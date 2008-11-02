@@ -1,0 +1,169 @@
+;;;;;
+; REQUIRED Sections: Api, Database, Paths, Logging.
+; All other sections maybe optional if not pulling anything from that part of API.
+;;;;;
+
+;;;;;
+; REQUIRED variables have to be set in a default section if there is one or set
+; in all the overriding sections if not set in default.
+; I.E. 'database' is required in Database-xxx sections so it must be set in the
+; Database section or that Database-xxx or both.
+; If it's not set for any Database-xxx section after reading from the default
+; and Database-xxx sections an error will be triggered.
+;;;;;
+
+; EVE API settings. (required)
+[Api]
+; Base part of URL. (required)
+; This could be pointed at a proxy server.
+url_base="http://api.eve-online.com"
+; File suffix for APIs. (required)
+file_suffix=".xml.aspx"
+
+; Default section for database settings. (required)
+[Database]
+; Any of these settings can be overridden in any of the per Database-xxx
+; sections below.
+
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+active=TRUE
+
+; Database name used in MDB2 DSN. (required)
+database="Yapeal"
+
+; Driver part of MDB2 DSN. (required)
+driver="mysqli://"
+
+; Host name used in MDB2 DSN. (required)
+host="localhost"
+
+; User/password with only select access. (required)
+; The :password part is optional by highly recommended.
+reader="reader:1234"
+
+; User/password with write access. (required)
+; Needs minimum of select, insert, and update access.
+; The :password part is optional by highly recommended.
+writer="writer:5678"
+
+; Main database where Yapeal stores character API data. (required for chars)
+[Database-char]
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+active=FALSE
+
+; Database name used in MDB2 DSN
+database="Yapeal_char"
+
+; User/password with only select access.
+;reader="reader:1234"
+
+; User/password with select, insert, and update access.
+; May also need create and drop table access to this DB.
+;writer=writer:5678"
+
+; Main database where Yapeal stores corporation API data. (required for corps)
+[Database-corp]
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+active=TRUE
+
+; Database name used in MDB2 DSN
+database="Yapeal_corp"
+
+; User/password with only select access.
+; Also needs select access to CCP DB.
+;reader="reader:1234"
+
+; User/password with select, insert, and update access.
+; May also need create and drop table access to this DB.
+;writer="writer:5678"
+
+; Main database where Yepeal stores eve API data. (required for corps and chars)
+[Database-eve]
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+active=TRUE
+
+; Database name used in MDB2 DSN
+database="Yepeal_eve"
+
+; Reader is unused at this time.
+;reader="reader:password"
+
+; User/password with select, insert, and update access.
+;writer="writer:5678"
+
+; Database containing some housekeeper tables. (required)
+[Database-util]
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+; NEVER change this only here for compatablity with other sections.
+active=TRUE
+
+; Database name used in MDB2 DSN
+database="Yapeal_util"
+
+; User/password with select access.
+;reader="reader:password"
+
+; User/password with select, insert, and update access.
+;writer="writer:5678"
+
+; Logging settings (required)
+[Logging]
+; Error level log file name. (required)
+error_log=Yapeal_error.log
+
+; Logging levels which are enabled. (required)
+; Should be set like error_reporting() but ONLY use E_USER_* values
+level=E_USER_ERROR|E_USER_WARNING|E_USER_NOTICE
+
+; Notice level log file name. (required)
+notice_log=Yapeal_notice.log
+
+; Whether to use exceptions for errors. (required)
+; Turning this off may break Yapeal.
+; (Deprecated) Plan to move over to exception only system in future.
+use_exception=TRUE
+
+; Warning level log file name. (required)
+warning_log=Yapeal_warning.log
+
+; Path settings used by Yapeal (required)
+[Paths]
+; File system path to base of Yapeal directory. (required)
+; Should be relative to common_backend.inc's path.
+base_dir="../"
+
+; File system path to non-webpage (backend) files directory. (required)
+; Should be relative to common_backend.inc's path.
+backend_dir="../backend/"
+
+; File system path to cache directory. (required)
+; Should be relative to common_backend.inc's path.
+; Must be writable.
+cache_dir="../cache/"
+
+; File system path to class directory. (required)
+; Should be relative to common_backend.inc's path.
+class_dir="../class/"
+
+; File system path to config directory. (required)
+; Should be relative to common_backend.inc's path.
+config_dir="../config/"
+
+; INC directory path. (required)
+; Should be relative to common_backend.inc's path.
+; DEBUGGING ONLY This should never be change in production.
+inc_dir="./"
+
+; File system path to logging directory. (required)
+; Must be writable.
+; Should be relative to common_backend.inc's path.
+log_dir="../log/"
+
+; Used to add extra local path to PEAR.
+; Needed in some hosted sites configurations.
+pear_dir=""

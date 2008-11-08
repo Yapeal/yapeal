@@ -226,7 +226,7 @@ CREATE TABLE marketorders (
     minvolume BIGINT UNSIGNED NOT NULL,
     orderstate TINYINT UNSIGNED NOT NULL,
     typeid BIGINT UNSIGNED NOT NULL,
-    range SMALLINT NOT NULL,
+    `range` SMALLINT NOT NULL,
     accountkey SMALLINT UNSIGNED NOT NULL,
     duration SMALLINT UNSIGNED NOT NULL,
     escrow DECIMAL(17,2) NOT NULL,

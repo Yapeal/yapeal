@@ -49,17 +49,22 @@ class CurlRequest
    * Init curl session in constructor.
    *
    * $params=array(
-   *               'method' => '',
-   *               'timeout' => 0,
-   *               'url' => '',
-   *               ['cookie' => '',]
-   *               ['header' => '',]
-   *               ['host' => '',]
-   *               ['login' => '',]
-   *               ['password' => '',]
-   *               ['post_fields' => '',]
-   *               ['referer' => '']
-   *               );
+   *   'method' => '',
+   *   'timeout' => 0,
+   *   'url' => '',
+   *   ['content' => '',]
+   *   ['cookie' => '',]
+   *   ['header' => '',]
+   *   ['host' => '',]
+   *   ['login' => '',]
+   *   ['password' => '',]
+   *   ['referer' => '',]
+   *   ['user_agent' => '']
+   * );
+   *
+   * @param array $params An array of params that are used to set curl options
+   *
+   * @return void
    */
   public function __construct($params) {
     $this->ch=curl_init();
@@ -75,7 +80,11 @@ class CurlRequest
       CURLOPT_SSL_VERIFYHOST=>FALSE,CURLOPT_SSL_VERIFYPEER=>FALSE,
       CURLOPT_VERBOSE=>TRUE
     );
-    $options[CURLOPT_USERAGENT]=$user_agent;
+    if (isset($params['user_agent'])&&$params['user_agent']) {
+      $options[CURLOPT_USERAGENT]=$params['user_agent'];
+    } else {
+      $options[CURLOPT_USERAGENT]=$user_agent;
+    };
     // Set unchanging curl options as a block.
     curl_setopt_array($this->ch,$options);
     // Add optional user params to preset header.
@@ -103,7 +112,7 @@ class CurlRequest
         break;
       case 'POST':
         @curl_setopt($this->ch,CURLOPT_POST,TRUE);
-        @curl_setopt($this->ch,CURLOPT_POSTFIELDS,$params['post_fields']);
+        @curl_setopt($this->ch,CURLOPT_POSTFIELDS,$params['content']);
         break;
       case 'GET':
         break;

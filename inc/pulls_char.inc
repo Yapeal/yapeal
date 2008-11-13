@@ -108,7 +108,7 @@ try {
     $dbTable='skills';
     // Set the field types of query by name.
     $types=array('ownerid'=>'I','level'=>'I',
-      'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
+      'skillpoints'=>'I','typeid'=>'I','unpublished'=>'I');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerid'=>$ownerid,'unpublished'=>0);

@@ -111,7 +111,7 @@ try {
       'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
-      $extras=array('ownerid'=>$ownerid,'unpublished'=>FALSE);
+      $extras=array('ownerid'=>$ownerid,'unpublished'=>0);
       $dbTable=mb_strtolower($dbTable);
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
     };// if $datum>0
@@ -119,8 +119,8 @@ try {
   };// if $xml instanceof SimpleXMLElement
 }
 catch (EVE_API_File_Exception $e) {
-  // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-  $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
+  // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+  $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
   $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
   upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
 }

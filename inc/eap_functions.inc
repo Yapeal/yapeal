@@ -247,6 +247,7 @@ function multipleUpsertAttributes(
       };
       $data[]=$row;
     };// foreach $datum
+    elog($data,YAPEAL_WARNING_LOG);
     multipleUpsert($data,$types,$table,$dsn);
   };// if $datum>0
 }

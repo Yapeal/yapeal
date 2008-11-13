@@ -164,7 +164,7 @@ CREATE TABLE skills (
     typeid BIGINT UNSIGNED NOT NULL,
     level SMALLINT UNSIGNED NOT NULL,
     skillpoints BIGINT UNSIGNED NOT NULL,
-    unpublished BOOL NOT NULL DEFAULT FALSE,
+    unpublished BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT PK_skills PRIMARY KEY (ownerid, typeid)
 )
 engine=InnoDB

@@ -70,7 +70,7 @@ EXCEPTION:
      Line: {$e->getLine()}
 Backtrace:
 {$e->getTraceAsString()}
-\t--- END TRACE ---PHP_EOL
+\t--- END TRACE ---
 MESS;
     elog($message,$this->_filename);
   }

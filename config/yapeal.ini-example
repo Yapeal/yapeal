@@ -42,6 +42,9 @@ host="localhost"
 ; The :password part is optional by highly recommended.
 reader="reader:1234"
 
+; Extra stuff sometimes needed on some databases (required)
+suffix="?new"
+
 ; User/password with write access. (required)
 ; Needs minimum of select, insert, and update access.
 ; The :password part is optional by highly recommended.
@@ -87,7 +90,7 @@ database="Yapeal_corp"
 active=TRUE
 
 ; Database name used in MDB2 DSN
-database="Yepeal_eve"
+database="Yapeal_eve"
 
 ; Reader is unused at this time.
 ;reader="reader:password"
@@ -133,6 +136,10 @@ warning_log=Yapeal_warning.log
 
 ; Path settings used by Yapeal (required)
 [Paths]
+; File system path to ADOdb directory. (required)
+; Should be relative to common_backend.inc's path.
+adodb_dir="../ADOdb/"
+
 ; File system path to base of Yapeal directory. (required)
 ; Should be relative to common_backend.inc's path.
 base_dir="../"

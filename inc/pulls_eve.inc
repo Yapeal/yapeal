@@ -45,8 +45,6 @@ require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once 'MDB2.php';
-require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_INC.'eap_functions.inc';
@@ -60,26 +58,26 @@ $con=connect(DSN_EVE_WRITER);
 $apis=array(
   'AllianceList'=>array(
     'types'=>array(
-      'allianceid'=>'integer','executorcorpid'=>'integer',
-      'membercount'=>'integer','name'=>'text','shortname'=>'text',
-      'startdate'=>'timestamp'
+      'allianceid'=>'I','executorcorpid'=>'I',
+      'membercount'=>'I','name'=>'C','shortname'=>'C',
+      'startdate'=>'T'
     ),
     'xpath'=>'//result/rowset/row'
   ),
   'ConquerableStationList'=>array(
     'types'=>array(
-      'corporationid'=>'integer','corporationname'=>'text',
-      'solarsystemid'=>'integer','stationid'=>'integer','stationname'=>'text',
-      'stationtypeid'=>'integer'
+      'corporationid'=>'I','corporationname'=>'C',
+      'solarsystemid'=>'I','stationid'=>'I','stationname'=>'C',
+      'stationtypeid'=>'I'
       ),
     'xpath'=>'//result/rowset/row'
   ),
   'ErrorList'=>array(
-    'types'=>array('errorcode'=>'integer','errortext'=>'text'),
+    'types'=>array('errorcode'=>'I','errortext'=>'C'),
     'xpath'=>'//result/rowset/row'
   ),
   'RefTypes'=>array(
-    'types'=>array('reftypeid'=>'integer','reftypename'=>'text'),
+    'types'=>array('reftypeid'=>'I','reftypename'=>'C'),
     'xpath'=>'//result/rowset/row'
   )
 );
@@ -97,7 +95,7 @@ foreach ($apis as $api=>$settings) {
         // Empty out old data then upsert (insert) new
         $sql='truncate table '.mb_strtolower($api);
         print_on_command('Before trucate');
-        $con->exec($sql);
+        $con->Execute($sql);
         print_on_command('After trucate');
         multipleUpsertAttributes($datum,$settings['types'],mb_strtolower($api),DSN_EVE_WRITER);
       };// if count $datum ...

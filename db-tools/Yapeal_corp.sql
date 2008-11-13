@@ -473,3 +473,4 @@ CREATE INDEX IDX_FK_corporationsheet_wallettransactions ON wallettransactions (o
 CREATE INDEX IDX_wallettransactions_2 ON wallettransactions (account);
 
 CREATE INDEX IDX_wallettransactions_3 ON wallettransactions (typeid);
+

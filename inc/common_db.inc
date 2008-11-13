@@ -30,12 +30,23 @@ if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 
+/* **************************************************************************
+ * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+ * **************************************************************************/
+
 /**
  * Find path for includes
  */
 // Assumes this file is in same directory as common_backend.inc
 require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc';
-require_once 'MDB2.php';
+
+/* **************************************************************************
+ * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
+ * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
+ * **************************************************************************/
+
+require_once YAPEAL_ADODB.'adodb-exceptions.inc.php';
+require_once YAPEAL_ADODB.'adodb.inc.php';
 
 /**
  * Function used to connect to a DB.
@@ -46,11 +57,11 @@ require_once 'MDB2.php';
  * @throws PEAR_Exception for any errors.
  */
 function connect($dsn) {
-  $con=MDB2::singleton($dsn);
-  $con->setFetchMode(MDB2_FETCHMODE_ASSOC);
-  $con->loadModule('Extended');
-  $con->setCharSet(array('utf8','utf8_general_ci'));
-  $con->query("set character set 'utf8'");
+  print $dsn."\n";
+  $con=&NewADOConnection($dsn);
+  $con->debug=TRUE;
+  $con->SetFetchMode(ADODB_FETCH_ASSOC);
+  $con->Execute('set names utf8');
   return $con;
 };
 
@@ -66,8 +77,8 @@ function connect($dsn) {
 function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
   $sql='select stationid from corporationsheet';
-  $sql.=' where corporationid='.$con->quote($corp,'integer');
-  $result=$con->queryOne($sql,'integer');
+  $sql.=' where corporationid=?';
+  $result=$con->GetOne($sql,array($corp));
   return $result;
 };
 
@@ -84,9 +95,8 @@ function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
 function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
   $sql='select description from walletdivisions';
-  $sql.=' where accountkey='.$con->quote($accountkey,'integer');
-  $sql.=' and corporationid='.$con->quote($corp,'integer');
-  $result=$con->queryOne($sql,'text');
+  $sql.=' where accountkey=? and corporationid=?';
+  $result=$con->GetOne($sql,array($accountkey,$corp));
   return $result;
 };
 
@@ -102,10 +112,9 @@ function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  */
 function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
-  $sql="select accountkey,description accountname from walletdivisions ";
-  $sql.=' where corporationid='.$con->quote($corp,'integer');
-  $otypes=array('integer','text');
-  $result=$con->queryAll($sql,$otypes);
+  $sql='select accountkey,description accountname from walletdivisions';
+  $sql.=' where corporationid=?';
+  $result=$con->GetAll($sql,array($corp));
   return $result;
 };
 
@@ -122,9 +131,8 @@ function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
 function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
   $sql='select description from divisions';
-  $sql.=' where accountkey='.$con->quote($accountkey,'integer');
-  $sql.=' and corporationid='.$con->quote($corp,'integer');
-  $result=$con->queryOne($sql,'text');
+  $sql.=' where accountkey=? and corporationid=?';
+  $result=$con->GetOne($sql,array($accountkey,$corp));
   return $result;
 };
 
@@ -141,14 +149,9 @@ function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
 function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
   $sql='select accountkey,description accountname from divisions';
-  $sql.=' where corporationid='.$con->quote($corp,'integer');
-  $otypes=array('integer','text');
-  $result=$con->queryAll($sql,$otypes);
-  $divs=array();
-  foreach ($result as $k=>$v) {
-    $divs[$v['accountkey']]=$v['accountname'];
-  };// foreach
-  return $divs;
+  $sql.=' where corporationid=?';
+  $result=$con->GetAssoc($sql,array($corp));
+  return $result;
 };
 
 /**
@@ -165,14 +168,13 @@ function get_cacheduntil($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRIT
   try {
     $con=connect($dsn);
     $sql='select cacheduntil from '.$table;
-    $sql.=' where tablename='.$con->quote($tname,'text');
-    $sql.=' and ownerid='.$con->quote($owner,'integer');
-    $until=$con->queryOne($sql,'timestamp');
+    $sql.=' where tablename=? and ownerid=?';
+    $until=$con->GetOne($sql,array($tname,$owner));
     if (!strtotime($until)) {
       return '1970-01-01 00:00:01';// One second after epox
     };
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     return '1970-01-01 00:00:01';// One second after epox
   };
   return $until;
@@ -194,14 +196,13 @@ function get_expires($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) 
     $con=connect($dsn);
     $sql='select date_format(cacheduntil,"%a, %d %b %Y %T +0000") cacheduntil';
     $sql.=' from '.$table;
-    $sql.=' where tablename='.$con->quote($tname,'text');
-    $sql.=' and ownerid='.$con->quote($owner,'integer');
-    $until=$con->queryOne($sql,'text');
+    $sql.=' where tablename=? and ownerid=?';
+    $until=$con->GetOne($sql,array($tname,$owner));
     if (!strtotime($until)) {
       return gmdate("r",1);// One second after epox
     };
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     return gmdate("r",1);// One second after epox
   };
   return $until;
@@ -236,7 +237,7 @@ function upsert(array $data,array $types,$table,$dsn) {
   if (empty($data)||empty($types)) {return FALSE;};
   $con=connect($dsn);
   $upsert=makeMultiUpsert(array($data),$types,$table,$dsn);
-  $effected=$con->exec($upsert);
+  $effected=$con->Execute($upsert);
   return $effected;
 }// function upsert ...
 
@@ -278,24 +279,26 @@ function multipleUpsert(array $data,array $types,$table,$dsn) {
   $con=connect($dsn);
   $upsert=makeMultiUpsert($data,$types,$table,$dsn);
   // Use a transaction for larger upserts to make them faster when we can.
-  if (count($data)>10&&$con->supports('transactions')) {
+  if (count($data)>10) {
     try {
-      $con->beginTransaction();
-      $effected=$con->exec($upsert);
-      $con->commit();
-      return $effected;
+      $con->BeginTrans();
+      $ok=$con->Execute($upsert);
+      if (!$ok) {
+        $con->RollbackTrans();
+      } else {
+        $con->CommitTrans();
+      };
+      return $ok;
     }
-    catch (PEAR_Exception $e) {
+    catch (ADODB_Exception $e) {
       // Rollback transaction here then we'll re-try without transaction and
       // throw another exception if there's still a problem with upsert for
       // the caller to catch.
-      if ($con->inTransaction()) {
-        $con->rollback();
-      };
+      $con->RollbackTrans();
     }
   };// if count $data > 10&&...
   elog($upsert,YAPEAL_NOTICE_LOG);
-  return $con->exec($upsert);
+  return $con->Execute($upsert);
 }// function multipleUpsert ...
 
 /**
@@ -314,6 +317,7 @@ function multipleUpsert(array $data,array $types,$table,$dsn) {
 function makeMultiUpsert(array $data,array $params,$table,$dsn) {
   // Need this so we can do quoting.
   $con=connect($dsn);
+  $needsQuote=array('C','X','D','T');
   // Build query sections
   $insert='insert into '.$table.' ('.implode(',',array_keys($params)).')';
   $values=' values';
@@ -321,7 +325,11 @@ function makeMultiUpsert(array $data,array $params,$table,$dsn) {
   foreach ($data as $row) {
     $set=array();
     foreach ($params as $k=>$v) {
-      $set[]=$con->quote($row[$k],$params[$k]);
+      if (in_array($v,$needsQuote)) {
+        $set[]=$con->qstr($row[$k]);
+      } else {
+        $set[]=$row[$k];
+      };
     };
     $sets[]='('.implode(',',$set).')';
   };

@@ -80,16 +80,17 @@ if (!(isset($iniVars['Api'])&&isset($iniVars['Database'])&&
 $req1='Required variable ';
 $req2=' in '.YAPEAL_INI_FILE." file isn't defined";
 $nonexist='None existent path defined for ';
-
+$ds=DIRECTORY_SEPARATOR;
 /* **************************************************************************
  * Paths
  * **************************************************************************/
 // Make sure required setting vars aren't already set
-unset($base_dir,$backend_dir,$cache_dir,$class_dir,$config_dir,$inc_dir,$log_dir);
+unset($adodb_dir,$base_dir,$backend_dir,$cache_dir,$class_dir,$config_dir,$inc_dir,$log_dir);
 // Pull out Paths settings
 extract($iniVars['Paths']);
 
 // Throw error if a required setting is missing.
+isset($adodb_dir)||trigger_error($req1.'adodb_dir'.$req2,E_USER_ERROR);
 isset($base_dir)||trigger_error($req1.'base_dir'.$req2,E_USER_ERROR);
 isset($backend_dir)||trigger_error($req1.'backend_dir'.$req2,E_USER_ERROR);
 isset($cache_dir)||trigger_error($req1.'cache_dir'.$req2,E_USER_ERROR);
@@ -99,46 +100,45 @@ isset($inc_dir)||trigger_error($req1.'inc_dir'.$req2,E_USER_ERROR);
 isset($log_dir)||trigger_error($req1.'log_dir'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
-if (realpath($dir.DIRECTORY_SEPARATOR.$base_dir)) {
-  define('YAPEAL_BASE',
-    realpath($dir.DIRECTORY_SEPARATOR.$base_dir).DIRECTORY_SEPARATOR);
+if (realpath($dir.$ds.$adodb_dir)) {
+  define('YAPEAL_ADODB',realpath($dir.$ds.$adodb_dir).$ds);
+} else {
+  trigger_error($nonexist.'adodb_dir',E_USER_ERROR);
+};
+if (realpath($dir.$ds.$base_dir)) {
+  define('YAPEAL_BASE',realpath($dir.$ds.$base_dir).$ds);
 } else {
   trigger_error($nonexist.'base_dir',E_USER_ERROR);
 };
-if (realpath($dir.DIRECTORY_SEPARATOR.$backend_dir)) {
-  define('YAPEAL_BACKEND',
-    realpath($dir.DIRECTORY_SEPARATOR.$backend_dir).DIRECTORY_SEPARATOR);
+if (realpath($dir.$ds.$backend_dir)) {
+  define('YAPEAL_BACKEND',realpath($dir.$ds.$backend_dir).$ds);
 } else {
   trigger_error($nonexist.'backend_dir',E_USER_ERROR);
 };
-if (realpath($dir.DIRECTORY_SEPARATOR.$cache_dir)) {
-  $realpath=realpath($dir.DIRECTORY_SEPARATOR.$cache_dir);
+if (realpath($dir.$ds.$cache_dir)) {
+  $realpath=realpath($dir.$ds.$cache_dir);
   if (is_writable($realpath)) {
-    define('YAPEAL_CACHE',
-      realpath($dir.DIRECTORY_SEPARATOR.$cache_dir).DIRECTORY_SEPARATOR);
+    define('YAPEAL_CACHE',realpath($dir.$ds.$cache_dir).$ds);
   } else {
     trigger_error($realpath.' is not writeable',E_USER_ERROR);
   };
 } else {
   trigger_error($nonexist.'cache_dir',E_USER_ERROR);
 };
-if (realpath($dir.DIRECTORY_SEPARATOR.$class_dir)) {
-  define('YAPEAL_CLASS',
-    realpath($dir.DIRECTORY_SEPARATOR.$class_dir).DIRECTORY_SEPARATOR);
+if (realpath($dir.$ds.$class_dir)) {
+  define('YAPEAL_CLASS',realpath($dir.$ds.$class_dir).$ds);
 } else {
   trigger_error($nonexist.'class_dir',E_USER_ERROR);
 };
-if (realpath($dir.DIRECTORY_SEPARATOR.$inc_dir)) {
-  define('YAPEAL_INC',
-    realpath($dir.DIRECTORY_SEPARATOR.$inc_dir).DIRECTORY_SEPARATOR);
+if (realpath($dir.$ds.$inc_dir)) {
+  define('YAPEAL_INC',realpath($dir.$ds.$inc_dir).$ds);
 } else {
   trigger_error($nonexist.'inc_dir',E_USER_ERROR);
 };
-if (realpath($dir.DIRECTORY_SEPARATOR.$log_dir)) {
-  $realpath=realpath($dir.DIRECTORY_SEPARATOR.$log_dir);
+if (realpath($dir.$ds.$log_dir)) {
+  $realpath=realpath($dir.$ds.$log_dir);
   if (is_writable($realpath)) {
-    define('YAPEAL_LOG',
-      realpath($dir.DIRECTORY_SEPARATOR.$log_dir).DIRECTORY_SEPARATOR);
+    define('YAPEAL_LOG',realpath($dir.$ds.$log_dir).$ds);
   } else {
     trigger_error($realpath.' is not writeable',E_USER_ERROR);
   };
@@ -229,7 +229,7 @@ define('YAPEAL_API_ACCOUNT',4);
 $dbs=array('char','corp','eve','util');
 foreach ($dbs as $db) {
   // Make sure required setting vars aren't already set
-  unset($active,$database,$driver,$host,$reader,$writer);
+  unset($active,$database,$driver,$host,$reader,$suffix,$writer);
   // Pull out default database settings
   extract($iniVars['Database']);
   // Overwrite defaults with ones given in Database-xx section
@@ -244,14 +244,15 @@ foreach ($dbs as $db) {
     isset($driver)||trigger_error($req1.'driver'.$req2,E_USER_ERROR);
     isset($host)||trigger_error($req1.'host'.$req2,E_USER_ERROR);
     isset($reader)||trigger_error($req1.'reader'.$req2,E_USER_ERROR);
+    isset($suffix)||trigger_error($req1.'suffix'.$req2,E_USER_ERROR);
     isset($writer)||trigger_error($req1.'writer'.$req2,E_USER_ERROR);
 
     // Mark as active.
     define('YAPEAL_'.$db.'_ACTIVE',TRUE);
     // Define some constants from vars.
     define('DB_'.$db,$database);
-    define('DSN_'.$db,$driver.$reader.'@'.$host.'/'.$database);
-    define('DSN_'.$db.'_WRITER',$driver.$writer.'@'.$host.'/'.$database);
+    define('DSN_'.$db,$driver.$reader.'@'.$host.'/'.$database.$suffix);
+    define('DSN_'.$db.'_WRITER',$driver.$writer.'@'.$host.'/'.$database.$suffix);
   } else {
     // Mark as inactive.
     define('YAPEAL_'.$db.'_ACTIVE',FALSE);

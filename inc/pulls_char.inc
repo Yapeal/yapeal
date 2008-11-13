@@ -45,7 +45,6 @@ require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once 'MDB2.php';
 require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
@@ -60,17 +59,17 @@ $con=connect(DSN_CHAR_WRITER);
 /* Character Sheet */
 
 $api='CharacterSheet';
-$cachetypes=array('tablename'=>'text','ownerid'=>'integer',
-  'cacheduntil'=>'timestamp');
+$cachetypes=array('tablename'=>'C','ownerid'=>'I',
+  'cacheduntil'=>'T');
 $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid);
 // Set the field types of query by name.
 $types=array(
-  'balance'=>'decimal','bloodline'=>'text','characterid'=>'integer',
-  'corporationid'=>'integer','corporationname'=>'text','gender'=>'text',
-  'name'=>'text','race'=>'text');
+  'balance'=>'N','bloodline'=>'C','characterid'=>'I',
+  'corporationid'=>'I','corporationname'=>'C','gender'=>'C',
+  'name'=>'C','race'=>'C');
 // Add attributes
-$types.=array('charisma'=>'integer','intelligence'=>'integer',
-  'memory'=>'integer','perception'=>'integer','willpower'=>'integer');
+$types.=array('charisma'=>'I','intelligence'=>'I',
+  'memory'=>'I','perception'=>'I','willpower'=>'I');
 try {
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
@@ -101,15 +100,15 @@ try {
         $data[mb_strtolower($k)]=(int)$v;
       };
     };// if $datum>0
-    if (!empty($data)) {
+    if (!count($data)) {
       upsert($data,$types,mb_strtolower($api),DSN_CHAR_WRITER);
     };
 
     /* Skills */
     $dbTable='skills';
     // Set the field types of query by name.
-    $types=array('ownerid'=>'integer','level'=>'integer',
-      'skillpoints'=>'integer','typeid'=>'integer','unpublished'=>'boolean');
+    $types=array('ownerid'=>'I','level'=>'I',
+      'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerid'=>$ownerid,'unpublished'=>FALSE);
@@ -134,41 +133,41 @@ catch (PEAR_Exception $e) {
 
 $apis=array(
   'AccountBalance'=>array(
-    'types'=>array('accountid'=>'integer','accountkey'=>'integer',
-      'balance'=>'decimal','ownerid'=>'integer'),
+    'types'=>array('accountid'=>'I','accountkey'=>'I',
+      'balance'=>'N','ownerid'=>'I'),
     'xpath'=>'//result/rowset/row'
   ),
   'IndustryJobs'=>array(
     'types'=>array(
-      'activityid'=>'integer','assemblylineid'=>'integer',
-      'beginproductiontime'=>'timestamp','charmaterialmultiplier'=>'decimal',
-      'chartimemultiplier'=>'decimal','completed'=>'integer',
-      'completedstatus'=>'integer','completedsuccessfully'=>'integer',
-      'containerid'=>'integer','containerlocationid'=>'integer',
-      'containertypeid'=>'integer','endproductiontime'=>'timestamp',
-      'installedinsolarsystemid'=>'integer','installeditemcopy'=>'integer',
-      'installeditemflag'=>'integer','installeditemid'=>'integer',
-      'installeditemlicensedproductionrunsremaining'=>'integer',
-      'installeditemlocationid'=>'integer',
-      'installeditemmateriallevel'=>'integer',
-      'installeditemproductivitylevel'=>'integer',
-      'installeditemquantity'=>'integer','installeditemtypeid'=>'integer',
-      'installerid'=>'integer','installtime'=>'timestamp','jobid'=>'integer',
-      'licensedproductionruns'=>'integer','materialmultiplier'=>'decimal',
-      'outputflag'=>'integer','outputlocationid'=>'integer',
-      'outputtypeid'=>'integer','ownerid'=>'integer',
-      'pauseproductiontime'=>'timestamp','runs'=>'integer',
-      'timemultiplier'=>'decimal'),
+      'activityid'=>'I','assemblylineid'=>'I',
+      'beginproductiontime'=>'T','charmaterialmultiplier'=>'N',
+      'chartimemultiplier'=>'N','completed'=>'I',
+      'completedstatus'=>'I','completedsuccessfully'=>'I',
+      'containerid'=>'I','containerlocationid'=>'I',
+      'containertypeid'=>'I','endproductiontime'=>'T',
+      'installedinsolarsystemid'=>'I','installeditemcopy'=>'I',
+      'installeditemflag'=>'I','installeditemid'=>'I',
+      'installeditemlicensedproductionrunsremaining'=>'I',
+      'installeditemlocationid'=>'I',
+      'installeditemmateriallevel'=>'I',
+      'installeditemproductivitylevel'=>'I',
+      'installeditemquantity'=>'I','installeditemtypeid'=>'I',
+      'installerid'=>'I','installtime'=>'T','jobid'=>'I',
+      'licensedproductionruns'=>'I','materialmultiplier'=>'N',
+      'outputflag'=>'I','outputlocationid'=>'I',
+      'outputtypeid'=>'I','ownerid'=>'I',
+      'pauseproductiontime'=>'T','runs'=>'I',
+      'timemultiplier'=>'N'),
     'xpath'=>'//result/rowset/row'
   ),
   'MarketOrders'=>array(
     'types'=>array(
-      'accountkey'=>'integer','bid'=>'integer','charid'=>'integer',
-      'duration'=>'integer','escrow'=>'decimal','issued'=>'timestamp',
-      'minvolume'=>'integer','orderid'=>'integer','orderstate'=>'integer',
-      'ownerid'=>'integer','price'=>'decimal','range'=>'integer',
-      'stationid'=>'integer','typeid'=>'integer','volentered'=>'integer',
-      'volremaining'=>'integer'),
+      'accountkey'=>'I','bid'=>'I','charid'=>'I',
+      'duration'=>'I','escrow'=>'N','issued'=>'T',
+      'minvolume'=>'I','orderid'=>'I','orderstate'=>'I',
+      'ownerid'=>'I','price'=>'N','range'=>'I',
+      'stationid'=>'I','typeid'=>'I','volentered'=>'I',
+      'volremaining'=>'I'),
     'xpath'=>'//result/rowset/row'
   )
 );
@@ -223,11 +222,11 @@ $apis=array(
   'WalletJournal'=>array(
     'beforeid'=>'beforeRefID',
     'types'=>array(
-      'account'=>'integer','amount'=>'decimal','argid1'=>'integer',
-      'argname1'=>'text','balance'=>'decimal','date'=>'timestamp',
-      'ownerid'=>'integer','ownerid1'=>'integer','ownerid2'=>'integer',
-      'ownername1'=>'text','ownername2'=>'text','reason'=>'text',
-      'refid'=>'integer','reftypeid'=>'integer'),
+      'account'=>'I','amount'=>'N','argid1'=>'I',
+      'argname1'=>'C','balance'=>'N','date'=>'T',
+      'ownerid'=>'I','ownerid1'=>'I','ownerid2'=>'I',
+      'ownername1'=>'C','ownername2'=>'C','reason'=>'C',
+      'refid'=>'I','reftypeid'=>'I'),
     'walkdt'=>'date',
     'walkid'=>'refID',
     'xpath'=>'//result/rowset/row'
@@ -235,12 +234,12 @@ $apis=array(
   'WalletTransactions'=>array(
     'beforeid'=>'beforeTransID',
     'types'=>array(
-      'account'=>'integer','clientid'=>'integer','clientname'=>'text',
-      'ownerid'=>'integer','price'=>'decimal','quantity'=>'integer',
-      'stationid'=>'integer','stationname'=>'text',
-      'transactiondatetime'=>'timestamp','transactionfor'=>'text',
-      'transactionid'=>'integer','transactiontype'=>'text',
-      'typeid'=>'integer','typename'=>'text'),
+      'account'=>'I','clientid'=>'I','clientname'=>'C',
+      'ownerid'=>'I','price'=>'N','quantity'=>'I',
+      'stationid'=>'I','stationname'=>'C',
+      'transactiondatetime'=>'T','transactionfor'=>'C',
+      'transactionid'=>'I','transactiontype'=>'C',
+      'typeid'=>'I','typename'=>'C'),
     'walkdt'=>'transactionDateTime',
     'walkid'=>'transactionID',
     'xpath'=>'//result/rowset/row'
@@ -349,7 +348,7 @@ $params=array(
   'ownerid'=>'characterid','quantity'=>'quantity','rgt'=>'r',
   'rootid'=>'rootid','singleton'=>'singleton','typeid'=>'typeid'
 );
-try {
+/*try {
   $nestedSet=& DB_NestedSet::factory('MDB2',DSN_CHAR_WRITER,$params);
   $nestedSet->setAttr(array('node_table'=>'assetlist',
     'lock_table'=>'nested_locks','secondarySort'=>'locationid')
@@ -411,5 +410,5 @@ catch (EVE_API_Exception $e) {
 }
 catch (PEAR_Exception $e) {
   // Do nothing use observers to log info
-}
+}*/
 ?>

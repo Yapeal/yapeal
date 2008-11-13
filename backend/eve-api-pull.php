@@ -28,8 +28,8 @@
  */
 
 // Track version of script.
-$scriptversion=str_replace(array('$','#'),'',
-  '$Revision: 20 $ $Date:: 2008-10-24 00:48:59 #$');
+define('YAPEAL_VERSION',str_replace(array('$','#'),'',
+  '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
 
 /* **************************************************************************
  * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
@@ -45,17 +45,17 @@ chdir($dir);
  */
 defined('YEPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
 if (YAPEAL_SCRIPT_MODE=='cli') {
-  require_once 'Console/Getopt.php';
-  $options=Console_Getopt::getopt($argv,'hVc:',array('help','version','config='));
-  foreach ($options[0] as $opt) {
-    switch ($opt[0]) {
+  //require_once 'Console/Getopt.php';
+  $options=getopt('hVc:');
+  foreach ($options as $opt=>$value) {
+    switch ($opt) {
       case 'c':
       case '--config':
-        if (realpath($opt[1])&&is_readable(realpath($opt[1]))) {
+        if (realpath($value)&&is_readable(realpath($value))) {
           /**
            * @ignore
            */
-          define('YAPEAL_INI_FILE',realpath($opt[1]));
+          define('YAPEAL_INI_FILE',realpath($value));
           break;
         } else {
           $mess=$opt[1].' does not exist or is not readable'.PHP_EOL;
@@ -67,7 +67,7 @@ if (YAPEAL_SCRIPT_MODE=='cli') {
         exit;
       case 'V':
       case '--version':
-        $mess=$argv[0].' '.$scriptversion.PHP_EOL;
+        $mess=$argv[0].' '.YAPEAL_VERSION.PHP_EOL;
         $mess.="Copyright (C) 2008, Michael Cummings".PHP_EOL;
         $mess.="This program comes with ABSOLUTELY NO WARRANTY.".PHP_EOL;
         $mess.='Licensed under the GNU LPGL 3.0 License.'.PHP_EOL;
@@ -90,8 +90,6 @@ require_once realpath($path);
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * **************************************************************************/
 
-require_once 'MDB2.php';
-require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_INC.'eap_functions.inc';
@@ -100,6 +98,7 @@ require_once YAPEAL_INC.'eap_functions.inc';
 
 function usage() {
   $progname=basename($GLOBALS['argv'][0]);
+  $scriptversion=YAPEAL_VERSION;
   $use=<<<USAGE_MESSAGE
 Usage: $progname [-h | -V | -c config.ini]
 Options:
@@ -109,11 +108,11 @@ Options:
 
 Version $scriptversion
 USAGE_MESSAGE;
-  fwrite(STDERR,$use);
+  fwrite(STDERR,$use.PHP_EOL);
 };
 
-$cachetypes=array('tablename'=>'text','ownerid'=>'integer',
-  'cacheduntil'=>'timestamp');
+$cachetypes=array('tablename'=>'C','ownerid'=>'I',
+  'cacheduntil'=>'T');
 try {
   $api='eve-api-pull';
   // Mutex to keep from having more than one pull going at once most the time.
@@ -157,7 +156,7 @@ try {
     $sql.=' where cp.is_active=true';
     $sql.=' and cp.characterid=chr.characterid';
     $sql.=' and chr.userid=u.userid';
-    $corpList=$con->queryAll($sql);
+    $corpList=$con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
     foreach ($corpList as $corp) {
@@ -188,7 +187,7 @@ try {
     $sql.=DB_UTIL.'.registereduser as u';
     $sql.=' where chr.is_active=true';
     $sql.=' and chr.userid=u.userid';
-    $charList=$con->queryAll($sql);
+    $charList=$con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
     foreach ($charList as $char) {

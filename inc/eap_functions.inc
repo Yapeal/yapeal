@@ -35,7 +35,6 @@ if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
  */
 // Assumes this file is in same directory as common_backend.inc
 require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc';
-require_once 'MDB2.php';
 require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';

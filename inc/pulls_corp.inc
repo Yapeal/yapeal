@@ -45,7 +45,6 @@ require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once 'MDB2.php';
 require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
@@ -60,16 +59,14 @@ $con=connect(DSN_CORP_WRITER);
 /* Corporation Sheet */
 
 $api='CorporationSheet';
-$cachetypes=array('tablename'=>'text','ownerid'=>'integer',
-  'cacheduntil'=>'timestamp');
 $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid);
 // Set the field types of query by name.
 $types=array(
-  'corporationid'=>'integer','corporationname'=>'text','ticker'=>'text',
-  'ceoid'=>'integer','ceoname'=>'text','stationid'=>'integer',
-  'stationname'=>'text','description'=>'text','url'=>'text',
-  'allianceid'=>'integer','alliancename'=>'text','taxrate'=>'decimal',
-  'membercount'=>'integer','memberlimit'=>'integer','shares'=>'integer'
+  'corporationid'=>'I','corporationname'=>'C','ticker'=>'C',
+  'ceoid'=>'I','ceoname'=>'C','stationid'=>'I',
+  'stationname'=>'C','description'=>'X','url'=>'C',
+  'allianceid'=>'I','alliancename'=>'X','taxrate'=>'N',
+  'membercount'=>'I','memberlimit'=>'I','shares'=>'I'
 );
 try {
   // Should we wait to get API data
@@ -83,6 +80,7 @@ try {
     // Main table first
     // Must be done first because of foreign key constraints in
     // other tables
+    print_on_command('Before clone');
     $datum=clone $xml->result[0]->children();
     // Get rid of child table stuff
     unset($datum->rowset,$datum->logo);
@@ -99,8 +97,8 @@ try {
     /* walletDivisions */
     $dbTable='walletDivisions';
     // Set the field types of query by name.
-    $types=array('accountkey'=>'integer','ownerid'=>'integer',
-      'description'=>'text');
+    $types=array('accountkey'=>'I','ownerid'=>'I',
+      'description'=>'C');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerid'=>$ownerid);
@@ -111,8 +109,8 @@ try {
     /* Divisions */
     $dbTable='divisions';
     // Set the field types of query by name.
-    $types=array('accountkey'=>'integer','ownerid'=>'integer',
-      'description'=>'text');
+    $types=array('accountkey'=>'I','ownerid'=>'I',
+      'description'=>'C');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerid'=>$ownerid);
@@ -123,9 +121,9 @@ try {
     /* corplogo */
     $dbTable='corplogo';
     // Set the field types of query by name.
-    $types=array('graphicid'=>'integer','ownerid'=>'integer',
-      'shape1'=>'integer','shape2'=>'integer','shape3'=>'integer',
-      'color1'=>'integer','color2'=>'integer','color3'=>'integer');
+    $types=array('graphicid'=>'I','ownerid'=>'I',
+      'shape1'=>'I','shape2'=>'I','shape3'=>'I',
+      'color1'=>'I','color2'=>'I','color3'=>'I');
     $datum=$xml->xpath('//result/logo');
     if (count($datum)>0) {
       $data=array('ownerid'=>$ownerid);
@@ -137,8 +135,8 @@ try {
   };// if $xml instanceof SimpleXMLElement
 }
 catch (EVE_API_File_Exception $e) {
-  // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-  $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
+  // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+  $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
   $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
   upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
 }
@@ -151,41 +149,41 @@ catch (PEAR_Exception $e) {
 
 $apis=array(
   'AccountBalance'=>array(
-    'types'=>array('accountid'=>'integer','accountkey'=>'integer',
-      'balance'=>'decimal','ownerid'=>'integer'),
+    'types'=>array('accountid'=>'I','accountkey'=>'I',
+      'balance'=>'N','ownerid'=>'I'),
     'xpath'=>'//result/rowset/row'
   ),
   'IndustryJobs'=>array(
     'types'=>array(
-      'activityid'=>'integer','assemblylineid'=>'integer',
-      'beginproductiontime'=>'timestamp','charmaterialmultiplier'=>'decimal',
-      'chartimemultiplier'=>'decimal','completed'=>'integer',
-      'completedstatus'=>'integer','completedsuccessfully'=>'integer',
-      'containerid'=>'integer','containerlocationid'=>'integer',
-      'containertypeid'=>'integer','endproductiontime'=>'timestamp',
-      'installedinsolarsystemid'=>'integer','installeditemcopy'=>'integer',
-      'installeditemflag'=>'integer','installeditemid'=>'integer',
-      'installeditemlicensedproductionrunsremaining'=>'integer',
-      'installeditemlocationid'=>'integer',
-      'installeditemmateriallevel'=>'integer',
-      'installeditemproductivitylevel'=>'integer',
-      'installeditemquantity'=>'integer','installeditemtypeid'=>'integer',
-      'installerid'=>'integer','installtime'=>'timestamp','jobid'=>'integer',
-      'licensedproductionruns'=>'integer','materialmultiplier'=>'decimal',
-      'outputflag'=>'integer','outputlocationid'=>'integer',
-      'outputtypeid'=>'integer','ownerid'=>'integer',
-      'pauseproductiontime'=>'timestamp','runs'=>'integer',
-      'timemultiplier'=>'decimal'),
+      'activityid'=>'I','assemblylineid'=>'I',
+      'beginproductiontime'=>'T','charmaterialmultiplier'=>'N',
+      'chartimemultiplier'=>'N','completed'=>'I',
+      'completedstatus'=>'I','completedsuccessfully'=>'I',
+      'containerid'=>'I','containerlocationid'=>'I',
+      'containertypeid'=>'I','endproductiontime'=>'T',
+      'installedinsolarsystemid'=>'T','installeditemcopy'=>'I',
+      'installeditemflag'=>'I','installeditemid'=>'I',
+      'installeditemlicensedproductionrunsremaining'=>'I',
+      'installeditemlocationid'=>'I',
+      'installeditemmateriallevel'=>'I',
+      'installeditemproductivitylevel'=>'I',
+      'installeditemquantity'=>'I','installeditemtypeid'=>'I',
+      'installerid'=>'I','installtime'=>'T','jobid'=>'I',
+      'licensedproductionruns'=>'I','materialmultiplier'=>'N',
+      'outputflag'=>'I','outputlocationid'=>'I',
+      'outputtypeid'=>'I','ownerid'=>'I',
+      'pauseproductiontime'=>'T','runs'=>'I',
+      'timemultiplier'=>'N'),
     'xpath'=>'//result/rowset/row'
   ),
   'MarketOrders'=>array(
     'types'=>array(
-      'accountkey'=>'integer','bid'=>'integer','charid'=>'integer',
-      'duration'=>'integer','escrow'=>'decimal','issued'=>'timestamp',
-      'minvolume'=>'integer','orderid'=>'integer','orderstate'=>'integer',
-      'ownerid'=>'integer','price'=>'decimal','range'=>'integer',
-      'stationid'=>'integer','typeid'=>'integer','volentered'=>'integer',
-      'volremaining'=>'integer'),
+      'accountkey'=>'I','bid'=>'I','charid'=>'I',
+      'duration'=>'I','escrow'=>'N','issued'=>'T',
+      'minvolume'=>'I','orderid'=>'I','orderstate'=>'I',
+      'ownerid'=>'I','price'=>'N','range'=>'I',
+      'stationid'=>'I','typeid'=>'I','volentered'=>'I',
+      'volremaining'=>'I'),
     'xpath'=>'//result/rowset/row'
   )
 );
@@ -239,20 +237,20 @@ foreach ($apis as $api=>$settings) {
 $apis=array(
   'MemberTracking'=>array(
     'types'=>array(
-      'base'=>'text','baseid'=>'integer','characterid'=>'integer',
-      'grantableroles'=>'text','location'=>'text','locationid'=>'integer',
-      'logoffdatetime'=>'timestamp','logondatetime'=>'timestamp',
-      'name'=>'text','ownerid'=>'integer','roles'=>'text','shiptype'=>'text',
-      'shiptypeid'=>'integer','startdatetime'=>'timestamp','title'=>'text'
+      'base'=>'C','baseid'=>'I','characterid'=>'I',
+      'grantableroles'=>'C','location'=>'C','locationid'=>'I',
+      'logoffdatetime'=>'T','logondatetime'=>'T',
+      'name'=>'C','ownerid'=>'I','roles'=>'C','shiptype'=>'C',
+      'shiptypeid'=>'I','startdatetime'=>'T','title'=>'C'
     ),
     'xpath'=>'//result/rowset/row',
     'check'=>'characterID'
   ),
   'StarbaseList'=>array(
     'types'=>array(
-      'itemid'=>'integer','locationid'=>'integer','moonid'=>'integer',
-      'onlinetimestamp'=>'timestamp','ownerid'=>'integer','state'=>'integer',
-      'statetimestamp'=>'timestamp','typeid'=>'integer'
+      'itemid'=>'I','locationid'=>'I','moonid'=>'I',
+      'onlinetimestamp'=>'T','ownerid'=>'I','state'=>'I',
+      'statetimestamp'=>'T','typeid'=>'I'
     ),
     'xpath'=>'//result/rowset/row',
     'check'=>'itemID'
@@ -273,7 +271,7 @@ foreach ($apis as $api=>$settings) {
         $sql='select '.mb_strtolower($settings['check']);
         $sql.=' from '.mb_strtolower($api);
         $sql.=' where ownerid='.$ownerid;
-        $result=$con->getAll($sql,'integer');
+        $result=$con->getAll($sql);
         $checking=array();
         // Change assoc array of records from DB into simple array
         foreach ($result as $k=>$v) {
@@ -295,7 +293,7 @@ foreach ($apis as $api=>$settings) {
             $sql='delete from '.mb_strtolower($api);
             $sql.=' where ownerid='.$ownerid;
             $sql.=' and '.mb_strtolower($settings['check']).'='.$v;
-            $con->exec($sql);
+            $con->Execute($sql);
           };// foreach $delete...
         };// if !empty $delete
         $extras=array('ownerid'=>$ownerid);
@@ -337,11 +335,11 @@ $apis=array(
   'WalletJournal'=>array(
     'beforeid'=>'beforeRefID',
     'types'=>array(
-      'account'=>'integer','amount'=>'decimal','argid1'=>'integer',
-      'argname1'=>'text','balance'=>'decimal','date'=>'timestamp',
-      'ownerid'=>'integer','ownerid1'=>'integer','ownerid2'=>'integer',
-      'ownername1'=>'text','ownername2'=>'text','reason'=>'text',
-      'refid'=>'integer','reftypeid'=>'integer'),
+      'account'=>'I','amount'=>'N','argid1'=>'I',
+      'argname1'=>'C','balance'=>'N','date'=>'T',
+      'ownerid'=>'I','ownerid1'=>'I','ownerid2'=>'I',
+      'ownername1'=>'C','ownername2'=>'C','reason'=>'X',
+      'refid'=>'I','reftypeid'=>'I'),
     'walkdt'=>'date',
     'walkid'=>'refID',
     'xpath'=>'//result/rowset/row'
@@ -349,12 +347,12 @@ $apis=array(
   'WalletTransactions'=>array(
     'beforeid'=>'beforeTransID',
     'types'=>array(
-      'account'=>'integer','clientid'=>'integer','clientname'=>'text',
-      'ownerid'=>'integer','price'=>'decimal','quantity'=>'integer',
-      'stationid'=>'integer','stationname'=>'text',
-      'transactiondatetime'=>'timestamp','transactionfor'=>'text',
-      'transactionid'=>'integer','transactiontype'=>'text',
-      'typeid'=>'integer','typename'=>'text'),
+      'account'=>'I','clientid'=>'I','clientname'=>'C',
+      'ownerid'=>'I','price'=>'N','quantity'=>'I',
+      'stationid'=>'I','stationname'=>'C',
+      'transactiondatetime'=>'T','transactionfor'=>'C',
+      'transactionid'=>'I','transactiontype'=>'C',
+      'typeid'=>'I','typename'=>'C'),
     'walkdt'=>'transactionDateTime',
     'walkid'=>'transactionID',
     'xpath'=>'//result/rowset/row'
@@ -457,7 +455,7 @@ try {
   $sql='select itemid from '.mb_strtolower($api);
   $sql.=' where moonid!=0';
   $sql.=' and ownerid='.$ownerid;
-  $datum=$con->queryAll($sql);
+  $datum=$con->GetAll($sql);
   $POSlist=array();
   if (count($datum)>0) {
     foreach ($datum as $k) {
@@ -478,13 +476,13 @@ if (!empty($POSlist)) {
     $postdata=array('userID'=>$userid,'apiKey'=>$apikey,
       'characterID'=>$charid,'itemID'=>$pos);
     $types=array(
-      'allowalliancemembers'=>'boolean','allowcorporationmembers'=>'boolean',
-      'claimsovereignty'=>'boolean','deployflags'=>'integer',
-      'itemid'=>'integer','onaggressionenabled'=>'boolean',
-      'oncorporationwarenabled'=>'boolean','onstandingdropenabled'=>'boolean',
-      'onstandingdropstanding'=>'decimal','onstatusdropenabled'=>'boolean',
-      'onstatusdropstanding'=>'decimal','ownerid'=>'integer',
-      'usageflags'=>'integer'
+      'allowalliancemembers'=>'L','allowcorporationmembers'=>'L',
+      'claimsovereignty'=>'L','deployflags'=>'I',
+      'itemid'=>'I','onaggressionenabled'=>'L',
+      'oncorporationwarenabled'=>'L','onstandingdropenabled'=>'L',
+      'onstandingdropstanding'=>'N','onstatusdropenabled'=>'L',
+      'onstatusdropstanding'=>'N','ownerid'=>'I',
+      'usageflags'=>'I'
     );
     try {
       // Should we wait to get API data
@@ -520,8 +518,8 @@ if (!empty($POSlist)) {
         /* Pos Fuel */
         $dbTable='fuel';
         // Set the field types of query by name.
-        $types=array('itemid'=>'integer','typeid'=>'integer',
-          'quantity'=>'integer');
+        $types=array('itemid'=>'I','typeid'=>'I',
+          'quantity'=>'I');
         $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
         if (count($datum)>0) {
           foreach ($datum as $record) {
@@ -567,7 +565,7 @@ $params=array(
   'id'=> 'id','rootid'=>'rootid',
   'lft'=>'l','rgt'=>'r','norder'=>'norder','lvl'=>'level'
 );
-try {
+/*try {
   $nestedSet=& DB_NestedSet::factory('MDB2',DSN_CORP_WRITER,$params);
   $nestedSet->setAttr(array('node_table'=>'assetlist',
     'lock_table'=>'nested_locks','secondarySort'=>'locationid')
@@ -629,5 +627,5 @@ catch (EVE_API_Exception $e) {
 }
 catch (PEAR_Exception $e) {
   // Do nothing use observers to log info
-}
+}*/
 ?>

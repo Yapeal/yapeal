@@ -63,11 +63,11 @@ character set utf8
 collate utf8_unicode_ci;
 
 CREATE TABLE accountbalance (
-    ownerrid BIGINT UNSIGNED NOT NULL,
+    ownerid BIGINT UNSIGNED NOT NULL,
     accountid BIGINT UNSIGNED NOT NULL,
     accountkey SMALLINT UNSIGNED NOT NULL,
     balance DECIMAL(17,2) NOT NULL,
-    CONSTRAINT PK_accountbalance PRIMARY KEY (ownerrid, accountid)
+    CONSTRAINT PK_accountbalance PRIMARY KEY (ownerid, accountid)
 )
 engine=InnoDB
 character set utf8
@@ -94,7 +94,7 @@ character set utf8
 collate utf8_unicode_ci;
 
 CREATE TABLE industryjobs (
-    ownerrid BIGINT UNSIGNED NOT NULL,
+    ownerid BIGINT UNSIGNED NOT NULL,
     jobid BIGINT UNSIGNED NOT NULL,
     assemblylineid BIGINT UNSIGNED NOT NULL,
     containerid BIGINT UNSIGNED NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE industryjobs (
     beginproductiontime DATETIME NOT NULL,
     endproductiontime DATETIME NOT NULL,
     pauseproductiontime DATETIME NOT NULL,
-    CONSTRAINT PK_industryjobs PRIMARY KEY (ownerrid, jobid),
+    CONSTRAINT PK_industryjobs PRIMARY KEY (ownerid, jobid),
     CONSTRAINT UC_industryjobs_1 UNIQUE (jobid, installtime)
 )
 engine=InnoDB
@@ -160,12 +160,12 @@ character set utf8
 collate utf8_unicode_ci;
 
 CREATE TABLE skills (
-    ownerrid BIGINT UNSIGNED NOT NULL,
+    ownerid BIGINT UNSIGNED NOT NULL,
     typeid BIGINT UNSIGNED NOT NULL,
     level SMALLINT UNSIGNED NOT NULL,
     skillpoints BIGINT UNSIGNED NOT NULL,
     unpublished BOOL NOT NULL DEFAULT FALSE,
-    CONSTRAINT PK_skills PRIMARY KEY (ownerrid, typeid)
+    CONSTRAINT PK_skills PRIMARY KEY (ownerid, typeid)
 )
 engine=InnoDB
 character set utf8
@@ -221,7 +221,7 @@ collate utf8_unicode_ci;
 /*============================================================================*/
 ALTER TABLE accountbalance
     ADD CONSTRAINT FK_accountbalance
-    FOREIGN KEY (ownerrid) REFERENCES charactersheet (characterid)
+    FOREIGN KEY (ownerid) REFERENCES charactersheet (characterid)
     ON DELETE CASCADE;
 
 ALTER TABLE assetlist
@@ -231,7 +231,7 @@ ALTER TABLE assetlist
 
 ALTER TABLE industryjobs
     ADD CONSTRAINT FK_industryjobs
-    FOREIGN KEY (ownerrid) REFERENCES charactersheet (characterid)
+    FOREIGN KEY (ownerid) REFERENCES charactersheet (characterid)
     ON DELETE CASCADE;
 
 ALTER TABLE marketorders
@@ -241,7 +241,7 @@ ALTER TABLE marketorders
 
 ALTER TABLE skills
     ADD CONSTRAINT FK_NewTable
-    FOREIGN KEY (ownerrid) REFERENCES charactersheet (characterid)
+    FOREIGN KEY (ownerid) REFERENCES charactersheet (characterid)
     ON DELETE CASCADE;
 
 ALTER TABLE walletjournal
@@ -259,7 +259,7 @@ ALTER TABLE wallettransactions
 /*============================================================================*/
 CREATE INDEX IDX_charactersheet_1 ON charactersheet (corporationid);
 
-CREATE INDEX IDX_FK_accountbalance ON accountbalance (ownerrid);
+CREATE INDEX IDX_FK_accountbalance ON accountbalance (ownerid);
 
 CREATE INDEX IDX_assetlist_1 ON assetlist (typeid);
 
@@ -269,7 +269,7 @@ CREATE INDEX IDX_assetlist_3 ON assetlist (locationid);
 
 CREATE INDEX IDX_FK_assetlist ON assetlist (ownerid);
 
-CREATE INDEX IDX_FK_industryjobs ON industryjobs (ownerrid);
+CREATE INDEX IDX_FK_industryjobs ON industryjobs (ownerid);
 
 CREATE INDEX IDX_industryjobs_1 ON industryjobs (activityid);
 
@@ -283,7 +283,7 @@ CREATE INDEX IDX_marketorders_2 ON marketorders (orderstate);
 
 CREATE INDEX IDX_marketorders_3 ON marketorders (typeid);
 
-CREATE INDEX IDX_FK_NewTable ON skills (ownerrid);
+CREATE INDEX IDX_FK_NewTable ON skills (ownerid);
 
 CREATE INDEX IDX_skills_1 ON skills (typeid);
 

@@ -64,9 +64,9 @@ EXCEPTION:
      Line: {$e->getLine()}
 Backtrace:
 {$e->getTraceAsString()}
-\t--- END TRACE ---PHP_EOL
+\t--- END TRACE ---
 MESS;
-    print_on_command($message);
+    print_on_command($message.PHP_EOL);
   }
 }
 ?>

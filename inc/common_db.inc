@@ -317,7 +317,7 @@ function multipleUpsert(array $data,array $types,$table,$dsn) {
 function makeMultiUpsert(array $data,array $params,$table,$dsn) {
   // Need this so we can do quoting.
   $con=connect($dsn);
-  $needsQuote=array('C','X','D','T');
+  $needsQuote=array('C','X','D','T','L');
   // Build query sections
   $insert='insert into '.$table.' ('.implode(',',array_keys($params)).')';
   $values=' values';

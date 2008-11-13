@@ -108,10 +108,10 @@ try {
     $dbTable='skills';
     // Set the field types of query by name.
     $types=array('ownerid'=>'I','level'=>'I',
-      'skillpoints'=>'I','typeid'=>'I','unpublished'=>'I');
+      'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
-      $extras=array('ownerid'=>$ownerid,'unpublished'=>0);
+      $extras=array('ownerid'=>$ownerid,'unpublished'=>'0');
       $dbTable=mb_strtolower($dbTable);
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
     };// if $datum>0

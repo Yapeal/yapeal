@@ -126,7 +126,7 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   } else {
     // Setup for POST query.
     $http['method']='POST';
-    $http['post_fields']=http_build_query($postdata,NULL,'&');
+    $http['content']=http_build_query($postdata,NULL,'&');
   };// if $posttype=YAPEAL_API_EVE||...
 
   // Setup connection options.
@@ -136,8 +136,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   // Now check for errors.
   if ($result['curl_error']) {
     $mess='CURL error '.$result['curl_error'].' for '.$http['url'];
-    if ($http['post_fields']) {
-      $mess.=PHP_EOL.'Parameters '.$http['post_fields'];
+    if ($http['content']) {
+      $mess.=PHP_EOL.'Parameters '.$http['content'];
     };
     // Throw exception, or ...
     if (YAPEAL_EXCEPTIONS) {
@@ -151,8 +151,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (200!=$result['http_code']) {
     $mess='HTTP error '.$result['http_code'].' for '.$http['url'];
-    if ($http['post_fields']) {
-      $mess.=PHP_EOL.'Parameters '.$http['post_fields'];
+    if ($http['content']) {
+      $mess.=PHP_EOL.'Parameters '.$http['content'];
     };
     // Throw exception, or ...
     if (YAPEAL_EXCEPTIONS) {
@@ -166,8 +166,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (!$result['body']) {
     $mess='API data was empty for '.$http['url'];
-    if ($http['post_fields']) {
-      $mess.=PHP_EOL.'Parameters '.$http['post_fields'];
+    if ($http['content']) {
+      $mess.=PHP_EOL.'Parameters '.$http['content'];
     };
     // Throw exception, or ...
     if (YAPEAL_EXCEPTIONS) {
@@ -182,8 +182,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   if (!mb_strpos($result['body'],'<eveapi version="')) {
     $result=FALSE;
     $mess="API didn't return xml for ".$http['url'];
-    if ($http['post_fields']) {
-      $mess.=PHP_EOL.'Parameters '.$http['post_fields'];
+    if ($http['content']) {
+      $mess.=PHP_EOL.'Parameters '.$http['content'];
     };
     // Throw exception, or ...
     if (YAPEAL_EXCEPTIONS) {
@@ -200,8 +200,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
     $result=FALSE;
     $mess='API error '.(int)$data->error[0]['code'].' '.(string)$data->error[0];
     $mess.=' for '.$http['url'];
-    if ($http['post_fields']) {
-      $mess.=PHP_EOL.'Parameters '.$http['post_fields'];
+    if ($http['content']) {
+      $mess.=PHP_EOL.'Parameters '.$http['content'];
     };
     // Throw exception, or ...
     if (YAPEAL_EXCEPTIONS) {

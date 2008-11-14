@@ -110,7 +110,7 @@ foreach ($apis as $api=>$settings) {
   catch (EVE_API_Exception $e) {
     // Do nothing use observers to log info
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     // Do nothing use observers to log info
   }
 };// foreach $apis ...

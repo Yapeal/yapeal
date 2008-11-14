@@ -111,7 +111,7 @@ try {
       'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
-      $extras=array('ownerid'=>$ownerid,'unpublished'=>'0');
+      $extras=array('ownerid'=>$ownerid,'unpublished'=>0);
       $dbTable=mb_strtolower($dbTable);
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
     };// if $datum>0
@@ -127,7 +127,7 @@ catch (EVE_API_File_Exception $e) {
 catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
-catch (PEAR_Exception $e) {
+catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
 }
 
@@ -213,7 +213,7 @@ foreach ($apis as $api=>$settings) {
   catch (EVE_API_Exception $e) {
     // Do nothing use observers to log info
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     // Do nothing use observers to log info
   }
 };// foreach $apis ...
@@ -328,7 +328,7 @@ foreach ($apis as $api=>$settings) {
     catch (EVE_API_Exception $e) {
       // Do nothing use observers to log info
     }
-    catch (PEAR_Exception $e) {
+    catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
   };// foreach $accounts ...
@@ -408,7 +408,7 @@ catch (EVE_API_Error_Exception $e) {
 catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
-catch (PEAR_Exception $e) {
+catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
 }*/
 ?>

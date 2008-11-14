@@ -50,11 +50,11 @@ require_once YAPEAL_ADODB.'adodb.inc.php';
 
 /**
  * Function used to connect to a DB.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
- * @return object Returns MDB2 connection object.
+ * @return object Returns ADOdb connection object.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function connect($dsn) {
   print $dsn."\n";
@@ -68,11 +68,11 @@ function connect($dsn) {
 /**
  * Get stationid (corp HQ) from corporationsheet table
  * @param integer $corp Which corporation's HQ.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return string Returns the HQ station for this corp.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
@@ -86,11 +86,11 @@ function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
  * Get description (wallet name) from accountkey using corpwalletdivisions table
  * @param integer $accountkey Which wallet to get name of. Range 1000-1006.
  * @param integer $corp Which corporation's wallet.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return string Returns the wallet name for this corp.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
@@ -104,11 +104,11 @@ function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  * Get list of accountkeys and description (wallet names) from walletdivisions
  * table.
  * @param integer $corp Which corporation's wallets to get.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return array Returns assoc array of accountkeys and names.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
@@ -122,11 +122,11 @@ function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
  * Get description (division name) from accountkey using divisions table
  * @param integer $accountkey Which division to get name of. Range 1000-1006.
  * @param integer $corp Which corporation's division.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return string Returns the division name for this corp.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
@@ -140,11 +140,11 @@ function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  * Get list of accountkeys and description (division names) from divisions
  * table.
  * @param integer $corp Which corporation's divisions to get.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return array Returns assoc array of accountkeys and names.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
@@ -160,7 +160,7 @@ function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
  * @param integer $corp ID of corporation. Use 0 for non-corp tables like
  * RefTypes.
  * @param string $table Used to override table to get time from.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return string A date/time using format 'YYYY-MM-DD HH:MM:SS'
  */
@@ -186,7 +186,7 @@ function get_cacheduntil($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRIT
  * @param integer $corp ID of corporation. Use 0 for non-corp tables like
  * RefTypes or ErrorList.
  * @param string $table Used to override table to get time from.
- * @param string $dsn A MDB2 compatible connection string.
+ * @param string $dsn A ADOdb compatible connection string.
  *
  * @return string A date/time using format
  * 'weekday, 2digitDay month 4digitYear HH:MM:SS +0000'
@@ -221,15 +221,15 @@ function get_expires($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) 
  * </code>
  *
  * @param array $data Assoc array of column names and value to be Upserted.
- * @param array $types Assoc array of column names and MDB2 types.
+ * @param array $types Assoc array of column names and ADOdb types.
  * @param string $table Name of table to Upsert into.
- * @param string $dsn A valid MDB2 DSN.
+ * @param string $dsn A valid ADOdb DSN.
  *
  * @return mixed Number rows effected (1),
  * FALSE if either $data or $types is empty,
  * or PEAR::Error if not using exceptions for PEAR
  *
- * @throws PEAR_Exception for any errors if using exceptions.
+ * @throws ADODB_Exception for any errors if using exceptions.
  *
  * @uses makeMultiUpsert()
  */
@@ -262,15 +262,15 @@ function upsert(array $data,array $types,$table,$dsn) {
  *
  * @param array $data An array of assoc arrays of column names and values to be
  * Upserted.
- * @param array $types Assoc array of column names and MDB2 types.
+ * @param array $types Assoc array of column names and ADOdb types.
  * @param string $table Name of table to Upsert into.
- * @param string $dsn A valid MDB2 DSN.
+ * @param string $dsn A valid ADOdb DSN.
  *
  * @return mixed Number rows effected,
  * FALSE if either $data or $types is empty,
  * or PEAR::Error if not using exceptions for PEAR
  *
- * @throws PEAR_Exception for any errors if using exceptions.
+ * @throws ADODB_Exception for any errors if using exceptions.
  *
  * @uses makeMultiUpsert()
  */
@@ -307,17 +307,17 @@ function multipleUpsert(array $data,array $types,$table,$dsn) {
  * @param array $data Values to be put into query
  * @param array $params Keys are parameter names and values their types
  * @param string $table Table to use in query's from clause
- * @param string $dsn A valid MDB2 DSN.
+ * @param string $dsn A valid ADOdb DSN.
  *
  * @return string Returns a complete SQL statement ready to be used by a
- * MDB2 exec
+ * ADOdb exec
  *
- * @throws PEAR_Exception if connect used to do quoting fails.
+ * @throws ADODB_Exception if connect used to do quoting fails.
  */
 function makeMultiUpsert(array $data,array $params,$table,$dsn) {
   // Need this so we can do quoting.
   $con=connect($dsn);
-  $needsQuote=array('C','X','D','T','L');
+  $needsQuote=array('C','X','D','T');
   // Build query sections
   $insert='insert into '.$table.' ('.implode(',',array_keys($params)).')';
   $values=' values';

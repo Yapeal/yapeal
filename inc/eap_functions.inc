@@ -222,7 +222,7 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
  * @param mixed $datum SimpleXMLElement object who's element attributes will
  * be inserted into table or an array of SimpleXMLElement objects with
  * attributes
- * @param array $types Keys are DB field names and values are thier MDB2 type
+ * @param array $types Keys are DB field names and values are thier ADOdb type
  * i.e. 'id'=>'integer','name'=>'text' ...
  * @param string $table Name of the table to use in query's from clause
  * @param string $dsn The connection infomation needed to connect to DB

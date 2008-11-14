@@ -143,7 +143,7 @@ catch (EVE_API_File_Exception $e) {
 catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
-catch (PEAR_Exception $e) {
+catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
 }
 
@@ -229,7 +229,7 @@ foreach ($apis as $api=>$settings) {
   catch (EVE_API_Exception $e) {
     // Do nothing use observers to log info
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     // Do nothing use observers to log info
   }
 };// foreach $apis ...
@@ -326,7 +326,7 @@ foreach ($apis as $api=>$settings) {
   catch (EVE_API_Exception $e) {
     // Do nothing use observers to log info
   }
-  catch (PEAR_Exception $e) {
+  catch (ADODB_Exception $e) {
     // Do nothing use observers to log info
   }
 };// foreach $apis ...
@@ -441,7 +441,7 @@ foreach ($apis as $api=>$settings) {
     catch (EVE_API_Exception $e) {
       // Do nothing use observers to log info
     }
-    catch (PEAR_Exception $e) {
+    catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
   };// foreach $accounts ...
@@ -463,7 +463,7 @@ try {
     };// foreach $datum
   };// if count $datum
 }
-catch (PEAR_Exception $e) {
+catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
 }
 
@@ -544,7 +544,7 @@ if (!empty($POSlist)) {
     catch (EVE_API_Exception $e) {
       // Do nothing use observers to log info
     }
-    catch (PEAR_Exception $e) {
+    catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
   };// foreach $POSlist
@@ -625,7 +625,7 @@ catch (EVE_API_Error_Exception $e) {
 catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
-catch (PEAR_Exception $e) {
+catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
 }*/
 ?>

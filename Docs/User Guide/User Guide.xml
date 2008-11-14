@@ -12,6 +12,11 @@
       </affiliation>
     </author>
     <pubdate>2008-10-20</pubdate>
+    <edition>0.2</edition>
+    <copyright>
+      <year>2008</year>
+      <holder>Michael Cummings</holder>
+    </copyright>
   </bookinfo>
   <chapter>
     <title>Introduction</title>
@@ -32,8 +37,8 @@
       <title>What does it do?</title>
       <para>A quick outline would be that it uses information from some tables
       in a MySQL database to make requests for XML files to the EVE-online API
-      from CCP and then convert those files and puts them into tables in
-      another MySQL database for the users to use locally.</para>
+      from CCP and then convert those files and puts them into tables in the
+      same or another MySQL database for the users to use locally.</para>
     </section>
     <section>
       <title>How is it different from the others?</title>
@@ -56,85 +61,65 @@
       shared host with just a little configuration. It does require PHP5 and
       MySQL. It's been developed on a AMD 64 1GB linux system with PHP version
       5.2.6 and MySQL version 5.0.51a. It uses cURL for API connections and
-      MDB2 from PEAR for the Database. If you're going to use it like I do
-      you'll also need shell access and be able to setup a crontab job. I
-      believe it would also work on a windows server if you know how to set up
-      something like a Unix type crontab but I haven't tried it nor do I know
-      that it can be done. If someone tries it and would like to send me an
-      explaination of how to do it I'll include it here in the future.</para>
+      now I have replace MDB2 with ADOdb for the Database. If you'd like to
+      use it like I do you'll also need shell access and be able to setup a
+      crontab job. I believe it would also be used on a windows server if you
+      know how to set up something like a Unix type crontab but I haven't
+      tried it nor do I know for sure that it can be done. If someone tries it
+      and would like to send me an explaination of how to do it I'll include
+      it here in the future. Even better if they develop a BAT or CMD wrapper
+      that can be used I'll be glad to include it with Yapeal.</para>
     </section>
   </chapter>
   <chapter>
     <title>Installation</title>
     <section>
       <title>Getting software</title>
-      <para>A SourceForge project has been setup for Yapeal at <ulink
-      url="http://sourceforge.net/projects/yapeal/">http://sourceforge.net/projects/yapeal/</ulink>
-      where you can find the latest version plus the latest version of this
-      documention.</para>
-      <para>Follow the instructions below that match the type of file you
-      downloaded.</para>
-      <section>
-        <title>Extracting Yapeal.tgz</title>
-        <orderedlist>
-          <listitem>
-            <para>Extract archive with:</para>
-            <para><programlisting language="">tar -xzf &lt;Yapeal-x.x.x.tgz&gt;</programlisting></para>
-            <para>Where &lt;Yapeal-x.x.x.tgz&gt; is the version you
-            downloaded.</para>
-            <para>This will create a directory in the same location as the tgz
-            file named Yapeal. Now that you have the directory you can go to
-            the section on editing the configuration file.</para>
-          </listitem>
-        </orderedlist>
-      </section>
-      <section>
-        <title>Extracting Yapeal.zip</title>
-        <orderedlist>
-          <listitem>
-            <para>Extract archive with:</para>
-            <para><programlisting>unzip &lt;Yapeal-x.x.x.zip&gt;</programlisting>Where
-            &lt;Yapeal-x.x.x.zip&gt; is the version you downloaded.</para>
-            <para>This will create a directory in the same location as the zip
-            file named Yapeal. Now that you have the directory you can go to
-            the section on editing the configuration file.</para>
-          </listitem>
-        </orderedlist>
-      </section>
+      <para>A new Google code project has been setup for Yapeal at <ulink
+      url="http://code.google.com/p/yapeal/">http://code.google.com/p/yapeal/
+      </ulink>where you can find the latest version plus the latest version of
+      this documention.</para>
+      <para>For now Yapeal is only being offered through the subversion at
+      Google code. With future releases it maybe offered as tgz and/or zip
+      files. See the project home above for instructions on how to get it from
+      the subversion.</para>
     </section>
     <section>
       <title>Editing configuration file</title>
-      <para>Yapeal expect to find a file named yapeal.ini in the config
-      directory. There is an example configuration file in the config
-      directory of Yapeal named yapeal.ini-example that you'll want to copy
-      and rename to yapeal.ini then edit it for your local environment. The
-      example have been largely commented to help users with any changes
-      needed.</para>
+      <para>Yapeal expect to find a file named <filename>yapeal.ini</filename>
+      in the config directory. There is an example configuration file in the
+      config directory of Yapeal named <filename>yapeal.ini-example</filename>
+      that you'll want to copy and rename to <filename>yapeal.ini</filename>
+      then edit it for your local environment. The example have been largely
+      commented to help users with any changes needed.</para>
       <para>The default configuration for Yapeal is to use a separate database
       for each of the areas char, corp, eve, util but if you are limited on
-      the number of databases you can have you should be able to combine some
-      or all of the different areas into a single database though it hasn't
-      been tested. Combining char and corp is the most likely area to cause
-      problems because of overlapping table names.</para>
+      the number of databases you can have or want to use you can combine some
+      or all of the different areas into a single database. Combining char and
+      corp is the most likely area to cause problems because of overlapping
+      table names.</para>
       <para>Though Yapeal was made with the idea of having two
       username/password pairs per database to separate select only (reader)
       access and select, insert, update (writer) access that has been mostly
       unused and you only need one usename/password pair with full write
       access to each database and the same pair can and normally is used for
-      all databases. For future versions all database access will only use the
-      writer and all the reader settings will be removed but are being kept
-      for now for compatability with my other projects.</para>
+      all databases in a multiple database setup. For future versions all
+      database access will only use the writer and all the reader settings
+      will be removed but are being kept for now for backwards compatability
+      with my other projects.</para>
     </section>
     <section>
-      <title>Setting up databases</title>
-      <para>Yapeal has been used to pull (request) data from some of the eve
+      <title>Setting up database(s)</title>
+      <para>Yapeal is being used to pull (request) data from some of the eve
       and corp APIs and that code is can be considered useable at this time
-      while the code for char APIs is mostly untested but is based on the corp
-      code which has been. Code for map and other areas available though the
-      EVE API has not been written yet because I've not need them for any of
-      my projects but could and hopefully will be added soon.</para>
+      while the code for char APIs is still in testing but largely based on
+      the corp code which has been tested. Code for map and other areas
+      available through the EVE API has not been written because my other
+      projects haven't used them for anything yet but the code hopefully can
+      be added soon if someone would help the author out adding them.</para>
       <para>More detailed information about setting up databases to be added
-      later including SQL needed to build databases and tables.</para>
+      later. Sample SQL to build some of the tables has been include but has
+      not been fully checked or tested yet.</para>
     </section>
   </chapter>
   <appendix id="gfdl">

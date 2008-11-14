@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Editing configuration file</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="YAPEAL User Guide"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Installation"
+HREF="c30.html"><LINK
+REL="PREVIOUS"
+TITLE="Installation"
+HREF="c30.html"><LINK
+REL="NEXT"
+TITLE="Setting up database(s)"
+HREF="x45.html"></HEAD
+><BODY
+CLASS="section"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>YAPEAL User Guide</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c30.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. Installation</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x45.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="section"
+><H1
+CLASS="section"
+><A
+NAME="AEN37"
+>2.2. Editing configuration file</A
+></H1
+><P
+>Yapeal expect to find a file named <TT
+CLASS="filename"
+>yapeal.ini</TT
+>
+      in the config directory. There is an example configuration file in the
+      config directory of Yapeal named <TT
+CLASS="filename"
+>yapeal.ini-example</TT
+>
+      that you'll want to copy and rename to <TT
+CLASS="filename"
+>yapeal.ini</TT
+>
+      then edit it for your local environment. The example have been largely
+      commented to help users with any changes needed.</P
+><P
+>The default configuration for Yapeal is to use a separate database
+      for each of the areas char, corp, eve, util but if you are limited on
+      the number of databases you can have or want to use you can combine some
+      or all of the different areas into a single database. Combining char and
+      corp is the most likely area to cause problems because of overlapping
+      table names.</P
+><P
+>Though Yapeal was made with the idea of having two
+      username/password pairs per database to separate select only (reader)
+      access and select, insert, update (writer) access that has been mostly
+      unused and you only need one usename/password pair with full write
+      access to each database and the same pair can and normally is used for
+      all databases in a multiple database setup. For future versions all
+      database access will only use the writer and all the reader settings
+      will be removed but are being kept for now for backwards compatability
+      with my other projects.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c30.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x45.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Installation</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c30.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Setting up database(s)</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

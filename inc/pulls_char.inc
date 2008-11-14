@@ -108,7 +108,7 @@ try {
     /**
      * Have some kind of strange bug think it has to do with unpublished but can't find anything.
      */
-    /*$dbTable='skills';
+    $dbTable='skills';
     // Set the field types of query by name.
     $types=array('ownerid'=>'I','level'=>'I',
       'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
@@ -117,7 +117,7 @@ try {
       $extras=array('ownerid'=>$ownerid,level=>0,'unpublished'=>0);
       $dbTable=mb_strtolower($dbTable);
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
-    };// if $datum>0*/
+    };// if $datum>0
 
   };// if $xml instanceof SimpleXMLElement
 }

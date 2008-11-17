@@ -76,20 +76,20 @@ COLLATE = utf8_unicode_ci;
 DROP TABLE IF EXISTS `CharacterSheet` ;
 
 CREATE  TABLE IF NOT EXISTS `CharacterSheet` (
-  `characterid` BIGINT UNSIGNED NOT NULL ,
+  `characterID` BIGINT UNSIGNED NOT NULL ,
   `name` VARCHAR(255) NOT NULL ,
   `race` VARCHAR(255) NOT NULL ,
-  `bloodline` VARCHAR(255) NOT NULL ,
+  `bloodLine` VARCHAR(255) NOT NULL ,
   `gender` VARCHAR(255) NOT NULL ,
-  `corporationname` VARCHAR(255) NOT NULL ,
-  `corporationid` BIGINT UNSIGNED NOT NULL ,
+  `corporationName` VARCHAR(255) NOT NULL ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
   `balance` DECIMAL(17,2) NOT NULL ,
   `charisma` SMALLINT UNSIGNED NOT NULL ,
   `intelligence` SMALLINT UNSIGNED NOT NULL ,
   `memory` SMALLINT UNSIGNED NOT NULL ,
   `perception` SMALLINT UNSIGNED NOT NULL ,
   `willpower` SMALLINT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`characterid`) )
+  PRIMARY KEY (`characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
@@ -101,12 +101,12 @@ COLLATE = utf8_unicode_ci;
 DROP TABLE IF EXISTS `skills` ;
 
 CREATE  TABLE IF NOT EXISTS `skills` (
-  `ownerrid` BIGINT UNSIGNED NOT NULL ,
-  `typeid` BIGINT UNSIGNED NOT NULL ,
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
   `level` SMALLINT UNSIGNED NOT NULL ,
   `skillpoints` BIGINT UNSIGNED NOT NULL ,
   `unpublished` BOOLEAN NOT NULL DEFAULT FALSE ,
-  PRIMARY KEY (`ownerrid`, `typeid`) )
+  PRIMARY KEY (`ownerID`, `typeID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci
@@ -148,7 +148,7 @@ DROP TABLE IF EXISTS `AccountBalance` ;
 CREATE  TABLE IF NOT EXISTS `AccountBalance` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `accountID` BIGINT UNSIGNED NOT NULL ,
-  `accountkey` SMALLINT UNSIGNED NOT NULL ,
+  `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `balance` DECIMAL(17,2) NOT NULL ,
   PRIMARY KEY (`ownerID`, `accountID`) )
 ENGINE = InnoDB
@@ -165,7 +165,7 @@ CREATE  TABLE IF NOT EXISTS `AssetList` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `itemID` BIGINT UNSIGNED NOT NULL ,
   `locationID` BIGINT UNSIGNED NOT NULL ,
-  `typeId` BIGINT UNSIGNED NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
   `quantity` BIGINT UNSIGNED NOT NULL ,
   `flag` SMALLINT UNSIGNED NOT NULL ,
   `singleton` BOOLEAN NOT NULL ,

@@ -81,6 +81,7 @@ $req1='Required variable ';
 $req2=' in '.YAPEAL_INI_FILE." file isn't defined";
 $nonexist='None existent path defined for ';
 $ds=DIRECTORY_SEPARATOR;
+
 /* **************************************************************************
  * Paths
  * **************************************************************************/
@@ -146,12 +147,6 @@ if (realpath($dir.$ds.$log_dir)) {
   trigger_error($nonexist.'log_dir',E_USER_ERROR);
 };
 
-// Include extra path for local PEAR packages.
-// Needed in some hosted sites configurations.
-if (!empty($pear_dir)&&is_dir($pear_dir)) {
-  ini_set('include_path',$pear_dir.PATH_SEPARATOR.ini_get('include_path'));
-};
-
 /* **************************************************************************
  * Logging
  * **************************************************************************/
@@ -179,11 +174,9 @@ define('YAPEAL_WARNING_LOG',YAPEAL_LOG.$warning_log);
  * **************************************************************************/
 
 require_once YAPEAL_CLASS.'ErrorHandler.class.php';
-require_once YAPEAL_INC.'PEAR_ErrorToPEAR_Exception.inc';
 require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
 require_once YAPEAL_CLASS.'Logging_Exception_Observer.class.php';
 require_once YAPEAL_CLASS.'Printing_Exception_Observer.class.php';
-require_once YAPEAL_INC.'Logging_PEAR_Exception_Observer.inc';
 
 //Setup Error logging
 error_reporting(YAPEAL_LOG_LEVEL);
@@ -195,8 +188,8 @@ ini_set('log_errors',true);
 // Setup exception observers.
 EVE_API_Exception::attach(new Logging_Exception_Observer(YAPEAL_ERROR_LOG));
 EVE_API_Exception::attach(new Printing_Exception_Observer());
-PEAR_Exception::addObserver('Logging_PEAR_Exception_Observer');
-
+//Yapeal_ADOdb_Exception::attach(new Logging_Exception_Observer(YAPEAL_ERROR_LOG));
+//Yapeal_ADOdb_Exception::attach(new Printing_Exception_Observer());
 /* Any errors or exceptions after this point go to our custom settings */
 
 /* **************************************************************************
@@ -204,17 +197,20 @@ PEAR_Exception::addObserver('Logging_PEAR_Exception_Observer');
  * **************************************************************************/
 
 // Make sure required setting vars aren't already set
-unset($file_suffix,$url_base);
+unset($cache_xml,$file_suffix,$url_base);
 // Pull out API settings
 extract($iniVars['Api']);
 
 // Throw error if a required setting is missing.
+isset($cache_xml)||trigger_error($req1.'cache_xml'.$req2,E_USER_ERROR);
 isset($file_suffix)||trigger_error($req1.'file_suffix'.$req2,E_USER_ERROR);
 isset($url_base)||trigger_error($req1.'url_base'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
 define('API_URL_BASE',$url_base);
 define('API_SUFFIX',$file_suffix);
+define('YAPEAL_CACHE_XML',$cache_xml);
+
 // Define some addtional constants that are mostly used by pull scripts
 define('YAPEAL_API_EVE',0);
 define('YAPEAL_API_CHAR',1);

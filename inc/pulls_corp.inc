@@ -45,7 +45,6 @@ require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_INC.'eap_functions.inc';
@@ -80,7 +79,6 @@ try {
     // Main table first
     // Must be done first because of foreign key constraints in
     // other tables
-    print_on_command('Before clone');
     $datum=clone $xml->result[0]->children();
     // Get rid of child table stuff
     unset($datum->rowset,$datum->logo);
@@ -404,11 +402,6 @@ foreach ($apis as $api=>$settings) {
           };// if $oldest<$lastDT
         };// if $xml instanceof SimpleXMLElement
       } while ($cnt==1000&&isset($postdata[$settings['beforeid']]));
-      /*if ((YAPEAL_LOG_LEVEL&E_USER_NOTICE)==E_USER_NOTICE) {
-        $mess='Cache until for '.$api.$account.': '.$cuntil;
-        print_on_command($mess);
-        trigger_error($mess,E_USER_NOTICE);
-      };*/
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil=gmdate('Y-m-d H:i:s',strtotime('60 minutes'));
@@ -552,24 +545,8 @@ if (!empty($POSlist)) {
 
 /* Asset List */
 
-// Done last because it can take several minutes to finish.
-// TODO: This needs to be rewritten somehow so it can use multiUpsert that
-// would make it much faster.
 $api='AssetList';
-// TODO: Table structure needs to be changed to work for both characters and
-// corporations. corporationid changed to ownerid maybe would work.
-$params=array(
-  'itemid'=>'itemid','corporationid'=>'corporationid',
-  'locationid'=>'locationid','typeid'=>'typeid','quantity'=>'quantity',
-  'flag'=>'flag','singleton'=>'singleton',
-  'id'=> 'id','rootid'=>'rootid',
-  'lft'=>'l','rgt'=>'r','norder'=>'norder','lvl'=>'level'
-);
-/*try {
-  $nestedSet=& DB_NestedSet::factory('MDB2',DSN_CORP_WRITER,$params);
-  $nestedSet->setAttr(array('node_table'=>'assetlist',
-    'lock_table'=>'nested_locks','secondarySort'=>'locationid')
-  );
+try {
   // Now get API pull and re-build asset list
   $postdata=array('userID'=>$userid,'apiKey'=>$apikey,
     'characterID'=>$charid);
@@ -580,26 +557,34 @@ $params=array(
     $cuntil=(string)$xml->cachedUntil[0];
     $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
     upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
-    //file_put_contents(YAPEAL_CACHE.'corp/'.$api.'.xml',$xml);
-    $datum=$xml->xpath('//result/rowset/row');
+    $datum=$xml;
     if (count($datum)>0) {
-      // Clear out old tree for this corp
+      // Call recursive function to modify XML.
+      editAssets($datum);
+      // Use generated owner node as root for tree.
+      $corpHQ=get_corpHQ($ownerid,DSN_CORP_WRITER);
+      $lft=$datum->result[0]['lft'];
+      $rgt=$datum->result[0]['rgt'];
+      $nodeData=array(
+        'flag'=>'0','itemid'=>$ownerid,'lft'=>$lft,'locationid'=>$corpHQ,
+        'ownerid'=>$ownerid,'quantity'=>'1','rgt'=>$rgt,'singleton'=>'0',
+        'typeid'=>2
+      );
+      // Clear out old tree for this owner
       $sql='delete';
       $sql.=' from '.mb_strtolower($api);
       $sql.=' where ownerid='.$ownerid;
-      $con->exec($sql);
-      // Use generated corp node as root for tree.
-      $corpHQ=get_corpHQ($corpid);
-      $nodeData=array(
-        'locationid'=>$corpHQ,'typeid'=>'2','quantity'=>'1','flag'=>'0',
-        'singleton'=>'0','itemid'=>$corpid,'ownerid'=>$ownerid
-      );
-      $parent=$nestedSet->createRootNode($nodeData);
-      $location=0;
-      foreach ($datum as $row) {
-        // Recursive function that does the magic
-        addNode($row,$parent,$nestedSet,$ownerid,$location);
-      };// foreach $datum ...
+      $con->Execute($sql);
+      $types=array(
+        'flag'=>'I','itemid'=>'I','lft'=>'I','locationid'=>'I','ownerid'=>'I',
+        'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeid'=>'I');
+      // Insert the new owner's root node.
+      upsert($nodeData,$types,mb_strtolower($api),DSN_CORP_WRITER);
+       //Just need the rows from XML now
+      $datum=$xml->xpath('//row');
+      $extras=array('locationid'=>0,'ownerid'=>$ownerid);
+      multipleUpsertAttributes($datum,$types,mb_strtolower($api),
+        DSN_CORP_WRITER,$extras);
     };// if count $datum ...
   };// if $xml instanceof SimpleXMLElement
 }
@@ -627,5 +612,5 @@ catch (EVE_API_Exception $e) {
 }
 catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
-}*/
+}
 ?>

@@ -45,7 +45,6 @@ chdir($dir);
  */
 defined('YEPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
 if (YAPEAL_SCRIPT_MODE=='cli') {
-  //require_once 'Console/Getopt.php';
   $options=getopt('hVc:');
   foreach ($options as $opt=>$value) {
     switch ($opt) {
@@ -118,7 +117,7 @@ try {
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (dontWait($api,0,FALSE,FALSE)) {
-    // Give ourself up to 10 minutes to finish.
+    // Give ourself up to 5 minutes to finish.
     $timer=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
     $data=array('tablename'=>$api,'ownerid'=>0,'cacheduntil'=>$timer);
     upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
@@ -144,7 +143,6 @@ try {
 
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
-    print_on_command('Before gen corps');
     /* Generate a list of corporation(s) we need to do updates for */
     $api='registeredcorporation';
     $con=connect(DSN_CORP_WRITER);
@@ -176,7 +174,6 @@ try {
 
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
-    print_on_command('Before gen chars');
     /* Generate a list of character(s) we need to do updates for */
     $api='registeredcharacter';
     $con=connect(DSN_CHAR_WRITER);
@@ -218,7 +215,7 @@ try {
   };// else $timer==get_cacheduntil $api ...
   exit;
 }
-catch (PEAR_Exception $e) {
-  // Do nothing use observers to log info
+catch (Exception $e) {
+  elog('Uncaught exception in eve-api-pull.php',YAPEAL_WARNING_LOG);
 }
 ?>

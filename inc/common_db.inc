@@ -50,16 +50,15 @@ require_once YAPEAL_ADODB.'adodb.inc.php';
 
 /**
  * Function used to connect to a DB.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return object Returns ADOdb connection object.
  *
  * @throws ADODB_Exception for any errors.
  */
 function connect($dsn) {
-  print $dsn."\n";
   $con=&NewADOConnection($dsn);
-  $con->debug=TRUE;
+  $con->debug=FALSE;
   $con->SetFetchMode(ADODB_FETCH_ASSOC);
   $con->Execute('set names utf8');
   return $con;
@@ -68,13 +67,13 @@ function connect($dsn) {
 /**
  * Get stationid (corp HQ) from corporationsheet table
  * @param integer $corp Which corporation's HQ.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string Returns the HQ station for this corp.
  *
  * @throws ADODB_Exception for any errors.
  */
-function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
+function get_corpHQ($corp,$dsn) {
   $con=connect($dsn);
   $sql='select stationid from corporationsheet';
   $sql.=' where corporationid=?';
@@ -86,7 +85,7 @@ function get_corpHQ($corp,$dsn=DSN_CORP_WRITER) {
  * Get description (wallet name) from accountkey using corpwalletdivisions table
  * @param integer $accountkey Which wallet to get name of. Range 1000-1006.
  * @param integer $corp Which corporation's wallet.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string Returns the wallet name for this corp.
  *
@@ -104,7 +103,7 @@ function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  * Get list of accountkeys and description (wallet names) from walletdivisions
  * table.
  * @param integer $corp Which corporation's wallets to get.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return array Returns assoc array of accountkeys and names.
  *
@@ -122,7 +121,7 @@ function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
  * Get description (division name) from accountkey using divisions table
  * @param integer $accountkey Which division to get name of. Range 1000-1006.
  * @param integer $corp Which corporation's division.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string Returns the division name for this corp.
  *
@@ -140,7 +139,7 @@ function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  * Get list of accountkeys and description (division names) from divisions
  * table.
  * @param integer $corp Which corporation's divisions to get.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return array Returns assoc array of accountkeys and names.
  *
@@ -160,7 +159,7 @@ function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
  * @param integer $corp ID of corporation. Use 0 for non-corp tables like
  * RefTypes.
  * @param string $table Used to override table to get time from.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string A date/time using format 'YYYY-MM-DD HH:MM:SS'
  */
@@ -186,7 +185,7 @@ function get_cacheduntil($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRIT
  * @param integer $corp ID of corporation. Use 0 for non-corp tables like
  * RefTypes or ErrorList.
  * @param string $table Used to override table to get time from.
- * @param string $dsn A ADOdb compatible connection string.
+ * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string A date/time using format
  * 'weekday, 2digitDay month 4digitYear HH:MM:SS +0000'
@@ -229,14 +228,14 @@ function get_expires($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) 
  * FALSE if either $data or $types is empty,
  * or PEAR::Error if not using exceptions for PEAR
  *
- * @throws ADODB_Exception for any errors if using exceptions.
+ * @throws ADODB_Exception for any errors.
  *
  * @uses makeMultiUpsert()
  */
 function upsert(array $data,array $types,$table,$dsn) {
   if (empty($data)||empty($types)) {return FALSE;};
-  $con=connect($dsn);
   $upsert=makeMultiUpsert(array($data),$types,$table,$dsn);
+  $con=connect($dsn);
   $effected=$con->Execute($upsert);
   return $effected;
 }// function upsert ...
@@ -270,7 +269,7 @@ function upsert(array $data,array $types,$table,$dsn) {
  * FALSE if either $data or $types is empty,
  * or PEAR::Error if not using exceptions for PEAR
  *
- * @throws ADODB_Exception for any errors if using exceptions.
+ * @throws ADODB_Exception for any errors.
  *
  * @uses makeMultiUpsert()
  */
@@ -297,7 +296,6 @@ function multipleUpsert(array $data,array $types,$table,$dsn) {
       $con->RollbackTrans();
     }
   };// if count $data > 10&&...
-  elog($upsert,YAPEAL_NOTICE_LOG);
   return $con->Execute($upsert);
 }// function multipleUpsert ...
 

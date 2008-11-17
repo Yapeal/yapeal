@@ -45,7 +45,6 @@ require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_INC.'eap_functions.inc';
@@ -59,17 +58,13 @@ $con=connect(DSN_CHAR_WRITER);
 /* Character Sheet */
 
 $api='CharacterSheet';
-$cachetypes=array('tablename'=>'C','ownerid'=>'I',
-  'cacheduntil'=>'T');
 $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid);
 // Set the field types of query by name.
 $types=array(
-  'balance'=>'N','bloodline'=>'C','characterid'=>'I',
-  'corporationid'=>'I','corporationname'=>'C','gender'=>'C',
-  'name'=>'C','race'=>'C');
-// Add attributes
-$types.=array('charisma'=>'I','intelligence'=>'I',
-  'memory'=>'I','perception'=>'I','willpower'=>'I');
+  'balance'=>'N','bloodline'=>'C','characterid'=>'I','charisma'=>'I',
+  'clonename'=>'C','cloneskillpoints'=>'I','corporationid'=>'I',
+  'corporationname'=>'C','gender'=>'C','intelligence'=>'I','memory'=>'I',
+  'name'=>'C','perception'=>'I','race'=>'C','willpower'=>'I');
 try {
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
@@ -82,37 +77,36 @@ try {
     // Main table first
     // Must be done first because of foreign key constraints in
     // other tables
-    $datum=clone $xml->result[0]->children();
+    $datum=clone $xml->result;
     // Get rid of child table stuff
-    unset($datum->rowset,$datum->attributes,$datum->attributeEnhancers);
+    unset($datum->rowset,$datum->attributes);
+    unset($datum->attributeEnhancers,$datum->currentTime);
+    unset($datum->cachedUntil);
     $data=array();
     if (count($datum)>0) {
-      foreach ($datum as $k=>$v) {
+      foreach ($datum->children() as $k=>$v) {
         $data[mb_strtolower($k)]=(string)$v;
       };
     };// if $datum>0
     // Append attributes there's no need to have another table for them.
     /* attributes */
     $dbTable='attributes';
-    $datum=$xml->xpath('//result/attributes');
+    $datum=$xml->result->attributes;
     if (count($datum)>0) {
       foreach ($datum[0]->children() as $k=>$v) {
         $data[mb_strtolower($k)]=(int)$v;
       };
     };// if $datum>0
-    if (!count($data)) {
+    if (count($data)) {
       upsert($data,$types,mb_strtolower($api),DSN_CHAR_WRITER);
     };
 
     /* Skills */
-    /**
-     * Have some kind of strange bug think it has to do with unpublished but can't find anything.
-     */
     $dbTable='skills';
     // Set the field types of query by name.
     $types=array('ownerid'=>'I','level'=>'I',
       'skillpoints'=>'I','typeid'=>'I','unpublished'=>'L');
-    $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
+    $datum=$xml->xpath('//rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerid'=>$ownerid,'level'=>0,'unpublished'=>0);
       $dbTable=mb_strtolower($dbTable);
@@ -122,8 +116,8 @@ try {
   };// if $xml instanceof SimpleXMLElement
 }
 catch (EVE_API_File_Exception $e) {
-  // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
-  $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+  // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
+  $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
   $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
   upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
 }
@@ -294,11 +288,6 @@ foreach ($apis as $api=>$settings) {
           };// if $oldest<$lastDT
         };// if $xml instanceof SimpleXMLElement
       } while ($cnt==1000&&isset($postdata[$settings['beforeid']]));
-      /*if ((YAPEAL_LOG_LEVEL&E_USER_NOTICE)==E_USER_NOTICE) {
-        $mess='Cache until for '.$api.$account.': '.$cuntil;
-        print_on_command($mess);
-        trigger_error($mess,E_USER_NOTICE);
-      };*/
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil=gmdate('Y-m-d H:i:s',strtotime('60 minutes'));
@@ -339,23 +328,8 @@ foreach ($apis as $api=>$settings) {
 
 /* Asset List */
 
-// Done last because it can take several minutes to finish.
-// TODO: This needs to be rewritten somehow so it can use multiUpsert that
-// would make it much faster.
 $api='AssetList';
-// TODO: Table structure needs to be changed to work for both characters and
-// corporations. corporationid changed to ownerid maybe would work.
-$params=array(
-  'flag'=>'flag','id'=> 'id','itemid'=>'itemid','lft'=>'l',
-  'locationid'=>'locationid','lvl'=>'level','norder'=>'norder',
-  'ownerid'=>'characterid','quantity'=>'quantity','rgt'=>'r',
-  'rootid'=>'rootid','singleton'=>'singleton','typeid'=>'typeid'
-);
-/*try {
-  $nestedSet=& DB_NestedSet::factory('MDB2',DSN_CHAR_WRITER,$params);
-  $nestedSet->setAttr(array('node_table'=>'assetlist',
-    'lock_table'=>'nested_locks','secondarySort'=>'locationid')
-  );
+try {
   // Now get API pull and re-build asset list
   $postdata=array('userID'=>$userid,'apiKey'=>$apikey,
     'characterID'=>$charid);
@@ -366,26 +340,36 @@ $params=array(
     $cuntil=(string)$xml->cachedUntil[0];
     $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
     upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
-    $datum=$xml->xpath('//result/rowset/row');
+    $datum=$xml;
     if (count($datum)>0) {
-      // Clear out old tree for this corp
+      // Call recursive function to modify XML.
+      editAssets($datum);
+      // Use generated owner node as root for tree.
+      $chartype=get_charBloodLine($ownerid,DSN_CHAR_WRITER);
+      $charHQ=get_BloodLineHQ($chartype);
+      $typeID=get_bloodLineTypeID($chartype);
+      $lft=$datum->result[0]['lft'];
+      $rgt=$datum->result[0]['rgt'];
+      $nodeData=array(
+        'flag'=>'0','itemid'=>$ownerid,'lft'=>$lft,'locationid'=>$charHQ,
+        'ownerid'=>$ownerid,'quantity'=>'1','rgt'=>$rgt,'singleton'=>'0',
+        'typeid'=>$typeID
+      );
+      // Clear out old tree for this owner.
       $sql='delete';
       $sql.=' from '.mb_strtolower($api);
       $sql.=' where ownerid='.$ownerid;
-      $con->exec($sql);
-      // Use generated char node as root for tree.
-      $chartype=get_charBloodLine($charid);
-      $charHQ=get_BloodLineHQ($chartype);
-      $nodeData=array(
-        'locationid'=>$charHQ,'typeid'=>$chartype,'quantity'=>'1','flag'=>'0',
-        'singleton'=>'0','itemid'=>$charid,'ownerid'=>$ownerid
-      );
-      $parent=$nestedSet->createRootNode($nodeData);
-      $location=0;
-      foreach ($datum as $row) {
-        // Recursive function that does the magic
-        addNode($row,$parent,$nestedSet,$ownerid,$location);
-      };// foreach $datum ...
+      $con->Execute($sql);
+      $types=array(
+        'flag'=>'I','itemid'=>'I','lft'=>'I','locationid'=>'I','ownerid'=>'I',
+        'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeid'=>'I');
+      // Insert the new owner's root node.
+      upsert($nodeData,$types,mb_strtolower($api),DSN_CHAR_WRITER);
+      // Just need the rows from XML now
+      $datum=$xml->xpath('//row');
+      $extras=array('locationid'=>0,'ownerid'=>$ownerid);
+      multipleUpsertAttributes($datum,$types,mb_strtolower($api),
+        DSN_CHAR_WRITER,$extras);
     };// if count $datum ...
   };// if $xml instanceof SimpleXMLElement
 }
@@ -413,5 +397,5 @@ catch (EVE_API_Exception $e) {
 }
 catch (ADODB_Exception $e) {
   // Do nothing use observers to log info
-}*/
+}
 ?>

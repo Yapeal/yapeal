@@ -1,6 +1,6 @@
 <?php
 /**
- * Used to get information from Eve-online API
+ * Functions used by Yapeal during DB inserts and updates.
  *
  * LICENSE: This file is part of Yapeal.
  *
@@ -35,7 +35,6 @@ if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
  */
 // Assumes this file is in same directory as common_backend.inc
 require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc';
-require_once 'DB/NestedSet.php';
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_CLASS.'CurlRequest.class.php';
@@ -95,6 +94,9 @@ function dontWait($api,$owner=0,$randomize=true,$logit=YAPEAL_LOG_LEVEL) {
 /**
  * Function used to get info from Eve API.
  *
+ * GetAPIinfo has been updated and now only throws Exception.
+ * It will no longer trigger errors.
+ *
  * @param string $api Needs to be set to base part of name for example:
  * /corp/StarbaseDetail.xml.aspx would just be StarbaseDetail
  * @param integer $posttype 0=eve, 1=char, 2=corp, 3=map, 4=account See API
@@ -116,10 +118,34 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
     YAPEAL_API_MAP=>'/map/',
     YAPEAL_API_ACCOUNT=>'/account/'
   );
+  // If using cache file check for it first.
+  if (YAPEAL_CACHE_XML) {
+    // Build cache file path
+    $cachePath = YAPEAL_CACHE.$prefixes[$posttype];
+    // Build base part of cache file name
+    $cacheFileName = $api;
+    if (isset($postdata['accountKey'])) {
+      $cacheFileName .= $postdata['accountKey'];
+    };
+    if (isset($postdata['characterID'])) {
+      $cacheFileName .= '_'.$postdata['characterID'];
+    };
+    $cacheFileName .= '.xml';
+    $cacheFile = $cachePath.$cacheFileName;
+    if (file_exists($cacheFile) && is_readable($cacheFile)) {
+      $xml = simplexml_load_file($cacheFile);
+      $cuntil = strtotime($xml->cachedUntil[0].' +0000');
+      $ctime = time();
+      if ($ctime<$cuntil) {
+        return $xml;
+      };
+    };
+  };
   $result=array();
   $xml=NULL;
   // Build http parameter.
-  $http=array('timeout'=>60,'url'=>API_URL_BASE.$prefixes[$posttype].$api.API_SUFFIX);
+  $http=array('timeout'=>60,
+    'url'=>API_URL_BASE.$prefixes[$posttype].$api.API_SUFFIX);
   if ($posttype==YAPEAL_API_EVE||$posttype==YAPEAL_API_MAP) {
     // Global APIs like eve, and map don't use POST data.
     $http['method']='GET';
@@ -135,84 +161,81 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   $result=$sh->exec();
   // Now check for errors.
   if ($result['curl_error']) {
-    $mess='CURL error '.$result['curl_error'].' for '.$http['url'];
+    $mess='cURL error'.PHP_EOL;
     if ($http['content']) {
-      $mess.=PHP_EOL.'Parameters '.$http['content'];
+      $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
-    // Throw exception, or ...
-    if (YAPEAL_EXCEPTIONS) {
-      require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
-      throw new EVE_API_File_Exception($mess,1);
-    // trigger error instead.
-    } else if ((YAPEAL_LOG_LEVEL&E_USER_WARNING)==E_USER_WARNING) {
-      print_on_command($mess);
-      trigger_error($mess,E_USER_WARNING);
-    };
+    $mess.='Error code: '.$result['curl_errno'].' for '.$http['url'].PHP_EOL;
+    $mess.='Error message: '.$result['curl_error'];
+    print_on_command($mess);
+    // Throw exception
+    require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
+    throw new EVE_API_File_Exception($mess,1);
   };
   if (200!=$result['http_code']) {
-    $mess='HTTP error '.$result['http_code'].' for '.$http['url'];
+    $mess='HTTP error'.PHP_EOL;
     if ($http['content']) {
-      $mess.=PHP_EOL.'Parameters '.$http['content'];
+      $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
-    // Throw exception, or ...
-    if (YAPEAL_EXCEPTIONS) {
-      require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
-      throw new EVE_API_File_Exception($mess,2);
-    // trigger error instead.
-    } else if ((YAPEAL_LOG_LEVEL&E_USER_WARNING)==E_USER_WARNING) {
-      print_on_command($mess);
-      trigger_error($mess,E_USER_WARNING);
-    };
+    $mess.='Error code: '.$result['http_code'].' for '.$http['url'].PHP_EOL;
+    print_on_command($mess);
+    // Throw exception
+    require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
+    throw new EVE_API_File_Exception($mess,2);
   };
   if (!$result['body']) {
-    $mess='API data was empty for '.$http['url'];
+    $mess='API data error'.PHP_EOL;
     if ($http['content']) {
-      $mess.=PHP_EOL.'Parameters '.$http['content'];
+      $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
-    // Throw exception, or ...
-    if (YAPEAL_EXCEPTIONS) {
-      require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
-      throw new EVE_API_File_Exception($mess,3);
-    // trigger error instead.
-    } else if ((YAPEAL_LOG_LEVEL&E_USER_WARNING)==E_USER_WARNING) {
-      print_on_command($mess);
-      trigger_error($mess,E_USER_WARNING);
-    };
+    $mess.='Data empty for '.$http['url'].PHP_EOL;
+    print_on_command($mess);
+    // Throw exception
+    require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
+    throw new EVE_API_File_Exception($mess,3);
   };
   if (!mb_strpos($result['body'],'<eveapi version="')) {
     $result=FALSE;
-    $mess="API didn't return xml for ".$http['url'];
+    $mess='API data error'.PHP_EOL;
     if ($http['content']) {
-      $mess.=PHP_EOL.'Parameters '.$http['content'];
+      $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
-    // Throw exception, or ...
-    if (YAPEAL_EXCEPTIONS) {
-      require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
-      throw new EVE_API_File_Exception($mess,4);
-    // trigger error instead.
-    } else if ((YAPEAL_LOG_LEVEL&E_USER_WARNING)==E_USER_WARNING) {
-      print_on_command($mess);
-      trigger_error($mess,E_USER_WARNING);
-    };
+    $mess.='No XML returned for '.$http['url'].PHP_EOL;
+    print_on_command($mess);
+    // Throw exception
+    require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
+    throw new EVE_API_File_Exception($mess,4);
   };
   $xml=simplexml_load_string($result['body']);
   if (isset($xml->error[0])) {
     $result=FALSE;
-    $mess='API error '.(int)$data->error[0]['code'].' '.(string)$data->error[0];
-    $mess.=' for '.$http['url'];
+    $mess='Eve API error'.PHP_EOL;
     if ($http['content']) {
-      $mess.=PHP_EOL.'Parameters '.$http['content'];
+      $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
-    // Throw exception, or ...
-    if (YAPEAL_EXCEPTIONS) {
-      require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
-      throw new EVE_API_Error_Exception($mess,(int)$data->error[0]['code']);
-    // trigger error instead.
-    } else if ((YAPEAL_LOG_LEVEL&E_USER_WARNING)==E_USER_WARNING) {
-      print_on_command($mess);
-      trigger_error($mess,E_USER_WARNING);
-    };
+    $mess.='Error code: '.(int)$xml->error[0]['code'].' for '.$http['url'].PHP_EOL;
+    $mess.='Error message: '.(string)$xml->error[0];
+    if (YAPEAL_CACHE_XML) {
+      $cacheFile = $cachePath.'error_'.$cacheFileName;
+      if (is_dir($cachePath) && is_writeable($cachePath)) {
+        file_put_contents($cacheFile,$xml->asXML());
+      };
+    };// if YAPEAL_CACHE_XML
+    // Throw exception
+    require_once YAPEAL_CLASS.'EVE_API_Exception.class.php';
+    throw new EVE_API_Error_Exception($mess,(int)$xml->error[0]['code']);
   };
+  if (YAPEAL_CACHE_XML) {
+    $cacheFile = $cachePath.'error_'.$cacheFileName;
+    // Delete old XML error file if it exists
+    if (file_exists($cacheFile) && is_writeable($cacheFile)) {
+      unlink($cacheFile);
+    };
+    $cacheFile = $cachePath.$cacheFileName;
+    if (is_dir($cachePath) && is_writeable($cachePath)) {
+      file_put_contents($cacheFile,$xml->asXML());
+    };
+  };// if YAPEAL_CACHE_XML
   return $xml;
 };// function getAPIinfo
 
@@ -237,7 +260,6 @@ function multipleUpsertAttributes(
   if (count($datum)>0) {
     $data=array();
     $row=array();
-    print_on_command('In multiupsertattr');
     foreach ($datum as $record) {
       $row=$extras;
       foreach ($record->attributes() as $k=>$v) {
@@ -247,42 +269,90 @@ function multipleUpsertAttributes(
       };
       $data[]=$row;
     };// foreach $datum
-    elog($data,YAPEAL_WARNING_LOG);
     multipleUpsert($data,$types,$table,$dsn);
   };// if $datum>0
 }
 
 /**
- * Recrusive function used for asset list API to build NestedSet
+ * Get solarsystemid for a blood line.
+ * @param string $chartype Which character type (blood line) to get HQ for.
  *
- * @param array $row SimpleXML element who's attributes we'll be adding.
- * @param integer $parent ID of parent DB item we're adding this $row to.
- * @param integer @nestedSet The nested set resource to use to add $row.
- * @param integer $ownerid Owner of the $row we're adding (corp,char).
- * @param integer $location ID of location in eve for $row will be one of
- * hanger, office, or somewhere in space.
+ * @return string Returns the HQ system for this blood line.
  *
- * @return bool
- *
- * @uses DB_NestedSet::createSubNode()
  */
-// TODO: Needs to be changed to work with characters as well.
-function addNode($row,$parent,$nestedSet,$ownerid,$location) {
-  $nodeData=array('ownerid'=>$ownerid,'locationid'=>$location);
-  foreach ($row->attributes() as $k=>$v) {
-    $nodeData[mb_strtolower($k)]=(string)$v;
-    // If we have our own locationid save it for any children we might have
-    if ($k=='locationID') {
-      $location=(string)$v;
-    };// if $k ...
-  };// foreach $row->attributes() ...
-  $node=$nestedSet->createSubNode($parent,$nodeData);
-  if (count($row->children())) {
-    foreach ($row->rowset->row as $subnode) {
-      // The recursive call that makes magic happen
-      addNode($subnode,$node,$nestedSet,$ownerid,$location);
-    };// foreach
-  };// if count $row->children ...
-  return true;
-}// function addNode ...
+function get_BloodLineHQ($chartype) {
+  $raceToSystem=array(
+    'Achura'=>30000145,'Amarr'=>30002187,'Brutor'=>30002544,
+    'Civire'=>30000145,'Deteis'=>30000145,'Gallente'=>30004967,
+    'Intaki'=>30003788,'JinMei'=>30004967,'Khanid'=>30003863,
+    'NiKunni'=>30002187,'Sebiestor'=>30002544,'Vherokior'=>30002544);
+  return $raceToSystem[$chartype];
+}// function get_BloodLineHQ ...
+
+/**
+ * Get blood line for a character.
+ * @param integer $charid Which character to get blood line for.
+ * @param string $dsn An ADOdb compatible connection string.
+ *
+ * @return string Returns the HQ system for this race.
+ *
+ * @throws PEAR_Exception for any errors.
+ */
+function get_charBloodLine($charid,$dsn) {
+  $con=connect($dsn);
+  $sql='select bloodline from charactersheet';
+  $sql.=' where characterid='.$charid;
+  $result=$con->GetOne($sql);
+  print_r($result)."\n";
+  return $result;
+}// function get_charBloodLine ...
+
+/**
+ * Get typeID of blood line for a character.
+ * @param integer $bloodLine Which blood line to get typeID for.
+ *
+ * @return string Returns the typeID for this blood line.
+ */
+function get_bloodLineTypeID($bloodLine) {
+  $bloodLineToTypeID=array(
+    'Achura'=>1383,'Amarr'=>1373,'Brutor'=>1380,'Civire'=>1375,'Deteis'=>1376,
+    'Gallente'=>1377,'Intaki'=>1378,'JinMei'=>1384,'Khanid'=>1385,
+    'NiKunni'=>1374,'Sebiestor'=>1379,'Vherokior'=>1386);
+  return $bloodLineToTypeID[$bloodLine];
+}// function get_charBloodLine ...
+
+/**
+ * Navigates XML and adds lft and rgt attributes
+ *
+ * Navigates XML using SimpleXML and adds lft and rgt attributes of Nested Set
+ * for insertion into database.
+ *
+ * @param SimpleXMLElement $node Current element from tree.
+ * @param integer $_Id Current index for lft/rgt counting.
+ * @param integer $location Location of asset.
+ * Used to propagate information from parents to children that don't include it
+ * by default.
+ *
+ * @return void
+ */
+function editAssets($node, $_Id = 1, $location = 0) {
+  $nodeName = $node->getName();
+  if ($nodeName == 'row' || $nodeName == 'result') {
+    $node->addAttribute('lft', $_Id++);
+    if (isset($node['locationID'])) {
+      $location = $node['locationID'];
+    } else {
+      $node->addAttribute('locationID', $location);
+    }; //if isset $node['locationID']...
+  }; // if $nodeName=='row'||$nodeName=='result'
+  if ($children = $node->children()) {
+    foreach($children as $child) {
+      $_Id = editAssets($child, $_Id, $location);
+    }; //foreach children as child
+  };
+  if ($nodeName == 'row' || $nodeName == 'result') {
+    $node->addAttribute('rgt', $_Id++);
+  };
+  return $_Id;
+} //function editassets
 ?>

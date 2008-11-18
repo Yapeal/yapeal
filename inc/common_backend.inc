@@ -77,6 +77,7 @@ define('YAPEAL_DEBUG_CORP',8);
 define('YAPEAL_DEBUG_EVE',16);
 define('YAPEAL_DEBUG_MAP',32);
 define('YAPEAL_DEBUG_REQUEST',64);
+define('YAPEAL_DEBUG_ALL',16777215);
 
 // Grab the info from ini file.
 $iniVars=parse_ini_file(YAPEAL_INI_FILE,TRUE);

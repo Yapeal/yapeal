@@ -292,7 +292,7 @@ foreach ($apis as $api=>$settings) {
             print_on_command($mess);
             $yapealDebugging.=$mess.PHP_EOL;
           };// if YAPEAL_DEBUG&&...
-            $datum=$xml->xpath($settings['xpath']);
+          $datum=$xml->xpath($settings['xpath']);
           $cnt=count($datum);
           $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {

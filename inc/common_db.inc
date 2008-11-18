@@ -171,10 +171,22 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
     $cacheFileName .= '.xml';
     $cacheFile = $cachePath.$cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST) {
+        $mess='REQUEST: Loading '.$cacheFileName.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       $xml = simplexml_load_file($cacheFile);
       $cuntil = strtotime($xml->cachedUntil[0].' +0000');
       $ctime = time();
       if ($ctime<$cuntil) {
+        if (YAPEAL_DEBUG&&
+          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST) {
+          $mess='REQUEST: Using '.$cacheFileName.' in '.__FILE__;
+          print_on_command($mess);
+          $yapealDebugging.=$mess.PHP_EOL;
+        };// if YAPEAL_DEBUG&&...
         return $xml;
       };
     };
@@ -200,7 +212,9 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   // Now check for errors.
   if ($result['curl_error']) {
     $mess='cURL error'.PHP_EOL;
-    if ($http['content']) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+      $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
     $mess.='Error code: '.$result['curl_errno'].' for '.$http['url'].PHP_EOL;
@@ -212,7 +226,9 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (200!=$result['http_code']) {
     $mess='HTTP error'.PHP_EOL;
-    if ($http['content']) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+      $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
     $mess.='Error code: '.$result['http_code'].' for '.$http['url'].PHP_EOL;
@@ -223,7 +239,9 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (!$result['body']) {
     $mess='API data error'.PHP_EOL;
-    if ($http['content']) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+      $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
     $mess.='Data empty for '.$http['url'].PHP_EOL;
@@ -235,7 +253,9 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   if (!mb_strpos($result['body'],'<eveapi version="')) {
     $result=FALSE;
     $mess='API data error'.PHP_EOL;
-    if ($http['content']) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+      $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
     $mess.='No XML returned for '.$http['url'].PHP_EOL;
@@ -248,7 +268,9 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   if (isset($xml->error[0])) {
     $result=FALSE;
     $mess='Eve API error'.PHP_EOL;
-    if ($http['content']) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+      $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
     $mess.='Error code: '.(int)$xml->error[0]['code'].' for '.$http['url'].PHP_EOL;

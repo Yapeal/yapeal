@@ -59,6 +59,7 @@ require_once YAPEAL_CLASS.'CurlRequest.class.php';
  * @throws ADODB_Exception for any errors.
  */
 function connect($dsn) {
+  global $yapealDebugging;
   if (YAPEAL_DEBUG&&
     (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_DATABASE)==YAPEAL_DEBUG_DATABASE) {
     $mess='DATABASE: Before connect for '.$dsn.' in '.__FILE__;
@@ -91,6 +92,7 @@ function connect($dsn) {
  * @return Boolean Returns true when we need to get API data.
  */
 function dontWait($api,$owner=0,$randomize=true,$logit=YAPEAL_LOG_LEVEL) {
+  global $yapealDebugging;
   $mess='';
   $ctime=strtotime(get_cacheduntil($api,$owner).' +0000');
   $now=time()-10;// 10 seconds for EVE API time offset added :P
@@ -149,6 +151,7 @@ function dontWait($api,$owner=0,$randomize=true,$logit=YAPEAL_LOG_LEVEL) {
  * @throws EVE_API_Exception for API file errors
  */
 function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array()) {
+  global $yapealDebugging;
   $prefixes=array(
     YAPEAL_API_EVE=>'/eve/',
     YAPEAL_API_CHAR=>'/char/',

@@ -72,11 +72,11 @@ defined('YAPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
 define('YAPEAL_DEBUG_NONE',0);
 define('YAPEAL_DEBUG_ACCOUNT',1);
 define('YAPEAL_DEBUG_DATABASE',2);
-define('YAPEAL_DEBUG_CHAR',3);
-define('YAPEAL_DEBUG_CORP',4);
-define('YAPEAL_DEBUG_EVE',5);
-define('YAPEAL_DEBUG_MAP',6);
-define('YAPEAL_DEBUG_REQUEST',7);
+define('YAPEAL_DEBUG_CHAR',4);
+define('YAPEAL_DEBUG_CORP',8);
+define('YAPEAL_DEBUG_EVE',16);
+define('YAPEAL_DEBUG_MAP',32);
+define('YAPEAL_DEBUG_REQUEST',64);
 
 // Grab the info from ini file.
 $iniVars=parse_ini_file(YAPEAL_INI_FILE,TRUE);

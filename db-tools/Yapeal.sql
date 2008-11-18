@@ -375,7 +375,7 @@ CREATE  TABLE IF NOT EXISTS `WalletJournal` (
   `amount` DECIMAL(17,2) NOT NULL ,
   `balance` DECIMAL(17,2) NOT NULL ,
   `reason` TEXT NOT NULL ,
-  `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it\'s for we have to add it. Taken from POST call params.' ,
+  `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet its for we have to add it. Taken from POST call params.' ,
   PRIMARY KEY (`ownerID`, `date`, `refID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
@@ -403,7 +403,7 @@ CREATE  TABLE IF NOT EXISTS `WalletTransactions` (
   `stationName` VARCHAR(255) NOT NULL ,
   `transactionType` VARCHAR(255) NOT NULL DEFAULT 'sell' ,
   `transactionFor` VARCHAR(255) NOT NULL DEFAULT 'corporation' ,
-  `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it\'s for we have to add it. Taken from POST call params.' ,
+  `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet its for we have to add it. Taken from POST call params.' ,
   PRIMARY KEY (`ownerID`, `transactionDateTime`, `transactionID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8

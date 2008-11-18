@@ -89,6 +89,8 @@ CREATE  TABLE IF NOT EXISTS `CharacterSheet` (
   `memory` SMALLINT UNSIGNED NOT NULL ,
   `perception` SMALLINT UNSIGNED NOT NULL ,
   `willpower` SMALLINT UNSIGNED NOT NULL ,
+  `cloneName` VARCHAR(255) NOT NULL ,
+  `cloneSkillPoints` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8

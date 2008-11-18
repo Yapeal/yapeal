@@ -29,9 +29,9 @@ url_base="http://api.eve-online.com"
 ; Set to TRUE to turn debugging on. (required)
 debug=FALSE
 
-; Sets level of debugging wanted. (reserved)
-; This is reserved for future use. Not used at this time.
-debug_level=1
+; Sets level of debugging wanted. (required)
+; Used in a few places to turn on extra debugging when >0.
+debug_level=0
 
 ; Sections that you wish to log debug messages for. (required)
 ; Set to YAPEAL_DEBUG_NONE or

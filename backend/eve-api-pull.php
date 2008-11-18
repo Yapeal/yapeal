@@ -89,11 +89,11 @@ require_once realpath($path);
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * **************************************************************************/
 
-require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
-require_once YAPEAL_INC.'eap_functions.inc';
 require_once YAPEAL_CLASS.'Logging_Exception_Observer.class.php';
 require_once YAPEAL_CLASS.'Printing_Exception_Observer.class.php';
+require_once YAPEAL_INC.'common_db.inc';
+//require_once YAPEAL_INC.'eap_functions.inc';
 
 function usage() {
   $progname=basename($GLOBALS['argv'][0]);

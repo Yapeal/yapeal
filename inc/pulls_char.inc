@@ -271,7 +271,7 @@ $accounts=array(1000);
 foreach ($apis as $api=>$settings) {
   foreach ($accounts as $account) {
     $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid,
-      'accountKey'=>$account,$settings['beforeid']=>0);
+      'accountKey'=>$account);
     try {
       // Continue to next if we're not ready at this time
       if (false===dontWait($api.$account,$ownerid)) {

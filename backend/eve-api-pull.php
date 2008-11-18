@@ -268,8 +268,9 @@ try {
     );
     $data='';
     foreach ($yapealDebugging as $section=>$messages) {
-      $data='== '.$sectionToName[$section].' =='.PHP_EOL.implode(PHP_EOL,$messages);
-    }
+      $data='== '.$sectionToName[$section].' =='.PHP_EOL;
+      $data.=implode(PHP_EOL,$messages);
+    };
     elog($data,YAPEAL_DEBUG_LOG,TRUE);
   };// if YAPEAL_DEBUG&&...
   exit;

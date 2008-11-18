@@ -75,8 +75,8 @@ function connect($dsn) {
  */
 function get_corpHQ($corp,$dsn) {
   $con=connect($dsn);
-  $sql='select stationid from corporationsheet';
-  $sql.=' where corporationid=?';
+  $sql='select stationID from CorporationSheet';
+  $sql.=' where corporationID=?';
   $result=$con->GetOne($sql,array($corp));
   return $result;
 };
@@ -93,8 +93,8 @@ function get_corpHQ($corp,$dsn) {
  */
 function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
-  $sql='select description from walletdivisions';
-  $sql.=' where accountkey=? and corporationid=?';
+  $sql='select description from walletDivisions';
+  $sql.=' where accountKey=? and corporationID=?';
   $result=$con->GetOne($sql,array($accountkey,$corp));
   return $result;
 };
@@ -111,8 +111,8 @@ function get_walletname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  */
 function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
-  $sql='select accountkey,description accountname from walletdivisions';
-  $sql.=' where corporationid=?';
+  $sql='select accountKey,description accountName from walletDivisions';
+  $sql.=' where corporationID=?';
   $result=$con->GetAll($sql,array($corp));
   return $result;
 };
@@ -130,7 +130,7 @@ function get_walletnames($corp,$dsn=DSN_CORP_WRITER) {
 function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
   $sql='select description from divisions';
-  $sql.=' where accountkey=? and corporationid=?';
+  $sql.=' where accountKey=? and corporationID=?';
   $result=$con->GetOne($sql,array($accountkey,$corp));
   return $result;
 };
@@ -147,8 +147,8 @@ function get_divisionname($accountkey,$corp,$dsn=DSN_CORP_WRITER) {
  */
 function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
   $con=connect($dsn);
-  $sql='select accountkey,description accountname from divisions';
-  $sql.=' where corporationid=?';
+  $sql='select accountKey,description accountName from divisions';
+  $sql.=' where corporationID=?';
   $result=$con->GetAssoc($sql,array($corp));
   return $result;
 };
@@ -163,11 +163,11 @@ function get_divisionnames($corp,$dsn=DSN_CORP_WRITER) {
  *
  * @return string A date/time using format 'YYYY-MM-DD HH:MM:SS'
  */
-function get_cacheduntil($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) {
+function get_cacheduntil($tname,$owner=0,$table='CachedUntil',$dsn=DSN_UTIL_WRITER) {
   try {
     $con=connect($dsn);
-    $sql='select cacheduntil from '.$table;
-    $sql.=' where tablename=? and ownerid=?';
+    $sql='select cachedUntil from '.$table;
+    $sql.=' where tableName=? and ownerID=?';
     $until=$con->GetOne($sql,array($tname,$owner));
     if (!strtotime($until)) {
       return '1970-01-01 00:00:01';// One second after epox
@@ -190,12 +190,12 @@ function get_cacheduntil($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRIT
  * @return string A date/time using format
  * 'weekday, 2digitDay month 4digitYear HH:MM:SS +0000'
  */
-function get_expires($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) {
+function get_expires($tname,$owner=0,$table='CachedUntil',$dsn=DSN_UTIL_WRITER) {
   try {
     $con=connect($dsn);
-    $sql='select date_format(cacheduntil,"%a, %d %b %Y %T +0000") cacheduntil';
+    $sql='select date_format(cachedUntil,"%a, %d %b %Y %T +0000") cacheduntil';
     $sql.=' from '.$table;
-    $sql.=' where tablename=? and ownerid=?';
+    $sql.=' where tableName=? and ownerID=?';
     $until=$con->GetOne($sql,array($tname,$owner));
     if (!strtotime($until)) {
       return gmdate("r",1);// One second after epox
@@ -212,10 +212,10 @@ function get_expires($tname,$owner=0,$table='cacheduntil',$dsn=DSN_UTIL_WRITER) 
  *
  * Example of how to use:
  * <code>
- * $data=array('tablename'=>'eve-api-pull','ownerid'=>0,
- *   'cacheduntil'=>'2008-01-01 00:00:01');
- * $types=array('tablename'=>'text','ownerid'=>'integer',
- *   'cacheduntil'=>'timestamp');
+ * $data=array('tableName'=>'eve-api-pull','ownerID'=>0,
+ *   'cachedUntil'=>'2008-01-01 00:00:01');
+ * $types=array('tableName'=>'text','ownerID'=>'integer',
+ *   'cachedUntil'=>'timestamp');
  * upsert($data,$types,'cacheuntil',DSN_UTIL_WRITER);
  * </code>
  *
@@ -251,11 +251,11 @@ function upsert(array $data,array $types,$table,$dsn) {
  * Example of how to use:
  * <code>
  * $data=array(
- * array('tablename'=>'eve-api-pull','ownerid'=>0,
- *   'cacheduntil'=>'2008-01-01 00:00:01'), ...
+ * array('tableName'=>'eve-api-pull','ownerID'=>0,
+ *   'cachedUntil'=>'2008-01-01 00:00:01'), ...
  * );
- * $types=array('tablename'=>'text','ownerid'=>'integer',
- *   'cacheduntil'=>'timestamp');
+ * $types=array('tableName'=>'text','ownerID'=>'integer',
+ *   'cachedUntil'=>'timestamp');
  * multipleUpsert($data,$types,'cacheuntil',DSN_UTIL_WRITER);
  * </code>
  *

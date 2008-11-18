@@ -34,26 +34,14 @@ if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
  * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
  * *************************************************************************/
 
-/**
- * Find path for includes
- */
-// Assumes this file is in same directory as common_backend.inc
-require_once realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR.'common_backend.inc';
-
 /* *************************************************************************
  * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * *************************************************************************/
 
-require_once YAPEAL_INC.'common_db.inc';
-require_once YAPEAL_INC.'elog.inc';
-require_once YAPEAL_INC.'eap_functions.inc';
-
 /****************************************************************************
  * Per corp API pulls
  ****************************************************************************/
-
-$con=connect(DSN_CORP_WRITER);
 
 /* Corporation Sheet */
 
@@ -61,11 +49,11 @@ $api='CorporationSheet';
 $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid);
 // Set the field types of query by name.
 $types=array(
-  'corporationid'=>'I','corporationname'=>'C','ticker'=>'C',
-  'ceoid'=>'I','ceoname'=>'C','stationid'=>'I',
-  'stationname'=>'C','description'=>'X','url'=>'C',
-  'allianceid'=>'I','alliancename'=>'X','taxrate'=>'N',
-  'membercount'=>'I','memberlimit'=>'I','shares'=>'I'
+  'corporationID'=>'I','corporationName'=>'C','ticker'=>'C',
+  'ceoID'=>'I','ceoName'=>'C','stationID'=>'I',
+  'stationName'=>'C','description'=>'X','url'=>'C',
+  'allianceID'=>'I','allianceName'=>'X','taxRate'=>'N',
+  'memberCount'=>'I','memberLimit'=>'I','shares'=>'I'
 );
 try {
   // Should we wait to get API data
@@ -74,8 +62,8 @@ try {
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil=(string)$xml->cachedUntil[0];
-    $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     // Main table first
     // Must be done first because of foreign key constraints in
     // other tables
@@ -85,58 +73,58 @@ try {
     if (count($datum)>0) {
       // Only get alliance name field if in one ugh!
       // Set it to '' and let it be overwritten for corps in alliances
-      $data=array('alliancename'=>'');
+      $data=array('allianceName'=>'');
       foreach ($datum as $k=>$v) {
-        $data[mb_strtolower($k)]=(string)$v;
+        $data[$k]=(string)$v;
       };
-      upsert($data,$types,mb_strtolower($api),DSN_CORP_WRITER);
+      upsert($data,$types,$api,DSN_CORP_WRITER);
     };// if $datum>0
 
     /* walletDivisions */
     $dbTable='walletDivisions';
     // Set the field types of query by name.
-    $types=array('accountkey'=>'I','ownerid'=>'I',
+    $types=array('accountKey'=>'I','ownerID'=>'I',
       'description'=>'C');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
-      $extras=array('ownerid'=>$ownerid);
-      multipleUpsertAttributes($datum,$types,mb_strtolower($dbTable),
+      $extras=array('ownerID'=>$ownerid);
+      multipleUpsertAttributes($datum,$types,$dbTable,
         DSN_CORP_WRITER,$extras);
     };// if $datum>0
 
     /* Divisions */
     $dbTable='divisions';
     // Set the field types of query by name.
-    $types=array('accountkey'=>'I','ownerid'=>'I',
+    $types=array('accountKey'=>'I','ownerID'=>'I',
       'description'=>'C');
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
-      $extras=array('ownerid'=>$ownerid);
-      multipleUpsertAttributes($datum,$types,mb_strtolower($dbTable),
+      $extras=array('ownerID'=>$ownerid);
+      multipleUpsertAttributes($datum,$types,$dbTable,
         DSN_CORP_WRITER,$extras);
     };// if $datum>0
 
     /* corplogo */
     $dbTable='corplogo';
     // Set the field types of query by name.
-    $types=array('graphicid'=>'I','ownerid'=>'I',
+    $types=array('graphicID'=>'I','ownerID'=>'I',
       'shape1'=>'I','shape2'=>'I','shape3'=>'I',
       'color1'=>'I','color2'=>'I','color3'=>'I');
     $datum=$xml->xpath('//result/logo');
     if (count($datum)>0) {
-      $data=array('ownerid'=>$ownerid);
+      $data=array('ownerID'=>$ownerid);
       foreach ($datum[0]->children() as $k=>$v) {
-        $data[mb_strtolower($k)]=(int)$v;
+        $data[$k]=(int)$v;
       };
-      upsert($data,$types,mb_strtolower($dbTable),DSN_CORP_WRITER);
+      upsert($data,$types,$dbTable,DSN_CORP_WRITER);
     };// if $datum>0
   };// if $xml instanceof SimpleXMLElement
 }
 catch (EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
   $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
-  $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-  upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+  $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+  upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
 }
 catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
@@ -147,41 +135,41 @@ catch (ADODB_Exception $e) {
 
 $apis=array(
   'AccountBalance'=>array(
-    'types'=>array('accountid'=>'I','accountkey'=>'I',
-      'balance'=>'N','ownerid'=>'I'),
+    'types'=>array('accountID'=>'I','accountKey'=>'I',
+      'balance'=>'N','ownerID'=>'I'),
     'xpath'=>'//result/rowset/row'
   ),
   'IndustryJobs'=>array(
     'types'=>array(
-      'activityid'=>'I','assemblylineid'=>'I',
-      'beginproductiontime'=>'T','charmaterialmultiplier'=>'N',
-      'chartimemultiplier'=>'N','completed'=>'I',
-      'completedstatus'=>'I','completedsuccessfully'=>'I',
-      'containerid'=>'I','containerlocationid'=>'I',
-      'containertypeid'=>'I','endproductiontime'=>'T',
-      'installedinsolarsystemid'=>'T','installeditemcopy'=>'I',
-      'installeditemflag'=>'I','installeditemid'=>'I',
-      'installeditemlicensedproductionrunsremaining'=>'I',
-      'installeditemlocationid'=>'I',
-      'installeditemmateriallevel'=>'I',
-      'installeditemproductivitylevel'=>'I',
-      'installeditemquantity'=>'I','installeditemtypeid'=>'I',
-      'installerid'=>'I','installtime'=>'T','jobid'=>'I',
-      'licensedproductionruns'=>'I','materialmultiplier'=>'N',
-      'outputflag'=>'I','outputlocationid'=>'I',
-      'outputtypeid'=>'I','ownerid'=>'I',
-      'pauseproductiontime'=>'T','runs'=>'I',
-      'timemultiplier'=>'N'),
+      'activityID'=>'I','assemblyLineID'=>'I',
+      'beginProductionTime'=>'T','charMaterialMultiplier'=>'N',
+      'charTimeMultiplier'=>'N','completed'=>'I',
+      'completedStatus'=>'I','completedSuccessfully'=>'I',
+      'containerID'=>'I','containerLocationID'=>'I',
+      'containerTypeID'=>'I','endProductionTime'=>'T',
+      'installedInSolarSystemID'=>'T','installedItemCopy'=>'I',
+      'installedItemFlag'=>'I','installedItemID'=>'I',
+      'installedItemLicensedProductionRunsRemaining'=>'I',
+      'installedItemlocationID'=>'I',
+      'installedItemMaterialLevel'=>'I',
+      'installedItemProductivityLevel'=>'I',
+      'installedItemQuantity'=>'I','installedItemTypeID'=>'I',
+      'installerID'=>'I','installTime'=>'T','jobID'=>'I',
+      'licensedProductionRuns'=>'I','materialMultiplier'=>'N',
+      'outputFlag'=>'I','outputLocationID'=>'I',
+      'outputTypeID'=>'I','ownerID'=>'I',
+      'pauseProductionTime'=>'T','runs'=>'I',
+      'timeMultiplier'=>'N'),
     'xpath'=>'//result/rowset/row'
   ),
   'MarketOrders'=>array(
     'types'=>array(
-      'accountkey'=>'I','bid'=>'I','charid'=>'I',
+      'accountKey'=>'I','bID'=>'I','charID'=>'I',
       'duration'=>'I','escrow'=>'N','issued'=>'T',
-      'minvolume'=>'I','orderid'=>'I','orderstate'=>'I',
-      'ownerid'=>'I','price'=>'N','range'=>'I',
-      'stationid'=>'I','typeid'=>'I','volentered'=>'I',
-      'volremaining'=>'I'),
+      'minVolume'=>'I','orderID'=>'I','orderState'=>'I',
+      'ownerID'=>'I','price'=>'N','range'=>'I',
+      'stationID'=>'I','typeID'=>'I','volEntered'=>'I',
+      'volRemaining'=>'I'),
     'xpath'=>'//result/rowset/row'
   )
 );
@@ -193,21 +181,21 @@ foreach ($apis as $api=>$settings) {
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil=(string)$xml->cachedUntil[0];
-      $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
-        $extras=array('ownerid'=>$ownerid);
+        $extras=array('ownerID'=>$ownerid);
         multipleUpsertAttributes($datum,$settings['types'],
-          mb_strtolower($api),DSN_CORP_WRITER,$extras);
+          $api,DSN_CORP_WRITER,$extras);
       };// if $datum>0
     };// if $xml instanceof SimpleXMLElement
   }
   catch (EVE_API_File_Exception $e) {
-    // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-    $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
-    $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+    $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+    $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
   }
   catch (EVE_API_Error_Exception $e) {
     // Some error codes give us a new time to retry after that should be
@@ -216,9 +204,9 @@ foreach ($apis as $api=>$settings) {
       case 116:// Industry jobs already downloaded
       case 117:// Market orders already downloaded
         $cuntil=substr($e->getMessage(),-20,19);
-        $data=array('tablename'=>$api,'ownerid'=>$ownerid,
-          'cacheduntil'=>$cuntil);
-        upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+        $data=array('tableName'=>$api,'ownerID'=>$ownerid,
+          'cachedUntil'=>$cuntil);
+        upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
         break;
       default:
         // Do nothing but logging by default
@@ -235,20 +223,20 @@ foreach ($apis as $api=>$settings) {
 $apis=array(
   'MemberTracking'=>array(
     'types'=>array(
-      'base'=>'C','baseid'=>'I','characterid'=>'I',
-      'grantableroles'=>'C','location'=>'C','locationid'=>'I',
-      'logoffdatetime'=>'T','logondatetime'=>'T',
-      'name'=>'C','ownerid'=>'I','roles'=>'C','shiptype'=>'C',
-      'shiptypeid'=>'I','startdatetime'=>'T','title'=>'C'
+      'base'=>'C','baseID'=>'I','characterID'=>'I',
+      'grantableRoles'=>'C','location'=>'C','locationID'=>'I',
+      'logoffDateTime'=>'T','logonDateTime'=>'T',
+      'name'=>'C','ownerID'=>'I','roles'=>'C','shipType'=>'C',
+      'shipTypeID'=>'I','startDateTime'=>'T','title'=>'C'
     ),
     'xpath'=>'//result/rowset/row',
     'check'=>'characterID'
   ),
   'StarbaseList'=>array(
     'types'=>array(
-      'itemid'=>'I','locationid'=>'I','moonid'=>'I',
-      'onlinetimestamp'=>'T','ownerid'=>'I','state'=>'I',
-      'statetimestamp'=>'T','typeid'=>'I'
+      'itemID'=>'I','locationID'=>'I','moonID'=>'I',
+      'onlineTimestamp'=>'T','ownerID'=>'I','state'=>'I',
+      'stateTimestamp'=>'T','typeID'=>'I'
     ),
     'xpath'=>'//result/rowset/row',
     'check'=>'itemID'
@@ -262,18 +250,18 @@ foreach ($apis as $api=>$settings) {
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil=(string)$xml->cachedUntil[0];
-      $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
-        $sql='select '.mb_strtolower($settings['check']);
-        $sql.=' from '.mb_strtolower($api);
+        $sql='select '.$settings['check'];
+        $sql.=' from '.$api;
         $sql.=' where ownerid='.$ownerid;
         $result=$con->getAll($sql);
         $checking=array();
         // Change assoc array of records from DB into simple array
         foreach ($result as $k=>$v) {
-          $checking[]=(string)$v[mb_strtolower($settings['check'])];
+          $checking[]=(string)$v[$settings['check']];
         };
         //$check=$xml->xpath($settings['xpath'].'[@'.$settings['check'].']');
         // Extract attribute into simple array
@@ -288,23 +276,23 @@ foreach ($apis as $api=>$settings) {
         $delete=array_diff($checking,$current);
         if (!empty($delete)) {
           foreach ($delete as $k=>$v) {
-            $sql='delete from '.mb_strtolower($api);
+            $sql='delete from '.$api;
             $sql.=' where ownerid='.$ownerid;
-            $sql.=' and '.mb_strtolower($settings['check']).'='.$v;
+            $sql.=' and '.$settings['check'].'='.$v;
             $con->Execute($sql);
           };// foreach $delete...
         };// if !empty $delete
-        $extras=array('ownerid'=>$ownerid);
+        $extras=array('ownerID'=>$ownerid);
         multipleUpsertAttributes($datum,$settings['types'],
-          mb_strtolower($api),DSN_CORP_WRITER,$extras);
+          $api,DSN_CORP_WRITER,$extras);
       };// if $datum>0
     };// if $xml instanceof SimpleXMLElement
   }
   catch (EVE_API_File_Exception $e) {
-    // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-    $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
-    $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+    $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+    $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
   }
   catch (EVE_API_Error_Exception $e) {
     // Some error codes give us a new time to retry after that should be
@@ -313,9 +301,9 @@ foreach ($apis as $api=>$settings) {
       case 116:// Industry jobs already downloaded
       case 117:// Market orders already downloaded
         $cuntil=substr($e->getMessage(),-20,19);
-        $data=array('tablename'=>$api,'ownerid'=>$ownerid,
-          'cacheduntil'=>$cuntil);
-        upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+        $data=array('tableName'=>$api,'ownerID'=>$ownerid,
+          'cachedUntil'=>$cuntil);
+        upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
         break;
       default:
         // Do nothing but logging by default
@@ -333,11 +321,11 @@ $apis=array(
   'WalletJournal'=>array(
     'beforeid'=>'beforeRefID',
     'types'=>array(
-      'account'=>'I','amount'=>'N','argid1'=>'I',
-      'argname1'=>'C','balance'=>'N','date'=>'T',
-      'ownerid'=>'I','ownerid1'=>'I','ownerid2'=>'I',
-      'ownername1'=>'C','ownername2'=>'C','reason'=>'X',
-      'refid'=>'I','reftypeid'=>'I'),
+      'account'=>'I','amount'=>'N','argID1'=>'I',
+      'argName1'=>'C','balance'=>'N','date'=>'T',
+      'ownerID'=>'I','ownerID1'=>'I','ownerID2'=>'I',
+      'ownerName1'=>'C','ownerName2'=>'C','reason'=>'X',
+      'refID'=>'I','refTypeID'=>'I'),
     'walkdt'=>'date',
     'walkid'=>'refID',
     'xpath'=>'//result/rowset/row'
@@ -345,12 +333,12 @@ $apis=array(
   'WalletTransactions'=>array(
     'beforeid'=>'beforeTransID',
     'types'=>array(
-      'account'=>'I','clientid'=>'I','clientname'=>'C',
-      'ownerid'=>'I','price'=>'N','quantity'=>'I',
-      'stationid'=>'I','stationname'=>'C',
-      'transactiondatetime'=>'T','transactionfor'=>'C',
-      'transactionid'=>'I','transactiontype'=>'C',
-      'typeid'=>'I','typename'=>'C'),
+      'account'=>'I','clientID'=>'I','clientName'=>'C',
+      'ownerID'=>'I','price'=>'N','quantity'=>'I',
+      'stationID'=>'I','stationName'=>'C',
+      'transactionDateTime'=>'T','transactionFor'=>'C',
+      'transactionID'=>'I','transactionType'=>'C',
+      'typeID'=>'I','typeName'=>'C'),
     'walkdt'=>'transactionDateTime',
     'walkid'=>'transactionID',
     'xpath'=>'//result/rowset/row'
@@ -373,15 +361,15 @@ foreach ($apis as $api=>$settings) {
           // Now update cacheduntil time.
           $cuntil=(string)$xml->cachedUntil[0];
           // Note tablename
-          $data=array('tablename'=>$api.$account,'ownerid'=>$ownerid,
-            'cacheduntil'=>$cuntil);
-          upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+          $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
+            'cachedUntil'=>$cuntil);
+          upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
           $datum=$xml->xpath($settings['xpath']);
           $cnt=count($datum);
-          $extras=array('ownerid'=>$ownerid,'account'=>$account);
+          $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {
             multipleUpsertAttributes($datum,$settings['types'],
-              mb_strtolower($api),DSN_CORP_WRITER,$extras);
+              $api,DSN_CORP_WRITER,$extras);
           } else {
             break;// Leave while if no records returned
           };// else $cnt>0
@@ -405,9 +393,9 @@ foreach ($apis as $api=>$settings) {
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil=gmdate('Y-m-d H:i:s',strtotime('60 minutes'));
-      $data=array('tablename'=>$api.$account,'ownerid'=>$ownerid,
-        'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
+        'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     }
     catch (EVE_API_Error_Exception $e) {
       // Some error codes give us a new time to retry after that should be
@@ -416,20 +404,20 @@ foreach ($apis as $api=>$settings) {
         case 101:// Wallet exhausted
         case 103:// Already returned one week of data
           $cuntil=substr($e->getMessage(),-20,19);
-          $data=array('tablename'=>$api.$account,'ownerid'=>$ownerid,
-            'cacheduntil'=>$cuntil);
-          upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+          $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
+            'cachedUntil'=>$cuntil);
+          upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
           break;
         default:
           // Do nothing but logging by default
       };// case $e->getCode()
     }
     catch (EVE_API_File_Exception $e) {
-      // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-      $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
-      $data=array('tablename'=>$api.$account,'ownerid'=>$ownerid,
-        'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+      $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+      $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
+        'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     }
     catch (EVE_API_Exception $e) {
       // Do nothing use observers to log info
@@ -445,7 +433,7 @@ foreach ($apis as $api=>$settings) {
 // Need to get list of POSes first
 $api='StarbaseList';
 try {
-  $sql='select itemid from '.mb_strtolower($api);
+  $sql='select itemid from '.$api;
   $sql.=' where moonid!=0';
   $sql.=' and ownerid='.$ownerid;
   $datum=$con->GetAll($sql);
@@ -471,10 +459,10 @@ if (!empty($POSlist)) {
     $types=array(
       'allowalliancemembers'=>'L','allowcorporationmembers'=>'L',
       'claimsovereignty'=>'L','deployflags'=>'I',
-      'itemid'=>'I','onaggressionenabled'=>'L',
+      'itemID'=>'I','onaggressionenabled'=>'L',
       'oncorporationwarenabled'=>'L','onstandingdropenabled'=>'L',
       'onstandingdropstanding'=>'N','onstatusdropenabled'=>'L',
-      'onstatusdropstanding'=>'N','ownerid'=>'I',
+      'onstatusdropstanding'=>'N','ownerID'=>'I',
       'usageflags'=>'I'
     );
     try {
@@ -484,55 +472,55 @@ if (!empty($POSlist)) {
         // Now update cacheduntil time.
         $cuntil=(string)$xml->cachedUntil[0];
         // Note tablename
-        $data=array('tablename'=>$api.$pos,'ownerid'=>$ownerid,
-          'cacheduntil'=>$cuntil);
-        upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+        $data=array('tableName'=>$api.$pos,'ownerID'=>$ownerid,
+          'cachedUntil'=>$cuntil);
+        upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
         // Set the field types of query by name.
         $data=array();
         // Loop thru the first group of data.
         $datum=$xml->result->generalSettings->children();
         foreach ($datum as $k=>$v) {
-          $data[mb_strtolower($k)]=(string)$v;
+          $data[$k]=(string)$v;
         };
         // Loop thru the second group of data.
         $datum=$xml->result->combatSettings->children();
         foreach ($datum as $record=>$v) {
           foreach ($v->attributes() as $index=>$value) {
-            $data[mb_strtolower($record.$index)]=(string)$value;
+            $data[$record.$index]=(string)$value;
           };
         };
         if (!array_key_exists('onstandingdropenabled',$data)) {
           $data['onstandingdropenabled']=FALSE;
         };
-        $data['ownerid']=$ownerid;
+        $data['ownerID']=$ownerid;
         $data['itemid']=(int)$pos;
-        $result=upsert($data,$types,mb_strtolower($api),DSN_CORP_WRITER);
+        $result=upsert($data,$types,$api,DSN_CORP_WRITER);
 
         /* Pos Fuel */
         $dbTable='fuel';
         // Set the field types of query by name.
-        $types=array('itemid'=>'I','typeid'=>'I',
+        $types=array('itemID'=>'I','typeID'=>'I',
           'quantity'=>'I');
         $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
         if (count($datum)>0) {
           foreach ($datum as $record) {
             $data=array();
             foreach ($record->attributes() as $k=>$v) {
-              $data[mb_strtolower($k)]=(string)$v;
+              $data[$k]=(string)$v;
             };
             $data['itemid']=$pos;
-            $dbTable=mb_strtolower($dbTable);
+            $dbTable=$dbTable;
             $result=upsert($data,$types,$dbTable,DSN_CORP_WRITER);
           };// foreach $datum
         };// if $datum>0
       };// if $xml instanceof SimpleXMLElement
     }
     catch (EVE_API_File_Exception $e) {
-      // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-      $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
-      $data=array('tablename'=>$api.$pos,'ownerid'=>$ownerid,
-        'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+      $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+      $data=array('tableName'=>$api.$pos,'ownerID'=>$ownerid,
+        'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     }
     catch (EVE_API_Exception $e) {
       // Do nothing use observers to log info
@@ -555,8 +543,8 @@ try {
   if ($xml instanceof SimpleXMLElement) {
     // Now update cacheduntil time.
     $cuntil=(string)$xml->cachedUntil[0];
-    $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     $datum=$xml;
     if (count($datum)>0) {
       // Call recursive function to modify XML.
@@ -566,33 +554,33 @@ try {
       $lft=$datum->result[0]['lft'];
       $rgt=$datum->result[0]['rgt'];
       $nodeData=array(
-        'flag'=>'0','itemid'=>$ownerid,'lft'=>$lft,'locationid'=>$corpHQ,
-        'ownerid'=>$ownerid,'quantity'=>'1','rgt'=>$rgt,'singleton'=>'0',
-        'typeid'=>2
+        'flag'=>'0','itemID'=>$ownerid,'lft'=>$lft,'locationID'=>$corpHQ,
+        'ownerID'=>$ownerid,'quantity'=>'1','rgt'=>$rgt,'singleton'=>'0',
+        'typeID'=>2
       );
       // Clear out old tree for this owner
       $sql='delete';
-      $sql.=' from '.mb_strtolower($api);
+      $sql.=' from '.$api;
       $sql.=' where ownerid='.$ownerid;
       $con->Execute($sql);
       $types=array(
-        'flag'=>'I','itemid'=>'I','lft'=>'I','locationid'=>'I','ownerid'=>'I',
-        'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeid'=>'I');
+        'flag'=>'I','itemID'=>'I','lft'=>'I','locationID'=>'I','ownerID'=>'I',
+        'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeID'=>'I');
       // Insert the new owner's root node.
-      upsert($nodeData,$types,mb_strtolower($api),DSN_CORP_WRITER);
+      upsert($nodeData,$types,$api,DSN_CORP_WRITER);
        //Just need the rows from XML now
       $datum=$xml->xpath('//row');
-      $extras=array('locationid'=>0,'ownerid'=>$ownerid);
-      multipleUpsertAttributes($datum,$types,mb_strtolower($api),
+      $extras=array('locationID'=>0,'ownerID'=>$ownerid);
+      multipleUpsertAttributes($datum,$types,$api,
         DSN_CORP_WRITER,$extras);
     };// if count $datum ...
   };// if $xml instanceof SimpleXMLElement
 }
 catch (EVE_API_File_Exception $e) {
-  // Set cacheduntil to wait 15 minutes if we couldn't get XML from API
-  $cuntil=gmdate('Y-m-d H:i:s',strtotime('15 minutes'));
-  $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-  upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+  // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+  $cuntil=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
+  $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+  upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
 }
 catch (EVE_API_Error_Exception $e) {
   // Some error codes give us a new time to retry after that should be
@@ -600,8 +588,8 @@ catch (EVE_API_Error_Exception $e) {
   switch ($e->getCode()) {
     case 115:// Assets already downloaded
       $cuntil=substr($e->getMessage(),-20,19);
-      $data=array('tablename'=>$api,'ownerid'=>$ownerid,'cacheduntil'=>$cuntil);
-      upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+      $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
+      upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
       break;
     default:
       // Do nothing but logging by default

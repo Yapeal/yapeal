@@ -39,51 +39,51 @@ $allApis=array();
 $allApis.=array(
   'char'=>array(
     'AccountBalance'=>array(
-      'types'=>array('accountid'=>'integer','accountkey'=>'integer',
-        'balance'=>'decimal','ownerid'=>'integer'),
+      'types'=>array('accountID'=>'integer','accountKey'=>'integer',
+        'balance'=>'decimal','ownerID'=>'integer'),
       'xpath'=>'//result/rowset/row'
     ),
     'IndustryJobs'=>array(
       'types'=>array(
-        'activityid'=>'integer','assemblylineid'=>'integer',
-        'beginproductiontime'=>'timestamp','charmaterialmultiplier'=>'decimal',
-        'chartimemultiplier'=>'decimal','completed'=>'integer',
-        'completedstatus'=>'integer','completedsuccessfully'=>'integer',
-        'containerid'=>'integer','containerlocationid'=>'integer',
-        'containertypeid'=>'integer','endproductiontime'=>'timestamp',
-        'installedinsolarsystemid'=>'integer','installeditemcopy'=>'integer',
-        'installeditemflag'=>'integer','installeditemid'=>'integer',
-        'installeditemlicensedproductionrunsremaining'=>'integer',
-        'installeditemlocationid'=>'integer',
-        'installeditemmateriallevel'=>'integer',
-        'installeditemproductivitylevel'=>'integer',
-        'installeditemquantity'=>'integer','installeditemtypeid'=>'integer',
-        'installerid'=>'integer','installtime'=>'timestamp','jobid'=>'integer',
-        'licensedproductionruns'=>'integer','materialmultiplier'=>'decimal',
-        'outputflag'=>'integer','outputlocationid'=>'integer',
-        'outputtypeid'=>'integer','ownerid'=>'integer',
-        'pauseproductiontime'=>'timestamp','runs'=>'integer',
-        'timemultiplier'=>'decimal'),
+        'activityID'=>'integer','assemblyLineID'=>'integer',
+        'beginProductionTime'=>'timestamp','charMaterialMultiplier'=>'decimal',
+        'charTimeMultiplier'=>'decimal','completed'=>'integer',
+        'completedStatus'=>'integer','completedSuccessfully'=>'integer',
+        'containerID'=>'integer','containerLocationID'=>'integer',
+        'containerTypeID'=>'integer','endProductionTime'=>'timestamp',
+        'installedInSolarSystemID'=>'integer','installedItemCopy'=>'integer',
+        'installedItemFlag'=>'integer','installedItemID'=>'integer',
+        'installedItemLicensedProductionRunsRemaining'=>'integer',
+        'installedItemlocationID'=>'integer',
+        'installedItemMaterialLevel'=>'integer',
+        'installedItemProductivityLevel'=>'integer',
+        'installedItemQuantity'=>'integer','installedItemTypeID'=>'integer',
+        'installerID'=>'integer','installTime'=>'timestamp','jobID'=>'integer',
+        'licensedProductionRuns'=>'integer','materialMultiplier'=>'decimal',
+        'outputFlag'=>'integer','outputLocationID'=>'integer',
+        'outputTypeID'=>'integer','ownerID'=>'integer',
+        'pauseProductionTime'=>'timestamp','runs'=>'integer',
+        'timeMultiplier'=>'decimal'),
       'xpath'=>'//result/rowset/row'
     ),
     'MarketOrders'=>array(
       'types'=>array(
-        'accountkey'=>'integer','bid'=>'integer','charid'=>'integer',
+        'accountKey'=>'integer','bid'=>'integer','charID'=>'integer',
         'duration'=>'integer','escrow'=>'decimal','issued'=>'timestamp',
-        'minvolume'=>'integer','orderid'=>'integer','orderstate'=>'integer',
-        'ownerid'=>'integer','price'=>'decimal','range'=>'integer',
-        'stationid'=>'integer','typeid'=>'integer','volentered'=>'integer',
-        'volremaining'=>'integer'),
+        'minVolume'=>'integer','orderID'=>'integer','orderState'=>'integer',
+        'ownerID'=>'integer','price'=>'decimal','range'=>'integer',
+        'stationID'=>'integer','typeID'=>'integer','volEntered'=>'integer',
+        'volRemaining'=>'integer'),
       'xpath'=>'//result/rowset/row'
     ),
     'WalletJournal'=>array(
       'beforeid'=>'beforeRefID',
       'types'=>array(
-        'account'=>'integer','amount'=>'decimal','argid1'=>'integer',
-        'argname1'=>'text','balance'=>'decimal','date'=>'timestamp',
-        'ownerid'=>'integer','ownerid1'=>'integer','ownerid2'=>'integer',
-        'ownername1'=>'text','ownername2'=>'text','reason'=>'text',
-        'refid'=>'integer','reftypeid'=>'integer'),
+        'account'=>'integer','amount'=>'decimal','argID1'=>'integer',
+        'argName1'=>'text','balance'=>'decimal','date'=>'timestamp',
+        'ownerID'=>'integer','ownerID1'=>'integer','ownerID2'=>'integer',
+        'ownerName1'=>'text','ownerName2'=>'text','reason'=>'text',
+        'refID'=>'integer','refTypeID'=>'integer'),
       'walkdt'=>'date',
       'walkid'=>'refID',
       'xpath'=>'//result/rowset/row'
@@ -91,12 +91,12 @@ $allApis.=array(
     'WalletTransactions'=>array(
       'beforeid'=>'beforeTransID',
       'types'=>array(
-        'account'=>'integer','clientid'=>'integer','clientname'=>'text',
-        'ownerid'=>'integer','price'=>'decimal','quantity'=>'integer',
-        'stationid'=>'integer','stationname'=>'text',
-        'transactiondatetime'=>'timestamp','transactionfor'=>'text',
-        'transactionid'=>'integer','transactiontype'=>'text',
-        'typeid'=>'integer','typename'=>'text'),
+        'account'=>'integer','clientID'=>'integer','clientName'=>'text',
+        'ownerID'=>'integer','price'=>'decimal','quantity'=>'integer',
+        'stationID'=>'integer','stationName'=>'text',
+        'transactionDateTime'=>'timestamp','transactionFor'=>'text',
+        'transactionID'=>'integer','transactionType'=>'text',
+        'typeID'=>'integer','typeName'=>'text'),
       'walkdt'=>'transactionDateTime',
       'walkid'=>'transactionID',
       'xpath'=>'//result/rowset/row'
@@ -118,51 +118,51 @@ $allApis.=array(
 $allApis.=array(
   'corp'=>array(
     'AccountBalance'=>array(
-      'types'=>array('accountid'=>'integer','accountkey'=>'integer',
-        'balance'=>'decimal','ownerid'=>'integer'),
+      'types'=>array('accountID'=>'integer','accountKey'=>'integer',
+        'balance'=>'decimal','ownerID'=>'integer'),
       'xpath'=>'//result/rowset/row'
     ),
     'IndustryJobs'=>array(
       'types'=>array(
-        'activityid'=>'integer','assemblylineid'=>'integer',
-        'beginproductiontime'=>'timestamp','charmaterialmultiplier'=>'decimal',
-        'chartimemultiplier'=>'decimal','completed'=>'integer',
-        'completedstatus'=>'integer','completedsuccessfully'=>'integer',
-        'containerid'=>'integer','containerlocationid'=>'integer',
-        'containertypeid'=>'integer','endproductiontime'=>'timestamp',
-        'installedinsolarsystemid'=>'integer','installeditemcopy'=>'integer',
-        'installeditemflag'=>'integer','installeditemid'=>'integer',
-        'installeditemlicensedproductionrunsremaining'=>'integer',
-        'installeditemlocationid'=>'integer',
-        'installeditemmateriallevel'=>'integer',
-        'installeditemproductivitylevel'=>'integer',
-        'installeditemquantity'=>'integer','installeditemtypeid'=>'integer',
-        'installerid'=>'integer','installtime'=>'timestamp','jobid'=>'integer',
-        'licensedproductionruns'=>'integer','materialmultiplier'=>'decimal',
-        'outputflag'=>'integer','outputlocationid'=>'integer',
-        'outputtypeid'=>'integer','ownerid'=>'integer',
-        'pauseproductiontime'=>'timestamp','runs'=>'integer',
-        'timemultiplier'=>'decimal'),
+        'activityID'=>'integer','assemblyLineID'=>'integer',
+        'beginProductionTime'=>'timestamp','charMaterialMultiplier'=>'decimal',
+        'charTimeMultiplier'=>'decimal','completed'=>'integer',
+        'completedStatus'=>'integer','completedSuccessfully'=>'integer',
+        'containerID'=>'integer','containerLocationID'=>'integer',
+        'containerTypeID'=>'integer','endProductionTime'=>'timestamp',
+        'installedInSolarSystemID'=>'integer','installedItemCopy'=>'integer',
+        'installedItemFlag'=>'integer','installedItemID'=>'integer',
+        'installedItemLicensedProductionRunsRemaining'=>'integer',
+        'installedItemlocationID'=>'integer',
+        'installedItemMaterialLevel'=>'integer',
+        'installedItemProductivityLevel'=>'integer',
+        'installedItemQuantity'=>'integer','installedItemTypeID'=>'integer',
+        'installerID'=>'integer','installTime'=>'timestamp','jobID'=>'integer',
+        'licensedProductionRuns'=>'integer','materialMultiplier'=>'decimal',
+        'outputFlag'=>'integer','outputLocationID'=>'integer',
+        'outputTypeID'=>'integer','ownerID'=>'integer',
+        'pauseProductionTime'=>'timestamp','runs'=>'integer',
+        'timeMultiplier'=>'decimal'),
       'xpath'=>'//result/rowset/row'
     ),
     'MarketOrders'=>array(
       'types'=>array(
-        'accountkey'=>'integer','bid'=>'integer','charid'=>'integer',
+        'accountKey'=>'integer','bID'=>'integer','charID'=>'integer',
         'duration'=>'integer','escrow'=>'decimal','issued'=>'timestamp',
-        'minvolume'=>'integer','orderid'=>'integer','orderstate'=>'integer',
-        'ownerid'=>'integer','price'=>'decimal','range'=>'integer',
-        'stationid'=>'integer','typeid'=>'integer','volentered'=>'integer',
-        'volremaining'=>'integer'),
+        'minVolume'=>'integer','orderID'=>'integer','orderState'=>'integer',
+        'ownerID'=>'integer','price'=>'decimal','range'=>'integer',
+        'stationID'=>'integer','typeID'=>'integer','volEntered'=>'integer',
+        'volRemaining'=>'integer'),
       'xpath'=>'//result/rowset/row'
     ),
     'WalletJournal'=>array(
       'beforeid'=>'beforeRefID',
       'types'=>array(
-        'account'=>'integer','amount'=>'decimal','argid1'=>'integer',
-        'argname1'=>'text','balance'=>'decimal','date'=>'timestamp',
-        'ownerid'=>'integer','ownerid1'=>'integer','ownerid2'=>'integer',
-        'ownername1'=>'text','ownername2'=>'text','reason'=>'text',
-        'refid'=>'integer','reftypeid'=>'integer'),
+        'account'=>'integer','amount'=>'decimal','argID1'=>'integer',
+        'argName1'=>'text','balance'=>'decimal','date'=>'timestamp',
+        'ownerID'=>'integer','ownerID1'=>'integer','ownerID2'=>'integer',
+        'ownerName1'=>'text','ownerName2'=>'text','reason'=>'text',
+        'refID'=>'integer','refTypeID'=>'integer'),
       'walkdt'=>'date',
       'walkid'=>'refID',
       'xpath'=>'//result/rowset/row'
@@ -170,12 +170,12 @@ $allApis.=array(
     'WalletTransactions'=>array(
       'beforeid'=>'beforeTransID',
       'types'=>array(
-        'account'=>'integer','clientid'=>'integer','clientname'=>'text',
-        'ownerid'=>'integer','price'=>'decimal','quantity'=>'integer',
-        'stationid'=>'integer','stationname'=>'text',
-        'transactiondatetime'=>'timestamp','transactionfor'=>'text',
-        'transactionid'=>'integer','transactiontype'=>'text',
-        'typeid'=>'integer','typename'=>'text'),
+        'account'=>'integer','clientID'=>'integer','clientName'=>'text',
+        'ownerID'=>'integer','price'=>'decimal','quantity'=>'integer',
+        'stationID'=>'integer','stationName'=>'text',
+        'transactionDateTime'=>'timestamp','transactionFor'=>'text',
+        'transactionID'=>'integer','transactionType'=>'text',
+        'typeID'=>'integer','typeName'=>'text'),
       'walkdt'=>'transactionDateTime',
       'walkid'=>'transactionID',
       'xpath'=>'//result/rowset/row'
@@ -199,26 +199,26 @@ $allApis.=array(
     array(
       'AllianceList'=>array(
         'types'=>array(
-          'allianceid'=>'integer','executorcorpid'=>'integer',
-          'membercount'=>'integer','name'=>'text','shortname'=>'text',
-          'startdate'=>'timestamp'
+          'allianceID'=>'integer','executorCorpID'=>'integer',
+          'memberCount'=>'integer','name'=>'text','shortName'=>'text',
+          'startDate'=>'timestamp'
         ),
         'xpath'=>'//result/rowset/row'
       ),
       'ConquerableStationList'=>array(
         'types'=>array(
-          'corporationid'=>'integer','corporationname'=>'text',
-          'solarsystemid'=>'integer','stationid'=>'integer','stationname'=>'text',
-          'stationtypeid'=>'integer'
+          'corporationID'=>'integer','corporationName'=>'text',
+          'solarSystemID'=>'integer','stationID'=>'integer','stationName'=>'text',
+          'stationTypeID'=>'integer'
           ),
         'xpath'=>'//result/rowset/row'
       ),
       'ErrorList'=>array(
-        'types'=>array('errorcode'=>'integer','errortext'=>'text'),
+        'types'=>array('errorCode'=>'integer','errorText'=>'text'),
         'xpath'=>'//result/rowset/row'
       ),
       'RefTypes'=>array(
-        'types'=>array('reftypeid'=>'integer','reftypename'=>'text'),
+        'types'=>array('refTypeID'=>'integer','refTypeName'=>'text'),
         'xpath'=>'//result/rowset/row'
       )
     )

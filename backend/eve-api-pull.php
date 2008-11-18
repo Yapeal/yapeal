@@ -110,8 +110,8 @@ USAGE_MESSAGE;
   fwrite(STDERR,$use.PHP_EOL);
 };
 
-$cachetypes=array('tablename'=>'C','ownerid'=>'I',
-  'cacheduntil'=>'T');
+$cachetypes=array('tableName'=>'C','ownerID'=>'I',
+  'cachedUntil'=>'T');
 try {
   $api='eve-api-pull';
   // Mutex to keep from having more than one pull going at once most the time.
@@ -119,8 +119,8 @@ try {
   if (dontWait($api,0,FALSE,FALSE)) {
     // Give ourself up to 5 minutes to finish.
     $timer=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
-    $data=array('tablename'=>$api,'ownerid'=>0,'cacheduntil'=>$timer);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    $data=array('tableName'=>$api,'ownerID'=>0,'cachedUntil'=>$timer);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     $ctime=strtotime($timer.' +0000');
   } else {
     // Someone else has set timer need to wait it out.
@@ -132,8 +132,19 @@ try {
    * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+      $mess='Connect before EVE section in '.__FILE__;
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_EVE][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_EVE_WRITER);
-    print_on_command('Before pulls_eve');
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+      $mess='Before require pulls_eve.inc';
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_EVE][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     require YAPEAL_INC.'pulls_eve.inc';
   };// if YAPEAL_EVE_ACTIVE...
 
@@ -143,17 +154,29 @@ try {
 
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
-    /* Generate a list of corporation(s) we need to do updates for */
-    $api='registeredcorporation';
+    $api='RegisteredCorporation';
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      $mess='Connect before CORP section in '.__FILE__;
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CORP_WRITER);
-    $sql='select cp.corporationid "corpid",u.userid,u.fullapikey "apikey",';
-    $sql.='u.limitedapikey "lapikey",cp.characterid "charid"';
-    $sql.=' from '.DB_UTIL.'.registeredcorporation as cp,';
-    $sql.=DB_UTIL.'.registeredcharacter as chr,';
-    $sql.=DB_UTIL.'.registereduser as u';
-    $sql.=' where cp.is_active=true';
-    $sql.=' and cp.characterid=chr.characterid';
-    $sql.=' and chr.userid=u.userid';
+    // Generate a list of corporation(s) we need to do updates for
+    $sql='select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
+    $sql.='u.limitedApiKey "lapikey",cp.characterID "charid"';
+    $sql.=' from '.DB_UTIL.'.RegisteredCorporation as cp,';
+    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
+    $sql.=DB_UTIL.'.RegisteredUser as u';
+    $sql.=' where cp.isActive=true';
+    $sql.=' and cp.characterID=chr.characterID';
+    $sql.=' and chr.userID=u.userID';
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      $mess='Before GetAll CORP updates in '.__FILE__;
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     $corpList=$con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
@@ -163,7 +186,12 @@ try {
       /* ********************************************************************
        * Per corp API pulls
        * ********************************************************************/
-      print_on_command('Before pulls_corp');
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+        $mess='Before require pulls_corp.inc';
+        print_on_command($mess);
+        $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+      };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_corp.inc';
     };// foreach $corpList
   };// if YAPEAL_CORP_ACTIVE...
@@ -174,16 +202,28 @@ try {
 
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
-    /* Generate a list of character(s) we need to do updates for */
-    $api='registeredcharacter';
+    $api='RegisteredCharacter';
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      $mess='Connect before CHAR section in '.__FILE__;
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CHAR_WRITER);
-    $sql='select u.userid,u.fullapikey "apikey",u.limitedapikey "lapikey",';
-    $sql.='chr.characterid "charid"';
+    /* Generate a list of character(s) we need to do updates for */
+    $sql='select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
+    $sql.='chr.characterID "charid"';
     $sql.=' from ';
-    $sql.=DB_UTIL.'.registeredcharacter as chr,';
-    $sql.=DB_UTIL.'.registereduser as u';
-    $sql.=' where chr.is_active=true';
-    $sql.=' and chr.userid=u.userid';
+    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
+    $sql.=DB_UTIL.'.RegisteredUser as u';
+    $sql.=' where chr.isActive=true';
+    $sql.=' and chr.userID=u.userID';
+    if (YAPEAL_DEBUG&&
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      $mess='Before GetAll CHAR updates in '.__FILE__;
+      print_on_command($mess);
+      $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+    };// if YAPEAL_DEBUG&&...
     $charList=$con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
@@ -193,7 +233,12 @@ try {
       /* **********************************************************************
        * Per character API pulls
        * **********************************************************************/
-      print_on_command('Before pulls_char');
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='Before require pulls_char.inc';
+        print_on_command($mess);
+        $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+      };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_char.inc';
     };// foreach $charList
   };// if YAPEAL_CHAR_ACTIVE...
@@ -203,8 +248,8 @@ try {
   $ctime2=strtotime(get_cacheduntil($api).' +0000');
   if ($ctime==$ctime2) {
     $cuntil=gmdate('Y-m-d H:i:s');
-    $data=array('tablename'=>$api,'ownerid'=>0,'cacheduntil'=>$cuntil);
-    upsert($data,$cachetypes,'cacheduntil',DSN_UTIL_WRITER);
+    $data=array('tableName'=>$api,'ownerID'=>0,'cachedUntil'=>$cuntil);
+    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
   } else {
     // Lost Mutex we should log that as notice.
     if ((YAPEAL_LOG_LEVEL&E_USER_NOTICE)==E_USER_NOTICE) {
@@ -213,6 +258,20 @@ try {
       trigger_error($mess,E_USER_NOTICE);
     };
   };// else $timer==get_cacheduntil $api ...
+  if (YAPEAL_DEBUG&&!empty($yapealDebugging)) {
+    print_on_command(YAPEAL_DEBUG_SECTION);
+    $sectionToName=array(
+      YAPEAL_DEBUG_ACCOUNT=>'Account',YAPEAL_DEBUG_DATABASE=>'Database',
+      YAPEAL_DEBUG_CHAR=>'Character',YAPEAL_DEBUG_CORP=>'Corporation',
+      YAPEAL_DEBUG_EVE=>'Eve',YAPEAL_DEBUG_MAP=>'Map',
+      YAPEAL_DEBUG_REQUEST=>'Request'
+    );
+    $data='';
+    foreach ($yapealDebugging as $section=>$messages) {
+      $data='== '.$sectionToName[$section].' =='.PHP_EOL.implode(PHP_EOL,$messages);
+    }
+    elog($data,YAPEAL_DEBUG_LOG,TRUE);
+  };// if YAPEAL_DEBUG&&...
   exit;
 }
 catch (Exception $e) {

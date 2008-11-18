@@ -67,7 +67,7 @@ function elog($str,$filename=YAPEAL_ERROR_LOG,$collected=FALSE) {
       ob_start();
     };
   };
-  // Now write message this method was called to log.
+  // Now write message this function was called to log.
   $mess.='['.gmdate('Y-m-d H:i:s').substr(microtime(false),1,4).'] ';
   $mess.=$str.PHP_EOL;
   error_log($mess,3,$filename);

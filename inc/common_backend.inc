@@ -67,12 +67,25 @@ if (is_file($ini_file)&&is_readable($ini_file)) {
 // Mostly being used to detect cli vs cgi or apache for now where needed.
 defined('YAPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
 
+// Define some constants used with debug_section setting.
+// They need to be set here so they exist before reading ini file.
+define('YAPEAL_DEBUG_NONE',0);
+define('YAPEAL_DEBUG_ACCOUNT',1);
+define('YAPEAL_DEBUG_DATABASE',2);
+define('YAPEAL_DEBUG_CHAR',3);
+define('YAPEAL_DEBUG_CORP',4);
+define('YAPEAL_DEBUG_EVE',5);
+define('YAPEAL_DEBUG_MAP',6);
+define('YAPEAL_DEBUG_REQUEST',7);
+
 // Grab the info from ini file.
 $iniVars=parse_ini_file(YAPEAL_INI_FILE,TRUE);
 // Abort if required sections aren't defined
 if (!(isset($iniVars['Api'])&&isset($iniVars['Database'])&&
-  isset($iniVars['Paths'])&&isset($iniVars['Logging']))) {
-  $mess='One or more of the required sections: API, Database, Paths, Logging';
+  isset($iniVars['Debugging'])&&isset($iniVars['Logging'])&&
+  isset($iniVars['Paths']))) {
+  $mess='One or more of the required sections:';
+  $mess.=' API, Debugging, Database, Paths, Logging';
   $mess.=' is missing from '.YEPEAL_INI_FILE;
   trigger_error($mess,E_USER_ERROR);
 };// if isset ...
@@ -90,7 +103,7 @@ unset($adodb_dir,$base_dir,$backend_dir,$cache_dir,$class_dir,$config_dir,$inc_d
 // Pull out Paths settings
 extract($iniVars['Paths']);
 
-// Throw error if a required setting is missing.
+// Triggers error if a required setting is missing.
 isset($adodb_dir)||trigger_error($req1.'adodb_dir'.$req2,E_USER_ERROR);
 isset($base_dir)||trigger_error($req1.'base_dir'.$req2,E_USER_ERROR);
 isset($backend_dir)||trigger_error($req1.'backend_dir'.$req2,E_USER_ERROR);
@@ -101,45 +114,44 @@ isset($inc_dir)||trigger_error($req1.'inc_dir'.$req2,E_USER_ERROR);
 isset($log_dir)||trigger_error($req1.'log_dir'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
-if (realpath($dir.$ds.$adodb_dir)) {
-  define('YAPEAL_ADODB',realpath($dir.$ds.$adodb_dir).$ds);
+if ($realpath=realpath($dir.$ds.$adodb_dir)) {
+  define('YAPEAL_ADODB',$realpath.$ds);
 } else {
   trigger_error($nonexist.'adodb_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$base_dir)) {
-  define('YAPEAL_BASE',realpath($dir.$ds.$base_dir).$ds);
+if ($realpath=realpath($dir.$ds.$base_dir)) {
+  define('YAPEAL_BASE',$realpath.$ds);
 } else {
   trigger_error($nonexist.'base_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$backend_dir)) {
-  define('YAPEAL_BACKEND',realpath($dir.$ds.$backend_dir).$ds);
+if ($realpath=realpath($dir.$ds.$backend_dir)) {
+  define('YAPEAL_BACKEND',$realpath.$ds);
 } else {
   trigger_error($nonexist.'backend_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$cache_dir)) {
-  $realpath=realpath($dir.$ds.$cache_dir);
+if ($realpath=realpath($dir.$ds.$cache_dir)) {
   if (is_writable($realpath)) {
-    define('YAPEAL_CACHE',realpath($dir.$ds.$cache_dir).$ds);
+    define('YAPEAL_CACHE',$realpath.$ds);
   } else {
     trigger_error($realpath.' is not writeable',E_USER_ERROR);
   };
 } else {
   trigger_error($nonexist.'cache_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$class_dir)) {
-  define('YAPEAL_CLASS',realpath($dir.$ds.$class_dir).$ds);
+if ($realpath=realpath($dir.$ds.$class_dir)) {
+  define('YAPEAL_CLASS',$realpath.$ds);
 } else {
   trigger_error($nonexist.'class_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$inc_dir)) {
-  define('YAPEAL_INC',realpath($dir.$ds.$inc_dir).$ds);
+if ($realpath=realpath($dir.$ds.$inc_dir)) {
+  define('YAPEAL_INC',$realpath.$ds);
 } else {
   trigger_error($nonexist.'inc_dir',E_USER_ERROR);
 };
-if (realpath($dir.$ds.$log_dir)) {
-  $realpath=realpath($dir.$ds.$log_dir);
+// This is relative to YAPEAL_CACHE
+if ($realpath=realpath(YAPEAL_CACHE.$log_dir)) {
   if (is_writable($realpath)) {
-    define('YAPEAL_LOG',realpath($dir.$ds.$log_dir).$ds);
+    define('YAPEAL_LOG',$realpath.$ds);
   } else {
     trigger_error($realpath.' is not writeable',E_USER_ERROR);
   };
@@ -151,11 +163,12 @@ if (realpath($dir.$ds.$log_dir)) {
  * Logging
  * **************************************************************************/
 // Make sure required setting vars aren't already set
-unset($error_log,$level,$notice_log,$use_exception,$warning_log);
+unset($debug_log,$error_log,$level,$notice_log,$use_exception,$warning_log);
 // Pull out Logging settings
 extract($iniVars['Logging']);
 
-// Throw error if a required setting is missing.
+// Triggers error if a required setting is missing.
+isset($debug_log)||trigger_error($req1.'debug_log'.$req2,E_USER_ERROR);
 isset($error_log)||trigger_error($req1.'error_log'.$req2,E_USER_ERROR);
 isset($level)||trigger_error($req1.'level'.$req2,E_USER_ERROR);
 isset($notice_log)||trigger_error($req1.'notice_log'.$req2,E_USER_ERROR);
@@ -163,9 +176,12 @@ isset($use_exception)||trigger_error($req1.'use_exception'.$req2,E_USER_ERROR);
 isset($warning_log)||trigger_error($req1.'warning_log'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
-define('YAPEAL_LOG_LEVEL',$level);
+define('YAPEAL_DEBUG_LOG',YAPEAL_LOG.$debug_log);
 define('YAPEAL_ERROR_LOG',YAPEAL_LOG.$error_log);
-define('YAPEAL_EXCEPTIONS',$use_exception);
+// NOTE this is deprecated and being forced to TRUE for now. It will be removed
+// in the near future.
+define('YAPEAL_EXCEPTIONS',TRUE);
+define('YAPEAL_LOG_LEVEL',$level);
 define('YAPEAL_NOTICE_LOG',YAPEAL_LOG.$notice_log);
 define('YAPEAL_WARNING_LOG',YAPEAL_LOG.$warning_log);
 
@@ -201,7 +217,7 @@ unset($cache_xml,$file_suffix,$url_base);
 // Pull out API settings
 extract($iniVars['Api']);
 
-// Throw error if a required setting is missing.
+// Triggers error if a required setting is missing.
 isset($cache_xml)||trigger_error($req1.'cache_xml'.$req2,E_USER_ERROR);
 isset($file_suffix)||trigger_error($req1.'file_suffix'.$req2,E_USER_ERROR);
 isset($url_base)||trigger_error($req1.'url_base'.$req2,E_USER_ERROR);
@@ -219,27 +235,48 @@ define('YAPEAL_API_MAP',3);
 define('YAPEAL_API_ACCOUNT',4);
 
 /* **************************************************************************
+ * Debug
+ * **************************************************************************/
+
+// Make sure required setting vars aren't already set
+unset($debug,$debug_level,$debug_section);
+// Pull out API settings
+extract($iniVars['Debugging']);
+
+// Triggers error if a required setting is missing.
+isset($debug)||trigger_error($req1.'debug'.$req2,E_USER_ERROR);
+isset($debug_level)||trigger_error($req1.'debug_level'.$req2,E_USER_ERROR);
+isset($debug_section)||trigger_error($req1.'debug_section'.$req2,E_USER_ERROR);
+
+// Define some constants from vars
+define('YAPEAL_DEBUG',$debug);
+define('YAPEAL_DEBUG_LEVEL',$debug_level);
+define('YAPEAL_DEBUG_SECTION',$debug_section);
+
+// Var used to collect debug info
+$yapealDebugging=array();
+
+/* **************************************************************************
  * Required DBs
  * **************************************************************************/
 
 $dbs=array('char','corp','eve','util');
 foreach ($dbs as $db) {
   // Make sure required setting vars aren't already set
-  unset($active,$database,$driver,$host,$reader,$suffix,$writer);
+  unset($active,$database,$driver,$host,$suffix,$writer);
   // Pull out default database settings
   extract($iniVars['Database']);
-  // Overwrite defaults with ones given in Database-xx section
+  // Overwrite defaults with ones given in Database-xxx section
   if (isset($iniVars['Database-'.$db])) {
     extract($iniVars['Database-'.$db]);
   };
-  // All constant names are in upppercase only.
+  // All constant names are in uppercase only.
   $db=strtoupper($db);
   if (isset($active)&&$active) {
-    // Throw error if a required setting is missing for any section.
+    // Triggers error if a required setting is missing for any section.
     isset($database)||trigger_error($req1.'database'.$req2,E_USER_ERROR);
     isset($driver)||trigger_error($req1.'driver'.$req2,E_USER_ERROR);
     isset($host)||trigger_error($req1.'host'.$req2,E_USER_ERROR);
-    isset($reader)||trigger_error($req1.'reader'.$req2,E_USER_ERROR);
     isset($suffix)||trigger_error($req1.'suffix'.$req2,E_USER_ERROR);
     isset($writer)||trigger_error($req1.'writer'.$req2,E_USER_ERROR);
 
@@ -247,7 +284,6 @@ foreach ($dbs as $db) {
     define('YAPEAL_'.$db.'_ACTIVE',TRUE);
     // Define some constants from vars.
     define('DB_'.$db,$database);
-    define('DSN_'.$db,$driver.$reader.'@'.$host.'/'.$database.$suffix);
     define('DSN_'.$db.'_WRITER',$driver.$writer.'@'.$host.'/'.$database.$suffix);
   } else {
     // Mark as inactive.

@@ -246,7 +246,7 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
  * be inserted into table or an array of SimpleXMLElement objects with
  * attributes
  * @param array $types Keys are DB field names and values are thier ADOdb type
- * i.e. 'id'=>'integer','name'=>'text' ...
+ * i.e. 'ID'=>'integer','name'=>'text' ...
  * @param string $table Name of the table to use in query's from clause
  * @param string $dsn The connection infomation needed to connect to DB
  * @param array $extras Used when you need to add any extra table fields that
@@ -265,7 +265,7 @@ function multipleUpsertAttributes(
       foreach ($record->attributes() as $k=>$v) {
         // Note that all attributes names are converted to lower case
         // Should probably NOT do this and just pass them thru
-        $row[mb_strtolower($k)]=(string)$v;
+        $row[$k]=(string)$v;
       };
       $data[]=$row;
     };// foreach $datum
@@ -300,8 +300,8 @@ function get_BloodLineHQ($chartype) {
  */
 function get_charBloodLine($charid,$dsn) {
   $con=connect($dsn);
-  $sql='select bloodline from charactersheet';
-  $sql.=' where characterid='.$charid;
+  $sql='select bloodLine from CharacterSheet';
+  $sql.=' where characterID='.$charid;
   $result=$con->GetOne($sql);
   print_r($result)."\n";
   return $result;

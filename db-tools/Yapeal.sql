@@ -9,10 +9,10 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 DROP TABLE IF EXISTS `CachedUntil` ;
 
 CREATE  TABLE IF NOT EXISTS `CachedUntil` (
-  `ownerid` BIGINT UNSIGNED NOT NULL ,
-  `tablename` VARCHAR(255) NOT NULL ,
-  `cacheduntil` DATETIME NOT NULL ,
-  PRIMARY KEY (`tablename`, `ownerid`) )
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `tableName` VARCHAR(255) NOT NULL ,
+  `cachedUntil` DATETIME NOT NULL ,
+  PRIMARY KEY (`tableName`, `ownerID`) )
 ENGINE = MEMORY
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
@@ -450,9 +450,9 @@ COLLATE = utf8_unicode_ci;
 DROP TABLE IF EXISTS `ErrorList` ;
 
 CREATE  TABLE IF NOT EXISTS `ErrorList` (
-  `errorcode` SMALLINT UNSIGNED NOT NULL ,
+  `errorCode` SMALLINT UNSIGNED NOT NULL ,
   `errorText` TEXT NOT NULL ,
-  PRIMARY KEY (`errorcode`) )
+  PRIMARY KEY (`errorCode`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;

@@ -267,7 +267,13 @@ foreach ($apis as $api=>$settings) {
           $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
             'cachedUntil'=>$cuntil);
           upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-          $datum=$xml->xpath($settings['xpath']);
+          if (YAPEAL_DEBUG&&
+            (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+            $mess='CHAR: Before xpath for '.$api.' in '.__FILE__;
+            print_on_command($mess);
+            $yapealDebugging.=$mess.PHP_EOL;
+          };// if YAPEAL_DEBUG&&...
+            $datum=$xml->xpath($settings['xpath']);
           $cnt=count($datum);
           $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {

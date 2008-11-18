@@ -260,6 +260,7 @@ try {
   };// else $timer==get_cacheduntil $api ...
   if (YAPEAL_DEBUG&&!empty($yapealDebugging)) {
     print_on_command(YAPEAL_DEBUG_SECTION);
+    print_r($yapealDebugging)."\n";
     $sectionToName=array(
       YAPEAL_DEBUG_ACCOUNT=>'Account',YAPEAL_DEBUG_DATABASE=>'Database',
       YAPEAL_DEBUG_CHAR=>'Character',YAPEAL_DEBUG_CORP=>'Corporation',

@@ -254,7 +254,7 @@ define('YAPEAL_DEBUG_LEVEL',$debug_level);
 define('YAPEAL_DEBUG_SECTION',$debug_section);
 
 // Var used to collect debug info
-$yapealDebugging=array();
+$yapealDebugging='';
 
 /* **************************************************************************
  * Required DBs

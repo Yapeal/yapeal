@@ -44,7 +44,7 @@ chdir($dir);
  * @ignore
  */
 defined('YEPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
-if (YAPEAL_SCRIPT_MODE=='cli') {
+if (YAPEAL_SCRIPT_MODE=='cli'&&function_exists('getopt')) {
   $options=getopt('hVc:');
   foreach ($options as $opt=>$value) {
     switch ($opt) {
@@ -92,8 +92,8 @@ require_once realpath($path);
 require_once YAPEAL_INC.'common_db.inc';
 require_once YAPEAL_INC.'elog.inc';
 require_once YAPEAL_INC.'eap_functions.inc';
-//require_once YAPEAL_CLASS.'Logging_Exception_Observer.class.php';
-//require_once YAPEAL_CLASS.'Printing_Exception_Observer.class.php';
+require_once YAPEAL_CLASS.'Logging_Exception_Observer.class.php';
+require_once YAPEAL_CLASS.'Printing_Exception_Observer.class.php';
 
 function usage() {
   $progname=basename($GLOBALS['argv'][0]);
@@ -134,16 +134,16 @@ try {
   if (YAPEAL_EVE_ACTIVE) {
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
-      $mess='Connect before EVE section in '.__FILE__;
+      $mess='EVE: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_EVE]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_EVE_WRITER);
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
-      $mess='Before require pulls_eve.inc';
+      $mess='EVE: Before require pulls_eve.inc';
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_EVE]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     require YAPEAL_INC.'pulls_eve.inc';
   };// if YAPEAL_EVE_ACTIVE...
@@ -157,9 +157,9 @@ try {
     $api='RegisteredCorporation';
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
-      $mess='Connect before CORP section in '.__FILE__;
+      $mess='CORP: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
@@ -173,9 +173,9 @@ try {
     $sql.=' and chr.userID=u.userID';
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
-      $mess='Before GetAll CORP updates in '.__FILE__;
+      $mess='CORP: Before GetAll $corpList in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     $corpList=$con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
@@ -188,9 +188,9 @@ try {
        * ********************************************************************/
       if (YAPEAL_DEBUG&&
         (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
-        $mess='Before require pulls_corp.inc';
+        $mess='CORP: Before require pulls_corp.inc';
         print_on_command($mess);
-        $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
+        $yapealDebugging.=$mess.PHP_EOL;
       };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_corp.inc';
     };// foreach $corpList
@@ -205,9 +205,9 @@ try {
     $api='RegisteredCharacter';
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-      $mess='Connect before CHAR section in '.__FILE__;
+      $mess='CHAR: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
@@ -220,9 +220,9 @@ try {
     $sql.=' and chr.userID=u.userID';
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-      $mess='Before GetAll CHAR updates in '.__FILE__;
+      $mess='CHAR: Before GetAll $charList in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
+      $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
     $charList=$con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
@@ -235,9 +235,9 @@ try {
        * **********************************************************************/
       if (YAPEAL_DEBUG&&
         (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-        $mess='Before require pulls_char.inc';
+        $mess='CHAR: Before require pulls_char.inc';
         print_on_command($mess);
-        $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
+        $yapealDebugging.=$mess.PHP_EOL;
       };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_char.inc';
     };// foreach $charList
@@ -259,20 +259,7 @@ try {
     };
   };// else $timer==get_cacheduntil $api ...
   if (YAPEAL_DEBUG&&!empty($yapealDebugging)) {
-    print_on_command(YAPEAL_DEBUG_SECTION);
-    print_r($yapealDebugging)."\n";
-    $sectionToName=array(
-      YAPEAL_DEBUG_ACCOUNT=>'Account',YAPEAL_DEBUG_DATABASE=>'Database',
-      YAPEAL_DEBUG_CHAR=>'Character',YAPEAL_DEBUG_CORP=>'Corporation',
-      YAPEAL_DEBUG_EVE=>'Eve',YAPEAL_DEBUG_MAP=>'Map',
-      YAPEAL_DEBUG_REQUEST=>'Request'
-    );
-    $data='';
-    foreach ($yapealDebugging as $sections=>$messages) {
-      $data='== '.$sectionToName[$sections].' =='.PHP_EOL;
-      $data.=$messages;
-    };
-    elog($data,YAPEAL_DEBUG_LOG,TRUE);
+    elog($yapealDebugging,YAPEAL_DEBUG_LOG);
   };// if YAPEAL_DEBUG&&...
   exit;
 }

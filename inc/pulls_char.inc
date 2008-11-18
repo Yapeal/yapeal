@@ -86,6 +86,12 @@ try {
       };
     };// if $datum>0
     if (count($data)) {
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before upsert for '.$api.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       upsert($data,$types,$api,DSN_CHAR_WRITER);
     };
 
@@ -97,6 +103,12 @@ try {
     $datum=$xml->xpath('//rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerID'=>$ownerid,'level'=>0,'unpublished'=>0);
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before upsert for '.$dbTable.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
     };// if $datum>0
 
@@ -168,6 +180,12 @@ foreach ($apis as $api=>$settings) {
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
         $extras=array('ownerID'=>$ownerid);
+        if (YAPEAL_DEBUG&&
+          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+          $mess='CHAR: Before MultiUpsert for '.$api.' in '.__FILE__;
+          print_on_command($mess);
+          $yapealDebugging.=$mess.PHP_EOL;
+        };// if YAPEAL_DEBUG&&...
         multipleUpsertAttributes($datum,$settings['types'],
           $api,DSN_CHAR_WRITER,$extras);
       };// if $datum>0
@@ -253,6 +271,12 @@ foreach ($apis as $api=>$settings) {
           $cnt=count($datum);
           $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {
+            if (YAPEAL_DEBUG&&
+              (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+              $mess='CHAR: Before multiUpsert for '.$api.' in '.__FILE__;
+              print_on_command($mess);
+              $yapealDebugging.=$mess.PHP_EOL;
+            };// if YAPEAL_DEBUG&&...
             multipleUpsertAttributes($datum,$settings['types'],
               $api,DSN_CHAR_WRITER,$extras);
           } else {
@@ -346,15 +370,33 @@ try {
       $sql='delete';
       $sql.=' from '.$api;
       $sql.=' where ownerid='.$ownerid;
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before delete for '.$api.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       $con->Execute($sql);
       $types=array(
         'flag'=>'I','itemID'=>'I','lft'=>'I','locationID'=>'I','ownerID'=>'I',
         'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeID'=>'I');
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before upsert owner node for '.$api.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       // Insert the new owner's root node.
       upsert($nodeData,$types,$api,DSN_CHAR_WRITER);
       // Just need the rows from XML now
       $datum=$xml->xpath('//row');
       $extras=array('locationID'=>0,'ownerID'=>$ownerid);
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before multiUpsert for '.$api.' in '.__FILE__;
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
       multipleUpsertAttributes($datum,$types,$api,
         DSN_CHAR_WRITER,$extras);
     };// if count $datum ...

@@ -128,25 +128,51 @@ try {
   };// else dontwait $api ...
 
   /* ************************************************************************
-   * /eve/ API pulls
+   * Generate character list
    * ************************************************************************/
+
   // Only pull if activated.
-  if (YAPEAL_EVE_ACTIVE) {
+  if (YAPEAL_CHAR_ACTIVE) {
+    $api='RegisteredCharacter';
     if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
-      $mess='EVE: Connect before section in '.__FILE__;
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      $mess='CHAR: Connect before section in '.__FILE__;
       print_on_command($mess);
       $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
-    $con=connect(DSN_EVE_WRITER);
+    $con=connect(DSN_CHAR_WRITER);
+    /* Generate a list of character(s) we need to do updates for */
+    $sql='select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
+    $sql.='chr.characterID "charid"';
+    $sql.=' from ';
+    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
+    $sql.=DB_UTIL.'.RegisteredUser as u';
+    $sql.=' where chr.isActive=true';
+    $sql.=' and chr.userID=u.userID';
     if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
-      $mess='EVE: Before require pulls_eve.inc';
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      $mess='CHAR: Before GetAll $charList in '.__FILE__;
       print_on_command($mess);
       $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
-    require YAPEAL_INC.'pulls_eve.inc';
-  };// if YAPEAL_EVE_ACTIVE...
+    $charList=$con->GetAll($sql);
+    // Ok now that we have a list of characters that need updated
+    // we can check API for updates to their infomation.
+    foreach ($charList as $char) {
+      extract($char);
+      $ownerid=$charid;
+      /* **********************************************************************
+       * Per character API pulls
+       * **********************************************************************/
+      if (YAPEAL_DEBUG&&
+        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        $mess='CHAR: Before require pulls_char.inc';
+        print_on_command($mess);
+        $yapealDebugging.=$mess.PHP_EOL;
+      };// if YAPEAL_DEBUG&&...
+      require YAPEAL_INC.'pulls_char.inc';
+    };// foreach $charList
+  };// if YAPEAL_CHAR_ACTIVE...
 
   /* ************************************************************************
    * Generate corp list
@@ -197,51 +223,25 @@ try {
   };// if YAPEAL_CORP_ACTIVE...
 
   /* ************************************************************************
-   * Generate character list
+   * /eve/ API pulls
    * ************************************************************************/
-
   // Only pull if activated.
-  if (YAPEAL_CHAR_ACTIVE) {
-    $api='RegisteredCharacter';
+  if (YAPEAL_EVE_ACTIVE) {
     if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-      $mess='CHAR: Connect before section in '.__FILE__;
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+      $mess='EVE: Connect before section in '.__FILE__;
       print_on_command($mess);
       $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
-    $con=connect(DSN_CHAR_WRITER);
-    /* Generate a list of character(s) we need to do updates for */
-    $sql='select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
-    $sql.='chr.characterID "charid"';
-    $sql.=' from ';
-    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
-    $sql.=DB_UTIL.'.RegisteredUser as u';
-    $sql.=' where chr.isActive=true';
-    $sql.=' and chr.userID=u.userID';
+    $con=connect(DSN_EVE_WRITER);
     if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-      $mess='CHAR: Before GetAll $charList in '.__FILE__;
+      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+      $mess='EVE: Before require pulls_eve.inc';
       print_on_command($mess);
       $yapealDebugging.=$mess.PHP_EOL;
     };// if YAPEAL_DEBUG&&...
-    $charList=$con->GetAll($sql);
-    // Ok now that we have a list of characters that need updated
-    // we can check API for updates to their infomation.
-    foreach ($charList as $char) {
-      extract($char);
-      $ownerid=$charid;
-      /* **********************************************************************
-       * Per character API pulls
-       * **********************************************************************/
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
-        $mess='CHAR: Before require pulls_char.inc';
-        print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
-      require YAPEAL_INC.'pulls_char.inc';
-    };// foreach $charList
-  };// if YAPEAL_CHAR_ACTIVE...
+    require YAPEAL_INC.'pulls_eve.inc';
+  };// if YAPEAL_EVE_ACTIVE...
 
   $api='eve-api-pull';
   // Reset Mutex if we still own it.

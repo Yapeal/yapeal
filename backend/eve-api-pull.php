@@ -136,14 +136,14 @@ try {
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
       $mess='Connect before EVE section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_EVE][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_EVE]=$mess;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_EVE_WRITER);
     if (YAPEAL_DEBUG&&
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
       $mess='Before require pulls_eve.inc';
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_EVE][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_EVE]=$mess;
     };// if YAPEAL_DEBUG&&...
     require YAPEAL_INC.'pulls_eve.inc';
   };// if YAPEAL_EVE_ACTIVE...
@@ -159,7 +159,7 @@ try {
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
       $mess='Connect before CORP section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
@@ -175,7 +175,7 @@ try {
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
       $mess='Before GetAll CORP updates in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
     };// if YAPEAL_DEBUG&&...
     $corpList=$con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
@@ -190,7 +190,7 @@ try {
         (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
         $mess='Before require pulls_corp.inc';
         print_on_command($mess);
-        $yapealDebugging[YAPEAL_DEBUG_CORP][]=$mess;
+        $yapealDebugging[YAPEAL_DEBUG_CORP]=$mess;
       };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_corp.inc';
     };// foreach $corpList
@@ -207,7 +207,7 @@ try {
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
       $mess='Connect before CHAR section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
     };// if YAPEAL_DEBUG&&...
     $con=connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
@@ -222,7 +222,7 @@ try {
       (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
       $mess='Before GetAll CHAR updates in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+      $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
     };// if YAPEAL_DEBUG&&...
     $charList=$con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
@@ -237,7 +237,7 @@ try {
         (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
         $mess='Before require pulls_char.inc';
         print_on_command($mess);
-        $yapealDebugging[YAPEAL_DEBUG_CHAR][]=$mess;
+        $yapealDebugging[YAPEAL_DEBUG_CHAR]=$mess;
       };// if YAPEAL_DEBUG&&...
       require YAPEAL_INC.'pulls_char.inc';
     };// foreach $charList
@@ -267,9 +267,9 @@ try {
       YAPEAL_DEBUG_REQUEST=>'Request'
     );
     $data='';
-    foreach ($yapealDebugging as $section=>$messages) {
-      $data='== '.$sectionToName[$section].' =='.PHP_EOL;
-      $data.=implode(PHP_EOL,$messages);
+    foreach ($yapealDebugging as $sections=>$messages) {
+      $data='== '.$sectionToName[$sections].' =='.PHP_EOL;
+      $data.=$messages;
     };
     elog($data,YAPEAL_DEBUG_LOG,TRUE);
   };// if YAPEAL_DEBUG&&...

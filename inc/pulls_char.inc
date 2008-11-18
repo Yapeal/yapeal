@@ -124,7 +124,17 @@ catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
 catch (ADODB_Exception $e) {
-  // Do nothing use observers to log info
+  $message=<<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+{$e->getTraceAsString()}
+\t--- END TRACE ---
+MESS;
+  elog($message,$this->_filename);
 }
 
 $apis=array(
@@ -216,7 +226,17 @@ foreach ($apis as $api=>$settings) {
     // Do nothing use observers to log info
   }
   catch (ADODB_Exception $e) {
-    // Do nothing use observers to log info
+    $message=<<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+  {$e->getTraceAsString()}
+  \t--- END TRACE ---
+MESS;
+    elog($message,$this->_filename);
   }
 };// foreach $apis ...
 
@@ -250,9 +270,8 @@ $apis=array(
 $accounts=array(1000);
 foreach ($apis as $api=>$settings) {
   foreach ($accounts as $account) {
-    $postdata=array('userID'=>$userid,'apiKey'=>$apikey,
-      'characterID'=>$charid,'accountKey'=>$account,
-      (string)$settings['beforeid']=>0);
+    $postdata=array('userID'=>$userid,'apiKey'=>$apikey,'characterID'=>$charid,
+      'accountKey'=>$account,$settings['beforeid']=>0);
     try {
       // Continue to next if we're not ready at this time
       if (false===dontWait($api.$account,$ownerid)) {

@@ -78,7 +78,7 @@ class CurlRequest
       CURLOPT_ENCODING=>'',CURLOPT_FOLLOWLOCATION=>TRUE,CURLOPT_HEADER=>TRUE,
       CURLOPT_MAXREDIRS=>5,CURLOPT_RETURNTRANSFER=>TRUE,
       CURLOPT_SSL_VERIFYHOST=>FALSE,CURLOPT_SSL_VERIFYPEER=>FALSE,
-      CURLOPT_VERBOSE=>TRUE
+      CURLOPT_VERBOSE=>FALSE
     );
     if (isset($params['user_agent'])&&$params['user_agent']) {
       $options[CURLOPT_USERAGENT]=$params['user_agent'];

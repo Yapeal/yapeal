@@ -22,44 +22,39 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-
 /* *************************************************************************
- * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
- * *************************************************************************/
-
+* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+* *************************************************************************/
 /**
  * Find path for includes
  */
 // Move up and over to 'inc' directory to read common_backend.inc
-$path=realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
-$path.='..'.DIRECTORY_SEPARATOR.'inc'.DIRECTORY_SEPARATOR.'common_backend.inc';
+$path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+$path.= '..' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'common_backend.inc';
 require_once realpath($path);
-
 /* *************************************************************************
- * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
- * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
- * *************************************************************************/
-
+* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
+* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
+* *************************************************************************/
 class ErrorHandler {
-  public $message='';
-  public $filename='';
-  public $line=0;
-  public $vars=array();
-  public function __construct($message,$filename,$linenum,$vars) {
-  $this->message=$message;
-  $this->filename=$filename;
-  $this->line=$linenum;
-  $this->vars=$vars;
+  public $message = '';
+  public $filename = '';
+  public $line = 0;
+  public $vars = array();
+  public function __construct($message, $filename, $linenum, $vars) {
+    $this->message = $message;
+    $this->filename = $filename;
+    $this->line = $linenum;
+    $this->vars = $vars;
   }
-  public static function handle($errno,$errmsg,$filename,$line,$vars) {
-  $self=new self($errmsg,$filename,$line,$vars);
+  public static function handle($errno, $errmsg, $filename, $line, $vars) {
+    $self = new self($errmsg, $filename, $line, $vars);
     switch ($errno) {
       case E_USER_ERROR:
         return $self->handleError();
@@ -76,51 +71,58 @@ class ErrorHandler {
   public function handleError() {
     ob_start();
     debug_print_backtrace();
-    $backtrace=ob_get_flush();
-    $body=<<<EOT
+    $backtrace = ob_get_flush();
+    $body = <<<EOT
 ERROR:
   Message: {$this->message}
      File: {$this->filename}
      Line: {$this->line}
 Backtrace: {$backtrace}
 EOT;
-    elog($body,YAPEAL_ERROR_LOG);
+    elog($body, YAPEAL_ERROR_LOG);
     exit(1);
   }
   public function handleWarning() {
     if ($this->line) {
-      $body=<<<EOT
+      $body = <<<EOT
 WARNING:
 Message: {$this->message}
    File: {$this->filename}
    Line: {$this->line}
 EOT;
+      
     } else {
-      $body=<<<EOT
+      $body = <<<EOT
 WARNING:
 Message: {$this->message}
    File: {$this->filename}
 EOT;
+      
     };
-    return elog($body,YAPEAL_WARNING_LOG);
+    return elog($body, YAPEAL_WARNING_LOG);
   }
   public function handleNotice() {
     if ($this->line) {
-      $body=<<<EOT
+      $body = <<<EOT
 NOTICE:
 Message: {$this->message}
    File: {$this->filename}
    Line: {$this->line}
 EOT;
+      
     } else {
-      $body=<<<EOT
+      $body = <<<EOT
 NOTICE:
 Message: {$this->message}
    File: {$this->filename}
 EOT;
+      
     };
-    return elog($body,YAPEAL_NOTICE_LOG);
+    return elog($body, YAPEAL_NOTICE_LOG);
   }
 }
-set_error_handler(array('ErrorHandler','handle'));
+set_error_handler(array(
+  'ErrorHandler',
+  'handle'
+));
 ?>

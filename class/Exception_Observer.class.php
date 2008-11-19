@@ -22,19 +22,17 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-
 /**
  * Interface classes need to implement to observe exceptions.
  * @package Yapeal
  */
 interface Exception_Observer {
- public function update(Observable_Exception $e);
+  public function update(Observable_Exception $e);
 }
 ?>

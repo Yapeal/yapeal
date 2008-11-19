@@ -22,14 +22,12 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-
 /**
  * Wrapper class for CURL
  *
@@ -38,13 +36,11 @@ if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
  *
  * @package Yapeal
  */
-class CurlRequest
-{
+class CurlRequest {
   /**
    * @var object Handle to CURL object.
    */
   private $ch;
-
   /**
    * Init curl session in constructor.
    *
@@ -67,83 +63,91 @@ class CurlRequest
    * @return void
    */
   public function __construct($params) {
-    $this->ch=curl_init();
-    $user_agent='Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3';
-    $header=array(
+    $this->ch = curl_init();
+    $user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3';
+    $header = array(
       "Accept: text/xml,application/xml,application/xhtml+xml;q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;q=0.5",
       "Accept-Language: en-us;q=0.9,en;q=0.8,*;q=0.7",
       "Accept-Charset: utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6",
-      "Keep-Alive: 300");
-    $options=array(
-      CURLOPT_ENCODING=>'',CURLOPT_FOLLOWLOCATION=>TRUE,CURLOPT_HEADER=>TRUE,
-      CURLOPT_MAXREDIRS=>5,CURLOPT_RETURNTRANSFER=>TRUE,
-      CURLOPT_SSL_VERIFYHOST=>FALSE,CURLOPT_SSL_VERIFYPEER=>FALSE,
-      CURLOPT_VERBOSE=>FALSE
+      "Keep-Alive: 300"
     );
-    if (isset($params['user_agent'])&&$params['user_agent']) {
-      $options[CURLOPT_USERAGENT]=$params['user_agent'];
+    $options = array(
+      CURLOPT_ENCODING => '',
+      CURLOPT_FOLLOWLOCATION => TRUE,
+      CURLOPT_HEADER => TRUE,
+      CURLOPT_MAXREDIRS => 5,
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_SSL_VERIFYHOST => FALSE,
+      CURLOPT_SSL_VERIFYPEER => FALSE,
+      CURLOPT_VERBOSE => FALSE
+    );
+    if (isset($params['user_agent']) && $params['user_agent']) {
+      $options[CURLOPT_USERAGENT] = $params['user_agent'];
     } else {
-      $options[CURLOPT_USERAGENT]=$user_agent;
+      $options[CURLOPT_USERAGENT] = $user_agent;
     };
     // Set unchanging curl options as a block.
-    curl_setopt_array($this->ch,$options);
+    curl_setopt_array($this->ch, $options);
     // Add optional user params to preset header.
-    if (isset($params['host'])&&$params['host']) {
-      $header[]="Host: ".$params['host'];
+    if (isset($params['host']) && $params['host']) {
+      $header[] = "Host: " . $params['host'];
     };
-    if (isset($params['header'])&&$params['header']) {
-      $header[]=$params['header'];
+    if (isset($params['header']) && $params['header']) {
+      $header[] = $params['header'];
     };
-    @curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
+    @curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
     // Set optional user params.
     if (isset($params['referer'])) {
-      @curl_setopt($this->ch,CURLOPT_REFERER,$params['referer']);
+      @curl_setopt($this->ch, CURLOPT_REFERER, $params['referer']);
     };
     if (isset($params['cookie'])) {
-      @curl_setopt($this->ch,CURLOPT_COOKIE,$params['cookie']);
+      @curl_setopt($this->ch, CURLOPT_COOKIE, $params['cookie']);
     };
-    if (isset($params['login'])&&isset($params['password'])) {
-      @curl_setopt($this->ch,CURLOPT_USERPWD,$params['login'].':'.$params['password']);
+    if (isset($params['login']) && isset($params['password'])) {
+      @curl_setopt($this->ch, CURLOPT_USERPWD, $params['login'] . ':' . $params['password']);
     };
     // Set any method dependent params.
     switch ($params['method']) {
       case 'HEAD':
-        @curl_setopt($this->ch,CURLOPT_NOBODY,1);
-        break;
+        @curl_setopt($this->ch, CURLOPT_NOBODY, 1);
+      break;
       case 'POST':
-        @curl_setopt($this->ch,CURLOPT_POST,TRUE);
-        @curl_setopt($this->ch,CURLOPT_POSTFIELDS,$params['content']);
-        break;
+        @curl_setopt($this->ch, CURLOPT_POST, TRUE);
+        @curl_setopt($this->ch, CURLOPT_POSTFIELDS, $params['content']);
+      break;
       case 'GET':
-        break;
+      break;
     };
     // Set required user params.
-    @curl_setopt($this->ch,CURLOPT_TIMEOUT,$params['timeout']);
-    @curl_setopt($this->ch,CURLOPT_URL,$params['url']);
+    @curl_setopt($this->ch, CURLOPT_TIMEOUT, $params['timeout']);
+    @curl_setopt($this->ch, CURLOPT_URL, $params['url']);
   }
-
   /**
    * Make curl request.
    *
    * @return array  'header','body','curl_error','http_code','last_url'
    */
   public function exec() {
-    $response=curl_exec($this->ch);
-    $error=curl_error($this->ch);
-    $result=array('header'=>'','body'=>'','curl_error'=>'','http_code'=>'',
-      'last_url'=>'');
-    if ($error!="") {
-      $result['curl_error']=$error;
+    $response = curl_exec($this->ch);
+    $error = curl_error($this->ch);
+    $result = array(
+      'header' => '',
+      'body' => '',
+      'curl_error' => '',
+      'http_code' => '',
+      'last_url' => ''
+    );
+    if ($error != "") {
+      $result['curl_error'] = $error;
       return $result;
     };
-    $header_size=curl_getinfo($this->ch,CURLINFO_HEADER_SIZE);
-    $result['header']=substr($response,0,$header_size);
-    $result['body']=substr($response,$header_size);
-    $result['http_code']=curl_getinfo($this->ch,CURLINFO_HTTP_CODE);
-    $result['last_url']=curl_getinfo($this->ch,CURLINFO_EFFECTIVE_URL);
+    $header_size = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
+    $result['header'] = substr($response, 0, $header_size);
+    $result['body'] = substr($response, $header_size);
+    $result['http_code'] = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+    $result['last_url'] = curl_getinfo($this->ch, CURLINFO_EFFECTIVE_URL);
     return $result;
   }
-
   /**
    * Close curl connection before exiting.
    *
@@ -151,6 +155,7 @@ class CurlRequest
    */
   public function __destruct() {
     //curl_close($this->ch);
+    
   }
 }
 ?>

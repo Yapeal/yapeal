@@ -26,79 +26,77 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
 // Track version of script.
-define('YAPEAL_VERSION',str_replace(array('$','#'),'',
-  '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
-
+define('YAPEAL_VERSION', str_replace(array(
+  '$',
+  '#'
+) , '', '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
 /* **************************************************************************
- * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
- * **************************************************************************/
-
+* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+* **************************************************************************/
 // Used to over come path issues caused by how script is ran on server.
-$dir=realpath(dirname(__FILE__));
+$dir = realpath(dirname(__FILE__));
 chdir($dir);
 // Set constant for how we're being run.
 // Being used here to detect cli mode.
+
 /**
  * @ignore
  */
-defined('YEPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
-if (YAPEAL_SCRIPT_MODE=='cli'&&function_exists('getopt')) {
-  $options=getopt('hVc:');
-  foreach ($options as $opt=>$value) {
+defined('YEPEAL_SCRIPT_MODE') || define('YAPEAL_SCRIPT_MODE', php_sapi_name());
+if (YAPEAL_SCRIPT_MODE == 'cli' && function_exists('getopt')) {
+  $options = getopt('hVc:');
+  foreach($options as $opt => $value) {
     switch ($opt) {
       case 'c':
       case '--config':
-        if (realpath($value)&&is_readable(realpath($value))) {
+        if (realpath($value) && is_readable(realpath($value))) {
           /**
            * @ignore
            */
-          define('YAPEAL_INI_FILE',realpath($value));
+          define('YAPEAL_INI_FILE', realpath($value));
           break;
         } else {
-          $mess=$opt[1].' does not exist or is not readable'.PHP_EOL;
-          fwrite(STDERR,$mess);
-        };// else realpath $opt[1]&& ...
+          $mess = $opt[1] . ' does not exist or is not readable' . PHP_EOL;
+          fwrite(STDERR, $mess);
+        }; // else realpath $opt[1]&& ...
+        
       case 'h':
       case '--help':
         usage();
         exit;
       case 'V':
       case '--version':
-        $mess=$argv[0].' '.YAPEAL_VERSION.PHP_EOL;
-        $mess.="Copyright (C) 2008, Michael Cummings".PHP_EOL;
-        $mess.="This program comes with ABSOLUTELY NO WARRANTY.".PHP_EOL;
-        $mess.='Licensed under the GNU LPGL 3.0 License.'.PHP_EOL;
-        $mess.='See COPYING and COPYING-LESSER for more details.'.PHP_EOL;
-        fwrite(STDERR,$mess);
+        $mess = $argv[0] . ' ' . YAPEAL_VERSION . PHP_EOL;
+        $mess.= "Copyright (C) 2008, Michael Cummings" . PHP_EOL;
+        $mess.= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
+        $mess.= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
+        $mess.= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+        fwrite(STDERR, $mess);
         exit;
     };
   };
 };
-
 /* This would need to be changed if this file isn't in another path at same
- * level as 'inc' directory where common_emt.inc is.
- */
+* level as 'inc' directory where common_emt.inc is.
+*/
 // Move up and over to 'inc' directory to read common_backend.inc
-$path=realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
-$path.='..'.DIRECTORY_SEPARATOR.'inc'.DIRECTORY_SEPARATOR.'common_backend.inc';
+$path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+$path.= '..' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'common_backend.inc';
 require_once realpath($path);
 /* **************************************************************************
- * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
- * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
- * **************************************************************************/
-
-require_once YAPEAL_INC.'elog.inc';
-require_once YAPEAL_CLASS.'Logging_Exception_Observer.class.php';
-require_once YAPEAL_CLASS.'Printing_Exception_Observer.class.php';
-require_once YAPEAL_INC.'common_db.inc';
+* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
+* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
+* **************************************************************************/
+require_once YAPEAL_INC . 'elog.inc';
+require_once YAPEAL_CLASS . 'Logging_Exception_Observer.class.php';
+require_once YAPEAL_CLASS . 'Printing_Exception_Observer.class.php';
+require_once YAPEAL_INC . 'common_db.inc';
 //require_once YAPEAL_INC.'eap_functions.inc';
-
 function usage() {
-  $progname=basename($GLOBALS['argv'][0]);
-  $scriptversion=YAPEAL_VERSION;
-  $use=<<<USAGE_MESSAGE
+  $progname = basename($GLOBALS['argv'][0]);
+  $scriptversion = YAPEAL_VERSION;
+  $use = <<<USAGE_MESSAGE
 Usage: $progname [-h | -V | -c config.ini]
 Options:
   -c config.ini, --config=config.ini   Read configation from 'config.ini'.
@@ -107,174 +105,172 @@ Options:
 
 Version $scriptversion
 USAGE_MESSAGE;
-  fwrite(STDERR,$use.PHP_EOL);
+  fwrite(STDERR, $use . PHP_EOL);
 };
-
-$cachetypes=array('tableName'=>'C','ownerID'=>'I',
-  'cachedUntil'=>'T');
+$cachetypes = array(
+  'tableName' => 'C',
+  'ownerID' => 'I',
+  'cachedUntil' => 'T'
+);
 try {
-  $api='eve-api-pull';
+  $api = 'eve-api-pull';
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
-  if (dontWait($api,0,FALSE,FALSE)) {
+  if (dontWait($api, 0, FALSE, FALSE)) {
     // Give ourself up to 5 minutes to finish.
-    $timer=gmdate('Y-m-d H:i:s',strtotime('5 minutes'));
-    $data=array('tableName'=>$api,'ownerID'=>0,'cachedUntil'=>$timer);
-    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-    $ctime=strtotime($timer.' +0000');
+    $timer = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
+    $data = array(
+      'tableName' => $api,
+      'ownerID' => 0,
+      'cachedUntil' => $timer
+    );
+    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+    $ctime = strtotime($timer . ' +0000');
   } else {
     // Someone else has set timer need to wait it out.
     exit;
-  };// else dontwait $api ...
-
+  }; // else dontwait $api ...
   /* ************************************************************************
-   * Generate character list
-   * ************************************************************************/
-
+  * Generate character list
+  * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
-    $api='RegisteredCharacter';
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
-      $mess='CHAR: Connect before section in '.__FILE__;
+    $api = 'RegisteredCharacter';
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      $mess = 'CHAR: Connect before section in ' . __FILE__;
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    $con=connect(DSN_CHAR_WRITER);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $con = connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
-    $sql='select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
-    $sql.='chr.characterID "charid"';
-    $sql.=' from ';
-    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
-    $sql.=DB_UTIL.'.RegisteredUser as u';
-    $sql.=' where chr.isActive=true';
-    $sql.=' and chr.userID=u.userID';
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
-      $mess='CHAR: Before GetAll $charList in '.__FILE__;
+    $sql = 'select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
+    $sql.= 'chr.characterID "charid"';
+    $sql.= ' from ';
+    $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
+    $sql.= DB_UTIL . '.RegisteredUser as u';
+    $sql.= ' where chr.isActive=true';
+    $sql.= ' and chr.userID=u.userID';
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      $mess = 'CHAR: Before GetAll $charList in ' . __FILE__;
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    $charList=$con->GetAll($sql);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $charList = $con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
-    foreach ($charList as $char) {
+    foreach($charList as $char) {
       extract($char);
-      $ownerid=$charid;
+      $ownerid = $charid;
       /* **********************************************************************
-       * Per character API pulls
-       * **********************************************************************/
-      if (YAPEAL_TRACE&&
-        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
-        $mess='CHAR: Before require pulls_char.inc';
+      * Per character API pulls
+      * **********************************************************************/
+      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+        $mess = 'CHAR: Before require pulls_char.inc';
         print_on_command($mess);
-        $yapealTracing.=$mess.PHP_EOL;
-      };// if YAPEAL_TRACE&&...
-      require YAPEAL_INC.'pulls_char.inc';
-    };// foreach $charList
-  };// if YAPEAL_CHAR_ACTIVE...
-
+        $yapealTracing.= $mess . PHP_EOL;
+      }; // if YAPEAL_TRACE&&...
+      require YAPEAL_INC . 'pulls_char.inc';
+    }; // foreach $charList
+    
+  }; // if YAPEAL_CHAR_ACTIVE...
   /* ************************************************************************
-   * Generate corp list
-   * ************************************************************************/
-
+  * Generate corp list
+  * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
-    $api='RegisteredCorporation';
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
-      $mess='CORP: Connect before section in '.__FILE__;
+    $api = 'RegisteredCorporation';
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+      $mess = 'CORP: Connect before section in ' . __FILE__;
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    $con=connect(DSN_CORP_WRITER);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $con = connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
-    $sql='select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
-    $sql.='u.limitedApiKey "lapikey",cp.characterID "charid"';
-    $sql.=' from '.DB_UTIL.'.RegisteredCorporation as cp,';
-    $sql.=DB_UTIL.'.RegisteredCharacter as chr,';
-    $sql.=DB_UTIL.'.RegisteredUser as u';
-    $sql.=' where cp.isActive=true';
-    $sql.=' and cp.characterID=chr.characterID';
-    $sql.=' and chr.userID=u.userID';
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
-      $mess='CORP: Before GetAll $corpList in '.__FILE__;
+    $sql = 'select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
+    $sql.= 'u.limitedApiKey "lapikey",cp.characterID "charid"';
+    $sql.= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
+    $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
+    $sql.= DB_UTIL . '.RegisteredUser as u';
+    $sql.= ' where cp.isActive=true';
+    $sql.= ' and cp.characterID=chr.characterID';
+    $sql.= ' and chr.userID=u.userID';
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+      $mess = 'CORP: Before GetAll $corpList in ' . __FILE__;
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    $corpList=$con->GetAll($sql);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $corpList = $con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
-    foreach ($corpList as $corp) {
+    foreach($corpList as $corp) {
       extract($corp);
-      $ownerid=$corpid;
+      $ownerid = $corpid;
       /* ********************************************************************
-       * Per corp API pulls
-       * ********************************************************************/
-      if (YAPEAL_TRACE&&
-        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
-        $mess='CORP: Before require pulls_corp.inc';
+      * Per corp API pulls
+      * ********************************************************************/
+      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+        $mess = 'CORP: Before require pulls_corp.inc';
         print_on_command($mess);
-        $yapealTracing.=$mess.PHP_EOL;
-      };// if YAPEAL_TRACE&&...
-      require YAPEAL_INC.'pulls_corp.inc';
-    };// foreach $corpList
-  };// if YAPEAL_CORP_ACTIVE...
-
+        $yapealTracing.= $mess . PHP_EOL;
+      }; // if YAPEAL_TRACE&&...
+      require YAPEAL_INC . 'pulls_corp.inc';
+    }; // foreach $corpList
+    
+  }; // if YAPEAL_CORP_ACTIVE...
   /* ************************************************************************
-   * /eve/ API pulls
-   * ************************************************************************/
+  * /eve/ API pulls
+  * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
-      $mess='EVE: Connect before section in '.__FILE__;
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+      $mess = 'EVE: Connect before section in ' . __FILE__;
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    $con=connect(DSN_EVE_WRITER);
-    if (YAPEAL_TRACE&&
-      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
-      $mess='EVE: Before require pulls_eve.inc';
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $con = connect(DSN_EVE_WRITER);
+    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+      $mess = 'EVE: Before require pulls_eve.inc';
       print_on_command($mess);
-      $yapealTracing.=$mess.PHP_EOL;
-    };// if YAPEAL_TRACE&&...
-    require YAPEAL_INC.'pulls_eve.inc';
-  };// if YAPEAL_EVE_ACTIVE...
-
-  $api='eve-api-pull';
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    require YAPEAL_INC . 'pulls_eve.inc';
+  }; // if YAPEAL_EVE_ACTIVE...
+  $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
-  $ctime2=strtotime(get_cacheduntil($api).' +0000');
-  if ($ctime==$ctime2) {
-    $cuntil=gmdate('Y-m-d H:i:s');
-    $data=array('tableName'=>$api,'ownerID'=>0,'cachedUntil'=>$cuntil);
-    upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
+  $ctime2 = strtotime(get_cacheduntil($api) . ' +0000');
+  if ($ctime == $ctime2) {
+    $cuntil = gmdate('Y-m-d H:i:s');
+    $data = array(
+      'tableName' => $api,
+      'ownerID' => 0,
+      'cachedUntil' => $cuntil
+    );
+    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   } else {
     // Lost Mutex we should log that as notice.
-    if ((YAPEAL_LOG_LEVEL&E_USER_NOTICE)==E_USER_NOTICE) {
-      $mess=$api.' '.$timer.' ran long';
+    if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
+      $mess = $api . ' ' . $timer . ' ran long';
       print_on_command($mess);
-      trigger_error($mess,E_USER_NOTICE);
+      trigger_error($mess, E_USER_NOTICE);
     };
-  };// else $timer==get_cacheduntil $api ...
-  if (YAPEAL_TRACE&&!empty($yapealTracing)) {
-    elog($yapealTracing,YAPEAL_TRACE_LOG);
-  };// if YAPEAL_TRACE&&...
+  }; // else $timer==get_cacheduntil $api ...
+  if (YAPEAL_TRACE && !empty($yapealTracing)) {
+    elog($yapealTracing, YAPEAL_TRACE_LOG);
+  }; // if YAPEAL_TRACE&&...
   exit;
 }
-catch (Exception $e) {
-  elog('Uncaught exception in eve-api-pull.php',YAPEAL_WARNING_LOG);
-  $message=<<<MESS
+catch(Exception $e) {
+  elog('Uncaught exception in eve-api-pull.php', YAPEAL_WARNING_LOG);
+  $message = <<<MESS
 EXCEPTION:
-     Code: {$e->getCode()}
-  Message: {$e->getMessage()}
-     File: {$e->getFile()}
-     Line: {$e->getLine()}
+     Code: {$e->getCode() }
+  Message: {$e->getMessage() }
+     File: {$e->getFile() }
+     Line: {$e->getLine() }
 Backtrace:
-  {$e->getTraceAsString()}
+  {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message,$this->_filename);
+  elog($message, $this->_filename);
 }
 ?>

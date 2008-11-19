@@ -22,47 +22,42 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename( __FILE__ )==basename($_SERVER['PHP_SELF'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-
 /* *************************************************************************
- * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
- * *************************************************************************/
-
+* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+* *************************************************************************/
 /**
  * Find path for includes
  */
 // Move up and over to 'inc' directory to read common_backend.inc
-$path=realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
-$path.='..'.DIRECTORY_SEPARATOR.'inc'.DIRECTORY_SEPARATOR.'common_backend.inc';
+$path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+$path.= '..' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'common_backend.inc';
 require_once realpath($path);
-
 /* *************************************************************************
- * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
- * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
- * *************************************************************************/
-
+* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
+* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
+* *************************************************************************/
 /**
  * Observable_Exception class.
  *
  * @package Yapeal
  */
 class Observable_Exception extends Exception {
-  public static $_observers=array();
+  public static $_observers = array();
   public static function attach(Exception_Observer $observer) {
-    self::$_observers[]=$observer;
+    self::$_observers[] = $observer;
   }
-  public function __construct($message=null,$code=0) {
-    parent::__construct($message,$code);
+  public function __construct($message = null, $code = 0) {
+    parent::__construct($message, $code);
     $this->notify();
   }
   public function notify() {
-    foreach (self::$_observers as $observer) {
+    foreach(self::$_observers as $observer) {
       $observer->update($this);
     };
   }

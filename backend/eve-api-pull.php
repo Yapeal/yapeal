@@ -134,12 +134,12 @@ try {
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
     $api='RegisteredCharacter';
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
       $mess='CHAR: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     $con=connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
     $sql='select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
@@ -149,12 +149,12 @@ try {
     $sql.=DB_UTIL.'.RegisteredUser as u';
     $sql.=' where chr.isActive=true';
     $sql.=' and chr.userID=u.userID';
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
       $mess='CHAR: Before GetAll $charList in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     $charList=$con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
@@ -164,12 +164,12 @@ try {
       /* **********************************************************************
        * Per character API pulls
        * **********************************************************************/
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before require pulls_char.inc';
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       require YAPEAL_INC.'pulls_char.inc';
     };// foreach $charList
   };// if YAPEAL_CHAR_ACTIVE...
@@ -181,12 +181,12 @@ try {
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
     $api='RegisteredCorporation';
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
       $mess='CORP: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     $con=connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
     $sql='select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
@@ -197,12 +197,12 @@ try {
     $sql.=' where cp.isActive=true';
     $sql.=' and cp.characterID=chr.characterID';
     $sql.=' and chr.userID=u.userID';
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
       $mess='CORP: Before GetAll $corpList in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     $corpList=$con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
@@ -212,12 +212,12 @@ try {
       /* ********************************************************************
        * Per corp API pulls
        * ********************************************************************/
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before require pulls_corp.inc';
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       require YAPEAL_INC.'pulls_corp.inc';
     };// foreach $corpList
   };// if YAPEAL_CORP_ACTIVE...
@@ -227,19 +227,19 @@ try {
    * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
       $mess='EVE: Connect before section in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     $con=connect(DSN_EVE_WRITER);
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
       $mess='EVE: Before require pulls_eve.inc';
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     require YAPEAL_INC.'pulls_eve.inc';
   };// if YAPEAL_EVE_ACTIVE...
 
@@ -258,12 +258,23 @@ try {
       trigger_error($mess,E_USER_NOTICE);
     };
   };// else $timer==get_cacheduntil $api ...
-  if (YAPEAL_DEBUG&&!empty($yapealDebugging)) {
-    elog($yapealDebugging,YAPEAL_DEBUG_LOG);
-  };// if YAPEAL_DEBUG&&...
+  if (YAPEAL_TRACE&&!empty($yapealTracing)) {
+    elog($yapealTracing,YAPEAL_TRACE_LOG);
+  };// if YAPEAL_TRACE&&...
   exit;
 }
 catch (Exception $e) {
   elog('Uncaught exception in eve-api-pull.php',YAPEAL_WARNING_LOG);
+  $message=<<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+  {$e->getTraceAsString()}
+  \t--- END TRACE ---
+MESS;
+  elog($message,$this->_filename);
 }
 ?>

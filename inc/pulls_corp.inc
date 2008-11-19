@@ -64,12 +64,12 @@ try {
     $cuntil=(string)$xml->cachedUntil[0];
     $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
     upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
       $mess='CORP: Before clone for '.$api.' in '.__FILE__;
       print_on_command($mess);
-      $yapealDebugging.=$mess.PHP_EOL;
-    };// if YAPEAL_DEBUG&&...
+      $yapealTracing.=$mess.PHP_EOL;
+    };// if YAPEAL_TRACE&&...
     // Main table first
     // Must be done first because of foreign key constraints in
     // other tables
@@ -83,12 +83,12 @@ try {
       foreach ($datum as $k=>$v) {
         $data[$k]=(string)$v;
       };
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before upsert for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       upsert($data,$types,$api,DSN_CORP_WRITER);
     };// if $datum>0
 
@@ -100,12 +100,12 @@ try {
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerID'=>$ownerid);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before multiUpsert for '.$dbTable.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum,$types,$dbTable,
         DSN_CORP_WRITER,$extras);
     };// if $datum>0
@@ -118,12 +118,12 @@ try {
     $datum=$xml->xpath('//result/rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerID'=>$ownerid);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before multiUpsert for '.$dbTable.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum,$types,$dbTable,
         DSN_CORP_WRITER,$extras);
     };// if $datum>0
@@ -140,12 +140,12 @@ try {
       foreach ($datum[0]->children() as $k=>$v) {
         $data[$k]=(int)$v;
       };
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before upsert for '.$dbTable.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       upsert($data,$types,$dbTable,DSN_CORP_WRITER);
     };// if $datum>0
   };// if $xml instanceof SimpleXMLElement
@@ -216,12 +216,12 @@ foreach ($apis as $api=>$settings) {
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
         $extras=array('ownerID'=>$ownerid);
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
           $mess='CORP: Before multiUpsert for '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum,$settings['types'],
           $api,DSN_CORP_WRITER,$extras);
       };// if $datum>0
@@ -288,23 +288,23 @@ foreach ($apis as $api=>$settings) {
       $cuntil=(string)$xml->cachedUntil[0];
       $data=array('tableName'=>$api,'ownerID'=>$ownerid,'cachedUntil'=>$cuntil);
       upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before xpath for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
         $sql='select '.$settings['check'];
         $sql.=' from '.$api;
         $sql.=' where ownerid='.$ownerid;
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
           $mess='CORP: Before select check for '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         $result=$con->getAll($sql);
         $checking=array();
         // Change assoc array of records from DB into simple array
@@ -327,22 +327,22 @@ foreach ($apis as $api=>$settings) {
             $sql='delete from '.$api;
             $sql.=' where ownerid='.$ownerid;
             $sql.=' and '.$settings['check'].'='.$v;
-            if (YAPEAL_DEBUG&&
-              (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+            if (YAPEAL_TRACE&&
+              (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
               $mess='CORP: Before delete losers for '.$api.' in '.__FILE__;
               print_on_command($mess);
-              $yapealDebugging.=$mess.PHP_EOL;
-            };// if YAPEAL_DEBUG&&...
+              $yapealTracing.=$mess.PHP_EOL;
+            };// if YAPEAL_TRACE&&...
             $con->Execute($sql);
           };// foreach $delete...
         };// if !empty $delete
         $extras=array('ownerID'=>$ownerid);
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
           $mess='CORP: Before multiUpsert for '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum,$settings['types'],
           $api,DSN_CORP_WRITER,$extras);
       };// if $datum>0
@@ -428,12 +428,12 @@ foreach ($apis as $api=>$settings) {
           $cnt=count($datum);
           $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {
-            if (YAPEAL_DEBUG&&
-              (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+            if (YAPEAL_TRACE&&
+              (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
               $mess='CORP: Before multiUpsert for '.$api.' in '.__FILE__;
               print_on_command($mess);
-              $yapealDebugging.=$mess.PHP_EOL;
-            };// if YAPEAL_DEBUG&&...
+              $yapealTracing.=$mess.PHP_EOL;
+            };// if YAPEAL_TRACE&&...
             multipleUpsertAttributes($datum,$settings['types'],
               $api,DSN_CORP_WRITER,$extras);
           } else {
@@ -502,12 +502,12 @@ try {
   $sql='select itemid from '.$api;
   $sql.=' where moonid!=0';
   $sql.=' and ownerid='.$ownerid;
-  if (YAPEAL_DEBUG&&
-    (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+  if (YAPEAL_TRACE&&
+    (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
     $mess='CORP: Before getALL $POSList for '.$api.' in '.__FILE__;
     print_on_command($mess);
-    $yapealDebugging.=$mess.PHP_EOL;
-  };// if YAPEAL_DEBUG&&...
+    $yapealTracing.=$mess.PHP_EOL;
+  };// if YAPEAL_TRACE&&...
   $datum=$con->GetAll($sql);
   $POSlist=array();
   if (count($datum)>0) {
@@ -619,12 +619,12 @@ try {
     upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
     $datum=$xml;
     if (count($datum)>0) {
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before editAssets for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       // Call recursive function to modify XML.
       editAssets($datum);
       // Use generated owner node as root for tree.
@@ -639,34 +639,34 @@ try {
       $sql='delete';
       $sql.=' from '.$api;
       $sql.=' where ownerid='.$ownerid;
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before delete for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       // Clear out old tree for this owner
       $con->Execute($sql);
       $types=array(
         'flag'=>'I','itemID'=>'I','lft'=>'I','locationID'=>'I','ownerID'=>'I',
         'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeID'=>'I');
       // Insert the new owner's root node.
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before owner node insert for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       upsert($nodeData,$types,$api,DSN_CORP_WRITER);
        //Just need the rows from XML now
       $datum=$xml->xpath('//row');
       $extras=array('locationID'=>0,'ownerID'=>$ownerid);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CORP)==YAPEAL_DEBUG_CORP) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CORP)==YAPEAL_TRACE_CORP) {
         $mess='CORP: Before multiUpsert for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum,$types,$api,
         DSN_CORP_WRITER,$extras);
     };// if count $datum ...

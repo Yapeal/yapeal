@@ -78,29 +78,29 @@ foreach ($apis as $api=>$settings) {
       $cuntil=(string)$xml->cachedUntil[0];
       $data=array('tableName'=>$api,'ownerID'=>0,'cachedUntil'=>$cuntil);
       upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
         $mess='EVE: Before xpath for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
           $mess='EVE: Before truncate '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         // Empty out old data then upsert (insert) new
         $sql='truncate table '.$api;
         $con->Execute($sql);
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_EVE)==YAPEAL_DEBUG_EVE) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_EVE)==YAPEAL_TRACE_EVE) {
           $mess='EVE: Before multiUpsert for '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum,$settings['types'],$api,DSN_EVE_WRITER);
       };// if count $datum ...
     };// if $xml instanceof SimpleXMLElement

@@ -86,12 +86,12 @@ try {
       };
     };// if $datum>0
     if (count($data)) {
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before upsert for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       upsert($data,$types,$api,DSN_CHAR_WRITER);
     };
 
@@ -103,12 +103,12 @@ try {
     $datum=$xml->xpath('//rowset[@name="'.$dbTable.'"]/row');
     if (count($datum)>0) {
       $extras=array('ownerID'=>$ownerid,'level'=>0,'unpublished'=>0);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before upsert for '.$dbTable.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum,$types,$dbTable,DSN_CHAR_WRITER,$extras);
     };// if $datum>0
 
@@ -190,12 +190,12 @@ foreach ($apis as $api=>$settings) {
       $datum=$xml->xpath($settings['xpath']);
       if (count($datum)>0) {
         $extras=array('ownerID'=>$ownerid);
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
           $mess='CHAR: Before MultiUpsert for '.$api.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum,$settings['types'],
           $api,DSN_CHAR_WRITER,$extras);
       };// if $datum>0
@@ -286,22 +286,22 @@ foreach ($apis as $api=>$settings) {
           $data=array('tableName'=>$api.$account,'ownerID'=>$ownerid,
             'cachedUntil'=>$cuntil);
           upsert($data,$cachetypes,'CachedUntil',DSN_UTIL_WRITER);
-          if (YAPEAL_DEBUG&&
-            (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+          if (YAPEAL_TRACE&&
+            (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
             $mess='CHAR: Before xpath for '.$api.' in '.__FILE__;
             print_on_command($mess);
-            $yapealDebugging.=$mess.PHP_EOL;
-          };// if YAPEAL_DEBUG&&...
+            $yapealTracing.=$mess.PHP_EOL;
+          };// if YAPEAL_TRACE&&...
           $datum=$xml->xpath($settings['xpath']);
           $cnt=count($datum);
           $extras=array('ownerID'=>$ownerid,'account'=>$account);
           if ($cnt>0) {
-            if (YAPEAL_DEBUG&&
-              (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+            if (YAPEAL_TRACE&&
+              (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
               $mess='CHAR: Before multiUpsert for '.$api.' in '.__FILE__;
               print_on_command($mess);
-              $yapealDebugging.=$mess.PHP_EOL;
-            };// if YAPEAL_DEBUG&&...
+              $yapealTracing.=$mess.PHP_EOL;
+            };// if YAPEAL_TRACE&&...
             multipleUpsertAttributes($datum,$settings['types'],
               $api,DSN_CHAR_WRITER,$extras);
           } else {
@@ -357,7 +357,17 @@ foreach ($apis as $api=>$settings) {
       // Do nothing use observers to log info
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      $message=<<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+  {$e->getTraceAsString()}
+  \t--- END TRACE ---
+MESS;
+      elog($message,$this->_filename);
     }
   };// foreach $accounts ...
 };// foreach $apis ...
@@ -395,33 +405,33 @@ try {
       $sql='delete';
       $sql.=' from '.$api;
       $sql.=' where ownerid='.$ownerid;
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before delete for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       $con->Execute($sql);
       $types=array(
         'flag'=>'I','itemID'=>'I','lft'=>'I','locationID'=>'I','ownerID'=>'I',
         'quantity'=>'I','rgt'=>'I','singleton'=>'L','typeID'=>'I');
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before upsert owner node for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       // Insert the new owner's root node.
       upsert($nodeData,$types,$api,DSN_CHAR_WRITER);
       // Just need the rows from XML now
       $datum=$xml->xpath('//row');
       $extras=array('locationID'=>0,'ownerID'=>$ownerid);
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_CHAR)==YAPEAL_DEBUG_CHAR) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_CHAR)==YAPEAL_TRACE_CHAR) {
         $mess='CHAR: Before multiUpsert for '.$api.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum,$types,$api,
         DSN_CHAR_WRITER,$extras);
     };// if count $datum ...
@@ -450,6 +460,16 @@ catch (EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
 catch (ADODB_Exception $e) {
-  // Do nothing use observers to log info
+  $message=<<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+  {$e->getTraceAsString()}
+  \t--- END TRACE ---
+MESS;
+  elog($message,$this->_filename);
 }
 ?>

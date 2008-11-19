@@ -67,26 +67,26 @@ if (is_file($ini_file)&&is_readable($ini_file)) {
 // Mostly being used to detect cli vs cgi or apache for now where needed.
 defined('YAPEAL_SCRIPT_MODE')||define('YAPEAL_SCRIPT_MODE',php_sapi_name());
 
-// Define some constants used with debug_section setting.
+// Define some constants used with trace_section setting.
 // They need to be set here so they exist before reading ini file.
-define('YAPEAL_DEBUG_NONE',0);
-define('YAPEAL_DEBUG_ACCOUNT',1);
-define('YAPEAL_DEBUG_DATABASE',2);
-define('YAPEAL_DEBUG_CHAR',4);
-define('YAPEAL_DEBUG_CORP',8);
-define('YAPEAL_DEBUG_EVE',16);
-define('YAPEAL_DEBUG_MAP',32);
-define('YAPEAL_DEBUG_REQUEST',64);
-define('YAPEAL_DEBUG_ALL',16777215);
+define('YAPEAL_TRACE_NONE',0);
+define('YAPEAL_TRACE_ACCOUNT',1);
+define('YAPEAL_TRACE_DATABASE',2);
+define('YAPEAL_TRACE_CHAR',4);
+define('YAPEAL_TRACE_CORP',8);
+define('YAPEAL_TRACE_EVE',16);
+define('YAPEAL_TRACE_MAP',32);
+define('YAPEAL_TRACE_REQUEST',64);
+define('YAPEAL_TRACE_ALL',16777215);
 
 // Grab the info from ini file.
 $iniVars=parse_ini_file(YAPEAL_INI_FILE,TRUE);
 // Abort if required sections aren't defined
 if (!(isset($iniVars['Api'])&&isset($iniVars['Database'])&&
-  isset($iniVars['Debugging'])&&isset($iniVars['Logging'])&&
-  isset($iniVars['Paths']))) {
+  isset($iniVars['Logging'])&&isset($iniVars['Paths'])&&
+  isset($iniVars['Tracing']))) {
   $mess='One or more of the required sections:';
-  $mess.=' API, Debugging, Database, Paths, Logging';
+  $mess.=' API, Tracing, Database, Paths, Logging';
   $mess.=' is missing from '.YEPEAL_INI_FILE;
   trigger_error($mess,E_USER_ERROR);
 };// if isset ...
@@ -164,26 +164,26 @@ if ($realpath=realpath(YAPEAL_CACHE.$log_dir)) {
  * Logging
  * **************************************************************************/
 // Make sure required setting vars aren't already set
-unset($debug_log,$error_log,$level,$notice_log,$use_exception,$warning_log);
+unset($error_log,$level,$notice_log,$trace_log,$use_exception,$warning_log);
 // Pull out Logging settings
 extract($iniVars['Logging']);
 
 // Triggers error if a required setting is missing.
-isset($debug_log)||trigger_error($req1.'debug_log'.$req2,E_USER_ERROR);
 isset($error_log)||trigger_error($req1.'error_log'.$req2,E_USER_ERROR);
 isset($level)||trigger_error($req1.'level'.$req2,E_USER_ERROR);
 isset($notice_log)||trigger_error($req1.'notice_log'.$req2,E_USER_ERROR);
+isset($trace_log)||trigger_error($req1.'trace_log'.$req2,E_USER_ERROR);
 isset($use_exception)||trigger_error($req1.'use_exception'.$req2,E_USER_ERROR);
 isset($warning_log)||trigger_error($req1.'warning_log'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
-define('YAPEAL_DEBUG_LOG',YAPEAL_LOG.$debug_log);
 define('YAPEAL_ERROR_LOG',YAPEAL_LOG.$error_log);
 // NOTE this is deprecated and being forced to TRUE for now. It will be removed
 // in the near future.
 define('YAPEAL_EXCEPTIONS',TRUE);
 define('YAPEAL_LOG_LEVEL',$level);
 define('YAPEAL_NOTICE_LOG',YAPEAL_LOG.$notice_log);
+define('YAPEAL_TRACE_LOG',YAPEAL_LOG.$trace_log);
 define('YAPEAL_WARNING_LOG',YAPEAL_LOG.$warning_log);
 
 /* **************************************************************************
@@ -236,26 +236,26 @@ define('YAPEAL_API_MAP',3);
 define('YAPEAL_API_ACCOUNT',4);
 
 /* **************************************************************************
- * Debug
+ * Trace
  * **************************************************************************/
 
 // Make sure required setting vars aren't already set
-unset($debug,$debug_level,$debug_section);
+unset($trace,$trace_level,$trace_section);
 // Pull out API settings
-extract($iniVars['Debugging']);
+extract($iniVars['Tracing']);
 
 // Triggers error if a required setting is missing.
-isset($debug)||trigger_error($req1.'debug'.$req2,E_USER_ERROR);
-isset($debug_level)||trigger_error($req1.'debug_level'.$req2,E_USER_ERROR);
-isset($debug_section)||trigger_error($req1.'debug_section'.$req2,E_USER_ERROR);
+isset($trace)||trigger_error($req1.'trace'.$req2,E_USER_ERROR);
+isset($trace_level)||trigger_error($req1.'trace_level'.$req2,E_USER_ERROR);
+isset($trace_section)||trigger_error($req1.'trace_section'.$req2,E_USER_ERROR);
 
 // Define some constants from vars
-define('YAPEAL_DEBUG',$debug);
-define('YAPEAL_DEBUG_LEVEL',$debug_level);
-define('YAPEAL_DEBUG_SECTION',$debug_section);
+define('YAPEAL_TRACE',$trace);
+define('YAPEAL_TRACE_LEVEL',$trace_level);
+define('YAPEAL_TRACE_SECTION',$trace_section);
 
-// Var used to collect debug info
-$yapealDebugging='';
+// Var used to collect trace info
+$yapealTracing='';
 
 /* **************************************************************************
  * Required DBs

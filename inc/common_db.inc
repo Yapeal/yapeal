@@ -59,16 +59,16 @@ require_once YAPEAL_CLASS.'CurlRequest.class.php';
  * @throws ADODB_Exception for any errors.
  */
 function connect($dsn) {
-  global $yapealDebugging;
-  if (YAPEAL_DEBUG&&
-    (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_DATABASE)==YAPEAL_DEBUG_DATABASE) {
+  global $yapealTracing;
+  if (YAPEAL_TRACE&&
+    (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_DATABASE)==YAPEAL_TRACE_DATABASE) {
     $mess='DATABASE: Before connect for '.$dsn.' in '.__FILE__;
     print_on_command($mess);
-    $yapealDebugging.=$mess.PHP_EOL;
-  };// if YAPEAL_DEBUG&&...
+    $yapealTracing.=$mess.PHP_EOL;
+  };// if YAPEAL_TRACE&&...
   $con=&NewADOConnection($dsn);
-  if (YAPEAL_DEBUG&&YAPEAL_DEBUG_LEVEL>0&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_DATABASE)==YAPEAL_DEBUG_DATABASE) {
+  if (YAPEAL_TRACE&&YAPEAL_TRACE_LEVEL>0&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_DATABASE)==YAPEAL_TRACE_DATABASE) {
     $con->debug=TRUE;
   } else {
     $con->debug=FALSE;
@@ -92,7 +92,7 @@ function connect($dsn) {
  * @return Boolean Returns true when we need to get API data.
  */
 function dontWait($api,$owner=0,$randomize=true,$logit=YAPEAL_LOG_LEVEL) {
-  global $yapealDebugging;
+  global $yapealTracing;
   $mess='';
   $ctime=strtotime(get_cacheduntil($api,$owner).' +0000');
   $now=time()-10;// 10 seconds for EVE API time offset added :P
@@ -151,7 +151,7 @@ function dontWait($api,$owner=0,$randomize=true,$logit=YAPEAL_LOG_LEVEL) {
  * @throws EVE_API_Exception for API file errors
  */
 function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array()) {
-  global $yapealDebugging;
+  global $yapealTracing;
   $prefixes=array(
     YAPEAL_API_EVE=>'/eve/',
     YAPEAL_API_CHAR=>'/char/',
@@ -174,22 +174,22 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
     $cacheFileName .= '.xml';
     $cacheFile = $cachePath.$cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {
-      if (YAPEAL_DEBUG&&
-        (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST) {
+      if (YAPEAL_TRACE&&
+        (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST) {
         $mess='REQUEST: Loading '.$cacheFileName.' in '.__FILE__;
         print_on_command($mess);
-        $yapealDebugging.=$mess.PHP_EOL;
-      };// if YAPEAL_DEBUG&&...
+        $yapealTracing.=$mess.PHP_EOL;
+      };// if YAPEAL_TRACE&&...
       $xml = simplexml_load_file($cacheFile);
       $cuntil = strtotime($xml->cachedUntil[0].' +0000');
       $ctime = time();
       if ($ctime<$cuntil) {
-        if (YAPEAL_DEBUG&&
-          (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST) {
+        if (YAPEAL_TRACE&&
+          (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST) {
           $mess='REQUEST: Using '.$cacheFileName.' in '.__FILE__;
           print_on_command($mess);
-          $yapealDebugging.=$mess.PHP_EOL;
-        };// if YAPEAL_DEBUG&&...
+          $yapealTracing.=$mess.PHP_EOL;
+        };// if YAPEAL_TRACE&&...
         return $xml;
       };
     };
@@ -215,8 +215,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   // Now check for errors.
   if ($result['curl_error']) {
     $mess='cURL error'.PHP_EOL;
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST&&
       $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
@@ -229,8 +229,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (200!=$result['http_code']) {
     $mess='HTTP error'.PHP_EOL;
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST&&
       $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
@@ -242,8 +242,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   };
   if (!$result['body']) {
     $mess='API data error'.PHP_EOL;
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST&&
       $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
@@ -256,8 +256,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   if (!mb_strpos($result['body'],'<eveapi version="')) {
     $result=FALSE;
     $mess='API data error'.PHP_EOL;
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST&&
       $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };
@@ -271,8 +271,8 @@ function getAPIinfo($api='ErrorList',$posttype=YAPEAL_API_EVE,$postdata=array())
   if (isset($xml->error[0])) {
     $result=FALSE;
     $mess='Eve API error'.PHP_EOL;
-    if (YAPEAL_DEBUG&&
-      (YAPEAL_DEBUG_SECTION&YAPEAL_DEBUG_REQUEST)==YAPEAL_DEBUG_REQUEST&&
+    if (YAPEAL_TRACE&&
+      (YAPEAL_TRACE_SECTION&YAPEAL_TRACE_REQUEST)==YAPEAL_TRACE_REQUEST&&
       $http['content']) {
       $mess.='Post parameters: '.$http['content'].PHP_EOL;
     };

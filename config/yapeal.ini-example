@@ -25,21 +25,22 @@ file_suffix=".xml.aspx"
 url_base="http://api.eve-online.com"
 
 ; Settings used when debugging Yapeal. (required)
-[Debugging]
-; Set to TRUE to turn debugging on. (required)
-debug=FALSE
+[Tracing]
+; Set to TRUE to turn tracing on. (required)
+trace=FALSE
 
 ; Sets level of debugging wanted. (required)
-; Used in a few places to turn on extra debugging when >0.
-debug_level=0
+; Used in a few places to turn on extra tracing when >0.
+trace_level=0
 
-; Sections that you wish to log debug messages for. (required)
-; Set to YAPEAL_DEBUG_NONE or
-; YAPEAL_DEBUG_ACCOUNT, YAPEAL_DEBUG_DATABASE, YAPEAL_DEBUG_CHAR,
-; YAPEAL_DEBUG_CORP, YAPEAL_DEBUG_EVE, YAPEAL_DEBUG_MAP, YAPEAL_DEBUG_REQUEST
+; Sections that you wish to log trace messages for. (required)
+; Set to YAPEAL_TRACE_NONE or
+; YAPEAL_TRACE_ACCOUNT, YAPEAL_TRACE_DATABASE, YAPEAL_TRACE_CHAR,
+; YAPEAL_TRACE_CORP, YAPEAL_TRACE_EVE, YAPEAL_TRACE_MAP, YAPEAL_TRACE_REQUEST or
+; YAPEAL_TRACE_ALL
 ; Settings can be combined with '|' for example:
-; debug_section=YAPEAL_DEBUG_EVE|YAPEAL_DEBUG_REQUEST
-debug_section=YAPEAL_DEBUG_NONE
+; trace_section=YAPEAL_TRACE_EVE|YAPEAL_TRACE_REQUEST
+trace_section=YAPEAL_TRACE_NONE
 
 ; Default section for database settings. (required)
 [Database]
@@ -122,10 +123,6 @@ active=TRUE
 
 ; Logging settings (required)
 [Logging]
-; Debug level log file name. (required)
-; This is only used if debugging is turned on in [Debugging]
-debug_log=Yapeal_debug.log
-
 ; Error level log file name. (required)
 error_log=Yapeal_error.log
 
@@ -135,6 +132,10 @@ level=E_USER_ERROR|E_USER_WARNING|E_USER_NOTICE
 
 ; Notice level log file name. (required)
 notice_log=Yapeal_notice.log
+
+; Trace level log file name. (required)
+; This is only used if tracing is turned on in [Tracing]
+trace_log=Yapeal_trace.log
 
 ; Whether to use exceptions for errors. (required Deprecated)
 ; (Deprecated) Now using an exception only system.

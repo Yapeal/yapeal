@@ -76,7 +76,7 @@ $iniVars = parse_ini_file(YAPEAL_INI_FILE, TRUE);
 if (!(isset($iniVars['Api']) && isset($iniVars['Database']) && isset($iniVars['Logging']) && isset($iniVars['Paths']) && isset($iniVars['Tracing']))) {
   $mess = 'One or more of the required sections:';
   $mess.= ' API, Tracing, Database, Paths, Logging';
-  $mess.= ' is missing from ' . YEPEAL_INI_FILE;
+  $mess.= ' is missing from ' . YAPEAL_INI_FILE;
   trigger_error($mess, E_USER_ERROR);
 }; // if isset ...
 // Set vars use in error messages.
@@ -261,7 +261,7 @@ foreach($dbs as $db) {
     // Mark as inactive.
     define('YAPEAL_' . $db . '_ACTIVE', FALSE);
   }; // else $active...
-  
+
 }; // foreach $dbs...
 
 ?>

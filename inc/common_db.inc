@@ -340,18 +340,10 @@ function editAssets($node, $_Id = 1, $location = 0) {
  */
 function getBloodLineHQ($chartype) {
   $raceToSystem = array(
-    'Achura' => 30000145,
-    'Amarr' => 30002187,
-    'Brutor' => 30002544,
-    'Civire' => 30000145,
-    'Deteis' => 30000145,
-    'Gallente' => 30004967,
-    'Intaki' => 30003788,
-    'JinMei' => 30004967,
-    'Khanid' => 30003863,
-    'NiKunni' => 30002187,
-    'Sebiestor' => 30002544,
-    'Vherokior' => 30002544
+    'Achura' => 30000145, 'Amarr' => 30002187, 'Brutor' => 30002544,
+    'Civire' => 30000145, 'Deteis' => 30000145, 'Gallente' => 30004967,
+    'Intaki' => 30003788, 'JinMei' => 30004967, 'Khanid' => 30003863,
+    'NiKunni' => 30002187, 'Sebiestor' => 30002544, 'Vherokior' => 30002544
   );
   return $raceToSystem[$chartype];
 } // function get_BloodLineHQ ...
@@ -364,18 +356,9 @@ function getBloodLineHQ($chartype) {
  */
 function getBloodLineTypeID($bloodLine) {
   $bloodLineToTypeID = array(
-    'Achura' => 1383,
-    'Amarr' => 1373,
-    'Brutor' => 1380,
-    'Civire' => 1375,
-    'Deteis' => 1376,
-    'Gallente' => 1377,
-    'Intaki' => 1378,
-    'JinMei' => 1384,
-    'Khanid' => 1385,
-    'NiKunni' => 1374,
-    'Sebiestor' => 1379,
-    'Vherokior' => 1386
+    'Achura' => 1383, 'Amarr' => 1373, 'Brutor' => 1380, 'Civire' => 1375,
+    'Deteis' => 1376, 'Gallente' => 1377, 'Intaki' => 1378, 'JinMei' => 1384,
+    'Khanid' => 1385, 'NiKunni' => 1374, 'Sebiestor' => 1379, 'Vherokior' => 1386
   );
   return $bloodLineToTypeID[$bloodLine];
 } // function get_charBloodLine ...
@@ -395,10 +378,7 @@ function getCachedUntil($tname, $owner, $table, $dsn) {
     $con = connect($dsn);
     $sql = 'select cachedUntil from ' . $table;
     $sql.= ' where tableName=? and ownerID=?';
-    $until = $con->GetOne($sql, array(
-      $tname,
-      $owner
-    ));
+    $until = $con->GetOne($sql, array($tname, $owner));
     if (!strtotime($until)) {
       return '1970-01-01 00:00:01'; // One second after epox
 
@@ -422,9 +402,8 @@ function getCachedUntil($tname, $owner, $table, $dsn) {
 function getCharBloodLine($charid, $dsn) {
   $con = connect($dsn);
   $sql = 'select bloodLine from CharacterSheet';
-  $sql.= ' where characterID=' . $charid;
-  $result = $con->GetOne($sql);
-  print_r($result) . "\n";
+  $sql.= ' where characterID=?';
+  $result = $con->GetOne($sql,array($charid));
   return $result;
 } // function get_charBloodLine ...
 
@@ -441,7 +420,7 @@ function getCorpHQ($corp, $dsn) {
   $con = connect($dsn);
   $sql = 'select stationID from CorporationSheet';
   $sql.= ' where corporationID=?';
-  return $con->GetOne($sql, array( $corp ));
+  return $con->GetOne($sql, array($corp));
 };
 /**
  * Function to build a multi-values insert ... on duplicate key update query
@@ -461,7 +440,8 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $con = connect($dsn);
   $needsQuote = array('C', 'X', 'D', 'T');
   // Build query sections
-  $insert = 'insert into ' . $table . ' (' . implode(',', array_keys($params)) . ')';
+  $insert = 'insert into ' . $table . ' (';
+  $insert.= implode(',', array_keys($params)) . ')';
   $values = ' values';
   $sets = array();
   foreach($data as $row) {
@@ -528,6 +508,7 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
   $con = connect($dsn);
   $upsert = makeMultiUpsert($data, $types, $table, $dsn);
   // Use a transaction for larger upserts to make them faster when we can.
+  $con->debug=TRUE;
   if (count($data) > 10) {
     try {
       $con->BeginTrans();
@@ -572,12 +553,12 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
     foreach($datum as $record) {
       $row = $extras;
       foreach($record->attributes() as $k => $v) {
-        // Note that all attributes names are converted to lower case
-        // Should probably NOT do this and just pass them thru
         $row[$k] = (string)$v;
       };
       $data[] = $row;
     }; // foreach $datum
+    print_on_command('MultiUpsertAttributes');
+    print_r($data)."\n";
     multipleUpsert($data, $types, $table, $dsn);
   }; // if $datum>0
 

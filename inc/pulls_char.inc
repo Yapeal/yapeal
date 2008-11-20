@@ -47,20 +47,10 @@ $postdata = array(
 );
 // Set the field types of query by name.
 $types = array(
-  'balance' => 'N',
-  'bloodLine' => 'C',
-  'characterID' => 'I',
-  'charisma' => 'I',
-  'cloneName' => 'C',
-  'cloneSkillPoints' => 'I',
-  'corporationID' => 'I',
-  'corporationName' => 'C',
-  'gender' => 'C',
-  'intelligence' => 'I',
-  'memory' => 'I',
-  'name' => 'C',
-  'perception' => 'I',
-  'race' => 'C',
+  'balance' => 'N', 'bloodLine' => 'C', 'characterID' => 'I', 'cloneName' => 'C',
+  'cloneSkillPoints' => 'I', 'corporationID' => 'I', 'corporationName' => 'C',
+  'gender' => 'C', 'name' => 'C', 'race' => 'C',
+  'charisma' => 'I', 'intelligence' => 'I', 'memory' => 'I', 'perception' => 'I',
   'willpower' => 'I'
 );
 try {
@@ -70,15 +60,10 @@ try {
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil = (string)$xml->cachedUntil[0];
-    $data = array(
-      'tableName' => $api,
-      'ownerID' => $ownerid,
-      'cachedUntil' => $cuntil
-    );
+    $data = array('tableName' => $api, 'ownerID' => $ownerid,
+      'cachedUntil' => $cuntil);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
     // Main table first
-    // Must be done first because of foreign key constraints in
-    // other tables
     $datum = clone $xml->result;
     // Get rid of child table stuff
     unset($datum->rowset, $datum->attributes);
@@ -87,7 +72,7 @@ try {
     $data = array();
     if (count($datum) > 0) {
       foreach($datum->children() as $k => $v) {
-        $data[$k] = $v;
+        $data[$k] = (string)$v;
       };
     }; // if $datum>0
     // Append attributes there's no need to have another table for them.
@@ -96,7 +81,7 @@ try {
     $datum = $xml->result->attributes;
     if (count($datum) > 0) {
       foreach($datum[0]->children() as $k => $v) {
-        $data[$k] = $v;
+        $data[$k] = (string)$v;
       };
     }; // if $datum>0
     if (count($data)) {
@@ -111,18 +96,15 @@ try {
     $dbTable = 'skills';
     // Set the field types of query by name.
     $types = array(
-      'ownerID' => 'I',
-      'level' => 'I',
-      'skillpoints' => 'I',
-      'typeID' => 'I',
+      'ownerID' => 'I', 'level' => 'I', 'skillpoints' => 'I', 'typeID' => 'I',
       'unpublished' => 'L'
     );
     $datum = $xml->xpath('//rowset[@name="' . $dbTable . '"]/row');
+    //print_on_command($dbTable.' datum');
+    //print_r($datum)."\n";
     if (count($datum) > 0) {
       $extras = array(
-        'ownerID' => $ownerid,
-        'level' => 0,
-        'unpublished' => 0
+        'ownerID' => $ownerid, 'level' => 0, 'unpublished' => 0
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
         $mess = 'CHAR: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
@@ -138,9 +120,7 @@ try {
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
   $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-  $data = array(
-    'tableName' => $api,
-    'ownerID' => $ownerid,
+  $data = array('tableName' => $api, 'ownerID' => $ownerid,
     'cachedUntil' => $cuntil
   );
   upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -233,9 +213,7 @@ $apis = array(
     'xpath' => '//result/rowset/row'
   )
 );
-$postdata = array(
-  'userID' => $userid,
-  'apiKey' => $apikey,
+$postdata = array('userID' => $userid, 'apiKey' => $apikey,
   'characterID' => $charid
 );
 foreach($apis as $api => $settings) {
@@ -245,18 +223,15 @@ foreach($apis as $api => $settings) {
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil = (string)$xml->cachedUntil[0];
-      $data = array(
-        'tableName' => $api,
-        'ownerID' => $ownerid,
+      $data = array('tableName' => $api, 'ownerID' => $ownerid,
         'cachedUntil' => $cuntil
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
-        $extras = array(
-          'ownerID' => $ownerid
-        );
-        if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+        $extras = array('ownerID' => $ownerid);
+        if (YAPEAL_TRACE &&
+          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
           $mess = 'CHAR: Before MultiUpsert for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
@@ -270,9 +245,7 @@ foreach($apis as $api => $settings) {
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
     $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-    $data = array(
-      'tableName' => $api,
-      'ownerID' => $ownerid,
+    $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => $cuntil
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -285,9 +258,7 @@ foreach($apis as $api => $settings) {
 
       case 117: // Market orders already downloaded
         $cuntil = substr($e->getMessage() , -20, 19);
-        $data = array(
-          'tableName' => $api,
-          'ownerID' => $ownerid,
+        $data = array('tableName' => $api, 'ownerID' => $ownerid,
           'cachedUntil' => $cuntil
         );
         upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -320,58 +291,34 @@ $apis = array(
   'WalletJournal' => array(
     'beforeid' => 'beforeRefID',
     'types' => array(
-      'account' => 'I',
-      'amount' => 'N',
-      'argID1' => 'I',
-      'argName1' => 'C',
-      'balance' => 'N',
-      'date' => 'T',
-      'ownerID' => 'I',
-      'ownerID1' => 'I',
-      'ownerID2' => 'I',
-      'ownerName1' => 'C',
-      'ownerName2' => 'C',
-      'reason' => 'C',
-      'refID' => 'I',
-      'refTypeID' => 'I'
+      'accountKey' => 'I', 'amount' => 'N', 'argID1' => 'I', 'argName1' => 'C',
+      'balance' => 'N', 'date' => 'T', 'ownerID' => 'I', 'ownerID1' => 'I',
+      'ownerID2' => 'I', 'ownerName1' => 'C', 'ownerName2' => 'C',
+      'reason' => 'C', 'refID' => 'I', 'refTypeID' => 'I'
     ) ,
     'walkdt' => 'date',
     'walkid' => 'refID',
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   ) ,
   'WalletTransactions' => array(
     'beforeid' => 'beforeTransID',
     'types' => array(
-      'account' => 'I',
-      'clientID' => 'I',
-      'clientName' => 'C',
-      'ownerID' => 'I',
-      'price' => 'N',
-      'quantity' => 'I',
-      'stationID' => 'I',
-      'stationName' => 'C',
-      'transactionDateTime' => 'T',
-      'transactionFor' => 'C',
-      'transactionID' => 'I',
-      'transactionType' => 'C',
-      'typeID' => 'I',
-      'typeName' => 'C'
+      'accountKey' => 'I', 'clientID' => 'I', 'clientName' => 'C',
+      'ownerID' => 'I', 'price' => 'N', 'quantity' => 'I', 'stationID' => 'I',
+      'stationName' => 'C', 'transactionDateTime' => 'T',
+      'transactionFor' => 'C', 'transactionID' => 'I',
+      'transactionType' => 'C', 'typeID' => 'I', 'typeName' => 'C'
     ) ,
     'walkdt' => 'transactionDateTime',
     'walkid' => 'transactionID',
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   )
 );
-$accounts = array(
-  1000
-);
+$accounts = array(1000);
 foreach($apis as $api => $settings) {
   foreach($accounts as $account) {
-    $postdata = array(
-      'userID' => $userid,
-      'apiKey' => $apikey,
-      'characterID' => $charid,
-      'accountKey' => $account
+    $postdata = array('userID' => $userid, 'apiKey' => $apikey,
+      'characterID' => $charid, 'accountKey' => $account
     );
     try {
       // Continue to next if we're not ready at this time
@@ -384,9 +331,7 @@ foreach($apis as $api => $settings) {
           // Now update cacheduntil time.
           $cuntil = (string)$xml->cachedUntil[0];
           // Note tablename
-          $data = array(
-            'tableName' => $api . $account,
-            'ownerID' => $ownerid,
+          $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
             'cachedUntil' => $cuntil
           );
           upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -396,13 +341,13 @@ foreach($apis as $api => $settings) {
             $yapealTracing.= $mess . PHP_EOL;
           }; // if YAPEAL_TRACE&&...
           $datum = $xml->xpath($settings['xpath']);
+          //print_on_command($api.' datum');
+          //print_r($datum)."\n";
           $cnt = count($datum);
-          $extras = array(
-            'ownerID' => $ownerid,
-            'account' => $account
-          );
+          $extras = array('ownerID' => $ownerid, 'accountKey' => $account);
           if ($cnt > 0) {
-            if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+            if (YAPEAL_TRACE &&
+              (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
               $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
@@ -410,7 +355,6 @@ foreach($apis as $api => $settings) {
             multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CHAR_WRITER, $extras);
           } else {
             break; // Leave while if no records returned
-
           }; // else $cnt>0
           // Get date/time of last record
           $lastDT = strtotime($datum[$cnt - 1][$settings['walkdt']] . ' +0000');
@@ -427,11 +371,8 @@ foreach($apis as $api => $settings) {
             // Leave while loop if we can't walk back anymore.
             $cnt = 0;
           }; // if $oldest<$lastDT
-
         }; // if $xml instanceof SimpleXMLElement
-
-      }
-      while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
+      } while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil = gmdate('Y-m-d H:i:s', strtotime('60 minutes'));
@@ -450,32 +391,25 @@ foreach($apis as $api => $settings) {
 
         case 103: // Already returned one week of data
           $cuntil = substr($e->getMessage() , -20, 19);
-          $data = array(
-            'tableName' => $api . $account,
-            'ownerID' => $ownerid,
+          $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
             'cachedUntil' => $cuntil
           );
           upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
         break;
         default:
           // Do nothing but logging by default
-
       }; // case $e->getCode()
-
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
     $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-    $data = array(
-      'tableName' => $api . $account,
-      'ownerID' => $ownerid,
+    $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
       'cachedUntil' => $cuntil
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   }
   catch(EVE_API_Exception $e) {
     // Do nothing use observers to log info
-
   }
   catch(ADODB_Exception $e) {
     $message = <<<MESS

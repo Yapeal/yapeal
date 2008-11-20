@@ -55,7 +55,7 @@ require_once YAPEAL_CLASS . 'CurlRequest.class.php';
 function connect($dsn) {
   global $yapealTracing;
   if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_DATABASE) == YAPEAL_TRACE_DATABASE) {
-    $mess = 'DATABASE: Before connect for ' . $dsn . ' in ' . __FILE__;
+    $mess = 'DATABASE: Before connect for ' . $dsn . ' in ' . basename(__FILE__);
     print_on_command($mess);
     $yapealTracing.= $mess . PHP_EOL;
   }; // if YAPEAL_TRACE&&...
@@ -78,22 +78,21 @@ function connect($dsn) {
  * @param integer $owner Identifies owner of the api we're trying to update.
  * @param boolean $randomize When true (the default) can randomly decide
  * to delay get API data.
- * @param boolean $logit Log status by default if not waiting.
  *
  * @return Boolean Returns true when we need to get API data.
  */
-function dontWait($api, $owner = 0, $randomize = true, $logit = YAPEAL_LOG_LEVEL) {
-  global $yapealTracing;
+function dontWait($api, $owner = 0, $randomize = true) {
   $mess = '';
-  $ctime = strtotime(get_cacheduntil($api, $owner) . ' +0000');
+  $ctime = strtotime(
+    getCachedUntil($api, $owner, 'CachedUntil', DSN_UTIL_WRITER) . ' +0000');
   $now = time() - 10; // 10 seconds for EVE API time offset added :P
   // hard limited to maximum delay of 6 minutes for randomized pulls.
   // 5 minutes (300) plus a minute from being almost ready last time.
   if (($now - $ctime) > 300) {
-    if (($logit & E_USER_NOTICE) == E_USER_NOTICE) {
+    if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
       $mess = 'Tired of waiting! Getting ' . $api . ' for ' . $owner;
       print_on_command($mess);
-      trigger_error($mess, E_USER_NOTICE);
+      elog($mess, YAPEAL_NOTICE_LOG);
     };
     return true;
   };
@@ -113,12 +112,12 @@ function dontWait($api, $owner = 0, $randomize = true, $logit = YAPEAL_LOG_LEVEL
     if ($rand == $mod) {
       return false;
     }; // if $rand==$mod ...
-    
+
   }; // if $randomize ...
-  if (($logit & E_USER_NOTICE) == E_USER_NOTICE) {
+  if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
     $mess.= 'Get ' . $api . ' for ' . $owner;
     print_on_command($mess);
-    trigger_error($mess, E_USER_NOTICE);
+    elog($mess, YAPEAL_NOTICE_LOG);
   };
   return true;
 }; // function dontWait
@@ -166,8 +165,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
     $cacheFileName.= '.xml';
     $cacheFile = $cachePath . $cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-        $mess = 'REQUEST: Loading ' . $cacheFileName . ' in ' . __FILE__;
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
+        $mess = 'REQUEST: Loading ' . $cacheFileName . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -175,8 +175,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
       $cuntil = strtotime($xml->cachedUntil[0] . ' +0000');
       $ctime = time();
       if ($ctime < $cuntil) {
-        if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-          $mess = 'REQUEST: Using ' . $cacheFileName . ' in ' . __FILE__;
+        if (YAPEAL_TRACE &&
+          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
+          $mess = 'REQUEST: Using ' . $cacheFileName . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -206,7 +207,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   // Now check for errors.
   if ($result['curl_error']) {
     $mess = 'cURL error' . PHP_EOL;
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST && $http['content']) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
+      $http['content']) {
       $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess.= 'Error code: ' . $result['curl_errno'] . ' for ' . $http['url'] . PHP_EOL;
@@ -218,7 +221,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   };
   if (200 != $result['http_code']) {
     $mess = 'HTTP error' . PHP_EOL;
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST && $http['content']) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
+      $http['content']) {
       $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess.= 'Error code: ' . $result['http_code'] . ' for ' . $http['url'] . PHP_EOL;
@@ -229,7 +234,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   };
   if (!$result['body']) {
     $mess = 'API data error' . PHP_EOL;
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST && $http['content']) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
+      $http['content']) {
       $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess.= 'Data empty for ' . $http['url'] . PHP_EOL;
@@ -241,7 +248,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   if (!mb_strpos($result['body'], '<eveapi version="')) {
     $result = FALSE;
     $mess = 'API data error' . PHP_EOL;
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST && $http['content']) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
+      $http['content']) {
       $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess.= 'No XML returned for ' . $http['url'] . PHP_EOL;
@@ -254,7 +263,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   if (isset($xml->error[0])) {
     $result = FALSE;
     $mess = 'Eve API error' . PHP_EOL;
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST && $http['content']) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
+      $http['content']) {
       $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess.= 'Error code: ' . (int)$xml->error[0]['code'] . ' for ' . $http['url'] . PHP_EOL;
@@ -267,7 +278,7 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
     }; // if YAPEAL_CACHE_XML
     // Throw exception
     require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_Error_Exception($mess, (int)$xml->error[0]['code']);
+    throw new EVE_API_Error_Exception($mess, 5);
   };
   if (YAPEAL_CACHE_XML) {
     $cacheFile = $cachePath . 'error_' . $cacheFileName;
@@ -282,106 +293,6 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
   }; // if YAPEAL_CACHE_XML
   return $xml;
 }; // function getAPIinfo
-
-/**
- * Builds table upsert from the attributes of a SimpleXMLElement array
- *
- * @param mixed $datum SimpleXMLElement object who's element attributes will
- * be inserted into table or an array of SimpleXMLElement objects with
- * attributes
- * @param array $types Keys are DB field names and values are thier ADOdb type
- * i.e. 'ID'=>'integer','name'=>'text' ...
- * @param string $table Name of the table to use in query's from clause
- * @param string $dsn The connection infomation needed to connect to DB
- * @param array $extras Used when you need to add any extra table fields that
- * aren't included in attributes
- * @return mixed Number of records inserted/update, PEAR error object, or false
- *
- * @uses multipleUpsert()
- */
-function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = array()) {
-  if (count($datum) > 0) {
-    $data = array();
-    $row = array();
-    foreach($datum as $record) {
-      $row = $extras;
-      foreach($record->attributes() as $k => $v) {
-        // Note that all attributes names are converted to lower case
-        // Should probably NOT do this and just pass them thru
-        $row[$k] = (string)$v;
-      };
-      $data[] = $row;
-    }; // foreach $datum
-    multipleUpsert($data, $types, $table, $dsn);
-  }; // if $datum>0
-  
-}
-/**
- * Get solarsystemid for a blood line.
- * @param string $chartype Which character type (blood line) to get HQ for.
- *
- * @return string Returns the HQ system for this blood line.
- *
- */
-function get_BloodLineHQ($chartype) {
-  $raceToSystem = array(
-    'Achura' => 30000145,
-    'Amarr' => 30002187,
-    'Brutor' => 30002544,
-    'Civire' => 30000145,
-    'Deteis' => 30000145,
-    'Gallente' => 30004967,
-    'Intaki' => 30003788,
-    'JinMei' => 30004967,
-    'Khanid' => 30003863,
-    'NiKunni' => 30002187,
-    'Sebiestor' => 30002544,
-    'Vherokior' => 30002544
-  );
-  return $raceToSystem[$chartype];
-} // function get_BloodLineHQ ...
-
-/**
- * Get blood line for a character.
- * @param integer $charid Which character to get blood line for.
- * @param string $dsn An ADOdb compatible connection string.
- *
- * @return string Returns the HQ system for this race.
- *
- * @throws PEAR_Exception for any errors.
- */
-function get_charBloodLine($charid, $dsn) {
-  $con = connect($dsn);
-  $sql = 'select bloodLine from CharacterSheet';
-  $sql.= ' where characterID=' . $charid;
-  $result = $con->GetOne($sql);
-  print_r($result) . "\n";
-  return $result;
-} // function get_charBloodLine ...
-
-/**
- * Get typeID of blood line for a character.
- * @param integer $bloodLine Which blood line to get typeID for.
- *
- * @return string Returns the typeID for this blood line.
- */
-function get_bloodLineTypeID($bloodLine) {
-  $bloodLineToTypeID = array(
-    'Achura' => 1383,
-    'Amarr' => 1373,
-    'Brutor' => 1380,
-    'Civire' => 1375,
-    'Deteis' => 1376,
-    'Gallente' => 1377,
-    'Intaki' => 1378,
-    'JinMei' => 1384,
-    'Khanid' => 1385,
-    'NiKunni' => 1374,
-    'Sebiestor' => 1379,
-    'Vherokior' => 1386
-  );
-  return $bloodLineToTypeID[$bloodLine];
-} // function get_charBloodLine ...
 
 /**
  * Navigates XML and adds lft and rgt attributes
@@ -406,13 +317,13 @@ function editAssets($node, $_Id = 1, $location = 0) {
     } else {
       $node->addAttribute('locationID', $location);
     }; //if isset $node['locationID']...
-    
+
   }; // if $nodeName=='row'||$nodeName=='result'
   if ($children = $node->children()) {
     foreach($children as $child) {
       $_Id = editAssets($child, $_Id, $location);
     }; //foreach children as child
-    
+
   };
   if ($nodeName == 'row' || $nodeName == 'result') {
     $node->addAttribute('rgt', $_Id++);
@@ -421,34 +332,65 @@ function editAssets($node, $_Id = 1, $location = 0) {
 } //function editassets
 
 /**
- * Get stationid (corp HQ) from corporationsheet table
- * @param integer $corp Which corporation's HQ.
- * @param string $dsn An ADOdb compatible connection string.
+ * Get solarsystemid for a blood line.
+ * @param string $chartype Which character type (blood line) to get HQ for.
  *
- * @return string Returns the HQ station for this corp.
+ * @return string Returns the HQ system for this blood line.
  *
- * @throws ADODB_Exception for any errors.
  */
-function get_corpHQ($corp, $dsn) {
-  $con = connect($dsn);
-  $sql = 'select stationID from CorporationSheet';
-  $sql.= ' where corporationID=?';
-  $result = $con->GetOne($sql, array(
-    $corp
-  ));
-  return $result;
-};
+function getBloodLineHQ($chartype) {
+  $raceToSystem = array(
+    'Achura' => 30000145,
+    'Amarr' => 30002187,
+    'Brutor' => 30002544,
+    'Civire' => 30000145,
+    'Deteis' => 30000145,
+    'Gallente' => 30004967,
+    'Intaki' => 30003788,
+    'JinMei' => 30004967,
+    'Khanid' => 30003863,
+    'NiKunni' => 30002187,
+    'Sebiestor' => 30002544,
+    'Vherokior' => 30002544
+  );
+  return $raceToSystem[$chartype];
+} // function get_BloodLineHQ ...
+
+/**
+ * Get typeID of blood line for a character.
+ * @param integer $bloodLine Which blood line to get typeID for.
+ *
+ * @return string Returns the typeID for this blood line.
+ */
+function getBloodLineTypeID($bloodLine) {
+  $bloodLineToTypeID = array(
+    'Achura' => 1383,
+    'Amarr' => 1373,
+    'Brutor' => 1380,
+    'Civire' => 1375,
+    'Deteis' => 1376,
+    'Gallente' => 1377,
+    'Intaki' => 1378,
+    'JinMei' => 1384,
+    'Khanid' => 1385,
+    'NiKunni' => 1374,
+    'Sebiestor' => 1379,
+    'Vherokior' => 1386
+  );
+  return $bloodLineToTypeID[$bloodLine];
+} // function get_charBloodLine ...
+
 /**
  * Get cache until time for a table from cacheduntil table
  * @param string $tname Name of table to get time for.
- * @param integer $corp ID of corporation. Use 0 for non-corp tables like
+ * @param integer $owner ID of owner. Use 0 for non-corp tables like
  * RefTypes.
- * @param string $table Used to override table to get time from.
+ * @param string $table Name of the table used to cache times.
  * @param string $dsn An ADOdb compatible connection string.
  *
  * @return string A date/time using format 'YYYY-MM-DD HH:MM:SS'
  */
-function get_cacheduntil($tname, $owner = 0, $table = 'CachedUntil', $dsn = DSN_UTIL_WRITER) {
+function getCachedUntil($tname, $owner, $table, $dsn) {
   try {
     $con = connect($dsn);
     $sql = 'select cachedUntil from ' . $table;
@@ -459,51 +401,92 @@ function get_cacheduntil($tname, $owner = 0, $table = 'CachedUntil', $dsn = DSN_
     ));
     if (!strtotime($until)) {
       return '1970-01-01 00:00:01'; // One second after epox
-      
+
     };
   }
   catch(ADODB_Exception $e) {
     return '1970-01-01 00:00:01'; // One second after epox
-    
+
   };
   return $until;
 };
 /**
- * Function to build, prepare, execute an insert ... on duplicate key update
+ * Get blood line for a character.
+ * @param integer $charid Which character to get blood line for.
+ * @param string $dsn An ADOdb compatible connection string.
  *
- * Example of how to use:
- * <code>
- * $data=array('tableName'=>'eve-api-pull','ownerID'=>0,
- *   'cachedUntil'=>'2008-01-01 00:00:01');
- * $types=array('tableName'=>'text','ownerID'=>'integer',
- *   'cachedUntil'=>'timestamp');
- * upsert($data,$types,'cacheuntil',DSN_UTIL_WRITER);
- * </code>
+ * @return string Returns the HQ system for this race.
  *
- * @param array $data Assoc array of column names and value to be Upserted.
- * @param array $types Assoc array of column names and ADOdb types.
- * @param string $table Name of table to Upsert into.
- * @param string $dsn A valid ADOdb DSN.
+ * @throws PEAR_Exception for any errors.
+ */
+function getCharBloodLine($charid, $dsn) {
+  $con = connect($dsn);
+  $sql = 'select bloodLine from CharacterSheet';
+  $sql.= ' where characterID=' . $charid;
+  $result = $con->GetOne($sql);
+  print_r($result) . "\n";
+  return $result;
+} // function get_charBloodLine ...
+
+/**
+ * Get stationid (corp HQ) from corporationsheet table
+ * @param integer $corp Which corporation's HQ.
+ * @param string $dsn An ADOdb compatible connection string.
  *
- * @return mixed Number rows effected (1),
- * FALSE if either $data or $types is empty,
- * or PEAR::Error if not using exceptions for PEAR
+ * @return string Returns the HQ station for this corp.
  *
  * @throws ADODB_Exception for any errors.
- *
- * @uses makeMultiUpsert()
  */
-function upsert(array $data, array $types, $table, $dsn) {
-  if (empty($data) || empty($types)) {
-    return FALSE;
-  };
-  $upsert = makeMultiUpsert(array(
-    $data
-  ) , $types, $table, $dsn);
+function getCorpHQ($corp, $dsn) {
   $con = connect($dsn);
-  $effected = $con->Execute($upsert);
-  return $effected;
-} // function upsert ...
+  $sql = 'select stationID from CorporationSheet';
+  $sql.= ' where corporationID=?';
+  return $con->GetOne($sql, array( $corp ));
+};
+/**
+ * Function to build a multi-values insert ... on duplicate key update query
+ *
+ * @param array $data Values to be put into query
+ * @param array $params Keys are parameter names and values their types
+ * @param string $table Table to use in query's from clause
+ * @param string $dsn A valid ADOdb DSN.
+ *
+ * @return string Returns a complete SQL statement ready to be used by a
+ * ADOdb exec
+ *
+ * @throws ADODB_Exception if connect used to do quoting fails.
+ */
+function makeMultiUpsert(array $data, array $params, $table, $dsn) {
+  // Need this so we can do quoting.
+  $con = connect($dsn);
+  $needsQuote = array('C', 'X', 'D', 'T');
+  // Build query sections
+  $insert = 'insert into ' . $table . ' (' . implode(',', array_keys($params)) . ')';
+  $values = ' values';
+  $sets = array();
+  foreach($data as $row) {
+    $set = array();
+    foreach($params as $k => $v) {
+      if (array_key_exists($k,$row)) {
+        if (in_array($v, $needsQuote)) {
+          $set[] = $con->qstr($row[$k]);
+        } else {
+          $set[] = $row[$k];
+        };
+      };
+    };
+    $sets[] = '(' . implode(',', $set) . ')';
+  };
+  $values.= ' ' . implode(',', $sets);
+  $dupup = ' on duplicate key update ';
+  // Loop thru and build update section.
+  $updates = array();
+  foreach($params as $k => $v) {
+    $updates[] = $k . '=values(' . $k . ')';
+  };
+  $dupup.= implode(',', $updates);
+  return $insert . $values . $dupup;
+} // function makeMultiUpsert ...
 
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update
@@ -567,51 +550,73 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
 } // function multipleUpsert ...
 
 /**
- * Function to build a multi-values insert ... on duplicate key update query
+ * Builds table upsert from the attributes of a SimpleXMLElement array
  *
- * @param array $data Values to be put into query
- * @param array $params Keys are parameter names and values their types
- * @param string $table Table to use in query's from clause
+ * @param mixed $datum SimpleXMLElement object who's element attributes will
+ * be inserted into table or an array of SimpleXMLElement objects with
+ * attributes
+ * @param array $types Keys are DB field names and values are thier ADOdb type
+ * i.e. 'ID'=>'integer','name'=>'text' ...
+ * @param string $table Name of the table to use in query's from clause
+ * @param string $dsn The connection infomation needed to connect to DB
+ * @param array $extras Used when you need to add any extra table fields that
+ * aren't included in attributes
+ * @return mixed Number of records inserted/update, PEAR error object, or false
+ *
+ * @uses multipleUpsert()
+ */
+function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = array()) {
+  if (count($datum) > 0) {
+    $data = array();
+    $row = array();
+    foreach($datum as $record) {
+      $row = $extras;
+      foreach($record->attributes() as $k => $v) {
+        // Note that all attributes names are converted to lower case
+        // Should probably NOT do this and just pass them thru
+        $row[$k] = (string)$v;
+      };
+      $data[] = $row;
+    }; // foreach $datum
+    multipleUpsert($data, $types, $table, $dsn);
+  }; // if $datum>0
+
+}
+/**
+ * Function to build, prepare, execute an insert ... on duplicate key update
+ *
+ * Example of how to use:
+ * <code>
+ * $data=array('tableName'=>'eve-api-pull','ownerID'=>0,
+ *   'cachedUntil'=>'2008-01-01 00:00:01');
+ * $types=array('tableName'=>'text','ownerID'=>'integer',
+ *   'cachedUntil'=>'timestamp');
+ * upsert($data,$types,'cacheuntil',DSN_UTIL_WRITER);
+ * </code>
+ *
+ * @param array $data Assoc array of column names and value to be Upserted.
+ * @param array $types Assoc array of column names and ADOdb types.
+ * @param string $table Name of table to Upsert into.
  * @param string $dsn A valid ADOdb DSN.
  *
- * @return string Returns a complete SQL statement ready to be used by a
- * ADOdb exec
+ * @return mixed Number rows effected (1),
+ * FALSE if either $data or $types is empty,
+ * or PEAR::Error if not using exceptions for PEAR
  *
- * @throws ADODB_Exception if connect used to do quoting fails.
+ * @throws ADODB_Exception for any errors.
+ *
+ * @uses makeMultiUpsert()
  */
-function makeMultiUpsert(array $data, array $params, $table, $dsn) {
-  // Need this so we can do quoting.
+function upsert(array $data, array $types, $table, $dsn) {
+  if (empty($data) || empty($types)) {
+    return FALSE;
+  };
+  $upsert = makeMultiUpsert(array(
+    $data
+  ) , $types, $table, $dsn);
   $con = connect($dsn);
-  $needsQuote = array(
-    'C',
-    'X',
-    'D',
-    'T'
-  );
-  // Build query sections
-  $insert = 'insert into ' . $table . ' (' . implode(',', array_keys($params)) . ')';
-  $values = ' values';
-  $sets = array();
-  foreach($data as $row) {
-    $set = array();
-    foreach($params as $k => $v) {
-      if (in_array($v, $needsQuote)) {
-        $set[] = $con->qstr($row[$k]);
-      } else {
-        $set[] = $row[$k];
-      };
-    };
-    $sets[] = '(' . implode(',', $set) . ')';
-  };
-  $values.= ' ' . implode(',', $sets);
-  $dupup = ' on duplicate key update ';
-  // Loop thru and build update section.
-  $updates = array();
-  foreach($params as $k => $v) {
-    $updates[] = $k . '=values(' . $k . ')';
-  };
-  $dupup.= implode(',', $updates);
-  return $insert . $values . $dupup;
-} // function makeMultiUpsert ...
+  $effected = $con->Execute($upsert);
+  return $effected;
+} // function upsert ...
 
 ?>

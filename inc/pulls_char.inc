@@ -87,7 +87,7 @@ try {
     $data = array();
     if (count($datum) > 0) {
       foreach($datum->children() as $k => $v) {
-        $data[$k] = (string)$v;
+        $data[$k] = $v;
       };
     }; // if $datum>0
     // Append attributes there's no need to have another table for them.
@@ -96,12 +96,12 @@ try {
     $datum = $xml->result->attributes;
     if (count($datum) > 0) {
       foreach($datum[0]->children() as $k => $v) {
-        $data[$k] = (int)$v;
+        $data[$k] = $v;
       };
     }; // if $datum>0
     if (count($data)) {
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before upsert for ' . $api . ' in ' . __FILE__;
+        $mess = 'CHAR: Before upsert for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -125,15 +125,15 @@ try {
         'unpublished' => 0
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before upsert for ' . $dbTable . ' in ' . __FILE__;
+        $mess = 'CHAR: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum, $types, $dbTable, DSN_CHAR_WRITER, $extras);
     }; // if $datum>0
-    
+
   }; // if $xml instanceof SimpleXMLElement
-  
+
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -147,7 +147,7 @@ catch(EVE_API_File_Exception $e) {
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   $message = <<<MESS
@@ -257,15 +257,15 @@ foreach($apis as $api => $settings) {
           'ownerID' => $ownerid
         );
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-          $mess = 'CHAR: Before MultiUpsert for ' . $api . ' in ' . __FILE__;
+          $mess = 'CHAR: Before MultiUpsert for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CHAR_WRITER, $extras);
       }; // if $datum>0
-      
+
     }; // if $xml instanceof SimpleXMLElement
-    
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -282,7 +282,7 @@ foreach($apis as $api => $settings) {
     // used for cached until time.
     switch ($e->getCode()) {
       case 116: // Industry jobs already downloaded
-        
+
       case 117: // Market orders already downloaded
         $cuntil = substr($e->getMessage() , -20, 19);
         $data = array(
@@ -294,13 +294,13 @@ foreach($apis as $api => $settings) {
       break;
       default:
         // Do nothing but logging by default
-        
+
     }; // case $e->getCode()
-    
+
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   $message = <<<MESS
@@ -391,7 +391,7 @@ foreach($apis as $api => $settings) {
           );
           upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
           if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-            $mess = 'CHAR: Before xpath for ' . $api . ' in ' . __FILE__;
+            $mess = 'CHAR: Before xpath for ' . $api . ' in ' . basename(__FILE__);
             print_on_command($mess);
             $yapealTracing.= $mess . PHP_EOL;
           }; // if YAPEAL_TRACE&&...
@@ -403,14 +403,14 @@ foreach($apis as $api => $settings) {
           );
           if ($cnt > 0) {
             if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-              $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+              $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
             }; // if YAPEAL_TRACE&&...
             multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CHAR_WRITER, $extras);
           } else {
             break; // Leave while if no records returned
-            
+
           }; // else $cnt>0
           // Get date/time of last record
           $lastDT = strtotime($datum[$cnt - 1][$settings['walkdt']] . ' +0000');
@@ -427,9 +427,9 @@ foreach($apis as $api => $settings) {
             // Leave while loop if we can't walk back anymore.
             $cnt = 0;
           }; // if $oldest<$lastDT
-          
+
         }; // if $xml instanceof SimpleXMLElement
-        
+
       }
       while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
       // API returning wrong cache until time need to set cacheduntil to
@@ -447,7 +447,7 @@ foreach($apis as $api => $settings) {
       // used for cached until time.
       switch ($e->getCode()) {
         case 101: // Wallet exhausted
-          
+
         case 103: // Already returned one week of data
           $cuntil = substr($e->getMessage() , -20, 19);
           $data = array(
@@ -459,9 +459,9 @@ foreach($apis as $api => $settings) {
         break;
         default:
           // Do nothing but logging by default
-          
+
       }; // case $e->getCode()
-      
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -475,7 +475,7 @@ foreach($apis as $api => $settings) {
   }
   catch(EVE_API_Exception $e) {
     // Do nothing use observers to log info
-    
+
   }
   catch(ADODB_Exception $e) {
     $message = <<<MESS
@@ -518,9 +518,9 @@ try {
       // Call recursive function to modify XML.
       editAssets($datum);
       // Use generated owner node as root for tree.
-      $chartype = get_charBloodLine($ownerid, DSN_CHAR_WRITER);
-      $charHQ = get_BloodLineHQ($chartype);
-      $typeID = get_bloodLineTypeID($chartype);
+      $chartype = getCharBloodLine($ownerid, DSN_CHAR_WRITER);
+      $charHQ = getBloodLineHQ($chartype);
+      $typeID = getBloodLineTypeID($chartype);
       $lft = $datum->result[0]['lft'];
       $rgt = $datum->result[0]['rgt'];
       $nodeData = array(
@@ -539,7 +539,7 @@ try {
       $sql.= ' from ' . $api;
       $sql.= ' where ownerid=' . $ownerid;
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before delete for ' . $api . ' in ' . __FILE__;
+        $mess = 'CHAR: Before delete for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -556,7 +556,7 @@ try {
         'typeID' => 'I'
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before upsert owner node for ' . $api . ' in ' . __FILE__;
+        $mess = 'CHAR: Before upsert owner node for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -569,15 +569,15 @@ try {
         'ownerID' => $ownerid
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+        $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum, $types, $api, DSN_CHAR_WRITER, $extras);
     }; // if count $datum ...
-    
+
   }; // if $xml instanceof SimpleXMLElement
-  
+
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -604,13 +604,13 @@ catch(EVE_API_Error_Exception $e) {
     break;
     default:
       // Do nothing but logging by default
-      
+
   }; // case $e->getCode()
-  
+
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   $message = <<<MESS

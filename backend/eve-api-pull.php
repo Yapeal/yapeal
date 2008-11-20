@@ -60,7 +60,7 @@ if (YAPEAL_SCRIPT_MODE == 'cli' && function_exists('getopt')) {
           $mess = $opt[1] . ' does not exist or is not readable' . PHP_EOL;
           fwrite(STDERR, $mess);
         }; // else realpath $opt[1]&& ...
-        
+
       case 'h':
       case '--help':
         usage();
@@ -137,7 +137,7 @@ try {
   if (YAPEAL_CHAR_ACTIVE) {
     $api = 'RegisteredCharacter';
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-      $mess = 'CHAR: Connect before section in ' . __FILE__;
+      $mess = 'CHAR: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -151,7 +151,7 @@ try {
     $sql.= ' where chr.isActive=true';
     $sql.= ' and chr.userID=u.userID';
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-      $mess = 'CHAR: Before GetAll $charList in ' . __FILE__;
+      $mess = 'CHAR: Before GetAll $charList in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -171,7 +171,7 @@ try {
       }; // if YAPEAL_TRACE&&...
       require YAPEAL_INC . 'pulls_char.inc';
     }; // foreach $charList
-    
+
   }; // if YAPEAL_CHAR_ACTIVE...
   /* ************************************************************************
   * Generate corp list
@@ -180,7 +180,7 @@ try {
   if (YAPEAL_CORP_ACTIVE) {
     $api = 'RegisteredCorporation';
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Connect before section in ' . __FILE__;
+      $mess = 'CORP: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -195,7 +195,7 @@ try {
     $sql.= ' and cp.characterID=chr.characterID';
     $sql.= ' and chr.userID=u.userID';
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Before GetAll $corpList in ' . __FILE__;
+      $mess = 'CORP: Before GetAll $corpList in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -215,7 +215,7 @@ try {
       }; // if YAPEAL_TRACE&&...
       require YAPEAL_INC . 'pulls_corp.inc';
     }; // foreach $corpList
-    
+
   }; // if YAPEAL_CORP_ACTIVE...
   /* ************************************************************************
   * /eve/ API pulls
@@ -223,7 +223,7 @@ try {
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-      $mess = 'EVE: Connect before section in ' . __FILE__;
+      $mess = 'EVE: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -237,7 +237,8 @@ try {
   }; // if YAPEAL_EVE_ACTIVE...
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
-  $ctime2 = strtotime(get_cacheduntil($api) . ' +0000');
+  $ctime2 = strtotime(
+    getCachedUntil($api, 0, 'CachedUntil', DSN_UTIL_WRITER) . ' +0000');
   if ($ctime == $ctime2) {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array(

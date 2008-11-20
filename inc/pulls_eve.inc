@@ -90,14 +90,14 @@ foreach($apis as $api => $settings) {
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-        $mess = 'EVE: Before xpath for ' . $api . ' in ' . __FILE__;
+        $mess = 'EVE: Before xpath for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before truncate ' . $api . ' in ' . __FILE__;
+          $mess = 'EVE: Before truncate ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -105,7 +105,7 @@ foreach($apis as $api => $settings) {
         $sql = 'truncate table ' . $api;
         $con->Execute($sql);
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+          $mess = 'EVE: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...

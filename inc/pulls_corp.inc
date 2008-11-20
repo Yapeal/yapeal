@@ -77,7 +77,7 @@ try {
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Before clone for ' . $api . ' in ' . __FILE__;
+      $mess = 'CORP: Before clone for ' . $api . ' in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -97,7 +97,7 @@ try {
         $data[$k] = (string)$v;
       };
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before upsert for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before upsert for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -117,7 +117,7 @@ try {
         'ownerID' => $ownerid
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . __FILE__;
+        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -137,7 +137,7 @@ try {
         'ownerID' => $ownerid
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . __FILE__;
+        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -165,7 +165,7 @@ try {
         $data[$k] = (int)$v;
       };
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before upsert for ' . $dbTable . ' in ' . __FILE__;
+        $mess = 'CORP: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -288,7 +288,7 @@ foreach($apis as $api => $settings) {
           'ownerID' => $ownerid
         );
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -394,7 +394,7 @@ foreach($apis as $api => $settings) {
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before xpath for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before xpath for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -404,7 +404,7 @@ foreach($apis as $api => $settings) {
         $sql.= ' from ' . $api;
         $sql.= ' where ownerid=' . $ownerid;
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before select check for ' . $api . ' in ' . __FILE__;
+          $mess = 'CORP: Before select check for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -433,7 +433,7 @@ foreach($apis as $api => $settings) {
             $sql.= ' where ownerid=' . $ownerid;
             $sql.= ' and ' . $settings['check'] . '=' . $v;
             if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-              $mess = 'CORP: Before delete losers for ' . $api . ' in ' . __FILE__;
+              $mess = 'CORP: Before delete losers for ' . $api . ' in ' . basename(__FILE__);
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
             }; // if YAPEAL_TRACE&&...
@@ -445,7 +445,7 @@ foreach($apis as $api => $settings) {
           'ownerID' => $ownerid
         );
         if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -584,7 +584,7 @@ foreach($apis as $api => $settings) {
           );
           if ($cnt > 0) {
             if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-              $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+              $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
             }; // if YAPEAL_TRACE&&...
@@ -673,7 +673,7 @@ try {
   $sql.= ' where moonid!=0';
   $sql.= ' and ownerid=' . $ownerid;
   if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-    $mess = 'CORP: Before getALL $POSList for ' . $api . ' in ' . __FILE__;
+    $mess = 'CORP: Before getALL $POSList for ' . $api . ' in ' . basename(__FILE__);
     print_on_command($mess);
     $yapealTracing.= $mess . PHP_EOL;
   }; // if YAPEAL_TRACE&&...
@@ -795,14 +795,14 @@ try {
     $datum = $xml;
     if (count($datum) > 0) {
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before editAssets for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before editAssets for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       // Call recursive function to modify XML.
       editAssets($datum);
       // Use generated owner node as root for tree.
-      $corpHQ = get_corpHQ($ownerid, DSN_CORP_WRITER);
+      $corpHQ = getCorpHQ($ownerid, DSN_CORP_WRITER);
       $lft = $datum->result[0]['lft'];
       $rgt = $datum->result[0]['rgt'];
       $nodeData = array(
@@ -820,7 +820,7 @@ try {
       $sql.= ' from ' . $api;
       $sql.= ' where ownerid=' . $ownerid;
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before delete for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before delete for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -839,7 +839,7 @@ try {
       );
       // Insert the new owner's root node.
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before owner node insert for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before owner node insert for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -851,7 +851,7 @@ try {
         'ownerID' => $ownerid
       );
       if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . __FILE__;
+        $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...

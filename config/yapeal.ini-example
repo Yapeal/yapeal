@@ -82,7 +82,7 @@ active=FALSE
 ;database="Yapeal_char"
 
 ; User/password with select, insert, and update access.
-;writer=writer:5678"
+;writer="writer:5678"
 
 ; Main database where Yapeal stores corporation API data. (required for corps)
 [Database-corp]

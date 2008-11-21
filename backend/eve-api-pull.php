@@ -110,6 +110,7 @@ USAGE_MESSAGE;
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
+  $con = connect(DSN_UTIL_WRITER);
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (dontWait($api, 0, FALSE, FALSE)) {

@@ -592,9 +592,7 @@ function upsert(array $data, array $types, $table, $dsn) {
   if (empty($data) || empty($types)) {
     return FALSE;
   };
-  $upsert = makeMultiUpsert(array(
-    $data
-  ) , $types, $table, $dsn);
+  $upsert = makeMultiUpsert(array($data) , $types, $table, $dsn);
   $con = connect($dsn);
   $effected = $con->Execute($upsert);
   return $effected;

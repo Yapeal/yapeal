@@ -142,7 +142,8 @@ try {
     $sql.= DB_UTIL . '.RegisteredUser as u';
     $sql.= ' where chr.isActive=true';
     $sql.= ' and chr.userID=u.userID';
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
       $mess = 'CHAR: Before GetAll $charList in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
@@ -156,7 +157,8 @@ try {
       /* **********************************************************************
       * Per character API pulls
       * **********************************************************************/
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
         $mess = 'CHAR: Before require pulls_char.inc';
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
@@ -171,7 +173,8 @@ try {
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
     $api = 'RegisteredCorporation';
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
       $mess = 'CORP: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
@@ -186,7 +189,8 @@ try {
     $sql.= ' where cp.isActive=true';
     $sql.= ' and cp.characterID=chr.characterID';
     $sql.= ' and chr.userID=u.userID';
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
       $mess = 'CORP: Before GetAll $corpList in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
@@ -200,7 +204,8 @@ try {
       /* ********************************************************************
       * Per corp API pulls
       * ********************************************************************/
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
         $mess = 'CORP: Before require pulls_corp.inc';
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
@@ -214,13 +219,15 @@ try {
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
       $mess = 'EVE: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
     $con = connect(DSN_EVE_WRITER);
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
       $mess = 'EVE: Before require pulls_eve.inc';
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
@@ -250,7 +257,7 @@ try {
   exit;
 }
 catch(Exception $e) {
-  elog('Uncaught exception in eve-api-pull.php', YAPEAL_WARNING_LOG);
+  elog('Uncaught ADOdb exception in '.basename(__FILE__), YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }

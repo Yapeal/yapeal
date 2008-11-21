@@ -131,6 +131,8 @@ catch(EVE_API_Exception $e) {
 
 }
 catch(ADODB_Exception $e) {
+  $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+  elog($mess, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }
@@ -138,8 +140,8 @@ EXCEPTION:
      File: {$e->getFile() }
      Line: {$e->getLine() }
 Backtrace:
-{$e->getTraceAsString() }
-\t--- END TRACE ---
+  {$e->getTraceAsString() }
+  \t--- END TRACE ---
 MESS;
   elog($message, $this->_filename);
 }
@@ -151,7 +153,7 @@ $apis = array(
       'balance' => 'N',
       'ownerID' => 'I'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   ) ,
   'IndustryJobs' => array(
     'types' => array(
@@ -190,7 +192,7 @@ $apis = array(
       'runs' => 'I',
       'timeMultiplier' => 'N'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   ) ,
   'MarketOrders' => array(
     'types' => array(
@@ -265,16 +267,16 @@ foreach($apis as $api => $settings) {
       break;
       default:
         // Do nothing but logging by default
+   }; // case $e->getCode()
+  }
+  catch(EVE_API_Exception $e) {
+    // Do nothing use observers to log info
 
-    }; // case $e->getCode()
-
-}
-catch(EVE_API_Exception $e) {
-  // Do nothing use observers to log info
-
-}
-catch(ADODB_Exception $e) {
-  $message = <<<MESS
+  }
+  catch(ADODB_Exception $e) {
+    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    elog($mess, YAPEAL_WARNING_LOG);
+    $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }
   Message: {$e->getMessage() }
@@ -284,8 +286,8 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
-}
+    elog($message, $this->_filename);
+  }
 }; // foreach $apis ...
 $apis = array(
   'WalletJournal' => array(
@@ -412,6 +414,8 @@ foreach($apis as $api => $settings) {
     // Do nothing use observers to log info
   }
   catch(ADODB_Exception $e) {
+    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    elog($mess, YAPEAL_WARNING_LOG);
     $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }
@@ -547,6 +551,8 @@ catch(EVE_API_Exception $e) {
 
 }
 catch(ADODB_Exception $e) {
+  $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+  elog($mess, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }

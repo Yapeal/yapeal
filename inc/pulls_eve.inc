@@ -111,9 +111,9 @@ foreach($apis as $api => $settings) {
         }; // if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_EVE_WRITER);
       }; // if count $datum ...
-      
+
     }; // if $xml instanceof SimpleXMLElement
-    
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -127,12 +127,22 @@ foreach($apis as $api => $settings) {
   }
   catch(EVE_API_Exception $e) {
     // Do nothing use observers to log info
-    
+
   }
   catch(ADODB_Exception $e) {
-    // Do nothing use observers to log info
-    
+    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    elog($mess, YAPEAL_WARNING_LOG);
+    $message = <<<MESS
+EXCEPTION:
+     Code: {$e->getCode() }
+  Message: {$e->getMessage() }
+     File: {$e->getFile() }
+     Line: {$e->getLine() }
+Backtrace:
+  {$e->getTraceAsString() }
+  \t--- END TRACE ---
+MESS;
+    elog($message, $this->_filename);
   }
 }; // foreach $apis ...
-
 ?>

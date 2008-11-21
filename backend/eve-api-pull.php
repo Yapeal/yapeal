@@ -107,25 +107,17 @@ Version $scriptversion
 USAGE_MESSAGE;
   fwrite(STDERR, $use . PHP_EOL);
 };
-$cachetypes = array(
-  'tableName' => 'C',
-  'ownerID' => 'I',
-  'cachedUntil' => 'T'
-);
+$cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (dontWait($api, 0, FALSE, FALSE)) {
     // Give ourself up to 5 minutes to finish.
-    $timer = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-    $data = array(
-      'tableName' => $api,
-      'ownerID' => 0,
-      'cachedUntil' => $timer
-    );
+    define('YAPEAL_START_TIME',gmdate('Y-m-d H:i:s', strtotime('5 minutes')));
+    $data = array('tableName' => $api, 'ownerID' => 0,
+      'cachedUntil' => YAPEAL_START_TIME);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-    $ctime = strtotime($timer . ' +0000');
   } else {
     // Someone else has set timer need to wait it out.
     exit;
@@ -237,20 +229,17 @@ try {
   }; // if YAPEAL_EVE_ACTIVE...
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
-  $ctime2 = strtotime(
-    getCachedUntil($api, 0, 'CachedUntil', DSN_UTIL_WRITER) . ' +0000');
-  if ($ctime == $ctime2) {
+  $ctime2 = getCachedUntil($api, 0, 'CachedUntil', DSN_UTIL_WRITER);
+  if (YAPEAL_START_TIME == $ctime2) {
     $cuntil = gmdate('Y-m-d H:i:s');
-    $data = array(
-      'tableName' => $api,
-      'ownerID' => 0,
+    $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => $cuntil
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   } else {
-    // Lost Mutex we should log that as notice.
-    if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
-      $mess = $api . ' ' . $timer . ' ran long';
+    // Lost Mutex we should log that as warning.
+    if ((YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
+      $mess = $api . ' ' . YAPEAL_START_TIME . ' ran long';
       print_on_command($mess);
       trigger_error($mess, E_USER_NOTICE);
     };

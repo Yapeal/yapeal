@@ -193,7 +193,6 @@ $apis = array(
   ) ,
   'MarketOrders' => array(
     'types' => array(
-      'accountKey' => 'I',
       'bid' => 'I',
       'charID' => 'I',
       'duration' => 'I',
@@ -210,7 +209,7 @@ $apis = array(
       'volEntered' => 'I',
       'volRemaining' => 'I'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   )
 );
 $postdata = array('userID' => $userid, 'apiKey' => $apikey,

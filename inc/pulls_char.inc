@@ -337,7 +337,8 @@ foreach($apis as $api => $settings) {
             'cachedUntil' => $cuntil
           );
           upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-          if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+          if (YAPEAL_TRACE &&
+            (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
             $mess = 'CHAR: Before xpath for ' . $api . ' in ' . basename(__FILE__);
             print_on_command($mess);
             $yapealTracing.= $mess . PHP_EOL;
@@ -378,9 +379,7 @@ foreach($apis as $api => $settings) {
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil = gmdate('Y-m-d H:i:s', strtotime('60 minutes'));
-      $data = array(
-        'tableName' => $api . $account,
-        'ownerID' => $ownerid,
+      $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
         'cachedUntil' => $cuntil
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -390,7 +389,6 @@ foreach($apis as $api => $settings) {
       // used for cached until time.
       switch ($e->getCode()) {
         case 101: // Wallet exhausted
-
         case 103: // Already returned one week of data
           $cuntil = substr($e->getMessage() , -20, 19);
           $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,

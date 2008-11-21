@@ -277,7 +277,8 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     }; // if YAPEAL_CACHE_XML
     // Throw exception
     require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_Error_Exception($mess, 5);
+    // Have to use API error code for special API error handling to work.
+    throw new EVE_API_Error_Exception($mess, (int)$xml->error[0]['code']);
   };
   if (YAPEAL_CACHE_XML) {
     $cacheFile = $cachePath . 'error_' . $cacheFileName;

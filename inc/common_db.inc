@@ -130,18 +130,16 @@ function dontWait($api, $owner = 0, $randomize = true) {
  *
  * @param string $api Needs to be set to base part of name for example:
  * /corp/StarbaseDetail.xml.aspx would just be StarbaseDetail
- * @param integer $posttype 0=eve, 1=char, 2=corp, 3=map, 4=account See API
- * section of common_backend.inc for a list constants that should be used here.
+ * @param integer $posttype 0=eve, 1=char, 2=corp, 3=map, 4=account See constants
+ * in $prefixes below for allowed values.
  * @param array $postdata Is an array of data ready to be used in
  * http_build_query.
- * @param array $prefixes Is used to override api prefixes should they change
- * them in the future or add more.
  *
  * @return mixed Returns SimpleXML object or false
  *
  * @throws EVE_API_Exception for API file errors
  */
-function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = array()) {
+function getAPIinfo($api, $posttype, $postdata = array()) {
   global $yapealTracing;
   $prefixes = array(
     YAPEAL_API_EVE => '/eve/',
@@ -150,18 +148,21 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
     YAPEAL_API_MAP => '/map/',
     YAPEAL_API_ACCOUNT => '/account/'
   );
+  $result = array();
+  $xml = NULL;
   // If using cache file check for it first.
   if (YAPEAL_CACHE_XML) {
     // Build cache file path
     $cachePath = YAPEAL_CACHE . $prefixes[$posttype];
     // Build base part of cache file name
     $cacheFileName = $api;
-    if (isset($postdata['accountKey'])) {
-      $cacheFileName.= $postdata['accountKey'];
-    };
-    if (isset($postdata['characterID'])) {
-      $cacheFileName.= '_' . $postdata['characterID'];
-    };
+    $cacheFileName.= http_build_query($postdata, NULL, '&');
+    //if (isset($postdata['accountKey'])) {
+    //  $cacheFileName.= $postdata['accountKey'];
+    //};
+    //if (isset($postdata['characterID'])) {
+    //  $cacheFileName.= '_' . $postdata['characterID'];
+    //};
     $cacheFileName.= '.xml';
     $cacheFile = $cachePath . $cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {
@@ -172,9 +173,11 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       $xml = simplexml_load_file($cacheFile);
-      $cuntil = strtotime($xml->cachedUntil[0] . ' +0000');
+      $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
       $ctime = time();
-      if ($ctime < $cuntil) {
+      print_on_command($cuntil);
+      print_on_command($ctime);
+      if ($ctime <= $cuntil) {
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
           $mess = 'REQUEST: Using ' . $cacheFileName . ' in ' . basename(__FILE__);
@@ -182,11 +185,9 @@ function getAPIinfo($api = 'ErrorList', $posttype = YAPEAL_API_EVE, $postdata = 
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         return $xml;
-      };
+      };// if $ctime ...
     };
   };
-  $result = array();
-  $xml = NULL;
   // Build http parameter.
   $http = array(
     'timeout' => 60,

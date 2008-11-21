@@ -28,318 +28,198 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-$allApis = array();
-/* ************************************************************************
-* CHAR API
-* ************************************************************************ */
-$allApis.= array(
-  'char' => array(
-    'AccountBalance' => array(
-      'types' => array(
-        'accountID' => 'integer',
-        'accountKey' => 'integer',
-        'balance' => 'decimal',
-        'ownerID' => 'integer'
-      ) ,
-      'xpath' => '//result/rowset/row'
+$allApis= array(
+  'AccountBalance' => array(
+    'types' => array(
+      'accountID' => 'I',
+      'accountKey' => 'I',
+      'balance' => 'N',
+      'ownerID' => 'I'
     ) ,
-    'IndustryJobs' => array(
-      'types' => array(
-        'activityID' => 'integer',
-        'assemblyLineID' => 'integer',
-        'beginProductionTime' => 'timestamp',
-        'charMaterialMultiplier' => 'decimal',
-        'charTimeMultiplier' => 'decimal',
-        'completed' => 'integer',
-        'completedStatus' => 'integer',
-        'completedSuccessfully' => 'integer',
-        'containerID' => 'integer',
-        'containerLocationID' => 'integer',
-        'containerTypeID' => 'integer',
-        'endProductionTime' => 'timestamp',
-        'installedInSolarSystemID' => 'integer',
-        'installedItemCopy' => 'integer',
-        'installedItemFlag' => 'integer',
-        'installedItemID' => 'integer',
-        'installedItemLicensedProductionRunsRemaining' => 'integer',
-        'installedItemlocationID' => 'integer',
-        'installedItemMaterialLevel' => 'integer',
-        'installedItemProductivityLevel' => 'integer',
-        'installedItemQuantity' => 'integer',
-        'installedItemTypeID' => 'integer',
-        'installerID' => 'integer',
-        'installTime' => 'timestamp',
-        'jobID' => 'integer',
-        'licensedProductionRuns' => 'integer',
-        'materialMultiplier' => 'decimal',
-        'outputFlag' => 'integer',
-        'outputLocationID' => 'integer',
-        'outputTypeID' => 'integer',
-        'ownerID' => 'integer',
-        'pauseProductionTime' => 'timestamp',
-        'runs' => 'integer',
-        'timeMultiplier' => 'decimal'
-      ) ,
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'AllianceList' => array(
+    'types' => array(
+      'allianceID' => 'I',
+      'executorCorpID' => 'I',
+      'memberCount' => 'I',
+      'name' => 'C',
+      'shortName' => 'C',
+      'startDate' => 'T'
     ) ,
-    'MarketOrders' => array(
-      'types' => array(
-        'accountKey' => 'integer',
-        'bid' => 'integer',
-        'charID' => 'integer',
-        'duration' => 'integer',
-        'escrow' => 'decimal',
-        'issued' => 'timestamp',
-        'minVolume' => 'integer',
-        'orderID' => 'integer',
-        'orderState' => 'integer',
-        'ownerID' => 'integer',
-        'price' => 'decimal',
-        'range' => 'integer',
-        'stationID' => 'integer',
-        'typeID' => 'integer',
-        'volEntered' => 'integer',
-        'volRemaining' => 'integer'
-      ) ,
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'AssetList' => array(
+    'types' => array(
+      'flag' => 'I',
+      'itemID' => 'I',
+      'lft' => 'I',
+      'locationID' => 'I',
+      'ownerID' => 'I',
+      'quantity' => 'I',
+      'rgt' => 'I',
+      'singleton' => 'L',
+      'typeID' => 'I'
     ) ,
-    'WalletJournal' => array(
-      'beforeid' => 'beforeRefID',
-      'types' => array(
-        'account' => 'integer',
-        'amount' => 'decimal',
-        'argID1' => 'integer',
-        'argName1' => 'text',
-        'balance' => 'decimal',
-        'date' => 'timestamp',
-        'ownerID' => 'integer',
-        'ownerID1' => 'integer',
-        'ownerID2' => 'integer',
-        'ownerName1' => 'text',
-        'ownerName2' => 'text',
-        'reason' => 'text',
-        'refID' => 'integer',
-        'refTypeID' => 'integer'
-      ) ,
-      'walkdt' => 'date',
-      'walkid' => 'refID',
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//result'
+  ) ,
+  'CharacterSheet' => array(
+    'types' => array(
+      'balance' => 'N',
+      'bloodLine' => 'C',
+      'characterID' => 'I',
+      'cloneName' => 'C',
+      'cloneSkillPoints' => 'I',
+      'corporationID' => 'I',
+      'corporationName' => 'C',
+      'gender' => 'C',
+      'name' => 'C',
+      'race' => 'C',
+      'charisma' => 'I',
+      'intelligence' => 'I',
+      'memory' => 'I',
+      'perception' => 'I',
+      'willpower' => 'I'
     ) ,
-    'WalletTransactions' => array(
-      'beforeid' => 'beforeTransID',
-      'types' => array(
-        'account' => 'integer',
-        'clientID' => 'integer',
-        'clientName' => 'text',
-        'ownerID' => 'integer',
-        'price' => 'decimal',
-        'quantity' => 'integer',
-        'stationID' => 'integer',
-        'stationName' => 'text',
-        'transactionDateTime' => 'timestamp',
-        'transactionFor' => 'text',
-        'transactionID' => 'integer',
-        'transactionType' => 'text',
-        'typeID' => 'integer',
-        'typeName' => 'text'
-      ) ,
-      'walkdt' => 'transactionDateTime',
-      'walkid' => 'transactionID',
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//result'
+  ) ,
+  'ConquerableStationList' => array(
+    'types' => array(
+      'corporationID' => 'I',
+      'corporationName' => 'C',
+      'solarSystemID' => 'I',
+      'stationID' => 'I',
+      'stationName' => 'C',
+      'stationTypeID' => 'I'
     ) ,
-    'AssetList' => array(
-      'types' => array(
-        'flag' => 'integer',
-        'itemID' => 'integer',
-        'lft' => 'integer',
-        'locationID' => 'integer',
-        'ownerID' => 'integer',
-        'quantity' => 'integer',
-        'rgt' => 'integer',
-        'singleton' => 'boolean',
-        'typeID' => 'integer'
-      ) ,
-      'xpath' => '//result'
-    )
-  )
-);
-/* ************************************************************************
-* CORP API
-* ************************************************************************ */
-$allApis.= array(
-  'corp' => array(
-    'AccountBalance' => array(
-      'types' => array(
-        'accountID' => 'integer',
-        'accountKey' => 'integer',
-        'balance' => 'decimal',
-        'ownerID' => 'integer'
-      ) ,
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'ErrorList' => array(
+    'types' => array(
+      'errorCode' => 'I',
+      'errorC' => 'C'
     ) ,
-    'IndustryJobs' => array(
-      'types' => array(
-        'activityID' => 'integer',
-        'assemblyLineID' => 'integer',
-        'beginProductionTime' => 'timestamp',
-        'charMaterialMultiplier' => 'decimal',
-        'charTimeMultiplier' => 'decimal',
-        'completed' => 'integer',
-        'completedStatus' => 'integer',
-        'completedSuccessfully' => 'integer',
-        'containerID' => 'integer',
-        'containerLocationID' => 'integer',
-        'containerTypeID' => 'integer',
-        'endProductionTime' => 'timestamp',
-        'installedInSolarSystemID' => 'integer',
-        'installedItemCopy' => 'integer',
-        'installedItemFlag' => 'integer',
-        'installedItemID' => 'integer',
-        'installedItemLicensedProductionRunsRemaining' => 'integer',
-        'installedItemlocationID' => 'integer',
-        'installedItemMaterialLevel' => 'integer',
-        'installedItemProductivityLevel' => 'integer',
-        'installedItemQuantity' => 'integer',
-        'installedItemTypeID' => 'integer',
-        'installerID' => 'integer',
-        'installTime' => 'timestamp',
-        'jobID' => 'integer',
-        'licensedProductionRuns' => 'integer',
-        'materialMultiplier' => 'decimal',
-        'outputFlag' => 'integer',
-        'outputLocationID' => 'integer',
-        'outputTypeID' => 'integer',
-        'ownerID' => 'integer',
-        'pauseProductionTime' => 'timestamp',
-        'runs' => 'integer',
-        'timeMultiplier' => 'decimal'
-      ) ,
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'IndustryJobs' => array(
+    'types' => array(
+      'activityID' => 'I',
+      'assemblyLineID' => 'I',
+      'beginProductionTime' => 'T',
+      'charMaterialMultiplier' => 'N',
+      'charTimeMultiplier' => 'N',
+      'completed' => 'I',
+      'completedStatus' => 'I',
+      'completedSuccessfully' => 'I',
+      'containerID' => 'I',
+      'containerLocationID' => 'I',
+      'containerTypeID' => 'I',
+      'endProductionTime' => 'T',
+      'installedInSolarSystemID' => 'I',
+      'installedItemCopy' => 'I',
+      'installedItemFlag' => 'I',
+      'installedItemID' => 'I',
+      'installedItemLicensedProductionRunsRemaining' => 'I',
+      'installedItemLocationID' => 'I',
+      'installedItemMaterialLevel' => 'I',
+      'installedItemProductivityLevel' => 'I',
+      'installedItemQuantity' => 'I',
+      'installedItemTypeID' => 'I',
+      'installerID' => 'I',
+      'installTime' => 'T',
+      'jobID' => 'I',
+      'licensedProductionRuns' => 'I',
+      'materialMultiplier' => 'N',
+      'outputFlag' => 'I',
+      'outputLocationID' => 'I',
+      'outputTypeID' => 'I',
+      'ownerID' => 'I',
+      'pauseProductionTime' => 'T',
+      'runs' => 'I',
+      'timeMultiplier' => 'N'
     ) ,
-    'MarketOrders' => array(
-      'types' => array(
-        'accountKey' => 'integer',
-        'bID' => 'integer',
-        'charID' => 'integer',
-        'duration' => 'integer',
-        'escrow' => 'decimal',
-        'issued' => 'timestamp',
-        'minVolume' => 'integer',
-        'orderID' => 'integer',
-        'orderState' => 'integer',
-        'ownerID' => 'integer',
-        'price' => 'decimal',
-        'range' => 'integer',
-        'stationID' => 'integer',
-        'typeID' => 'integer',
-        'volEntered' => 'integer',
-        'volRemaining' => 'integer'
-      ) ,
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'MarketOrders' => array(
+    'types' => array(
+      'bid' => 'I',
+      'charID' => 'I',
+      'duration' => 'I',
+      'escrow' => 'N',
+      'issued' => 'T',
+      'minVolume' => 'I',
+      'orderID' => 'I',
+      'orderState' => 'I',
+      'ownerID' => 'I',
+      'price' => 'N',
+      'range' => 'I',
+      'stationID' => 'I',
+      'typeID' => 'I',
+      'volEntered' => 'I',
+      'volRemaining' => 'I'
     ) ,
-    'WalletJournal' => array(
-      'beforeid' => 'beforeRefID',
-      'types' => array(
-        'account' => 'integer',
-        'amount' => 'decimal',
-        'argID1' => 'integer',
-        'argName1' => 'text',
-        'balance' => 'decimal',
-        'date' => 'timestamp',
-        'ownerID' => 'integer',
-        'ownerID1' => 'integer',
-        'ownerID2' => 'integer',
-        'ownerName1' => 'text',
-        'ownerName2' => 'text',
-        'reason' => 'text',
-        'refID' => 'integer',
-        'refTypeID' => 'integer'
-      ) ,
-      'walkdt' => 'date',
-      'walkid' => 'refID',
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'RefTypes' => array(
+    'types' => array(
+      'refTypeID' => 'I',
+      'refTypeName' => 'C'
     ) ,
-    'WalletTransactions' => array(
-      'beforeid' => 'beforeTransID',
-      'types' => array(
-        'account' => 'integer',
-        'clientID' => 'integer',
-        'clientName' => 'text',
-        'ownerID' => 'integer',
-        'price' => 'decimal',
-        'quantity' => 'integer',
-        'stationID' => 'integer',
-        'stationName' => 'text',
-        'transactionDateTime' => 'timestamp',
-        'transactionFor' => 'text',
-        'transactionID' => 'integer',
-        'transactionType' => 'text',
-        'typeID' => 'integer',
-        'typeName' => 'text'
-      ) ,
-      'walkdt' => 'transactionDateTime',
-      'walkid' => 'transactionID',
-      'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
+  ) ,
+  'WalletJournal' => array(
+    'beforeid' => 'beforeRefID',
+    'types' => array(
+      'account' => 'I',
+      'amount' => 'N',
+      'argID1' => 'I',
+      'argName1' => 'C',
+      'balance' => 'N',
+      'date' => 'T',
+      'ownerID' => 'I',
+      'ownerID1' => 'I',
+      'ownerID2' => 'I',
+      'ownerName1' => 'C',
+      'ownerName2' => 'C',
+      'reason' => 'C',
+      'refID' => 'I',
+      'refTypeID' => 'I'
     ) ,
-    'AssetList' => array(
-      'types' => array(
-        'flag' => 'integer',
-        'itemID' => 'integer',
-        'lft' => 'integer',
-        'locationID' => 'integer',
-        'ownerID' => 'integer',
-        'quantity' => 'integer',
-        'rgt' => 'integer',
-        'singleton' => 'boolean',
-        'typeID' => 'integer'
-      ) ,
-      'xpath' => '//result'
-    )
-  )
-);
-/* ************************************************************************
-* EVE API
-* ************************************************************************ */
-$allApis.= array(
-  'eve' => array(
-    array(
-      'AllianceList' => array(
-        'types' => array(
-          'allianceID' => 'integer',
-          'executorCorpID' => 'integer',
-          'memberCount' => 'integer',
-          'name' => 'text',
-          'shortName' => 'text',
-          'startDate' => 'timestamp'
-        ) ,
-        'xpath' => '//result/rowset/row'
-      ) ,
-      'ConquerableStationList' => array(
-        'types' => array(
-          'corporationID' => 'integer',
-          'corporationName' => 'text',
-          'solarSystemID' => 'integer',
-          'stationID' => 'integer',
-          'stationName' => 'text',
-          'stationTypeID' => 'integer'
-        ) ,
-        'xpath' => '//result/rowset/row'
-      ) ,
-      'ErrorList' => array(
-        'types' => array(
-          'errorCode' => 'integer',
-          'errorText' => 'text'
-        ) ,
-        'xpath' => '//result/rowset/row'
-      ) ,
-      'RefTypes' => array(
-        'types' => array(
-          'refTypeID' => 'integer',
-          'refTypeName' => 'text'
-        ) ,
-        'xpath' => '//result/rowset/row'
-      )
-    )
+    'walkdt' => 'date',
+    'walkid' => 'refID',
+    'xpath' => '//row'
+  ) ,
+  'WalletTransactions' => array(
+    'beforeid' => 'beforeTransID',
+    'types' => array(
+      'account' => 'I',
+      'clientID' => 'I',
+      'clientName' => 'C',
+      'ownerID' => 'I',
+      'price' => 'N',
+      'quantity' => 'I',
+      'stationID' => 'I',
+      'stationName' => 'C',
+      'transactionDateTime' => 'T',
+      'transactionFor' => 'C',
+      'transactionID' => 'I',
+      'transactionType' => 'C',
+      'typeID' => 'I',
+      'typeName' => 'C'
+    ) ,
+    'walkdt' => 'transactionDateTime',
+    'walkid' => 'transactionID',
+    'xpath' => '//row'
+  ) ,
+  'skills' => array(
+    'types' => array(
+      'ownerID' => 'I',
+      'level' => 'I',
+      'skillpoints' => 'I',
+      'typeID' => 'I',
+      'unpublished' => 'L'
+    ) ,
+    'xpath' => '//rowset[@name="skills"]/row'
   )
 );
 ?>

@@ -557,8 +557,8 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
       };
       $data[] = $row;
     }; // foreach $datum
-    print_on_command('MultiUpsertAttributes');
-    print_r($data)."\n";
+    //print_on_command('MultiUpsertAttributes');
+    //print_r($data)."\n";
     multipleUpsert($data, $types, $table, $dsn);
   }; // if $datum>0
 

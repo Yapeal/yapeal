@@ -144,7 +144,7 @@ try {
       multipleUpsertAttributes($datum, $types, $dbTable, DSN_CORP_WRITER, $extras);
     }; // if $datum>0
     /* corplogo */
-    $dbTable = 'corplogo';
+    $dbTable = 'logo';
     // Set the field types of query by name.
     $types = array(
       'graphicID' => 'I',
@@ -156,7 +156,7 @@ try {
       'color2' => 'I',
       'color3' => 'I'
     );
-    $datum = $xml->xpath('//result/logo');
+    $datum = $xml->xpath('//logo');
     if (count($datum) > 0) {
       $data = array(
         'ownerID' => $ownerid
@@ -171,9 +171,9 @@ try {
       }; // if YAPEAL_TRACE&&...
       upsert($data, $types, $dbTable, DSN_CORP_WRITER);
     }; // if $datum>0
-    
+
   }; // if $xml instanceof SimpleXMLElement
-  
+
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -187,11 +187,11 @@ catch(EVE_API_File_Exception $e) {
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 $apis = array(
   'AccountBalance' => array(
@@ -294,9 +294,9 @@ foreach($apis as $api => $settings) {
         }; // if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CORP_WRITER, $extras);
       }; // if $datum>0
-      
+
     }; // if $xml instanceof SimpleXMLElement
-    
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -313,7 +313,7 @@ foreach($apis as $api => $settings) {
     // used for cached until time.
     switch ($e->getCode()) {
       case 116: // Industry jobs already downloaded
-        
+
       case 117: // Market orders already downloaded
         $cuntil = substr($e->getMessage() , -20, 19);
         $data = array(
@@ -325,17 +325,17 @@ foreach($apis as $api => $settings) {
       break;
       default:
         // Do nothing but logging by default
-        
+
     }; // case $e->getCode()
-    
+
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 }; // foreach $apis ...
 $apis = array(
@@ -422,9 +422,9 @@ foreach($apis as $api => $settings) {
             if ($k == $settings['check']) {
               $current[] = (string)$v;
             }; // if $k==...
-            
+
           }; // foreach $data[$settings['check']]...
-          
+
         }; // foreach $datum...
         $delete = array_diff($checking, $current);
         if (!empty($delete)) {
@@ -439,7 +439,7 @@ foreach($apis as $api => $settings) {
             }; // if YAPEAL_TRACE&&...
             $con->Execute($sql);
           }; // foreach $delete...
-          
+
         }; // if !empty $delete
         $extras = array(
           'ownerID' => $ownerid
@@ -451,9 +451,9 @@ foreach($apis as $api => $settings) {
         }; // if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CORP_WRITER, $extras);
       }; // if $datum>0
-      
+
     }; // if $xml instanceof SimpleXMLElement
-    
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -470,7 +470,7 @@ foreach($apis as $api => $settings) {
     // used for cached until time.
     switch ($e->getCode()) {
       case 116: // Industry jobs already downloaded
-        
+
       case 117: // Market orders already downloaded
         $cuntil = substr($e->getMessage() , -20, 19);
         $data = array(
@@ -482,17 +482,17 @@ foreach($apis as $api => $settings) {
       break;
       default:
         // Do nothing but logging by default
-        
+
     }; // case $e->getCode()
-    
+
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 }; // foreach $apis ...
 $apis = array(
@@ -591,7 +591,7 @@ foreach($apis as $api => $settings) {
             multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CORP_WRITER, $extras);
           } else {
             break; // Leave while if no records returned
-            
+
           }; // else $cnt>0
           // Get date/time of last record
           $lastDT = strtotime($datum[$cnt - 1][$settings['walkdt']] . ' +0000');
@@ -608,9 +608,9 @@ foreach($apis as $api => $settings) {
             // Leave while loop if we can't walk back anymore.
             $cnt = 0;
           }; // if $oldest<$lastDT
-          
+
         }; // if $xml instanceof SimpleXMLElement
-        
+
       }
       while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
       // API returning wrong cache until time need to set cacheduntil to
@@ -628,7 +628,7 @@ foreach($apis as $api => $settings) {
       // used for cached until time.
       switch ($e->getCode()) {
         case 101: // Wallet exhausted
-          
+
         case 103: // Already returned one week of data
           $cuntil = substr($e->getMessage() , -20, 19);
           $data = array(
@@ -640,9 +640,9 @@ foreach($apis as $api => $settings) {
         break;
         default:
           // Do nothing but logging by default
-          
+
       }; // case $e->getCode()
-      
+
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -656,11 +656,11 @@ foreach($apis as $api => $settings) {
   }
   catch(EVE_API_Exception $e) {
     // Do nothing use observers to log info
-    
+
   }
   catch(ADODB_Exception $e) {
     // Do nothing use observers to log info
-    
+
   }
 }; // foreach $accounts ...
 
@@ -683,13 +683,13 @@ try {
     foreach($datum as $k) {
       $POSlist[] = (int)$k['itemid'];
     }; // foreach $datum
-    
+
   }; // if count $datum
-  
+
 }
 catch(ADODB_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 // TODO: Whole table structure needs to be changed at some point here to make
 // it better organized.
@@ -857,9 +857,9 @@ try {
       }; // if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum, $types, $api, DSN_CORP_WRITER, $extras);
     }; // if count $datum ...
-    
+
   }; // if $xml instanceof SimpleXMLElement
-  
+
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -886,16 +886,16 @@ catch(EVE_API_Error_Exception $e) {
     break;
     default:
       // Do nothing but logging by default
-      
+
   }; // case $e->getCode()
-  
+
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 catch(ADODB_Exception $e) {
   // Do nothing use observers to log info
-  
+
 }
 ?>

@@ -156,7 +156,9 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     $cachePath = YAPEAL_CACHE . $prefixes[$posttype];
     // Build base part of cache file name
     $cacheFileName = $api;
-    $cacheFileName.= http_build_query($postdata, NULL, '&');
+    // Hash the parameters to protect userID, characterID, and ApiKey while
+    // still having unique names
+    $cacheFileName.= sha1(http_build_query($postdata, NULL, '&'));
     //if (isset($postdata['accountKey'])) {
     //  $cacheFileName.= $postdata['accountKey'];
     //};

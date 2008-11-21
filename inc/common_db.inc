@@ -158,13 +158,9 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     $cacheFileName = $api;
     // Hash the parameters to protect userID, characterID, and ApiKey while
     // still having unique names
-    $cacheFileName.= sha1(http_build_query($postdata, NULL, '&'));
-    //if (isset($postdata['accountKey'])) {
-    //  $cacheFileName.= $postdata['accountKey'];
-    //};
-    //if (isset($postdata['characterID'])) {
-    //  $cacheFileName.= '_' . $postdata['characterID'];
-    //};
+    if (!empty($postdata)) {
+     $cacheFileName.= sha1(http_build_query($postdata, NULL, '&'));
+    };
     $cacheFileName.= '.xml';
     $cacheFile = $cachePath . $cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {

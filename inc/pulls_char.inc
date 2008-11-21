@@ -143,7 +143,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 $apis = array(
   'AccountBalance' => array(
@@ -286,7 +286,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-    elog($message, $this->_filename);
+    elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $apis ...
 $apis = array(
@@ -424,7 +424,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-    elog($message, $this->_filename);
+    elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $accounts ...
 
@@ -561,6 +561,6 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 ?>

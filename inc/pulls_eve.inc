@@ -142,7 +142,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-    elog($message, $this->_filename);
+    elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $apis ...
 ?>

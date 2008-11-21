@@ -196,7 +196,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 $apis = array(
   'AccountBalance' => array(
@@ -337,7 +337,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-    elog($message, $this->_filename);
+    elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $apis ...
 $apis = array(
@@ -497,7 +497,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 }; // foreach $apis ...
 $apis = array(
@@ -651,7 +651,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-    elog($message, $this->_filename);
+    elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $accounts ...
 
@@ -692,7 +692,7 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 // TODO: Whole table structure needs to be changed at some point here to make
 // it better organized.
@@ -904,6 +904,6 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_WARNING_LOG);
 }
 ?>

@@ -257,7 +257,7 @@ try {
   exit;
 }
 catch(Exception $e) {
-  elog('Uncaught ADOdb exception in '.basename(__FILE__), YAPEAL_WARNING_LOG);
+  elog('Uncaught ADOdb exception in '.basename(__FILE__), YAPEAL_ERROR_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }
@@ -268,6 +268,6 @@ Backtrace:
   {$e->getTraceAsString() }
   \t--- END TRACE ---
 MESS;
-  elog($message, $this->_filename);
+  elog($message, YAPEAL_ERROR_LOG);
 }
 ?>

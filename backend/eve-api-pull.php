@@ -141,7 +141,7 @@ try {
     $sql.= ' from ';
     $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
     $sql.= DB_UTIL . '.RegisteredUser as u';
-    $sql.= ' where chr.isActive=true';
+    $sql.= ' where chr.isActive=1';
     $sql.= ' and chr.userID=u.userID';
     if (YAPEAL_TRACE &&
       (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
@@ -187,7 +187,7 @@ try {
     $sql.= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
     $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
     $sql.= DB_UTIL . '.RegisteredUser as u';
-    $sql.= ' where cp.isActive=true';
+    $sql.= ' where cp.isActive=1';
     $sql.= ' and cp.characterID=chr.characterID';
     $sql.= ' and chr.userID=u.userID';
     if (YAPEAL_TRACE &&

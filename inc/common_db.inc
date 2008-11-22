@@ -344,8 +344,8 @@ function getBloodLineHQ($chartype) {
   $raceToSystem = array(
     'Achura' => 30000145, 'Amarr' => 30002187, 'Brutor' => 30002544,
     'Civire' => 30000145, 'Deteis' => 30000145, 'Gallente' => 30004967,
-    'Intaki' => 30003788, 'JinMei' => 30004967, 'Khanid' => 30003863,
-    'NiKunni' => 30002187, 'Sebiestor' => 30002544, 'Vherokior' => 30002544
+    'Intaki' => 30003788, 'Jin-Mei' => 30004967, 'Khanid' => 30003863,
+    'Ni-Kunni' => 30002187, 'Sebiestor' => 30002544, 'Vherokior' => 30002544
   );
   return $raceToSystem[$chartype];
 } // function get_BloodLineHQ ...
@@ -359,8 +359,8 @@ function getBloodLineHQ($chartype) {
 function getBloodLineTypeID($bloodLine) {
   $bloodLineToTypeID = array(
     'Achura' => 1383, 'Amarr' => 1373, 'Brutor' => 1380, 'Civire' => 1375,
-    'Deteis' => 1376, 'Gallente' => 1377, 'Intaki' => 1378, 'JinMei' => 1384,
-    'Khanid' => 1385, 'NiKunni' => 1374, 'Sebiestor' => 1379, 'Vherokior' => 1386
+    'Deteis' => 1376, 'Gallente' => 1377, 'Intaki' => 1378, 'Jin-Mei' => 1384,
+    'Khanid' => 1385, 'Ni-Kunni' => 1374, 'Sebiestor' => 1379, 'Vherokior' => 1386
   );
   return $bloodLineToTypeID[$bloodLine];
 } // function get_charBloodLine ...

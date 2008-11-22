@@ -48,7 +48,7 @@ $apis = array(
       'shortName' => 'C',
       'startDate' => 'T'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//result/rowset[@name="alliances"]/row'
   ) ,
   'ConquerableStationList' => array(
     'types' => array(
@@ -59,21 +59,21 @@ $apis = array(
       'stationName' => 'C',
       'stationTypeID' => 'I'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   ) ,
   'ErrorList' => array(
     'types' => array(
       'errorCode' => 'I',
       'errorText' => 'C'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   ) ,
   'RefTypes' => array(
     'types' => array(
       'refTypeID' => 'I',
       'refTypeName' => 'C'
     ) ,
-    'xpath' => '//result/rowset/row'
+    'xpath' => '//row'
   )
 );
 foreach($apis as $api => $settings) {

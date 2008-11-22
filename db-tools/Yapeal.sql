@@ -473,6 +473,21 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 
+-- -----------------------------------------------------
+-- Table `certificates`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `certificates` ;
+
+CREATE  TABLE IF NOT EXISTS `certificates` (
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `certificateID` BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`ownerID`, `certificateID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci
+COMMENT = 'Sub-table from CharacterSheet';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

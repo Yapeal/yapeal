@@ -93,6 +93,25 @@ try {
       }; // if YAPEAL_TRACE&&...
       upsert($data, $types, $api, DSN_CHAR_WRITER);
     };
+
+    /* Certificates */
+    $dbTable = 'certificates';
+    // Set the field types of query by name.
+    $types = array('ownerID' => 'I', 'certificateID' => 'I');
+    $datum = $xml->xpath('//rowset[@name="' . $dbTable . '"]/row');
+    //print_on_command($dbTable.' datum');
+    //print_r($datum)."\n";
+    if (count($datum) > 0) {
+      $extras = array('ownerID' => $ownerid);
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+        $mess = 'CHAR: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
+        print_on_command($mess);
+        $yapealTracing.= $mess . PHP_EOL;
+      }; // if YAPEAL_TRACE&&...
+      multipleUpsertAttributes($datum, $types, $dbTable, DSN_CHAR_WRITER, $extras);
+    }; // if $datum>0
+
     /* Skills */
     $dbTable = 'skills';
     // Set the field types of query by name.
@@ -107,16 +126,15 @@ try {
       $extras = array(
         'ownerID' => $ownerid, 'level' => 0, 'unpublished' => 0
       );
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
         $mess = 'CHAR: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       multipleUpsertAttributes($datum, $types, $dbTable, DSN_CHAR_WRITER, $extras);
     }; // if $datum>0
-
   }; // if $xml instanceof SimpleXMLElement
-
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API

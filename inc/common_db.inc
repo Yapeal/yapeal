@@ -445,6 +445,11 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $insert = 'insert into ' . $table . ' (';
   $insert.= implode(',', array_keys($params)) . ')';
   $values = ' values';
+  $vtest = array();
+  foreach(array_keys($params) as $param) {
+    $vtest[] = $con->Param($param);
+  };
+  print_on_command($values. '(' . implode(',', $vtest) . ')');
   $sets = array();
   foreach($data as $row) {
     $set = array();

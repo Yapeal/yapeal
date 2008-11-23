@@ -335,19 +335,24 @@ function editAssets($node, $_Id = 1, $location = 0) {
 
 /**
  * Get solarsystemid for a blood line.
- * @param string $chartype Which character type (blood line) to get HQ for.
+ * @param string $bloodline Which bloodline to get HQ for.
  *
  * @return string Returns the HQ system for this blood line.
  *
+ * @throws UnexpectedValueException for unknown bloodlines.
  */
-function getBloodLineHQ($chartype) {
+function getBloodLineHQ($bloodline) {
   $raceToSystem = array(
     'Achura' => 30000145, 'Amarr' => 30002187, 'Brutor' => 30002544,
     'Civire' => 30000145, 'Deteis' => 30000145, 'Gallente' => 30004967,
     'Intaki' => 30003788, 'Jin-Mei' => 30004967, 'Khanid' => 30003863,
     'Ni-Kunni' => 30002187, 'Sebiestor' => 30002544, 'Vherokior' => 30002544
   );
-  return $raceToSystem[$chartype];
+  if (array_key_exists($bloodline,$raceToSystem)) {
+    return $raceToSystem[$bloodline];
+  } else {
+    throw new UnexpectedValueException('Unknouwn bloodline '.$chartype,0);
+  };
 } // function get_BloodLineHQ ...
 
 /**
@@ -355,6 +360,8 @@ function getBloodLineHQ($chartype) {
  * @param integer $bloodLine Which blood line to get typeID for.
  *
  * @return string Returns the typeID for this blood line.
+ *
+ * @throws UnexpectedValueException for unknown bloodlines.
  */
 function getBloodLineTypeID($bloodLine) {
   $bloodLineToTypeID = array(
@@ -362,7 +369,11 @@ function getBloodLineTypeID($bloodLine) {
     'Deteis' => 1376, 'Gallente' => 1377, 'Intaki' => 1378, 'Jin-Mei' => 1384,
     'Khanid' => 1385, 'Ni-Kunni' => 1374, 'Sebiestor' => 1379, 'Vherokior' => 1386
   );
-  return $bloodLineToTypeID[$bloodLine];
+  if (array_key_exists($bloodLine,$bloodLineToTypeID)) {
+    return $bloodLineToTypeID[$bloodLine];
+  } else {
+    throw new UnexpectedValueException('Unknown bloodline '.$bloodLine,0);
+  };
 } // function get_charBloodLine ...
 
 /**
@@ -442,14 +453,9 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $con = connect($dsn);
   $needsQuote = array('C', 'X', 'D', 'T');
   // Build query sections
-  $insert = 'insert into ' . $table . ' (';
-  $insert.= implode(',', array_keys($params)) . ')';
+  $insert = 'insert into ' . $table . ' (`';
+  $insert.= implode('`,`', array_keys($params)) . '`)';
   $values = ' values';
-  $vtest = array();
-  foreach(array_keys($params) as $param) {
-    $vtest[] = $con->Param($param);
-  };
-  print_on_command($values. '(' . implode(',', $vtest) . ')');
   $sets = array();
   foreach($data as $row) {
     $set = array();
@@ -469,7 +475,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   // Loop thru and build update section.
   $updates = array();
   foreach($params as $k => $v) {
-    $updates[] = $k . '=values(' . $k . ')';
+    $updates[] = '`' . $k . '`=values(`' . $k . '`)';
   };
   $dupup.= implode(',', $updates);
   return $insert . $values . $dupup;

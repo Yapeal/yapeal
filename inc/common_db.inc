@@ -451,6 +451,8 @@ function getCorpHQ($corp, $dsn) {
 function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $pkeys = array_keys($params);
   $dkeys = array_keys($data);
+  print_r($pkeys)."\n";
+  print_r($dkeys)."\n";
   // Check for missing fields
   $missing = array_diff($pkeys,$dkeys);
   if (count($missing)) {

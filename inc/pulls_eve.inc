@@ -25,7 +25,8 @@
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
+$sectionFile = basename(__FILE__);
+if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /* *************************************************************************
@@ -83,29 +84,30 @@ foreach($apis as $api => $settings) {
     if ($xml instanceof SimpleXMLElement) {
       // Update cacheduntil time.
       $cuntil = (string)$xml->cachedUntil[0];
-      $data = array(
-        'tableName' => $api,
-        'ownerID' => 0,
+      $data = array('tableName' => $api, 'ownerID' => 0,
         'cachedUntil' => $cuntil
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-        $mess = 'EVE: Before xpath for ' . $api . ' in ' . basename(__FILE__);
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+        $mess = 'EVE: Before xpath for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
-        if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before truncate ' . $api . ' in ' . basename(__FILE__);
+        if (YAPEAL_TRACE &&
+          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+          $mess = 'EVE: Before truncate ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         // Empty out old data then upsert (insert) new
         $sql = 'truncate table ' . $api;
         $con->Execute($sql);
-        if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
+        if (YAPEAL_TRACE &&
+          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
+          $mess = 'EVE: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -118,9 +120,7 @@ foreach($apis as $api => $settings) {
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
     $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-    $data = array(
-      'tableName' => $api,
-      'ownerID' => 0,
+    $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => $cuntil
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -130,7 +130,7 @@ foreach($apis as $api => $settings) {
 
   }
   catch(ADODB_Exception $e) {
-    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
     elog($mess, YAPEAL_WARNING_LOG);
     $message = <<<MESS
 EXCEPTION:

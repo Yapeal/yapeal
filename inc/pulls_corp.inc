@@ -25,7 +25,8 @@
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
+$sectionFile = basename(__FILE__);
+if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /* *************************************************************************
@@ -76,8 +77,9 @@ try {
       'cachedUntil' => $cuntil
     );
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Before clone for ' . $api . ' in ' . basename(__FILE__);
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+      $mess = 'CORP: Before clone for ' . $api . ' in ' . $sectionFile;
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...
@@ -94,8 +96,9 @@ try {
       foreach($datum as $k => $v) {
         $data[$k] = (string)$v;
       };
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before upsert for ' . $api . ' in ' . basename(__FILE__);
+      if (YAPEAL_TRACE &&
+          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+        $mess = 'CORP: Before upsert for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -114,7 +117,7 @@ try {
       $extras = array('ownerID' => $ownerid);
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -135,7 +138,7 @@ try {
       );
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before multiUpsert for ' . $dbTable . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -160,8 +163,9 @@ try {
       foreach($datum[0]->children() as $k => $v) {
         $data[$k] = (int)$v;
       };
-      if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before upsert for ' . $dbTable . ' in ' . basename(__FILE__);
+      if (YAPEAL_TRACE &&
+        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+        $mess = 'CORP: Before upsert for ' . $dbTable . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -184,7 +188,7 @@ catch(EVE_API_Exception $e) {
 
 }
 catch(ADODB_Exception $e) {
-  $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+  $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
   elog($mess, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
@@ -288,7 +292,7 @@ foreach($apis as $api => $settings) {
         $extras = array('ownerID' => $ownerid);
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
+          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -309,7 +313,6 @@ foreach($apis as $api => $settings) {
     // used for cached until time.
     switch ($e->getCode()) {
       case 116: // Industry jobs already downloaded
-
       case 117: // Market orders already downloaded
         $cuntil = substr($e->getMessage() , -20, 19);
         $data = array( 'tableName' => $api, 'ownerID' => $ownerid,
@@ -325,7 +328,7 @@ foreach($apis as $api => $settings) {
     // Do nothing use observers to log info
   }
   catch(ADODB_Exception $e) {
-    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
     elog($mess, YAPEAL_WARNING_LOG);
     $message = <<<MESS
 EXCEPTION:
@@ -393,7 +396,7 @@ foreach($apis as $api => $settings) {
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before xpath for ' . $api . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before xpath for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -404,7 +407,7 @@ foreach($apis as $api => $settings) {
         $sql.= ' where ownerid=' . $ownerid;
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before select check for ' . $api . ' in ' . basename(__FILE__);
+          $mess = 'CORP: Before select check for ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -434,7 +437,7 @@ foreach($apis as $api => $settings) {
             $sql.= ' and ' . $settings['check'] . '=' . $v;
             if (YAPEAL_TRACE &&
               (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-              $mess = 'CORP: Before delete losers for ' . $api . ' in ' . basename(__FILE__);
+              $mess = 'CORP: Before delete losers for ' . $api . ' in ' . $sectionFile;
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
             }; // if YAPEAL_TRACE&&...
@@ -445,7 +448,7 @@ foreach($apis as $api => $settings) {
         $extras = array('ownerID' => $ownerid);
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
+          $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
@@ -485,7 +488,7 @@ catch(EVE_API_Exception $e) {
 
 }
 catch(ADODB_Exception $e) {
-  $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+  $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
   elog($mess, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
@@ -573,8 +576,9 @@ foreach($apis as $api => $settings) {
           $extras = array('ownerID' => $ownerid, 'accountKey' => $account
           );
           if ($cnt > 0) {
-            if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-              $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
+            if (YAPEAL_TRACE &&
+              (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
+              $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
               print_on_command($mess);
               $yapealTracing.= $mess . PHP_EOL;
             }; // if YAPEAL_TRACE&&...
@@ -639,7 +643,7 @@ foreach($apis as $api => $settings) {
     // Do nothing use observers to log info
   }
   catch(ADODB_Exception $e) {
-    $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+    $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
     elog($mess, YAPEAL_WARNING_LOG);
     $message = <<<MESS
 EXCEPTION:
@@ -665,7 +669,7 @@ try {
   $sql.= ' and ownerid=' . $ownerid;
   if (YAPEAL_TRACE &&
     (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-    $mess = 'CORP: Before getALL $POSList for ' . $api . ' in ' . basename(__FILE__);
+    $mess = 'CORP: Before getALL $POSList for ' . $api . ' in ' . $sectionFile;
     print_on_command($mess);
     $yapealTracing.= $mess . PHP_EOL;
   }; // if YAPEAL_TRACE&&...
@@ -680,7 +684,7 @@ try {
 
 }
 catch(ADODB_Exception $e) {
-  $mess = 'ADOdb exception during ' . $api .'in '.basename(__FILE__);
+  $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
   elog($mess, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
@@ -795,7 +799,7 @@ try {
     if (count($datum) > 0) {
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before editAssets for ' . $api . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before editAssets for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -821,7 +825,7 @@ try {
       $sql.= ' where ownerid=' . $ownerid;
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before delete for ' . $api . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before delete for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -841,7 +845,7 @@ try {
       // Insert the new owner's root node.
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before owner node insert for ' . $api . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before owner node insert for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -854,7 +858,7 @@ try {
       );
       if (YAPEAL_TRACE &&
         (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . basename(__FILE__);
+        $mess = 'CORP: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
@@ -893,7 +897,7 @@ catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
 }
 catch(ADODB_Exception $e) {
-  elog('Uncaught ADOdb exception in '.basename(__FILE__), YAPEAL_WARNING_LOG);
+  elog('Uncaught ADOdb exception in '.$sectionFile, YAPEAL_WARNING_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }

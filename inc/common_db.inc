@@ -100,7 +100,7 @@ function dontWait($api, $owner = 0, $randomize = true) {
   };
   // Got to wait until our time.
   if ($now < $ctime) {
-    return false;
+    return FALSE;
   };
   if ($randomize) {
     // The later in the day and having been delay already decreases chance of
@@ -112,7 +112,7 @@ function dontWait($api, $owner = 0, $randomize = true) {
     $mess = 'Rolled ' . $rand . ' ' . $mod . ' ';
     // Get to wait a while longer
     if ($rand == $mod) {
-      return false;
+      return FALSE;
     }; // if $rand==$mod ...
 
   }; // if $randomize ...
@@ -137,7 +137,7 @@ function dontWait($api, $owner = 0, $randomize = true) {
  * @param array $postdata Is an array of data ready to be used in
  * http_build_query.
  *
- * @return mixed Returns SimpleXML object or false
+ * @return mixed Returns SimpleXML object or FALSE
  *
  * @throws EVE_API_Exception for API file errors
  */
@@ -410,7 +410,7 @@ function getCachedUntil($tname, $owner, $table, $dsn) {
  *
  * @return string Returns the HQ system for this race.
  *
- * @throws PEAR_Exception for any errors.
+ * @throws ADODB_Exception for any errors.
  */
 function getCharBloodLine($charid, $dsn) {
   $con = connect($dsn);
@@ -449,23 +449,38 @@ function getCorpHQ($corp, $dsn) {
  * @throws ADODB_Exception if connect used to do quoting fails.
  */
 function makeMultiUpsert(array $data, array $params, $table, $dsn) {
+  $pkeys = array_keys($params);
+  $dkeys = array_keys($data);
+  // Check for missing fields
+  $missing = array_keys(array_diff_key($pkeys,$dkeys));
+  if (count($missing)) {
+    $mess = 'Missing required fields (' . implode(', ', $missing);
+    $mess.= ') found while making upsert for ' .$table;
+    throw new UnexpectedValueException($mess,1);
+  };
+  // Check for extra unknown fields
+  $extras = array_keys(array_diff_key($dkeys, $pkeys));
+  if (count($extras) && (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
+    $mess = 'Extra unknown fields (' . implode(', ', $extras);
+    $mess.= ') found while making upsert for ' . $table;
+    elog($mess, YAPEAL_WARNING_LOG);
+  };
+  $fields = array_intersect_key($pkeys, $dkeys);
   // Need this so we can do quoting.
   $con = connect($dsn);
   $needsQuote = array('C', 'X', 'D', 'T');
   // Build query sections
   $insert = 'insert into ' . $table . ' (`';
-  $insert.= implode('`,`', array_keys($params)) . '`)';
+  $insert.= implode('`,`', $pkeys) . '`)';
   $values = ' values';
   $sets = array();
-  foreach($data as $row) {
+  foreach ($data as $row) {
     $set = array();
-    foreach($params as $k => $v) {
-      if (array_key_exists($k,$row)) {
-        if (in_array($v, $needsQuote)) {
-          $set[] = $con->qstr($row[$k]);
-        } else {
-          $set[] = $row[$k];
-        };
+    foreach ($params as $k => $v) {
+      if (in_array($v, $needsQuote)) {
+        $set[] = $con->qstr($row[$k]);
+      } else {
+        $set[] = $row[$k];
       };
     };
     $sets[] = '(' . implode(',', $set) . ')';
@@ -474,7 +489,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $dupup = ' on duplicate key update ';
   // Loop thru and build update section.
   $updates = array();
-  foreach($params as $k => $v) {
+  foreach ($params as $k => $v) {
     $updates[] = '`' . $k . '`=values(`' . $k . '`)';
   };
   $dupup.= implode(',', $updates);
@@ -488,7 +503,6 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
  * The function tries to use a SQL transaction for larger upserts and falls
  * back to normal upsert if transactions not supported by DB or the transaction
  * throws an exception when we try to use it.
- * If not using PEAR Exceptions caller has to handle PEAR::Error on return
  * Example of how to use:
  * <code>
  * $data=array(
@@ -507,8 +521,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
  * @param string $dsn A valid ADOdb DSN.
  *
  * @return mixed Number rows effected,
- * FALSE if either $data or $types is empty,
- * or PEAR::Error if not using exceptions for PEAR
+ * FALSE if either $data or $types is empty
  *
  * @throws ADODB_Exception for any errors.
  *
@@ -555,7 +568,7 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
  * @param string $dsn The connection infomation needed to connect to DB
  * @param array $extras Used when you need to add any extra table fields that
  * aren't included in attributes
- * @return mixed Number of records inserted/update, PEAR error object, or false
+ * @return mixed Number of records inserted/update or FALSE
  *
  * @uses multipleUpsert()
  */
@@ -594,8 +607,7 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
  * @param string $dsn A valid ADOdb DSN.
  *
  * @return mixed Number rows effected (1),
- * FALSE if either $data or $types is empty,
- * or PEAR::Error if not using exceptions for PEAR
+ * FALSE if either $data or $types is empty
  *
  * @throws ADODB_Exception for any errors.
  *

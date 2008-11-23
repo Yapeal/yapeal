@@ -65,7 +65,7 @@ class ErrorHandler {
       case E_NOTICE:
         return $self->handleNotice();
       default:
-        return false;
+        return FALSE;
     };
   }
   public function handleError() {

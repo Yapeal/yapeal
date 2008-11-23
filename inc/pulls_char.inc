@@ -57,7 +57,7 @@ $types = array(
 try {
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
-  $xml = dontWait($api, $ownerid, false) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : false;
+  $xml = dontWait($api, $ownerid, FALSE) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil = (string)$xml->cachedUntil[0];
@@ -240,7 +240,7 @@ $postdata = array('userID' => $userid, 'apiKey' => $apikey,
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data
-    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : false;
+    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil = (string)$xml->cachedUntil[0];
@@ -343,9 +343,9 @@ foreach($apis as $api => $settings) {
     );
     try {
       // Continue to next if we're not ready at this time
-      if (false === dontWait($api . $account, $ownerid)) {
+      if (FALSE === dontWait($api . $account, $ownerid)) {
         continue;
-      }; // if false===dontWait ...
+      }; // if FALSE===dontWait ...
       do {
         $xml = getAPIinfo($api, YAPEAL_API_CHAR, $postdata);
         if ($xml instanceof SimpleXMLElement) {
@@ -456,7 +456,7 @@ try {
     'characterID' => $charid
   );
   // Should we wait to get API data
-  $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : false;
+  $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
   if ($xml instanceof SimpleXMLElement) {
     // Now update cacheduntil time.
     $cuntil = (string)$xml->cachedUntil[0];

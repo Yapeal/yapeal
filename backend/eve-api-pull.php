@@ -113,7 +113,7 @@ try {
   $con = connect(DSN_UTIL_WRITER);
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
-  if (dontWait($api, 0, FALSE, FALSE)) {
+  if (dontWait($api, 0, FALSE)) {
     // Give ourself up to 5 minutes to finish.
     define('YAPEAL_START_TIME',gmdate('Y-m-d H:i:s', strtotime('5 minutes')));
     $data = array('tableName' => $api, 'ownerID' => 0,

@@ -67,7 +67,7 @@ $types = array(
 try {
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
-  $xml = dontWait($api, $ownerid, false) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : false;
+  $xml = dontWait($api, $ownerid, FALSE) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil = (string)$xml->cachedUntil[0];
@@ -171,9 +171,7 @@ try {
       }; // if YAPEAL_TRACE&&...
       upsert($data, $types, $dbTable, DSN_CORP_WRITER);
     }; // if $datum>0
-
   }; // if $xml instanceof SimpleXMLElement
-
 }
 catch(EVE_API_File_Exception $e) {
   // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -185,7 +183,6 @@ catch(EVE_API_File_Exception $e) {
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-
 }
 catch(ADODB_Exception $e) {
   $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
@@ -279,7 +276,7 @@ $postdata = array('userID' => $userid, 'apiKey' => $apikey,
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data
-    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : false;
+    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil = (string)$xml->cachedUntil[0];
@@ -386,7 +383,7 @@ $postdata = array('userID' => $userid, 'apiKey' => $apikey,
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data
-    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : false;
+    $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
     if ($xml instanceof SimpleXMLElement) {
       // Now update cacheduntil time
       $cuntil = (string)$xml->cachedUntil[0];
@@ -417,7 +414,6 @@ foreach($apis as $api => $settings) {
         foreach($result as $k => $v) {
           $checking[] = (string)$v[$settings['check']];
         };
-        //$check=$xml->xpath($settings['xpath'].'[@'.$settings['check'].']');
         // Extract attribute into simple array
         $current = array();
         foreach($datum as $data) {
@@ -425,9 +421,7 @@ foreach($apis as $api => $settings) {
             if ($k == $settings['check']) {
               $current[] = (string)$v;
             }; // if $k==...
-
           }; // foreach $data[$settings['check']]...
-
         }; // foreach $datum...
         $delete = array_diff($checking, $current);
         if (!empty($delete)) {
@@ -443,7 +437,6 @@ foreach($apis as $api => $settings) {
             }; // if YAPEAL_TRACE&&...
             $con->Execute($sql);
           }; // foreach $delete...
-
         }; // if !empty $delete
         $extras = array('ownerID' => $ownerid);
         if (YAPEAL_TRACE &&
@@ -454,9 +447,7 @@ foreach($apis as $api => $settings) {
         }; // if YAPEAL_TRACE&&...
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CORP_WRITER, $extras);
       }; // if $datum>0
-
     }; // if $xml instanceof SimpleXMLElement
-
   }
   catch(EVE_API_File_Exception $e) {
     // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
@@ -480,12 +471,10 @@ foreach($apis as $api => $settings) {
       break;
       default:
         // Do nothing but logging by default
-
     }; // case $e->getCode()
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info
-
 }
 catch(ADODB_Exception $e) {
   $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
@@ -558,9 +547,9 @@ foreach($apis as $api => $settings) {
     );
     try {
       // Continue to next if we're not ready at this time
-      if (false === dontWait($api . $account, $ownerid)) {
+      if (FALSE === dontWait($api . $account, $ownerid)) {
         continue;
-      }; // if false===dontWait ...
+      }; // if FALSE===dontWait ...
       do {
         $xml = getAPIinfo($api, YAPEAL_API_CORP, $postdata);
         if ($xml instanceof SimpleXMLElement) {
@@ -585,7 +574,6 @@ foreach($apis as $api => $settings) {
             multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CORP_WRITER, $extras);
           } else {
             break; // Leave while if no records returned
-
           }; // else $cnt>0
           // Get date/time of last record
           $lastDT = strtotime($datum[$cnt - 1][$settings['walkdt']] . ' +0000');
@@ -602,11 +590,8 @@ foreach($apis as $api => $settings) {
             // Leave while loop if we can't walk back anymore.
             $cnt = 0;
           }; // if $oldest<$lastDT
-
         }; // if $xml instanceof SimpleXMLElement
-
-      }
-      while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
+      } while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
       // API returning wrong cache until time need to set cacheduntil to
       // 60 minutes
       $cuntil = gmdate('Y-m-d H:i:s', strtotime('60 minutes'));
@@ -679,9 +664,7 @@ try {
     foreach($datum as $k) {
       $POSlist[] = (int)$k['itemid'];
     }; // foreach $datum
-
   }; // if count $datum
-
 }
 catch(ADODB_Exception $e) {
   $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
@@ -717,7 +700,7 @@ $types=array(
 );
 try {
 // Should we wait to get API data
-$xml=dontWait($api.$pos,$ownerid)?getAPIinfo($api,YAPEAL_API_CORP,$postdata):false;
+$xml=dontWait($api.$pos,$ownerid)?getAPIinfo($api,YAPEAL_API_CORP,$postdata):FALSE;
 if ($xml instanceof SimpleXMLElement) {
 // Now update cacheduntil time.
 $cuntil=(string)$xml->cachedUntil[0];
@@ -787,7 +770,7 @@ try {
     'characterID' => $charid
   );
   // Should we wait to get API data
-  $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : false;
+  $xml = dontWait($api, $ownerid) ? getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
   if ($xml instanceof SimpleXMLElement) {
     // Now update cacheduntil time.
     $cuntil = (string)$xml->cachedUntil[0];
@@ -889,9 +872,7 @@ catch(EVE_API_Error_Exception $e) {
     break;
     default:
       // Do nothing but logging by default
-
   }; // case $e->getCode()
-
 }
 catch(EVE_API_Exception $e) {
   // Do nothing use observers to log info

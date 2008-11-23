@@ -56,14 +56,14 @@ function elog($str, $filename = YAPEAL_ERROR_LOG, $collected = FALSE) {
     // and write it now...
     $writeme = ob_get_contents();
     if ($writeme) {
-      $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(false) , 1, 4) . '] ';
+      $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
       $mess.= $writeme . PHP_EOL;
       ob_end_clean();
       ob_start();
     };
   };
   // Now write message this function was called to log.
-  $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(false) , 1, 4) . '] ';
+  $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
   $mess.= $str . PHP_EOL;
   error_log($mess, 3, $filename);
   return TRUE;
@@ -81,7 +81,7 @@ function print_on_command($str, $timestamp = TRUE, $newline = TRUE) {
   if (YAPEAL_SCRIPT_MODE == 'cli') {
     $mess = '';
     if ($timestamp) {
-      $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(false) , 1, 4) . '] ';
+      $mess.= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
     };
     $mess.= $str;
     if ($newline) {

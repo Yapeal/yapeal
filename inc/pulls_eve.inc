@@ -80,7 +80,7 @@ $apis = array(
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data
-    $xml = dontWait($api) ? getAPIinfo($api, YAPEAL_API_EVE) : false;
+    $xml = dontWait($api) ? getAPIinfo($api, YAPEAL_API_EVE) : FALSE;
     if ($xml instanceof SimpleXMLElement) {
       // Update cacheduntil time.
       $cuntil = (string)$xml->cachedUntil[0];

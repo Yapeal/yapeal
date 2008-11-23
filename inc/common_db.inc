@@ -452,20 +452,20 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $pkeys = array_keys($params);
   $dkeys = array_keys($data);
   // Check for missing fields
-  $missing = array_keys(array_diff_key($pkeys,$dkeys));
+  $missing = array_diff($pkeys,$dkeys);
   if (count($missing)) {
     $mess = 'Missing required fields (' . implode(', ', $missing);
     $mess.= ') found while making upsert for ' .$table;
     throw new UnexpectedValueException($mess,1);
   };
   // Check for extra unknown fields
-  $extras = array_keys(array_diff_key($dkeys, $pkeys));
+  $extras = array_diff($dkeys, $pkeys);
   if (count($extras) && (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
     $mess = 'Extra unknown fields (' . implode(', ', $extras);
     $mess.= ') found while making upsert for ' . $table;
     elog($mess, YAPEAL_WARNING_LOG);
   };
-  $fields = array_intersect_key($pkeys, $dkeys);
+  $fields = array_intersect($pkeys, $dkeys);
   // Need this so we can do quoting.
   $con = connect($dsn);
   $needsQuote = array('C', 'X', 'D', 'T');
@@ -476,11 +476,11 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $sets = array();
   foreach ($data as $row) {
     $set = array();
-    foreach ($params as $k => $v) {
-      if (in_array($v, $needsQuote)) {
-        $set[] = $con->qstr($row[$k]);
+    foreach ($fields as $field) {
+      if (in_array($params[$field], $needsQuote)) {
+        $set[] = $con->qstr($row[$field]);
       } else {
-        $set[] = $row[$k];
+        $set[] = $row[$field];
       };
     };
     $sets[] = '(' . implode(',', $set) . ')';

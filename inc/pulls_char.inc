@@ -306,19 +306,146 @@ MESS;
     elog($message, YAPEAL_WARNING_LOG);
   }
 }; // foreach $apis ...
+
+/* WalletJournal */
 $apis = array(
   'WalletJournal' => array(
     'beforeid' => 'beforeRefID',
     'types' => array(
-      'accountKey' => 'I', 'amount' => 'N', 'argID1' => 'I', 'argName1' => 'C',
-      'balance' => 'N', 'date' => 'T', 'ownerID' => 'I', 'ownerID1' => 'I',
-      'ownerID2' => 'I', 'ownerName1' => 'C', 'ownerName2' => 'C',
-      'reason' => 'C', 'refID' => 'I', 'refTypeID' => 'I'
+      'accountKey' => 'I',
+      'amount' => 'N',
+      'argID1' => 'I',
+      'argName1' => 'C',
+      'balance' => 'N',
+      'date' => 'T',
+      'ownerID' => 'I',
+      'ownerID1' => 'I',
+      'ownerID2' => 'I',
+      'ownerName1' => 'C',
+      'ownerName2' => 'C',
+      'reason' => 'C',
+      'refID' => 'I',
+      'refTypeID' => 'I'
     ) ,
     'walkdt' => 'date',
     'walkid' => 'refID',
     'xpath' => '//row'
-  ) ,
+  )
+);
+$accounts = array(1000);
+foreach($apis as $api => $settings) {
+  foreach($accounts as $account) {
+    $postdata = array('userID' => $userid, 'apiKey' => $apikey,
+      'characterID' => $charid, 'accountKey' => $account
+    );
+    try {
+      // Continue to next if we're not ready at this time
+      if (FALSE === dontWait($api . $account, $ownerid)) {
+        continue;
+      }; // if FALSE===dontWait ...
+      do {
+        $xml = getAPIinfo($api, YAPEAL_API_CHAR, $postdata);
+        if ($xml instanceof SimpleXMLElement) {
+          // Now update cacheduntil time.
+          $cuntil = (string)$xml->cachedUntil[0];
+          // Note tablename
+          $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
+            'cachedUntil' => $cuntil
+          );
+          upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+          if (YAPEAL_TRACE &&
+            (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+            $mess = 'CHAR: Before xpath for ' . $api . ' in ' . $sectionFile;
+            print_on_command($mess);
+            $yapealTracing.= $mess . PHP_EOL;
+          }; // if YAPEAL_TRACE&&...
+          $datum = $xml->xpath($settings['xpath']);
+          $cnt = count($datum);
+          $extras = array('accountKey' => $account, 'ownerID' => $ownerid);
+          if ($cnt > 0) {
+            if (YAPEAL_TRACE &&
+              (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+              $mess = 'CHAR: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
+              print_on_command($mess);
+              $yapealTracing.= $mess . PHP_EOL;
+            }; // if YAPEAL_TRACE&&...
+            multipleUpsertAttributes($datum, $settings['types'], $api, DSN_CHAR_WRITER, $extras);
+          } else {
+            break; // Leave while if no records returned
+          }; // else $cnt>0
+          // Get date/time of last record
+          $lastDT = strtotime($datum[$cnt - 1][$settings['walkdt']] . ' +0000');
+          $oldest = strtotime('7 days ago');
+          // If last record is less than a week old we might be able to
+          // continue walking backwards thru records
+          if ($oldest < $lastDT) {
+            $walkid = (int)$datum[$cnt - 1][$settings['walkid']];
+            $postdata[(string)$settings['beforeid']] = $walkid;
+            // Pause to let CCP figure out we got last 1000 records before
+            // trying to getting another batch :P
+            sleep(2);
+          } else {
+            // Leave while loop if we can't walk back anymore.
+            $cnt = 0;
+          }; // if $oldest<$lastDT
+        }; // if $xml instanceof SimpleXMLElement
+      } while ($cnt == 1000 && isset($postdata[$settings['beforeid']]));
+      // API returning wrong cache until time need to set cacheduntil to
+      // 60 minutes
+      $cuntil = gmdate('Y-m-d H:i:s', strtotime('60 minutes'));
+      $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
+        'cachedUntil' => $cuntil
+      );
+      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+    }
+    catch(EVE_API_Error_Exception $e) {
+      // Some error codes give us a new time to retry after that should be
+      // used for cached until time.
+      switch ($e->getCode()) {
+        case 101: // Wallet exhausted
+        case 103: // Already returned one week of data
+          $cuntil = substr($e->getMessage() , -20, 19);
+          $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
+            'cachedUntil' => $cuntil
+          );
+          upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+        break;
+        default:
+          // Do nothing but logging by default
+      }; // case $e->getCode()
+  }
+  catch(EVE_API_File_Exception $e) {
+    // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
+    $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
+    $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
+      'cachedUntil' => $cuntil
+    );
+    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+  }
+  catch(EVE_API_Exception $e) {
+    // Do nothing use observers to log info
+  }
+  catch(ADODB_Exception $e) {
+    $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
+    elog($mess, YAPEAL_WARNING_LOG);
+    $message = <<<MESS
+EXCEPTION:
+     Code: {$e->getCode() }
+  Message: {$e->getMessage() }
+     File: {$e->getFile() }
+     Line: {$e->getLine() }
+Backtrace:
+  {$e->getTraceAsString() }
+  \t--- END TRACE ---
+MESS;
+    elog($message, YAPEAL_WARNING_LOG);
+  }
+}; // foreach $accounts ...
+
+}; // foreach $apis ...
+
+/* WalletTransactions */
+$apis = array(
   'WalletTransactions' => array(
     'beforeid' => 'beforeTransID',
     'types' => array(
@@ -456,6 +583,7 @@ MESS;
 }; // foreach $accounts ...
 
 }; // foreach $apis ...
+
 /* Asset List */
 $api = 'AssetList';
 try {

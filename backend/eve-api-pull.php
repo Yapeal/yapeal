@@ -129,7 +129,8 @@ try {
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
     $api = 'RegisteredCharacter';
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
       $mess = 'CHAR: Connect before section in ' . basename(__FILE__);
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;

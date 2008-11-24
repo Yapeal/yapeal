@@ -41,9 +41,7 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 ****************************************************************************/
 /* Character Sheet */
 $api = 'CharacterSheet';
-$postdata = array(
-  'userID' => $userid,
-  'apiKey' => $apikey,
+$postdata = array('userID' => $userid, 'apiKey' => $apikey,
   'characterID' => $charid
 );
 // Set the field types of query by name.
@@ -324,11 +322,21 @@ $apis = array(
   'WalletTransactions' => array(
     'beforeid' => 'beforeTransID',
     'types' => array(
-      'accountKey' => 'I', 'clientID' => 'I', 'clientName' => 'C',
-      'ownerID' => 'I', 'price' => 'N', 'quantity' => 'I', 'stationID' => 'I',
-      'stationName' => 'C', 'transactionDateTime' => 'T',
-      'transactionFor' => 'C', 'transactionID' => 'I',
-      'transactionType' => 'C', 'typeID' => 'I', 'typeName' => 'C'
+      'accountKey' => 'I',
+      'characterID' => 'I',
+      'clientID' => 'I',
+      'clientName' => 'C',
+      'ownerID' => 'I',
+      'price' => 'N',
+      'quantity' => 'I',
+      'stationID' => 'I',
+      'stationName' => 'C',
+      'transactionDateTime' => 'T',
+      'transactionFor' => 'C',
+      'transactionID' => 'I',
+      'transactionType' => 'C',
+      'typeID' => 'I',
+      'typeName' => 'C'
     ) ,
     'walkdt' => 'transactionDateTime',
     'walkid' => 'transactionID',
@@ -363,10 +371,10 @@ foreach($apis as $api => $settings) {
             $yapealTracing.= $mess . PHP_EOL;
           }; // if YAPEAL_TRACE&&...
           $datum = $xml->xpath($settings['xpath']);
-          //print_on_command($api.' datum');
-          //print_r($datum)."\n";
           $cnt = count($datum);
-          $extras = array('ownerID' => $ownerid, 'accountKey' => $account);
+          $extras = array('accountKey' => $account, 'characterID' => $ownerid,
+            'ownerID' => $ownerid
+          );
           if ($cnt > 0) {
             if (YAPEAL_TRACE &&
               (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {

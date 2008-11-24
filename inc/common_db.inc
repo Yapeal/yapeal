@@ -155,7 +155,7 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   // If using cache file check for it first.
   if (YAPEAL_CACHE_XML) {
     // Build cache file path
-    $cachePath = YAPEAL_CACHE . $prefixes[$posttype];
+    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]);
     // Build base part of cache file name
     $cacheFileName = $api;
     // Hash the parameters to protect userID, characterID, and ApiKey while
@@ -175,8 +175,6 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
       $xml = simplexml_load_file($cacheFile);
       $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
       $ctime = time();
-      print_on_command($cuntil);
-      print_on_command($ctime);
       if ($ctime <= $cuntil) {
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
@@ -451,8 +449,6 @@ function getCorpHQ($corp, $dsn) {
 function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $pkeys = array_keys($params);
   $dkeys = array_keys($data[0]);
-  print_r($pkeys)."\n";
-  print_r($dkeys)."\n";
   // Check for missing fields
   $missing = array_diff($pkeys,$dkeys);
   if (count($missing)) {

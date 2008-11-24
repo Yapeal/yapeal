@@ -155,7 +155,7 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   // If using cache file check for it first.
   if (YAPEAL_CACHE_XML) {
     // Build cache file path
-    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]);
+    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]).DIRECTORY_SEPARATOR;
     // Build base part of cache file name
     $cacheFileName = $api;
     // Hash the parameters to protect userID, characterID, and ApiKey while

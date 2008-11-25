@@ -83,7 +83,7 @@ foreach($apis as $api => $settings) {
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         $data = array();
-        foreach($datum->children() as $k => $v) {
+        foreach($datum as $k => $v) {
           $data[$k] = (string)$v;
         };
         print_r($data)."\n";

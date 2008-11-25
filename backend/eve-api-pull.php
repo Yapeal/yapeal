@@ -240,7 +240,7 @@ try {
     $con = connect(DSN_SERVER_WRITER);
     if (YAPEAL_TRACE &&
       (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-      $mess = 'SERVER: Before require pulls_eve.inc';
+      $mess = 'SERVER: Before require pulls_server.inc';
       print_on_command($mess);
       $yapealTracing.= $mess . PHP_EOL;
     }; // if YAPEAL_TRACE&&...

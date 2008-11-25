@@ -86,7 +86,7 @@ foreach($apis as $api => $settings) {
         $data['serverOpen'] = (string)$datum->serverOpen;
         $data['onlinePlayers'] = (string)$datum->onlinePlayers;
         print_r($data)."\n";
-        multipleUpsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
+        Upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...
 
     }; // if $xml instanceof SimpleXMLElement

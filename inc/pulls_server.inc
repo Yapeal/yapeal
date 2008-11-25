@@ -82,9 +82,11 @@ foreach($apis as $api => $settings) {
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
+        $data = array();
         foreach($datum->children() as $k => $v) {
           $data[$k] = (string)$v;
         };
+        print_r($data)."\n";
         multipleUpsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...
 

@@ -45,7 +45,7 @@ $apis = array(
       'serverOpen' => 'L',
       'onlinePlayers' => 'I'
     ) ,
-    'xpath' => '//result'
+    'xpath' => '//result/*'
   )
 );
 foreach($apis as $api => $settings) {

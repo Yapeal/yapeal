@@ -45,7 +45,7 @@ $apis = array(
       'serverOpen' => 'L',
       'onlinePlayers' => 'I'
     ) ,
-    'xpath' => '//result/*'
+    'xpath' => '//result'
   )
 );
 foreach($apis as $api => $settings) {
@@ -83,9 +83,8 @@ foreach($apis as $api => $settings) {
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         $data = array();
-        foreach($datum as $k => $v) {
-          $data[$k] = (string)$v;
-        };
+        $data['serverOpen'] = (string)$datum->serverOpen;
+        $data['onlinePlayers'] = (string)$datum->onlinePlayers;
         print_r($data)."\n";
         multipleUpsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...

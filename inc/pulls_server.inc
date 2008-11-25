@@ -86,7 +86,7 @@ foreach($apis as $api => $settings) {
         $data = array();
         $data['serverOpen'] = (string)$datum[0]->serverOpen;
         $data['onlinePlayers'] = (string)$datum[0]->onlinePlayers;
-        print_r($datum->children())."\n";
+        print_r($datum[0]->children())."\n";
         Upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...
 

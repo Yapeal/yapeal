@@ -84,8 +84,8 @@ foreach($apis as $api => $settings) {
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...
         $data = array();
-        $data['serverOpen'] = (string)$datum->serverOpen;
-        $data['onlinePlayers'] = (string)$datum->onlinePlayers;
+        $data['serverOpen'] = (string)$datum[0]->serverOpen;
+        $data['onlinePlayers'] = (string)$datum[0]->onlinePlayers;
         print_r($data)."\n";
         Upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...

@@ -148,7 +148,8 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     YAPEAL_API_CHAR => '/char/',
     YAPEAL_API_CORP => '/corp/',
     YAPEAL_API_MAP => '/map/',
-    YAPEAL_API_ACCOUNT => '/account/'
+    YAPEAL_API_ACCOUNT => '/account/',
+    YAPEAL_API_SERVER => '/server/'
   );
   $result = array();
   $xml = NULL;
@@ -191,8 +192,9 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     'timeout' => 60,
     'url' => API_URL_BASE . $prefixes[$posttype] . $api . API_SUFFIX
   );
-  if ($posttype == YAPEAL_API_EVE || $posttype == YAPEAL_API_MAP) {
-    // Global APIs like eve, and map don't use POST data.
+  if ($posttype == YAPEAL_API_EVE || $posttype == YAPEAL_API_MAP ||
+    $posttype == YAPEAL_API_SERVER) {
+    // Global APIs like eve, map, and server don't use POST data.
     $http['method'] = 'GET';
   } else {
     // Setup for POST query.
@@ -576,7 +578,7 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
     $row = array();
     foreach($datum as $record) {
       $row = $extras;
-      foreach($record->attributes() as $k => $v) {
+      foreach ($record->attributes() as $k => $v) {
         $row[$k] = (string)$v;
       };
       $data[] = $row;

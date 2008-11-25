@@ -27,34 +27,20 @@
  * @package Yapeal
  */
 // Track version of script.
-define('YAPEAL_VERSION', str_replace(array(
-  '$',
-  '#'
-) , '', '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
-/* **************************************************************************
-* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
-* **************************************************************************/
+define('YAPEAL_VERSION', str_replace(
+  array('$', '#') , '', '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-// Set constant for how we're being run.
-// Being used here to detect cli mode.
-
-/**
- * @ignore
- */
-defined('YEPEAL_SCRIPT_MODE') || define('YAPEAL_SCRIPT_MODE', php_sapi_name());
-if (YAPEAL_SCRIPT_MODE == 'cli' && function_exists('getopt')) {
+// If being run from command-line look for options there if function available.
+if (php_sapi_name() == 'cli' && function_exists('getopt')) {
   $options = getopt('hVc:');
   foreach($options as $opt => $value) {
     switch ($opt) {
       case 'c':
       case '--config':
-        if (realpath($value) && is_readable(realpath($value))) {
-          /**
-           * @ignore
-           */
-          define('YAPEAL_INI_FILE', realpath($value));
+        if ($file = realpath($value) && is_file($file) && is_readable($file)) {
+          $yapealIniFile = $file;
           break;
         } else {
           $mess = $opt[1] . ' does not exist or is not readable' . PHP_EOL;
@@ -74,15 +60,19 @@ if (YAPEAL_SCRIPT_MODE == 'cli' && function_exists('getopt')) {
         $mess.= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
         fwrite(STDERR, $mess);
         exit;
-    };
-  };
-};
+    };// switch $opt
+  };// foreach $options...
+};// if php_sapi_name() == 'cli' && ...
+/* **************************************************************************
+* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+* **************************************************************************/
 /* This would need to be changed if this file isn't in another path at same
 * level as 'inc' directory where common_emt.inc is.
 */
 // Move up and over to 'inc' directory to read common_backend.inc
 $path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
-$path.= '..' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'common_backend.inc';
+$path.= '..' . DIRECTORY_SEPARATOR . 'inc';
+$path.= DIRECTORY_SEPARATOR . 'common_backend.inc';
 require_once realpath($path);
 /* **************************************************************************
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
@@ -236,6 +226,29 @@ try {
     }; // if YAPEAL_TRACE&&...
     require YAPEAL_INC . 'pulls_eve.inc';
   }; // if YAPEAL_EVE_ACTIVE...
+  /* ************************************************************************
+  * /server/ API pulls
+  * ************************************************************************/
+  // Only pull if activated.
+  if (YAPEAL_SERVER_ACTIVE) {
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
+      $mess = 'SERVER: Connect before section in ' . basename(__FILE__);
+      print_on_command($mess);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    $con = connect(DSN_SERVER_WRITER);
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
+      $mess = 'SERVER: Before require pulls_eve.inc';
+      print_on_command($mess);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
+    require YAPEAL_INC . 'pulls_server.inc';
+  }; // if YAPEAL_EVE_ACTIVE...
+  /* ************************************************************************
+  * Final admin stuff
+  * ************************************************************************/
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
   $ctime2 = getCachedUntil($api, 0, 'CachedUntil', DSN_UTIL_WRITER);

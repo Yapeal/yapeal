@@ -108,6 +108,18 @@ active=TRUE
 ; User/password with select, insert, and update access.
 ;writer="writer:5678"
 
+; Main database where Yepeal stores server API data. (required)
+[Database-server]
+; Determines if pulls for this database type are active. (required)
+; Set to FALSE to turn off pulls.
+active=TRUE
+
+; Database name used in ADOdb DSN.
+;database="Yapeal_server"
+
+; User/password with select, insert, and update access.
+;writer="writer:5678"
+
 ; Database containing some housekeeper tables. (required)
 [Database-util]
 ; Determines if pulls for this database type are active. (required)

@@ -27,7 +27,7 @@
 if (version_compare(PHP_VERSION, '5.2.0', '<')) {
   $mess = 'Need minimum of PHP 5.2.0 to use this software';
   trigger_error($mess, E_USER_ERROR);
-}
+};
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
@@ -35,19 +35,23 @@ chdir($dir);
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/
 // Set a constant for location of ini file.
-// Default assumes that this file and yapeal ini file are in 'neighboring'
-// directories.
-$ds = DIRECTORY_SEPARATOR;
-if (!$ini_file = realpath($dir . $ds . '..' . $ds . 'config' . $ds . 'yapeal.ini')) {
-  $mess = "Bad path to required ini configuration file for Yapeal";
-  trigger_error($mess, E_USER_ERROR);
-};
-if (is_file($ini_file) && is_readable($ini_file)) {
-  defined('YAPEAL_INI_FILE') || define('YAPEAL_INI_FILE', $ini_file);
+if (isset($yapealIniFile)) {
+  define('YAPEAL_INI_FILE', $ini_file);
 } else {
-  $mess = "Can't find required ini configuration file for Yapeal";
-  trigger_error($mess, E_USER_ERROR);
-};
+  // Default assumes that this file and yapeal ini file are in 'neighboring'
+  // directories.
+  $ds = DIRECTORY_SEPARATOR;
+  if (!$ini_file = realpath($dir . $ds . '..' . $ds . 'config' . $ds . 'yapeal.ini')) {
+    $mess = "Bad path to required ini configuration file for Yapeal";
+    trigger_error($mess, E_USER_ERROR);
+  };
+  if (is_file($ini_file) && is_readable($ini_file)) {
+    define('YAPEAL_INI_FILE', $ini_file);
+  } else {
+    $mess = "Can't find required ini configuration file for Yapeal";
+    trigger_error($mess, E_USER_ERROR);
+  };
+};// if isset $yapealIniFile
 /* **************************************************************************
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
@@ -61,6 +65,7 @@ if (is_file($ini_file) && is_readable($ini_file)) {
 defined('YAPEAL_SCRIPT_MODE') || define('YAPEAL_SCRIPT_MODE', php_sapi_name());
 // Define some constants used with trace_section setting.
 // They need to be set here so they exist before reading ini file.
+define('YAPEAL_TRACE_ALL', 16777215);
 define('YAPEAL_TRACE_NONE', 0);
 define('YAPEAL_TRACE_ACCOUNT', 1);
 define('YAPEAL_TRACE_DATABASE', 2);
@@ -69,7 +74,7 @@ define('YAPEAL_TRACE_CORP', 8);
 define('YAPEAL_TRACE_EVE', 16);
 define('YAPEAL_TRACE_MAP', 32);
 define('YAPEAL_TRACE_REQUEST', 64);
-define('YAPEAL_TRACE_ALL', 16777215);
+define('YAPEAL_TRACE_SERVER', 128);
 // Grab the info from ini file.
 $iniVars = parse_ini_file(YAPEAL_INI_FILE, TRUE);
 // Abort if required sections aren't defined
@@ -208,6 +213,7 @@ define('YAPEAL_API_CHAR', 1);
 define('YAPEAL_API_CORP', 2);
 define('YAPEAL_API_MAP', 3);
 define('YAPEAL_API_ACCOUNT', 4);
+define('YAPEAL_API_SERVER', 5);
 /* **************************************************************************
 * Trace
 * **************************************************************************/
@@ -228,12 +234,7 @@ $yapealTracing = '';
 /* **************************************************************************
 * Required DBs
 * **************************************************************************/
-$dbs = array(
-  'char',
-  'corp',
-  'eve',
-  'util'
-);
+$dbs = array('char', 'corp', 'eve', 'server', 'util');
 foreach($dbs as $db) {
   // Make sure required setting vars aren't already set
   unset($active, $database, $driver, $host, $suffix, $writer);

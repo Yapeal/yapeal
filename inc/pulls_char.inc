@@ -55,7 +55,8 @@ $types = array(
 try {
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
-  $xml = dontWait($api, $ownerid, FALSE) ? getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
+  $xml = dontWait($api, $ownerid, FALSE) ?
+    getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil = (string)$xml->cachedUntil[0];

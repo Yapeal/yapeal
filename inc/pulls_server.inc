@@ -66,6 +66,7 @@ foreach($apis as $api => $settings) {
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       $datum = $xml->xpath($settings['xpath']);
+      print_r($datum)."\n";
       if (count($datum) > 0) {
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {

@@ -137,66 +137,123 @@ class RegisteredAccountManagement {
    * @param mixed $characters String with name of character or array with list
    * of characters to load from database.
    *
-   * @return boolean TRUE if character(s) were loaded.
+   * @return integer number of character(s) that were loaded.
    */
   protected function loadCharacters($characters) {
     try {
+      $api = 'RegisteredCharacter';
       $con = connect(DSN_UTIL_WRITER);
-      $sql = 'select characterID, corporationID, corporationName, name';
-      $sql.= ' from ' . DB_UTIL . '.RegisteredCharacter';
+      $sql = 'select characterID,corporationID,corporationName,isActive,name,';
+      $sql.= 'userID';
+      $sql.= ' from `' . DB_UTIL . '`.`' . $api . '`';
       $sql.= ' where userID=' . $this->user['userID'];
       if (isset($characters) && !empty($characters) &&
         (is_string($characters) || is_array($characters))) {
-        $sql .= ' and characterName=';
+        $sql .= ' and name in ';
         if (is_string($characters)) {
-          $sql .= $con->qstr($characters);
-        } else {
-          foreach ($characters as $char) {
-            $chars[] = $con->qstr($char);
-          };
-          $sql .= '(' . implode('|', $chars) . ')';
-        };// else is_string $characters ...
+          $characters = array($characters);
+        };
+        foreach ($characters as $char) {
+          $chars[] = $con->qstr($char);
+        };
+        $sql .= '(' . implode(',', $chars) . ')';
         $result = $con->GetAll($sql);
-        if (count($result)) {
+        if ($ret=count($result)) {
           $this->characters = array();
           foreach ($result as $record) {
-            $this->characters[] = $record;
+            $this->characters[$record['name']] = $record;
           };
         };// if count $result ...
       };// if isset $characters && ...
-      return TRUE;
+      return $ret;
     }
     catch (ADODB_Exception $e) {
-      return FALSE;
+      return 0;
     }
   }
 
   /**
-   * Set character(s) as activate to receive API updates.
+   * Activate character(s) to receive API updates.
    *
    * @param mixed $characters String with name of character or array with list
    * of characters that need activated to receive API updates.
    *
-   * @return boolean TRUE if character(s) were activated.
+   * @return integer number of character(s) that were activated.
    */
   protected function activateCharacters($characters) {
-    $ret = FALSE;
+    $ret = 0;
     if (isset($characters) && !empty($characters) &&
       (is_string($characters) || is_array($characters))) {
-      if (is_string($characters) &&
-        array_key_exists($characters,$this->characters)) {
-        $this->characters[$characters]['isActive'] = 1;
-        $ret = TRUE;
-      } else {
+      if (is_string($characters)) {
+        $characters = array($characters);
+      };
+      foreach ($characters as $char) {
+        if (array_key_exists($char,$this->characters)) {
+          $this->characters[$char]['isActive'] = 1;
+          ++$ret;
+        };
+      };// foreach $characters
+    };// if isset $characters && ...
+    return $ret;
+  }
+
+  /**
+   * Deactivate character(s) from receiving API updates.
+   *
+   * @param mixed $characters String with name of character or array with list
+   * of characters that need deactivated from receiving API updates.
+   *
+   * @return integer number of character(s) that were deactivated.
+   */
+  protected function deactivateCharacters($characters) {
+    $ret = 0;
+    if (isset($characters) && !empty($characters) &&
+      (is_string($characters) || is_array($characters))) {
+      if (is_string($characters)) {
+        $characters = array($characters);
+      };
+      foreach ($characters as $char) {
+        if (array_key_exists($char,$this->characters)) {
+          $this->characters[$char]['isActive'] = 0;
+          ++$ret;
+        };
+      };// foreach $characters
+    };// if isset $characters && ...
+    return $ret;
+  }
+
+  /**
+   * Saves character(s) data to database
+   *
+   * @param mixed $characters String with name of character or array with list
+   * of characters that we wish to save back to database.
+   *
+   * @return integer Number of characters save into database.
+   */
+  protected function saveCharacters($characters) {
+    $ret = 0;
+    try {
+      $table = '`' . DB_UTIL .'`.`RegisteredCharacter`';
+      if (isset($characters) && !empty($characters) &&
+        (is_string($characters) || is_array($characters))) {
+        if (is_string($characters)) {
+          $characters = array($characters);
+        };
+        $data = array();
+        $types = array('characterID'=>'I', 'corporationID'=>'I',
+          'corporationName'=>'C', 'isActive'=>'C',
+          'name'=>'C', 'userID'=>'I');
         foreach ($characters as $char) {
           if (array_key_exists($char,$this->characters)) {
-            $this->characters[$char]['isActive'] = 1;
-            $ret = TRUE;
-          };
-        };
-      };
-    };// if isset $characters
-    return $ret;
+            $data[] = $this->characters[$char];
+          }
+        };// foreach $characters
+        multipleUpsert($data, $types, $table, DSN_UTIL_WRITER);
+      };// isset $characters && ...
+    }
+    catch (ADODB_Exception $e) {
+      return 0;
+    }
   }
 
 }

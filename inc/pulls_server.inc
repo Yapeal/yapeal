@@ -78,7 +78,7 @@ foreach($apis as $api => $settings) {
         $con->Execute($sql);
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-          $mess = 'SERVER: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
+          $mess = 'SERVER: Before Upsert for ' . $api . ' in ' . $sectionFile;
           print_on_command($mess);
           $yapealTracing.= $mess . PHP_EOL;
         }; // if YAPEAL_TRACE&&...

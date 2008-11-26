@@ -488,6 +488,45 @@ COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet';
 
 
+-- -----------------------------------------------------
+-- Table `ContainerLog`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ContainerLog` ;
+
+CREATE  TABLE IF NOT EXISTS `ContainerLog` (
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `logTime` DATETIME NOT NULL ,
+  `itemID` BIGINT UNSIGNED NOT NULL ,
+  `itemTypeID` BIGINT UNSIGNED NOT NULL ,
+  `actorID` BIGINT UNSIGNED NOT NULL ,
+  `actorName` VARCHAR(255) NOT NULL ,
+  `flag` VARCHAR(255) NOT NULL ,
+  `locationID` BIGINT UNSIGNED NOT NULL ,
+  `action` VARCHAR(255) NOT NULL ,
+  `passwordType` VARCHAR(255) NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
+  `quantity` BIGINT UNSIGNED NOT NULL ,
+  `oldConfiguration` VARCHAR(255) NOT NULL ,
+  `newConfiguration` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`ownerID`, `logTime`, `itemID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ServerStatus`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ServerStatus` ;
+
+CREATE  TABLE IF NOT EXISTS `ServerStatus` (
+  `serverOpen` BOOLEAN NOT NULL ,
+  `onlinePlayers` BIGINT UNSIGNED NOT NULL )
+ENGINE = MEMORY
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

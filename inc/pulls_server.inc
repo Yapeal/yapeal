@@ -66,7 +66,6 @@ foreach($apis as $api => $settings) {
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
       $datum = $xml->xpath($settings['xpath']);
-      print_r($datum)."\n";
       if (count($datum) > 0) {
         if (YAPEAL_TRACE &&
           (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
@@ -87,9 +86,6 @@ foreach($apis as $api => $settings) {
         foreach ($datum[0]->children() as $k=>$v) {
           $data[$k] = (string)$v;
         }
-        //$data['serverOpen'] = (string)$datum[0]->serverOpen;
-        //$data['onlinePlayers'] = (string)$datum[0]->onlinePlayers;
-        print_r($data)."\n";
         Upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...
 

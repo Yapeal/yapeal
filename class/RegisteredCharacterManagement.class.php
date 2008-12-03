@@ -43,23 +43,29 @@ require_once realpath($path);
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
 * **************************************************************************/
+require_once YAPEAL_CLASS . 'IFetchApiTable.php';
 require_once YAPEAL_CLASS . 'ILoadApiTable.php';
-require_once YAPEAL_CLASS . 'IFetchStoreApiTable.php';
+require_once YAPEAL_CLASS . 'IStoreApiTable.php';
 /**
  * Use to manage Registered Characters table in Yapeal.
  *
  * @package Yapeal
  */
-class RegisteredCharacterManagement implements ILoadApiTable, IFetchStoreApiTable {
+class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
+  IStoreApiTable {
   /**
-   * @var array Holds types of allowed fields for $this->characters
+   * @var array Holds types of allowed fields for $this->character
    */
-  static $types = array('characterID'=>'I', 'corporationID'=>'I', 'corporationName'=>'C', 'graphic'=>'B', 'graphicType'=>'C', 'isActive'=>'L', 'name'=>'C', 'userID'=>'I');
+  static $types = array('characterID'=>'I', 'corporationID'=>'I',
+    'corporationName'=>'C', 'graphic'=>'B', 'graphicType'=>'C', 'isActive'=>'L',
+    'name'=>'C', 'userID'=>'I');
 
   /**
    * @var array Holds the information about the character.
    */
-  protected $character = array();
+  protected $character = array('characterID'=>0, 'corporationID'=>0,
+    'corporationName'=>'', 'graphic'=>NULL, 'graphicType'=>'', 'isActive'=>0,
+    'name'=>'', 'userID'=>0);
 
   /**
    * Default action is to return information from $this->characters.
@@ -112,45 +118,29 @@ class RegisteredCharacterManagement implements ILoadApiTable, IFetchStoreApiTabl
     $isActive = NULL, $name = NULL, $userID = NULL) {
     if (isset($characterID) && is_int($characterID)) {
       $this->character['characterID'] = $characterID;
-    } else {
-      $this->character['characterID'] = 0;
     };
     if (isset($corporationID) && is_int($corporationID)) {
       $this->character['corporationID'] = $corporationID;
-    } else {
-      $this->character['corporationID'] = 0;
     };
     if (isset($corporationName) && is_string($corporationName) &&
       !empty($corporationName)) {
       $this->character['corporationName'] = $corporationName;
-    } else {
-      $this->character['corporationName'] = '';
     };
     if (isset($graphic) && is_string($graphic) && !empty($graphic)) {
       $this->character['graphic'] = $graphic;
-    } else {
-      $this->character['graphic'] = NULL;
     };
     if (isset($graphicType) && is_string($graphicType) &&
       !empty($graphicType)) {
       $this->character['graphicType'] = $graphicType;
-    } else {
-      $this->character['graphicType'] = '';
     };
     if (isset($isActive) && is_bool($isActive)) {
       $this->character['isActive'] = $isActive;
-    } else {
-      $this->character['isActive'] = FALSE;
     };
     if (isset($name) && is_string($name) && !empty($name)) {
       $this->character['name'] = $name;
-    } else {
-      $this->character['name'] = '';
     };
     if (isset($userID) && is_int($userID)) {
       $this->character['userID'] = $userID;
-    } else {
-      $this->character['userID'] = 0;
     };
     require_once YAPEAL_INC . 'elog.inc';
     require_once YAPEAL_INC . 'common_db.inc';
@@ -217,7 +207,7 @@ class RegisteredCharacterManagement implements ILoadApiTable, IFetchStoreApiTabl
   function apiLoadByName($item = NULL, $field = NULL) {
     $ret = FALSE;
     try {
-      $api = 'RegisteredCharacter';
+      $table = '`' . DB_UTIL .'`.`RegisteredCharacter`';;
       $con = connect(DSN_UTIL_WRITER);
       // If we have just a field and it's value is set we can try that way.
       if ((!isset($item) || !is_int($item)) && isset($field) &&
@@ -236,12 +226,11 @@ class RegisteredCharacterManagement implements ILoadApiTable, IFetchStoreApiTabl
       $item = $con->qstr($item);
       $field = '`' . $field .'`';
       $cols = array();
-      $sql = 'select';
       foreach(array_keys(RegisteredCharacterManagement::$types) as $column) {
         $cols[] = '`' . $column .'`';
       };
-      $sql .= ' ' . implode(',', $cols);
-      $sql.= ' from `' . DB_UTIL . '`.`' . $api . '`';
+      $sql = 'select ' . implode(',', $cols);
+      $sql.= ' from ' . $table;
       $sql.= ' where ' . $field . '=' . $item;
       $result = $con->GetAll($sql);
       if (count($result) == 1) {
@@ -256,38 +245,54 @@ class RegisteredCharacterManagement implements ILoadApiTable, IFetchStoreApiTabl
   }
 
   /**
-   * Saves character(s) data to database
+   * Used to get an item from Eve API.
    *
-   * @param mixed $characters String with name of character or array with list
-   * of characters that we wish to save back to database.
+   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
    *
-   * @return integer Number of characters save into database.
+   * @return boolean Returns TRUE if item received.
    */
-  protected function saveCharacters($characters) {
-    $ret = 0;
-    try {
-      $table = '`' . DB_UTIL .'`.`RegisteredCharacter`';
-      if (isset($characters) && !empty($characters) &&
-        (is_string($characters) || is_array($characters))) {
-        if (is_string($characters)) {
-          $characters = array($characters);
-        };
-        $data = array();
-        $types = array('characterID'=>'I', 'corporationID'=>'I',
-          'corporationName'=>'C', 'isActive'=>'C',
-          'name'=>'C', 'userID'=>'I');
-        foreach ($characters as $char) {
-          if (array_key_exists($char,$this->characters)) {
-            $data[] = $this->characters[$char];
-          }
-        };// foreach $characters
-        multipleUpsert($data, $types, $table, DSN_UTIL_WRITER);
-      };// isset $characters && ...
-    }
-    catch (ADODB_Exception $e) {
-      return 0;
-    }
+  function apiFetch() {
   }
-
+  /**
+   * Used to save an item into database.
+   *
+   * Parent item (object) should call all child(ren)'s apiStore() as appropriate.
+   *
+   * @return boolean Returns TRUE if item was saved to database.
+   */
+  function apiStore() {
+    if (isset($this->character['characterID'],
+          $this->character['corporationID'],
+          $this->character['corporationName'],
+          $this->character['graphicType'],
+          $this->character['isActive'],
+          $this->character['name'],
+          $this->character['userID']) &&
+      !(empty($this->character['characterID']) ||
+      empty($this->character['corporationID']) ||
+      empty($this->character['corporationName']) ||
+      empty($this->character['name']) ||
+      empty($this->character['userID']))) {
+      $table = '`' . DB_UTIL .'`.`RegisteredCharacter`';
+      $data = $this->character;
+      // Graphic BLOB requires special handling
+      if (isset($this->character['graphic'])) {
+        $graphic = $this->character['graphic'];
+        $data['graphic'] = 'null';
+      }
+      try {
+        upsert($data, RegisteredCharacterManagement::$types, $table,
+          DSN_UTIL_WRITER);
+        $where = '`characterID`=' . $this->character['characterID'];
+        $con = connect(DSN_UTIL_WRITER);
+        $con->UpdateBlob($table, 'graphic', $graphic, $where);
+      }
+      catch (ADODB_Exception $e) {
+        return FALSE;
+      }
+      return TRUE;
+    }
+    return FALSE;
+  }
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface for fetching XML from API and storing it into database.
+ * Interface for storing API data into database.
  *
  * LICENSE: This file is part of Yapeal.
  *
@@ -30,17 +30,9 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 };
 
 /**
- * Interface for getting (pulling) an Eve API and storing it to database table(s).
+ * Interface for storing Eve API data into database table(s).
  */
-interface IFetchStoreApiTable {
-  /**
-   * Used to get an item from Eve API.
-   *
-   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
-   *
-   * @return boolean Returns TRUE if item received.
-   */
-  function apiFetch();
+interface IStoreApiTable {
   /**
    * Used to save an item into database.
    *

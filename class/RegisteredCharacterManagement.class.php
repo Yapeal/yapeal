@@ -245,15 +245,6 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
   }
 
   /**
-   * Used to get an item from Eve API.
-   *
-   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
-   *
-   * @return boolean Returns TRUE if item received.
-   */
-  function apiFetch() {
-  }
-  /**
    * Used to save an item into database.
    *
    * Parent item (object) should call all child(ren)'s apiStore() as appropriate.

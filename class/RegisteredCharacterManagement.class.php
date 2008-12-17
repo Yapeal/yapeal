@@ -92,7 +92,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
    */
   public function __set($index, $value) {
     $ret = FALSE;
-    if (array_key_exists($index, RegisteredCharacterManagement::$types)) {
+    if (array_key_exists($index, self::$types)) {
       if (array_key_exists($index,$this->character)) {
         $ret = TRUE;
       };
@@ -162,7 +162,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $con = connect(DSN_UTIL_WRITER);
       // If we have just a field and it's value is set we can try that way.
       if ((!isset($item) || !is_int($item)) && isset($field) &&
-        array_key_exists($field, RegisteredCharacterManagement::$types) &&
+        array_key_exists($field, self::$types) &&
         !empty($this->character[$field])) {
         $item = $this->character[$field];
         // If we know at least characterID we can try to get the rest.
@@ -178,7 +178,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $field = '`' . $field .'`';
       $cols = array();
       $sql = 'select';
-      foreach(array_keys(RegisteredCharacterManagement::$types) as $column) {
+      foreach(array_keys(self::$types) as $column) {
         $cols[] = '`' . $column .'`';
       };
       $sql .= ' ' . implode(',', $cols);
@@ -211,7 +211,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $con = connect(DSN_UTIL_WRITER);
       // If we have just a field and it's value is set we can try that way.
       if ((!isset($item) || !is_int($item)) && isset($field) &&
-        array_key_exists($field, RegisteredCharacterManagement::$types) &&
+        array_key_exists($field, self::$types) &&
         !empty($this->character[$field])) {
         $item = $this->character[$field];
         // If we know at least name we can try to get the rest.
@@ -226,7 +226,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $item = $con->qstr($item);
       $field = '`' . $field .'`';
       $cols = array();
-      foreach(array_keys(RegisteredCharacterManagement::$types) as $column) {
+      foreach(array_keys(self::$types) as $column) {
         $cols[] = '`' . $column .'`';
       };
       $sql = 'select ' . implode(',', $cols);
@@ -272,7 +272,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
         $data['graphic'] = 'null';
       }
       try {
-        upsert($data, RegisteredCharacterManagement::$types, $table,
+        upsert($data, self::$types, $table,
           DSN_UTIL_WRITER);
         $where = '`characterID`=' . $this->character['characterID'];
         $con = connect(DSN_UTIL_WRITER);

@@ -95,7 +95,7 @@ class RegisteredAccountManagement {
    */
   public function __set($index, $value) {
     $ret = FALSE;
-    if (array_key_exists($index, RegisteredAccountManagement::$types)) {
+    if (array_key_exists($index, self::$types)) {
       if (array_key_exists($index,$this->user)) {
         $ret = TRUE;
       };

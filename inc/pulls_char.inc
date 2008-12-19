@@ -63,8 +63,20 @@ try {
     $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => $cuntil);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      $mess = 'CHAR: Before clone';
+      print_on_command($mess);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
     // Main table first
     $datum = clone $xml->result;
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      $mess = 'CHAR: Before delete children';
+      print_on_command($mess);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
     // Get rid of child table stuff
     unset($datum->rowset, $datum->attributes);
     unset($datum->attributeEnhancers, $datum->currentTime);
@@ -75,6 +87,12 @@ try {
         $data[$k] = (string)$v;
       };
     }; // if $datum>0
+    if (YAPEAL_TRACE &&
+      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+      $mess = 'CHAR: Before append attributes';
+      print_on_command($mess);
+      $yapealTracing.= $mess . PHP_EOL;
+    }; // if YAPEAL_TRACE&&...
     // Append attributes there's no need to have another table for them.
     /* attributes */
     $dbTable = 'attributes';

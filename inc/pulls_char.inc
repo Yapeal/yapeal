@@ -53,10 +53,23 @@ $types = array(
   'willpower' => 'I'
 );
 try {
+  if (YAPEAL_TRACE &&
+    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+    $mess = 'CHAR: Before dontWait';
+    print_on_command($mess);
+    $yapealTracing.= $mess . PHP_EOL;
+  }; // if YAPEAL_TRACE&&...
   // Should we wait to get API data
   // No randomness here because other tables depend on this data
   $xml = dontWait($api, $ownerid, FALSE) ?
     getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
+  if (YAPEAL_TRACE &&
+    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
+    $mess = 'CHAR: after dontWait';
+    print_on_command($mess);
+    $yapealTracing.= $mess . PHP_EOL;
+  }; // if YAPEAL_TRACE&&...
+  print_r($xml) . "\n";
   if ($xml instanceof SimpleXMLElement) {
     // Update cacheduntil time
     $cuntil = (string)$xml->cachedUntil[0];

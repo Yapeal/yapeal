@@ -156,7 +156,13 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   // If using cache file check for it first.
   if (YAPEAL_CACHE_XML) {
     // Build cache file path
-    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]).DIRECTORY_SEPARATOR;
+    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]) . DIRECTORY_SEPARATOR;
+    if (!(is_dir($cachePath) && is_writable($cachePath)) &&
+      (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
+      $mess = 'XML cache directory ' . $cachePath . ' is missing or not writable';
+      print_on_command($mess);
+      elog($mess, YAPEAL_WARNING_LOG);
+    };
     // Build base part of cache file name
     $cacheFileName = $api;
     // Hash the parameters to protect userID, characterID, and ApiKey while
@@ -201,8 +207,20 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     $http['method'] = 'POST';
     $http['content'] = http_build_query($postdata, NULL, '&');
   }; // if $posttype=YAPEAL_API_EVE||...
+  if (YAPEAL_TRACE &&
+    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
+    $mess = 'REQUEST: Before CurlRequest in ' . basename(__FILE__);
+    print_on_command($mess);
+    $yapealTracing.= $mess . PHP_EOL;
+  }; // if YAPEAL_TRACE&&...
   // Setup connection options.
   $sh = new CurlRequest($http);
+  if (YAPEAL_TRACE &&
+    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
+    $mess = 'REQUEST: Before Curl exec in ' . basename(__FILE__);
+    print_on_command($mess);
+    $yapealTracing.= $mess . PHP_EOL;
+  }; // if YAPEAL_TRACE&&...
   // Try to get XML.
   $result = $sh->exec();
   // Now check for errors.

@@ -25,7 +25,16 @@
  */
 // Insure minimum version of PHP 5 we need to run.
 if (version_compare(PHP_VERSION, '5.2.0', '<')) {
-  $mess = 'Need minimum of PHP 5.2.0 to use this software';
+  $mess = 'Need minimum of PHP 5.2.0 to use this software!';
+  trigger_error($mess, E_USER_ERROR);
+};
+// Check for some required extensions
+if (!extension_loaded('curl')) {
+  $mess = 'The required PHP extension cURL is missing!';
+  trigger_error($mess, E_USER_ERROR);
+};
+if (!extension_loaded('mysqli')) {
+  $mess = 'The required PHP extension mysqli is missing!';
   trigger_error($mess, E_USER_ERROR);
 };
 // Used to over come path issues caused by how script is ran on server.

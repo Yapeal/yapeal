@@ -284,5 +284,8 @@ Backtrace:
   \t--- END TRACE ---
 MESS;
   elog($message, YAPEAL_ERROR_LOG);
+  if (YAPEAL_TRACE && !empty($yapealTracing)) {
+    elog($yapealTracing, YAPEAL_TRACE_LOG);
+  }; // if YAPEAL_TRACE&&...
 }
 ?>

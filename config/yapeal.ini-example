@@ -58,7 +58,7 @@ database="Yapeal"
 
 ; Driver part of ADOdb DSN. (required)
 ; Must support transactions.
-driver="mysqlt://"
+driver="mysqli://"
 
 ; Host name used in ADOdb DSN. (required)
 host="localhost"

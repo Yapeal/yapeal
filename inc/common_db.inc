@@ -369,7 +369,7 @@ function getBloodLineHQ($bloodline) {
   if (array_key_exists($bloodline,$raceToSystem)) {
     return $raceToSystem[$bloodline];
   } else {
-    throw new UnexpectedValueException('Unknouwn bloodline '.$chartype,0);
+    throw new UnexpectedValueException('Unknown bloodline '.$bloodline,0);
   };
 } // function get_BloodLineHQ ...
 

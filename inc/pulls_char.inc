@@ -65,7 +65,7 @@ try {
     getAPIinfo($api, YAPEAL_API_CHAR, $postdata) : FALSE;
   if (YAPEAL_TRACE &&
     (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-    $mess = 'CHAR: after dontWait';
+    $mess = 'CHAR: After dontWait';
     print_on_command($mess);
     $yapealTracing.= $mess . PHP_EOL;
   }; // if YAPEAL_TRACE&&...
@@ -245,6 +245,7 @@ $apis = array(
   ) ,
   'MarketOrders' => array(
     'types' => array(
+      'accountKey' => 'I',
       'bid' => 'I',
       'charID' => 'I',
       'duration' => 'I',

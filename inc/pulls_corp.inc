@@ -250,6 +250,7 @@ $apis = array(
   ) ,
   'MarketOrders' => array(
     'types' => array(
+      'accountKey' => 'I',
       'bid' => 'I',
       'charID' => 'I',
       'duration' => 'I',

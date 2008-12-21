@@ -48,6 +48,7 @@ $apis = array(
     'xpath' => '//result'
   )
 );
+$tracing = new YapealTracing();
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data
@@ -65,6 +66,7 @@ foreach($apis as $api => $settings) {
         print_on_command($mess);
         $yapealTracing.= $mess . PHP_EOL;
       }; // if YAPEAL_TRACE&&...
+      $tracing->checkTrace(YAPEAL_API_SERVER, 0) && $tracing->logTrace(YAPEAL_API_SERVER, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
         if (YAPEAL_TRACE &&

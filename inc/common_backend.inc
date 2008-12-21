@@ -40,6 +40,7 @@ if (!extension_loaded('mysqli')) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
+$ds = DIRECTORY_SEPARATOR;
 /* **************************************************************************
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/
@@ -49,7 +50,6 @@ if (isset($yapealIniFile)) {
 } else {
   // Default assumes that this file and yapeal ini file are in 'neighboring'
   // directories.
-  $ds = DIRECTORY_SEPARATOR;
   if (!$ini_file = realpath($dir . $ds . '..' . $ds . 'config' . $ds . 'yapeal.ini')) {
     $mess = "Bad path to required ini configuration file for Yapeal";
     trigger_error($mess, E_USER_ERROR);
@@ -97,7 +97,6 @@ if (!(isset($iniVars['Api']) && isset($iniVars['Database']) && isset($iniVars['L
 $req1 = 'Required variable ';
 $req2 = ' in ' . YAPEAL_INI_FILE . " file isn't defined";
 $nonexist = 'None existent path defined for ';
-$ds = DIRECTORY_SEPARATOR;
 /* **************************************************************************
 * Paths
 * **************************************************************************/
@@ -240,6 +239,10 @@ define('YAPEAL_TRACE_LEVEL', $trace_level);
 define('YAPEAL_TRACE_SECTION', $trace_section);
 // Var used to collect trace info
 $yapealTracing = '';
+// Require tracing code here if tracing is turned on.
+if (YAPEAL_TRACE && YAPEAL_TRACE_SECTION) {
+  require_once YAPEAL_CLASS . 'YapealTracing.class.php';
+};
 /* **************************************************************************
 * Required DBs
 * **************************************************************************/

@@ -64,21 +64,13 @@ foreach($apis as $api => $settings) {
       $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
-        if (YAPEAL_TRACE &&
-          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-          $mess = 'SERVER: Before truncate ' . $api . ' in ' . $sectionFile;
-          print_on_command($mess);
-          $yapealTracing.= $mess . PHP_EOL;
-        }; // if YAPEAL_TRACE&&...
+        $mess = 'SERVER: Before truncate ' . $api . ' in ' . $sectionFile;
+        $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
         // Empty out old data then upsert (insert) new
         $sql = 'truncate table ' . $api;
         $con->Execute($sql);
-        if (YAPEAL_TRACE &&
-          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-          $mess = 'SERVER: Before Upsert for ' . $api . ' in ' . $sectionFile;
-          print_on_command($mess);
-          $yapealTracing.= $mess . PHP_EOL;
-        }; // if YAPEAL_TRACE&&...
+        $mess = 'SERVER: Before Upsert for ' . $api . ' in ' . $sectionFile;
+        $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
         $data = array();
         foreach ($datum[0]->children() as $k=>$v) {
           $data[$k] = (string)$v;

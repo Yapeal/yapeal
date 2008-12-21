@@ -60,12 +60,7 @@ foreach($apis as $api => $settings) {
         'cachedUntil' => $cuntil
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-      if (YAPEAL_TRACE &&
-        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-        $mess = 'SERVER: Before xpath for ' . $api . ' in ' . $sectionFile;
-        print_on_command($mess);
-        $yapealTracing.= $mess . PHP_EOL;
-      }; // if YAPEAL_TRACE&&...
+      $mess = 'SERVER: Before xpath for ' . $api . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {

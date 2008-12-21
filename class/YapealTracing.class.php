@@ -66,14 +66,14 @@ class YapealTracing {
    * @param integer $section Which section we're check about tracing for.
    * @param integer $level What trace level we should output message at.
    *
-   * @return bool TRUE if this type and level of tracing is on.
+   * @return bool TRUE if this type and level of tracing is off.
    */
-  function activeTrace($section, $level) {
+  function skipTrace($section, $level) {
     if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & $section) == $section &&
       YAPEAL_TRACE_LEVEL >= $level) {
-      return TRUE;
+      return FALSE;
     }; // if YAPEAL_TRACE&&...
-    return FALSE;
+    return TRUE;
   }
   /**
    * Function used to check for tracing and output a message if enabled.

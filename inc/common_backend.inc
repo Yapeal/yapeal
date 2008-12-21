@@ -240,7 +240,7 @@ define('YAPEAL_TRACE_SECTION', $trace_section);
 // Var used to collect trace info
 $yapealTracing = '';
 // Require tracing code here if tracing is turned on.
-if (YAPEAL_TRACE === TRUE) {
+if (YAPEAL_TRACE) {
   require_once YAPEAL_CLASS . 'YapealTracing.class.php';
 };
 /* **************************************************************************

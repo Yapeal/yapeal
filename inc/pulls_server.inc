@@ -61,16 +61,16 @@ foreach($apis as $api => $settings) {
       );
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
       $mess = 'SERVER: Before xpath for ' . $api . ' in ' . $sectionFile;
-      $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
+      $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) || $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
         $mess = 'Before truncate ' . $api . ' in ' . $sectionFile;
-        $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
+        $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) || $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
         // Empty out old data then upsert (insert) new
         $sql = 'truncate table ' . $api;
         $con->Execute($sql);
         $mess = 'SERVER: Before Upsert for ' . $api . ' in ' . $sectionFile;
-        $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
+        $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) || $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
         $data = array();
         foreach ($datum[0]->children() as $k=>$v) {
           $data[$k] = (string)$v;

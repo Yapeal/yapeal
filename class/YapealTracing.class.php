@@ -56,7 +56,7 @@ class YapealTracing {
    * destructor outputs the trace to log file.
    */
   public function __destruct() {
-    if ($this->trace) {
+    if (!empty($this->trace)) {
       elog(PHP_EOL . $this->trace, YAPEAL_TRACE_LOG . '1');
     };
   }

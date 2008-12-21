@@ -92,7 +92,7 @@ class YapealTracing {
       YAPEAL_TRACE_REQUEST => 'REQUEST: ',
       YAPEAL_TRACE_SERVER => 'SERVER: '
     );
-    print_r ($sections) . "\n";
+    print_r($sections) . "\n";
     $mess = $sections[$section] . $message;
     $this->trace .= $mess . PHP_EOL;
     print_on_command($mess);

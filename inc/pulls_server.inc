@@ -48,7 +48,6 @@ $apis = array(
     'xpath' => '//result'
   )
 );
-$tracing = new YapealTracing();
 foreach($apis as $api => $settings) {
   try {
     // Should we wait to get API data

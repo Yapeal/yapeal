@@ -98,6 +98,7 @@ USAGE_MESSAGE;
   fwrite(STDERR, $use . PHP_EOL);
 };
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
+$tracing = new YapealTracing();
 try {
   $api = 'eve-api-pull';
   $con = connect(DSN_UTIL_WRITER);
@@ -119,12 +120,8 @@ try {
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
     $api = 'RegisteredCharacter';
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-      $mess = 'CHAR: Connect before section in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Connect before section in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $con = connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
     $sql = 'select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
@@ -134,12 +131,8 @@ try {
     $sql.= DB_UTIL . '.RegisteredUser as u';
     $sql.= ' where chr.isActive=1';
     $sql.= ' and chr.userID=u.userID';
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-      $mess = 'CHAR: Before GetAll $charList in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Before GetAll $charList in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $charList = $con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
@@ -149,12 +142,8 @@ try {
       /* **********************************************************************
       * Per character API pulls
       * **********************************************************************/
-      if (YAPEAL_TRACE &&
-        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CHAR) == YAPEAL_TRACE_CHAR) {
-        $mess = 'CHAR: Before require pulls_char.inc';
-        print_on_command($mess);
-        $yapealTracing.= $mess . PHP_EOL;
-      }; // if YAPEAL_TRACE&&...
+      $mess = 'Before require pulls_char.inc';
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       require YAPEAL_INC . 'pulls_char.inc';
     }; // foreach $charList
 
@@ -165,12 +154,8 @@ try {
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
     $api = 'RegisteredCorporation';
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Connect before section in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Connect before section in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $con = connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
     $sql = 'select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
@@ -181,12 +166,8 @@ try {
     $sql.= ' where cp.isActive=1';
     $sql.= ' and cp.characterID=chr.characterID';
     $sql.= ' and chr.userID=u.userID';
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-      $mess = 'CORP: Before GetAll $corpList in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Before GetAll $corpList in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $corpList = $con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
@@ -196,12 +177,9 @@ try {
       /* ********************************************************************
       * Per corp API pulls
       * ********************************************************************/
-      if (YAPEAL_TRACE &&
-        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_CORP) == YAPEAL_TRACE_CORP) {
-        $mess = 'CORP: Before require pulls_corp.inc';
-        print_on_command($mess);
-        $yapealTracing.= $mess . PHP_EOL;
-      }; // if YAPEAL_TRACE&&...
+      $mess = 'Before require pulls_corp.inc';
+      $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $corpList = $con->GetAll($sql);
       require YAPEAL_INC . 'pulls_corp.inc';
     }; // foreach $corpList
 
@@ -211,19 +189,11 @@ try {
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-      $mess = 'EVE: Connect before section in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Connect before section in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) && $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     $con = connect(DSN_EVE_WRITER);
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-      $mess = 'EVE: Before require pulls_eve.inc';
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Before require pulls_eve.inc';
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) && $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     require YAPEAL_INC . 'pulls_eve.inc';
   }; // if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -231,19 +201,11 @@ try {
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_SERVER_ACTIVE) {
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-      $mess = 'SERVER: Connect before section in ' . basename(__FILE__);
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Connect before section in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) && $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
     $con = connect(DSN_SERVER_WRITER);
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_SERVER) == YAPEAL_TRACE_SERVER) {
-      $mess = 'SERVER: Before require pulls_server.inc';
-      print_on_command($mess);
-      $yapealTracing.= $mess . PHP_EOL;
-    }; // if YAPEAL_TRACE&&...
+    $mess = 'Before require pulls_server.inc';
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) && $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
     require YAPEAL_INC . 'pulls_server.inc';
   }; // if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -266,9 +228,6 @@ try {
       trigger_error($mess, E_USER_NOTICE);
     };
   }; // else $timer==get_cacheduntil $api ...
-  if (YAPEAL_TRACE && !empty($yapealTracing)) {
-    elog($yapealTracing, YAPEAL_TRACE_LOG);
-  }; // if YAPEAL_TRACE&&...
   exit;
 }
 catch(Exception $e) {
@@ -284,8 +243,5 @@ Backtrace:
   \t--- END TRACE ---
 MESS;
   elog($message, YAPEAL_ERROR_LOG);
-  if (YAPEAL_TRACE && !empty($yapealTracing)) {
-    elog($yapealTracing, YAPEAL_TRACE_LOG);
-  }; // if YAPEAL_TRACE&&...
 }
 ?>

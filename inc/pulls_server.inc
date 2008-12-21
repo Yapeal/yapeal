@@ -64,7 +64,7 @@ foreach($apis as $api => $settings) {
       $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
-        $mess = 'SERVER: Before truncate ' . $api . ' in ' . $sectionFile;
+        $mess = 'Before truncate ' . $api . ' in ' . $sectionFile;
         $tracing->activeTrace(YAPEAL_API_SERVER, 0) || $tracing->logTrace(YAPEAL_API_SERVER, $mess);
         // Empty out old data then upsert (insert) new
         $sql = 'truncate table ' . $api;

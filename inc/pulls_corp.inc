@@ -73,7 +73,6 @@ try {
   $xml = dontWait($api, $ownerid, FALSE) ?
     getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
   // Set it so we wait a bit before trying again if something goes wrong.
-  $cuntil = (string)$xml->cachedUntil[0];
   $data = array('tableName' => $api, 'ownerID' => $ownerid,
     'cachedUntil' => YAPEAL_START_TIME);
   $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
@@ -275,7 +274,6 @@ foreach($apis as $api => $settings) {
     $xml = dontWait($api, $ownerid) ?
       getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
     // Set it so we wait a bit before trying again if something goes wrong.
-    $cuntil = (string)$xml->cachedUntil[0];
     $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => YAPEAL_START_TIME);
     $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
@@ -388,7 +386,6 @@ foreach($apis as $api => $settings) {
     $xml = dontWait($api, $ownerid) ?
       getAPIinfo($api, YAPEAL_API_CORP, $postdata) : FALSE;
     // Set it so we wait a bit before trying again if something goes wrong.
-    $cuntil = (string)$xml->cachedUntil[0];
     $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => YAPEAL_START_TIME);
     $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);

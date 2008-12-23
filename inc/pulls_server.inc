@@ -56,7 +56,6 @@ foreach($apis as $api => $settings) {
     // Should we wait to get API data
     $xml = dontWait($api) ? getAPIinfo($api, YAPEAL_API_SERVER) : FALSE;
     // Set it so we wait a bit before trying again if something goes wrong.
-    $cuntil = (string)$xml->cachedUntil[0];
     $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => YAPEAL_START_TIME);
     $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);

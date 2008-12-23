@@ -43,7 +43,6 @@ require_once realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'common_backend
 require_once YAPEAL_ADODB . 'adodb-exceptions.inc.php';
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_INC . 'elog.inc';
-require_once YAPEAL_CLASS . 'CurlRequest.class.php';
 /**
  * Function used to connect to a DB.
  * @param string $dsn An ADOdb compatible connection string.
@@ -53,16 +52,12 @@ require_once YAPEAL_CLASS . 'CurlRequest.class.php';
  * @throws ADODB_Exception for any errors.
  */
 function connect($dsn) {
-  global $yapealTracing;
-  if (YAPEAL_TRACE &&
-    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_DATABASE) == YAPEAL_TRACE_DATABASE) {
-    $mess = 'DATABASE: Before connect for ' . $dsn . ' in ' . basename(__FILE__);
-    print_on_command($mess);
-    $yapealTracing.= $mess . PHP_EOL;
-  }; // if YAPEAL_TRACE&&...
+  global $tracing;
+  $mess = 'Before connect for ' . $dsn . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 0) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $con = & NewADOConnection($dsn);
-  if (YAPEAL_TRACE && YAPEAL_TRACE_LEVEL > 0 &&
-    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_DATABASE) == YAPEAL_TRACE_DATABASE) {
+  if ($tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1)) {
     $con->debug = TRUE;
   } else {
     $con->debug = FALSE;
@@ -114,7 +109,6 @@ function dontWait($api, $owner = 0, $randomize = true) {
     if ($rand == $mod) {
       return FALSE;
     }; // if $rand==$mod ...
-
   }; // if $randomize ...
   if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
     $mess.= 'Get ' . $api . ' for ' . $owner;
@@ -123,197 +117,6 @@ function dontWait($api, $owner = 0, $randomize = true) {
   };
   return true;
 }; // function dontWait
-
-/**
- * Function used to get info from Eve API.
- *
- * GetAPIinfo has been updated and now only throws Exception.
- * It will no longer trigger errors.
- *
- * @param string $api Needs to be set to base part of name for example:
- * /corp/StarbaseDetail.xml.aspx would just be StarbaseDetail
- * @param integer $posttype 0=eve, 1=char, 2=corp, 3=map, 4=account See constants
- * in $prefixes below for allowed values.
- * @param array $postdata Is an array of data ready to be used in
- * http_build_query.
- *
- * @return mixed Returns SimpleXML object or FALSE
- *
- * @throws EVE_API_Exception for API file errors
- */
-function getAPIinfo($api, $posttype, $postdata = array()) {
-  global $yapealTracing;
-  $prefixes = array(
-    YAPEAL_API_EVE => '/eve/',
-    YAPEAL_API_CHAR => '/char/',
-    YAPEAL_API_CORP => '/corp/',
-    YAPEAL_API_MAP => '/map/',
-    YAPEAL_API_ACCOUNT => '/account/',
-    YAPEAL_API_SERVER => '/server/'
-  );
-  $result = array();
-  $xml = NULL;
-  // If using cache file check for it first.
-  if (YAPEAL_CACHE_XML) {
-    // Build cache file path
-    $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]) . DIRECTORY_SEPARATOR;
-    if (!(is_dir($cachePath) && is_writable($cachePath)) &&
-      (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
-      $mess = 'XML cache directory ' . $cachePath . ' is missing or not writable';
-      print_on_command($mess);
-      elog($mess, YAPEAL_WARNING_LOG);
-    };
-    // Build base part of cache file name
-    $cacheFileName = $api;
-    // Hash the parameters to protect userID, characterID, and ApiKey while
-    // still having unique names
-    if (!empty($postdata)) {
-     $cacheFileName.= sha1(http_build_query($postdata, NULL, '&'));
-    };
-    $cacheFileName.= '.xml';
-    $cacheFile = $cachePath . $cacheFileName;
-    if (file_exists($cacheFile) && is_readable($cacheFile)) {
-      if (YAPEAL_TRACE &&
-        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-        $mess = 'REQUEST: Loading ' . $cacheFileName . ' in ' . basename(__FILE__);
-        print_on_command($mess);
-        $yapealTracing.= $mess . PHP_EOL;
-      }; // if YAPEAL_TRACE&&...
-      $xml = simplexml_load_file($cacheFile);
-      $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
-      $ctime = time();
-      if ($ctime <= $cuntil) {
-        if (YAPEAL_TRACE &&
-          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-          $mess = 'REQUEST: Using ' . $cacheFileName . ' in ' . basename(__FILE__);
-          print_on_command($mess);
-          $yapealTracing.= $mess . PHP_EOL;
-        }; // if YAPEAL_TRACE&&...
-        return $xml;
-      };// if $ctime ...
-    };
-  };
-  // Build http parameter.
-  $http = array(
-    'timeout' => 60,
-    'url' => API_URL_BASE . $prefixes[$posttype] . $api . API_SUFFIX
-  );
-  if ($posttype == YAPEAL_API_EVE || $posttype == YAPEAL_API_MAP ||
-    $posttype == YAPEAL_API_SERVER) {
-    // Global APIs like eve, map, and server don't use POST data.
-    $http['method'] = 'GET';
-  } else {
-    // Setup for POST query.
-    $http['method'] = 'POST';
-    $http['content'] = http_build_query($postdata, NULL, '&');
-  }; // if $posttype=YAPEAL_API_EVE||...
-  if (YAPEAL_TRACE &&
-    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-    $mess = 'REQUEST: Before CurlRequest in ' . basename(__FILE__);
-    print_on_command($mess);
-    $yapealTracing.= $mess . PHP_EOL;
-  }; // if YAPEAL_TRACE&&...
-  // Setup connection options.
-  $sh = new CurlRequest($http);
-  if (YAPEAL_TRACE &&
-    (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST) {
-    $mess = 'REQUEST: Before Curl exec in ' . basename(__FILE__);
-    print_on_command($mess);
-    $yapealTracing.= $mess . PHP_EOL;
-  }; // if YAPEAL_TRACE&&...
-  // Try to get XML.
-  $result = $sh->exec();
-  // Now check for errors.
-  if ($result['curl_error']) {
-    $mess = 'cURL error' . PHP_EOL;
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
-      $http['content']) {
-      $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
-    };
-    $mess.= 'Error code: ' . $result['curl_errno'] . ' for ' . $http['url'] . PHP_EOL;
-    $mess.= 'Error message: ' . $result['curl_error'];
-    print_on_command($mess);
-    // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 1);
-  };
-  if (200 != $result['http_code']) {
-    $mess = 'HTTP error' . PHP_EOL;
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
-      $http['content']) {
-      $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
-    };
-    $mess.= 'Error code: ' . $result['http_code'] . ' for ' . $http['url'] . PHP_EOL;
-    print_on_command($mess);
-    // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 2);
-  };
-  if (!$result['body']) {
-    $mess = 'API data error' . PHP_EOL;
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
-      $http['content']) {
-      $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
-    };
-    $mess.= 'Data empty for ' . $http['url'] . PHP_EOL;
-    print_on_command($mess);
-    // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 3);
-  };
-  if (!mb_strpos($result['body'], '<eveapi version="')) {
-    $result = FALSE;
-    $mess = 'API data error' . PHP_EOL;
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
-      $http['content']) {
-      $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
-    };
-    $mess.= 'No XML returned for ' . $http['url'] . PHP_EOL;
-    print_on_command($mess);
-    // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 4);
-  };
-  $xml = simplexml_load_string($result['body']);
-  if (isset($xml->error[0])) {
-    $result = FALSE;
-    $mess = 'Eve API error' . PHP_EOL;
-    if (YAPEAL_TRACE &&
-      (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_REQUEST) == YAPEAL_TRACE_REQUEST &&
-      $http['content']) {
-      $mess.= 'Post parameters: ' . $http['content'] . PHP_EOL;
-    };
-    $mess.= 'Error code: ' . (int)$xml->error[0]['code'] . ' for ' . $http['url'] . PHP_EOL;
-    $mess.= 'Error message: ' . (string)$xml->error[0];
-    if (YAPEAL_CACHE_XML) {
-      $cacheFile = $cachePath . 'error_' . $cacheFileName;
-      if (is_dir($cachePath) && is_writeable($cachePath)) {
-        file_put_contents($cacheFile, $xml->asXML());
-      };
-    }; // if YAPEAL_CACHE_XML
-    // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    // Have to use API error code for special API error handling to work.
-    throw new EVE_API_Error_Exception($mess, (int)$xml->error[0]['code']);
-  };
-  if (YAPEAL_CACHE_XML) {
-    $cacheFile = $cachePath . 'error_' . $cacheFileName;
-    // Delete old XML error file if it exists
-    if (file_exists($cacheFile) && is_writeable($cacheFile)) {
-      unlink($cacheFile);
-    };
-    $cacheFile = $cachePath . $cacheFileName;
-    if (is_dir($cachePath) && is_writeable($cachePath)) {
-      file_put_contents($cacheFile, $xml->asXML());
-    };
-  }; // if YAPEAL_CACHE_XML
-  return $xml;
-}; // function getAPIinfo
-
 /**
  * Navigates XML and adds lft and rgt attributes
  *
@@ -337,20 +140,17 @@ function editAssets($node, $_Id = 1, $location = 0) {
     } else {
       $node->addAttribute('locationID', $location);
     }; //if isset $node['locationID']...
-
   }; // if $nodeName=='row'||$nodeName=='result'
   if ($children = $node->children()) {
     foreach($children as $child) {
       $_Id = editAssets($child, $_Id, $location);
     }; //foreach children as child
-
   };
   if ($nodeName == 'row' || $nodeName == 'result') {
     $node->addAttribute('rgt', $_Id++);
   };
   return $_Id;
 } //function editassets
-
 /**
  * Get solarsystemid for a blood line.
  * @param string $bloodline Which bloodline to get HQ for.
@@ -369,10 +169,9 @@ function getBloodLineHQ($bloodline) {
   if (array_key_exists($bloodline,$raceToSystem)) {
     return $raceToSystem[$bloodline];
   } else {
-    throw new UnexpectedValueException('Unknown bloodline '.$bloodline,0);
+    throw new UnexpectedValueException('Unknouwn bloodline '.$chartype,0);
   };
 } // function get_BloodLineHQ ...
-
 /**
  * Get typeID of blood line for a character.
  * @param integer $bloodLine Which blood line to get typeID for.
@@ -393,7 +192,6 @@ function getBloodLineTypeID($bloodLine) {
     throw new UnexpectedValueException('Unknown bloodline '.$bloodLine,0);
   };
 } // function get_charBloodLine ...
-
 /**
  * Get cache until time for a table from cacheduntil table
  * @param string $tname Name of table to get time for.
@@ -412,12 +210,10 @@ function getCachedUntil($tname, $owner, $table, $dsn) {
     $until = $con->GetOne($sql, array($tname, $owner));
     if (!strtotime($until)) {
       return '1970-01-01 00:00:01'; // One second after epox
-
     };
   }
   catch(ADODB_Exception $e) {
     return '1970-01-01 00:00:01'; // One second after epox
-
   };
   return $until;
 };
@@ -437,7 +233,6 @@ function getCharBloodLine($charid, $dsn) {
   $result = $con->GetOne($sql,array($charid));
   return $result;
 } // function get_charBloodLine ...
-
 /**
  * Get stationid (corp HQ) from corporationsheet table
  * @param integer $corp Which corporation's HQ.
@@ -513,7 +308,6 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $dupup.= implode(',', $updates);
   return $insert . $values . $dupup;
 } // function makeMultiUpsert ...
-
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update
  * for an array of records
@@ -573,7 +367,6 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
   }; // if count $data > 10&&...
   return $con->Execute($upsert);
 } // function multipleUpsert ...
-
 /**
  * Builds table upsert from the attributes of a SimpleXMLElement array
  *
@@ -605,7 +398,6 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
     //print_r($data)."\n";
     multipleUpsert($data, $types, $table, $dsn);
   }; // if $datum>0
-
 }
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update
@@ -640,5 +432,4 @@ function upsert(array $data, array $types, $table, $dsn) {
   $effected = $con->Execute($upsert);
   return $effected;
 } // function upsert ...
-
 ?>

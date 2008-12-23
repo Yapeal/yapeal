@@ -72,22 +72,12 @@ if (isset($yapealIniFile)) {
 // Set constant for how we're being run.
 // Mostly being used to detect cli vs cgi or apache for now where needed.
 defined('YAPEAL_SCRIPT_MODE') || define('YAPEAL_SCRIPT_MODE', php_sapi_name());
-// Define some constants used with trace_section setting.
-// They need to be set here so they exist before reading ini file.
-define('YAPEAL_TRACE_ALL', 16777215);
-define('YAPEAL_TRACE_NONE', 0);
-define('YAPEAL_TRACE_ACCOUNT', 1);
-define('YAPEAL_TRACE_DATABASE', 2);
-define('YAPEAL_TRACE_CHAR', 4);
-define('YAPEAL_TRACE_CORP', 8);
-define('YAPEAL_TRACE_EVE', 16);
-define('YAPEAL_TRACE_MAP', 32);
-define('YAPEAL_TRACE_REQUEST', 64);
-define('YAPEAL_TRACE_SERVER', 128);
 // Grab the info from ini file.
 $iniVars = parse_ini_file(YAPEAL_INI_FILE, TRUE);
 // Abort if required sections aren't defined
-if (!(isset($iniVars['Api']) && isset($iniVars['Database']) && isset($iniVars['Logging']) && isset($iniVars['Paths']) && isset($iniVars['Tracing']))) {
+if (!(isset($iniVars['Api']) && isset($iniVars['Database']) &&
+  isset($iniVars['Logging']) && isset($iniVars['Paths']) &&
+  isset($iniVars['Tracing']))) {
   $mess = 'One or more of the required sections:';
   $mess.= ' API, Tracing, Database, Paths, Logging';
   $mess.= ' is missing from ' . YAPEAL_INI_FILE;
@@ -162,7 +152,7 @@ if ($realpath = realpath(YAPEAL_CACHE . $log_dir)) {
 * Logging
 * **************************************************************************/
 // Make sure required setting vars aren't already set
-unset($error_log, $level, $notice_log, $trace_log, $use_exception, $warning_log);
+unset($error_log, $level, $notice_log, $trace_log, $warning_log);
 // Pull out Logging settings
 extract($iniVars['Logging']);
 // Triggers error if a required setting is missing.
@@ -170,13 +160,9 @@ isset($error_log) || trigger_error($req1 . 'error_log' . $req2, E_USER_ERROR);
 isset($level) || trigger_error($req1 . 'level' . $req2, E_USER_ERROR);
 isset($notice_log) || trigger_error($req1 . 'notice_log' . $req2, E_USER_ERROR);
 isset($trace_log) || trigger_error($req1 . 'trace_log' . $req2, E_USER_ERROR);
-isset($use_exception) || trigger_error($req1 . 'use_exception' . $req2, E_USER_ERROR);
 isset($warning_log) || trigger_error($req1 . 'warning_log' . $req2, E_USER_ERROR);
 // Define some constants from vars
 define('YAPEAL_ERROR_LOG', YAPEAL_LOG . $error_log);
-// NOTE this is deprecated and being forced to TRUE for now. It will be removed
-// in the near future.
-define('YAPEAL_EXCEPTIONS', TRUE);
 define('YAPEAL_LOG_LEVEL', $level);
 define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . $notice_log);
 define('YAPEAL_TRACE_LOG', YAPEAL_LOG . $trace_log);
@@ -216,32 +202,55 @@ define('API_URL_BASE', $url_base);
 define('API_SUFFIX', $file_suffix);
 define('YAPEAL_CACHE_XML', $cache_xml);
 // Define some addtional constants that are mostly used by pull scripts
-define('YAPEAL_API_EVE', 0);
+define('YAPEAL_API_ACCOUNT', 0);
 define('YAPEAL_API_CHAR', 1);
 define('YAPEAL_API_CORP', 2);
-define('YAPEAL_API_MAP', 3);
-define('YAPEAL_API_ACCOUNT', 4);
+define('YAPEAL_API_EVE', 3);
+define('YAPEAL_API_MAP', 4);
 define('YAPEAL_API_SERVER', 5);
 /* **************************************************************************
 * Trace
 * **************************************************************************/
+// Define some constants used with trace_section setting.
+// They need to be set here so they exist before re-reading ini file.
+// Lower 16 bits used for API.
+define('YAPEAL_TRACE_ALL', 2147483647);
+define('YAPEAL_TRACE_NONE', 0);
+define('YAPEAL_TRACE_ACCOUNT', 1);
+define('YAPEAL_TRACE_CHAR', 2);
+define('YAPEAL_TRACE_CORP', 4);
+define('YAPEAL_TRACE_EVE', 8);
+define('YAPEAL_TRACE_MAP', 16);
+define('YAPEAL_TRACE_SERVER', 32);
+// Upper bits used for Yapeal.
+define('YAPEAL_TRACE_API', 65536);
+define('YAPEAL_TRACE_CACHE', 131072);
+define('YAPEAL_TRACE_CURL', 262144);
+define('YAPEAL_TRACE_DATABASE', 524288);
+define('YAPEAL_TRACE_FILES', 1048576);
+define('YAPEAL_TRACE_REQUEST', 2097152);
+// Grab the info from ini file again now that our constants are defined.
+$iniVars = parse_ini_file(YAPEAL_INI_FILE, TRUE);
 // Make sure required setting vars aren't already set
-unset($trace, $trace_level, $trace_section);
+unset($trace, $trace_level, $trace_output, $trace_section);
 // Pull out API settings
 extract($iniVars['Tracing']);
 // Triggers error if a required setting is missing.
 isset($trace) || trigger_error($req1 . 'trace' . $req2, E_USER_ERROR);
 isset($trace_level) || trigger_error($req1 . 'trace_level' . $req2, E_USER_ERROR);
+isset($trace_output) || trigger_error($req1 . 'trace_output' . $req2, E_USER_ERROR);
 isset($trace_section) || trigger_error($req1 . 'trace_section' . $req2, E_USER_ERROR);
 // Define some constants from vars
 define('YAPEAL_TRACE', $trace);
 define('YAPEAL_TRACE_LEVEL', $trace_level);
+define('YAPEAL_TRACE_OUTPUT', $trace_output);
 define('YAPEAL_TRACE_SECTION', $trace_section);
-// Var used to collect trace info
-$yapealTracing = '';
 // Require tracing code here if tracing is turned on.
 if (YAPEAL_TRACE) {
   require_once YAPEAL_CLASS . 'YapealTracing.class.php';
+  if (!isset($tracing)) {
+    $tracing = new YapealTracing();
+  };
 };
 /* **************************************************************************
 * Required DBs

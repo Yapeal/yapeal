@@ -155,7 +155,6 @@ class CurlRequest {
    */
   public function __destruct() {
     //curl_close($this->ch);
-    
   }
 }
 ?>

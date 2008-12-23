@@ -90,14 +90,12 @@ Message: {$this->message}
    File: {$this->filename}
    Line: {$this->line}
 EOT;
-      
     } else {
       $body = <<<EOT
 WARNING:
 Message: {$this->message}
    File: {$this->filename}
 EOT;
-      
     };
     return elog($body, YAPEAL_WARNING_LOG);
   }
@@ -109,20 +107,15 @@ Message: {$this->message}
    File: {$this->filename}
    Line: {$this->line}
 EOT;
-      
     } else {
       $body = <<<EOT
 NOTICE:
 Message: {$this->message}
    File: {$this->filename}
 EOT;
-      
     };
     return elog($body, YAPEAL_NOTICE_LOG);
   }
 }
-set_error_handler(array(
-  'ErrorHandler',
-  'handle'
-));
+set_error_handler(array('ErrorHandler', 'handle'));
 ?>

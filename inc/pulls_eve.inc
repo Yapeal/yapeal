@@ -79,55 +79,51 @@ $apis = array(
 );
 foreach($apis as $api => $settings) {
   try {
+    $mess = 'Before dontWait';
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     // Should we wait to get API data
     $xml = dontWait($api) ? getAPIinfo($api, YAPEAL_API_EVE) : FALSE;
+    // Set it so we wait a bit before trying again if something goes wrong.
+    $cuntil = (string)$xml->cachedUntil[0];
+    $data = array('tableName' => $api, 'ownerID' => 0,
+      'cachedUntil' => YAPEAL_START_TIME);
+    $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
+    $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
+    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
     if ($xml instanceof SimpleXMLElement) {
-      // Update cacheduntil time.
-      $cuntil = (string)$xml->cachedUntil[0];
-      $data = array('tableName' => $api, 'ownerID' => 0,
-        'cachedUntil' => $cuntil
-      );
-      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-      if (YAPEAL_TRACE &&
-        (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-        $mess = 'EVE: Before xpath for ' . $api . ' in ' . $sectionFile;
-        print_on_command($mess);
-        $yapealTracing.= $mess . PHP_EOL;
-      }; // if YAPEAL_TRACE&&...
+      $mess = 'Before xpath for ' . $api . ' in ' . $sectionFile;
+      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
-        if (YAPEAL_TRACE &&
-          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before truncate ' . $api . ' in ' . $sectionFile;
-          print_on_command($mess);
-          $yapealTracing.= $mess . PHP_EOL;
-        }; // if YAPEAL_TRACE&&...
+        $mess = 'Before truncate ' . $api . ' in ' . $sectionFile;
+        $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
         // Empty out old data then upsert (insert) new
         $sql = 'truncate table ' . $api;
         $con->Execute($sql);
-        if (YAPEAL_TRACE &&
-          (YAPEAL_TRACE_SECTION & YAPEAL_TRACE_EVE) == YAPEAL_TRACE_EVE) {
-          $mess = 'EVE: Before multiUpsert for ' . $api . ' in ' . $sectionFile;
-          print_on_command($mess);
-          $yapealTracing.= $mess . PHP_EOL;
-        }; // if YAPEAL_TRACE&&...
+        $mess = 'Before multiUpsert for ' . $api . ' in ' . $sectionFile;
+        $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
+        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
         multipleUpsertAttributes($datum, $settings['types'], $api, DSN_EVE_WRITER);
       }; // if count $datum ...
-
+      // Update CachedUntil time since we updated records and have new one.
+      $cuntil = (string)$xml->cachedUntil[0];
+      $data = array('tableName' => $api, 'ownerID' => 0,
+        'cachedUntil' => $cuntil);
+      $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
+      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
+      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
     }; // if $xml instanceof SimpleXMLElement
-
   }
   catch(EVE_API_File_Exception $e) {
-    // Set cacheduntil to wait 5 minutes if we couldn't get XML from API
-    $cuntil = gmdate('Y-m-d H:i:s', strtotime('5 minutes'));
-    $data = array('tableName' => $api, 'ownerID' => 0,
-      'cachedUntil' => $cuntil
-    );
-    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+    // Do nothing CachedUntil already set to retry in a bit.
   }
   catch(EVE_API_Exception $e) {
     // Do nothing use observers to log info
-
   }
   catch(ADODB_Exception $e) {
     $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;

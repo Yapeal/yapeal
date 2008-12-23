@@ -71,8 +71,8 @@ if (php_sapi_name() == 'cli' && function_exists('getopt')) {
 */
 // Move up and over to 'inc' directory to read common_backend.inc
 $path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
-$path.= '..' . DIRECTORY_SEPARATOR . 'inc';
-$path.= DIRECTORY_SEPARATOR . 'common_backend.inc';
+$path .= '..' . DIRECTORY_SEPARATOR . 'inc';
+$path .= DIRECTORY_SEPARATOR . 'common_backend.inc';
 require_once realpath($path);
 /* **************************************************************************
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
@@ -82,6 +82,7 @@ require_once YAPEAL_INC . 'elog.inc';
 require_once YAPEAL_CLASS . 'Logging_Exception_Observer.class.php';
 require_once YAPEAL_CLASS . 'Printing_Exception_Observer.class.php';
 require_once YAPEAL_INC . 'common_db.inc';
+require_once YAPEAL_INC . 'common_api.inc';
 //require_once YAPEAL_INC.'eap_functions.inc';
 function usage() {
   $progname = basename($GLOBALS['argv'][0]);
@@ -98,10 +99,15 @@ USAGE_MESSAGE;
   fwrite(STDERR, $use . PHP_EOL);
 };
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
-$tracing = new YapealTracing();
 try {
   $api = 'eve-api-pull';
+  $mess = 'Before connect for ' . $api . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   $con = connect(DSN_UTIL_WRITER);
+  $mess = 'Before dontWait';
+  $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (dontWait($api, 0, FALSE)) {
@@ -109,6 +115,9 @@ try {
     define('YAPEAL_START_TIME',gmdate('Y-m-d H:i:s', strtotime('5 minutes')));
     $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => YAPEAL_START_TIME);
+    $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
+    $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   } else {
     // Someone else has set timer need to wait it out.
@@ -121,7 +130,8 @@ try {
   if (YAPEAL_CHAR_ACTIVE) {
     $api = 'RegisteredCharacter';
     $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $con = connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
     $sql = 'select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
@@ -132,7 +142,8 @@ try {
     $sql.= ' where chr.isActive=1';
     $sql.= ' and chr.userID=u.userID';
     $mess = 'Before GetAll $charList in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
+    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $charList = $con->GetAll($sql);
     // Ok now that we have a list of characters that need updated
     // we can check API for updates to their infomation.
@@ -143,7 +154,8 @@ try {
       * Per character API pulls
       * **********************************************************************/
       $mess = 'Before require pulls_char.inc';
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) && $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       require YAPEAL_INC . 'pulls_char.inc';
     }; // foreach $charList
 
@@ -155,7 +167,8 @@ try {
   if (YAPEAL_CORP_ACTIVE) {
     $api = 'RegisteredCorporation';
     $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $con = connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
     $sql = 'select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
@@ -167,7 +180,8 @@ try {
     $sql.= ' and cp.characterID=chr.characterID';
     $sql.= ' and chr.userID=u.userID';
     $mess = 'Before GetAll $corpList in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
+    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $corpList = $con->GetAll($sql);
     // Ok now that we have a list of corporations that need updated
     // we can check API for updates to their infomation.
@@ -178,7 +192,8 @@ try {
       * Per corp API pulls
       * ********************************************************************/
       $mess = 'Before require pulls_corp.inc';
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) && $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) &&
+      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
       $corpList = $con->GetAll($sql);
       require YAPEAL_INC . 'pulls_corp.inc';
     }; // foreach $corpList
@@ -190,10 +205,12 @@ try {
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
     $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) && $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     $con = connect(DSN_EVE_WRITER);
     $mess = 'Before require pulls_eve.inc';
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) && $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) &&
+    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     require YAPEAL_INC . 'pulls_eve.inc';
   }; // if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -202,10 +219,12 @@ try {
   // Only pull if activated.
   if (YAPEAL_SERVER_ACTIVE) {
     $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) && $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
     $con = connect(DSN_SERVER_WRITER);
     $mess = 'Before require pulls_server.inc';
-    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) && $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) &&
+    $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
     require YAPEAL_INC . 'pulls_server.inc';
   }; // if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -217,8 +236,7 @@ try {
   if (YAPEAL_START_TIME == $ctime2) {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array('tableName' => $api, 'ownerID' => 0,
-      'cachedUntil' => $cuntil
-    );
+      'cachedUntil' => $cuntil);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   } else {
     // Lost Mutex we should log that as warning.

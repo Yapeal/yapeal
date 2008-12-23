@@ -33,11 +33,17 @@ trace=FALSE
 ; Used in a few places to turn on extra tracing when >0.
 trace_level=0
 
+; Where you want trace output to go. (required)
+; One of "file", "database", or "both"
+; NOTE database option isn't active but is being reserved for the future.
+trace_output="file"
+
 ; Sections that you wish to log trace messages for. (required)
-; Set to YAPEAL_TRACE_NONE or
-; YAPEAL_TRACE_ACCOUNT, YAPEAL_TRACE_DATABASE, YAPEAL_TRACE_CHAR,
-; YAPEAL_TRACE_CORP, YAPEAL_TRACE_EVE, YAPEAL_TRACE_MAP, YAPEAL_TRACE_REQUEST or
-; YAPEAL_TRACE_ALL
+; Set to YAPEAL_TRACE_ALL or YAPEAL_TRACE_NONE or
+; YAPEAL_TRACE_ACCOUNT, YAPEAL_TRACE_CHAR, YAPEAL_TRACE_CORP, YAPEAL_TRACE_EVE,
+; YAPEAL_TRACE_MAP, YAPEAL_TRACE_SERVER,
+; YAPEAL_TRACE_API, YAPEAL_TRACE_CACHE, YAPEAL_TRACE_CURL, YAPEAL_TRACE_DATABASE,
+; YAPEAL_TRACE_FILES, YAPEAL_TRACE_REQUEST
 ; Settings can be combined with '|' for example:
 ; trace_section=YAPEAL_TRACE_EVE|YAPEAL_TRACE_REQUEST
 trace_section=YAPEAL_TRACE_NONE
@@ -148,11 +154,6 @@ notice_log=Yapeal_notice.log
 ; Trace level log file name. (required)
 ; This is only used if tracing is turned on in [Tracing]
 trace_log=Yapeal_trace.log
-
-; Whether to use exceptions for errors. (required Deprecated)
-; (Deprecated) Now using an exception only system.
-; This setting has no effect and will be removed soon.
-use_exception=TRUE
 
 ; Warning level log file name. (required)
 warning_log=Yapeal_warning.log

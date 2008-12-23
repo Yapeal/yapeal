@@ -43,9 +43,13 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
  */
 class YapealTracing {
   /**
-   * @var string Used to accumulate all the tracing messages before outputting.
+   * @var string Used to accumulate all the tracing messages for file.
    */
-  private $trace = '';
+  private $fileTrace = '';
+  /**
+   * @var string Used to accumulate all the tracing messages for database.
+   */
+  private $dbTrace = '';
   /**
    * Constructor
    */
@@ -56,8 +60,11 @@ class YapealTracing {
    * destructor outputs the trace to log file.
    */
   public function __destruct() {
-    if (!empty($this->trace)) {
-      elog(PHP_EOL . $this->trace, YAPEAL_TRACE_LOG . '1');
+    if (!empty($this->fileTrace)) {
+      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
+    };
+    if (!empty($this->dbTrace)) {
+      // This is where the code to store trace into database will go.
     };
   }
   /**
@@ -84,17 +91,27 @@ class YapealTracing {
   function logTrace($section, $message) {
     $sections = array(
       YAPEAL_TRACE_ACCOUNT => 'ACCOUNT: ',
-      YAPEAL_TRACE_DATABASE => 'DATABASE: ',
       YAPEAL_TRACE_CHAR => 'CHAR: ',
       YAPEAL_TRACE_CORP => 'CORP: ',
       YAPEAL_TRACE_EVE => 'EVE: ',
       YAPEAL_TRACE_MAP => 'MAP: ',
-      YAPEAL_TRACE_REQUEST => 'REQUEST: ',
-      YAPEAL_TRACE_SERVER => 'SERVER: '
+      YAPEAL_TRACE_SERVER => 'SERVER: ',
+      YAPEAL_TRACE_API => 'API: ',
+      YAPEAL_TRACE_CACHE => 'CACHE: ',
+      YAPEAL_TRACE_CURL => 'CURL: ',
+      YAPEAL_TRACE_DATABASE => 'DATABASE: ',
+      YAPEAL_TRACE_REQUEST => 'REQUEST: '
     );
-    $mess = $sections[$section] . $message;
-    $this->trace .= $mess . PHP_EOL;
-    print_on_command($mess);
+    $mess = $sections[$section] . $message .PHP_EOL;
+    if (YAPEAL_TRACE_OUTPUT == 'file' || YAPEAL_TRACE_OUTPUT == 'both') {
+      $this->fileTrace .= $mess;
+    };
+    // Chance of causing an infinite loop if we tried to put database trace into
+    // the database.
+    if ((YAPEAL_TRACE_OUTPUT == 'database' || YAPEAL_TRACE_OUTPUT == 'both') &&
+      $section != YAPEAL_TRACE_DATABASE) {
+      $this->dbTrace .= $mess;
+    };
   }
 }
 ?>

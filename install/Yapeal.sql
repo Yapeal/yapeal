@@ -232,7 +232,7 @@ CREATE  TABLE IF NOT EXISTS `IndustryJobs` (
   `installedItemQuantity` BIGINT UNSIGNED NOT NULL ,
   `installedItemProductivityLevel` INT NOT NULL ,
   `installedItemMaterialLevel` INT NOT NULL ,
-  `installedItemLicensedProductionRunsRemaining` BIGINT UNSIGNED NOT NULL ,
+  `installedItemLicensedProductionRunsRemaining` BIGINT NOT NULL ,
   `outputLocationID` BIGINT UNSIGNED NOT NULL ,
   `installerID` BIGINT UNSIGNED NOT NULL ,
   `runs` BIGINT UNSIGNED NOT NULL ,

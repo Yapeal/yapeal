@@ -46,7 +46,6 @@ if (php_sapi_name() == 'cli' && function_exists('getopt')) {
           $mess = $opt[1] . ' does not exist or is not readable' . PHP_EOL;
           fwrite(STDERR, $mess);
         }; // else realpath $opt[1]&& ...
-
       case 'h':
       case '--help':
         usage();
@@ -158,7 +157,6 @@ try {
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       require YAPEAL_INC . 'pulls_char.inc';
     }; // foreach $charList
-
   }; // if YAPEAL_CHAR_ACTIVE...
   /* ************************************************************************
   * Generate corp list
@@ -197,7 +195,6 @@ try {
       $corpList = $con->GetAll($sql);
       require YAPEAL_INC . 'pulls_corp.inc';
     }; // foreach $corpList
-
   }; // if YAPEAL_CORP_ACTIVE...
   /* ************************************************************************
   * /eve/ API pulls

@@ -3,66 +3,82 @@
 ;   This file explains the contents of the YAPEAL yapeal.ini file.
 ;      ( http://code.google.com/p/yapeal/ )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;          Author: Iskandara Cho
+;          Author: Iskandara Cho
 ;    Date Created: 2008.12.28
 ;   Date Modified: 2008.12.28
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-YAPEAL INI File 
+YAPEAL INI File
 
 REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [API]
-     This section contains settings relating to the API data files pulled 
+     This section contains settings relating to the API data files pulled
      from the API server. It must contain the following items
-        
+
         cache_xml=FALSE
-           Turns on caching of API XML data to local files. This can be  
+           Turns on caching of API XML data to local files. This can be
            either TRUE or FALSE
-  
-        file_suffix=".xml.aspx"                                               
-           File suffix of API files recieved from the CCP API server this 
-           should only change if CCP changes the output file names or you 
-           are using a non-standsard source for the API data files. 
-  
-        url_base="http://API.eve-online.com"                       
+
+        file_suffix=".xml.aspx"
+           File suffix of API files recieved from the CCP API server this
+           should only change if CCP changes the output file names or you
+           are using a non-standard source for the API data files.
+
+        url_base="http://API.eve-online.com"
            This is the base url of the CCP API server and should only be
-           changed if CCP changes the URL of the API server or if you 
-           are using a non-standsard source for the API data files.                                                          
+           changed if CCP changes the URL of the API server or if you
+           are using a non-standard source for the API data files.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [DATABASE]
-	* YAPEAL is designed to use multiple databases to contain the data pulled from the api but 
-	* can also be used with a single databse. 
+	* YAPEAL is designed to use multiple databases to contain the data pulled from the api but
+	* can also be used with a single database.
 	* 	[DATABASE]
-	* 		[DATABASE-CHAR] 
-	* 		[DATABASE-CORP] 
-	* 		[DATABASE-EVE] 
-	* 		[DATABASE-SERVER]	 
-	* 		[DATABASE-UTIL] 
+	* 		[DATABASE-CHAR]
+	* 		[DATABASE-CORP]
+	* 		[DATABASE-EVE]
+	* 		[DATABASE-SERVER]
+	* 		[DATABASE-UTIL]
 
-	* The simplest way to get YAPEAL working is to simply set all the values in the main [DATABASE] section to those appropriate to your YAPEAL installation.  
-	* Then ensure the sections for the specific sub-databases are commented out. YAPEAL will then use this single database for all its storage needs. 
+	* The simplest way to get YAPEAL working is to simply set all the values in
+	  the main [DATABASE] section to those appropriate to your YAPEAL installation.
 
-	* While this is is the simplest approach it is not the best. There may be conflicts between personal and coprporate data due to duplication of field names in the API data.
+	* Then ensure the sections for the specific sub-databases are commented out.
+	  YAPEAL will then use this single database for all its storage needs.
 
-	* The more robust solution would be to create each of the sub-databases and set the values in each sub-database section to those appropriate to your YAPEAL installation. Set the "active" flag in the main database section to FALSE. This option also allows you to pick and choose which API data will be pulled. Simply comment out or set the "active" flag to FALSE for each section you do not wish to poll.
+	* While this is is the simplest approach it is not the best. There may be
+	  conflicts between personal and corporate data due to duplication of field
+		names in some of the API data.
 
-	active=FALSE 
-		Determines if pulls for this database type are active. Since this section acts as the default for all database activity, setting this to TRUE will cause all API data to be pulled and is the same as setting each of the sub-database "active" fields to true.
-		Don't set this to TRUE except if you wish to have all Database-xxx sections on by default and plan to set unused sections off below. 
+	* The more complex but probably more robust solution would be to create each
+	  of the sub-databases and set the values in each sub-database section to
+		those appropriate to your YAPEAL installation. Set the "active" flag in the
+		main database section to FALSE. This option also allows you to pick and
+		choose which API data will be pulled. Simply comment out or set the "active"
+		flag to FALSE for each section you do not wish to poll.
+
+	active=FALSE
+		Determines if pulls for this database type are active. Since this section
+		acts as the default for all database activity, setting this to TRUE will
+		cause all API data to be pulled and is the same as setting each of the
+		sub-database "active" fields to true.
+		Don't set this to TRUE except if you wish to have all Database-xxx sections
+		on by default and plan to set unused sections off below.
 
 	database="YAPEAL"
-		Main Database name 
-		Only used for single database installations?
-	 	
+		Main Database name
+		Database name used if only using a single database or the default database
+		name used if not overridden in a [database-xxx] section below.
+
 	host="localhost"
-		Host name for ALL databases - if set here it need not be set in each database-xxx section.
-  	
+		Host name for ALL databases - if set here it need not be set in each
+		database-xxx section.
+
 	writer="writer:5678"
-		user:password with write access to ALL databases . (required)	
+		user:password with write access to ALL databases . (required)
 		Needs minimum of select, insert, and update access.
 		The :password part is optional by highly recommended.
-		
+
 	STUFF YOU WONT WANT TO CHANGE UNLESS YOU KNOW YOU WANT TO.
 	driver="mysqli://"
 		Driver part of ADOdb DSN. Must support transactions.
@@ -71,7 +87,7 @@ REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 	suffix="?new"
 		ADOdb needs a setting of "?new" to work correctly with MySQL.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[DATABASE-CHAR]	
+[DATABASE-CHAR]
 	Main database where YAPEAL stores character API data. (required for chars)
 
 	active=FALSE
@@ -80,57 +96,57 @@ REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 
 	database="YAPEAL_char"
 		Database name used in ADOdb DSN.
-	
+
 	writer="writer:5678"
 		User/password with select, insert, and update access.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [DATABASE-CORP]
 	Main database where YAPEAL stores corporation API data. (required for corps)
 
-	active=FALSE 		
-		Determines if pulls for this database type are active. (required)	
+	active=FALSE
+		Determines if pulls for this database type are active. (required)
 		Set to FALSE to turn off pulls.
-	
+
 	database="YAPEAL_corp"
 		Database name used in ADOdb DSN.
-	
+
 	writer="writer:5678"
 		User/password with select, insert, and update access.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [DATABASE-EVE]
 	Main database where Yepeal stores eve API data. (required)
-	
+
 	active=TRUE
 		Determines if pulls for this database type are active. (required)
 		Set to FALSE to turn off pulls.
-	
+
 		database="YAPEAL_eve"
 			Database name used in ADOdb DSN.
-	
+
 		writer="writer:5678"
 			User/password with select, insert, and update access.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [DATABASE-SERVER]
 	Main database where Yepeal stores server API data. (required)
-	
+
 	active=TRUE
 		Determines if pulls for this database type are active. (required)
 		Set to FALSE to turn off pulls.
-	
+
 	database="YAPEAL_server"
 		Database name used in ADOdb DSN.
-	
+
 	writer="writer:5678"
 		User/password with select, insert, and update access.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [DATABASE-UTIL]
 	Database containing some housekeeper tables. (required)
-	
+
 	active=TRUE
 		Determines if pulls for this database type are active. (required)
 		Set to FALSE to turn off pulls.
 		***NEVER*** change this only here for compatablity with other sections.
-	
+
 	database="YAPEAL_util"
 		Database name used in ADOdb DSN.
 
@@ -139,7 +155,7 @@ REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [LOGGING]
 	Logging settings (required)
-	
+
 	error_log=YAPEAL_error.log
 		Error level log file name. (required)
 
@@ -159,7 +175,7 @@ REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [Paths]
 	Path settings used by YAPEAL. (required)
-	
+
 	adodb_dir="../ADOdb/"
 		File system path to ADOdb directory. (required)
 		Should be relative to common_backend.inc's path.
@@ -220,4 +236,3 @@ REQUIRED Sections: API, DATABASE, TRACING, PATHS, LOGGING
 		Settings can be combined with '|' for example:
 			trace_section=YAPEAL_TRACE_EVE|YAPEAL_TRACE_REQUEST
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-

@@ -65,7 +65,7 @@ $types = array(
   'shares' => 'I'
 );
 try {
-  $mess = 'Before dontWait';
+  $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
   $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
   $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
   // Should we wait to get API data
@@ -75,7 +75,7 @@ try {
   // Set it so we wait a bit before trying again if something goes wrong.
   $data = array('tableName' => $api, 'ownerID' => $ownerid,
     'cachedUntil' => YAPEAL_START_TIME);
-  $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+  $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
   $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
   $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
   upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -267,7 +267,7 @@ $postdata = array('userID' => $userid, 'apiKey' => $apikey,
 );
 foreach($apis as $api => $settings) {
   try {
-    $mess = 'Before dontWait';
+    $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     // Should we wait to get API data
@@ -379,7 +379,7 @@ $postdata = array('userID' => $userid, 'apiKey' => $apikey,
 );
 foreach($apis as $api => $settings) {
   try {
-    $mess = 'Before dontWait';
+    $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     // Should we wait to get API data
@@ -388,7 +388,7 @@ foreach($apis as $api => $settings) {
     // Set it so we wait a bit before trying again if something goes wrong.
     $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => YAPEAL_START_TIME);
-    $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+    $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
     $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -541,7 +541,7 @@ foreach($apis as $api => $settings) {
       (string)$settings['beforeid'] => 0
     );
     try {
-      $mess = 'Before dontWait ' . $api . ' in ' . $sectionFile;
+      $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
       // Continue to next if we're not ready at this time
@@ -551,7 +551,7 @@ foreach($apis as $api => $settings) {
       // Set it so we wait a bit before trying again if something goes wrong.
       $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
         'cachedUntil' => YAPEAL_START_TIME);
-      $mess = 'Before upsert for ' . $api . $account . ' in ' . basename(__FILE__);
+      $mess = 'Before upsert for ' . $api . $account . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -596,7 +596,7 @@ foreach($apis as $api => $settings) {
       //$cuntil = (string)$xml->cachedUntil[0];
       $data = array('tableName' => $api . $account, 'ownerID' => $ownerid,
         'cachedUntil' => $cuntil);
-      $mess = 'Before upsert for ' . $api . $account . ' in ' . basename(__FILE__);
+      $mess = 'Before upsert for ' . $api . $account . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -770,7 +770,7 @@ try {
   // Set it so we wait a bit before trying again if something goes wrong.
   $data = array('tableName' => $api, 'ownerID' => $ownerid,
     'cachedUntil' => YAPEAL_START_TIME);
-  $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+  $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
   $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
   $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
   upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
@@ -833,7 +833,7 @@ try {
     $cuntil = (string)$xml->cachedUntil[0];
     $data = array('tableName' => $api, 'ownerID' => $ownerid,
       'cachedUntil' => $cuntil);
-    $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
+    $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
     $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);

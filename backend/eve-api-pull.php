@@ -104,7 +104,7 @@ try {
   $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
   $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   $con = connect(DSN_UTIL_WRITER);
-  $mess = 'Before dontWait';
+  $mess = 'Before dontWait for ' . $api . ' in ' . basename(__FILE__);
   $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
   $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   // Mutex to keep from having more than one pull going at once most the time.
@@ -152,7 +152,7 @@ try {
       /* **********************************************************************
       * Per character API pulls
       * **********************************************************************/
-      $mess = 'Before require pulls_char.inc';
+      $mess = 'Before require pulls_char.inc for character ' . $ownerid;
       $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       require YAPEAL_INC . 'pulls_char.inc';
@@ -189,7 +189,7 @@ try {
       /* ********************************************************************
       * Per corp API pulls
       * ********************************************************************/
-      $mess = 'Before require pulls_corp.inc';
+      $mess = 'Before require pulls_corp.inc for corporation ' . $ownerid;
       $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
       $corpList = $con->GetAll($sql);
@@ -246,7 +246,7 @@ try {
   exit;
 }
 catch(Exception $e) {
-  elog('Uncaught exception in '.basename(__FILE__), YAPEAL_ERROR_LOG);
+  elog('Uncaught exception in ' . basename(__FILE__), YAPEAL_ERROR_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }

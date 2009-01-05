@@ -106,7 +106,7 @@ active=FALSE
 [Database-eve]
 ; Determines if pulls for this database type are active. (required)
 ; Set to FALSE to turn off pulls.
-active=TRUE
+active=FALSE
 
 ; Database name used in ADOdb DSN.
 ;database="Yapeal_eve"
@@ -146,7 +146,8 @@ error_log=Yapeal_error.log
 
 ; Logging levels which are enabled. (required)
 ; Should be set like error_reporting() but ONLY use E_USER_* values
-level=E_USER_ERROR|E_USER_WARNING|E_USER_NOTICE
+;level=E_USER_ERROR|E_USER_WARNING|E_USER_NOTICE
+level=E_USER_ERROR|E_USER_WARNING
 
 ; Notice level log file name. (required)
 notice_log=Yapeal_notice.log

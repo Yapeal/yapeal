@@ -245,13 +245,9 @@ define('YAPEAL_TRACE', $trace);
 define('YAPEAL_TRACE_LEVEL', $trace_level);
 define('YAPEAL_TRACE_OUTPUT', $trace_output);
 define('YAPEAL_TRACE_SECTION', $trace_section);
-// Require tracing code here if tracing is turned on.
-if (YAPEAL_TRACE) {
-  require_once YAPEAL_CLASS . 'YapealTracing.class.php';
-  if (!isset($tracing)) {
-    $tracing = new YapealTracing();
-  };
-};
+// Load tracing code here and set it up.
+require_once YAPEAL_CLASS . 'YapealTracing.class.php';
+$tracing = new YapealTracing();
 /* **************************************************************************
 * Required DBs
 * **************************************************************************/

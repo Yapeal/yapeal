@@ -1,18 +1,10 @@
 ;;;;;
-; REQUIRED Sections: Api, Database, Debugging, Paths, Logging.
+; REQUIRED Sections: Api, Debugging, Paths, Logging.
 ; All other sections maybe optional if not pulling anything from that part of API.
 ;;;;;
 
-;;;;;
-; REQUIRED variables have to be set in a default section if there is one or set
-; in all the overriding sections if not set in default.
-; I.E. 'database' is required in Database-xxx sections so it must be set in the
-; Database section or that Database-xxx or both.
-; If it's NOT set for any Database-xxx section after reading from the default
-; and Database-xxx sections in any active section an error will be triggered.
-;;;;;
-
 ; EVE API settings. (required)
+; WARNING: Yapeal well not work with this section missing.
 [Api]
 ; Turns on caching of API XML data to local files. (required)
 cache_xml=FALSE
@@ -24,43 +16,29 @@ file_suffix=".xml.aspx"
 ; This could be pointed at a proxy server.
 url_base="http://api.eve-online.com"
 
-; Settings used when debugging Yapeal. (required)
-[Tracing]
-; Set to TRUE to turn tracing on. (required)
-trace=FALSE
-
-; Sets level of debugging wanted. (required)
-; Used in a few places to turn on extra tracing when >0.
-trace_level=0
-
-; Where you want trace output to go. (required)
-; One of "file", "database", or "both"
-; NOTE database option isn't active but is being reserved for the future.
-trace_output="file"
-
-; Sections that you wish to log trace messages for. (required)
-; Set to YAPEAL_TRACE_ALL or YAPEAL_TRACE_NONE or
-; YAPEAL_TRACE_ACCOUNT, YAPEAL_TRACE_CHAR, YAPEAL_TRACE_CORP, YAPEAL_TRACE_EVE,
-; YAPEAL_TRACE_MAP, YAPEAL_TRACE_SERVER,
-; YAPEAL_TRACE_API, YAPEAL_TRACE_CACHE, YAPEAL_TRACE_CURL, YAPEAL_TRACE_DATABASE,
-; YAPEAL_TRACE_FILES, YAPEAL_TRACE_REQUEST
-; Settings can be combined with '|' for example:
-; trace_section=YAPEAL_TRACE_EVE|YAPEAL_TRACE_REQUEST
-trace_section=YAPEAL_TRACE_NONE
-
-; Default section for database settings. (required)
+; Default section for database settings. (optional)
+; Though optional not having this section is not recommended if use a single
+; database with multiple [Database-xxx] sections turned on.
 [Database]
-; Any of these settings can be overridden in any of the per Database-xxx
-; sections below.
+;;;;;
+; REQUIRED variables have to be set in [Database] section if it exist or set
+; in all the active [Database-xxx] sections if does not exist.
+; I.E. 'database' is required setting in [Database-xxx] sections so it must be set
+; here in the [Database] section, or in all active [Database-xxx] section, or both.
+; If it's NOT set for any active [Database-xxx] section an error will be triggered.
+;;;;;
 
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
-; Don't set this to TRUE except if you wish to have all Database-xxx sections
-; on by default and plan to set unused sections off below.
+; These settings are used as default for any missing settings in the
+; [Database-xxx] sections.
+
+; Determines if pulls for database sections are active. (required)
+; Set to FALSE to turn off pulls for a section.
+; Don't set this to TRUE in [Database] section except if you plan to have all
+; [Database-xxx] sections on by default and will be set unused sections off.
 active=FALSE
 
 ; Database name used in ADOdb DSN. (required)
-database="Yapeal"
+database="yapeal"
 
 ; Driver part of ADOdb DSN. (required)
 ; Must support transactions.
@@ -78,88 +56,54 @@ suffix="?new"
 ; The :password part is optional by highly recommended.
 writer="writer:5678"
 
-; Main database where Yapeal stores character API data. (required for chars)
+; Main database where Yapeal stores account API data. (optional)
+[Database-account]
+
+; Main database where Yapeal stores character API data. (optional)
 [Database-char]
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
-active=FALSE
 
-; Database name used in ADOdb DSN.
-;database="Yapeal_char"
-
-; User/password with select, insert, and update access.
-;writer="writer:5678"
-
-; Main database where Yapeal stores corporation API data. (required for corps)
+; Main database where Yapeal stores corporation API data. (optional)
 [Database-corp]
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
-active=FALSE
 
-; Database name used in ADOdb DSN.
-;database="Yapeal_corp"
-
-; User/password with select, insert, and update access.
-;writer="writer:5678"
-
-; Main database where Yepeal stores eve API data. (required)
+; Main database where Yepeal stores eve API data. (optional)
 [Database-eve]
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
-active=FALSE
 
-; Database name used in ADOdb DSN.
-;database="Yapeal_eve"
+; Main database where Yapeal stores map API data. (optional)
+[Database-map]
 
-; User/password with select, insert, and update access.
-;writer="writer:5678"
-
-; Main database where Yepeal stores server API data. (required)
+; Main database where Yepeal stores server API data. (optional)
 [Database-server]
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
 active=TRUE
-
-; Database name used in ADOdb DSN.
-;database="Yapeal_server"
-
-; User/password with select, insert, and update access.
-;writer="writer:5678"
 
 ; Database containing some housekeeper tables. (required)
+; WARNING: Yapeal well not work with this section deactived.
 [Database-util]
-; Determines if pulls for this database type are active. (required)
-; Set to FALSE to turn off pulls.
-; NEVER change this only here for compatablity with other sections.
 active=TRUE
 
-; Database name used in ADOdb DSN.
-;database="Yapeal_util"
-
-; User/password with select, insert, and update access.
-;writer="writer:5678"
-
 ; Logging settings (required)
+; WARNING: Yapeal well not work with this section missing.
 [Logging]
 ; Error level log file name. (required)
-error_log=Yapeal_error.log
+error_log="yapeal_error.log"
 
 ; Logging levels which are enabled. (required)
-; Should be set like error_reporting() but ONLY use E_USER_* values
-;level=E_USER_ERROR|E_USER_WARNING|E_USER_NOTICE
-level=E_USER_ERROR|E_USER_WARNING
+; Used to set error_reporting()
+; During testing: level=E_ALL
+; In production: level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
+level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
 
 ; Notice level log file name. (required)
-notice_log=Yapeal_notice.log
+notice_log="yapeal_notice.log"
 
 ; Trace level log file name. (required)
 ; This is only used if tracing is turned on in [Tracing]
-trace_log=Yapeal_trace.log
+trace_log="yapeal_trace.log"
 
 ; Warning level log file name. (required)
-warning_log=Yapeal_warning.log
+warning_log="yapeal_warning.log"
 
 ; Path settings used by Yapeal. (required)
+; WARNING: Yapeal well not work with this section missing.
 [Paths]
 ; File system path to ADOdb directory. (required)
 ; Should be relative to common_backend.inc's path.
@@ -171,6 +115,8 @@ base_dir="../"
 
 ; File system path to backend files directory. (required)
 ; Should be relative to common_backend.inc's path.
+; NOTE: This directory is due to being depreciated soon(tm) when
+; eve_api_pulls.php is moved into root directory.
 backend_dir="../backend/"
 
 ; File system path to cache directory. (required)
@@ -186,12 +132,38 @@ class_dir="../class/"
 ; Should be relative to common_backend.inc's path.
 config_dir="../config/"
 
-; INC directory path. (required)
-; Should be relative to common_backend.inc's path.
-; DEBUGGING ONLY This should never be change in production.
-inc_dir="./"
-
 ; File system path to logging directory. (required)
 ; Must be writable.
 ; NOTE Should be relative to cache_dir's path.
 log_dir="log/"
+
+; Settings used when debugging Yapeal. (required)
+; WARNING: Yapeal well not work with this section missing.
+[Tracing]
+; Set to TRUE to turn tracing on. (required)
+; During testing: trace=TRUE
+; In production: trace=FALSE
+trace=FALSE
+
+; Sets level of debugging wanted. (required)
+; Used in a few places to turn on extra tracing when >0.
+; During testing: trace_level=1
+; In production: trace_level=0
+trace_level=0
+
+; Where you want trace output to go. (required)
+; One of "file", "database", or "both"
+; NOTE database option isn't active but is being reserved for the future.
+trace_output="file"
+
+; Sections that you wish to log trace messages for. (required)
+; Set to YAPEAL_TRACE_ALL or YAPEAL_TRACE_NONE or
+; YAPEAL_TRACE_ACCOUNT, YAPEAL_TRACE_CHAR, YAPEAL_TRACE_CORP, YAPEAL_TRACE_EVE,
+; YAPEAL_TRACE_MAP, YAPEAL_TRACE_SERVER,
+; YAPEAL_TRACE_API, YAPEAL_TRACE_CACHE, YAPEAL_TRACE_CURL, YAPEAL_TRACE_DATABASE,
+; YAPEAL_TRACE_FILES, YAPEAL_TRACE_REQUEST
+; Settings can be combined with '|' for example:
+; trace_section=YAPEAL_TRACE_EVE|YAPEAL_TRACE_REQUEST
+; During testing: YAPEAL_TRACE_Api under testing
+; In production: trace_section=YAPEAL_TRACE_NONE
+trace_section=YAPEAL_TRACE_NONE

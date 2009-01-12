@@ -18,7 +18,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, Michael Cummings
+ * @copyright Copyright (c) 2008, 2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -57,7 +57,8 @@ require_once YAPEAL_CLASS . 'CurlRequest.class.php';
  *
  * @return mixed Returns SimpleXML object or FALSE
  *
- * @throws EVE_API_Exception for API file errors
+ * @throws YapealApiFileException for API file errors
+ * @throws YapealApiErrorException for API errors
  */
 function getAPIinfo($api, $posttype, $postdata = array()) {
   global $tracing;
@@ -75,20 +76,22 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   if (YAPEAL_CACHE_XML) {
     // Build cache file path
     $cachePath = realpath(YAPEAL_CACHE . $prefixes[$posttype]) . DIRECTORY_SEPARATOR;
-    if (!(is_dir($cachePath) && is_writable($cachePath)) &&
-      (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
-      $mess = 'XML cache directory ' . $cachePath . ' is missing or not writable';
-      print_on_command($mess);
-      elog($mess, YAPEAL_WARNING_LOG);
+    if (!is_dir($cachePath)) {
+      $mess = 'XML cache ' . $cachePath . ' is not a directory or does not exist';
+      trigger_error($mess, YAPEAL_WARNING_LOG);
+    };
+    if (!is_writable($cachePath)) {
+      $mess = 'XML cache directory ' . $cachePath . ' is not writable';
+      trigger_error($mess, YAPEAL_WARNING_LOG);
     };
     // Build base part of cache file name
     $cacheFileName = $api;
     // Hash the parameters to protect userID, characterID, and ApiKey while
     // still having unique names
     if (!empty($postdata)) {
-     $cacheFileName.= sha1(http_build_query($postdata, NULL, '&'));
+     $cacheFileName .= sha1(http_build_query($postdata, NULL, '&'));
     };
-    $cacheFileName.= '.xml';
+    $cacheFileName .= '.xml';
     $cacheFile = $cachePath . $cacheFileName;
     if (file_exists($cacheFile) && is_readable($cacheFile)) {
       $mess = 'Loading ' . $cacheFileName . ' in ' . basename(__FILE__);
@@ -132,51 +135,47 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   // Now check for errors.
   if ($result['curl_error']) {
     $mess = 'cURL error' . PHP_EOL;
-    if ($http['content']) {
+    if (isset($http['content'])) {
       $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess .= 'Error code: ' . $result['curl_errno'] . ' for ';
     $mess .= $http['url'] . PHP_EOL;
     $mess .= 'Error message: ' . $result['curl_error'];
-    print_on_command($mess);
     // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 1);
+    require_once YAPEAL_CLASS . 'YapealApiFileException.class.php';
+    throw new YapealApiFileException($mess, 1);
   };
   if (200 != $result['http_code']) {
     $mess = 'HTTP error' . PHP_EOL;
-    if ($http['content']) {
+    if (isset($http['content'])) {
       $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess .= 'Error code: ' . $result['http_code'] . ' for ';
     $mess .= $http['url'] . PHP_EOL;
-    print_on_command($mess);
     // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 2);
+    require_once YAPEAL_CLASS . 'YapealApiFileException.class.php';
+    throw new YapealApiFileException($mess, 2);
   };
   if (!$result['body']) {
     $mess = 'API data error' . PHP_EOL;
-    if ($http['content']) {
+    if (isset($http['content'])) {
       $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess .= 'Data empty for ' . $http['url'] . PHP_EOL;
-    print_on_command($mess);
     // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 3);
+    require_once YAPEAL_CLASS . 'YapealApiFileException.class.php';
+    throw new YapealApiFileException($mess, 3);
   };
   if (!mb_strpos($result['body'], '<eveapi version="')) {
     $result = FALSE;
     $mess = 'API data error' . PHP_EOL;
-    if ($http['content']) {
+    if (isset($http['content'])) {
       $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess .= 'No XML returned for ' . $http['url'] . PHP_EOL;
-    print_on_command($mess);
     // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
-    throw new EVE_API_File_Exception($mess, 4);
+    require_once YAPEAL_CLASS . 'YapealApiFileException.class.php';
+    throw new YapealApiFileException($mess, 4);
   };
   $mess = 'Before simplexml_load_string';
   $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
@@ -184,7 +183,7 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
   $xml = simplexml_load_string($result['body']);
   if (isset($xml->error[0])) {
     $mess = 'Eve API error' . PHP_EOL;
-    if ($http['content']) {
+    if (isset($http['content'])) {
       $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
     };
     $mess .= 'Error code: ' . (int)$xml->error[0]['code'] . ' for ';
@@ -197,9 +196,9 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
       };
     }; // if YAPEAL_CACHE_XML
     // Throw exception
-    require_once YAPEAL_CLASS . 'EVE_API_Exception.class.php';
+    require_once YAPEAL_CLASS . 'YapealApiErrorException.class.php';
     // Have to use API error code for special API error handling to work.
-    throw new EVE_API_Error_Exception($mess, (int)$xml->error[0]['code']);
+    throw new YapealApiErrorException($mess, (int)$xml->error[0]['code']);
   };
   if (YAPEAL_CACHE_XML) {
     $cacheFile = $cachePath . 'error_' . $cacheFileName;

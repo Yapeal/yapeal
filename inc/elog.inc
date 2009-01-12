@@ -42,33 +42,22 @@ require_once realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'common_backend
 * *************************************************************************/
 /**
  * Used to send message to a log file.
- * The "collected output" can be flushed anytime "elog()" is used...
  *
  * @param string $str Message to be sent to log file.
  * @param string $filename File to use for logging message.
- * @param bool $collected Should we flush stdout and stderr also.
  */
-function elog($str, $filename = YAPEAL_ERROR_LOG, $collected = FALSE) {
+function elog($str, $filename = YAPEAL_ERROR_LOG) {
   $mess = '';
-  // Only capture stdout and stderr when told to do so.
-  if ($collected) {
-    // Get anything written to stdout or stderr that did *NOT* use elog()
-    // and write it now...
-    $writeme = ob_get_contents();
-    if ($writeme) {
-      $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
-      $mess .= $writeme . PHP_EOL;
-      ob_end_clean();
-      ob_start();
-    };
-  };
-  // Now write message this function was called to log.
+  // Write message this function was called to log.
   $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
   $mess .= $str . PHP_EOL;
   error_log($mess, 3, $filename);
 }
 /**
  * Only prints message if in command line mode.
+ *
+ * NOTE: This function also flushes and clears any output buffers and will strip
+ * any tags in the output.
  *
  * @param string $str Message to be printed.
  * @param bool $timestamp Add Timestamp in front of $str
@@ -86,10 +75,8 @@ function print_on_command($str, $timestamp = TRUE, $newline = TRUE) {
     if ($newline) {
       $mess .= PHP_EOL;
     };
-    print $mess;
-    if (ob_get_level()) {
-      ob_flush();
-    };
+    while (@ob_end_flush());
+    print strip_tags($mess);
   };
 }
 ?>

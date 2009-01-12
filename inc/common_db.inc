@@ -18,7 +18,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, Michael Cummings
+ * @copyright Copyright (c) 2008, 2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -40,7 +40,7 @@ require_once realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'common_backend
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
 * **************************************************************************/
-require_once YAPEAL_ADODB . 'adodb-exceptions.inc.php';
+require_once YAPEAL_CLASS . 'ADODB_Exception.class.php';
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_INC . 'elog.inc';
 /**
@@ -53,7 +53,7 @@ require_once YAPEAL_INC . 'elog.inc';
  */
 function connect($dsn) {
   global $tracing;
-  $mess = 'Before connect for ' . $dsn . ' in ' . basename(__FILE__);
+  $mess = 'Before connect in ' . basename(__FILE__);
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 0) &&
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $con = & NewADOConnection($dsn);
@@ -79,18 +79,19 @@ function connect($dsn) {
  * @return Boolean Returns true when we need to get API data.
  */
 function dontWait($api, $owner = 0, $randomize = true) {
-  $mess = '';
+  global $tracing;
+  $mess = 'Before getCachedUntil for ' . $api . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $ctime = strtotime(
     getCachedUntil($api, $owner, 'CachedUntil', DSN_UTIL_WRITER) . ' +0000');
   $now = time() - 10; // 10 seconds for EVE API time offset added :P
   // hard limited to maximum delay of 6 minutes for randomized pulls.
   // 5 minutes (300) plus a minute from being almost ready last time.
+  $mess = '';
   if (($now - $ctime) > 300) {
-    if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
-      $mess = 'Tired of waiting! Getting ' . $api . ' for ' . $owner;
-      print_on_command($mess);
-      elog($mess, YAPEAL_NOTICE_LOG);
-    };
+    $mess = 'Tired of waiting! Getting ' . $api . ' for ' . $owner;
+    trigger_error($mess, E_USER_NOTICE);
     return true;
   };
   // Got to wait until our time.
@@ -104,17 +105,14 @@ function dontWait($api, $owner = 0, $randomize = true) {
     // 1 + 0-23 (hours) + Time difference in minutes
     $mod = 1 + gmdate('G') + floor(($now - $ctime) / 60);
     $rand = mt_rand(0, $mod);
-    $mess = 'Rolled ' . $rand . ' ' . $mod . ' ';
+    $mess = 'Rolled ' . $rand . ' out of ' . $mod . '. ';
     // Get to wait a while longer
     if ($rand == $mod) {
       return FALSE;
     }; // if $rand==$mod ...
   }; // if $randomize ...
-  if ((YAPEAL_LOG_LEVEL & E_USER_NOTICE) == E_USER_NOTICE) {
-    $mess.= 'Get ' . $api . ' for ' . $owner;
-    print_on_command($mess);
-    elog($mess, YAPEAL_NOTICE_LOG);
-  };
+    $mess .= 'Get ' . $api . ' for ' . $owner;
+    trigger_error($mess, E_USER_NOTICE);
   return true;
 }; // function dontWait
 /**
@@ -273,10 +271,10 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   };
   // Check for extra unknown fields
   $extras = array_diff($dkeys, $pkeys);
-  if (count($extras) && (YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
+  if (count($extras)) {
     $mess = 'Extra unknown fields (' . implode(', ', $extras);
-    $mess.= ') found while making upsert for ' . $table;
-    elog($mess, YAPEAL_WARNING_LOG);
+    $mess .= ') found while making upsert for ' . $table;
+    trigger_error($mess, E_USER_WARNING);
   };
   $fields = array_intersect($pkeys, $dkeys);
   // Need this so we can do quoting.
@@ -340,15 +338,21 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
  * @uses makeMultiUpsert()
  */
 function multipleUpsert(array $data, array $types, $table, $dsn) {
+  global $tracing;
   if (empty($data) || empty($types)) {
     return FALSE;
   };
   $con = connect($dsn);
+  $mess = 'Before makeMultiUpsert for ' . $table . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $upsert = makeMultiUpsert($data, $types, $table, $dsn);
   // Use a transaction for larger upserts to make them faster when we can.
-  $con->debug=TRUE;
   if (count($data) > 10) {
     try {
+      $mess = 'Before transaction for ' . $table . ' in ' . basename(__FILE__);
+      $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
+      $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
       $con->BeginTrans();
       $ok = $con->Execute($upsert);
       if (!$ok) {
@@ -359,12 +363,28 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
       return $ok;
     }
     catch(ADODB_Exception $e) {
+      $mess = 'Transaction failed for ' . $table . ' in ' . basename(__FILE__);
+      elog($mess, YAPEAL_WARNING_LOG);
+      $mess = <<<MESS
+EXCEPTION:
+     Code: {$e->getCode() }
+  Message: {$e->getMessage() }
+     File: {$e->getFile() }
+     Line: {$e->getLine() }
+Backtrace:
+{$e->getTraceAsString() }
+\t--- END TRACE ---
+MESS;
+      elog($mess, YAPEAL_WARNING_LOG);
       // Rollback transaction here then we'll re-try without transaction and
       // throw another exception if there's still a problem with upsert for
       // the caller to catch.
       $con->RollbackTrans();
     }
   }; // if count $data > 10&&...
+  $mess = 'Before non-transaction Execute for ' . $table . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   return $con->Execute($upsert);
 } // function multipleUpsert ...
 /**
@@ -384,6 +404,7 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
  * @uses multipleUpsert()
  */
 function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = array()) {
+  global $tracing;
   if (count($datum) > 0) {
     $data = array();
     $row = array();
@@ -394,8 +415,9 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
       };
       $data[] = $row;
     }; // foreach $datum
-    //print_on_command('MultiUpsertAttributes');
-    //print_r($data)."\n";
+    $mess = 'Before multipleUpsert for ' . $table . ' in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     multipleUpsert($data, $types, $table, $dsn);
   }; // if $datum>0
 }
@@ -424,9 +446,13 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn, $extras = 
  * @uses makeMultiUpsert()
  */
 function upsert(array $data, array $types, $table, $dsn) {
+  global $tracing;
   if (empty($data) || empty($types)) {
     return FALSE;
   };
+  $mess = 'Before makeMultiUpsert for ' . $table . ' in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $upsert = makeMultiUpsert(array($data) , $types, $table, $dsn);
   $con = connect($dsn);
   $effected = $con->Execute($upsert);

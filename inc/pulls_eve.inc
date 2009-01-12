@@ -78,19 +78,28 @@ $apis = array(
   )
 );
 foreach($apis as $api => $settings) {
+  $xml = NULL;
   try {
     $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
     $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     // Should we wait to get API data
-    $xml = dontWait($api) ? getAPIinfo($api, YAPEAL_API_EVE) : FALSE;
-    // Set it so we wait a bit before trying again if something goes wrong.
-    $data = array('tableName' => $api, 'ownerID' => 0,
-      'cachedUntil' => YAPEAL_START_TIME);
-    $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
-    $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-    upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+    if (dontWait($api)) {
+      // Set it so we wait a bit before trying again if something goes wrong.
+      $data = array('tableName' => $api, 'ownerID' => 0,
+        'cachedUntil' => YAPEAL_START_TIME);
+      $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
+      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
+      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
+      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
+      $mess = 'Before getAPIinfo for ' . $api . ' in ' . $sectionFile;
+      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+      // Grab the XML data
+      $xml = getAPIinfo($api, YAPEAL_API_EVE);
+    } else {
+      continue;
+    };// else dontWait ...
     if ($xml instanceof SimpleXMLElement) {
       $mess = 'Before xpath for ' . $api . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
@@ -118,26 +127,14 @@ foreach($apis as $api => $settings) {
       upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
     }; // if $xml instanceof SimpleXMLElement
   }
-  catch(EVE_API_File_Exception $e) {
+  catch(YapealApiFileException $e) {
     // Do nothing CachedUntil already set to retry in a bit.
   }
-  catch(EVE_API_Exception $e) {
+  catch(YapealApiException $e) {
     // Do nothing use observers to log info
   }
   catch(ADODB_Exception $e) {
-    $mess = 'ADOdb exception during ' . $api .' in '.$sectionFile;
-    elog($mess, YAPEAL_WARNING_LOG);
-    $message = <<<MESS
-EXCEPTION:
-     Code: {$e->getCode() }
-  Message: {$e->getMessage() }
-     File: {$e->getFile() }
-     Line: {$e->getLine() }
-Backtrace:
-  {$e->getTraceAsString() }
-  \t--- END TRACE ---
-MESS;
-    elog($message, YAPEAL_WARNING_LOG);
+    // Do nothing use observers to log info
   }
 }; // foreach $apis ...
 ?>

@@ -22,13 +22,13 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, Michael Cummings
+ * @copyright Copyright (c) 2008, 2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
 // Track version of script.
 define('YAPEAL_VERSION', str_replace(
-  array('$', '#') , '', '$Revision$ $Date:: 2008-10-24 00:48:59 #$'));
+  array('$', '#') , '', '$Revision$ $Date::                      $'));
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
@@ -38,22 +38,14 @@ if (php_sapi_name() == 'cli' && function_exists('getopt')) {
   foreach($options as $opt => $value) {
     switch ($opt) {
       case 'c':
-      case '--config':
-        if ($file = realpath($value) && is_file($file) && is_readable($file)) {
-          $yapealIniFile = $file;
-          break;
-        } else {
-          $mess = $opt[1] . ' does not exist or is not readable' . PHP_EOL;
-          fwrite(STDERR, $mess);
-        }; // else realpath $opt[1]&& ...
+        $iniFile = realpath($value);
+        break;
       case 'h':
-      case '--help':
         usage();
         exit;
       case 'V':
-      case '--version':
         $mess = $argv[0] . ' ' . YAPEAL_VERSION . PHP_EOL;
-        $mess.= "Copyright (C) 2008, Michael Cummings" . PHP_EOL;
+        $mess.= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
         $mess.= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
         $mess.= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
         $mess.= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
@@ -69,29 +61,26 @@ if (php_sapi_name() == 'cli' && function_exists('getopt')) {
 * level as 'inc' directory where common_emt.inc is.
 */
 // Move up and over to 'inc' directory to read common_backend.inc
-$path = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
-$path .= '..' . DIRECTORY_SEPARATOR . 'inc';
-$path .= DIRECTORY_SEPARATOR . 'common_backend.inc';
+$ds = DIRECTORY_SEPARATOR;
+$path = realpath(dirname(__FILE__)) . $ds . '..' . $ds;
+$path .= 'inc' . $ds . 'common_backend.inc';
 require_once realpath($path);
 /* **************************************************************************
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
 * **************************************************************************/
 require_once YAPEAL_INC . 'elog.inc';
-require_once YAPEAL_CLASS . 'Logging_Exception_Observer.class.php';
-require_once YAPEAL_CLASS . 'Printing_Exception_Observer.class.php';
 require_once YAPEAL_INC . 'common_db.inc';
 require_once YAPEAL_INC . 'common_api.inc';
-//require_once YAPEAL_INC.'eap_functions.inc';
 function usage() {
   $progname = basename($GLOBALS['argv'][0]);
   $scriptversion = YAPEAL_VERSION;
   $use = <<<USAGE_MESSAGE
 Usage: $progname [-h | -V | -c config.ini]
 Options:
-  -c config.ini, --config=config.ini   Read configation from 'config.ini'.
-  -h, --help                           Show this help.
-  -V, --version                        Show $progname version.
+  -c config.ini                        Read configation from 'config.ini'.
+  -h                                   Show this help.
+  -V                                   Show $progname version.
 
 Version $scriptversion
 USAGE_MESSAGE;
@@ -134,12 +123,12 @@ try {
     $con = connect(DSN_CHAR_WRITER);
     /* Generate a list of character(s) we need to do updates for */
     $sql = 'select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
-    $sql.= 'chr.characterID "charid"';
-    $sql.= ' from ';
-    $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
-    $sql.= DB_UTIL . '.RegisteredUser as u';
-    $sql.= ' where chr.isActive=1';
-    $sql.= ' and chr.userID=u.userID';
+    $sql .= 'chr.characterID "charid"';
+    $sql .= ' from ';
+    $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
+    $sql .= DB_UTIL . '.RegisteredUser as u';
+    $sql .= ' where chr.isActive=1';
+    $sql .= ' and chr.userID=u.userID';
     $mess = 'Before GetAll $charList in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
@@ -170,13 +159,13 @@ try {
     $con = connect(DSN_CORP_WRITER);
     // Generate a list of corporation(s) we need to do updates for
     $sql = 'select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
-    $sql.= 'u.limitedApiKey "lapikey",cp.characterID "charid"';
-    $sql.= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
-    $sql.= DB_UTIL . '.RegisteredCharacter as chr,';
-    $sql.= DB_UTIL . '.RegisteredUser as u';
-    $sql.= ' where cp.isActive=1';
-    $sql.= ' and cp.characterID=chr.characterID';
-    $sql.= ' and chr.userID=u.userID';
+    $sql .= 'u.limitedApiKey "lapikey",cp.characterID "charid"';
+    $sql .= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
+    $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
+    $sql .= DB_UTIL . '.RegisteredUser as u';
+    $sql .= ' where cp.isActive=1';
+    $sql .= ' and cp.characterID=chr.characterID';
+    $sql .= ' and chr.userID=u.userID';
     $mess = 'Before GetAll $corpList in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
@@ -237,15 +226,12 @@ try {
     upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
   } else {
     // Lost Mutex we should log that as warning.
-    if ((YAPEAL_LOG_LEVEL & E_USER_WARNING) == E_USER_WARNING) {
-      $mess = $api . ' ' . YAPEAL_START_TIME . ' ran long';
-      print_on_command($mess);
-      trigger_error($mess, E_USER_NOTICE);
-    };
+    $mess = $api . ' ' . YAPEAL_START_TIME . ' ran long';
+    trigger_error($mess, E_USER_WARNING);
   }; // else $timer==get_cacheduntil $api ...
   exit;
 }
-catch(Exception $e) {
+catch (Exception $e) {
   elog('Uncaught exception in ' . basename(__FILE__), YAPEAL_ERROR_LOG);
   $message = <<<MESS
 EXCEPTION:
@@ -254,8 +240,8 @@ EXCEPTION:
      File: {$e->getFile() }
      Line: {$e->getLine() }
 Backtrace:
-  {$e->getTraceAsString() }
-  \t--- END TRACE ---
+{$e->getTraceAsString() }
+\t--- END TRACE ---
 MESS;
   elog($message, YAPEAL_ERROR_LOG);
 }

@@ -65,7 +65,13 @@ if (!extension_loaded('mysqli')) {
   $mess = 'The required PHP extension mysqli is missing!';
   print_on_command($mess);
   trigger_error($mess, E_USER_ERROR);
-  exit(3);
+  exit(2);
+};
+if (!extension_loaded('simplexml')) {
+  $mess = 'The required PHP extension simplexml is missing!';
+  print_on_command($mess);
+  trigger_error($mess, E_USER_ERROR);
+  exit(2);
 };
 /* **************************************************************************
  * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
@@ -98,7 +104,7 @@ foreach ($requiredSections as $section) {
   if (!empty($mess)) {
     print_on_command($mess);
     trigger_error($mess, E_USER_WARNING);
-    exit(4);
+    exit(3);
   };
 };
 // Set vars use in error messages.

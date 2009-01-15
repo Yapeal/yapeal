@@ -18,7 +18,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, Michael Cummings
+ * @copyright Copyright (c) 2008, 2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -47,17 +47,14 @@ require_once realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'common_backend
  * @param string $filename File to use for logging message.
  */
 function elog($str, $filename = YAPEAL_ERROR_LOG) {
-  $mess = '';
-  // Write message this function was called to log.
-  $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
+  $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
   $mess .= $str . PHP_EOL;
   error_log($mess, 3, $filename);
 }
 /**
  * Only prints message if in command line mode.
  *
- * NOTE: This function also flushes and clears any output buffers and will strip
- * any tags in the output.
+ * NOTE: This function will strip any tags in the output.
  *
  * @param string $str Message to be printed.
  * @param bool $timestamp Add Timestamp in front of $str
@@ -66,7 +63,7 @@ function elog($str, $filename = YAPEAL_ERROR_LOG) {
  * @return void
  */
 function print_on_command($str, $timestamp = TRUE, $newline = TRUE) {
-  if (YAPEAL_SCRIPT_MODE == 'cli') {
+  if (PHP_SAPI == 'cli') {
     $mess = '';
     if ($timestamp) {
       $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
@@ -75,8 +72,7 @@ function print_on_command($str, $timestamp = TRUE, $newline = TRUE) {
     if ($newline) {
       $mess .= PHP_EOL;
     };
-    while (@ob_end_flush());
-    print strip_tags($mess);
+    print $mess;
   };
 }
 ?>

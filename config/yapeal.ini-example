@@ -3,6 +3,12 @@
 ; All other sections maybe optional if not pulling anything from that part of API.
 ;;;;;
 
+date="$Date::                      $"
+
+stability="beta"
+
+version="$Revision$"
+
 ; EVE API settings. (required)
 ; WARNING: Yapeal well not work with this section missing.
 [Api]
@@ -37,18 +43,18 @@ url_base="http://api.eve-online.com"
 ; [Database-xxx] sections on by default and will be set unused sections off.
 active=FALSE
 
-; Database name used in ADOdb DSN. (required)
+; Database name. (required)
 database="yapeal"
 
-; Driver part of ADOdb DSN. (required)
+; Driver part of DSN. (required)
 ; Must support transactions.
 driver="mysqli://"
 
-; Host name used in ADOdb DSN. (required)
+; Host name for Database. (required)
 host="localhost"
 
 ; Extra stuff sometimes needed on some databases (required)
-; ADOdb needs a setting of "?new" to work correctly with MySQL.
+; ADOdb needs a setting of "?new" to work correctly with mysqli.
 suffix="?new"
 
 ; User/password with write access. (required)

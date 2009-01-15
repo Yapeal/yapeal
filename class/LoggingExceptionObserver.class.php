@@ -69,19 +69,20 @@ class LoggingExceptionObserver implements YapealObserver {
   /**
    * Method the 'object' calls to let us know something has happened.
    *
-   * @param object $e The 'object' we're observering.
+   * @param object $e The 'object' we're observing.
    */
   public function update(YapealSubject $e) {
-    $message = <<<MESS
+    $message = PHP_EOL;
+    $message .= <<<MESS
 EXCEPTION:
-     Code: {$e->getCode() }
-  Message: {$e->getMessage() }
-     File: {$e->getFile() }
-     Line: {$e->getLine() }
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
 Backtrace:
-{$e->getTraceAsString() }
-\t--- END TRACE ---
+{$e->getTraceAsString()}
 MESS;
+    $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
     elog($message, $this->file);
   }
 }

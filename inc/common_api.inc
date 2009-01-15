@@ -166,7 +166,7 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     require_once YAPEAL_CLASS . 'YapealApiFileException.class.php';
     throw new YapealApiFileException($mess, 3);
   };
-  if (!mb_strpos($result['body'], '<eveapi version="')) {
+  if (!strpos($result['body'], '<eveapi version="')) {
     $result = FALSE;
     $mess = 'API data error' . PHP_EOL;
     if (isset($http['content'])) {

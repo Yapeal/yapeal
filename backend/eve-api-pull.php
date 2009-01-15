@@ -26,34 +26,45 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-// Track version of script.
-define('YAPEAL_VERSION', str_replace(
-  array('$', '#') , '', '$Revision$ $Date::                      $'));
+// Track versioning of script.
+define('YAPEAL_STABILITY', 'beta');
+define('YAPEAL_VERSION',
+  (int)trim(str_replace(array('$', 'Revision:'), '', '$Revision$')));
+define('YAPEAL_DATE', trim(str_replace(
+  array('$', '#', 'Date::') , '', '$Date::                      $')));
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
 // If being run from command-line look for options there if function available.
-if (php_sapi_name() == 'cli' && function_exists('getopt')) {
-  $options = getopt('hVc:');
+if (PHP_SAPI == 'cli' && function_exists('getopt')) {
+  $options = getopt('hVc:d:');
   foreach($options as $opt => $value) {
     switch ($opt) {
       case 'c':
         $iniFile = realpath($value);
         break;
+      case 'd':
+        define('YAPEAL_DEBUG', $value);
+        break;
       case 'h':
         usage();
         exit;
       case 'V':
-        $mess = $argv[0] . ' ' . YAPEAL_VERSION . PHP_EOL;
-        $mess.= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
-        $mess.= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
-        $mess.= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
-        $mess.= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-        fwrite(STDERR, $mess);
+        $mess = $argv[0] . ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+        $mess .= YAPEAL_DATE . PHP_EOL;
+        $mess .= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
+        $mess .= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
+        $mess .= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
+        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+        fwrite(STDOUT, $mess);
         exit;
+      default:
+        $mess = 'Unknown option ' . $opt . PHP_EOL;
+        usage();
+        exit(1);
     };// switch $opt
   };// foreach $options...
-};// if php_sapi_name() == 'cli' && ...
+};// if PHP_SAPI == 'cli' && ...
 /* **************************************************************************
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/
@@ -74,17 +85,19 @@ require_once YAPEAL_INC . 'common_db.inc';
 require_once YAPEAL_INC . 'common_api.inc';
 function usage() {
   $progname = basename($GLOBALS['argv'][0]);
-  $scriptversion = YAPEAL_VERSION;
+  $scriptversion = YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+  $scriptversion .= YAPEAL_DATE . PHP_EOL;
   $use = <<<USAGE_MESSAGE
-Usage: $progname [-h | -V | -c config.ini]
+Usage: $progname [-V | [-h] | [-c <config.ini>] [-d <logfile.log>]]
 Options:
   -c config.ini                        Read configation from 'config.ini'.
+  -d logfile.log                       Save debugging log to 'logfile.log'.
   -h                                   Show this help.
-  -V                                   Show $progname version.
+  -V                                   Show $progname version and license.
 
 Version $scriptversion
 USAGE_MESSAGE;
-  fwrite(STDERR, $use . PHP_EOL);
+  fwrite(STDOUT, $use);
 };
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
@@ -229,7 +242,6 @@ try {
     $mess = $api . ' ' . YAPEAL_START_TIME . ' ran long';
     trigger_error($mess, E_USER_WARNING);
   }; // else $timer==get_cacheduntil $api ...
-  exit;
 }
 catch (Exception $e) {
   elog('Uncaught exception in ' . basename(__FILE__), YAPEAL_ERROR_LOG);
@@ -245,4 +257,6 @@ Backtrace:
 MESS;
   elog($message, YAPEAL_ERROR_LOG);
 }
+trigger_error('Peak memory used:' . memory_get_peak_usage(TRUE), E_USER_NOTICE);
+exit;
 ?>

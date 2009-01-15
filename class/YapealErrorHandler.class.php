@@ -18,7 +18,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, Michael Cummings
+ * @copyright Copyright (c) 2008, 2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -47,7 +47,7 @@ class YapealErrorHandler {
    */
   private $line = 0;
   /**
-   * @var array Holds any extra values.
+   * @var array Holds array of all varables.
    */
   private $vars = array();
   /**
@@ -90,20 +90,23 @@ class YapealErrorHandler {
     ob_start();
     debug_print_backtrace();
     $backtrace = ob_get_flush();
+    $body = PHP_EOL;
     if ($this->line) {
-      $body = <<<EOT
+      $body .= <<<EOT
 ERROR:
   Message: {$this->message}
      File: {$this->filename}
      Line: {$this->line}
-Backtrace: {$backtrace}
+Backtrace:
+{$backtrace}
 EOT;
     } else {
-      $body = <<<EOT
+      $body .= <<<EOT
 ERROR:
   Message: {$this->message}
      File: {$this->filename}
-Backtrace: {$backtrace}
+Backtrace:
+{$backtrace}
 EOT;
     };
     print_on_command($body);
@@ -114,18 +117,19 @@ EOT;
    * Called to handle warning type messages.
    */
   private function handleWarning() {
+    $body = PHP_EOL;
     if ($this->line) {
-      $body = <<<EOT
+      $body .= <<<EOT
 WARNING:
-Message: {$this->message}
-   File: {$this->filename}
-   Line: {$this->line}
+  Message: {$this->message}
+     File: {$this->filename}
+     Line: {$this->line}
 EOT;
     } else {
-      $body = <<<EOT
+      $body .= <<<EOT
 WARNING:
-Message: {$this->message}
-   File: {$this->filename}
+  Message: {$this->message}
+     File: {$this->filename}
 EOT;
     };
     print_on_command($body);
@@ -135,18 +139,19 @@ EOT;
    * Called to handle notice type messages.
    */
   private function handleNotice() {
+    $body = PHP_EOL;
     if ($this->line) {
-      $body = <<<EOT
+      $body .= <<<EOT
 NOTICE:
-Message: {$this->message}
-   File: {$this->filename}
-   Line: {$this->line}
+  Message: {$this->message}
+     File: {$this->filename}
+     Line: {$this->line}
 EOT;
     } else {
-      $body = <<<EOT
+      $body .= <<<EOT
 NOTICE:
-Message: {$this->message}
-   File: {$this->filename}
+  Message: {$this->message}
+     File: {$this->filename}
 EOT;
     };
     print_on_command($body);

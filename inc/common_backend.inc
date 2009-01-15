@@ -33,46 +33,42 @@ $ds = DIRECTORY_SEPARATOR;
 // Since this file has to be in the 'inc' directory we can set that path now and
 // all the other paths are relative to it.
 define('YAPEAL_INC', $incDir . $ds);
-// Set constant for how we're being run.
-// Mostly being used to detect cli vs cgi or apache for now where needed.
-defined('YAPEAL_SCRIPT_MODE') || define('YAPEAL_SCRIPT_MODE', php_sapi_name());
 // Set some basic common settings so we know we'll get to see any errors etc.
 error_reporting(E_ALL);
-ini_set('display_errors', TRUE);
-ini_set('log_errors', TRUE);
-ini_set('ignore_repeated_errors', FALSE);
-ini_set('ignore_repeated_source', FALSE);
-ini_set('track_errors', TRUE);
-ini_set('html_errors', FALSE);
+ini_set('ignore_repeated_errors', 0);
+ini_set('ignore_repeated_source', 0);
+ini_set('html_errors', 0);
+ini_set('display_errors', 1);
 ini_set('error_log', NULL);
-// Bring in function so we can 'print_on_command'
-require_once YAPEAL_INC . 'elog.inc';
+ini_set('log_errors', 0);
+// Special debugging command-line override.
+if (defined('YAPEAL_DEBUG')) {
+  ob_start();
+  trigger_error(str_pad(' Pre-custom ', 75, '-', STR_PAD_BOTH), E_USER_NOTICE);
+  ini_set('track_errors', 1);
+} else {
+  ini_set('track_errors', 0);
+};// else defined YAPEAL_DEBUG ...
+// Log Yapeal version information.
+$mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+$mess .= YAPEAL_DATE;
+trigger_error($mess, E_USER_NOTICE);
 // Insure minimum version of PHP 5 we need to run.
 if (version_compare(PHP_VERSION, '5.2.1', '<')) {
   $mess = 'Need minimum of PHP 5.2.1 to use this software!';
-  print_on_command($mess);
   trigger_error($mess, E_USER_ERROR);
   exit(1);
 };
 // Check for some required extensions
-if (!extension_loaded('curl')) {
-  $mess = 'The required PHP extension cURL is missing!';
-  print_on_command($mess);
-  trigger_error($mess, E_USER_ERROR);
-  exit(2);
-};
-if (!extension_loaded('mysqli')) {
-  $mess = 'The required PHP extension mysqli is missing!';
-  print_on_command($mess);
-  trigger_error($mess, E_USER_ERROR);
-  exit(2);
-};
-if (!extension_loaded('simplexml')) {
-  $mess = 'The required PHP extension simplexml is missing!';
-  print_on_command($mess);
-  trigger_error($mess, E_USER_ERROR);
-  exit(2);
-};
+$required = array('curl', 'mysqli', 'SimpleXML');
+$exts = get_loaded_extensions();
+foreach ($required as $ext) {
+  if (!in_array($ext, $exts)) {
+    $mess = 'The required PHP extension ' . $ext . ' is missing!';
+    trigger_error($mess, E_USER_ERROR);
+    exit(2);
+  };
+};// foreach $exts ...
 /* **************************************************************************
  * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
  * **************************************************************************/
@@ -84,7 +80,6 @@ if (!isset($iniFile)) {
 }
 if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
   $mess = 'The required ' . $iniFile . ' configuration file is missing';
-  print_on_command($mess);
   trigger_error($mess, E_USER_ERROR);
 };
 /* **************************************************************************
@@ -94,108 +89,115 @@ if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
 // Grab the info from ini file.
 $iniVars = parse_ini_file($iniFile, TRUE);
 // Abort if required sections aren't defined
-$requiredSections = array('Api', 'Logging', 'Paths', 'Tracing');
+$sections = array('Api', 'Logging', 'Paths', 'Tracing');
 $mess = '';
-foreach ($requiredSections as $section) {
+foreach ($sections as $section) {
   if (!isset($iniVars[$section])) {
     $mess .= 'Required section [' . $section;
     $mess .= '] is missing from ' . $iniFile . PHP_EOL;
   }; // if isset ...
-  if (!empty($mess)) {
-    print_on_command($mess);
-    trigger_error($mess, E_USER_WARNING);
-    exit(3);
-  };
+};
+if (!empty($mess)) {
+  trigger_error($mess, E_USER_WARNING);
+  exit(3);
 };
 // Set vars use in error messages.
 $req1 = 'Required variable ';
-$req2 = ' in ' . $iniFile . " file isn't defined";
-$nonexist = 'None existent path defined for ';
+$req2 = ' in ' . $iniFile . '  is undefined';
+$nonexist = 'Nonexistent directory defined for ';
 /* **************************************************************************
  * Paths
  * **************************************************************************/
-// Make sure required setting vars aren't already set
-unset($adodb_dir, $base_dir, $backend_dir, $cache_dir, $class_dir, $config_dir, $inc_dir, $log_dir);
-// Pull out Paths settings
-extract($iniVars['Paths']);
-// Triggers error if a required setting is missing.
-isset($adodb_dir) || trigger_error($req1 . 'adodb_dir' . $req2, E_USER_ERROR);
-isset($base_dir) || trigger_error($req1 . 'base_dir' . $req2, E_USER_ERROR);
-isset($backend_dir) || trigger_error($req1 . 'backend_dir' . $req2, E_USER_ERROR);
-isset($cache_dir) || trigger_error($req1 . 'cache_dir' . $req2, E_USER_ERROR);
-isset($class_dir) || trigger_error($req1 . 'class_dir' . $req2, E_USER_ERROR);
-isset($config_dir) || trigger_error($req1 . 'config_dir' . $req2, E_USER_ERROR);
-isset($log_dir) || trigger_error($req1 . 'log_dir' . $req2, E_USER_ERROR);
-// Define some constants from vars
-if ($realpath = realpath($dir . $ds . $adodb_dir)) {
-  define('YAPEAL_ADODB', $realpath . $ds);
-} else {
-  trigger_error($nonexist . 'adodb_dir', E_USER_ERROR);
-};
-if ($realpath = realpath($dir . $ds . $base_dir)) {
-  define('YAPEAL_BASE', $realpath . $ds);
-} else {
-  trigger_error($nonexist . 'base_dir', E_USER_ERROR);
-};
-if ($realpath = realpath($dir . $ds . $backend_dir)) {
-  define('YAPEAL_BACKEND', $realpath . $ds);
-} else {
-  trigger_error($nonexist . 'backend_dir', E_USER_ERROR);
-};
-if ($realpath = realpath($dir . $ds . $cache_dir)) {
-  if (is_writable($realpath)) {
-    define('YAPEAL_CACHE', $realpath . $ds);
+$settings = array('adodb', 'base', 'backend', 'cache','class', 'config');
+foreach ($settings as $setting) {
+  // Set to section value if it exists.
+  if (isset($iniVars['Paths'][$setting])) {
+    $realpath = realpath($incDir . $ds . $iniVars['Paths'][$setting]);
+    if ($realpath && is_dir($realpath)) {
+      define('YAPEAL_' . strtoupper($setting), $realpath . $ds);
+    } else {
+      trigger_error($nonexist . $setting, E_USER_ERROR);
+    };
   } else {
-    trigger_error($realpath . ' is not writeable', E_USER_ERROR);
+    trigger_error($req1 . $setting . $req2, E_USER_ERROR);
+  };// else isset $iniVars...
+};// foreach $settings ...
+// Check writable paths
+if (!is_writable(YAPEAL_CACHE)) {
+  trigger_error($realpath . ' is not writeable', E_USER_ERROR);
+};
+$sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
+foreach ($sections as $section) {
+  $realpath = realpath(YAPEAL_CACHE . $section);
+  if (!$realpath || !is_dir($realpath)) {
+    $mess = 'Missing required directory ' . YAPEAL_CACHE . $section;
+    trigger_error($mess, E_USER_ERROR);
   };
-} else {
-  trigger_error($nonexist . 'cache_dir', E_USER_ERROR);
-};
-if ($realpath = realpath($dir . $ds . $class_dir)) {
-  define('YAPEAL_CLASS', $realpath . $ds);
-} else {
-  trigger_error($nonexist . 'class_dir', E_USER_ERROR);
-};
-// This is relative to YAPEAL_CACHE
-if ($realpath = realpath(YAPEAL_CACHE . $log_dir)) {
-  if (is_writable($realpath)) {
+  if (!is_writable($realpath)) {
+    trigger_error(YAPEAL_CACHE . $section . ' is not writeable', E_USER_ERROR);
+  };
+};// foreach $sections ...
+// log_dir is relative to YAPEAL_CACHE
+if (isset($iniVars['Paths']['log'])) {
+  $realpath = realpath(YAPEAL_CACHE . $iniVars['Paths']['log']);
+  if ($realpath && is_dir($realpath)) {
     define('YAPEAL_LOG', $realpath . $ds);
   } else {
+    trigger_error($nonexist . 'log', E_USER_ERROR);
+  };
+  if (!is_writable($realpath)) {
     trigger_error($realpath . ' is not writeable', E_USER_ERROR);
   };
 } else {
-  trigger_error($nonexist . 'log_dir', E_USER_ERROR);
+  trigger_error($req1 . 'log' . $req2, E_USER_ERROR);
 };
 /* **************************************************************************
  * Logging
  * **************************************************************************/
-// Make sure required setting vars aren't already set
-unset($error_log, $level, $notice_log, $trace_log, $warning_log);
-// Pull out Logging settings
-extract($iniVars['Logging']);
-// Triggers error if a required setting is missing.
-isset($error_log) || trigger_error($req1 . 'error_log' . $req2, E_USER_ERROR);
-isset($level) || trigger_error($req1 . 'level' . $req2, E_USER_ERROR);
-isset($notice_log) || trigger_error($req1 . 'notice_log' . $req2, E_USER_ERROR);
-isset($trace_log) || trigger_error($req1 . 'trace_log' . $req2, E_USER_ERROR);
-isset($warning_log) || trigger_error($req1 . 'warning_log' . $req2, E_USER_ERROR);
-// Define some constants from vars
-define('YAPEAL_ERROR_LOG', YAPEAL_LOG . $error_log);
-define('YAPEAL_LOG_LEVEL', $level);
-define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . $notice_log);
-define('YAPEAL_TRACE_LOG', YAPEAL_LOG . $trace_log);
-define('YAPEAL_WARNING_LOG', YAPEAL_LOG . $warning_log);
+// Special debugging command-line override.
+if (defined('YAPEAL_DEBUG')) {
+  error_reporting(E_ALL);
+  define('YAPEAL_ERROR_LOG', YAPEAL_DEBUG);
+  define('YAPEAL_NOTICE_LOG', YAPEAL_DEBUG);
+  define('YAPEAL_TRACE_LOG', YAPEAL_DEBUG);
+  define('YAPEAL_WARNING_LOG', YAPEAL_DEBUG);
+} else {
+  $settings = array('error_log', 'notice_log', 'trace_log', 'warning_log');
+  foreach ($settings as $setting) {
+    // Set to section value if it exists.
+    if (isset($iniVars['Logging'][$setting])) {
+      define('YAPEAL_' . strtoupper($setting),
+        YAPEAL_LOG . $iniVars['Logging'][$setting]);
+    } else {
+      trigger_error($req1 . $setting . $req2, E_USER_ERROR);
+    };// else isset $iniVars...
+  };// foreach $settings ...
+  // Set error reporting level.
+  if (isset($iniVars['Logging']['log_level'])) {
+    error_reporting($iniVars['Logging']['log_level']);
+  } else {
+    trigger_error($req1 . 'log_level' . $req2, E_USER_ERROR);
+  };
+};// else defined YAPEAL_DEBUG ...
 /* **************************************************************************
  * Change over to our custom error and exception code
  * **************************************************************************/
-// Change some error logging settings
-error_reporting(YAPEAL_LOG_LEVEL);
+// Change some error logging settings.
 ini_set('error_log', YAPEAL_ERROR_LOG);
+ini_set('log_errors', 1);
+require_once YAPEAL_INC . 'elog.inc';
 require_once YAPEAL_CLASS . 'YapealErrorHandler.class.php';
 // Start using custom error handler.
 set_error_handler(array('YapealErrorHandler', 'handle'));
-// Log Yapeal version.
-$mess = 'Yapeal version ' . YAPEAL_VERSION;
+if (defined('YAPEAL_DEBUG')) {
+  $mess = ob_get_flush() . PHP_EOL;
+  file_put_contents(YAPEAL_DEBUG, $mess);
+};
+// Printing for CLI will be handled in our custom handler from now on.
+//if (PHP_SAPI == 'cli') {
+//  ini_set('display_errors', FALSE);
+//};
+$mess = str_pad(' Custom handler started ', 75, '-', STR_PAD_BOTH);
 trigger_error($mess, E_USER_NOTICE);
 // Setup custom exception handlers
 require_once YAPEAL_CLASS . 'YapealApiException.class.php';
@@ -210,6 +212,40 @@ YapealApiException::attach($logObserver);
 YapealApiException::attach($printObserver);
 ADODB_Exception::attach($logObserver);
 ADODB_Exception::attach($printObserver);
+/* **************************************************************************
+ * Logging init file if debugging.
+ * **************************************************************************/
+if (defined('YAPEAL_DEBUG')) {
+  $mess = str_pad(' '. $iniFile .' ', 75, '-', STR_PAD_BOTH) . PHP_EOL;
+  $settings = array('version', 'stability', 'date');
+  foreach ($settings as $setting) {
+    if (isset($iniVars[$setting])) {
+      $mess .= $setting . ' = ' . $iniVars[$setting] . PHP_EOL;
+    };
+  };
+  $sections = array('Api', 'Database', 'Database-account', 'Database-char',
+    'Database-corp', 'Database-eve', 'Database-map', 'Database-server',
+    'Database-util', 'Logging', 'Paths', 'Tracing'
+  );
+  $hidden = array('writer', 'username', 'password');
+  foreach ($sections as $section) {
+    if (isset($iniVars[$section])) {
+      $mess .= '[' . $section . ']' . PHP_EOL;
+      $settings = array_keys($iniVars[$section]);
+      foreach ($settings as $setting) {
+        // Hide any usernames or password fields.
+        if (in_array($setting, $hidden)) {
+          $value = str_repeat('*', strlen($iniVars[$section][$setting]));
+          $mess .= $setting . ' = ' . $value . PHP_EOL;
+        } else {
+          $mess .= $setting . ' = ' . $iniVars[$section][$setting] . PHP_EOL;
+        };// else in_array $setting ...
+      };// foreach $settings ...
+    };// if isset $iniVars...
+  };//foreach $sections ...
+  $mess .= str_pad(' End config file ', 75, '-', STR_PAD_BOTH);
+  trigger_error($mess, E_USER_NOTICE);
+};// if defined YAPEAL_DEBUG ...
 /* **************************************************************************
  * Api
  * **************************************************************************/
@@ -255,70 +291,74 @@ define('YAPEAL_TRACE_FILES', 1048576);
 define('YAPEAL_TRACE_REQUEST', 2097152);
 // Grab the info from ini file again now that our constants are defined.
 $iniVars = parse_ini_file($iniFile, TRUE);
-// Make sure required setting vars aren't already set
-unset($trace, $trace_level, $trace_output, $trace_section);
-// Pull out API settings
-extract($iniVars['Tracing']);
-// Triggers error if a required setting is missing.
-isset($trace) || trigger_error($req1 . 'trace' . $req2, E_USER_ERROR);
-isset($trace_level) || trigger_error($req1 . 'trace_level' . $req2, E_USER_ERROR);
-isset($trace_output) || trigger_error($req1 . 'trace_output' . $req2, E_USER_ERROR);
-isset($trace_section) || trigger_error($req1 . 'trace_section' . $req2, E_USER_ERROR);
-// Define some constants from vars
-define('YAPEAL_TRACE', $trace);
-define('YAPEAL_TRACE_LEVEL', $trace_level);
-define('YAPEAL_TRACE_OUTPUT', $trace_output);
-define('YAPEAL_TRACE_SECTION', $trace_section);
+// Special debugging command-line override.
+if (defined('YAPEAL_DEBUG')) {
+  define('YAPEAL_TRACE', TRUE);
+  define('YAPEAL_TRACE_LEVEL', 2);
+  define('YAPEAL_TRACE_OUTPUT', 'file');
+  define('YAPEAL_TRACE_SECTION', YAPEAL_TRACE_ALL);
+} else {
+  $settings = array('trace', 'trace_level', 'trace_output', 'trace_section');
+  foreach ($settings as $setting) {
+    // Set to section value if it exists.
+    if (isset($iniVars['Tracing'][$setting])) {
+      define('YAPEAL_' . strtoupper($setting), $iniVars['Tracing'][$setting]);
+    } else {
+      trigger_error($req1 . $setting . $req2, E_USER_ERROR);
+    };// if isset $iniVars...
+  };// foreach $settings ...
+};// else defined YAPEAL_DEBUG ...
 // Load tracing code here and set it up.
 require_once YAPEAL_CLASS . 'YapealTracing.class.php';
 $tracing = new YapealTracing();
 /* **************************************************************************
  * Datebase-xxx sections
  * **************************************************************************/
-$dbs = array('account', 'char', 'corp', 'eve', 'map', 'server', 'util');
-$requireds = array('database', 'driver', 'host', 'suffix', 'writer');
-foreach($dbs as $db) {
+$sections = array('account', 'char', 'corp', 'eve', 'map', 'server', 'util');
+$settings = array('database', 'driver', 'host', 'suffix', 'writer');
+foreach ($sections as $section) {
   $data = array();
   // Overwrite defaults with ones given in Database-xxx section
-  if (isset($iniVars['Database-' . $db]) &&
-    isset($iniVars['Database-' . $db]['active']) &&
-    $iniVars['Database-' . $db]['active'] == TRUE) {
-    foreach ($requireds as $required) {
+  if (isset($iniVars['Database-' . $section]) &&
+    isset($iniVars['Database-' . $section]['active']) &&
+    $iniVars['Database-' . $section]['active'] == TRUE) {
+    foreach ($settings as $setting) {
       // Set to default if we have one.
-      if (isset($iniVars['Database']) && isset($iniVars['Database'][$required])) {
-        $data[$required] = $iniVars['Database'][$required];
+      if (isset($iniVars['Database']) && isset($iniVars['Database'][$setting])) {
+        $data[$setting] = $iniVars['Database'][$setting];
       };
       // Set to section value if it exists which will override default.
-      if (isset($iniVars['Database-' . $db][$required])) {
-        $data[$required] = $iniVars['Database-' . $db][$required];
+      if (isset($iniVars['Database-' . $section][$setting])) {
+        $data[$setting] = $iniVars['Database-' . $section][$setting];
       };
       // If it's not set by now it's missing trigger the error.
-      if (empty($data[$required])) {
-        trigger_error($req1 . $required . $req2, E_USER_ERROR);
+      if (empty($data[$setting])) {
+        trigger_error($req1 . $setting . $req2, E_USER_ERROR);
       };
     };
     // All constant names are in uppercase only.
-    $db = strtoupper($db);
+    $section = strtoupper($section);
     // Extract the required fields from array.
     extract($data);
     // Mark as active.
-    define('YAPEAL_' . $db . '_ACTIVE', TRUE);
+    define('YAPEAL_' . $section . '_ACTIVE', TRUE);
     // Define some constants from vars.
-    define('DB_' . $db, $database);
-    define('DSN_' . $db . '_WRITER', $driver . $writer . '@' . $host . '/' . $database . $suffix);
-  } elseif ($db == 'util') {
+    define('DB_' . $section, $database);
+    define('DSN_' . $section . '_WRITER', $driver . $writer . '@' . $host . '/' . $database . $suffix);
+  } elseif ($section == 'util') {
     $mess = 'Section [util] is required in ' . $iniFile;
     trigger_error($mess, E_USER_ERROR);
-  } elseif (!isset($iniVars['Database-' . $db])) {
+  } elseif (!isset($iniVars['Database-' . $section])) {
     // Mark as inactive if section is missing.
-    define('YAPEAL_' . strtoupper($db) . '_ACTIVE', FALSE);
-    $mess = 'Optional section [Datebase-' . $db . '] is missing';
+    define('YAPEAL_' . strtoupper($section) . '_ACTIVE', FALSE);
+    $mess = 'Optional section [Datebase-' . $section . '] is missing';
     trigger_error($mess, E_USER_NOTICE);
   } else {
     // Mark section as deactived.
-    define('YAPEAL_' . strtoupper($db) . '_ACTIVE', FALSE);
-    $mess = 'Optional section [Datebase-' . $db . '] is deactived';
+    define('YAPEAL_' . strtoupper($section) . '_ACTIVE', FALSE);
+    $mess = 'Optional section [Datebase-' . $section . '] is deactived';
     trigger_error($mess, E_USER_NOTICE);
   };
 }; // foreach $dbs...
+print_r(get_defined_constants(TRUE)) . PHP_EOL;
 ?>

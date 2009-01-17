@@ -366,6 +366,7 @@ foreach($apis as $api => $settings) {
       $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
       $datum = $xml->xpath($settings['xpath']);
       if (count($datum) > 0) {
+        $con = connect(DSN_CORP_WRITER, $api);
         $sql = 'select ' . $settings['check'];
         $sql .= ' from ' . $api;
         $sql .= ' where ownerid=' . $ownerid;
@@ -593,6 +594,7 @@ foreach($apis as $api => $settings) {
 // Need to get list of POSes first
 $api = 'StarbaseList';
 try {
+  $con = connect(DSN_CORP_WRITER, $api);
   $sql = 'select itemid from ' . $api;
   $sql.= ' where moonid!=0';
   $sql.= ' and ownerid=' . $ownerid;
@@ -726,7 +728,7 @@ try {
       // Call recursive function to modify XML.
       editAssets($datum);
       // Use generated owner node as root for tree.
-      $corpHQ = getCorpHQ($ownerid, DSN_CORP_WRITER);
+      $corpHQ = getCorpHQ($ownerid);
       $lft = $datum->result[0]['lft'];
       $rgt = $datum->result[0]['rgt'];
       $nodeData = array('flag' => '0', 'itemID' => $ownerid, 'lft' => $lft,

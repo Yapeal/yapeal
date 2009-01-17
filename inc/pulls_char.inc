@@ -587,7 +587,7 @@ try {
       // Call recursive function to modify XML.
       editAssets($datum);
       // Use generated owner node as root for tree.
-      $chartype = getCharBloodLine($ownerid, DSN_CHAR_WRITER);
+      $chartype = getCharBloodLine($ownerid);
       $charHQ = getBloodLineHQ($chartype);
       $typeID = getBloodLineTypeID($chartype);
       $lft = $datum->result[0]['lft'];

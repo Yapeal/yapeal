@@ -90,7 +90,7 @@ foreach($apis as $api => $settings) {
         foreach ($datum[0]->children() as $k=>$v) {
           $data[$k] = (string)$v;
         }
-        Upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
+        upsert($data, $settings['types'], $api, DSN_SERVER_WRITER);
       }; // if count $datum ...
       // Update CachedUntil time since we updated records and have new one.
       $cuntil = (string)$xml->cachedUntil[0];

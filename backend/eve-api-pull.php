@@ -102,10 +102,6 @@ USAGE_MESSAGE;
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
-  $mess = 'Before connect for ' . $api . ' in ' . basename(__FILE__);
-  $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
-  $tracing->logTrace(YAPEAL_TRACE_API, $mess);
-  $con = connect(DSN_UTIL_WRITER);
   $mess = 'Before dontWait for ' . $api . ' in ' . basename(__FILE__);
   $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
   $tracing->logTrace(YAPEAL_TRACE_API, $mess);
@@ -129,86 +125,71 @@ try {
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_CHAR_ACTIVE) {
-    $api = 'RegisteredCharacter';
-    $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+    $mess = 'Character section active in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-    $con = connect(DSN_CHAR_WRITER);
-    /* Generate a list of character(s) we need to do updates for */
-    $sql = 'select u.userID "userid",u.fullApiKey "apikey",u.limitedApiKey "lapikey",';
-    $sql .= 'chr.characterID "charid"';
-    $sql .= ' from ';
-    $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
-    $sql .= DB_UTIL . '.RegisteredUser as u';
-    $sql .= ' where chr.isActive=1';
-    $sql .= ' and chr.userID=u.userID';
-    $mess = 'Before GetAll $charList in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-    $charList = $con->GetAll($sql);
-    // Ok now that we have a list of characters that need updated
-    // we can check API for updates to their infomation.
-    foreach($charList as $char) {
-      extract($char);
-      $ownerid = $charid;
-      /* **********************************************************************
-      * Per character API pulls
-      * **********************************************************************/
-      $mess = 'Before require pulls_char.inc for character ' . $ownerid;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-      require YAPEAL_INC . 'pulls_char.inc';
-    }; // foreach $charList
+    try {
+      $charList = getRegisteredCharacters();
+      // Ok now that we have a list of characters that need updated
+      // we can check API for updates to their infomation.
+      foreach ($charList as $char) {
+        extract($char);
+        $ownerid = $charid;
+        /* **********************************************************************
+        * Per character API pulls
+        * **********************************************************************/
+        $mess = 'Before require pulls_char.inc for character ' . $ownerid;
+        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
+        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+        require YAPEAL_INC . 'pulls_char.inc';
+      }; // foreach $charList
+    }
+    catch (ADODB_Exception $e) {
+      // Do nothing use observers to log info
+    }
   }; // if YAPEAL_CHAR_ACTIVE...
   /* ************************************************************************
   * Generate corp list
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_CORP_ACTIVE) {
-    $api = 'RegisteredCorporation';
-    $mess = 'Connect before section in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
+    $mess = 'Corporation section active in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-    $con = connect(DSN_CORP_WRITER);
-    // Generate a list of corporation(s) we need to do updates for
-    $sql = 'select cp.corporationID "corpid",u.userID "userid",u.fullApiKey "apikey",';
-    $sql .= 'u.limitedApiKey "lapikey",cp.characterID "charid"';
-    $sql .= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
-    $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
-    $sql .= DB_UTIL . '.RegisteredUser as u';
-    $sql .= ' where cp.isActive=1';
-    $sql .= ' and cp.characterID=chr.characterID';
-    $sql .= ' and chr.userID=u.userID';
-    $mess = 'Before GetAll $corpList in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-    $corpList = $con->GetAll($sql);
-    // Ok now that we have a list of corporations that need updated
-    // we can check API for updates to their infomation.
-    foreach($corpList as $corp) {
-      extract($corp);
-      $ownerid = $corpid;
-      /* ********************************************************************
-      * Per corp API pulls
-      * ********************************************************************/
-      $mess = 'Before require pulls_corp.inc for corporation ' . $ownerid;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-      $corpList = $con->GetAll($sql);
-      require YAPEAL_INC . 'pulls_corp.inc';
-    }; // foreach $corpList
+    try {
+      $corpList = getRegisteredCorporations();
+      // Ok now that we have a list of corporations that need updated
+      // we can check API for updates to their infomation.
+      foreach ($corpList as $corp) {
+        extract($corp);
+        $ownerid = $corpid;
+        /* ********************************************************************
+        * Per corp API pulls
+        * ********************************************************************/
+        $mess = 'Before require pulls_corp.inc for corporation ' . $ownerid;
+        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
+        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+        require YAPEAL_INC . 'pulls_corp.inc';
+      }; // foreach $corpList
+    }
+    catch (ADODB_Exception $e) {
+      // Do nothing use observers to log info
+    }
   }; // if YAPEAL_CORP_ACTIVE...
   /* ************************************************************************
   * /eve/ API pulls
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_EVE_ACTIVE) {
-    $mess = 'Connect before section in ' . basename(__FILE__);
+    $mess = 'Eve section active in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) &&
+    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+    $mess = 'Connect for eve section in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    $con = connect(DSN_EVE_WRITER);
+    $con = connect(DSN_EVE_WRITER, 'eve');
     $mess = 'Before require pulls_eve.inc';
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) &&
+    $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
     require YAPEAL_INC . 'pulls_eve.inc';
   }; // if YAPEAL_EVE_ACTIVE...
@@ -217,12 +198,15 @@ try {
   * ************************************************************************/
   // Only pull if activated.
   if (YAPEAL_SERVER_ACTIVE) {
-    $mess = 'Connect before section in ' . basename(__FILE__);
+    $mess = 'Server section active in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) &&
+    $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
+    $mess = 'Connect for server section in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_SERVER, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-    $con = connect(DSN_SERVER_WRITER);
+    $con = connect(DSN_SERVER_WRITER, 'server');
     $mess = 'Before require pulls_server.inc';
-    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) &&
+    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
     require YAPEAL_INC . 'pulls_server.inc';
   }; // if YAPEAL_EVE_ACTIVE...
@@ -231,7 +215,7 @@ try {
   * ************************************************************************/
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
-  $ctime2 = getCachedUntil($api, 0, 'CachedUntil', DSN_UTIL_WRITER);
+  $ctime2 = getCachedUntil($api, 0);
   if (YAPEAL_START_TIME == $ctime2) {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array('tableName' => $api, 'ownerID' => 0,

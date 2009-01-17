@@ -109,8 +109,7 @@ function getAPIinfo($api, $posttype, $postdata = array()) {
     };
   };
   // Build http parameter.
-  $http = array(
-    'timeout' => 60,
+  $http = array('timeout' => 60,
     'url' => API_URL_BASE . $prefixes[$posttype] . $api . API_SUFFIX
   );
   if ($posttype == YAPEAL_API_EVE || $posttype == YAPEAL_API_MAP ||

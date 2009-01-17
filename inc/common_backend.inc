@@ -268,6 +268,7 @@ define('YAPEAL_API_CORP', 2);
 define('YAPEAL_API_EVE', 3);
 define('YAPEAL_API_MAP', 4);
 define('YAPEAL_API_SERVER', 5);
+define('YAPEAL_API_UTIL', 65535);
 /* **************************************************************************
  * Trace
  * **************************************************************************/
@@ -344,7 +345,8 @@ foreach ($sections as $section) {
     define('YAPEAL_' . $section . '_ACTIVE', TRUE);
     // Define some constants from vars.
     define('DB_' . $section, $database);
-    define('DSN_' . $section . '_WRITER', $driver . $writer . '@' . $host . '/' . $database . $suffix);
+    define('DSN_' . $section . '_WRITER',
+      $driver . $writer . '@' . $host . '/' . $database . $suffix);
   } elseif ($section == 'util') {
     $mess = 'Section [util] is required in ' . $iniFile;
     trigger_error($mess, E_USER_ERROR);
@@ -360,5 +362,4 @@ foreach ($sections as $section) {
     trigger_error($mess, E_USER_NOTICE);
   };
 }; // foreach $dbs...
-print_r(get_defined_constants(TRUE)) . PHP_EOL;
 ?>

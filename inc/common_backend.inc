@@ -102,8 +102,8 @@ if (!empty($mess)) {
   exit(3);
 };
 // Set vars use in error messages.
-$req1 = 'Required variable ';
-$req2 = ' in ' . $iniFile . '  is undefined';
+$req1 = 'Missing required setting ';
+$req2 = ' in ' . $iniFile;
 $nonexist = 'Nonexistent directory defined for ';
 /* **************************************************************************
  * Paths
@@ -116,10 +116,11 @@ foreach ($settings as $setting) {
     if ($realpath && is_dir($realpath)) {
       define('YAPEAL_' . strtoupper($setting), $realpath . $ds);
     } else {
-      trigger_error($nonexist . $setting, E_USER_ERROR);
+      $mess = $nonexist . $setting . $req2 . ' section [Paths]';
+      trigger_error($mess, E_USER_ERROR);
     };
   } else {
-    trigger_error($req1 . $setting . $req2, E_USER_ERROR);
+    trigger_error($req1 . $setting . $req2 . ' section [Paths]', E_USER_ERROR);
   };// else isset $iniVars...
 };// foreach $settings ...
 // Check writable paths
@@ -315,46 +316,55 @@ $tracing = new YapealTracing();
 /* **************************************************************************
  * Datebase-xxx sections
  * **************************************************************************/
+if (!isset($iniVars['Database-util'])) {
+  $mess = 'Section [Database-util] is required in ' . $iniFile;
+  trigger_error($mess, E_USER_ERROR);
+} elseif (isset($iniVars['Database-util']['active']) &&
+  $iniVars['Database-util']['active'] == FALSE) {
+  $mess = 'Section [Database-util] in ' . $iniFile;
+  $mess .= ' can not be deactived or Yapeal does not work';
+  trigger_error($mess, E_USER_ERROR);
+};// elseif !isset $iniVars['Database-util']['active'] ...
 $sections = array('account', 'char', 'corp', 'eve', 'map', 'server', 'util');
-$settings = array('database', 'driver', 'host', 'suffix', 'writer');
+$settings = array('active', 'database', 'driver', 'host', 'suffix', 'writer');
 foreach ($sections as $section) {
   $data = array();
-  // Overwrite defaults with ones given in Database-xxx section
-  if (isset($iniVars['Database-' . $section]) &&
-    isset($iniVars['Database-' . $section]['active']) &&
-    $iniVars['Database-' . $section]['active'] == TRUE) {
-    foreach ($settings as $setting) {
-      // Set to default if we have one.
-      if (isset($iniVars['Database']) && isset($iniVars['Database'][$setting])) {
-        $data[$setting] = $iniVars['Database'][$setting];
-      };
+  foreach ($settings as $setting) {
+    // Set to default if we have one.
+    if (isset($iniVars['Database']) && isset($iniVars['Database'][$setting])) {
+      $data[$setting] = $iniVars['Database'][$setting];
+    };
+    if (isset($iniVars['Database-' . $section])) {
       // Set to section value if it exists which will override default.
       if (isset($iniVars['Database-' . $section][$setting])) {
         $data[$setting] = $iniVars['Database-' . $section][$setting];
       };
-      // If it's not set by now it's missing trigger the error.
-      if (empty($data[$setting])) {
-        trigger_error($req1 . $setting . $req2, E_USER_ERROR);
-      };
+    } else {
+      $mess = 'Optional section [Datebase-' . $section . '] is missing';
+      trigger_error($mess, E_USER_NOTICE);
     };
-    // All constant names are in uppercase only.
-    $section = strtoupper($section);
-    // Extract the required fields from array.
-    extract($data);
+    if (!isset($data[$setting])) {
+      $mess = $req1 . $setting . $req2 . ' section [Database-' . $section .'].';
+      if (isset($iniVars['Database-' . $section])) {
+        $mess .= ' It must be defined in this section or [Database] or both';
+      } else {
+        $mess .= ' It must be defined in [Database] since there is no ';
+        $mess .= '[Database-' . $section .'] section';
+      };
+      trigger_error($mess, E_USER_ERROR);
+    };
+  };
+  // All constant names are in uppercase only.
+  $section = strtoupper($section);
+  // Extract the required fields from array.
+  extract($data);
+  if ($active) {
     // Mark as active.
     define('YAPEAL_' . $section . '_ACTIVE', TRUE);
-    // Define some constants from vars.
+    // Define the other constants from vars.
     define('DB_' . $section, $database);
     define('DSN_' . $section . '_WRITER',
       $driver . $writer . '@' . $host . '/' . $database . $suffix);
-  } elseif ($section == 'util') {
-    $mess = 'Section [util] is required in ' . $iniFile;
-    trigger_error($mess, E_USER_ERROR);
-  } elseif (!isset($iniVars['Database-' . $section])) {
-    // Mark as inactive if section is missing.
-    define('YAPEAL_' . strtoupper($section) . '_ACTIVE', FALSE);
-    $mess = 'Optional section [Datebase-' . $section . '] is missing';
-    trigger_error($mess, E_USER_NOTICE);
   } else {
     // Mark section as deactived.
     define('YAPEAL_' . strtoupper($section) . '_ACTIVE', FALSE);

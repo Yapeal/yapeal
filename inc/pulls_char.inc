@@ -597,6 +597,7 @@ try {
         'rgt' => $rgt, 'singleton' => '0', 'typeID' => $typeID
       );
       // Clear out old tree for this owner.
+      $con = connect(DSN_CHAR_WRITER, $api);
       $sql = 'delete from ' . $api;
       $sql.= ' where ownerid=' . $ownerid;
       $mess = 'Before delete for ' . $api . ' in ' . $sectionFile;

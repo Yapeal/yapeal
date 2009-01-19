@@ -96,7 +96,7 @@ error_log="yapeal_error.log"
 ; Used to set error_reporting()
 ; During testing: level=E_ALL
 ; In production: level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
-level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
+log_level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
 
 ; Notice level log file name. (required)
 notice_log="yapeal_notice.log"
@@ -113,35 +113,35 @@ warning_log="yapeal_warning.log"
 [Paths]
 ; File system path to ADOdb directory. (required)
 ; Should be relative to common_backend.inc's path.
-adodb_dir="../ADOdb/"
+adodb="../ADOdb/"
 
 ; File system path to base of Yapeal directory. (required)
 ; Should be relative to common_backend.inc's path.
-base_dir="../"
+base="../"
 
 ; File system path to backend files directory. (required)
 ; Should be relative to common_backend.inc's path.
 ; NOTE: This directory is due to being depreciated soon(tm) when
 ; eve_api_pulls.php is moved into root directory.
-backend_dir="../backend/"
+backend="../backend/"
 
 ; File system path to cache directory. (required)
 ; Should be relative to common_backend.inc's path.
 ; Must be writable.
-cache_dir="../cache/"
+cache="../cache/"
 
 ; File system path to class directory. (required)
 ; Should be relative to common_backend.inc's path.
-class_dir="../class/"
+class="../class/"
 
 ; File system path to config directory. (required)
 ; Should be relative to common_backend.inc's path.
-config_dir="../config/"
+config="../config/"
 
 ; File system path to logging directory. (required)
 ; Must be writable.
 ; NOTE Should be relative to cache_dir's path.
-log_dir="log/"
+log="log/"
 
 ; Settings used when debugging Yapeal. (required)
 ; WARNING: Yapeal well not work with this section missing.

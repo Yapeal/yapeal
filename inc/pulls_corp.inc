@@ -498,7 +498,7 @@ foreach($apis as $api => $settings) {
     );
     $xml = NULL;
     try {
-      $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
+      $mess = 'Before dontWait for ' . $api . $account . ' in ' . $sectionFile;
       $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
       // Continue to next if we're not ready at this time

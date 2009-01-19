@@ -204,7 +204,7 @@ function getBloodLineTypeID($bloodLine) {
 function getCachedUntil($tname, $owner) {
   try {
     $con = connect(DSN_UTIL_WRITER, 'CachedUntil');
-    $sql = 'select cachedUntil from CachedUntil';
+    $sql = 'select cachedUntil from `CachedUntil`';
     $sql.= ' where tableName=? and ownerID=?';
     $until = $con->GetOne($sql, array($tname, $owner));
     if (!strtotime($until)) {
@@ -227,7 +227,7 @@ function getCachedUntil($tname, $owner) {
  */
 function getCharBloodLine($charid) {
   $con = connect(DSN_CHAR_WRITER, 'Yapeal');
-  $sql = 'select bloodLine from CharacterSheet';
+  $sql = 'select bloodLine from `CharacterSheet`';
   $sql.= ' where characterID=?';
   $result = $con->GetOne($sql,array($charid));
   return $result;
@@ -242,7 +242,7 @@ function getCharBloodLine($charid) {
  */
 function getCorpHQ($corp) {
   $con = connect(DSN_CORP_WRITER, 'Yapeal');
-  $sql = 'select stationID from CorporationSheet';
+  $sql = 'select stationID from `CorporationSheet`';
   $sql.= ' where corporationID=?';
   return $con->GetOne($sql, array($corp));
 };
@@ -258,9 +258,9 @@ function getRegisteredCharacters() {
   $con = connect(DSN_CHAR_WRITER, 'Yapeal');
   /* Generate a list of character(s) we need to do updates for */
   $sql = 'select u.userID "userid",u.fullApiKey "apikey",chr.characterID "charid"';
-  $sql .= ' from ';
-  $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
-  $sql .= DB_UTIL . '.RegisteredUser as u';
+  $sql .= ' from `';
+  $sql .= DB_UTIL . '`.`RegisteredCharacter` as chr,`';
+  $sql .= DB_UTIL . '`.`RegisteredUser` as u';
   $sql .= ' where chr.isActive=1';
   $sql .= ' and chr.userID=u.userID';
   $mess = 'Before GetAll active characters in ' . basename(__FILE__);
@@ -282,9 +282,9 @@ function getRegisteredCorporations() {
   // Generate a list of corporation(s) we need to do updates for
   $sql = 'select cp.corporationID "corpid",u.userID "userid",';
   $sql .= 'u.fullApiKey "apikey",cp.characterID "charid"';
-  $sql .= ' from ' . DB_UTIL . '.RegisteredCorporation as cp,';
-  $sql .= DB_UTIL . '.RegisteredCharacter as chr,';
-  $sql .= DB_UTIL . '.RegisteredUser as u';
+  $sql .= ' from `' . DB_UTIL . '`.`RegisteredCorporation` as cp,`';
+  $sql .= DB_UTIL . '`.`RegisteredCharacter` as chr,`';
+  $sql .= DB_UTIL . '`.`RegisteredUser` as u';
   $sql .= ' where cp.isActive=1';
   $sql .= ' and cp.characterID=chr.characterID';
   $sql .= ' and chr.userID=u.userID';
@@ -329,7 +329,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $con = connect($dsn, $table);
   $needsQuote = array('C', 'X', 'D', 'T');
   // Build query sections
-  $insert = 'insert into ' . $table . ' (`';
+  $insert = 'insert into `' . $table . '` (`';
   $insert .= implode('`,`', $pkeys) . '`)';
   $values = ' values';
   $sets = array();

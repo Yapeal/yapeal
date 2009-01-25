@@ -64,7 +64,9 @@ if (PHP_SAPI == 'cli' && function_exists('getopt')) {
         exit(1);
     };// switch $opt
   };// foreach $options...
-};// if PHP_SAPI == 'cli' && ...
+} else {
+  notAWebPage();
+};// else PHP_SAPI == 'cli' && ...
 /* **************************************************************************
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/
@@ -83,22 +85,6 @@ require_once realpath($path);
 require_once YAPEAL_INC . 'elog.inc';
 require_once YAPEAL_INC . 'common_db.inc';
 require_once YAPEAL_INC . 'common_api.inc';
-function usage() {
-  $progname = basename($GLOBALS['argv'][0]);
-  $scriptversion = YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-  $scriptversion .= YAPEAL_DATE . PHP_EOL;
-  $use = <<<USAGE_MESSAGE
-Usage: $progname [-V | [-h] | [-c <config.ini>] [-d <logfile.log>]]
-Options:
-  -c config.ini                        Read configation from 'config.ini'.
-  -d logfile.log                       Save debugging log to 'logfile.log'.
-  -h                                   Show this help.
-  -V                                   Show $progname version and license.
-
-Version $scriptversion
-USAGE_MESSAGE;
-  fwrite(STDOUT, $use);
-};
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
@@ -243,4 +229,44 @@ MESS;
 }
 trigger_error('Peak memory used:' . memory_get_peak_usage(TRUE), E_USER_NOTICE);
 exit;
+function usage() {
+  $progname = basename($GLOBALS['argv'][0]);
+  $scriptversion = YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+  $scriptversion .= YAPEAL_DATE . PHP_EOL;
+  $use = <<<USAGE_MESSAGE
+Usage: $progname [-V | [-h] | [-c <config.ini>] [-d <logfile.log>]]
+Options:
+  -c config.ini                        Read configation from 'config.ini'.
+  -d logfile.log                       Save debugging log to 'logfile.log'.
+  -h                                   Show this help.
+  -V                                   Show $progname version and license.
+
+Version $scriptversion
+USAGE_MESSAGE;
+  fwrite(STDOUT, $use);
+}
+function notAWebPage () {
+  $page = <<<WEBPAGE
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http:www.w3.org/TR/xhtml1" xml:lang="en" lang="en">
+  <head>
+    <title>Yapeal is not a web application</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1 style="font-size: xx-large;color: #ff1010;">USER ERROR USER ERROR USER ERROR</h1>
+    <p>
+    If you are seeing this you have tried to run Yapeal as a web page which is
+    incorrect.
+    Yapeal is made to <b>ONLY</b> ran from the command line.
+    See the <a href="http://code.google.com/p/yapeal/w/list">Yapeal Wiki</a> for
+    more information on using it.
+    </p>
+  </body>
+</html>
+WEBPAGE;
+print $page . PHP_EOL;
+exit(128);
+}
 ?>

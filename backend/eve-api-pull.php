@@ -36,37 +36,39 @@ define('YAPEAL_DATE', trim(str_replace(
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
 // If being run from command-line look for options there if function available.
-if (PHP_SAPI == 'cli' && function_exists('getopt')) {
-  $options = getopt('hVc:d:');
-  foreach($options as $opt => $value) {
-    switch ($opt) {
-      case 'c':
-        $iniFile = realpath($value);
-        break;
-      case 'd':
-        define('YAPEAL_DEBUG', $value);
-        break;
-      case 'h':
-        usage();
-        exit;
-      case 'V':
-        $mess = $argv[0] . ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-        $mess .= YAPEAL_DATE . PHP_EOL;
-        $mess .= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
-        $mess .= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
-        $mess .= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
-        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-        fwrite(STDOUT, $mess);
-        exit;
-      default:
-        $mess = 'Unknown option ' . $opt . PHP_EOL;
-        usage();
-        exit(1);
-    };// switch $opt
-  };// foreach $options...
+if (PHP_SAPI == 'cli') {
+  if (function_exists('getopt')) {
+    $options = getopt('hVc:d:');
+    foreach($options as $opt => $value) {
+      switch ($opt) {
+        case 'c':
+          $iniFile = realpath($value);
+          break;
+        case 'd':
+          define('YAPEAL_DEBUG', $value);
+          break;
+        case 'h':
+          usage();
+          exit;
+        case 'V':
+          $mess = $argv[0] . ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+          $mess .= YAPEAL_DATE . PHP_EOL;
+          $mess .= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
+          $mess .= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
+          $mess .= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
+          $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+          fwrite(STDOUT, $mess);
+          exit;
+        default:
+          $mess = 'Unknown option ' . $opt . PHP_EOL;
+          usage();
+          exit(1);
+      };// switch $opt
+    };// foreach $options...
+  };// if function_exists getopt ...
 } else {
   notAWebPage();
-};// else PHP_SAPI == 'cli' && ...
+};// else PHP_SAPI == 'cli' ...
 /* **************************************************************************
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/

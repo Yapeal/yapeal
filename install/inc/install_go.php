@@ -91,7 +91,7 @@ if ($stop == 0) {
   echo '<hr />' . PHP_EOL
       .'<h2>The setup is done.</h2>' . PHP_EOL
       .'<br />' . PHP_EOL
-      .'You can now setup a Cronjob on backend/eve-api-pull.php to cache all the data.<br>' . PHP_EOL;
+      .'You can now setup a Cronjob on backend/eve-api-pull.php to cache all the data.<br>' . PHP_EOL
       .'<h3>NOTIS: backend/eve-api-pull.php can\'t run in a webbrowser.</h3>' . PHP_EOL;
 } else {
   echo '<hr />' . PHP_EOL

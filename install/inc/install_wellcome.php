@@ -36,7 +36,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 }
 OpenSite('Welcome');
 echo '<h3>Welcome to Yapeal Installer.</h3><br />' . PHP_EOL
-    .'This installer will setup Yapeal EVE API Library to be runned on your site.<br />' . PHP_EOL
+    .'This installer will setup Yapeal EVE API Library to run on your site.<br />' . PHP_EOL
     .'<br />' . PHP_EOL
     .'The setup will check if your web host has the requirements to support this library.<br />' . PHP_EOL
     .'<br />' . PHP_EOL

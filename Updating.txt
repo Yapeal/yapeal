@@ -1,0 +1,45 @@
+Hi all decided I better write something about all the changes that I have made to Yapeal with this revision.
+
+Things that have changed
+
+* config/yapeal.ini has been overhauled and you will need to transfer settings from the old one into a copy of the new config/yapeal-example.ini. This should be much easier now as the file has been greatly simplified.
+
+* The main script of Yapeal is now named yapeal.php and is in the root directory instead of backend/eve-api-pull.php. The old file still exists for backwards compatibility but you should change to using the file as the old one will be dropped in the near future once all the documentation can be updated and I feel there's been enough time for everyone to changed over.
+
+* All the database tables have been renamed. The table names were changed to allow the addition of more APIs without table name overlap in some rowsets from different tables. It also allows users to have a optional extra Yapeal wide prefix to help those needing or wanting to use a single database for all of Yapeal's and their application's tables without conflicts.
+
+* The CharacterSheet table has been split into two tables. The old table had the attributes included in the main table instead of being it's own table. This was different then all the other API tables so it's been changed to bring it in line with the other tables by adding a new table for attributes.
+
+There have been a great many other changes to Yapeal but they shouldn't effect how you use it when compared to before.
+
+If you are currently using Yapeal and wish to migrate your historical data from your current database tables into the new tables you'll need the following instructions in the next section. If you aren't migrating your data or are new to Yapeal then you can skip over the migration section.
+
+How to migrate data from old tables into new ones.
+
+1. If you're running Yapeal in a crontab or scheduled task you need to stop it before continuing.
+
+2. Make sure you have at least one complete backup of your database tables.
+
+3. Use the install/Yapeal.sql to add all the new tables to your database. If you want all the new tables to have any special extra prefix you'll need to make a copy of Yapeal.sql and add the prefix manually in the copy for each table name. Note that you must add the same prefix to all the tables or they will not work correctly.
+
+4. Use the install/convert_tables.sql to import you data into the new tables. If you added a prefix to the table name in step 2 you'll also need to copy this file and change the table names in the 'INSERT INTO' part of the SQL for all the tables. Since convert_tables.sql only transfers data from the old tables that have a 'history' to the new tables most of the new tables will still be empty and will be filled in normally by Yapeal later.
+
+5. Check the new tables to insure that all of your historical data has been added to them. The easiest quick check is to add up the number of records in the new char/corp/util tables and compare it to the number of records in the old table they came from.
+
+6. Once you are sure your data has been transferred correctly you can use the install/delete_old_tables.sql to delete the old tables from your database.
+
+7. (optional) Delete any old cached XML files in cache/char, cache/corp, etc. Though Yapeal doesn't require you to do so the new cache files it uses are named differently and the old ones are no longer needed.
+
+8. Back up your old config/yapeal.ini and copy new config/yapeal-example.ini into config/yapeal.ini. Looking at the settings from your old file and the comments in the new one and edit the new one to add your settings. Do NOT use the install/setup.php if you migrated your old data as it will drop and recreate all the new tables causing you to lose all the data in them.
+
+9. Change your crontab or scheduled task to use the new yapeal.php in the root directory. You should test Yapeal manually before re-starting it as a task.
+
+Other changes
+
+* Each API now has it's own php class. This will make adding new APIs much easier and keep bugs in one API from affecting others.
+
+* Several new APIs have been added. To test the new class based system handling of the different types of APIs I impliment several new ones: Characters from the account section, Jumps, Kills, and Sovereignty from the map section.
+
+* Some APIs have now been fully implimented. Most noticable will be CharacterSheet which is now complete with attribute enhancers and all the corporation role rowsets added. Also the AllianceList memberCorporation rowset has been added in it's own table completing that API.
+
+Where the database before had only 25 tables and implimented 20 of the APIs it now has 43 tables and impliment fully 25 APIs. As always if you really want to understand how Yapeal works look at the code most of it is very well documented.

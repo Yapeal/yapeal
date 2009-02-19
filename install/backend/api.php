@@ -27,7 +27,11 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
+if (file_exists("../inc/language/lang_".$_GET['lang'].".php")) {
+  include("../inc/language/lang_".$_GET['lang'].".php");
+} else {
+  include("../inc/language/lang_en.php");
+}
 if ($_GET['id'] != "" && $_GET['key']) {
   //echo 'id = '.$_GET['id'].'<br>key = '.$_GET['key'];
   $params = array();
@@ -73,18 +77,20 @@ if ($_GET['id'] != "" && $_GET['key']) {
 
   if ($xml) {
     if (isset($xml->error)) {
-      echo '<center><font class="warning">Error: '.$xml->error.'</font></center>';
+      echo '<center><font class="warning">'.ERROR.': '.$xml->error.'</font></center>';
     } else {
       $characters = array();
-      echo PHP_EOL .'        <select id="api_char_choise" name="api_char_info" onchange="Select_Character();">' . PHP_EOL
-                   .'          <option value="">Select Character</option>' . PHP_EOL;
+			if (isset($_GET['char'])) { $onChange = ' onchange="Select_Character2();"'; } else { $onChange = ' onchange="Select_Character();"'; };
+      echo PHP_EOL .'        <select id="api_char_choise" name="config[api_char_info]"'.$onChange.'>' . PHP_EOL
+                   .'          <option value="">'.INSTALLER_SELECT_CHAR.'</option>' . PHP_EOL;
       foreach ($xml->result->rowset->row as $row) {
-        echo '          <option value="'.$row['name'].'^-_-^'.$row['characterID'].'^-_-^'.$row['corporationName'].'^-_-^'.$row['corporationID'].'">'.$row['name'].'</option>' . PHP_EOL;
+        if ($_GET['char']==$row['characterID']) { $sel = ' selected="selected"'; } else { $sel = ''; };
+				echo '          <option value="'.$row['name'].'^-_-^'.$row['characterID'].'^-_-^'.$row['corporationName'].'^-_-^'.$row['corporationID'].'"'.$sel.'>'.$row['name'].'</option>' . PHP_EOL;
       };
       echo '        </select>' . PHP_EOL;
     };
   } else {
-    echo '<center><font class="warning">Error<br>EVE API Server if Offline. Please try later.</font></center>';
+    echo '<center><font class="warning">'.INSTALLER_ERROR_API_SERVER_OFFLINE.'</font></center>';
   };
 } else {
   echo 'ERROR';

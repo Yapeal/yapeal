@@ -2,7 +2,10 @@
 /**
  * Group of common database functions.
  *
- * LICENSE: This file is part of Yapeal.
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal.
  *
  *  Yapeal is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -18,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, 2009, Michael Cummings
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -28,20 +31,8 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-/* **************************************************************************
-* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
-* **************************************************************************/
-/**
- * Find path for includes
- */
 // Assumes this file is in same directory as common_backend.inc
-require_once realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'common_backend.inc';
-/* **************************************************************************
-* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
-* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
-* **************************************************************************/
 require_once YAPEAL_CLASS . 'ADOdbFactory.class.php';
-require_once YAPEAL_INC . 'elog.inc';
 /**
  * Function used to connect to a DB.
  * @param string $dsn An ADOdb compatible connection string.
@@ -53,11 +44,11 @@ require_once YAPEAL_INC . 'elog.inc';
  */
 function connect($dsn, $section = '') {
   global $tracing;
-  $mess = 'Before getInstance in ' . basename(__FILE__);
+  $mess = 'Before getInstance in ' . __FILE__;
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $instance = ADOdbFactory::getInstance();
-  $mess = 'Before factory for section ' . $section .' in ' . basename(__FILE__);
+  $mess = 'Before factory for section ' . $section .' in ' . __FILE__;
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 0) &&
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $con = $instance->factory($dsn, $section);
@@ -67,9 +58,8 @@ function connect($dsn, $section = '') {
     $con->debug = FALSE;
   };
   $con->SetFetchMode(ADODB_FETCH_ASSOC);
-  $con->Execute('set names utf8');
   return $con;
-};
+}// function connect
 /**
  * Used to decide if we want to wait or not getting EVE API data. Has
  * randomizing wait option to help even out server and network loading.
@@ -82,7 +72,7 @@ function connect($dsn, $section = '') {
  *
  * @return Boolean Returns true when we need to get API data.
  */
-function dontWait($api, $owner = 0, $randomize = true) {
+function dontWait($api, $owner = 0, $randomize = TRUE) {
   global $tracing;
   $mess = 'Before getCachedUntil for ' . $api . ' in ' . basename(__FILE__);
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
@@ -95,7 +85,7 @@ function dontWait($api, $owner = 0, $randomize = true) {
   if (($now - $ctime) > 300) {
     $mess = 'Tired of waiting! Getting ' . $api . ' for ' . $owner;
     trigger_error($mess, E_USER_NOTICE);
-    return true;
+    return TRUE;
   };
   // Got to wait until our time.
   if ($now < $ctime) {
@@ -116,83 +106,8 @@ function dontWait($api, $owner = 0, $randomize = true) {
   }; // if $randomize ...
     $mess .= 'Get ' . $api . ' for ' . $owner;
     trigger_error($mess, E_USER_NOTICE);
-  return true;
-}; // function dontWait
-/**
- * Navigates XML and adds lft and rgt attributes
- *
- * Navigates XML using SimpleXML and adds lft and rgt attributes of Nested Set
- * for insertion into database.
- *
- * @param SimpleXMLElement $node Current element from tree.
- * @param integer $index Current index for lft/rgt counting.
- * @param integer $location Location of asset.
- * Used to propagate information from parents to children that don't include it
- * by default.
- *
- * @return integer Current index for lft/rgt counting.
- */
-function editAssets($node, $index = 1, $location = 0) {
-  $nodeName = $node->getName();
-  if ($nodeName == 'row' || $nodeName == 'result') {
-    $node->addAttribute('lft', $index++);
-    if (isset($node['locationID'])) {
-      $location = $node['locationID'];
-    } else {
-      $node->addAttribute('locationID', $location);
-    }; //if isset $node['locationID']...
-  }; // if $nodeName=='row'||$nodeName=='result'
-  if ($children = $node->children()) {
-    foreach($children as $child) {
-      $index = editAssets($child, $index, $location);
-    }; //foreach children as child
-  };
-  if ($nodeName == 'row' || $nodeName == 'result') {
-    $node->addAttribute('rgt', $index++);
-  };
-  return $index;
-} //function editassets
-/**
- * Get solarsystemid for a blood line.
- * @param string $bloodline Which bloodline to get HQ for.
- *
- * @return string Returns the HQ system for this blood line.
- *
- * @throws UnexpectedValueException for unknown bloodlines.
- */
-function getBloodLineHQ($bloodline) {
-  $raceToSystem = array(
-    'Achura' => 30000145, 'Amarr' => 30002187, 'Brutor' => 30002544,
-    'Civire' => 30000145, 'Deteis' => 30000145, 'Gallente' => 30004967,
-    'Intaki' => 30003788, 'Jin-Mei' => 30004967, 'Khanid' => 30003863,
-    'Ni-Kunni' => 30002187, 'Sebiestor' => 30002544, 'Vherokior' => 30002544
-  );
-  if (array_key_exists($bloodline,$raceToSystem)) {
-    return $raceToSystem[$bloodline];
-  } else {
-    throw new UnexpectedValueException('Unknouwn bloodline '.$chartype,0);
-  };
-} // function get_BloodLineHQ ...
-/**
- * Get typeID of blood line for a character.
- * @param integer $bloodLine Which blood line to get typeID for.
- *
- * @return string Returns the typeID for this blood line.
- *
- * @throws UnexpectedValueException for unknown bloodlines.
- */
-function getBloodLineTypeID($bloodLine) {
-  $bloodLineToTypeID = array(
-    'Achura' => 1383, 'Amarr' => 1373, 'Brutor' => 1380, 'Civire' => 1375,
-    'Deteis' => 1376, 'Gallente' => 1377, 'Intaki' => 1378, 'Jin-Mei' => 1384,
-    'Khanid' => 1385, 'Ni-Kunni' => 1374, 'Sebiestor' => 1379, 'Vherokior' => 1386
-  );
-  if (array_key_exists($bloodLine,$bloodLineToTypeID)) {
-    return $bloodLineToTypeID[$bloodLine];
-  } else {
-    throw new UnexpectedValueException('Unknown bloodline '.$bloodLine,0);
-  };
-} // function get_charBloodLine ...
+  return TRUE;
+}// function dontWait
 /**
  * Get cache until time for a table from cacheduntil table
  * @param string $tname Name of table to get time for.
@@ -203,51 +118,22 @@ function getBloodLineTypeID($bloodLine) {
  */
 function getCachedUntil($tname, $owner) {
   try {
-    $con = connect(DSN_UTIL_WRITER, 'CachedUntil');
-    $sql = 'select cachedUntil from `CachedUntil`';
-    $sql.= ' where tableName=? and ownerID=?';
+    $con = connect(YAPEAL_DSN, YAPEAL_TABLE_PREFIX . 'utilCachedUntil');
+    $sql = 'select cachedUntil';
+    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilCachedUntil`';
+    $sql .= ' where tableName=? and ownerID=?';
     $until = $con->GetOne($sql, array($tname, $owner));
     if (!strtotime($until)) {
-      return '1970-01-01 00:00:01'; // One second after epox
+      $until = '1970-01-01 00:00:01'; // One second after epox
     };
   }
   catch(ADODB_Exception $e) {
-    return '1970-01-01 00:00:01'; // One second after epox
+    $until = '1970-01-01 00:00:01'; // One second after epox
   };
   return $until;
-};
+}// function getCachedUntil
 /**
- * Get blood line for a character.
- * @param integer $charid Which character to get blood line for.
- * @param string $dsn An ADOdb compatible connection string.
- *
- * @return string Returns the HQ system for this race.
- *
- * @throws ADODB_Exception for any errors.
- */
-function getCharBloodLine($charid) {
-  $con = connect(DSN_CHAR_WRITER, 'Yapeal');
-  $sql = 'select bloodLine from `CharacterSheet`';
-  $sql.= ' where characterID=?';
-  $result = $con->GetOne($sql,array($charid));
-  return $result;
-} // function get_charBloodLine ...
-/**
- * Get stationid (corp HQ) from corporationsheet table
- * @param integer $corp Which corporation's HQ.
- *
- * @return string Returns the HQ station for this corp.
- *
- * @throws ADODB_Exception for any errors.
- */
-function getCorpHQ($corp) {
-  $con = connect(DSN_CORP_WRITER, 'Yapeal');
-  $sql = 'select stationID from `CorporationSheet`';
-  $sql.= ' where corporationID=?';
-  return $con->GetOne($sql, array($corp));
-};
-/**
- * Gets a list of characters the are active from RegisteredCharacter.
+ * Gets a list of characters that are active from RegisteredCharacter.
  *
  * @return array Returns the list of active characters.
  *
@@ -255,12 +141,12 @@ function getCorpHQ($corp) {
  */
 function getRegisteredCharacters() {
   global $tracing;
-  $con = connect(DSN_CHAR_WRITER, 'Yapeal');
+  $con = connect(YAPEAL_DSN, 'Yapeal');
   /* Generate a list of character(s) we need to do updates for */
-  $sql = 'select u.userID "userid",u.fullApiKey "apikey",chr.characterID "charid"';
-  $sql .= ' from `';
-  $sql .= DB_UTIL . '`.`RegisteredCharacter` as chr,`';
-  $sql .= DB_UTIL . '`.`RegisteredUser` as u';
+  $sql = 'select u.userID "userID",u.fullApiKey "apiKey",chr.characterID "charID"';
+  $sql .= ' from ';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
   $sql .= ' where chr.isActive=1';
   $sql .= ' and chr.userID=u.userID';
   $mess = 'Before GetAll active characters in ' . basename(__FILE__);
@@ -268,9 +154,9 @@ function getRegisteredCharacters() {
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $list = $con->GetAll($sql);
   return $list;
-};
+}// function getRegisteredCharacters
 /**
- * Gets a list of corporations the are active from RegisteredCorporation.
+ * Gets a list of corporations that are active from RegisteredCorporation.
  *
  * @return array Returns the list of active corporations.
  *
@@ -278,14 +164,16 @@ function getRegisteredCharacters() {
  */
 function getRegisteredCorporations() {
   global $tracing;
-  $con = connect(DSN_CORP_WRITER, 'Yapeal');
+  $con = connect(YAPEAL_DSN, 'Yapeal');
   // Generate a list of corporation(s) we need to do updates for
-  $sql = 'select cp.corporationID "corpid",u.userID "userid",';
-  $sql .= 'u.fullApiKey "apikey",cp.characterID "charid"';
-  $sql .= ' from `' . DB_UTIL . '`.`RegisteredCorporation` as cp,`';
-  $sql .= DB_UTIL . '`.`RegisteredCharacter` as chr,`';
-  $sql .= DB_UTIL . '`.`RegisteredUser` as u';
-  $sql .= ' where cp.isActive=1';
+  $sql = 'select cp.corporationID "corpID",u.userID "userID",';
+  $sql .= 'u.fullApiKey "apiKey",cp.characterID "charID"';
+  $sql .= ' from ';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation` as cp,';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
+  $sql .= ' where';
+  $sql .= ' cp.isActive=1';
   $sql .= ' and cp.characterID=chr.characterID';
   $sql .= ' and chr.userID=u.userID';
   $mess = 'Before GetAll active corporations in ' . basename(__FILE__);
@@ -293,7 +181,28 @@ function getRegisteredCorporations() {
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   $list = $con->GetAll($sql);
   return $list;
-};
+}// function getRegisteredCorporations
+/**
+ * Gets a list of users from RegisteredUser.
+ *
+ * @return array Returns the list of users.
+ *
+ * @throws ADODB_Exception for any errors.
+ */
+function getRegisteredUsers() {
+  global $tracing;
+  $con = connect(YAPEAL_DSN, 'Yapeal');
+  /* Generate a list of user(s) we need to do updates for */
+  $sql = 'select userID ,fullApiKey "apiKey"';
+  $sql .= ' from ';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
+  $sql .= ' where 1=1';
+  $mess = 'Before GetAll users in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+  $list = $con->GetAll($sql);
+  return $list;
+}// function getRegisteredUsers
 /**
  * Function to build a multi-values insert ... on duplicate key update query
  *
@@ -305,9 +214,10 @@ function getRegisteredCorporations() {
  * @return string Returns a complete SQL statement ready to be used by a
  * ADOdb exec
  *
- * @throws ADODB_Exception if connect used to do quoting fails.
+ * @throws ADODB_Exception if connection used to do quoting fails.
  */
 function makeMultiUpsert(array $data, array $params, $table, $dsn) {
+  global $tracing;
   $pkeys = array_keys($params);
   $dkeys = array_keys($data[0]);
   // Check for missing fields
@@ -352,8 +262,12 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
     $updates[] = '`' . $k . '`=values(`' . $k . '`)';
   };
   $dupup .= implode(',', $updates);
+  $mess = 'makeMutliUpsert query: ' . PHP_EOL;
+  $mess .= $insert . $values . $dupup;
+  $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 3) &&
+  $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   return $insert . $values . $dupup;
-} // function makeMultiUpsert ...
+}// function makeMultiUpsert
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update
  * for an array of records
@@ -369,7 +283,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
  * );
  * $types=array('tableName'=>'text','ownerID'=>'integer',
  *   'cachedUntil'=>'timestamp');
- * multipleUpsert($data,$types,'CacheUntil',DSN_UTIL_WRITER);
+ * multipleUpsert($data,$types,'CacheUntil',YAPEAL_DSN);
  * </code>
  *
  * @param array $data An array of assoc arrays of column names and values to be
@@ -423,7 +337,7 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
   return $con->Execute($upsert);
-} // function multipleUpsert ...
+}// function multipleUpsert
 /**
  * Builds table upsert from the attributes of a SimpleXMLElement array
  *
@@ -458,7 +372,7 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn,
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     multipleUpsert($data, $types, $table, $dsn);
   }; // if $datum>0
-}
+}// function multipleUpsertAttributes
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update
  *
@@ -468,7 +382,7 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn,
  *   'cachedUntil'=>'2008-01-01 00:00:01');
  * $types=array('tableName'=>'text','ownerID'=>'integer',
  *   'cachedUntil'=>'timestamp');
- * upsert($data,$types,'CacheUntil',DSN_UTIL_WRITER);
+ * upsert($data,$types,'CacheUntil',YAPEAL_DSN);
  * </code>
  *
  * @param array $data Assoc array of column names and value to be Upserted.
@@ -495,5 +409,5 @@ function upsert(array $data, array $types, $table, $dsn) {
   $con = connect($dsn);
   $effected = $con->Execute($upsert);
   return $effected;
-} // function upsert ...
+}// function upsert
 ?>

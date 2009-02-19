@@ -2,7 +2,10 @@
 /**
  * Interface for Api database tables.
  *
- * LICENSE: This file is part of Yapeal.
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
  *
  *  Yapeal is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -18,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, 2009, Michael Cummings
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -31,6 +34,9 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 
 /**
  * Interface for loading (selecting) Eve API from a database table.
+ *
+ * @package Yapeal
+ * @subpackage Api
  */
 interface ILoadApiTable {
   /**

@@ -1,8 +1,11 @@
 <?php
 /**
- * Used to get eve information from Eve-online API
+ * Used to get eve information from Eve-online API.
  *
- * LICENSE: This file is part of Yapeal.
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
  *
  *  Yapeal is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -18,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, 2009, Michael Cummings
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -29,112 +32,44 @@ $sectionFile = basename(__FILE__);
 if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-/* *************************************************************************
-* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
-* *************************************************************************/
-/* *************************************************************************
-* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
-* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
-* *************************************************************************/
 /* **************************************************************************
 * Global API pulls
 * **************************************************************************/
-$apis = array(
-  'AllianceList' => array(
-    'types' => array(
-      'allianceID' => 'I',
-      'executorCorpID' => 'I',
-      'memberCount' => 'I',
-      'name' => 'C',
-      'shortName' => 'C',
-      'startDate' => 'T'
-    ) ,
-    'xpath' => '//result/rowset[@name="alliances"]/row'
-  ) ,
-  'ConquerableStationList' => array(
-    'types' => array(
-      'corporationID' => 'I',
-      'corporationName' => 'C',
-      'solarSystemID' => 'I',
-      'stationID' => 'I',
-      'stationName' => 'C',
-      'stationTypeID' => 'I'
-    ) ,
-    'xpath' => '//row'
-  ) ,
-  'ErrorList' => array(
-    'types' => array(
-      'errorCode' => 'I',
-      'errorText' => 'C'
-    ) ,
-    'xpath' => '//row'
-  ) ,
-  'RefTypes' => array(
-    'types' => array(
-      'refTypeID' => 'I',
-      'refTypeName' => 'C'
-    ) ,
-    'xpath' => '//row'
-  )
+$apis = array('eveAllianceList', 'eveConquerableStationList', 'eveErrorList',
+  'eveRefTypes'
 );
-foreach($apis as $api => $settings) {
-  $xml = NULL;
-  try {
-    $mess = 'Before dontWait for ' . $api . ' in ' . $sectionFile;
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    // Should we wait to get API data
-    if (dontWait($api)) {
-      // Set it so we wait a bit before trying again if something goes wrong.
-      $data = array('tableName' => $api, 'ownerID' => 0,
-        'cachedUntil' => YAPEAL_START_TIME);
-      $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
-      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
-      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-      $mess = 'Before getAPIinfo for ' . $api . ' in ' . $sectionFile;
-      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-      // Grab the XML data
-      $xml = getAPIinfo($api, YAPEAL_API_EVE);
-    } else {
-      continue;
-    };// else dontWait ...
-    if ($xml instanceof SimpleXMLElement) {
-      $mess = 'Before xpath for ' . $api . ' in ' . $sectionFile;
-      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-      $datum = $xml->xpath($settings['xpath']);
-      if (count($datum) > 0) {
-        $mess = 'Before truncate ' . $api . ' in ' . $sectionFile;
-        $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-        // Empty out old data then upsert (insert) new
-        $sql = 'truncate table ' . $api;
-        $con->Execute($sql);
-        $mess = 'Before multiUpsert for ' . $api . ' in ' . $sectionFile;
-        $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-        multipleUpsertAttributes($datum, $settings['types'], $api, DSN_EVE_WRITER);
-      }; // if count $datum ...
-      // Update CachedUntil time since we updated records and have new one.
-      $cuntil = (string)$xml->cachedUntil[0];
-      $data = array('tableName' => $api, 'ownerID' => 0,
-        'cachedUntil' => $cuntil);
-      $mess = 'Before upsert for ' . $api . ' in ' . $sectionFile;
-      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-      upsert($data, $cachetypes, 'CachedUntil', DSN_UTIL_WRITER);
-    }; // if $xml instanceof SimpleXMLElement
-  }
-  catch(YapealApiFileException $e) {
-    // Do nothing CachedUntil already set to retry in a bit.
-  }
-  catch(YapealApiException $e) {
-    // Do nothing use observers to log info
-  }
-  catch(ADODB_Exception $e) {
-    // Do nothing use observers to log info
-  }
+$serverName = 'Tranquility';
+foreach ($apis as $api) {
+  require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
+  $tableName = YAPEAL_TABLE_PREFIX . $api;
+  $mess = 'Before dontWait for ' . $tableName . ' in ' . $sectionFile;
+  $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+  // Should we wait to get API data
+  if (dontWait($tableName)) {
+    // Set it so we wait a bit before trying again if something goes wrong.
+    $data = array('tableName' => $tableName,
+      'ownerID' => 0, 'cachedUntil' => YAPEAL_START_TIME);
+    $mess = 'Before upsert for ' . $tableName . ' in ' . $sectionFile;
+    $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
+    $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
+    try {
+      upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
+      YAPEAL_DSN);
+    }
+    catch(ADODB_Exception $e) {}
+  } else {
+    continue;
+  };// else dontWait ...
+  $params = array('serverName' => $serverName);
+  $mess = 'Before instance for ' . $tableName;
+  $mess .= ' in ' . $sectionFile;
+  $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
+  $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+  $instance = new $api($params);
+  if ($instance->apiFetch()) {
+    $instance->apiStore();
+  };
+  $instance = null;
 }; // foreach $apis ...
 ?>

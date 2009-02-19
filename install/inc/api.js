@@ -61,9 +61,6 @@ if (/msie/i.test (navigator.userAgent)) { //only override IE
 function Go_Back() {
   document.getElementById('Go_Back').innerHTML = '<a href="javascript:history.go(-1)">Go Back</a>';
 }
-
-
-
 /*
 * Get characters
 */
@@ -97,13 +94,13 @@ function api_get_chars() {
       // if API keys is not valid, tell the user
       if (valid_Limit_Key == false || valid_Full_Key == false) {
         if  (valid_Limit_Key == false && valid_Full_Key == true) {
-          alert("Limit API Key: Is not valid");
+          alert(lang.Limit_API_Not_Vanid);
         } else if (valid_Limit_Key == true && valid_Full_Key == false) {
-          alert("Full API Key: Is not valid");
+          alert(lang.Full_API_Not_Vanid);
         } else {
-          alert("Limit API Key: Is not valid\nand\nFull API Key: Is not valid");
+          alert(lang.Limit_and_Full_API_Not_Vanid);
         };
-        document.getElementById("api_char_select").innerHTML = "<font class=\"good\">Will load when API info is set<input type=\"hidden\" name=\"api_char_info\" value=\"\">";
+        document.getElementById("api_char_select").innerHTML = "<font class=\"good\">" + lang.Will_load_on_API + "<input type=\"hidden\" name=\"config[api_char_info]\" value=\"\">";
         API_Val_error = 1;
         check_submit();
       }
@@ -118,18 +115,85 @@ function api_get_chars() {
         check_submit();
         SendCharListRequest(api_user_id,API_Key);
       } else {
-        document.getElementById("api_char_select").innerHTML = 'Will load when API info is set<input type="hidden" name="api_char_info" value="">';
+        document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
         document.getElementById("api_char_select").className = 'good';
         API_Val_error = 1;
         check_submit();
       };
     } else {
-      document.getElementById("api_char_select").innerHTML = 'Will load when API info is set<input type="hidden" name="api_char_info" value="">';
+      document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
       document.getElementById("api_char_select").className = 'good';
-      alert("API User ID: is not a number");
+      alert(lang.API_User_ID_NAN);
     };
   } else {
-    document.getElementById("api_char_select").innerHTML = 'Will load when API info is set<input type="hidden" name="api_char_info" value="">';
+    document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
+    document.getElementById("api_char_select").className = 'good';
+  };
+}
+
+function api_get_chars2(charselect) {
+  var api_user_id = document.getElementById("api_user_id").value;
+  var api_limit_key = document.getElementById("api_limit_key").value;
+  var api_full_key = document.getElementById("api_full_key").value;
+  // Validation and if valid then pull the character list
+  if (api_user_id != "") {
+    if (!isNaN(api_user_id)) {
+      var valid_Limit_Key = true;
+      var valid_Full_Key = true;
+      // Validate limit API Key
+      if (api_limit_key != "") {
+        if (/[^a-zA-Z0-9]/.test(api_limit_key)) {
+          valid_Limit_Key = false;
+        };
+        if (api_limit_key.length != 64) {
+          valid_Limit_Key = false;
+        };
+      };
+      // Validate full API Key
+      if (api_full_key != "") {
+        if (/[^a-zA-Z0-9]/.test(api_full_key)) {
+          valid_Full_Key = false;
+        };
+        if (api_full_key.length != 64) {
+          valid_Full_Key = false;
+        };
+      };
+      // if API keys is not valid, tell the user
+      if (valid_Limit_Key == false || valid_Full_Key == false) {
+        if  (valid_Limit_Key == false && valid_Full_Key == true) {
+          alert(lang.Limit_API_Not_Vanid);
+        } else if (valid_Limit_Key == true && valid_Full_Key == false) {
+          alert(lang.Full_API_Not_Vanid);
+        } else {
+          alert(lang.Limit_and_Full_API_Not_Vanid);
+        };
+        document.getElementById("api_char_select").innerHTML = "<font class=\"good\">" + lang.Will_load_on_API + "<input type=\"hidden\" name=\"config[api_char_info]\" value=\"\">";
+        API_Val_error = 1;
+        check_submit2();
+      }
+      // All is okay. now get the character list
+      else if ((api_full_key != "" || api_limit_key != "") && valid_Limit_Key == true && valid_Full_Key == true) {
+        if (api_full_key != "") {
+          var API_Key = api_full_key;
+        } else {
+          var API_Key = api_limit_key;
+        };
+        API_Val_error = 0;
+        check_submit();
+        SendCharListRequest(api_user_id,API_Key,charselect,true);
+      } else {
+        document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
+        document.getElementById("api_char_select").className = 'good';
+        API_Val_error = 1;
+        check_submit2();
+      };
+    } else {
+      document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
+      document.getElementById("api_char_select").className = 'good';
+      alert(lang.API_User_ID_NAN);
+    };
+  } else {
+    document.getElementById("api_char_select").innerHTML = lang.Will_load_on_API + '<input type="hidden" name="config[api_char_info]" value="" />';
     document.getElementById("api_char_select").className = 'good';
   };
 }
@@ -146,6 +210,18 @@ function Select_Character() {
   };
 }
 
+// On character select change check if
+function Select_Character2() {
+  var selected_char = document.getElementById("api_char_choise").value;
+  if (selected_char != "") {
+    API_CharSel_error = 0;
+    check_submit2();
+  } else {
+    API_CharSel_error = 1;
+    check_submit2();
+  };
+}
+
 // Function to check if you are ready to run the install.
 function check_submit() {
   var checker = 0;
@@ -153,19 +229,32 @@ function check_submit() {
   checker += API_Val_error;
   checker += API_CharSel_error;
   if (checker > 0) {
-    document.getElementById("submit_select").innerHTML = '<input type="button" value="Run Install" disabled="disabled" />';
+    document.getElementById("submit_select").innerHTML = '<input type="button" value="' + lang.Run_Setup + '" disabled="disabled" />';
   } else {
-    document.getElementById("submit_select").innerHTML = '<input type="submit" value="Run Install" />';
+    document.getElementById("submit_select").innerHTML = '<input type="submit" value="' + lang.Run_Setup + '" />';
+  };
+}
+
+// Function to check if you are ready to run the install.
+function check_submit2() {
+  var checker = 0;
+  checker += DB_connect_error;
+  checker += API_Val_error;
+  checker += API_CharSel_error;
+  if (checker > 0) {
+    document.getElementById("submit_select").innerHTML = '<input type="button" value="' + lang.Update + '" disabled="disabled" />';
+  } else {
+    document.getElementById("submit_select").innerHTML = '<input type="submit" value="' + lang.Update + '" />';
   };
 }
 
 // Function to load JavaScript elements in the API Setup
 function load_Install_Setup_JavaScript() {
   // Change the form action path
-  document.go_no_go.setAttribute("action", window.location.pathname + "?install=go");
+  document.go_no_go.setAttribute("action", window.location.pathname + "?lang=" + lang.lang + "&install=go");
 
   // Disable the submit button
-  document.getElementById("submit_select").innerHTML = '<input type="button" value="Run Install" disabled="disabled" />';
+  document.getElementById("submit_select").innerHTML = '<input type="button" value="' + lang.Run_Setup + '" disabled="disabled" />';
 
   // Create the character select table with default text.
   var table = document.getElementById('api_setup_table');
@@ -175,14 +264,41 @@ function load_Install_Setup_JavaScript() {
   var td2   = document.createElement('TD');
 
   td1.className = 'tableinfolbl';
-  td1.innerHTML = 'Character:';
+  td1.innerHTML = lang.Character + ':';
   td2.setAttribute("id", "api_char_select");
   td2.className = 'good';
-  td2.innerHTML = 'Will load when API info is set<input type="hidden" name="api_char_info" value="" />';
+  td2.innerHTML = lang.Will_load_on_API + '<input type="hidden" name="api_char_info" value="" />';
 
   table.appendChild(tr);
   tr.appendChild(td1);
   tr.appendChild(td2);
+}
+
+// Function to load JavaScript elements in the API Setup
+function load_Edit_Setup_JavaScript(charselect) {
+  // Change the form action path
+  document.go_no_go.setAttribute("action", window.location.pathname + "?lang=" + lang.lang + "&edit=go");
+
+  // Disable the submit button
+  document.getElementById("submit_select").innerHTML = '<input type="button" value="' + lang.Update + '" disabled="disabled" />';
+
+  // Create the character select table with default text.
+  var table = document.getElementById('api_setup_table');
+
+  var tr    = document.createElement('TR');
+  var td1   = document.createElement('TD');
+  var td2   = document.createElement('TD');
+
+  td1.className = 'tableinfolbl';
+  td1.innerHTML = lang.Character + ':';
+  td2.setAttribute("id", "api_char_select");
+  td2.className = 'good';
+  td2.innerHTML = lang.Will_load_on_API + '<input type="hidden" name="api_char_info" value="" />';
+
+  table.appendChild(tr);
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  api_get_chars2(charselect);
 }
 
 
@@ -224,30 +340,30 @@ function receive() {
   //var response = "";
   try {
     if (clientHttpHandler.readyState == 1) {
-      document.getElementById("api_char_select").innerHTML = 'Loading';
+      document.getElementById("api_char_select").innerHTML = lang.Loading;
       document.getElementById("api_char_select").className = 'notis';
     } else if (clientHttpHandler.readyState == 2) {
-      document.getElementById("api_char_select").innerHTML = 'Loaded';
+      document.getElementById("api_char_select").innerHTML = lang.Loaded;
       document.getElementById("api_char_select").className = 'notis';
     } else if (clientHttpHandler.readyState == 3) {
-      document.getElementById("api_char_select").innerHTML = 'Interactive';
+      document.getElementById("api_char_select").innerHTML = lang.Interactive;
       document.getElementById("api_char_select").className = 'notis';
     } else if (clientHttpHandler.readyState == 4) { // Completed
       if (clientHttpHandler.status == 200) { // "OK"
         return true;
       } else if (clientHttpHandler.status == 403) { // "Forbidden"
-        alert("Forbidden");
+        alert(lang.Forbidden);
       } else if (clientHttpHandler.status == 404) { // "URL Not Found"
-        alert("URL Not Found");
+        alert(lang.URL_Not_Found);
       } else { // Miscellaneous
-        alert("Error: status code " + clientHttpHandler.status);
+        alert(lang.Error_Status_Code + " " + clientHttpHandler.status);
       };
     };
   } catch (genException) { }
   return false;
 }
 
-function SendCharListRequest(ID,Key){
+function SendCharListRequest(ID,Key,CharSelect,Update){
   /*
   We will append a random number each time we need to
   Send the request. So that browsers does not cache the request
@@ -260,7 +376,11 @@ function SendCharListRequest(ID,Key){
   I have here used the GET method to send data to the background
   Page so builds the query string here.
   */
-  queryString = "?rand=" + rand + "&id=" + ID + "&key=" + Key;
+  if (Update == true) {
+    queryString = "?rand=" + rand + "&lang=" + lang.lang + "&id=" + ID + "&key=" + Key + "&char=" + CharSelect;
+  } else {
+    queryString = "?rand=" + rand + "&lang=" + lang.lang + "&id=" + ID + "&key=" + Key;
+  }
   // Append the query string at the end of the URL
   sURL += "?" + queryString;
   // If this request is a synchronous or not.
@@ -274,10 +394,17 @@ function SendCharListRequest(ID,Key){
       response = clientHttpHandler.responseText;
       if(response == "ERROR"){
         API_CharSel_error = 1;
-        check_submit();
+        if (Update == true) {
+          check_submit2();
+        } else {
+          check_submit();
+        };
       } else {
         document.getElementById("api_char_select").innerHTML = response;
         document.getElementById("api_char_select").className = 'good';
+        if (Update == true) {
+          Select_Character2();
+        };
       };
     };
   };

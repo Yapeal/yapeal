@@ -32,7 +32,7 @@
 body {
   background-color: #666666;
   color: #FFFFFF;
-	margin: 0;
+  margin: 0;
 }
 h1 {
   text-transform: uppercase;
@@ -41,9 +41,9 @@ h1 {
 }
 table {
   background-color: #333333;
-	margin : 0.5em auto;
-	text-align : left;
-	width: 35em;
+  margin : 0.5em auto;
+  text-align : left;
+  width: 40em;
 }
 .input_text {
   width: 250px;
@@ -57,11 +57,11 @@ th {
   font-weight: bold;
 }
 .tableinfolbl {
-	background-color: #5E6E79;
-	color: white;
-	font-weight: bold;
-	text-align: right;
-	margin-right: 0.5em;
+ background-color: #5E6E79;
+  color: white;
+  font-weight: bold;
+  text-align: right;
+  margin-right: 0.5em;
 }
 td {
   background-color: #606060;
@@ -92,10 +92,10 @@ a:visited {
   text-decoration: none;
 }
 #wrapper {
-	margin: 0 auto;
-	padding-top: 1em;
-	text-align: center;
+  margin: 0 auto;
+  padding-top: 1em;
+  text-align: center;
 }
 #submit_select {
-	padding-bottom: 1em;
+  padding-bottom: 1em;
 }

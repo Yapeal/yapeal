@@ -34,13 +34,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-function activecheck($checker) {
-  if ($checker == 1) {
-    return PHP_EOL . 'active=TRUE';
-  } else {
-    return '';
-  };
-}
 function trueorfalse($checker) {
   if ($checker == 1) {
     return 'TRUE';
@@ -48,85 +41,108 @@ function trueorfalse($checker) {
     return 'FALSE';
   };
 }
+if (isset($_GET['edit'])) {
+  if ($config['db_action']==2) {
+    $host = $config['DB_Host'];
+    $username = $config['DB_Username'];
+    $password = $config['DB_Password'];
+    $database = $config['DB_Database'];
+    $table_prefix = $config['DB_Prefix'];
+  } elseif ($config['db_action']==1) {
+    $host = $config['DB_Host'];
+    $username = $config['DB_Username'];
+    $password = $config['DB_Password'];
+    $database = $ini_yapeal['Database']['database'];
+    $table_prefix = $ini_yapeal['Database']['table_prefix'];
+  } else {
+    $host = $ini_yapeal['Database']['host'];
+    $username = $ini_yapeal['Database']['username'];
+    $password = $ini_yapeal['Database']['password'];
+    $database = $ini_yapeal['Database']['database'];
+    $table_prefix = $ini_yapeal['Database']['table_prefix'];
+  }
+  if ($config['debug']==1) {
+    $log_level = 'E_ALL';
+    $trace_active = 'TRUE';
+    $trace_level = '1';
+    $trace_section = 'YAPEAL_TRACE_API';
+  } else {
+    $log_level = 'E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING';
+    $trace_active = 'FALSE';
+    $trace_level = '0';
+    $trace_section = 'YAPEAL_TRACE_NONE';
+  }
+} else {
+  $host = $config['DB_Host'];
+  $username = $config['DB_Username'];
+  $password = $config['DB_Password'];
+  $database = $config['DB_Database'];
+  $table_prefix = $config['DB_Prefix'];
+  $log_level = 'E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING';
+  $trace_active = 'FALSE';
+  $trace_level = '0';
+  $trace_section = 'YAPEAL_TRACE_NONE';
+}
 $inidata = ';;;;;
 ; Comments on setting up config/yapeal.ini manually can be found in
-; config/yapeal.ini-example or in config/yapeal_ini_docs.txt.
+; config/yapeal-example.ini or in config/yapeal_ini_docs.txt.
 ; Additional information can be found in the Wiki at:
 ; http://code.google.com/p/yapeal/
 ;;;;;
 
-date="$Date:: 2009-01-19 19:07:56 #$"
+date="$Date:: 2009-01-31 05:03:14 #$"
 
 stability="beta"
 
-version="$Revision: 471 $"
+version="$Revision: 526 $"
 
 [Api]
-cache_xml='.trueorfalse($_POST['cache_xml']).'
+cache_xml='.trueorfalse($config['cache_xml']).'
 file_suffix=".xml.aspx"
 url_base="http://api.eve-online.com"
+account_active='.trueorfalse($config['db_account']).'
+char_active='.trueorfalse($config['db_char']).'
+corp_active='.trueorfalse($config['db_corp']).'
+eve_active='.trueorfalse($config['db_eve']).'
+map_active='.trueorfalse($config['db_map']).'
+server_active=TRUE
 
 [Database]
-active=FALSE
-database="'.$_POST['DB_Database_Main'].'"
+host="'.$host.'"
+username="'.$username.'"
+password="'.$password.'"
+database="'.$database.'"
+table_prefix="'.$table_prefix.'"
 driver="mysqli://"
-host="'.$_POST['DB_Host_Main'].'"
 suffix="?new"
-writer="'.$_POST['DB_Username_Main'].':'.$_POST['DB_Password_Main'].'"
-
-[Database-account]'.activecheck($_POST['db_account']).'
-
-[Database-char]'.activecheck($_POST['db_char']).'
-
-[Database-corp]'.activecheck($_POST['db_corp']).'
-
-[Database-eve]'.activecheck($_POST['db_eve']).'
-
-[Database-map]'.activecheck($_POST['db_map']).'
-
-[Database-server]
-active=TRUE
-
-[Database-util]
-active=TRUE
 
 [Logging]
 error_log="yapeal_error.log"
-log_level=E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING
+log_level='.$log_level.'
 notice_log="yapeal_notice.log"
-trace_log="yapeal_trace.log"
 warning_log="yapeal_warning.log"
-
-[Paths]
-adodb="../ADOdb/"
-base="../"
-backend="../backend/"
-cache="../cache/"
-class="../class/"
-config="../config/"
-log="log/"
-
-[Tracing]
-trace=FALSE
-trace_level=0
+trace_active='.$trace_active.'
+trace_level='.$trace_level.'
+trace_log="yapeal_trace.log"
 trace_output="file"
-trace_section=YAPEAL_TRACE_NONE';
-$fp = fopen('../config/yapeal.ini', 'w');
+trace_section='.$trace_section;
+$fp = fopen('..'.$DS.'config'.$DS.'yapeal.ini', 'w');
 fwrite($fp, $inidata);
 fclose($fp);
-
-if (!(@is_readable('../config/yapeal.ini') || @is_file('../config/yapeal.ini') || @parse_ini_file('../config/yapeal.ini'))) {
+if (isset($_GET['edit'])) { $iniaction = ED_UPDATE_FILE; } else { $iniaction = INSTALLER_CREATE_FILE; }; // if isset $_GET['edit']
+if (!(@is_readable('..'.$DS.'config'.$DS.'yapeal.ini') || @is_file('..'.$DS.'config'.$DS.'yapeal.ini') || @parse_ini_file('..'.$DS.'config'.$DS.'yapeal.ini'))) {
   $stop++;
   $output .= '<tr>' . PHP_EOL;
-  $output .= '  <td class="tableinfolbl" style="text-align: left;">Create File:</td>' . PHP_EOL;
+  $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;
-  $output .= '  <td class="warning">yapeal.ini was not created or not a valid ini file</td>' . PHP_EOL;
+  $output .= '  <td class="warning">yapeal.ini '.INSTALLER_CREATE_ERROR.'</td>' . PHP_EOL;
   $output .= '</tr>' . PHP_EOL;
 } else {
+  
   $output .= '<tr>' . PHP_EOL;
-  $output .= '  <td class="tableinfolbl" style="text-align: left;">Creat File:</td>' . PHP_EOL;
+  $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;
-  $output .= '  <td class="good">Done</td>' . PHP_EOL;
+  $output .= '  <td class="good">'.DONE.'</td>' . PHP_EOL;
   $output .= '</tr>' . PHP_EOL;
 };
 ?>

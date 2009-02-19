@@ -2,7 +2,10 @@
 /**
  * Contents IYapealObserver Interface.
  *
- * LICENSE: This file is part of Yapeal.
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
  *
  *  Yapeal is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -32,6 +35,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Interface classes need to implement to observable exceptions.
  *
  * @package Yapeal
+ * @subpackage Observer
  */
 interface YapealObserver {
   /**

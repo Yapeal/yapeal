@@ -2,7 +2,10 @@
 /**
  * Stuff used to trace program flow in Yapeal.
  *
- * LICENSE: This file is part of Yapeal.
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
  *
  *  Yapeal is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -18,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008, 2009, Michael Cummings
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
@@ -29,17 +32,11 @@ $sectionFile = basename(__FILE__);
 if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-/* *************************************************************************
-* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
-* *************************************************************************/
-/* *************************************************************************
-* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
-* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
-* *************************************************************************/
 /**
  * Used to track tracing of execution in Yapeal.
  *
  * @package Yapeal
+ * @subpackage Tracing
  */
 class YapealTracing {
   /**
@@ -79,7 +76,7 @@ class YapealTracing {
    * @return bool TRUE if this type and level of tracing is on.
    */
   function activeTrace($section, $level) {
-    if (YAPEAL_TRACE && (YAPEAL_TRACE_SECTION & $section) == $section &&
+    if (YAPEAL_TRACE_ACTIVE && (YAPEAL_TRACE_SECTION & $section) == $section &&
       YAPEAL_TRACE_LEVEL >= $level) {
       return TRUE;
     }; // if YAPEAL_TRACE&&...
@@ -116,5 +113,77 @@ class YapealTracing {
       $this->dbTrace .= $mess;
     };
   }
+  /**
+   * flushes the trace to log file.
+   */
+  public function flushTrace() {
+    if (!empty($this->fileTrace)) {
+      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
+      $this->fileTrace = '';
+    };
+    if (!empty($this->dbTrace)) {
+      // This is where the code to store trace into database will go.
+      $this->dbTrace = '';
+    };
+  }
 }
+// Define some constants used with tracing.
+// Lower 16 bits used for API.
+/**
+ * Used to turn on tracing for all areas.
+ */
+define('YAPEAL_TRACE_ALL', 2147483647);
+/**
+ * Use when you want all tracing off but trace_active is still on.
+ */
+define('YAPEAL_TRACE_NONE', 0);
+/**
+ * Use to turn on account section tracing.
+ */
+define('YAPEAL_TRACE_ACCOUNT', 1);
+/**
+ * Use to turn on char section tracing.
+ */
+define('YAPEAL_TRACE_CHAR', 2);
+/**
+ * Use to turn on corp section tracing.
+ */
+define('YAPEAL_TRACE_CORP', 4);
+/**
+ * Use to turn on eve section tracing.
+ */
+define('YAPEAL_TRACE_EVE', 8);
+/**
+ * Use to turn on map section tracing.
+ */
+define('YAPEAL_TRACE_MAP', 16);
+/**
+ * Use to turn on server section tracing.
+ */
+define('YAPEAL_TRACE_SERVER', 32);
+// Upper bits used for Yapeal.
+/**
+ * Use to turn on api tracing.
+ */
+define('YAPEAL_TRACE_API', 65536);
+/**
+ * Use to turn on cache tracing.
+ */
+define('YAPEAL_TRACE_CACHE', 131072);
+/**
+ * Use to turn on curl tracing.
+ */
+define('YAPEAL_TRACE_CURL', 262144);
+/**
+ * Use to turn on database tracing.
+ */
+define('YAPEAL_TRACE_DATABASE', 524288);
+/**
+ * Use to turn on files tracing.
+ */
+define('YAPEAL_TRACE_FILES', 1048576);
+/**
+ * Use to turn on request tracing.
+ */
+define('YAPEAL_TRACE_REQUEST', 2097152);
 ?>

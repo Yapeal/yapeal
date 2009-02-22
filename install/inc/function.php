@@ -229,7 +229,7 @@ function createTables($type) {
     $eveData = $config['db_eve'];
     $mapData = $config['db_map'];
   }
-  if ($config['db_action']==2) { $replacepass = $conf['password']; } else { $replacepass = md5($config['config_pass']); }
+  if (isset($config['db_action']) && $config['db_action']==2) { $replacepass = $conf['password']; } else { $replacepass = md5($config['config_pass']); }
   $replace = array('prefix'           => $config['DB_Prefix'], 
                    'accountData'      => $accountData, 
                    'charData'         => $charData, 

@@ -139,6 +139,11 @@ class corpAssetList extends ACorporation {
    * Navigates XML using SimpleXML and adds lft and rgt attributes of Nested Set
    * for insertion into database.
    *
+   * Original idea for function coded by Stephen.
+   *
+   * @author Stephen <stephenmg12@gmail.com>
+   * @author Michael Cummings <mgcummings@yahoo.com>
+   *
    * @param SimpleXMLElement $node Current element from tree.
    * @param integer $index Current index for lft/rgt counting.
    * @param integer $location Location of asset.

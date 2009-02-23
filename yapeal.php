@@ -38,12 +38,12 @@ define('YAPEAL_STABILITY', 'alpha');
  * Track version of script.
  */
 define('YAPEAL_VERSION',
-  (int)trim(str_replace(array('$', 'Revision:'), '', '$Revision: 561 $')));
+  (int)trim(str_replace(array('$', 'Revision:'), '', '$Revision$')));
 /**
  * Track date of script.
  */
 define('YAPEAL_DATE', trim(str_replace(
-  array('$', '#', 'Date::') , '', '$Date:: 2009-02-15 12:21:50 #$')));
+  array('$', '#', 'Date::') , '', '$Date::                      $')));
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);

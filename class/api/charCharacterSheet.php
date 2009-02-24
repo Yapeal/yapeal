@@ -214,17 +214,24 @@ class charCharacterSheet  extends ACharacter {
         $data[$cnt]['ownerID'] = $this->characterID;
         ++$cnt;
       };
-      try {
-        $mess = 'Upsert for ' . $tableName;
+      if (count($data) > 0) {
+        try {
+          $mess = 'Upsert for ' . $tableName;
+          $mess .= ' from char section in ' . __FILE__;
+          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
+          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+          multipleUpsert($data, $types, $tableName, YAPEAL_DSN);
+        }
+        catch (ADODB_Exception $e) {
+          return FALSE;
+        }
+        $ret = TRUE;
+      } else {
+        $mess = 'No implants for ' . $tableName;
         $mess .= ' from char section in ' . __FILE__;
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsert($data, $types, $tableName, YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
+        trigger_error($mess, E_USER_NOTICE);
+        $ret = FALSE;
+      };// else count $data ...
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
     $mess .= ' from char section in ' . __FILE__;

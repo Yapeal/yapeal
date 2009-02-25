@@ -33,7 +33,7 @@
 /**
  * Track stability of script.
  */
-define('YAPEAL_STABILITY', 'alpha');
+define('YAPEAL_STABILITY', 'beta');
 /**
  * Track version of script.
  */

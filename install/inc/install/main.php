@@ -70,6 +70,10 @@ if (isset($_GET['install']) && $_GET['install'] == "go") {
       // show Danish site
       header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=da&install=welcome");
       exit;
+    } else if (strpos($lang, 'ru') === 0) {
+      // show Russian site
+      header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=ru&install=welcome");
+      exit;
     } else if (strpos($lang, 'en') === 0) {
       // show English site
       header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=en&install=welcome");

@@ -80,6 +80,10 @@ if (isset($_GET['edit']) && $_GET['edit'] == "setup") {
       // show Danish site
       header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=da&edit=setup");
       exit;
+    } else if (strpos($lang, 'ru') === 0) {
+      // show English site
+      header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=ru&edit=setup");
+      exit;
     } else if (strpos($lang, 'en') === 0) {
       // show English site
       header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=en&edit=setup");

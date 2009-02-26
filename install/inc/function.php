@@ -73,6 +73,7 @@ function OpenSite($subtitle = "", $JS = false, $langselect = true) {
                        .'<select name="lang" onchange="submit();">' . PHP_EOL
                        .'  <option value="en"'; if ($_GET['lang'] == 'en') { $languageselector .= ' selected="selected"'; } $languageselector .= '>English</option>' . PHP_EOL
                        .'  <option value="da"'; if ($_GET['lang'] == 'da') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Danish</option>' . PHP_EOL
+                       .'  <option value="ru"'; if ($_GET['lang'] == 'ru') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Russian</option>' . PHP_EOL
                        .'</select>' . PHP_EOL
                        .$page
                        .'<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL

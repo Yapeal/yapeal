@@ -448,12 +448,11 @@ CREATE TABLE IF NOT EXISTS `corpMemberTracking` (
   `shipTypeID` BIGINT UNSIGNED NOT NULL ,
   `startDateTime` DATETIME NOT NULL ,
   `title` TEXT NULL DEFAULT NULL ,
+  INDEX `corpindex1` (`ownerID` ASC) ,
   PRIMARY KEY (`characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
-
-CREATE INDEX `corpindex1` ON `corpMemberTracking` (`ownerID` ASC) ;
 
 CREATE TABLE IF NOT EXISTS `corpStarbaseList` (
   `itemID` BIGINT UNSIGNED NOT NULL ,

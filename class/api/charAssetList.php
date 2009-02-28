@@ -76,7 +76,7 @@ class charAssetList extends ACharacter {
         $rgt = $data->result[0]['rgt'];
         $nodeData = array('flag' => '0', 'itemID' => $this->characterID,
           'lft' => $lft, 'locationID' => 0, 'ownerID' => $this->characterID,
-          'quantity' => 1, 'rgt' => $rgt, 'singleton' => '0', 'typeID' => 2
+          'quantity' => 1, 'rgt' => $rgt, 'singleton' => '0', 'typeID' => 25
         );
         try {
           $con = connect(YAPEAL_DSN, $tableName);

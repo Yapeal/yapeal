@@ -77,7 +77,7 @@ class corpWalletTransactions extends ACorporation {
       $beforeID = 0;
       do {
         $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
-          'beforeTransID ' => $beforeID, 'characterID' => $this->characterID,
+          'beforeTransID' => $beforeID, 'characterID' => $this->characterID,
           'userID' => $this->userID
         );
         $cnt = 0;

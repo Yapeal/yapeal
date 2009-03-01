@@ -81,7 +81,7 @@ class charAssetList extends ACharacter {
         try {
           $con = connect(YAPEAL_DSN, $tableName);
           $sql = 'delete from ' . $tableName;
-          $sql .= ' where ownerid=' . $this->characterID;
+          $sql .= ' where ownerID=' . $this->characterID;
           $mess = 'Before delete for ' . $tableName;
           $mess .= ' from char section in ' . __FILE__;
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&

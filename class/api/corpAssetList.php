@@ -81,7 +81,7 @@ class corpAssetList extends ACorporation {
         try {
           $con = connect(YAPEAL_DSN, $tableName);
           $sql = 'delete from ' . $tableName;
-          $sql .= ' where ownerid=' . $this->corporationID;
+          $sql .= ' where ownerID=' . $this->corporationID;
           $mess = 'Before delete for ' . $tableName;
           $mess .= ' from corp section in ' . __FILE__;
           $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&

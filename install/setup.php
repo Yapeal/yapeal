@@ -52,9 +52,15 @@ if (($parts[0] == "EVE-minibrowser") or ($parts[0] == "Python-urllib")) {
 };
 // If Ingame Browser
 if ($IGB) {
-  echo '<center>This setup can only be run in a normal browser and not the IGB.<br />' . PHP_EOL
-      .'Press the link, you will be popped out EVE and this setup will re-openned in a normal browser.<br />' . PHP_EOL
-      .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">Yapeal Installer</a></center>' . PHP_EOL;
+  if (isset($_GET['lang'])) {
+    GetLang($_GET['lang']);
+    OpenSite(NOIGB_HEADLINE,false,false);
+    echo NOIGB_TEXT
+      .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
+    CloseSite();
+  } else {
+    header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang());
+  };
   // If not the Ingame Browser
 } else {
   // Check if there is an existing yapeal.ini file.

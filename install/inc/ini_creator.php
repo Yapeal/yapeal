@@ -90,11 +90,11 @@ $inidata = ';;;;;
 ; http://code.google.com/p/yapeal/
 ;;;;;
 
-date="$Date:: 2009-01-31 05:03:14 #$"
+date="$Date::                      $"
 
 stability="beta"
 
-version="$Revision: 526 $"
+version="$Revision$"
 
 [Api]
 cache_xml='.trueorfalse($config['cache_xml']).'

@@ -61,14 +61,20 @@ define("LOGIN","Login");
 define("UPDATE","Update");
 define("ON","On");
 define("OFF","Off");
+define("BACK","Back");
+/**
+ * YAPEAL INSTALLER TEXT'S
+ */
+define("NOIGB_HEADLINE","No IGB Support");
+define("NOIGB_TEXT",'This setup can only be run in a normal browser and not the IGB.<br />' . PHP_EOL
+                               .'Press the link and you will be popped out of EVE and this setup will re-openned in a normal browser.<br />' . PHP_EOL);
+define("NOIGB_YAPEAL_SETUP","Yapeal Setup");
 /**
  * YAPEAL INSTALLER TEXT'S
  */
 define("INSTALLER_WELCOME","Welcome");
-define("INSTALLER_WELCOME_TEXT",'<h3>Welcome to Yapeal Installer.</h3><br />' . PHP_EOL
-                               .'This installer will setup Yapeal EVE API Library to run on your site.<br />' . PHP_EOL
-                               .'<br />' . PHP_EOL
-                               .'Yapeal Setup will check if your web host has the requirements to support this library.<br />' . PHP_EOL
+define("INSTALLER_WELCOME_TEXT",'<h3>Welcome to Yapeal Setup.</h3><br />' . PHP_EOL
+                               .'This setup will make Yapeal EVE API Library run on your site.<br />' . PHP_EOL
                                .'<br />' . PHP_EOL);
 define("INSTALLER_PHP_VERSION","PHP version");
 define("INSTALLER_PHP_EXT","PHP extension");
@@ -118,8 +124,8 @@ define("INSTALLER_ERROR_NO_API_INFO","You must provide API Info");
 define("INSTALLER_PROGRESS","Progress");
 define("INSTALLER_SETUP_DONE",'<h2>The setup is done.</h2>' . PHP_EOL
                              .'<br />' . PHP_EOL
-                             .'You can now setup a Cronjob on backend/eve-api-pull.php to cache all the data.<br />' . PHP_EOL
-                             .'<h3>NOTICE: backend/eve-api-pull.php can\'t run in a web browser.</h3>' . PHP_EOL);
+                             .'You can now setup a Cronjob on yapeal.php to cache all the data.<br />' . PHP_EOL
+                             .'<h3>NOTICE: yapeal.php can\'t run in a web browser.</h3>' . PHP_EOL);
 define("INSTALLER_SETUP_FAILED",'<h2>The setup was not completed.</h2>' . PHP_EOL
                                .'<br />' . PHP_EOL
                                .'You might have mistyped some info.<br />' . PHP_EOL);
@@ -133,7 +139,11 @@ define("INSTALLER_DROP_TABLE","Drop Table");
 define("INSTALLER_CLOSE_CONNECTION","Close Connection");
 define("INSTALLER_WAS_NOT_FOUND","was not found");
 define("INSTALLER_SELECT_CHAR","Select Character");
-
+define("INSTALLER_NO_C_ACTION","Doing Nothing!");
+define("INSTALLER_NO_C_ACTION_DES","You need to select another option than \"Do Nothing\"");
+define("INSTALLER_MOVE_OLD_DATA","Move Old Data To");
+define("INSTALLER_REMOVE_OLD_TABLES","Remove Old Tables");
+define("INSTALLER_FROM_REVISION","From Revision: ");
 /**
  * Yapeal Config Editor
  */
@@ -158,4 +168,9 @@ define("ED_UPDATING_DONE",'<h2>The update is done.</h2><br />');
 define("ED_UPDATING_FAILED",'<h2>The update was not completed.</h2><br />' . PHP_EOL
                            .'You might have mistyped some info.<br />');
 define("ED_GO_TO_CONFIG","Go To Config");
+/**
+ * Yapeal Config Editor
+ */
+define("UPD_NEW_UPDATE","New Update");
+define("UPD_NEW_UPDATE_DES","There is a new update for your database.<br />" . PHP_EOL);
 ?>

@@ -34,6 +34,11 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+// Check for c_action
+check_c_action();
+/**
+ * Run the script if check_c_action(); didn't exit the script
+ */
 OpenSite(SETUP,true);
 echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&install=step3" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
@@ -164,6 +169,7 @@ echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['la
     .'      <td><input type="password" id="config_pass" name="config[config_pass]" value="" /></td>' . PHP_EOL
     .'    </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
+    .'<input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
     .'<div id="submit_select"><input type="submit" value="'.NEXT.'" /></div>' . PHP_EOL
     .'</form>' . PHP_EOL
     .'<script type="text/javascript">' . PHP_EOL

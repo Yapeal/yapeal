@@ -34,6 +34,11 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+// Check for c_action
+check_c_action();
+/**
+ * Run the script if check_c_action(); didn't exit the script
+ */
 $config = $_POST['config'];
 // Get Character infoes
 $charinfo = explode("^-_-^",$config['api_char_info']);
@@ -51,35 +56,39 @@ $link = @mysqli_connect($config['DB_Host'],$config['DB_Username'],$config['DB_Pa
 if (DBHandler($config['DB_Host'], "CON")) {
   // Check DB Select
   if(DBHandler($config['DB_Database'], "DS", $config['DB_Database'])) {
-    // Create the Required Databases
-    dropTables("util");
-    createTables("util");
-    dropTables("server");
-    createTables("server");
-    if (isset($config['db_account']) && $config['db_account'] > 0) {
-      // Create the account Databases
-      dropTables("account");
-      createTables("account");
-    };
-    if (isset($config['db_char']) && $config['db_char'] > 0) {
-      // Create the char Databases
-      dropTables("char");
-      createTables("char");
-    };
-    if (isset($config['db_corp']) && $config['db_corp'] > 0) {
-      // Create the corp Databases
-      dropTables("corp");
-      createTables("corp");
-    };
-    if (isset($config['db_eve']) && $config['db_eve'] > 0) {
-      // Create the eve Databases
-      dropTables("eve");
-      createTables("eve");
-    };
-    if (isset($config['db_map']) && $config['db_map'] > 0) {
-      // Create the map Databases
-      dropTables("map");
-      createTables("map");
+    if ($_POST['c_action']==1) {
+      // Create the Required Databases
+      dropTables("util");
+      createTables("util");
+      dropTables("server");
+      createTables("server");
+      if (isset($config['db_account']) && $config['db_account'] > 0) {
+        // Create the account Databases
+        dropTables("account");
+        createTables("account");
+      };
+      if (isset($config['db_char']) && $config['db_char'] > 0) {
+        // Create the char Databases
+        dropTables("char");
+        createTables("char");
+      };
+      if (isset($config['db_corp']) && $config['db_corp'] > 0) {
+        // Create the corp Databases
+        dropTables("corp");
+        createTables("corp");
+      };
+      if (isset($config['db_eve']) && $config['db_eve'] > 0) {
+        // Create the eve Databases
+        dropTables("eve");
+        createTables("eve");
+      };
+      if (isset($config['db_map']) && $config['db_map'] > 0) {
+        // Create the map Databases
+        dropTables("map");
+        createTables("map");
+      };
+    } elseif ($_POST['c_action']==2) {
+      include('db/update/updater.php');
     };
   };
 };

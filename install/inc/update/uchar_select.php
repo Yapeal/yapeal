@@ -36,11 +36,8 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 }
 // Check for c_action
 check_c_action();
-/**
- * Run the script if check_c_action(); didn't exit the script
- */
 $config = $_POST['config'];
-OpenSite('Character Selection');
+OpenSite('Character Selection',false,false);
 if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['api_full_key'] !="")) {
   $params = array();
   $params['userID'] = $config['api_user_id'];
@@ -93,18 +90,20 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
       echo '<center><font class="warning">'.ERROR.': '.$xml->error.'</font></center>';
     } else {
       $characters = array();
-      echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&install=go" method="post">' . PHP_EOL
+      echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&edit=go" method="post">' . PHP_EOL
           .'<input type="hidden" name="config[DB_Host]" value="'.$config['DB_Host'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[DB_Username]" value="'.$config['DB_Username'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[DB_Password]" value="'.$config['DB_Password'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[DB_Database]" value="'.$config['DB_Database'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[DB_Prefix]" value="'.$config['DB_Prefix'].'" />' . PHP_EOL
+          .'<input type="hidden" name="config[db_action]" value="'.$config['db_action'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[cache_xml]" value="'.DisableChecker($config['cache_xml']).'" />' . PHP_EOL
           .'<input type="hidden" name="config[db_account]" value="'.DisableChecker($config['db_account']).'" />' . PHP_EOL
           .'<input type="hidden" name="config[db_char]" value="'.DisableChecker($config['db_char']).'" />' . PHP_EOL
           .'<input type="hidden" name="config[db_corp]" value="'.DisableChecker($config['db_corp']).'" />' . PHP_EOL
           .'<input type="hidden" name="config[db_eve]" value="'.DisableChecker($config['db_eve']).'" />' . PHP_EOL
           .'<input type="hidden" name="config[db_map]" value="'.DisableChecker($config['db_map']).'" />' . PHP_EOL
+          .'<input type="hidden" name="config[debug]" value="'.$config['debug'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[api_user_id]" value="'.$config['api_user_id'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[api_limit_key]" value="'.$config['api_limit_key'].'" />' . PHP_EOL
           .'<input type="hidden" name="config[api_full_key]" value="'.$config['api_full_key'].'" />' . PHP_EOL
@@ -115,9 +114,10 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
           .'    <th colspan="2">'.INSTALLER_CHAR_SELECT.'</th>' . PHP_EOL
           .'  </tr>' . PHP_EOL;
       foreach ($xml->result->rowset->row as $row) {
+        if ($conf['creatorCharacterID']==$row['characterID']) { $checked = ' checked="checked"'; } else { $checked = ''; };
         echo '<tr>' . PHP_EOL
             .'  <td width="15" style="vertical-align:middle;">' . PHP_EOL
-            .'    <input type="radio" name="config[api_char_info]" value="'.$row['name'].'^-_-^'.$row['characterID'].'^-_-^'.$row['corporationName'].'^-_-^'.$row['corporationID'].'" checked="checked" />' . PHP_EOL
+            .'    <input type="radio" name="config[api_char_info]" value="'.$row['name'].'^-_-^'.$row['characterID'].'^-_-^'.$row['corporationName'].'^-_-^'.$row['corporationID'].'"'.$checked.' />' . PHP_EOL
             .'  </td>' . PHP_EOL
             .'  <td>' . PHP_EOL
             .'    <table style="background-color: #606060;">' . PHP_EOL
@@ -130,7 +130,7 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
             .'</tr>' . PHP_EOL;
       };
       echo '<tr style="text-align:center;">' . PHP_EOL
-          .'  <td colspan="2"><input type="submit" value="'.INSTALLER_RUN_SETUP.'" /></td>' . PHP_EOL
+          .'  <td colspan="2"><input type="submit" value="'.UPDATE.'" /></td>' . PHP_EOL
           .'</tr>' . PHP_EOL
           .'</table>' . PHP_EOL
           .'</form>' . PHP_EOL;

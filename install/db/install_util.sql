@@ -57,6 +57,7 @@ INSERT INTO `%prefix%utilconfig` VALUES('creatorCorporationID', '%corporationID%
 INSERT INTO `%prefix%utilconfig` VALUES('creatorCorporationName', '%corporationName%');
 INSERT INTO `%prefix%utilconfig` VALUES('creatorName', '%name%');
 INSERT INTO `%prefix%utilconfig` VALUES('password', '%password%');
+INSERT INTO `%prefix%utilconfig` VALUES('version', '$Revision$');
 
 -- -----------------------------------------------------
 -- Table `utilCachedUntil`
@@ -124,7 +125,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
--- Data `utilRegisteredCharacter`
+-- Data `utilRegisteredCorporation`
 -- -----------------------------------------------------
 INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%corporationID%', '%characterID%', '%corpisactive%', null, null);
 

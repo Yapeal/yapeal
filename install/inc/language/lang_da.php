@@ -58,17 +58,23 @@ define("CLOSED","Lukket");
 define("SELECTED","Valgt");
 define("CONNECTED","Forbindelse Oprettet");
 define("LOGIN","Login");
-define("UPDATE","Update");
+define("UPDATE","Opdater");
 define("ON","Aktiv");
 define("OFF","Inaktiv");
+define("BACK","Tilbage");
+/**
+ * YAPEAL INSTALLER TEXT'S
+ */
+define("NOIGB_HEADLINE","Ingen IGB Support");
+define("NOIGB_TEXT",'Denne setup kan kun køres fra en normal webbrowser og ikke fra EVE IGB.<br />' . PHP_EOL
+                               .'Klik på linket og du vil åbne denne side i en normal webbrowser.<br />' . PHP_EOL);
+define("NOIGB_YAPEAL_SETUP","Yapeal Setup");
 /**
  * YAPEAL INSTALLER TEXT'S
  */
 define("INSTALLER_WELCOME","Velkommen");
 define("INSTALLER_WELCOME_TEXT",'<h3>Velkommen til Yapeal Setup.</h3><br />' . PHP_EOL
                                .'Denne setup vil opsætte Yapeal EVE API Library til at kunne køre på din hjemmeside.<br />' . PHP_EOL
-                               .'<br />' . PHP_EOL
-                               .'Yapeal Setup vil kontrolere on din webhost udbyder kan køre Yapeal.<br />' . PHP_EOL
                                .'<br />' . PHP_EOL);
 define("INSTALLER_PHP_VERSION","PHP version");
 define("INSTALLER_PHP_EXT","PHP extension");
@@ -118,8 +124,8 @@ define("INSTALLER_ERROR_NO_API_INFO","API Info mangler");
 define("INSTALLER_PROGRESS","Forløb");
 define("INSTALLER_SETUP_DONE",'<h2>Setup er færdig.</h2>' . PHP_EOL
                              .'<br />' . PHP_EOL
-                             .'Du kan nu oprette en cronjob på backend/eve-api-pull.php for at hente og gemme dataerne.<br />' . PHP_EOL
-                             .'<h3>INFO: backend/eve-api-pull.php kan ikke køre i en webbrowser.</h3>' . PHP_EOL);
+                             .'Du kan nu oprette en cronjob på yapeal.php for at hente og gemme dataerne.<br />' . PHP_EOL
+                             .'<h3>INFO: yapeal.php kan ikke køre i en webbrowser.</h3>' . PHP_EOL);
 define("INSTALLER_SETUP_FAILED",'<h2>Setup fejlede</h2>' . PHP_EOL
                                .'<br />' . PHP_EOL
                                .'Du har måske indtastet nogle forkerte info.<br />' . PHP_EOL);
@@ -133,6 +139,11 @@ define("INSTALLER_DROP_TABLE","Drop Tabel");
 define("INSTALLER_CLOSE_CONNECTION","Luk Forbindelse");
 define("INSTALLER_WAS_NOT_FOUND","var ikke fundet");
 define("INSTALLER_SELECT_CHAR","Vælg Karakter");
+define("INSTALLER_NO_C_ACTION","Gør Intet!");
+define("INSTALLER_NO_C_ACTION_DES","Du skal vælge noget andet end \"Gør Intet\"");
+define("INSTALLER_MOVE_OLD_DATA","Kopier Data Til");
+define("INSTALLER_REMOVE_OLD_TABLES","Fjerner Gamle Tabeller");
+define("INSTALLER_FROM_REVISION","Fra Revision: ");
 /**
  * Yapeal Config Editor
  */
@@ -157,4 +168,9 @@ define("ED_UPDATING_DONE",'<h2>Opdateringen er færdig.</h2><br />');
 define("ED_UPDATING_FAILED",'<h2>Opdateringen fejlede.</h2><br />' . PHP_EOL
                            .'Du har måske indtastet nogle forkerte info.<br />');
 define("ED_GO_TO_CONFIG","Gå Til Konfiguration");
+/**
+ * Yapeal Config Editor
+ */
+define("UPD_NEW_UPDATE","Ny Opdatering");
+define("UPD_NEW_UPDATE_DES","Der er en ny opdatering til databasen.<br />" . PHP_EOL);
 ?>

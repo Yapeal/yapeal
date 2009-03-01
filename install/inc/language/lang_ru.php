@@ -61,14 +61,20 @@ define("LOGIN","Войти");
 define("UPDATE","Обновление");
 define("ON","На");
 define("OFF","Вне");
+define("BACK","Back");
+/**
+ * YAPEAL INSTALLER TEXT'S
+ */
+define("NOIGB_HEADLINE","No IGB Support");
+define("NOIGB_TEXT",'This setup can only be run in a normal browser and not the IGB.<br />' . PHP_EOL
+                               .'Press the link and you will be popped out of EVE and this setup will re-openned in a normal browser.<br />' . PHP_EOL);
+define("NOIGB_YAPEAL_SETUP","Yapeal Setup");
 /**
  * YAPEAL INSTALLER TEXT'S
  */
 define("INSTALLER_WELCOME","Добро пожаловать");
-define("INSTALLER_WELCOME_TEXT",'<h3>Добро пожаловать на Yapeal Installer</h3><br />' . PHP_EOL
-                               .'Это инсталлятор установит Yapeal EVE API библиотеки для запуска на вашем сайте.<br />' . PHP_EOL
-                               .'<br />' . PHP_EOL
-                               .'Yapeal установки проверит если ваш веб-хост требования для поддержки этой библиотеки.<br />' . PHP_EOL
+define("INSTALLER_WELCOME_TEXT",'<h3>Welcome to Yapeal Setup.</h3><br />' . PHP_EOL
+                               .'This setup will make Yapeal EVE API Library run on your site.<br />' . PHP_EOL
                                .'<br />' . PHP_EOL);
 define("INSTALLER_PHP_VERSION","PHP версии");
 define("INSTALLER_PHP_EXT","PHP продлении");
@@ -93,8 +99,7 @@ define("INSTALLER_SETUP_HOW_YAPEAL","Настройка Yapeal сейчас до
 define("INSTALLER_SAVE_XML_FILES","Сохранить XML файлов");
 define("INSTALLER_SAVE_XML_DES",'      включается кэширование данных XML API к локальным файлам.<br />' . PHP_EOL
                                .'      "Нет" = Сохранить веб-пространства, но добавляет в базу данных.' . PHP_EOL);
-define("INSTALLER_GET_ACCOUNT_INFO","	
-Получить учетной записи");
+define("INSTALLER_GET_ACCOUNT_INFO","Получить учетной записи");
 define("INSTALLER_GET_ACCOUNT_DES","Save characters from API Account info to database");
 define("INSTALLER_GET_CHAR_INFO","Получить Характер информации");
 define("INSTALLER_GET_CHAR_DES","Сохранить Характер информации в базу данных");
@@ -119,9 +124,8 @@ define("INSTALLER_ERROR_NO_API_INFO","Вы должны предоставить
 define("INSTALLER_PROGRESS","Прогресс");
 define("INSTALLER_SETUP_DONE",'<h2>Настройка выполняется.</h2>' . PHP_EOL
                              .'<br />' . PHP_EOL
-                             .'Теперь вы можете настроить на Cronjob backend/eve-api-pull.php 	
-кэшировал всех данных.<br />' . PHP_EOL
-                             .'<h3>NOTICE: backend/eve-api-pull.php может\'т работать в веб-браузере.</h3>' . PHP_EOL);
+                             .'Теперь вы можете настроить на Cronjob yapeal.php кэшировал всех данных.<br />' . PHP_EOL
+                             .'<h3>NOTICE: yapeal.php может\'т работать в веб-браузере.</h3>' . PHP_EOL);
 define("INSTALLER_SETUP_FAILED",'<h2>Настройка не была завершена.</h2>' . PHP_EOL
                                .'<br />' . PHP_EOL
                                .'Вы, возможно, некоторые опечатки информация.<br />' . PHP_EOL);
@@ -135,7 +139,11 @@ define("INSTALLER_DROP_TABLE","Ронять Стол");
 define("INSTALLER_CLOSE_CONNECTION","Закрыть Соединение");
 define("INSTALLER_WAS_NOT_FOUND","не найден");
 define("INSTALLER_SELECT_CHAR","Select CharacterВыберите Символ");
-
+define("INSTALLER_NO_C_ACTION","Doing Nothing!");
+define("INSTALLER_NO_C_ACTION_DES","You need to select another option than \"Do Nothing\"");
+define("INSTALLER_MOVE_OLD_DATA","Move Old Data To");
+define("INSTALLER_REMOVE_OLD_TABLES","Remove Old Tables");
+define("INSTALLER_FROM_REVISION","From Revision: ");
 /**
  * Yapeal Config Editor
  */
@@ -159,6 +167,10 @@ define("ED_UPDATE_FILE","Обновление файловe");
 define("ED_UPDATING_DONE",'<h2>Обновление сделано..</h2><br />');
 define("ED_UPDATING_FAILED",'<h2>Данное обновление не было завершено..</h2><br />' . PHP_EOL
                            .'Вы, возможно, некоторые опечатки информация<br />');
-define("ED_GO_TO_CONFIG","	
-Перейти Config");
+define("ED_GO_TO_CONFIG","Перейти Config");
+/**
+ * Yapeal Config Editor
+ */
+define("UPD_NEW_UPDATE","New Update");
+define("UPD_NEW_UPDATE_DES","There is a new update for your database.<br />" . PHP_EOL);
 ?>

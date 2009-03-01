@@ -34,6 +34,11 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+// Check for c_action
+check_c_action();
+/**
+ * Run the script if check_c_action(); didn't exit the script
+ */
 $error = 0;
 $chmodcheck = 0;
 $content  = '<tr>' . PHP_EOL;
@@ -85,6 +90,7 @@ if ($error > 0 || $chmodcheck > 0) {
   };
 } else {
   $end = '<form action="' . $_SERVER['SCRIPT_NAME'] . '?lang='.$_GET['lang'].'&install=step2" method="post">' . PHP_EOL
+        .'  <input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
         .'  <input type="submit" value="'.NEXT.'" />' . PHP_EOL
         .'</form>' . PHP_EOL;
 };

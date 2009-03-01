@@ -301,6 +301,32 @@ function load_Edit_Setup_JavaScript(charselect) {
   api_get_chars2(charselect);
 }
 
+// Function to load JavaScript elements in the API Setup
+function load_Convert_Setup_JavaScript() {
+  // Change the form action path
+  document.go_no_go.setAttribute("action", window.location.pathname + "?lang=" + lang.lang + "&convert=go");
+
+  // Disable the submit button
+  document.getElementById("submit_select").innerHTML = '<input type="button" value="' + lang.Run_Setup + '" disabled="disabled" />';
+
+  // Create the character select table with default text.
+  var table = document.getElementById('api_setup_table');
+
+  var tr    = document.createElement('TR');
+  var td1   = document.createElement('TD');
+  var td2   = document.createElement('TD');
+
+  td1.className = 'tableinfolbl';
+  td1.innerHTML = lang.Character + ':';
+  td2.setAttribute("id", "api_char_select");
+  td2.className = 'good';
+  td2.innerHTML = lang.Will_load_on_API + '<input type="hidden" name="api_char_info" value="" />';
+
+  table.appendChild(tr);
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+}
+
 
 var clientHttpHandler;
 clientHttpHandler = create();
@@ -356,7 +382,7 @@ function receive() {
       } else if (clientHttpHandler.status == 404) { // "URL Not Found"
         alert(lang.URL_Not_Found);
       } else { // Miscellaneous
-        alert(lang.Error_Status_Code + " " + clientHttpHandler.status);
+        //alert(lang.Error_Status_Code + " " + clientHttpHandler.status);
       };
     };
   } catch (genException) { }

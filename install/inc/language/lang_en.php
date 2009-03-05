@@ -113,8 +113,7 @@ define("INSTALLER_API_SETUP","API Setup");
 define("INSTALLER_GET_API_INFO_HERE","You can get your API info here");
 define("INSTALLER_EVE_API_CENTER","EVE API Center");
 define("INSTALLER_API_USERID","API User ID");
-define("INSTALLER_API_LIMIT_KEY","Limited API Key");
-define("INSTALLER_API_FULL_KEY","Full API Key");
+define("INSTALLER_API_KEY","API Key");
 define("INSTALLER_SETUP_PASS","Setup Password");
 define("INSTALLER_SETUP_PASS_DES","This is a password you can use if you need to make changes to this setup, when you have completed this setup.");
 define("INSTALLER_CHAR_SELECT","Character Select");
@@ -143,7 +142,7 @@ define("INSTALLER_NO_C_ACTION","Doing Nothing!");
 define("INSTALLER_NO_C_ACTION_DES","You need to select another option than \"Do Nothing\"");
 define("INSTALLER_MOVE_OLD_DATA","Move Old Data To");
 define("INSTALLER_REMOVE_OLD_TABLES","Remove Old Tables");
-define("INSTALLER_FROM_REVISION","From Revision: ");
+define("INSTALLER_OLD_TABLE","Old Table -> ");
 /**
  * Yapeal Config Editor
  */
@@ -162,15 +161,43 @@ define("ED_DISABLE","Disabled");
 define("ED_REMOVE_ALL_DATA","Disable and Remove Data");
 define("ED_DEBUGING","Debugging");
 define("ED_ONLY_CHANGE_IF","Change only if you need a new one");
-define("ED_UPDATE_CONFIG_TABLE","Update Config");
 define("ED_UPDATE_FILE","Update File");
 define("ED_UPDATING_DONE",'<h2>The update is done.</h2><br />');
 define("ED_UPDATING_FAILED",'<h2>The update was not completed.</h2><br />' . PHP_EOL
                            .'You might have mistyped some info.<br />');
 define("ED_GO_TO_CONFIG","Go To Config");
+define("ED_UPDATING_FROM_REV","Updating From Revision");
+define("ED_UPDATING_TO_REV","Updating To Revision");
+define("ED_TO_REV","To Revision");
 /**
  * Yapeal Config Editor
  */
 define("UPD_NEW_UPDATE","New Update");
 define("UPD_NEW_UPDATE_DES","There is a new update for your database.<br />" . PHP_EOL);
+define("UPD_ALTER_TABLE","Alter Table");
+define("UPD_START_UPDATE","Start Update");
+define("UPD_END_UPDATE","End Update");
+define("UPD_REVISION","Revision");
+define("UPD_CHAR_API_PULL_SELECT","Character API Pull Select");
+define("UPD_CHAR_API_PULL_SELECT_DES","Select what API data, that is needed to be pulled from this character");
+define("UPD_GET_charCharacterSheet_DES","Get Character Sheet");
+define("UPD_GET_charAccountBalance_DES","Get Account Balance from character");
+define("UPD_GET_charAssetList_DES","Get Asset List from character");
+define("UPD_GET_charIndustryJobs_DES","Get Industry Jobs from character");
+define("UPD_GET_charMarketOrders_DES","Get Market Orders from character");
+define("UPD_GET_charStandings_DES","Get Standings from character");
+define("UPD_GET_charWalletJournal_DES","Get Wallet Journal from character");
+define("UPD_GET_charWalletTransactions_DES","Get Wallet Transactions from character");
+define("UPD_CORP_API_PULL_SELECT","Corporation API Pull Select");
+define("UPD_CORP_API_PULL_SELECT_DES","Select what corporation API data, that is needed to be pulled");
+define("UPD_GET_corpCorporationSheet_DES","Get Corporation Sheet");
+define("UPD_GET_corpAccountBalance_DES","Get Account Balance from corporation");
+define("UPD_GET_corpAssetList_DES","Get Asset List from corporation");
+define("UPD_GET_corpIndustryJobs_DES","Get Industry Jobs from corporation");
+define("UPD_GET_corpMarketOrders_DES","Get Market Orders from corporation");
+define("UPD_GET_corpMemberTracking_DES","Get Member Tracking from corporation");
+define("UPD_GET_corpStandings_DES","Get Standings from corporation");
+define("UPD_GET_corpStarbaseList_DES","Get Starbase List from corporation");
+define("UPD_GET_corpWalletJournal_DES","Get Wallet Journal from corporation");
+define("UPD_GET_corpWalletTransactions_DES","Get Wallet Transactions from corporation");
 ?>

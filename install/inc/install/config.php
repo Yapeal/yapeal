@@ -40,7 +40,9 @@ check_c_action();
  * Run the script if check_c_action(); didn't exit the script
  */
 OpenSite(SETUP,true);
-echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&install=step3" method="post">' . PHP_EOL
+if ($_POST['c_action']==2) { $setupdatetext = '<h2>'.ED_UPDATING_TO_REV.' '.$setupversion.'</h2>' . PHP_EOL; } else { $setupdatetext = ''; }
+echo $setupdatetext
+    .'<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&install=step3" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
     .'  <tr>' . PHP_EOL
@@ -135,26 +137,20 @@ echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['la
     .'<br />' . PHP_EOL
     .'<!-- Api Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
-    .'  <tbody id="api_setup_table">' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <th colspan="2">'.INSTALLER_API_SETUP.'</th>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td colspan="2" style="text-align: center;">'.INSTALLER_GET_API_INFO_HERE.':<br /><a href="http://myeve.eve-online.com/api/default.asp">'.INSTALLER_EVE_API_CENTER.'</a></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_USERID.':</td>' . PHP_EOL
-    .'      <td><input size="10" type="text" id="api_user_id" name="config[api_user_id]" value="" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_LIMIT_KEY.':</td>' . PHP_EOL
-    .'      <td><input class="input_text" type="text" id="api_limit_key" name="config[api_limit_key]" value="" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_FULL_KEY.':</td>' . PHP_EOL
-    .'      <td><input class="input_text" type="text" id="api_full_key" name="config[api_full_key]" value="" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'  </tbody>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <th colspan="2">'.INSTALLER_API_SETUP.'</th>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td colspan="2" style="text-align: center;">'.INSTALLER_GET_API_INFO_HERE.':<br /><a href="http://myeve.eve-online.com/api/default.asp">'.INSTALLER_EVE_API_CENTER.'</a></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td class="tableinfolbl">'.INSTALLER_API_USERID.':</td>' . PHP_EOL
+    .'    <td><input size="10" type="text" name="config[api_user_id]" value="" /></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td class="tableinfolbl">'.INSTALLER_API_KEY.':</td>' . PHP_EOL
+    .'    <td><input class="input_text" type="text" name="config[api_full_key]" value="" /></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
     .'<!-- Api Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
@@ -166,14 +162,11 @@ echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['la
     .'    </tr>' . PHP_EOL
     .'    <tr>' . PHP_EOL
     .'      <td class="tableinfolbl">'.PASSWORD.':</td>' . PHP_EOL
-    .'      <td><input type="password" id="config_pass" name="config[config_pass]" value="" /></td>' . PHP_EOL
+    .'      <td><input type="password" name="config[config_pass]" value="" /></td>' . PHP_EOL
     .'    </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
     .'<input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
-    .'<div id="submit_select"><input type="submit" value="'.NEXT.'" /></div>' . PHP_EOL
-    .'</form>' . PHP_EOL
-    .'<script type="text/javascript">' . PHP_EOL
-    .'  load_Install_Setup_JavaScript();' . PHP_EOL
-    .'</script>' . PHP_EOL;
+    .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL
+    .'</form>' . PHP_EOL;
 CloseSite();
 ?>

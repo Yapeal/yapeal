@@ -27,8 +27,61 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
+
+/*
+ * Set what version we are using
+ */
+$setupversion = 643;
+/*
+ * make a short value for Directory Separators
+ */
 $DS = DIRECTORY_SEPARATOR;
+/*
+ * Require the function file
+ */
 require_once('inc'.$DS.'function.php');
+/*
+ * Set Language
+ */
+if (isset($_GET['lang'])) {
+  GetLang($_GET['lang']);
+} else {
+  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang());
+  exit;
+};
+/*****************************************************************
+ * Define what APIs the Character can pull with a description
+ * To use:
+ * If you have added a new char API pull, add it down here.
+ * array('The name of the API' => the description on that it is.);
+ * The description should be defined in the language files!
+ *****************************************************************/
+$charAPIs = array('charAccountBalance'     => UPD_GET_charAccountBalance_DES,
+                  'charAssetList'          => UPD_GET_charAssetList_DES,
+                  'charCharacterSheet'     => UPD_GET_charCharacterSheet_DES,
+                  'charIndustryJobs'       => UPD_GET_charIndustryJobs_DES,
+                  'charMarketOrders'       => UPD_GET_charMarketOrders_DES,
+                  'charStandings'          => UPD_GET_charStandings_DES,
+                  'charWalletJournal'      => UPD_GET_charWalletJournal_DES,
+                  'charWalletTransactions' => UPD_GET_charWalletTransactions_DES);
+/*****************************************************************
+ * Define what APIs the Corporation can pull with a description
+ * To use:
+ * If you have added a new corp API pull, add it down here.
+ * array('The name of the API' => the description on that it is.);
+ * The description should be defined in the language files!
+ *****************************************************************/
+$corpAPIs = array('corpAccountBalance'     => UPD_GET_corpAccountBalance_DES,
+                  'corpAssetList'          => UPD_GET_corpAssetList_DES,
+                  'corpCorporationSheet'   => UPD_GET_corpCorporationSheet_DES,
+                  'corpIndustryJobs'       => UPD_GET_corpIndustryJobs_DES,
+                  'corpMarketOrders'       => UPD_GET_corpMarketOrders_DES,
+                  'corpMemberTracking'     => UPD_GET_corpMemberTracking_DES,
+                  'corpStandings'          => UPD_GET_corpStandings_DES,
+                  'corpStarbaseList'       => UPD_GET_corpStarbaseList_DES,
+                  'corpWalletJournal'      => UPD_GET_corpWalletJournal_DES,
+                  'corpWalletTransactions' => UPD_GET_corpWalletTransactions_DES);
+
 
 ////////////////////////////////
 // Check if Browser is EVE IGB
@@ -52,25 +105,18 @@ if (($parts[0] == "EVE-minibrowser") or ($parts[0] == "Python-urllib")) {
 };
 // If Ingame Browser
 if ($IGB) {
-  if (isset($_GET['lang'])) {
-    GetLang($_GET['lang']);
-    OpenSite(NOIGB_HEADLINE,false,false);
-    echo NOIGB_TEXT
-      .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
-    CloseSite();
-  } else {
-    header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang());
-  };
+  OpenSite(NOIGB_HEADLINE,false,false);
+  echo NOIGB_TEXT
+    .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
+  CloseSite();
   // If not the Ingame Browser
 } else {
   // Check if there is an existing yapeal.ini file.
   // If so, then tell open Yapeal config updater.
   if (file_exists('..'.$DS.'config'.$DS.'yapeal.ini')) {
-    GetLang($_GET['lang']);
     // Config Updater
     require_once('inc'.$DS.'update'.$DS.'main.php');
   } else{
-    GetLang($_GET['lang']);
     // Welcome Page
     require_once('inc'.$DS.'install'.$DS.'main.php');
   };

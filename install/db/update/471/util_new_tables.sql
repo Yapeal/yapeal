@@ -62,7 +62,7 @@ INSERT INTO `%prefix%utilconfig` (`Name`,`Value`) VALUES
 ('creatorCorporationName', '%corporationName%'),
 ('creatorName', '%name%'),
 ('password', '%password%'),
-('version', '$Revision: 572 $')
+('version', '$Revision: 471 $')
 ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`);
 
 -- -----------------------------------------------------

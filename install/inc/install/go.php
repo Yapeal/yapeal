@@ -46,6 +46,38 @@ $config['api_char_name'] = $charinfo[0];
 $config['api_char_id'] = $charinfo[1];
 $config['api_corp_name'] = $charinfo[2];
 $config['api_corp_id'] = $charinfo[3];
+/*
+ * Build Selected Char APIs
+ */
+$charSelAPIs = '';
+$count = 0;
+foreach ($config['charAPIs'] as $data) {
+  if (!empty($data)) {
+    if ($count==0) {
+      $charSelAPIs .= $data;
+      $count++;
+    } else {
+      $charSelAPIs .= ' '.$data;
+    };
+  };
+}
+$config['charAPIs'] = $charSelAPIs;
+/*
+ * Build Selected Char APIs
+ */
+$corpSelAPIs = '';
+$count = 0;
+foreach ($config['corpAPIs'] as $data) {
+  if (!empty($data)) {
+    if ($count==0) {
+      $corpSelAPIs .= $data;
+      $count++;
+    } else {
+      $corpSelAPIs .= ' '.$data;
+    };
+  };
+}
+$config['corpAPIs'] = $corpSelAPIs;
 // Stopper
 $stop = 0;
 $output = "";
@@ -113,8 +145,8 @@ if ($stop == 0) {
 } else {
   echo '<hr />' . PHP_EOL
       .INSTALLER_SETUP_FAILED
-      .'<div id="Go_Back></div>' . PHP_EOL
-      .'<script> Go_Back(); </script>' . PHP_EOL;
+      .'<div id="Go_Back"></div>' . PHP_EOL
+      .'<script type="text/javascript"> Go_Back(); </script>' . PHP_EOL;
 };
 CloseSite();
 ?>

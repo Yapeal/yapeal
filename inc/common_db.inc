@@ -143,7 +143,8 @@ function getRegisteredCharacters() {
   global $tracing;
   $con = connect(YAPEAL_DSN, 'Yapeal');
   /* Generate a list of character(s) we need to do updates for */
-  $sql = 'select u.userID "userID",u.fullApiKey "apiKey",chr.characterID "charID"';
+  $sql = 'select u.userID "userID",u.fullApiKey "apiKey",';
+  $sql .= 'chr.characterID "charID", chr.activeAPI';
   $sql .= ' from ';
   $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
   $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
@@ -167,7 +168,7 @@ function getRegisteredCorporations() {
   $con = connect(YAPEAL_DSN, 'Yapeal');
   // Generate a list of corporation(s) we need to do updates for
   $sql = 'select cp.corporationID "corpID",u.userID "userID",';
-  $sql .= 'u.fullApiKey "apiKey",cp.characterID "charID"';
+  $sql .= 'u.fullApiKey "apiKey",cp.characterID "charID", cp.activeAPI';
   $sql .= ' from ';
   $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation` as cp,';
   $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';

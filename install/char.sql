@@ -222,6 +222,61 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet API';
 
+CREATE TABLE IF NOT EXISTS `charStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
 CREATE  TABLE IF NOT EXISTS `charWalletJournal` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
   `amount` DECIMAL(17,2) NOT NULL ,
@@ -244,8 +299,6 @@ COLLATE = utf8_unicode_ci;
 
 CREATE  TABLE IF NOT EXISTS `charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
-  `characterID` BIGINT UNSIGNED NULL ,
-  `characterName` VARCHAR(255) NULL ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,

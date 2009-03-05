@@ -35,17 +35,28 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 /****************************************************************************
 * Per corp API pulls
 ****************************************************************************/
-//$apis = array('CorporationSheet', 'AccountBalance', 'IndustryJobs',
-//  'MarketOrders', 'MemberTracking', 'StarbaseList', 'WalletJournal',
-//  'WalletTransactions', 'AssetList'
-//);
-$apis = array('corpCorporationSheet', 'corpAccountBalance', 'corpAssetList',
-  'corpIndustryJobs', 'corpMarketOrders', 'corpMemberTracking',
-  'corpStarbaseList', 'corpWalletJournal', 'corpWalletTransactions'
+$availableApis = array('corpAccountBalance', 'corpAssetList',
+  'corpCorporationSheet', 'corpIndustryJobs', 'corpMarketOrders',
+  'corpMemberTracking', 'corpStandings', 'corpStarbaseList',
+  'corpWalletJournal', 'corpWalletTransactions'
 );
+$apis = explode(' ', $activeAPI);
+if (count($apis) == 0) {
+  $mess = 'No active APIs listed for ' . $corpID;
+  $mess .= ' in ' . $sectionFile;
+  trigger_error($mess, E_USER_NOTICE);
+  continue;
+};
 $serverName = 'Tranquility';
 require_once YAPEAL_CLASS . 'api' . $ds . 'ACorporation.php';
 foreach ($apis as $api) {
+  $api = trim($api);
+  if (!in_array($api, $availableApis)) {
+    $mess = 'Invalid API ' . $api . ' in database table for ' . $corpID;
+    $mess .= ' in ' . $sectionFile;
+    trigger_error($mess, E_USER_WARNING);
+    continue;
+  };
   require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
   $tableName = YAPEAL_TABLE_PREFIX . $api;
   $mess = 'Before dontWait for ' . $tableName . $corpID;

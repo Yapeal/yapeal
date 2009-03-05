@@ -235,6 +235,61 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet API';
 
+CREATE TABLE IF NOT EXISTS `charStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `charStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
 CREATE TABLE IF NOT EXISTS `charWalletJournal` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
   `amount` DECIMAL(17,2) NOT NULL ,
@@ -257,8 +312,6 @@ COLLATE = utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
-  `characterID` BIGINT UNSIGNED NULL ,
-  `characterName` VARCHAR(255) NULL ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,
@@ -454,6 +507,72 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `corpStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToAlliances` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
 CREATE TABLE IF NOT EXISTS `corpStarbaseList` (
   `itemID` BIGINT UNSIGNED NOT NULL ,
   `locationID` BIGINT UNSIGNED NOT NULL ,
@@ -623,6 +742,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `utilRegisteredCharacter` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this character' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `corporationName` VARCHAR(255) NOT NULL ,
@@ -637,6 +757,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `utilRegisteredCorporation` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this corporation' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `graphic` BLOB NULL DEFAULT NULL ,

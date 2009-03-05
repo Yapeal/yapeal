@@ -46,6 +46,6 @@ if (isset($_GET['install']) && $_GET['install'] == "go") {
   // Welcome Page
   include_once('inc'.$DS.'install'.$DS.'welcome.php');
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang()."&install=welcome");
+  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&install=welcome");
 };
 ?>

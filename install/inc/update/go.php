@@ -41,11 +41,47 @@ $config['api_char_name'] = $charinfo[0];
 $config['api_char_id'] = $charinfo[1];
 $config['api_corp_name'] = $charinfo[2];
 $config['api_corp_id'] = $charinfo[3];
+/*
+ * Build Selected Char APIs
+ */
+$charSelAPIs = '';
+$count = 0;
+if (isset($config['charAPIs'])) {
+  foreach ($config['charAPIs'] as $data) {
+    if (!empty($data)) {
+      if ($count==0) {
+        $charSelAPIs .= $data;
+        $count++;
+      } else {
+        $charSelAPIs .= ' '.$data;
+      };
+    };
+  }
+};
+$config['charAPIs'] = $charSelAPIs;
+/*
+ * Build Selected Char APIs
+ */
+$corpSelAPIs = '';
+$count = 0;
+if (isset($config['corpAPIs'])) {
+  foreach ($config['corpAPIs'] as $data) {
+    if (!empty($data)) {
+      if ($count==0) {
+        $corpSelAPIs .= $data;
+        $count++;
+      } else {
+        $corpSelAPIs .= ' '.$data;
+      };
+    };
+  }
+};
+$config['corpAPIs'] = $corpSelAPIs;
 // Stopper
 $stop = 0;
 $output = "";
 $db_main_error = "";
-if (conRev($ini_yapeal['version'])<=471) {
+if (conRev($ini_yapeal['version'])<471) {
   $ini_yapeal['Database']['host'] = $config['DB_Host'];
   $ini_yapeal['Database']['database'] = $config['DB_Database'];
   $userpass = explode(":",$ini_yapeal['Database']['writer']);
@@ -113,40 +149,42 @@ if (DBHandler($ini_yapeal['Database']['host'], "CON")) {
         /**
          * Update extra utilConfig DB
          */
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_user_id']."' WHERE `Name` = 'creatorAPIuserID'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorAPIuserID", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_limit_key']."' WHERE `Name` = 'creatorAPIlimitedApiKey'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorAPIlimitedApiKey", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_full_key']."' WHERE `Name` = 'creatorAPIfullApiKey'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorAPIfullApiKey", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_char_id']."' WHERE `Name` = 'creatorCharacterID'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorCharacterID", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_corp_id']."' WHERE `Name` = 'creatorCorporationID'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorCorporationID", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_corp_name']."' WHERE `Name` = 'creatorCorporationName'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorCorporationName", "DUC", $query);
-        $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".$config['api_char_name']."' WHERE `Name` = 'creatorName'";
-        DBHandler($config['DB_Prefix']."utilconfig => creatorName", "DUC", $query);
-        $query = "INSERT INTO `".$config['DB_Prefix']."utilregistereduser` (`userID`,`fullApiKey`,`limitedApiKey`) 
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['charAPIs']."' WHERE `Name` = 'charAPIs'";
+        DBHandler($config['DB_Prefix']."utilConfig => charAPIs", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['corpAPIs']."' WHERE `Name` = 'corpAPIs'";
+        DBHandler($config['DB_Prefix']."utilConfig => corpAPIs", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_user_id']."' WHERE `Name` = 'creatorAPIuserID'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorAPIuserID", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_full_key']."' WHERE `Name` = 'creatorAPIfullApiKey'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorAPIfullApiKey", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_char_id']."' WHERE `Name` = 'creatorCharacterID'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorCharacterID", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_corp_id']."' WHERE `Name` = 'creatorCorporationID'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorCorporationID", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_corp_name']."' WHERE `Name` = 'creatorCorporationName'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorCorporationName", "DU", $query);
+        $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".$config['api_char_name']."' WHERE `Name` = 'creatorName'";
+        DBHandler($config['DB_Prefix']."utilConfig => creatorName", "DU", $query);
+        $query = "INSERT INTO `".$config['DB_Prefix']."utilRegisteredUser` (`userID`,`fullApiKey`,`limitedApiKey`) 
                   VALUES
                   ('".$config['api_user_id']."','".$config['api_full_key']."','".$config['api_limit_key']."') 
                   ON DUPLICATE KEY UPDATE `fullApiKey`=VALUES(`fullApiKey`),`limitedApiKey`=VALUES(`limitedApiKey`)";
-        DBHandler($config['DB_Prefix']."utilregistereduser", "DII", $query);
+        DBHandler($config['DB_Prefix']."utilRegisteredUser", "DII", $query);
         if ($config['db_char']==1) { $charisactive = '1'; } else { $charisactive = '0'; };
-        $query = "INSERT INTO `".$config['DB_Prefix']."utilRegisteredCharacter` (`characterID`,`userID`,`name`,`corporationID`,`corporationName`,`isActive`) 
+        $query = "INSERT INTO `".$config['DB_Prefix']."utilRegisteredCharacter` (`activeAPI`,`characterID`,`userID`,`name`,`corporationID`,`corporationName`,`isActive`) 
                   VALUES
-                  ('".$config['api_char_id']."', '".$config['api_user_id']."', '".$config['api_char_name']."', '".$config['api_corp_id']."', '".$config['api_corp_name']."', '".$charisactive."')
-                  ON DUPLICATE KEY UPDATE `userID`=VALUES(`userID`),`name`=VALUES(`name`),`corporationID`=VALUES(`corporationID`),`corporationName`=VALUES(`corporationName`),`isActive`=VALUES(`isActive`)";
-        DBHandler($config['DB_Prefix']."utilregistereduser", "DII", $query);
+                  ('".$config['charAPIs']."', '".$config['api_char_id']."', '".$config['api_user_id']."', '".$config['api_char_name']."', '".$config['api_corp_id']."', '".$config['api_corp_name']."', '".$charisactive."')
+                  ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`userID`=VALUES(`userID`),`name`=VALUES(`name`),`corporationID`=VALUES(`corporationID`),`corporationName`=VALUES(`corporationName`),`isActive`=VALUES(`isActive`)";
+        DBHandler($config['DB_Prefix']."utilRegisteredCharacter", "DII", $query);
         if ($config['db_corp']==1) { $coprisactive = '1'; } else { $coprisactive = '0'; };
-        $query = "INSERT INTO `".$config['DB_Prefix']."utilregisteredcorporation` (`corporationID`,`characterID`,`isActive`) 
+        $query = "INSERT INTO `".$config['DB_Prefix']."utilRegisteredCorporation` (`activeAPI`,`corporationID`,`characterID`,`isActive`) 
                   VALUES
-                  ('".$config['api_corp_id']."', '".$config['api_char_id']."', '".$coprisactive."')
-                  ON DUPLICATE KEY UPDATE `characterID`=VALUES(`characterID`),`isActive`=VALUES(`isActive`)";
-        DBHandler($config['DB_Prefix']."utilregisteredcorporation", "DII", $query);
+                  ('".$config['corpAPIs']."', '".$config['api_corp_id']."', '".$config['api_char_id']."', '".$coprisactive."')
+                  ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`characterID`=VALUES(`characterID`),`isActive`=VALUES(`isActive`)";
+        DBHandler($config['DB_Prefix']."utilRegisteredCorporation", "DII", $query);
         if (!empty($config['config_pass']) && $config['config_pass']!="" && md5($config['config_pass'])!==$conf['password']) {
-          $query = "UPDATE `".$config['DB_Prefix']."utilconfig` SET `Value` = '".md5($config['config_pass'])."' WHERE `Name` = 'password'";
-          DBHandler($config['DB_Prefix']."utilconfig => password", "DUC", $query);
+          $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = '".md5($config['config_pass'])."' WHERE `Name` = 'password'";
+          DBHandler($config['DB_Prefix']."utilConfig => password", "DU", $query);
         }; // if !(empty($config['db_map']) && $config['db_map']=="" && md5($config['db_map'])===$conf['password'])
       }; // if $config['db_action'] == 2
     } else {

@@ -39,6 +39,12 @@ h1 {
   letter-spacing: 3px;
   color: #00CCFF;
 }
+h2 {
+  color: #00CCFF;
+}
+h3 {
+  color: #00CCFF;
+}
 table {
   background-color: #333333;
   margin : 0.5em auto;

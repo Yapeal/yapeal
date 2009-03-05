@@ -109,7 +109,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corpdivisions`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corpdivisions` (
+CREATE TABLE `%prefix%corpDivisions` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `description` VARCHAR(255) NOT NULL ,
@@ -165,7 +165,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corplogo`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corplogo` (
+CREATE TABLE `%prefix%corpLogo` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `graphicID` BIGINT UNSIGNED NOT NULL ,
   `shape1` SMALLINT UNSIGNED NOT NULL ,
@@ -232,6 +232,90 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
+-- Table `corpStandingsFromAgents`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `corpStandingsFromFactions`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `corpStandingsFromNPCCorporations`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToAlliances`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsToAlliances` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToCharacters`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToCorporations`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%corpStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
 -- Table `corpStarbaseList`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%corpStarbaseList` (
@@ -251,7 +335,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corpwalletDivisions`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corpwalletDivisions` (
+CREATE TABLE `%prefix%corpWalletDivisions` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `description` VARCHAR(255) NOT NULL ,

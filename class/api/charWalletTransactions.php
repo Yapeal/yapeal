@@ -45,12 +45,11 @@ class charWalletTransactions extends ACharacter {
   /**
    * @var array Holds the database column names and ADOdb types.
    */
-  private $types = array('accountKey' => 'I', 'characterID' => 'I',
-    'characterName' => 'C', 'clientID' => 'I', 'clientName' => 'C',
-    'ownerID' => 'I', 'price' => 'N', 'quantity' => 'I', 'stationID' => 'I',
-    'stationName' => 'C', 'transactionDateTime' => 'T', 'transactionFor' => 'C',
-    'transactionID' => 'I', 'transactionType' => 'C', 'typeID' => 'I',
-    'typeName' => 'C'
+  private $types = array('accountKey' => 'I', 'clientID' => 'I',
+    'clientName' => 'C', 'ownerID' => 'I', 'price' => 'N', 'quantity' => 'I',
+    'stationID' => 'I', 'stationName' => 'C', 'transactionDateTime' => 'T',
+    'transactionFor' => 'C', 'transactionID' => 'I', 'transactionType' => 'C',
+    'typeID' => 'I', 'typeName' => 'C'
   );
   /**
    * @var array Hold an array of the XML return from API.
@@ -170,7 +169,7 @@ class charWalletTransactions extends ACharacter {
       } while ($cnt == 1000);
       ++$ret;
     };// foreach $accounts ...
-    if ($ret == 7) {
+    if ($ret == 1) {
       return TRUE;
     };
     return FALSE;

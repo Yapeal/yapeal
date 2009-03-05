@@ -28,14 +28,14 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE TABLE IF NOT EXISTS `utilconfig` (
+CREATE TABLE IF NOT EXISTS `utilConfig` (
   `Name` varchar(90) COLLATE utf8_unicode_ci NOT NULL,
   `Value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Name`) )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci;
-INSERT INTO `utilconfig` VALUES('version', '$Revision$')
+INSERT INTO `utilConfig` VALUES('version', '$Revision$')
 ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`);
 
 CREATE TABLE IF NOT EXISTS `utilCachedUntil` (
@@ -48,6 +48,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `utilRegisteredCharacter` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this character' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `corporationName` VARCHAR(255) NOT NULL ,
@@ -62,6 +63,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `utilRegisteredCorporation` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this corporation' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `graphic` BLOB NULL DEFAULT NULL ,

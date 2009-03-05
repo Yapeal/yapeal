@@ -34,7 +34,7 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
-if (conRev($ini_yapeal['version'])>471) {
+if (conRev($ini_yapeal['version'])>=471) {
   $db = new mysqli($ini_yapeal['Database']['host'],$ini_yapeal['Database']['username'],$ini_yapeal['Database']['password']);
   $query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilconfig`";
   $result = $db->query($query);
@@ -42,12 +42,20 @@ if (conRev($ini_yapeal['version'])>471) {
     $conf[$row['Name']] = $row['Value'];
   }
   require_once('inc'.$DS.'update'.$DS.'login.php');
+} elseif (conRev($ini_yapeal['version'])>=643) {
+  $db = new mysqli($ini_yapeal['Database']['host'],$ini_yapeal['Database']['username'],$ini_yapeal['Database']['password']);
+  $query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilConfig`";
+  $result = $db->query($query);
+  while ($row = $result->fetch_assoc()) {
+    $conf[$row['Name']] = $row['Value'];
+  }
+  require_once('inc'.$DS.'update'.$DS.'login.php');
 };
 if (isset($_GET['edit']) && $_GET['edit'] == "usetup") {
-  // Main edit site
+  // Config Site
   require_once('inc'.$DS.'update'.$DS.'uconfig.php');
 } elseif (isset($_GET['edit']) && $_GET['edit'] == "uselect") {
-  // Main edit site
+  // Character Selection Site
   require_once('inc'.$DS.'update'.$DS.'uchar_select.php');
 } elseif (isset($_GET['edit']) && $_GET['edit'] == "newupdate") {
   // Main edit site
@@ -62,10 +70,6 @@ if (isset($_GET['edit']) && $_GET['edit'] == "usetup") {
   // Do update
   require_once('inc'.$DS.'update'.$DS.'go.php');
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang()."&edit=newupdate");
+  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&edit=newupdate");
 };
-/* if (isset($ini_yapeal['table_prefix'])) {
-
-}; */
-
 ?>

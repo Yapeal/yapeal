@@ -35,31 +35,8 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
 //if (isset($_GET['install'])) {
-  if (getConfigRevision()===false || getConfigRevision()<=471) {
-    if (DBHandler('CachedUntil','CHKTABLE')) {
-      UpdateDB("util","471");
-    }; // if (DBHandler('CachedUntil','CHKTABLE'))
-    if (DBHandler('ServerStatus','CHKTABLE')) {
-      UpdateDB("server","471");
-    }; // if (DBHandler('ServerStatus','CHKTABLE'))
-    if (isset($config['db_account']) && $config['db_account'] > 0) {
-      UpdateDB("account","471");
-    }; // if (isset($config['db_account']) && $config['db_account'] > 0)
-    if (isset($config['db_char']) && $config['db_char'] > 0) {
-      UpdateDB("char","471");
-    }; // if (isset($config['db_account']) && $config['db_account'] > 0)
-    if (isset($config['db_corp']) && $config['db_corp'] > 0) {
-      UpdateDB("corp","471");
-    }; // if (isset($config['db_account']) && $config['db_account'] > 0)
-    if (isset($config['db_eve']) && $config['db_eve'] > 0) {
-      UpdateDB("eve","471");
-    }; // if (isset($config['db_account']) && $config['db_account'] > 0)
-    if (isset($config['db_map']) && $config['db_map'] > 0) {
-      UpdateDB("map","471");
-    }; // if (isset($config['db_account']) && $config['db_account'] > 0)
-    dropOldTables("471");
-  } elseif (getConfigRevision()==true && getConfigRevision()>471) {
-    
+  if (getConfigRevision()===false || getConfigRevision()<$setupversion) {
+    UpdateDB();
   } else {
     // Create the Required Databases
     createTables("util");

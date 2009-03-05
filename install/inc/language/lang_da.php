@@ -113,8 +113,7 @@ define("INSTALLER_API_SETUP","API Setup");
 define("INSTALLER_GET_API_INFO_HERE","Du kan finde dine API info her");
 define("INSTALLER_EVE_API_CENTER","EVE API Center");
 define("INSTALLER_API_USERID","API User ID");
-define("INSTALLER_API_LIMIT_KEY","Limited API Key");
-define("INSTALLER_API_FULL_KEY","Full API Key");
+define("INSTALLER_API_KEY","API Key");
 define("INSTALLER_SETUP_PASS","Setup Kodeord");
 define("INSTALLER_SETUP_PASS_DES","Denne kodeord bliver brugt når du vil ændre indstillingerne efter denne setup er færdig.");
 define("INSTALLER_CHAR_SELECT","Vælg Karakter");
@@ -143,7 +142,7 @@ define("INSTALLER_NO_C_ACTION","Gør Intet!");
 define("INSTALLER_NO_C_ACTION_DES","Du skal vælge noget andet end \"Gør Intet\"");
 define("INSTALLER_MOVE_OLD_DATA","Kopier Data Til");
 define("INSTALLER_REMOVE_OLD_TABLES","Fjerner Gamle Tabeller");
-define("INSTALLER_FROM_REVISION","Fra Revision: ");
+define("INSTALLER_OLD_TABLE","Gammel Tabel -> ");
 /**
  * Yapeal Config Editor
  */
@@ -162,15 +161,43 @@ define("ED_DISABLE","Inaktiv");
 define("ED_REMOVE_ALL_DATA","Inaktiver og fjern data");
 define("ED_DEBUGING","Fejlretning");
 define("ED_ONLY_CHANGE_IF","Skift kun hvis nødvendig");
-define("ED_UPDATE_CONFIG_TABLE","Opdater");
 define("ED_UPDATE_FILE","Opdater Fil");
 define("ED_UPDATING_DONE",'<h2>Opdateringen er færdig.</h2><br />');
 define("ED_UPDATING_FAILED",'<h2>Opdateringen fejlede.</h2><br />' . PHP_EOL
                            .'Du har måske indtastet nogle forkerte info.<br />');
 define("ED_GO_TO_CONFIG","Gå Til Konfiguration");
+define("ED_UPDATING_FROM_REV","Opdater Fra Revision");
+define("ED_UPDATING_TO_REV","Opdater Til Revision");
+define("ED_TO_REV","Til Revision");
 /**
  * Yapeal Config Editor
  */
 define("UPD_NEW_UPDATE","Ny Opdatering");
 define("UPD_NEW_UPDATE_DES","Der er en ny opdatering til databasen.<br />" . PHP_EOL);
+define("UPD_ALTER_TABLE","Ændre Tabel");
+define("UPD_START_UPDATE","Start Opdatering");
+define("UPD_END_UPDATE","Slut Opdatering");
+define("UPD_REVISION","Revision");
+define("UPD_CHAR_API_PULL_SELECT","Karakter API træk vælger");
+define("UPD_CHAR_API_PULL_SELECT_DES","Vælg hvilke API den enkeldte karakter skal hente");
+define("UPD_GET_charCharacterSheet_DES","Hent Karakter Ark");
+define("UPD_GET_charAccountBalance_DES","Hent Konto Balance fra karakter");
+define("UPD_GET_charAssetList_DES","Hent Beholdnings Liste fra karakter");
+define("UPD_GET_charIndustryJobs_DES","Hent Industri Opgaver fra karakter");
+define("UPD_GET_charMarketOrders_DES","Hent Market Ordere fra karakter");
+define("UPD_GET_charStandings_DES","Hent Standings fra karakter");
+define("UPD_GET_charWalletJournal_DES","Hent Konto Journal fra karakter");
+define("UPD_GET_charWalletTransactions_DES","Hent Konto Transaktioner fra karakter");
+define("UPD_CORP_API_PULL_SELECT","Corporation API træk vælger");
+define("UPD_CORP_API_PULL_SELECT_DES","Vælg hvilke API corporation skal hente");
+define("UPD_GET_corpCorporationSheet_DES","Hent Corporation Ark");
+define("UPD_GET_corpAccountBalance_DES","Hent Konto Balance fra corporation");
+define("UPD_GET_corpAssetList_DES","Hent Beholdnings Liste fra corporation");
+define("UPD_GET_corpIndustryJobs_DES","Hent Industri Opgaver fra corporation");
+define("UPD_GET_corpMarketOrders_DES","Hent Market Ordere fra corporation");
+define("UPD_GET_corpMemberTracking_DES","Hent Medlem Liste fra corporation");
+define("UPD_GET_corpStandings_DES","Hent Standings fra corporation");
+define("UPD_GET_corpStarbaseList_DES","Hent Starbase Liste fra corporation");
+define("UPD_GET_corpWalletJournal_DES","Hent Konto Journal fra corporation");
+define("UPD_GET_corpWalletTransactions_DES","Hent Konto Transaktioner fra corporation");
 ?>

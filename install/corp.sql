@@ -204,6 +204,72 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `corpStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToAlliances` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+CREATE TABLE IF NOT EXISTS `corpStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
 CREATE TABLE IF NOT EXISTS `corpStarbaseList` (
   `itemID` BIGINT UNSIGNED NOT NULL ,
   `locationID` BIGINT UNSIGNED NOT NULL ,

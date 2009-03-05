@@ -35,13 +35,27 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 /****************************************************************************
 * Per character API pulls
 ****************************************************************************/
-$apis = array('charCharacterSheet', 'charAccountBalance', 'charAssetList',
-  'charIndustryJobs', 'charMarketOrders', 'charWalletJournal',
-  'charWalletTransactions'
+$availableApis = array('charAccountBalance', 'charAssetList',
+  'charCharacterSheet', 'charIndustryJobs', 'charMarketOrders',
+  'charStandings', 'charWalletJournal', 'charWalletTransactions'
 );
+$apis = explode(' ', $activeAPI);
+if (count($apis) == 0) {
+  $mess = 'No active APIs listed for ' . $charID;
+  $mess .= ' in ' . $sectionFile;
+  trigger_error($mess, E_USER_NOTICE);
+  continue;
+};
 $serverName = 'Tranquility';
 require_once YAPEAL_CLASS . 'api' . $ds . 'ACharacter.php';
 foreach ($apis as $api) {
+  $api = trim($api);
+  if (!in_array($api, $availableApis)) {
+    $mess = 'Invalid API ' . $api . ' in database table for ' . $charID;
+    $mess .= ' in ' . $sectionFile;
+    trigger_error($mess, E_USER_WARNING);
+    continue;
+  };
   require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
   $tableName = YAPEAL_TABLE_PREFIX . $api;
   $mess = 'Before dontWait for ' . $tableName . $charID;

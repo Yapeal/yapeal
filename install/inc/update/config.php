@@ -35,7 +35,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
 OpenSite(SETUP,true);
-echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&amp;edit=select" method="post">' . PHP_EOL
+echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&amp;edit=select" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
     .'  <tr>' . PHP_EOL
@@ -155,44 +155,35 @@ echo '<form name="go_no_go" action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['la
     .'<br />' . PHP_EOL
     .'<!-- Api Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
-    .'  <tbody id="api_setup_table">' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <th colspan="2">'.INSTALLER_API_SETUP.'</th>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td colspan="2" style="text-align: center;">'.INSTALLER_GET_API_INFO_HERE.':<br /><a href="http://myeve.eve-online.com/api/default.asp">'.INSTALLER_EVE_API_CENTER.'</a></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_USERID.':</td>' . PHP_EOL
-    .'      <td><input size="10" type="text" id="api_user_id" name="config[api_user_id]" value="'.$conf['creatorAPIuserID'].'" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_LIMIT_KEY.':</td>' . PHP_EOL
-    .'      <td><input class="input_text" type="text" id="api_limit_key" name="config[api_limit_key]" value="'.$conf['creatorAPIlimitedApiKey'].'" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.INSTALLER_API_FULL_KEY.':</td>' . PHP_EOL
-    .'      <td><input class="input_text" type="text" id="api_full_key" name="config[api_full_key]" value="'.$conf['creatorAPIfullApiKey'].'" onblur="api_get_chars()" /></td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'  </tbody>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <th colspan="2">'.INSTALLER_API_SETUP.'</th>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td colspan="2" style="text-align: center;">'.INSTALLER_GET_API_INFO_HERE.':<br /><a href="http://myeve.eve-online.com/api/default.asp">'.INSTALLER_EVE_API_CENTER.'</a></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td class="tableinfolbl">'.INSTALLER_API_USERID.':</td>' . PHP_EOL
+    .'    <td><input size="10" type="text" name="config[api_user_id]" value="'.$conf['creatorAPIuserID'].'" /></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td class="tableinfolbl">'.INSTALLER_API_KEY.':</td>' . PHP_EOL
+    .'    <td><input class="input_text" type="text" name="config[api_full_key]" value="'.$conf['creatorAPIfullApiKey'].'" /></td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
     .'<!-- Api Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <th colspan="2">'.INSTALLER_SETUP_PASS.'</th>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td colspan="2" style="text-align: center;">'.INSTALLER_SETUP_PASS_DES.'</td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
-    .'    <tr>' . PHP_EOL
-    .'      <td class="tableinfolbl">'.PASSWORD.':</td>' . PHP_EOL
-    .'      <td><input type="password" id="config_pass" name="config[config_pass]" value="" /> '.ED_ONLY_CHANGE_IF.'</td>' . PHP_EOL
-    .'    </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <th colspan="2">'.INSTALLER_SETUP_PASS.'</th>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td colspan="2" style="text-align: center;">'.INSTALLER_SETUP_PASS_DES.'</td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
+    .'  <tr>' . PHP_EOL
+    .'    <td class="tableinfolbl">'.PASSWORD.':</td>' . PHP_EOL
+    .'    <td><input type="password" name="config[config_pass]" value="" /> '.ED_ONLY_CHANGE_IF.'</td>' . PHP_EOL
+    .'  </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
-    .'<div  id="submit_select"><input type="submit" value="'.NEXT.'" /></div>' . PHP_EOL
-    .'</form>' . PHP_EOL
-    .'<script type="text/javascript">' . PHP_EOL
-    .'  load_Edit_Setup_JavaScript('.$conf['creatorCharacterID'].');' . PHP_EOL
-    .'</script>' . PHP_EOL;
+    .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL
+    .'</form>' . PHP_EOL;
 CloseSite();
 ?>

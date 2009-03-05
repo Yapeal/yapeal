@@ -100,6 +100,31 @@ DROP TABLE IF EXISTS `%prefix%charMarketOrders`;
 DROP TABLE IF EXISTS `%prefix%charskills`;
 
 -- -----------------------------------------------------
+-- Table `charStandingsFromAgents`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charStandingsFromAgents`;
+
+-- -----------------------------------------------------
+-- Table `charStandingsFromFactions`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charStandingsFromFactions`;
+
+-- -----------------------------------------------------
+-- Table `charStandingsFromNPCCorporations`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charStandingsFromNPCCorporations`;
+
+-- -----------------------------------------------------
+-- Table `charStandingsToCharacters`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charStandingsToCharacters`;
+
+-- -----------------------------------------------------
+-- Table `charStandingsToCorporations`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charStandingsToCorporations`;
+
+-- -----------------------------------------------------
 -- Table `charWalletJournal`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%charWalletJournal`;

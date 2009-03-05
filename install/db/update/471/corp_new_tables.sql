@@ -109,7 +109,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corpdivisions`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corpdivisions` (
+CREATE TABLE `%prefix%corpDivisions` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `description` VARCHAR(255) NOT NULL ,
@@ -165,7 +165,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corplogo`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corplogo` (
+CREATE TABLE `%prefix%corpLogo` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `graphicID` BIGINT UNSIGNED NOT NULL ,
   `shape1` SMALLINT UNSIGNED NOT NULL ,
@@ -251,7 +251,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `corpwalletDivisions`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%corpwalletDivisions` (
+CREATE TABLE `%prefix%corpWalletDivisions` (
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `description` VARCHAR(255) NOT NULL ,

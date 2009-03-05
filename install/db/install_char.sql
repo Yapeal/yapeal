@@ -265,6 +265,76 @@ COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet API';
 
 -- -----------------------------------------------------
+-- Table `charStandingsFromAgents`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charStandingsFromAgents` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `charStandingsFromFactions`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charStandingsFromFactions` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `charStandingsFromNPCCorporations`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charStandingsFromNPCCorporations` (
+  `fromID` bigint(20) unsigned NOT NULL,
+  `fromName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  PRIMARY KEY  (`ownerID`, `fromID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `charStandingsToCharacters`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charStandingsToCharacters` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `charStandingsToCorporations`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charStandingsToCorporations` (
+  `ownerID` bigint(20) unsigned NOT NULL,
+  `standing` decimal(17,2) NOT NULL,
+  `toID` bigint(20) unsigned NOT NULL,
+  `toName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`ownerID`, `toID`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci
+COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
 -- Table `charWalletJournal`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charWalletJournal` (
@@ -292,8 +362,6 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
-  `characterID` BIGINT UNSIGNED NULL ,
-  `characterName` VARCHAR(255) NULL ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,

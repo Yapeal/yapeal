@@ -32,7 +32,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- -----------------------------------------------------
 -- Table `utilconfig`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%utilconfig` (
+CREATE TABLE `%prefix%utilConfig` (
   `Name` varchar(90) COLLATE utf8_unicode_ci NOT NULL,
   `Value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Name`) )
@@ -43,21 +43,23 @@ COLLATE=utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilconfig`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilconfig` VALUES('dbPrefix', '%prefix%');
-INSERT INTO `%prefix%utilconfig` VALUES('accountData', '%accountData%');
-INSERT INTO `%prefix%utilconfig` VALUES('charData', '%charData%');
-INSERT INTO `%prefix%utilconfig` VALUES('corpData', '%corpData%');
-INSERT INTO `%prefix%utilconfig` VALUES('eveData', '%eveData%');
-INSERT INTO `%prefix%utilconfig` VALUES('mapData', '%mapData%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorAPIfullApiKey', '%fullApiKey%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorAPIlimitedApiKey', '%limitedApiKey%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorAPIuserID', '%userID%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorCharacterID', '%characterID%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorCorporationID', '%corporationID%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorCorporationName', '%corporationName%');
-INSERT INTO `%prefix%utilconfig` VALUES('creatorName', '%name%');
-INSERT INTO `%prefix%utilconfig` VALUES('password', '%password%');
-INSERT INTO `%prefix%utilconfig` VALUES('version', '$Revision$');
+INSERT INTO `%prefix%utilConfig` VALUES('dbPrefix', '%prefix%');
+INSERT INTO `%prefix%utilConfig` VALUES('accountData', '%accountData%');
+INSERT INTO `%prefix%utilConfig` VALUES('charData', '%charData%');
+INSERT INTO `%prefix%utilConfig` VALUES('corpData', '%corpData%');
+INSERT INTO `%prefix%utilConfig` VALUES('eveData', '%eveData%');
+INSERT INTO `%prefix%utilConfig` VALUES('mapData', '%mapData%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorAPIfullApiKey', '%fullApiKey%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorAPIlimitedApiKey', '%limitedApiKey%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorAPIuserID', '%userID%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorCharacterID', '%characterID%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorCorporationID', '%corporationID%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorCorporationName', '%corporationName%');
+INSERT INTO `%prefix%utilConfig` VALUES('creatorName', '%name%');
+INSERT INTO `%prefix%utilConfig` VALUES('charAPIs', '%activeCharAPI%');
+INSERT INTO `%prefix%utilConfig` VALUES('corpAPIs', '%activeCorpAPI%');
+INSERT INTO `%prefix%utilConfig` VALUES('password', '%password%');
+INSERT INTO `%prefix%utilConfig` VALUES('version', '$Revision$');
 
 -- -----------------------------------------------------
 -- Table `utilCachedUntil`
@@ -92,6 +94,7 @@ INSERT INTO `%prefix%utilRegisteredUser` VALUES('%userID%', '%fullApiKey%', '%li
 -- Table `utilRegisteredCharacter`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%utilRegisteredCharacter` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this character' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `userID` BIGINT UNSIGNED NOT NULL ,
   `name` VARCHAR(255) NOT NULL ,
@@ -108,12 +111,13 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilRegisteredCharacter`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredCharacter` VALUES('%characterID%', '%userID%', '%name%', '%corporationID%', '%corporationName%', '%charisactive%', null, null);
+INSERT INTO `%prefix%utilRegisteredCharacter` VALUES('%activeCharAPI%', '%characterID%', '%userID%', '%name%', '%corporationID%', '%corporationName%', '%charisactive%', null, null);
 
 -- -----------------------------------------------------
 -- Table `utilRegisteredCorporation`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%utilRegisteredCorporation` (
+  `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this corporation' ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
   `isActive` BOOLEAN NOT NULL DEFAULT FALSE ,
@@ -127,7 +131,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilRegisteredCorporation`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%corporationID%', '%characterID%', '%corpisactive%', null, null);
+INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%activeCorpAPI%', '%corporationID%', '%characterID%', '%corpisactive%', null, null);
 
 -- -----------------------------------------------------
 SET SQL_MODE=@OLD_SQL_MODE;

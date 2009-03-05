@@ -90,12 +90,11 @@ SELECT `WalletJournal`.`accountKey`,`WalletJournal`.`amount`,
 FROM `WalletJournal`,`RegisteredCharacter`
 WHERE `WalletJournal`.`ownerID` = `RegisteredCharacter`.`characterID`;
 
-INSERT INTO `charWalletTransactions` (`accountKey`,`characterID`,`characterName`,
-  `clientID`,`clientName`,`ownerID`,`price`,`quantity`,`stationID`,`stationName`,
+INSERT INTO `charWalletTransactions` (`accountKey`,`clientID`,`clientName`,
+  `ownerID`,`price`,`quantity`,`stationID`,`stationName`,
   `transactionDateTime`,`transactionFor`,`transactionID`,`transactionType`,
   `typeID`,`typeName`)
-SELECT `WalletTransactions`.`accountKey`,`WalletTransactions`.`characterID`,
-  `WalletTransactions`.`characterName`,`WalletTransactions`.`clientID`,
+SELECT `WalletTransactions`.`accountKey`,`WalletTransactions`.`clientID`,
   `WalletTransactions`.`clientName`,`WalletTransactions`.`ownerID`,
   `WalletTransactions`.`price`,`WalletTransactions`.`quantity`,
   `WalletTransactions`.`stationID`,`WalletTransactions`.`stationName`,

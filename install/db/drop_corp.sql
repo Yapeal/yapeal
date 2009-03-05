@@ -75,6 +75,36 @@ DROP TABLE IF EXISTS `%prefix%corpMarketOrders`;
 DROP TABLE IF EXISTS `%prefix%corpMemberTracking`;
 
 -- -----------------------------------------------------
+-- Table `corpStandingsFromAgents`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsFromAgents`;
+
+-- -----------------------------------------------------
+-- Table `corpStandingsFromFactions`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsFromFactions`;
+
+-- -----------------------------------------------------
+-- Table `corpStandingsFromNPCCorporations`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsFromNPCCorporations`;
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToAlliances`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsToAlliances`;
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToCharacters`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsToCharacters`;
+
+-- -----------------------------------------------------
+-- Table `corpStandingsToCorporations`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpStandingsToCorporations`;
+
+-- -----------------------------------------------------
 -- Table `corpStarbaseList`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%corpStarbaseList`;

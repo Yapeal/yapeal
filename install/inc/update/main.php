@@ -36,12 +36,12 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 }
 // Get config info
 $ini_yapeal = parse_ini_file('..'.$DS.'config'.$DS.'yapeal.ini', true);
-if (conRev($ini_yapeal['version'])<=471) {
+if (conRev($ini_yapeal['version'])<$setupversion) {
   require('inc'.$DS.'update'.$DS.'update.php');
   exit;
 };// if (conRev($ini_yapeal['version'])<=471)
 $db = new mysqli($ini_yapeal['Database']['host'],$ini_yapeal['Database']['username'],$ini_yapeal['Database']['password']);
-$query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilconfig`";
+$query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilConfig`";
 $result = $db->query($query);
 while ($row = $result->fetch_assoc()) {
   $conf[$row['Name']] = $row['Value'];
@@ -60,6 +60,6 @@ if (isset($_GET['edit']) && $_GET['edit'] == "setup") {
   // Main edit site
   require_once('inc'.$DS.'update'.$DS.'go.php');
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang()."&edit=setup");
+  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&edit=setup");
 };
 ?>

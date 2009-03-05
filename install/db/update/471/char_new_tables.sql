@@ -292,8 +292,6 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
-  `characterID` BIGINT UNSIGNED NULL ,
-  `characterName` VARCHAR(255) NULL ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,

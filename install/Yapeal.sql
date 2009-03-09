@@ -732,6 +732,16 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 /* util section */
+CREATE TABLE IF NOT EXISTS `utilConfig` (
+  `Name` varchar(90) COLLATE utf8_unicode_ci NOT NULL,
+  `Value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`Name`) )
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_unicode_ci;
+INSERT INTO `utilconfig` VALUES('version', '$Revision: 621 $')
+ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`);
+
 CREATE TABLE IF NOT EXISTS `utilCachedUntil` (
   `cachedUntil` DATETIME NOT NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,

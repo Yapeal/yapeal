@@ -61,7 +61,7 @@ class LoggingExceptionObserver implements YapealObserver {
    *
    * @param object $e The 'object' we're observing.
    */
-  public function update(YapealSubject $e) {
+  public function YapealUpdate(YapealSubject $e) {
     $message = PHP_EOL;
     $message .= <<<MESS
 EXCEPTION:

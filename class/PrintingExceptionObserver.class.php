@@ -46,18 +46,18 @@ class PrintingExceptionObserver implements YapealObserver {
    *
    * @param object $e The 'object' we're observering.
    */
-  public function update(YapealSubject $e) {
+  public function YapealUpdate(YapealSubject $e) {
     $message = <<<MESS
 EXCEPTION:
-     Code: {$e->getCode() }
-  Message: {$e->getMessage() }
-     File: {$e->getFile() }
-     Line: {$e->getLine() }
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
 Backtrace:
-{$e->getTraceAsString() }
-\t--- END TRACE ---
+{$e->getTraceAsString()}
 MESS;
-    print_on_command($message . PHP_EOL);
+    $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
+    print_on_command($message);
   }
 }
 ?>

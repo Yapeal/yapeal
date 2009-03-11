@@ -137,10 +137,10 @@ class charWalletJournal extends ACharacter {
             $mess = 'No XML found for ' . $tableName;
             $mess .= ' from char section in ' . __FILE__;
             trigger_error($mess, E_USER_NOTICE);
-            continue 2;
+            continue 2;// while, foreach $accounts
           };// else $xml !== FALSE ...
         }
-        catch(YapealApiErrorException $e) {
+        catch (YapealApiErrorException $e) {
           // Some error codes give us a new time to retry after that should be
           // used for cached until time.
           switch ($e->getCode()) {
@@ -152,11 +152,15 @@ class charWalletJournal extends ACharacter {
                 'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
               );
               upsert($data, $cachetypes, 'utilCachedUntil', YAPEAL_DSN);
-            break;
+              break;
+            case 211: // Login denied by account status.
+              // The character's account isn't active no use trying any of the
+              // other APIs.
+              break 4;// switch, while, foreach $accounts, foreach $apis
             default:
               // Do nothing but logging by default
           };// switch $e->getCode()
-          continue 2;
+          continue 2;// while, foreach $accounts
         }
         catch (YapealApiException $e) {
           continue 2;

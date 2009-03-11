@@ -161,7 +161,7 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
         return FALSE;
       };
     }
-    catch(YapealApiErrorException $e) {
+    catch (YapealApiErrorException $e) {
       // Some error codes give us a new time to retry after that should be
       // used for cached until time.
       switch ($e->getCode()) {
@@ -177,7 +177,10 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
           );
           upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
             YAPEAL_DSN);
-        break;
+          break;
+        case 211: // Login denied by account status.
+          // The corporation's account isn't active no use trying any of the other APIs.
+          break 2;// switch, foreach $apis
         default:
           // Do nothing but logging by default
       };// switch $e->getCode()

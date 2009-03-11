@@ -140,7 +140,7 @@ class corpWalletJournal extends ACorporation {
             continue 2;
           };// else $xml !== FALSE ...
         }
-        catch(YapealApiErrorException $e) {
+        catch (YapealApiErrorException $e) {
           // Some error codes give us a new time to retry after that should be
           // used for cached until time.
           switch ($e->getCode()) {
@@ -153,11 +153,15 @@ class corpWalletJournal extends ACorporation {
               );
               upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
                 YAPEAL_DSN);
-            break;
+              break;
+            case 211: // Login denied by account status.
+              // The corporation's account isn't active no use trying any of the
+              // other APIs.
+              break 4;// switch, while, foreach $accounts, foreach $apis
             default:
               // Do nothing but logging by default
           };// switch $e->getCode()
-          continue 2;
+          continue 2;// while, foreach $accounts
         }
         catch (YapealApiException $e) {
           continue 2;

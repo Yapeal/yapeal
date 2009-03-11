@@ -41,6 +41,6 @@ interface YapealObserver {
   /**
    * Method that the 'subject' will call to let us know something happened.
    */
-  public function update(YapealSubject $e);
+  public function YapealUpdate(YapealSubject $e);
 }
 ?>

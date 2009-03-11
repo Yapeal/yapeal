@@ -78,8 +78,8 @@ class YapealApiException extends Exception implements YapealSubject {
    * Used to notify all the observers.
    */
   public function notify() {
-    foreach(self::$observers as $observer) {
-      $observer->update($this);
+    foreach (self::$observers as $observer) {
+      $observer->YapealUpdate($this);
     };
   }
 }

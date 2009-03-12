@@ -69,17 +69,17 @@ class charWalletTransactions extends ACharacter {
     global $cachetypes;
     $accounts = array(1000);
     $ret = 0;
-    $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
     foreach ($accounts as $account) {
       $beforeID = 0;
       do {
+        $cnt = 0;
         $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
           'beforeTransID' => $beforeID, 'characterID' => $this->characterID,
           'userID' => $this->userID
         );
-        $cnt = 0;
+        $xml = FALSE;
         try {
           // Build base part of cache file name.
           $cacheName = $this->serverName . $tableName;

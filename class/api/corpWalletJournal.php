@@ -68,17 +68,17 @@ class corpWalletJournal extends ACorporation {
     global $cachetypes;
     $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
-    $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
     foreach ($accounts as $account) {
       $beforeID = 0;
       do {
+        $cnt = 0;
         $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
           'beforeRefID' => $beforeID, 'characterID' => $this->characterID,
           'userID' => $this->userID
         );
-        $cnt = 0;
+        $xml = FALSE;
         try {
           // Build base part of cache file name.
           $cacheName = $this->serverName . $tableName;
@@ -220,10 +220,10 @@ class corpWalletJournal extends ACorporation {
           }
           // This doesn't work until CCP fixes thier cachedUntil timer.
           // Now correcting the time in XML instead.
-          //$until = (string)$xml->cachedUntil[0];
-          //if ($until > $cuntil) {
-          //  $cuntil = $until;
-          //};
+          $until = (string)$xml->cachedUntil[0];
+          if ($until > $cuntil) {
+            $cuntil = $until;
+          };
         } else {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
         $mess .= ' from corp section in ' . __FILE__;

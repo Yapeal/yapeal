@@ -68,17 +68,17 @@ class charWalletJournal extends ACharacter {
     global $cachetypes;
     $accounts = array(1000);
     $ret = 0;
-    $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
     foreach ($accounts as $account) {
       $beforeID = 0;
       do {
+        $cnt = 0;
         $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
           'beforeRefID' => $beforeID, 'characterID' => $this->characterID,
           'userID' => $this->userID
         );
-        $cnt = 0;
+        $xml = FALSE;
         try {
           // Build base part of cache file name.
           $cacheName = $this->serverName . $tableName;
@@ -151,7 +151,8 @@ class charWalletJournal extends ACharacter {
               $data = array( 'tableName' => $tableName,
                 'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
               );
-              upsert($data, $cachetypes, 'utilCachedUntil', YAPEAL_DSN);
+              upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
+                YAPEAL_DSN);
               break;
             case 211: // Login denied by account status.
               // The character's account isn't active no use trying any of the
@@ -252,7 +253,7 @@ class charWalletJournal extends ACharacter {
       // Already logged nothing to do here.
     }
     // If we stored everything correctly return TRUE.
-    if ($ret == 7) {
+    if ($ret == 1) {
       return TRUE;
     };
     return FALSE;

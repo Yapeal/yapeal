@@ -70,17 +70,17 @@ class corpWalletTransactions extends ACorporation {
     global $cachetypes;
     $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
-    $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
     foreach ($accounts as $account) {
       $beforeID = 0;
       do {
+        $cnt = 0;
         $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
           'beforeTransID' => $beforeID, 'characterID' => $this->characterID,
           'userID' => $this->userID
         );
-        $cnt = 0;
+        $xml = FALSE;
         try {
           // Build base part of cache file name.
           $cacheName = $this->serverName . $tableName;
@@ -154,7 +154,7 @@ class corpWalletTransactions extends ACorporation {
                 'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
               );
               upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-              YAPEAL_DSN);
+                YAPEAL_DSN);
               break;
             case 211: // Login denied by account status.
               // The corporation's account isn't active no use trying any of the

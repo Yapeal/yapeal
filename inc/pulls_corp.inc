@@ -88,9 +88,8 @@ foreach ($apis as $api) {
   $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
   $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
   $instance = new $api($params);
-  if ($instance->apiFetch()) {
-    $instance->apiStore();
-  };
+  $instance->apiFetch();
+  $instance->apiStore();
   $instance = null;
 };// foreach $apis ...
 ?>

@@ -222,9 +222,9 @@ class charWalletTransactions extends ACharacter {
           // This doesn't work until CCP fixes thier cachedUntil timer.
           // Now correcting the time in XML instead.
           $until = (string)$xml->cachedUntil[0];
-          if ($until > $cuntil) {
-            $cuntil = $until;
-          };
+          //if ($until > $cuntil) {
+          //  $cuntil = $until;
+          //};
         } else {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
         $mess .= ' from char section in ' . __FILE__;

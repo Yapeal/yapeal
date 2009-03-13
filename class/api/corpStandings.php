@@ -67,7 +67,7 @@ class corpStandings extends ACorporation {
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
@@ -217,7 +217,7 @@ class corpStandings extends ACorporation {
     if (count($datum) > 0) {
       try {
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         multipleUpsertAttributes($datum, $typesTo, $tableName, YAPEAL_DSN,
@@ -229,7 +229,7 @@ class corpStandings extends ACorporation {
       $ret = TRUE;
     } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' from corp section in ' . __FILE__;
+      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
     };// else count $datum ...
@@ -254,7 +254,7 @@ class corpStandings extends ACorporation {
     if (count($datum) > 0) {
       try {
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         multipleUpsertAttributes($datum, $typesFrom, $tableName, YAPEAL_DSN,
@@ -266,7 +266,7 @@ class corpStandings extends ACorporation {
       $ret = TRUE;
     } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' from corp section in ' . __FILE__;
+      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
     };// else count $datum ...

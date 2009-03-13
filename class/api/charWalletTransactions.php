@@ -197,6 +197,11 @@ class charWalletTransactions extends ACharacter {
       return FALSE;
     };// if empty $this->xml ...
     foreach ($accounts as $account) {
+      if (empty($this->xml[$account])) {
+        $mess = 'There was no XML data to store for ' . $tableName . $account;
+        $mess .= ' in ' . __FILE__;
+        trigger_error($mess, E_USER_NOTICE);
+      };// if empty $this->xml[$account] ...
       foreach ($this->xml[$account] as $xml) {
         $mess = 'Xpath for ' . $tableName . $account;
         $mess .= ' from char section in ' . __FILE__;

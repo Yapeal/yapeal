@@ -72,7 +72,7 @@ class corpCorporationSheet  extends ACorporation {
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
@@ -104,13 +104,13 @@ class corpCorporationSheet  extends ACorporation {
     );
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
-    $mess = 'Clone for ' . $tableName . ' from corp section in ' . __FILE__;
+    $mess = 'Clone for ' . $tableName . ' in ' . __FILE__;
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $datum = clone $this->xml->result[0]->children();
     // Get rid of child table stuff
     $mess = 'Delete children for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' in ' . __FILE__;
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     unset($datum->rowset[1], $datum->rowset[0], $datum->logo);
@@ -121,7 +121,7 @@ class corpCorporationSheet  extends ACorporation {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         upsert($data, $types, $tableName, YAPEAL_DSN);
@@ -132,7 +132,7 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -154,7 +154,7 @@ class corpCorporationSheet  extends ACorporation {
       try {
         $extras = array('ownerID' => $this->corporationID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
@@ -166,7 +166,7 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -192,7 +192,7 @@ class corpCorporationSheet  extends ACorporation {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         upsert($data, $types, $tableName, YAPEAL_DSN);
@@ -203,7 +203,7 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -225,7 +225,7 @@ class corpCorporationSheet  extends ACorporation {
       try {
         $extras = array('ownerID' => $this->corporationID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
@@ -237,7 +237,7 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...

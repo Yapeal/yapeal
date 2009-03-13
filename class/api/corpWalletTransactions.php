@@ -87,13 +87,13 @@ class corpWalletTransactions extends ACorporation {
           $cacheName .= $this->corporationID . $account . $beforeID . '.xml';
           // Try to get XML from local cache first if we can.
           $mess = 'getCachedXml for ' . $cacheName;
-          $mess .= ' from corp section in ' . __FILE__;
+          $mess .= ' in ' . __FILE__;
           $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
           if ($xml === FALSE) {
             $mess = 'getAPIinfo for ' . $this->api;
-            $mess .= ' from corp section in ' . __FILE__;
+            $mess .= ' in ' . __FILE__;
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
@@ -131,13 +131,13 @@ class corpWalletTransactions extends ACorporation {
               }; // if $oldest<$lastDT
             } else {
               $mess = 'No records for ' . $tableName;
-              $mess .= ' from corp section in ' . __FILE__;
+              $mess .= ' in ' . __FILE__;
               trigger_error($mess, E_USER_NOTICE);
               break;
             }
           } else {
             $mess = 'No XML found for ' . $tableName;
-            $mess .= ' from corp section in ' . __FILE__;
+            $mess .= ' in ' . __FILE__;
             trigger_error($mess, E_USER_NOTICE);
             continue 2;
           };// else $xml !== FALSE ...
@@ -193,14 +193,19 @@ class corpWalletTransactions extends ACorporation {
     $tableName = $this->tablePrefix . $this->api;
     if (empty($this->xml)) {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' from corp section in ' . __FILE__;
+      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };// if empty $this->xml ...
     foreach ($accounts as $account) {
+      if (empty($this->xml[$account])) {
+        $mess = 'There was no XML data to store for ' . $tableName . $account;
+        $mess .= ' in ' . __FILE__;
+        trigger_error($mess, E_USER_NOTICE);
+      };// if empty $this->xml[$account] ...
       foreach ($this->xml[$account] as $xml) {
         $mess = 'Xpath for ' . $tableName . $account;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         $datum = $xml->xpath($this->xpath);
@@ -210,7 +215,7 @@ class corpWalletTransactions extends ACorporation {
             $extras = array('ownerID' => $this->corporationID,
               'accountKey' => $account);
             $mess = 'multipleUpsertAttributes for ' . $tableName . $account;
-            $mess .= ' from corp section in ' . __FILE__;
+            $mess .= ' in ' . __FILE__;
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             multipleUpsertAttributes($datum, $this->types, $tableName, YAPEAL_DSN,
@@ -228,7 +233,7 @@ class corpWalletTransactions extends ACorporation {
           //};
         } else {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' in ' . __FILE__;
         trigger_error($mess, E_USER_NOTICE);
         };// else count $datum ...
       };// foreach $this->xml[$account] ...
@@ -245,7 +250,7 @@ class corpWalletTransactions extends ACorporation {
         'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
       );
       $mess = 'Upsert for '. $tableName;
-      $mess .= ' from corp section in ' . __FILE__;
+      $mess .= ' in ' . __FILE__;
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
       upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',

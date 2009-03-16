@@ -310,7 +310,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charWalletTransactions` (
+CREATE TABLE IF NOT EXISTS `charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,

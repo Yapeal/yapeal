@@ -228,7 +228,7 @@ class eveAllianceList implements IFetchApiTable, IStoreApiTable {
         $sql = 'truncate table ' . $tableName;
         $con->Execute($sql);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from corp section in ' . __FILE__;
+        $mess .= ' from eve section in ' . __FILE__;
         $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
         multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN);
@@ -239,7 +239,7 @@ class eveAllianceList implements IFetchApiTable, IStoreApiTable {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from corp section in ' . __FILE__;
+    $mess .= ' from eve section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...

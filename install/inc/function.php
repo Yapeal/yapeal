@@ -81,35 +81,77 @@ $langs = array();
 }
 
 // Input standard Site header
-function OpenSite($subtitle = "", $JS = false, $langselect = true) {
+function OpenSite($subtitle = "") {
   if ($subtitle != "") {
     $subtitle = ' - '.$subtitle;
   };
-  $JS = "";
-  if ($langselect) {
-    if (isset($_GET['install'])) {
-      $page = '<input type="hidden" name="install" value="'.$_GET['install'].'" />' . PHP_EOL;
-    } elseif (isset($_GET['edit'])) {
-      $page = '<input type="hidden" name="edit" value="'.$_GET['edit'].'" />' . PHP_EOL;
-    } elseif (isset($_GET['convert'])) {
-      $page = '<input type="hidden" name="convert" value="'.$_GET['convert'].'" />' . PHP_EOL;
-    }; // if / else
-    $languageselector = '<form action="setup.php" method="get">' . PHP_EOL
-                       .'<select name="lang" onchange="submit();">' . PHP_EOL
-                       .'  <option value="en"'; if ($_GET['lang'] == 'en') { $languageselector .= ' selected="selected"'; } $languageselector .= '>English</option>' . PHP_EOL
-                       .'  <option value="da"'; if ($_GET['lang'] == 'da') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Danish</option>' . PHP_EOL
-                       .'  <option value="ru"'; if ($_GET['lang'] == 'ru') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Russian</option>' . PHP_EOL
-                       .'</select>' . PHP_EOL
-                       .$page
-                       .'<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL
-                       .'</form>' . PHP_EOL;
-  } else {
-    $languageselector = '';
+  /*
+   * Language selector
+   */
+  $count = 0;
+  /*
+   * Make url query
+   */
+  foreach ($_GET as $getName=>$getValue) {
+    if ($count==0) {
+      $getParse = '?'.$getName.'='.$getValue;
+      $count++;
+    } else {
+      $getParse .= '&amp;'.$getName.'='.$getValue;
+    }; // if ($count==0)
   }
+  /*
+   * Setup the language selector bar
+   */
+  $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
+                     .'<select name="lang" onchange="submit();">' . PHP_EOL
+                     .'  <option value="en"'; if ($_POST['lang'] == 'en') { $languageselector .= ' selected="selected"'; } $languageselector .= '>English</option>' . PHP_EOL
+                     .'  <option value="da"'; if ($_POST['lang'] == 'da') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Danish</option>' . PHP_EOL
+                     .'  <option value="ru"'; if ($_POST['lang'] == 'ru') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Russian</option>' . PHP_EOL
+                     .'</select>' . PHP_EOL;
+  /*
+   * Make post query
+   */
+  foreach ($_POST as $postName=>$postValue) {
+    if ($postName=='lang') { continue; };
+    /*
+     * check if the value is a array
+     */
+    if (is_array($postValue)) {
+      foreach ($postValue as $postName1=>$postValue1) {
+        /*
+         * check if the value is a array
+         */
+        if (is_array($postValue1)) {
+          foreach ($postValue1 as $postName2=>$postValue2) {
+            /*
+             * check if the value is a array
+             */
+            if (is_array($postValue2)) {
+              foreach ($postValue2 as $postName3=>$postValue3) {
+                $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']['.$postName2.']['.$postName3.']" value="'.$postValue3.'" />' . PHP_EOL;
+              }
+            } else {
+             $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']['.$postName2.']" value="'.$postValue2.'" />' . PHP_EOL;
+            }; // if is_array($postValue2)
+          }
+        } else {
+          $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']" value="'.$postValue1.'" />' . PHP_EOL;
+        }; // if is_array($postValue1)
+      }
+    } else {
+      $languageselector .= '<input type="hidden" name="'.$postName.'" value="'.$postValue.'" />' . PHP_EOL;
+    }; // if is_array($postValue)
+  }
+  $languageselector .='<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL
+                     .'</form>' . PHP_EOL;
+  /*
+   * Set page title
+   */
   if (isset($_GET['install'])) {
-    $pagetitle = SETUP;
+    $pagetitle = '<h1>'.SETUP.'</h1>';
   } elseif (isset($_GET['edit'])) {
-    $pagetitle = CONFIG;
+    $pagetitle = '<h1>'.CONFIG.'</h1>';
   } else {
     $pagetitle = '';
   }; // if / else
@@ -118,13 +160,13 @@ function OpenSite($subtitle = "", $JS = false, $langselect = true) {
       .'<head>' . PHP_EOL
       .'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . PHP_EOL
       .'<title>Yapeal Setup' . $subtitle . '</title>' . PHP_EOL
-      .'<link href="inc/style.css" rel="stylesheet" type="text/css" />' . $JS . PHP_EOL
+      .'<link href="inc/style.css" rel="stylesheet" type="text/css" />' . PHP_EOL
       .'</head>' . PHP_EOL
       .'<body>' . PHP_EOL
       .$languageselector
       .'<div id="wrapper">' . PHP_EOL
       .'<img src="../pics/yapealblue.png" width="150" height="50" alt="Yapeal logo" /><br />' . PHP_EOL
-      .'<h1>'.$pagetitle.'</h1>' . PHP_EOL;
+      .$pagetitle . PHP_EOL;
 }
 
 // Input standard Site footer
@@ -136,13 +178,15 @@ function CloseSite() {
 
 // DB Handler
 function DBHandler($info, $dbtype = "CON", $checker = "") {
-  global $link, $output, $stop, $config;
+  global $link, $output, $stop, $config, $logtime, $logtype;
   $select = false;
   if ($dbtype==="CON") {
     // Check Connection
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_CONNECT_TO;
+    $request_type_log = 'Database: Connect to';
     $okay = CONNECTED;
+    $okay_log = 'Connected';
     $select = $link;
     if ($link) { @mysqli_query($link,"SET NAMES utf8"); };
     $errortext = @mysqli_connect_error();
@@ -150,68 +194,88 @@ function DBHandler($info, $dbtype = "CON", $checker = "") {
     // Check Selected DB
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_SELECT_DB;
+    $request_type_log = 'Database: Select Database';
     $okay = SELECTED;
+    $okay_log = 'Selected';
     $select = @mysqli_select_db($link,$checker);
     $errortext = DATABASE.' '.$info.' '.INSTALLER_WAS_NOT_FOUND;
   } else if ($dbtype==="DCT") {
     // Check Table Create
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_CREATE_TABLE;
+    $request_type_log = 'Database: Create Table';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="DII") {
     // Check Insert Into
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_INSERT_INTO;
+    $request_type_log = 'Database: Insert Into';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="DMOD") {
     // Move old data
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_MOVE_OLD_DATA;
+    $request_type_log = 'Database: Move Old Data To';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="DDOT") {
     // Remove old data
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_REMOVE_OLD_TABLES;
+    $request_type_log = 'Database: Remove Old Tables';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="DAT") {
     // Remove old data
     $errorval = 1;
     $request_type = DATABASE.": ".UPD_ALTER_TABLE;
+    $request_type_log = 'Database: Alter Table';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="SUR") {
     // Remove old data
     $errorval = 0;
     $request_type = UPD_START_UPDATE;
+    $request_type_log = 'Database: Start Update';
     $okay = $checker;
+    $okay_log = $checker;
     $select = true;
   } else if ($dbtype==="EUR") {
     // Add revision start
     $errorval = 0;
     $request_type = UPD_END_UPDATE;
+    $request_type_log = 'Database: End Update';
     $okay = $checker;
+    $okay_log = $checker;
     $select = true;
   } else if ($dbtype==="DU") {
     // Update data
     $errorval = 1;
     $request_type = DATABASE.": ".UPDATE;
+    $request_type_log = 'Database: Update';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="DDT") {
     // Check Drop Table
     $errorval = 1;
     $request_type = DATABASE.": ".INSTALLER_DROP_TABLE;
+    $request_type_log = 'Database: Drop Table';
     $okay = DONE;
+    $okay_log = 'Done';
     $select = @mysqli_query($link,$checker);
     $errortext = @mysqli_error($link);
   } else if ($dbtype==="CHKTABLE") {
@@ -231,13 +295,26 @@ function DBHandler($info, $dbtype = "CON", $checker = "") {
     if (!$link) { return false; };
     $errorval = 0;
     $request_type = DATABASE.": ".INSTALLER_CLOSE_CONNECTION;
+    $request_type_log = 'Database: Close Connection';
     $okay = CLOSED;
+    $okay_log = 'Closed';
     $select = @mysqli_close($link);
   } else {
     // Return false.
     return false;
   };
   if (!$select) {
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] $request_type_log => $info => $errortext
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    /**
+     * Output error
+     */
     $stop += $errorval;
     $output .= '  <tr>' . PHP_EOL;
     $output .= '    <td class="tableinfolbl" style="text-align: left;">'.$request_type.'</td>' . PHP_EOL;
@@ -246,6 +323,17 @@ function DBHandler($info, $dbtype = "CON", $checker = "") {
     $output .= '  </tr>' . PHP_EOL;
     return false;
   } else {
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] $request_type_log => $info => $okay_log
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    /**
+     * Output success
+     */
     $output .= '  <tr>' . PHP_EOL;
     $output .= '    <td class="tableinfolbl" style="text-align: left;">'.$request_type.'</td>' . PHP_EOL;
     $output .= '    <td class="notis">'.$info.'</td>' . PHP_EOL;
@@ -444,7 +532,18 @@ function editData($type) {
 
 // Update Checker
 function check_c_action() {
-  if (isset($_POST['c_action']) && $_POST['c_action']==0) {
+  global $logtime;
+	if (isset($_POST['c_action']) && $_POST['c_action']==0) {
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] post['c_action'] was set to 0.
+--------------------------------------------------------------------------------
+Log Setup_$logtime.log End
+LOGTEXT;
+    c_logging($log,$logtime,'Setup');
     OpenSite(INSTALLER_NO_C_ACTION);
     echo  INSTALLER_NO_C_ACTION_DES . PHP_EOL
          .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?lang=' . $_GET['lang'] . '&amp;install=welcome" method="post">' . PHP_EOL
@@ -510,7 +609,7 @@ function UpdateDB() {
       /*
        * Show Revision Update Start
        */
-      DBHandler(UPD_REVISION, $dbtype = "SUR", $version);
+      DBHandler(UPD_REVISION, "SUR", $version);
       /*
        * Loop throu the types
        */
@@ -573,17 +672,17 @@ function UpdateDB() {
                 $start = strpos($query,'`',(strpos($query,'CREATE TABLE') + 12)) + 1;
                 $end = strpos($query,'`',($start)) - $start;
                 $tablename = substr($query, $start, $end);
-                DBHandler($tablename, $dbtype = "DCT", $query);
+                DBHandler($tablename, "DCT", $query);
                 $insint = 0;
               /*
                * Inset Into table
                */
-              } if (eregi('INSERT INTO',$query)) {
+              } elseif (eregi('INSERT INTO',$query)) {
                 if ($insint==0) {
                   $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
                   $end = strpos($query,'`',($start)) - $start;
                   $tablename = substr($query, $start, $end);
-                  DBHandler($tablename, $dbtype = "DII", $query);
+                  DBHandler($tablename, "DII", $query);
                   $insint = 1;
                 } else {
                   @mysqli_query($link,$query);
@@ -625,22 +724,35 @@ function UpdateDB() {
               */
               if (empty($query)) { continue; };
               /*
-               * Create table or Inset Into table
+               * Alter Table
                */
               if (eregi('ALTER TABLE',$query)) {
                 $start = strpos($query,'`',(strpos($query,'ALTER TABLE') + 11)) + 1;
                 $end = strpos($query,'`',($start)) - $start;
                 $tablename = substr($query, $start, $end);
-                DBHandler($tablename, $dbtype = "DAT", $query);
+                DBHandler($tablename, "DAT", $query);
                 $insint = 0;
               /*
-               * Update to new revision number
+               * Update
                */
               } elseif (eregi('UPDATE',$query)) {
                 $start = strpos($query,'`',(strpos($query,'UPDATE') + 6)) + 1;
                 $end = strpos($query,'`',($start)) - $start;
                 $tablename = substr($query, $start, $end);
                 DBHandler($tablename, "DU", $query);
+              /*
+               * Inset Into table
+               */
+              } elseif (eregi('INSERT INTO',$query)) {
+                if ($insint==0) {
+                  $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
+                  $end = strpos($query,'`',($start)) - $start;
+                  $tablename = substr($query, $start, $end);
+                  DBHandler($tablename, "DII", $query);
+                  $insint = 1;
+                } else {
+                  @mysqli_query($link,$query);
+                };
               /*
                * Execute query with no message
                */
@@ -680,10 +792,15 @@ function UpdateDB() {
                * Move old data to new table
                */
               if (eregi('INSERT INTO',$query)) {
-                $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
+                $start = strpos($query,'`',(strpos($query,'FROM') + 4)) + 1;
                 $end = strpos($query,'`',($start)) - $start;
                 $tablename = substr($query, $start, $end);
-                DBHandler($tablename, $dbtype = "DMOD", $query);
+                if (DBHandler($tablename, "CHKTABLE")) {
+                  $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
+                  $end = strpos($query,'`',($start)) - $start;
+                  $tablename = substr($query, $start, $end);
+                  DBHandler($tablename, "DMOD", $query);
+                } else { continue; };
               /*
                * Execute query with no message
                */
@@ -773,7 +890,7 @@ function UpdateDB() {
             $start = strpos($query,'`',(strpos($query,'DROP TABLE') + 10)) + 1;
             $end = strpos($query,'`',($start)) - $start;
             $tablename = substr($query, $start, $end);
-            DBHandler(INSTALLER_OLD_TABLE.$tablename, $dbtype = "DDOT", $query);
+            DBHandler(INSTALLER_OLD_TABLE.$tablename, "DDOT", $query);
           /*
            * Execute query with no message
            */
@@ -785,7 +902,7 @@ function UpdateDB() {
       /*
        * Show Revision Update Start
        */
-      DBHandler(UPD_REVISION, $dbtype = "EUR", $version);
+      DBHandler(UPD_REVISION, "EUR", $version);
     }
   }
   unset($version);
@@ -844,5 +961,15 @@ function dropOldTables($version) {
     };
   }
   return true;
+}
+/*
+ * Get revision from utilConfig
+ */
+function c_logging($text,$timestamp,$type) {
+  if (is_writable('..'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'log')) {
+    $fp = fopen('..'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR.$type.'_'.$timestamp.'.log', 'a');
+    fwrite($fp, $text.PHP_EOL);
+    fclose($fp);
+  }
 }
 ?>

@@ -30,6 +30,13 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+/**
+ * Set logging type
+ */
+$logtype = 'Setup';
+/**
+ * Link handler
+ */
 if (isset($_GET['install']) && $_GET['install'] == "go") {
   // Setup Progress
   include_once('inc'.$DS.'install'.$DS.'go.php');
@@ -46,6 +53,6 @@ if (isset($_GET['install']) && $_GET['install'] == "go") {
   // Welcome Page
   include_once('inc'.$DS.'install'.$DS.'welcome.php');
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&install=welcome");
+  header('Location: ' . $_SERVER['SCRIPT_NAME'] . '?install=welcome');
 };
 ?>

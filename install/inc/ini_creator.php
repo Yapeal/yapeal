@@ -94,8 +94,7 @@ date="$Date::                      $"
 
 stability="beta"
 
-version="$Revision$"
-
+version="$Revision: '.$setupversion.' $"
 [Api]
 cache_xml='.trueorfalse($config['cache_xml']).'
 file_suffix=".xml.aspx"

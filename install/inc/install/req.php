@@ -34,6 +34,22 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+/**
+ * Log where in the setup progress we are
+ */
+$logtime = $_POST['logtime'];
+$logtimenow = date('H:i:s',time());
+$logfile = basename(__FILE__);
+$log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] Check if post['c_action'] is not = 0.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check for c_action
 check_c_action();
 /**
@@ -44,6 +60,14 @@ $chmodcheck = 0;
 $content  = '<tr>' . PHP_EOL;
 $content .= '  <td>'.INSTALLER_PHP_VERSION.' 5.2.1 +</td>' . PHP_EOL;
 $content .= '  <td>'.phpversion().'</td>' . PHP_EOL;
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Check php version.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Insure minimum version of PHP 5 we need to run.
 if (version_compare(PHP_VERSION, '5.2.1', '<')) {
   $content .= '  <td class="warning">'.FAILED.'</td>' . PHP_EOL;
@@ -52,6 +76,14 @@ if (version_compare(PHP_VERSION, '5.2.1', '<')) {
   $content .= '  <td class="good">'.OK.'</td>' . PHP_EOL;
 };
 $content .= '</tr>' . PHP_EOL;
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Check php extensions.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check for some required extensions
 $required = array('curl', 'date', 'mysqli', 'SimpleXML', 'SPL');
 $exts = get_loaded_extensions();
@@ -69,6 +101,17 @@ foreach ($required as $ext) {
   $content .= '</tr>' . PHP_EOL;
 };
 $content2 = '';
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Check file/dir write premission.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
+ * check if write able
+ */
 WritChecker('config'.$DS);
 WritChecker('cache'.$DS);
 WritChecker('cache'.$DS.'account'.$DS);
@@ -82,6 +125,17 @@ WritChecker('cache'.$DS.'log'.$DS.'yapeal_trace.log');
 WritChecker('cache'.$DS.'log'.$DS.'yapeal_warning.log');
 WritChecker('cache'.$DS.'map'.$DS);
 WritChecker('cache'.$DS.'server'.$DS);
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
+ * check if there was an extension or write premission that was not set corect
+ */
 if ($error > 0 || $chmodcheck > 0) {
   if ($error > 0) {
     $end = '<h2 class="warning">'.INSTALLER_HOST_NOT_SUPORTED.'</h2>' . PHP_EOL;
@@ -89,7 +143,9 @@ if ($error > 0 || $chmodcheck > 0) {
     $end = '<h2 class="warning">'.INSTALLER_CHMOD_CHECK_FAIL.'</h2>' . PHP_EOL;
   };
 } else {
-  $end = '<form action="' . $_SERVER['SCRIPT_NAME'] . '?lang='.$_GET['lang'].'&install=step2" method="post">' . PHP_EOL
+  $end = '<form action="' . $_SERVER['SCRIPT_NAME'] . '?install=step2" method="post">' . PHP_EOL
+        .'  <input type="hidden" name="logtime" value="'.$_POST['logtime'].'" />' . PHP_EOL
+        .'  <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
         .'  <input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
         .'  <input type="submit" value="'.NEXT.'" />' . PHP_EOL
         .'</form>' . PHP_EOL;
@@ -118,4 +174,12 @@ echo '<table>' . PHP_EOL
     .'</table><br />' . PHP_EOL
     .$end;
 CloseSite();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page Done.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 ?>

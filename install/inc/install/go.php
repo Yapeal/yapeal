@@ -34,61 +34,129 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+/**
+ * Log where in the setup progress we are
+ */
+$logtime = $_POST['logtime'];
+$logtimenow = date('H:i:s',time());
+$logfile = basename(__FILE__);
+$log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] Check if post['c_action'] is  not = 0.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check for c_action
 check_c_action();
 /**
  * Run the script if check_c_action(); didn't exit the script
  */
 $config = $_POST['config'];
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Get Character infoes
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Get Character infoes
 $charinfo = explode("^-_-^",$config['api_char_info']);
 $config['api_char_name'] = $charinfo[0];
 $config['api_char_id'] = $charinfo[1];
 $config['api_corp_name'] = $charinfo[2];
 $config['api_corp_id'] = $charinfo[3];
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Build Selected Char APIs
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 /*
  * Build Selected Char APIs
  */
 $charSelAPIs = '';
 $count = 0;
-foreach ($config['charAPIs'] as $data) {
-  if (!empty($data)) {
-    if ($count==0) {
-      $charSelAPIs .= $data;
-      $count++;
-    } else {
-      $charSelAPIs .= ' '.$data;
+if (isset($config['charAPIs']) && !empty($config['charAPIs'])) {
+  foreach ($config['charAPIs'] as $data) {
+    if (!empty($data)) {
+      if ($count==0) {
+        $charSelAPIs .= $data;
+        $count++;
+      } else {
+        $charSelAPIs .= ' '.$data;
+      };
     };
-  };
-}
+  }
+};
 $config['charAPIs'] = $charSelAPIs;
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Build Selected Corp APIs
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 /*
- * Build Selected Char APIs
+ * Build Selected Corp APIs
  */
 $corpSelAPIs = '';
 $count = 0;
-foreach ($config['corpAPIs'] as $data) {
-  if (!empty($data)) {
-    if ($count==0) {
-      $corpSelAPIs .= $data;
-      $count++;
-    } else {
-      $corpSelAPIs .= ' '.$data;
+if (isset($config['corpAPIs']) && !empty($config['corpAPIs'])) {
+  foreach ($config['corpAPIs'] as $data) {
+    if (!empty($data)) {
+      if ($count==0) {
+        $corpSelAPIs .= $data;
+        $count++;
+      } else {
+        $corpSelAPIs .= ' '.$data;
+      };
     };
-  };
-}
+  }
+};
 $config['corpAPIs'] = $corpSelAPIs;
 // Stopper
 $stop = 0;
 $output = "";
 $db_main_error = "";
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Setup Database Connection on Main Database
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check connection to DB
 //Setup Database Connection on Main Database
 $link = @mysqli_connect($config['DB_Host'],$config['DB_Username'],$config['DB_Password']);
 if (DBHandler($config['DB_Host'], "CON")) {
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Check DB Select
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
   // Check DB Select
   if(DBHandler($config['DB_Database'], "DS", $config['DB_Database'])) {
     if ($_POST['c_action']==1) {
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] post['c_action'] is 1. = Clean Setup Selected
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       // Create the Required Databases
       dropTables("util");
       createTables("util");
@@ -120,6 +188,14 @@ if (DBHandler($config['DB_Host'], "CON")) {
         createTables("map");
       };
     } elseif ($_POST['c_action']==2) {
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] post['c_action'] is 2. = Update Selected
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       include('db/update/updater.php');
     };
   };
@@ -128,11 +204,36 @@ if (DBHandler($config['DB_Host'], "CON")) {
 DBHandler($config['DB_Host'], "CLOSE");
 //Creating yapeal.ini file
 if($stop == 0) {
-  // Create the map Databases
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Creating yapeal.ini file
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  // Include the file that create yapeal.ini
   require_once('inc'.$DS.'ini_creator.php');
+} else {
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] There was errors in the DB queryes. setup failed
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
 };
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Show the Progress report
-OpenSite(INSTALLER_PROGRESS,true,false);
+OpenSite(INSTALLER_PROGRESS);
 echo '<table>'
     .'  <tr>' . PHP_EOL
     .'    <th colspan="3">'.INSTALLER_PROGRESS.'</th>' . PHP_EOL
@@ -149,4 +250,12 @@ if ($stop == 0) {
       .'<script type="text/javascript"> Go_Back(); </script>' . PHP_EOL;
 };
 CloseSite();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page Done
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 ?>

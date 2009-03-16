@@ -43,11 +43,11 @@ require_once('inc'.$DS.'function.php');
 /*
  * Set Language
  */
-if (isset($_GET['lang'])) {
-  GetLang($_GET['lang']);
+if (isset($_POST['lang'])) {
+  GetLang($_POST['lang']);
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".GetBrowserLang());
-  exit;
+  $_POST['lang'] = GetBrowserLang();
+  GetLang($_POST['lang']);
 };
 /*****************************************************************
  * Define what APIs the Character can pull with a description
@@ -105,7 +105,14 @@ if (($parts[0] == "EVE-minibrowser") or ($parts[0] == "Python-urllib")) {
 };
 // If Ingame Browser
 if ($IGB) {
-  OpenSite(NOIGB_HEADLINE,false,false);
+  $log = <<<LOGTEXT
+--------------------
+Trying to open setup.php from the EVE Ingame Browser.
+Retunring error and give a shellexec link to an normal browser.
+--------------------
+LOGTEXT;
+  c_logging($log,date('Y-m-d_H.i.s',time()),'IGB');
+  OpenSite(NOIGB_HEADLINE);
   echo NOIGB_TEXT
     .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
   CloseSite();

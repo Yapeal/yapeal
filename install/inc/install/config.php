@@ -34,15 +34,39 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+/**
+ * Log where in the setup progress we are
+ */
+$logtime = $_POST['logtime'];
+$logtimenow = date('H:i:s',time());
+$logfile = basename(__FILE__);
+$log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] Check if post['c_action'] is  not = 0.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check for c_action
 check_c_action();
 /**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
  * Run the script if check_c_action(); didn't exit the script
  */
-OpenSite(SETUP,true);
+OpenSite(SETUP);
 if ($_POST['c_action']==2) { $setupdatetext = '<h2>'.ED_UPDATING_TO_REV.' '.$setupversion.'</h2>' . PHP_EOL; } else { $setupdatetext = ''; }
 echo $setupdatetext
-    .'<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&install=step3" method="post">' . PHP_EOL
+    .'<form action="'.$_SERVER['SCRIPT_NAME'].'?install=step3" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
     .'  <tr>' . PHP_EOL
@@ -66,7 +90,7 @@ echo $setupdatetext
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
     .'    <td class="tableinfolbl">'.PREFIX.':</td>' . PHP_EOL
-    .'    <td><input type="text" name="config[DB_Prefix]" value="yapeal" /></td>' . PHP_EOL
+    .'    <td><input type="text" name="config[DB_Prefix]" value="" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'</table>' . PHP_EOL
     .'<br />' . PHP_EOL
@@ -165,8 +189,18 @@ echo $setupdatetext
     .'      <td><input type="password" name="config[config_pass]" value="" /></td>' . PHP_EOL
     .'    </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
+    .'<input type="hidden" name="logtime" value="'.$_POST['logtime'].'" />' . PHP_EOL
+    .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
     .'<input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
     .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL
     .'</form>' . PHP_EOL;
 CloseSite();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page Done
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 ?>

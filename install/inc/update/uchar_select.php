@@ -34,10 +34,45 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
+/**
+ * Log where in the setup progress we are
+ */
+$logtime = $_POST['logtime'];
+$logtimenow = date('H:i:s',time());
+$logfile = basename(__FILE__);
+$log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] Check if post['c_action'] is  not = 0.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 // Check for c_action
 check_c_action();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
+ * Run the script if check_c_action(); didn't exit the script
+ */
 $config = $_POST['config'];
-OpenSite('Character Selection',false,false);
+OpenSite('Character Selection');
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Check version.
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 /*
  * Set values
  */
@@ -46,15 +81,32 @@ if (conRev($ini_yapeal['version'])<471) {
 } else {
   $oldrev = conRev($ini_yapeal['version']);
 }; // if (conRev($ini_yapeal['version'])<=471)
-echo '<h2>'.ED_UPDATING_FROM_REV.' '.$oldrev.' '.ED_TO_REV.' '.$setupversion.'</h2>' . PHP_EOL;
-if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['api_full_key'] !="")) {
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Check if api info is set
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
+ * Check if api info is set
+ */
+if ($config['api_user_id'] !="" && $config['api_full_key'] !="") {
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Build cURL query
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Build cURL query
+   */
   $params = array();
   $params['userID'] = $config['api_user_id'];
-  if ($config['api_full_key'] !="") {
-    $params['apiKey'] = $config['api_full_key'];
-  } else {
-    $params['apiKey'] = $config['api_limit_key'];
-  };
+  $params['apiKey'] = $config['api_full_key'];
   
   // poststring
   if (count($params) > 0) {
@@ -84,10 +136,30 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
                    CURLOPT_POSTFIELDS => $poststring
                   );
   curl_setopt_array($ch, $options);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Execute cURL query
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Execute cURL query
+   */
   $content = curl_exec($ch);
   curl_close($ch);
-  //echo $content.'<hr>';
-  // create our xml parser
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Try create our xml parser from cURL query result
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Try create our xml parser from cURL query result
+   */
   try {
     $xml = new SimpleXMLElement($content);
   }
@@ -95,41 +167,64 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
   }
 
   if ($xml) {
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] XML data created
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    /**
+     * Handle xml data
+     */
     if (isset($xml->error)) {
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] XML error: {$xml->error}
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * Show XML error is there is one
        */
       echo '<center><font class="warning">'.ERROR.': '.$xml->error.'</font></center>';
     } else {
-      /*
-       * Set some default values from the previus page
+      /**
+       * Log where in the setup progress we are
        */
-      $characters = array();
-      echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&amp;edit=go" method="post">' . PHP_EOL
-          .'<input type="hidden" name="config[DB_Host]" value="'.$config['DB_Host'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[DB_Username]" value="'.$config['DB_Username'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[DB_Password]" value="'.$config['DB_Password'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[DB_Database]" value="'.$config['DB_Database'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[DB_Prefix]" value="'.$config['DB_Prefix'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_action]" value="'.$config['db_action'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[cache_xml]" value="'.DisableChecker($config['cache_xml']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_account]" value="'.DisableChecker($config['db_account']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_char]" value="'.DisableChecker($config['db_char']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_corp]" value="'.DisableChecker($config['db_corp']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_eve]" value="'.DisableChecker($config['db_eve']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[db_map]" value="'.DisableChecker($config['db_map']).'" />' . PHP_EOL
-          .'<input type="hidden" name="config[debug]" value="'.$config['debug'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[api_user_id]" value="'.$config['api_user_id'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[api_full_key]" value="'.$config['api_full_key'].'" />' . PHP_EOL
-          .'<input type="hidden" name="config[config_pass]" value="'.$config['config_pass'].'" />' . PHP_EOL
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Set hidden post values
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
+      /**
+       * Set hidden post values
+       */
+      echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?edit=go" method="post">' . PHP_EOL;
+      foreach ($config as $cfgName=>$cfgValue) {
+        echo '<input type="hidden" name="config['.$cfgName.']" value="'.$cfgValue.'" />' . PHP_EOL;
+      }
+      echo '<input type="hidden" name="logtime" value="'.$_POST['logtime'].'" />' . PHP_EOL
+          .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
           .'<input type="hidden" name="c_action" value="'.$_POST['c_action'].'" />' . PHP_EOL
-      /*
-       * List Characters
-       */
           .'<table>' . PHP_EOL
           .'  <tr>' . PHP_EOL
           .'    <th colspan="2">'.INSTALLER_CHAR_SELECT.'</th>' . PHP_EOL
           .'  </tr>' . PHP_EOL;
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Generate character list
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
+      /**
+       * Generate character list
+       */
       foreach ($xml->result->rowset->row as $row) {
         if ($conf['creatorCharacterID']==$row['characterID']) { $checked = ' checked="checked"'; } else { $checked = ''; };
         echo '<tr>' . PHP_EOL
@@ -146,6 +241,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
             .'  </td>' . PHP_EOL
             .'</tr>' . PHP_EOL;
       };
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] List API Selection for Character
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       echo '</table><br />' . PHP_EOL
       /*
        * List API Selection for Character
@@ -157,6 +260,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
           .'  <tr>' . PHP_EOL
           .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'.UPD_CHAR_API_PULL_SELECT_DES.'</td>' . PHP_EOL
           .'  </tr>' . PHP_EOL;
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Get the selected Character APIs from the database config
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * Get the selected Character APIs from the database config
        */
@@ -165,6 +276,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
       } else {
         $charSelectedAPIs = array();
       }; // if is set $conf['charAPIs']
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Build the Character API list
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * Build the Character API list
        */
@@ -177,6 +296,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
             .'    <td>'.$APIDes.'</td>' . PHP_EOL
             .'  </tr>' . PHP_EOL;
       }
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] List API Selection for Corporation
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * List API Selection for Corporation
        */
@@ -188,6 +315,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
           .'  <tr>' . PHP_EOL
           .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'.UPD_CORP_API_PULL_SELECT_DES.'</td>' . PHP_EOL
           .'  </tr>' . PHP_EOL;
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Get the selected Corporation APIs from the database config
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * Get the selected Corporation APIs from the database config
        */
@@ -196,6 +331,14 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
       } else {
         $corpSelectedAPIs = array();
       }; // if is set $conf['corpAPIs']
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Build the Corporation API list
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
       /*
        * Build the Corporation API list
        */
@@ -216,16 +359,40 @@ if ($config['api_user_id'] !="" && ($config['api_limit_key'] !="" || $config['ap
           .'</form>' . PHP_EOL;
     };
   } else {
-    /*
-     * If API server is offline, notise the user
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] Api server is offline. Try again later
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    /**
+     * Api server is offline
      */
     echo '<center><font class="warning">'.INSTALLER_ERROR_API_SERVER_OFFLINE.'</font></center>';
   };
 } else {
-  /*
-   * If the API info is wrong, notise the user
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Api info not set
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Api info not set
    */
   echo INSTALLER_ERROR_NO_API_INFO;
 };
 CloseSite();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page Done
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 ?>

@@ -51,25 +51,61 @@ if (conRev($ini_yapeal['version'])>=471) {
   }
   require_once('inc'.$DS.'update'.$DS.'login.php');
 };
+/**
+ * Set logging type
+ */
+$logtype = 'Update';
+/**
+ * Link handler
+ */
 if (isset($_GET['edit']) && $_GET['edit'] == "usetup") {
   // Config Site
   require_once('inc'.$DS.'update'.$DS.'uconfig.php');
 } elseif (isset($_GET['edit']) && $_GET['edit'] == "uselect") {
   // Character Selection Site
   require_once('inc'.$DS.'update'.$DS.'uchar_select.php');
+} elseif (isset($_GET['edit']) && $_GET['edit'] == "go") {
+  // Do update
+  require_once('inc'.$DS.'update'.$DS.'go.php');
 } elseif (isset($_GET['edit']) && $_GET['edit'] == "newupdate") {
-  // Main edit site
-  OpenSite(UPD_NEW_UPDATE,true);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtime = date('Y-m-d_H.i.s',time());
+  $logtimenow = date('H:i:s',time());
+  $logfile = basename(__FILE__);
+  $log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] New Update
+[$logtimenow] Generate Page
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Create site
+   */
+  OpenSite(UPD_NEW_UPDATE);
   echo  UPD_NEW_UPDATE_DES
-	     .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?lang=' . $_GET['lang'] . '&amp;edit=usetup" method="post">' . PHP_EOL
+	     .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?edit=usetup" method="post">' . PHP_EOL
+       .'<input type="hidden" name="logtime" value="'.$logtime.'" />' . PHP_EOL
+       .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
        .'<input type="hidden" name="c_action" value="2" />' . PHP_EOL
        .'<input type="submit" value="'.UPDATE.'" />' . PHP_EOL
        .'</form>' . PHP_EOL;
   CloseSite();
-} elseif (isset($_GET['edit']) && $_GET['edit'] == "go") {
-  // Do update
-  require_once('inc'.$DS.'update'.$DS.'go.php');
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Generate Page Done
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&edit=newupdate");
+  header('Location: ' . $_SERVER['SCRIPT_NAME'] . '?edit=newupdate');
 };
 ?>

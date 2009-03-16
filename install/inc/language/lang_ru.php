@@ -169,6 +169,16 @@ define("ED_GO_TO_CONFIG","Перейти Config");
 define("ED_UPDATING_FROM_REV","Updating From Revision");
 define("ED_UPDATING_TO_REV","Updating To Revision");
 define("ED_TO_REV","To Revision");
+define("ED_ERROR_NO_DB_SETUP","There was no database or the needed table is missing!");
+define("ED_ERROR_NO_DB_SETUP_DES",'Using the config info from yapeal.ini<br />' . PHP_EOL
+                                 .'The table that is needed is missing or the database config in yapeal.ini is not set correct.<br />' . PHP_EOL
+                                 .'<div class="warning">Error: ');
+define("ED_ERROR_NO_DB_SETUP_DES2",'</div>');
+define("ED_ERROR_NO_DB_SETUP_SOLUTION",'<hr />' . PHP_EOL
+.'Solution for this problem<br />' . PHP_EOL
+.'Either deleting the yapeal.ini file<br />' . PHP_EOL
+.'Or if the database exists and the table exists<br />' . PHP_EOL
+.'Edit yapeal.ini file manualy so the database info is correct.');
 /**
  * Yapeal Config Editor
  */

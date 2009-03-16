@@ -43,23 +43,38 @@ if (conRev($ini_yapeal['version'])<$setupversion) {
 $db = new mysqli($ini_yapeal['Database']['host'],$ini_yapeal['Database']['username'],$ini_yapeal['Database']['password']);
 $query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilConfig`";
 $result = $db->query($query);
+if (!$result) {
+  OpenSite(ED_ERROR_NO_DB_SETUP);
+  echo  '<h3>'.ED_ERROR_NO_DB_SETUP.'</h3><br />' . PHP_EOL
+      .ED_ERROR_NO_DB_SETUP_DES.$db->error.ED_ERROR_NO_DB_SETUP_DES2 . PHP_EOL
+      .ED_ERROR_NO_DB_SETUP_SOLUTION . PHP_EOL;
+  CloseSite;
+  exit;
+};
 while ($row = $result->fetch_assoc()) {
   $conf[$row['Name']] = $row['Value'];
 }
 $result->close();
 $db->close();
+/**
+ * Set logging type
+ */
+$logtype = 'Config';
+/**
+ * Link handler
+ */
 // Get login info
 require_once('inc'.$DS.'update'.$DS.'login.php');
-if (isset($_GET['edit']) && $_GET['edit'] == "setup") {
-  // Main edit site
-  require_once('inc'.$DS.'update'.$DS.'config.php');
-} elseif (isset($_GET['edit']) && $_GET['edit'] == "select") {
+if (isset($_GET['edit']) && $_GET['edit'] == "select") {
   // Main edit site
   require_once('inc'.$DS.'update'.$DS.'char_select.php');
 } elseif (isset($_GET['edit']) && $_GET['edit'] == "go") {
   // Main edit site
   require_once('inc'.$DS.'update'.$DS.'go.php');
+} elseif (isset($_GET['edit']) && $_GET['edit'] == "config") {
+  // Main edit site
+  require_once('inc'.$DS.'update'.$DS.'config.php');
 } else {
-  header("Location: ".$_SERVER['SCRIPT_NAME']."?lang=".$_GET['lang']."&edit=setup");
+  header('Location: ' . $_SERVER['SCRIPT_NAME'] . '?edit=config');
 };
 ?>

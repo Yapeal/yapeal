@@ -34,8 +34,27 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
-OpenSite(SETUP,true);
-echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&amp;edit=select" method="post">' . PHP_EOL
+/**
+ * Log where in the setup progress we are
+ */
+$logtime = date('Y-m-d_H.i.s',time());
+$logtimenow = date('H:i:s',time());
+$logfile = basename(__FILE__);
+$log = <<<LOGTEXT
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Time: [$logtimenow]
+Page: {$_SERVER['SCRIPT_NAME']}?{$_SERVER['QUERY_STRING']}
+File: $logfile
+--------------------------------------------------------------------------------
+[$logtimenow] Generate Page
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
+/**
+ * Create site
+ */
+OpenSite(SETUP);
+echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?edit=select" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
     .'<table>' . PHP_EOL
     .'  <tr>' . PHP_EOL
@@ -183,7 +202,17 @@ echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?lang='.$_GET['lang'].'&amp;edit=
     .'    <td><input type="password" name="config[config_pass]" value="" /> '.ED_ONLY_CHANGE_IF.'</td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'</table><br />' . PHP_EOL
+    .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
+    .'<input type="hidden" name="logtime" value="'.$logtime.'" />' . PHP_EOL
     .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL
     .'</form>' . PHP_EOL;
 CloseSite();
+/**
+ * Log where in the setup progress we are
+ */
+$logtimenow = date('H:i:s',time());
+$log = <<<LOGTEXT
+[$logtimenow] Generate Page Done
+LOGTEXT;
+c_logging($log,$logtime,$logtype);
 ?>

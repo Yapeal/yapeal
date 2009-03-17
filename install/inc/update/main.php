@@ -43,6 +43,9 @@ if (conRev($ini_yapeal['version'])<$setupversion) {
 $db = new mysqli($ini_yapeal['Database']['host'],$ini_yapeal['Database']['username'],$ini_yapeal['Database']['password']);
 $query = "SELECT * FROM `".$ini_yapeal['Database']['database']."`.`".$ini_yapeal['Database']['table_prefix']."utilConfig`";
 $result = $db->query($query);
+/**
+ * Check if the database setup is correct or if the table utilConfig is missing
+ */
 if (!$result) {
   OpenSite(ED_ERROR_NO_DB_SETUP);
   echo  '<h3>'.ED_ERROR_NO_DB_SETUP.'</h3><br />' . PHP_EOL

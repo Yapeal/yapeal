@@ -85,7 +85,7 @@ $log = <<<LOGTEXT
 LOGTEXT;
 c_logging($log,$logtime,$logtype);
 // Check for some required extensions
-$required = array('curl', 'date', 'mysqli', 'SimpleXML', 'SPL');
+$required = array('curl', 'date', 'mysqli', 'SimpleXML', 'SPL', 'pcre');
 $exts = get_loaded_extensions();
 foreach ($required as $ext) {
   $content .= '<tr>' . PHP_EOL;

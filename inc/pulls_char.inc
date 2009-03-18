@@ -37,7 +37,8 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 ****************************************************************************/
 $availableApis = array('charAccountBalance', 'charAssetList',
   'charCharacterSheet', 'charIndustryJobs', 'charMarketOrders',
-  'charStandings', 'charWalletJournal', 'charWalletTransactions'
+  'charSkillQueue', 'charStandings', 'charWalletJournal',
+  'charWalletTransactions'
 );
 $apis = explode(' ', $activeAPI);
 if (count($apis) == 0) {

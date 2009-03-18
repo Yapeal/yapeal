@@ -223,6 +223,20 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
+CREATE  TABLE IF NOT EXISTS `charSkillQueue` (
+  `endSP` BIGINT UNSIGNED NOT NULL ,
+  `endTime` DATETIME NOT NULL ,
+  `level` SMALLINT UNSIGNED NOT NULL ,
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `queuePosition` BIGINT UNSIGNED NOT NULL ,
+  `startSP` BIGINT UNSIGNED NOT NULL ,
+  `startTime` DATETIME NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`ownerID`, `queuePosition`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci
+
 CREATE TABLE IF NOT EXISTS `charSkills` (
   `level` SMALLINT UNSIGNED NOT NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,
@@ -739,7 +753,7 @@ CREATE TABLE IF NOT EXISTS `utilConfig` (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci;
-INSERT INTO `utilconfig` VALUES('version', '$Revision: 621 $')
+INSERT INTO `utilConfig` VALUES('version', '$Revision: 656 $')
 ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`);
 
 CREATE TABLE IF NOT EXISTS `utilCachedUntil` (

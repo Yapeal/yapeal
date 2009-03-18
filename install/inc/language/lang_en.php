@@ -195,6 +195,7 @@ define("UPD_GET_charAccountBalance_DES","Get Account Balance from character");
 define("UPD_GET_charAssetList_DES","Get Asset List from character");
 define("UPD_GET_charIndustryJobs_DES","Get Industry Jobs from character");
 define("UPD_GET_charMarketOrders_DES","Get Market Orders from character");
+define("UPD_GET_charSkillQueue_DES","Get Skill Queue from character");
 define("UPD_GET_charStandings_DES","Get Standings from character");
 define("UPD_GET_charWalletJournal_DES","Get Wallet Journal from character");
 define("UPD_GET_charWalletTransactions_DES","Get Wallet Transactions from character");

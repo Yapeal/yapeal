@@ -95,9 +95,14 @@ DROP TABLE IF EXISTS `%prefix%charIndustryJobs`;
 DROP TABLE IF EXISTS `%prefix%charMarketOrders`;
 
 -- -----------------------------------------------------
--- Table `charskills`
+-- Table `charSkillQueue`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%charskills`;
+DROP TABLE IF EXISTS `%prefix%charSkillQueue`;
+
+-- -----------------------------------------------------
+-- Table `charSkills`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charSkills`;
 
 -- -----------------------------------------------------
 -- Table `charStandingsFromAgents`

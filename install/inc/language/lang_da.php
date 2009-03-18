@@ -195,6 +195,7 @@ define("UPD_GET_charAccountBalance_DES","Hent Konto Balance fra karakter");
 define("UPD_GET_charAssetList_DES","Hent Beholdnings Liste fra karakter");
 define("UPD_GET_charIndustryJobs_DES","Hent Industri Opgaver fra karakter");
 define("UPD_GET_charMarketOrders_DES","Hent Market Ordere fra karakter");
+define("UPD_GET_charSkillQueue_DES","Hent Skill Queue fra karakter");
 define("UPD_GET_charStandings_DES","Hent Standings fra karakter");
 define("UPD_GET_charWalletJournal_DES","Hent Konto Journal fra karakter");
 define("UPD_GET_charWalletTransactions_DES","Hent Konto Transaktioner fra karakter");

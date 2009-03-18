@@ -45,6 +45,7 @@ DROP TABLE IF EXISTS `charCorporationRolesAtOther` ;
 DROP TABLE IF EXISTS `charCorporationTitles` ;
 DROP TABLE IF EXISTS `charIndustryJobs` ;
 DROP TABLE IF EXISTS `charMarketOrders` ;
+DROP TABLE IF EXISTS `charSkillQueue` ;
 DROP TABLE IF EXISTS `charSkills` ;
 DROP TABLE IF EXISTS `charStandingsFromAgents` ;
 DROP TABLE IF EXISTS `charStandingsFromFactions` ;
@@ -92,6 +93,7 @@ DROP TABLE IF EXISTS `serverServerStatus` ;
 
 /* util section */
 DROP TABLE IF EXISTS `utilCachedUntil` ;
+DROP TABLE IF EXISTS `utilConfig` ;
 DROP TABLE IF EXISTS `utilRegisteredUser` ;
 DROP TABLE IF EXISTS `utilRegisteredCharacter` ;
 DROP TABLE IF EXISTS `utilRegisteredCorporation` ;

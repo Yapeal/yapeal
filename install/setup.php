@@ -31,7 +31,7 @@
 /*
  * Set what version we are using
  */
-$setupversion = 643;
+$setupversion = 683;
 /*
  * make a short value for Directory Separators
  */
@@ -61,6 +61,7 @@ $charAPIs = array('charAccountBalance'     => UPD_GET_charAccountBalance_DES,
                   'charCharacterSheet'     => UPD_GET_charCharacterSheet_DES,
                   'charIndustryJobs'       => UPD_GET_charIndustryJobs_DES,
                   'charMarketOrders'       => UPD_GET_charMarketOrders_DES,
+                  'charSkillQueue'         => UPD_GET_charSKillQueue_DES,
                   'charStandings'          => UPD_GET_charStandings_DES,
                   'charWalletJournal'      => UPD_GET_charWalletJournal_DES,
                   'charWalletTransactions' => UPD_GET_charWalletTransactions_DES);

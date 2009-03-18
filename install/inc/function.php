@@ -667,7 +667,7 @@ LOGTEXT;
 function UpdateDB() {
   global $link, $config, $conf;
   $types = array('util','server','account','char','corp','eve','map');
-  $updateversions = array('471','616','643');
+  $updateversions = array('471', '616', '643', '683');
 	/*
    * Set some replacement values that is needed for the sql files
    */

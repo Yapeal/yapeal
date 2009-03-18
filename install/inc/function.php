@@ -448,29 +448,139 @@ function createTables($type) {
 }
 // Table Drop
 function dropTables($type, $dropold=false) {
-  global $link, $config, $conf;
-  // Load sql file
+  /**
+   * Setting Global values
+   */
+  global $link, $config, $conf, $logtime, $logtype;
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Setting Global values
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Set replace values
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  // Set replace values
   if ($dropold) { $dropprefix = $conf['dbPrefix']; } else { $dropprefix = $config['DB_Prefix']; };
   $replace = array('prefix' => $dropprefix);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Load sql file drop_$type.sql
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  // Load sql file
   $sql = subsFile($replace,'drop_'.$type.'.sql');
   if ($sql===false) { return false; };
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Remove comments in sql file
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
   // Remove comments in sql file
   $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
   $sql = preg_replace('/-- .*/', '', $sql);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Spliting up the sql file into query's
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
   // Spliting up the sql file into query's
   $sql = explode(';', $sql);
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Execute query's
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
   // Execute query's
   foreach ($sql as $query) {
-    $query = trim($query);
-    if (empty($query)) { continue; };
-    //
-    if (eregi('DROP TABLE',$query)) {
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] Query: $query
+[$logtimenow] Trim Query
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    // trim query
+		$query = trim($query);
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] Check if the query is a blank
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    // Check if the query is a blank
+		if (empty($query)) { 
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Query is blank. Continue to next query.
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
+      // Check if the query is a blank
+		  continue;
+    };
+    /**
+     * Log where in the setup progress we are
+     */
+    $logtimenow = date('H:i:s',time());
+    $log = <<<LOGTEXT
+[$logtimenow] Check if the query is DROP TABLE
+LOGTEXT;
+    c_logging($log,$logtime,$logtype);
+    // Check if the query is DROP TABLE
+		if (eregi('DROP TABLE',$query)) {
       $start = strpos($query,'`',(strpos($query,'DROP TABLE') + 10)) + 1;
       $end = strpos($query,'`',($start)) - $start;
       $tablename = substr($query, $start, $end);
       DBHandler($tablename, $dbtype = "DDT", $query);
+    } else {
+      /**
+       * Log where in the setup progress we are
+       */
+      $logtimenow = date('H:i:s',time());
+      $log = <<<LOGTEXT
+[$logtimenow] Execute query silent
+LOGTEXT;
+      c_logging($log,$logtime,$logtype);
+      // Execute query silent
+      @mysqli_query($link,$query);
     };
   }
+  /**
+   * Log where in the setup progress we are
+   */
+  $logtimenow = date('H:i:s',time());
+  $log = <<<LOGTEXT
+[$logtimenow] Done dropping tables for $type
+LOGTEXT;
+  c_logging($log,$logtime,$logtype);
+  // Done dropping tables for $type
   return true;
 }
 /**

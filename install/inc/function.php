@@ -1082,4 +1082,49 @@ function c_logging($text,$timestamp,$type) {
     fclose($fp);
   }
 }
+
+function getApiInfo($ch) {
+  $result = cURLRequest($ch);
+  // Now check for errors.
+  if ($result['curl_error']) {
+    //echo $result['curl_error'];
+	  return false;
+  };
+  if (200 != $result['http_code']) {
+    //echo 'Bad http_code';
+	  return false;
+  };
+  if (!$result['body']) {
+    //echo 'No result';
+	  return false;
+  };
+  if (!strpos($result['body'], '<eveapi version="')) {
+    //echo 'Not eveapi<br />'.$result['body'];
+	  return false;
+  };
+  return simplexml_load_string($result['body']);
+}
+  
+	
+function cURLRequest($ch) {
+  $response = curl_exec($ch);
+  $error = curl_error($ch);
+  $result = array(
+    'header' => '',
+    'body' => '',
+    'curl_error' => '',
+    'http_code' => '',
+    'last_url' => ''
+  );
+  if ($error != "") {
+    $result['curl_error'] = $error;
+    return $result;
+  };
+  $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+  $result['header'] = substr($response, 0, $header_size);
+  $result['body'] = substr($response, $header_size);
+  $result['http_code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  $result['last_url'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+  return $result;
+}
 ?>

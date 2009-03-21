@@ -94,7 +94,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilRegisteredCharacter`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredCharacter` VALUES('%activeCharAPI%', '%characterID%', '%userID%', '%name%', '%corporationID%', '%corporationName%', '%charisactive%', null, null);
+INSERT INTO `%prefix%utilRegisteredCharacter` VALUES('%activeCharAPI%', '%characterID%', '%corporationID%', '%corporationName%', null, null, '%charisactive%', '%name%', '%userID%');
 
 -- -----------------------------------------------------
 -- Table `utilRegisteredCorporation`
@@ -114,7 +114,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilRegisteredCorporation`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%activeCorpAPI%', '%corporationID%', '%characterID%', '%corpisactive%', null, null);
+INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%activeCorpAPI%', '%characterID%', '%corporationID%', null, null, '%corpisactive%');
 
 -- -----------------------------------------------------
 -- Table `utilRegisteredUser`
@@ -131,7 +131,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Data `utilRegisteredUser`
 -- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredUser` VALUES('%userID%', '%fullApiKey%', '%limitedApiKey%');
+INSERT INTO `%prefix%utilRegisteredUser` VALUES('%fullApiKey%', '%limitedApiKey%', '%userID%');
 
 -- -----------------------------------------------------
 

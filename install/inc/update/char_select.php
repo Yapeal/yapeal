@@ -98,7 +98,7 @@ LOGTEXT;
   $options = array(CURLOPT_URL => 'http://api.eve-online.com/account/Characters.xml.aspx',
                    CURLOPT_ENCODING => '',
                    CURLOPT_FOLLOWLOCATION => TRUE,
-                   CURLOPT_HEADER => FALSE,
+                   CURLOPT_HEADER => TRUE,
                    CURLOPT_MAXREDIRS => 5,
                    CURLOPT_RETURNTRANSFER => TRUE,
                    CURLOPT_SSL_VERIFYHOST => FALSE,
@@ -115,33 +115,25 @@ LOGTEXT;
    */
   $logtimenow = date('H:i:s',time());
   $log = <<<LOGTEXT
-[$logtimenow] Execute cURL query
+[$logtimenow] Execute cURL query and get xml
 LOGTEXT;
   c_logging($log,$logtime,$logtype);
   /**
-   * Execute cURL query
+   * Execute cURL query and get xml
    */
-  $content = curl_exec($ch);
+  $xml = getApiInfo($ch);
   curl_close($ch);
   /**
    * Log where in the setup progress we are
    */
   $logtimenow = date('H:i:s',time());
   $log = <<<LOGTEXT
-[$logtimenow] Try create our xml parser from cURL query result
+[$logtimenow] Check if $xml is false and output server is down if it is.
 LOGTEXT;
   c_logging($log,$logtime,$logtype);
   /**
-   * Try create our xml parser from cURL query result
+   * Check if $xml is false and output server is down if it is.
    */
-  try {
-    $xml = new SimpleXMLElement($content);
-  }
-  catch (Exception $e) {
-  }
-  if ($xml == 'Bad Request (Invalid Hostname)') {
-    $xml = false;
-  };
   if ($xml) {
     /**
      * Log where in the setup progress we are

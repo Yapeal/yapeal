@@ -66,7 +66,7 @@ $charAPIs = array('charAccountBalance'     => UPD_GET_charAccountBalance_DES,
                   'charIndustryJobs'       => UPD_GET_charIndustryJobs_DES,
                   'charKillLog'            => UPD_GET_charKillLog_DES,
                   'charMarketOrders'       => UPD_GET_charMarketOrders_DES,
-                  'charSkillQueue'         => UPD_GET_charSKillQueue_DES,
+                  'charSkillQueue'         => UPD_GET_charSkillQueue_DES,
                   'charStandings'          => UPD_GET_charStandings_DES,
                   'charWalletJournal'      => UPD_GET_charWalletJournal_DES,
                   'charWalletTransactions' => UPD_GET_charWalletTransactions_DES);

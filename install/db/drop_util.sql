@@ -30,19 +30,14 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Table `utilconfig`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%utilConfig`;
-
--- -----------------------------------------------------
 -- Table `utilCachedUntil`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%utilCachedUntil`;
 
 -- -----------------------------------------------------
--- Table `utilRegisteredUser`
+-- Table `utilConfig`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%utilRegisteredUser`;
+DROP TABLE IF EXISTS `%prefix%utilConfig`;
 
 -- -----------------------------------------------------
 -- Table `utilRegisteredCharacter`
@@ -55,6 +50,10 @@ DROP TABLE IF EXISTS `%prefix%utilRegisteredCharacter`;
 DROP TABLE IF EXISTS `%prefix%utilRegisteredCorporation`;
 
 -- -----------------------------------------------------
+-- Table `utilRegisteredUser`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%utilRegisteredUser`;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

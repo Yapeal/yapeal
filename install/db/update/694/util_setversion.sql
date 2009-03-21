@@ -34,7 +34,7 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Table `utilconfig`
+-- Table `utilConfig`
 -- -----------------------------------------------------
 UPDATE `%prefix%utilConfig` SET `Value` = '$Revision: 694 $' WHERE `Name` = 'version';
 

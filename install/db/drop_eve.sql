@@ -35,11 +35,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 DROP TABLE IF EXISTS `%prefix%eveAllianceList`;
 
 -- -----------------------------------------------------
--- Table `eveMemberCorporations`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%eveMemberCorporations`;
-
--- -----------------------------------------------------
 -- Table `eveConquerableStationList`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%eveConquerableStationList`;
@@ -48,6 +43,11 @@ DROP TABLE IF EXISTS `%prefix%eveConquerableStationList`;
 -- Table `eveErrorList`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%eveErrorList`;
+
+-- -----------------------------------------------------
+-- Table `eveMemberCorporations`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%eveMemberCorporations`;
 
 -- -----------------------------------------------------
 -- Table `eveRefTypes`

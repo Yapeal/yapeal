@@ -220,7 +220,7 @@ LOGTEXT;
    */
   $logtimenow = date('H:i:s',time());
   $log = <<<LOGTEXT
-[$logtimenow] There was errors in the DB queryes. setup failed
+[$logtimenow] There was errors in the DB queries. setup failed
 LOGTEXT;
   c_logging($log,$logtime,$logtype);
 };

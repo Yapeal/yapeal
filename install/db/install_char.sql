@@ -305,7 +305,7 @@ COLLATE = utf8_unicode_ci;
 -- -----------------------------------------------------
 -- Table `charSkillQueue`
 -- -----------------------------------------------------
-CREATE `%prefix%charSkillQueue` (
+CREATE TABLE `%prefix%charSkillQueue` (
   `endSP` BIGINT UNSIGNED NOT NULL ,
   `endTime` DATETIME NOT NULL ,
   `level` SMALLINT UNSIGNED NOT NULL ,
@@ -317,10 +317,10 @@ CREATE `%prefix%charSkillQueue` (
   PRIMARY KEY (`ownerID`, `queuePosition`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci
+COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
--- Table `charskills`
+-- Table `charSkills`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charSkills` (
   `level` SMALLINT UNSIGNED NOT NULL ,

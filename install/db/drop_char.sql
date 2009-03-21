@@ -145,6 +145,11 @@ DROP TABLE IF EXISTS `%prefix%charStandingsToCharacters`;
 DROP TABLE IF EXISTS `%prefix%charStandingsToCorporations`;
 
 -- -----------------------------------------------------
+-- Table `charVictim`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charVictim`;
+
+-- -----------------------------------------------------
 -- Table `charWalletJournal`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%charWalletJournal`;

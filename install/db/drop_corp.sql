@@ -55,9 +55,9 @@ DROP TABLE IF EXISTS `%prefix%corpCorporationSheet`;
 DROP TABLE IF EXISTS `%prefix%corpContainerLog`;
 
 -- -----------------------------------------------------
--- Table `corpdivisions`
+-- Table `corpDivisions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%corpdivisions`;
+DROP TABLE IF EXISTS `%prefix%corpDivisions`;
 
 -- -----------------------------------------------------
 -- Table `corpIndustryJobs`
@@ -75,9 +75,9 @@ DROP TABLE IF EXISTS `%prefix%corpItems`;
 DROP TABLE IF EXISTS `%prefix%corpKillLog`;
 
 -- -----------------------------------------------------
--- Table `corplogo`
+-- Table `corpLogo`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%corplogo`;
+DROP TABLE IF EXISTS `%prefix%corpLogo`;
 
 -- -----------------------------------------------------
 -- Table `corpMarketOrders`
@@ -130,9 +130,9 @@ DROP TABLE IF EXISTS `%prefix%corpStarbaseList`;
 DROP TABLE IF EXISTS `%prefix%corpVictim`;
 
 -- -----------------------------------------------------
--- Table `corpwalletDivisions`
+-- Table `corpWalletDivisions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `%prefix%corpwalletDivisions`;
+DROP TABLE IF EXISTS `%prefix%corpWalletDivisions`;
 
 -- -----------------------------------------------------
 -- Table `corpWalletJournal`

@@ -221,7 +221,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
--- Table `corplogo`
+-- Table `corpLogo`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%corpLogo` (
   `color1` BIGINT UNSIGNED NOT NULL ,

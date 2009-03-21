@@ -150,7 +150,7 @@ define("ED_UPDATE_DB","Update Database Settings");
 define("ED_ACTION","Action");
 define("ED_DO_NOTHING","Do Nothing");
 define("ED_CLEAN_SETUP","Clean Setup");
-define("ED_CLEAN_SETUP_DES","NOTISE:<br />To change the Database name or Prefix you need to use the <font class=\"warning\">\"Clean Setup\"</font>.<br />This will allso delete all data!");
+define("ED_CLEAN_SETUP_DES","WARNING:<br />To change the Database name or Prefix you need to use the <font class=\"warning\">\"Clean Setup\"</font>.<br />This will allso delete all data!");
 define("ED_ACCOUNT_INFO","Account Info");
 define("ED_CHAR_INFO","Character Info");
 define("ED_CORP_INFO","Corp Info");
@@ -178,7 +178,7 @@ define("ED_ERROR_NO_DB_SETUP_SOLUTION",'<hr />' . PHP_EOL
 .'Solution for this problem<br />' . PHP_EOL
 .'Either deleting the yapeal.ini file<br />' . PHP_EOL
 .'Or if the database exists and the table exists<br />' . PHP_EOL
-.'Edit yapeal.ini file manualy so the database info is correct.');
+.'Edit yapeal.ini file manually so the database info is correct.');
 /**
  * Yapeal Config Editor
  */

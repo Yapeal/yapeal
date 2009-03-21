@@ -44,8 +44,7 @@ define('YAPEAL_INC', $incDir . $ds);
  * Paths
  * **************************************************************************/
 $settings = array('ADODB' => '../ADOdb/', 'BASE' => '../',
-  'BACKEND' => '../backend/', 'CACHE' => '../cache/', 'CLASS' => '../class/',
-  'CONFIG' => '../config/');
+  'CACHE' => '../cache/', 'CLASS' => '../class/', 'CONFIG' => '../config/');
 foreach ($settings as $k => $v) {
   $realpath = realpath($incDir . $ds . $v);
   if ($realpath && is_dir($realpath)) {

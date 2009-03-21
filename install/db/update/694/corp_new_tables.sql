@@ -58,8 +58,8 @@ COMMENT = 'Sub-table from KillLog';
 CREATE TABLE `%prefix%corpItems` (
   `flag` SMALLINT UNSIGNED NOT NULL ,
   `killID` BIGINT UNSIGNED NOT NULL ,
-  `lvl` SMALLINT UNSIGNED NOT NULL ,
   `lft` BIGINT UNSIGNED NOT NULL ,
+  `lvl` SMALLINT UNSIGNED NOT NULL ,
   `rgt` BIGINT UNSIGNED NOT NULL ,
   `qtyDropped` BIGINT UNSIGNED NOT NULL ,
   `qtyDestroyed` BIGINT UNSIGNED NOT NULL ,
@@ -75,11 +75,11 @@ COMMENT = 'Sub-table from KillLog';
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%corpKillLog` (
   `killID` BIGINT UNSIGNED NOT NULL ,
+  `killTime` DATETIME NOT NULL ,
   `lastKillboard` VARCHAR(255) NOT NULL ,
   `moonID` BIGINT UNSIGNED NOT NULL ,
   `originalKillboard` VARCHAR(255) NOT NULL ,
   `solarSystemID` BIGINT UNSIGNED NOT NULL ,
-  `killTime` DATETIME NOT NULL ,
   `stratum` SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY (`killID`) )
 ENGINE = InnoDB

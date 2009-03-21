@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS `charAttackers` (
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `corporationName` VARCHAR(255) NULL ,
   `damageDone` BIGINT UNSIGNED NOT NULL ,
+  `factionID` BIGINT UNSIGNED NOT NULL ,
+  `factionName` VARCHAR(255) NULL ,
   `finalBlow` BOOLEAN DEFAULT FALSE ,
   `killID` BIGINT UNSIGNED NOT NULL ,
   `securityStatus` FLOAT NOT NULL DEFAULT 0.0 ,
@@ -69,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `charAttackers` (
   PRIMARY KEY (`killID`, `characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
+COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from KillLog';
 
 CREATE TABLE IF NOT EXISTS `charAttributes` (
@@ -209,22 +211,25 @@ COLLATE = utf8_unicode_ci;
 CREATE TABLE IF NOT EXISTS `charItems` (
   `flag` SMALLINT UNSIGNED NOT NULL ,
   `killID` BIGINT UNSIGNED NOT NULL ,
+  `lft` BIGINT UNSIGNED NOT NULL ,
+  `lvl` SMALLINT UNSIGNED NOT NULL ,
+  `rgt` BIGINT UNSIGNED NOT NULL ,
   `qtyDropped` BIGINT UNSIGNED NOT NULL ,
   `qtyDestroyed` BIGINT UNSIGNED NOT NULL ,
   `typeID` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`killID`, `typeID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
+COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from KillLog';
 
 CREATE TABLE IF NOT EXISTS `charKillLog` (
   `killID` BIGINT UNSIGNED NOT NULL ,
+  `killTime` DATETIME NOT NULL ,
   `lastKillboard` VARCHAR(255) NOT NULL ,
   `moonID` BIGINT UNSIGNED NOT NULL ,
   `originalKillboard` VARCHAR(255) NOT NULL ,
   `solarSystemID` BIGINT UNSIGNED NOT NULL ,
-  `killTime` DATETIME NOT NULL ,
   `stratum` SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY (`killID`) )
 ENGINE = InnoDB
@@ -343,12 +348,14 @@ CREATE TABLE IF NOT EXISTS `charVictim` (
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `corporationName` VARCHAR(255) NULL ,
   `damageTaken` BIGINT UNSIGNED NOT NULL ,
+  `factionID` BIGINT UNSIGNED NOT NULL ,
+  `factionName` VARCHAR(255) NULL ,
   `killID` BIGINT UNSIGNED NOT NULL ,
   `shipTypeID`  BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`killID`, `characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
+COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from KillLog';
 
 CREATE TABLE IF NOT EXISTS `charWalletJournal` (

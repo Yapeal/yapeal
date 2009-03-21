@@ -33,9 +33,9 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- Table `serverServerStatus`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%serverServerStatus` (
+  `onlinePlayers` BIGINT UNSIGNED NOT NULL ,
   `serverName` CHAR(32) NOT NULL,
   `serverOpen` BOOLEAN NOT NULL ,
-  `onlinePlayers` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`serverName`) )
 ENGINE = MEMORY
 DEFAULT CHARACTER SET = utf8

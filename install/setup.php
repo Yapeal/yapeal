@@ -31,7 +31,11 @@
 /*
  * Set what version we are using
  */
-$setupversion = 683;
+$setupversion = 694;
+/*
+ * Set what update versions there is
+ */
+$updateversions = array('471', '616', '643', '683', '694');
 /*
  * make a short value for Directory Separators
  */
@@ -60,6 +64,7 @@ $charAPIs = array('charAccountBalance'     => UPD_GET_charAccountBalance_DES,
                   'charAssetList'          => UPD_GET_charAssetList_DES,
                   'charCharacterSheet'     => UPD_GET_charCharacterSheet_DES,
                   'charIndustryJobs'       => UPD_GET_charIndustryJobs_DES,
+                  'charKillLog'            => UPD_GET_charKillLog_DES,
                   'charMarketOrders'       => UPD_GET_charMarketOrders_DES,
                   'charSkillQueue'         => UPD_GET_charSKillQueue_DES,
                   'charStandings'          => UPD_GET_charStandings_DES,
@@ -76,6 +81,7 @@ $corpAPIs = array('corpAccountBalance'     => UPD_GET_corpAccountBalance_DES,
                   'corpAssetList'          => UPD_GET_corpAssetList_DES,
                   'corpCorporationSheet'   => UPD_GET_corpCorporationSheet_DES,
                   'corpIndustryJobs'       => UPD_GET_corpIndustryJobs_DES,
+                  'corpKillLog'            => UPD_GET_corpKillLog_DES,
                   'corpMarketOrders'       => UPD_GET_corpMarketOrders_DES,
                   'corpMemberTracking'     => UPD_GET_corpMemberTracking_DES,
                   'corpStandings'          => UPD_GET_corpStandings_DES,

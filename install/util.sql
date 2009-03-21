@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `utilConfig` (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci;
-INSERT INTO `utilConfig` VALUES('version', '$Revision$')
+INSERT INTO `utilConfig` VALUES('version', '$Revision 694 $')
 ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`);
 
 CREATE TABLE IF NOT EXISTS `utilCachedUntil` (

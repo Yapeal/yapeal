@@ -60,6 +60,28 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
+-- Table `charAttackers`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charAttackers` (
+  `allianceID` BIGINT UNSIGNED NOT NULL ,
+  `allianceName` VARCHAR(255) NULL ,
+  `characterID` BIGINT UNSIGNED NOT NULL ,
+  `characterName` VARCHAR(255) NULL ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
+  `corporationName` VARCHAR(255) NULL ,
+  `damageDone` BIGINT UNSIGNED NOT NULL ,
+  `finalBlow` BOOLEAN DEFAULT FALSE ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `securityStatus` FLOAT NOT NULL DEFAULT 0.0 ,
+  `shipTypeID`  BIGINT UNSIGNED NOT NULL ,
+  `weaponTypeID`  BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `characterID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
+
+-- -----------------------------------------------------
 -- Table `charAttributes`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charAttributes` (
@@ -224,6 +246,37 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
+-- Table `charItems`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charItems` (
+  `flag` SMALLINT UNSIGNED NOT NULL ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `qtyDropped` BIGINT UNSIGNED NOT NULL ,
+  `qtyDestroyed` BIGINT UNSIGNED NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `typeID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
+
+-- -----------------------------------------------------
+-- Table `charKillLog`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charKillLog` (
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `lastKillboard` VARCHAR(255) NOT NULL ,
+  `moonID` BIGINT UNSIGNED NOT NULL ,
+  `originalKillboard` VARCHAR(255) NOT NULL ,
+  `solarSystemID` BIGINT UNSIGNED NOT NULL ,
+  `killTime` DATETIME NOT NULL ,
+  `stratum` SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`killID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+-- -----------------------------------------------------
 -- Table `charMarketOrders`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%charMarketOrders` (
@@ -350,6 +403,25 @@ CREATE TABLE `%prefix%charStandingsToCorporations` (
 DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci
 COMMENT='Sub-table from Standings API';
+
+-- -----------------------------------------------------
+-- Table `charVictim`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%charVictim` (
+  `allianceID` BIGINT UNSIGNED NOT NULL ,
+  `allianceName` VARCHAR(255) NULL ,
+  `characterID` BIGINT UNSIGNED NOT NULL ,
+  `characterName` VARCHAR(255) NULL ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
+  `corporationName` VARCHAR(255) NULL ,
+  `damageTaken` BIGINT UNSIGNED NOT NULL ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `shipTypeID`  BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `characterID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
 
 -- -----------------------------------------------------
 -- Table `charWalletJournal`

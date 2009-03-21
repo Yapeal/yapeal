@@ -34,12 +34,38 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%eveAllianceList` (
   `allianceID` BIGINT UNSIGNED NOT NULL ,
-  `name` VARCHAR(255) NULL DEFAULT NULL ,
-  `shortName` VARCHAR(255) NULL DEFAULT NULL ,
   `executorCorpID` BIGINT UNSIGNED NULL DEFAULT NULL ,
   `memberCount` BIGINT UNSIGNED NULL DEFAULT NULL ,
+  `name` VARCHAR(255) NULL DEFAULT NULL ,
+  `shortName` VARCHAR(255) NULL DEFAULT NULL ,
   `startDate` DATETIME NULL DEFAULT NULL ,
   PRIMARY KEY (`allianceID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `eveConquerableStationList`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%eveConquerableStationList` (
+  `corporationID` BIGINT UNSIGNED NULL DEFAULT NULL ,
+  `corporationName` VARCHAR(255) NULL DEFAULT NULL ,
+  `solarSystemID` BIGINT UNSIGNED NULL DEFAULT NULL ,
+  `stationID` BIGINT UNSIGNED NOT NULL ,
+  `stationName` VARCHAR(255) NULL DEFAULT NULL ,
+  `stationTypeID` BIGINT UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`stationID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `eveErrorList`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%eveErrorList` (
+  `errorCode` SMALLINT UNSIGNED NOT NULL ,
+  `errorText` TEXT NOT NULL ,
+  PRIMARY KEY (`errorCode`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
@@ -56,32 +82,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 COMMENT = 'Sub-table from AllianceList';
-
--- -----------------------------------------------------
--- Table `eveConquerableStationList`
--- -----------------------------------------------------
-CREATE TABLE `%prefix%eveConquerableStationList` (
-  `stationID` BIGINT UNSIGNED NOT NULL ,
-  `stationName` VARCHAR(255) NULL DEFAULT NULL ,
-  `stationTypeID` BIGINT UNSIGNED NULL DEFAULT NULL ,
-  `solarSystemID` BIGINT UNSIGNED NULL DEFAULT NULL ,
-  `corporationID` BIGINT UNSIGNED NULL DEFAULT NULL ,
-  `corporationName` VARCHAR(255) NULL DEFAULT NULL ,
-  PRIMARY KEY (`stationID`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
-
--- -----------------------------------------------------
--- Table `eveErrorList`
--- -----------------------------------------------------
-CREATE TABLE `%prefix%eveErrorList` (
-  `errorCode` SMALLINT UNSIGNED NOT NULL ,
-  `errorText` TEXT NOT NULL ,
-  PRIMARY KEY (`errorCode`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
 -- Table `eveRefTypes`

@@ -36,9 +36,9 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 * Per corp API pulls
 ****************************************************************************/
 $availableApis = array('corpAccountBalance', 'corpAssetList',
-  'corpCorporationSheet', 'corpIndustryJobs', 'corpMarketOrders',
-  'corpMemberTracking', 'corpStandings', 'corpStarbaseList',
-  'corpWalletJournal', 'corpWalletTransactions'
+  'corpCorporationSheet', 'corpIndustryJobs', 'corpKillLog',
+  'corpMarketOrders', 'corpMemberTracking', 'corpStandings',
+  'corpStarbaseList', 'corpWalletJournal', 'corpWalletTransactions'
 );
 $apis = explode(' ', $activeAPI);
 if (count($apis) == 0) {

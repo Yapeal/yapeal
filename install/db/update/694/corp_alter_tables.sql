@@ -30,12 +30,11 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Alter `utilRegisteredCharacter`
+-- Alter `corpContainerLog`
 -- -----------------------------------------------------
-ALTER TABLE `%prefix%charWalletTransactions`
-  DROP COLUMN `characterID`;
-ALTER TABLE `%prefix%charWalletTransactions`
-  DROP COLUMN `characterName`;
+ALTER TABLE `%prefix%corpContainerLog` MODIFY COLUMN `flag` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `%prefix%corpContainerLog` MODIFY COLUMN `newConfiguration` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `%prefix%corpContainerLog` MODIFY COLUMN `oldConfiguration` BIGINT UNSIGNED NOT NULL;
 
 -- -----------------------------------------------------
 SET SQL_MODE=@OLD_SQL_MODE;

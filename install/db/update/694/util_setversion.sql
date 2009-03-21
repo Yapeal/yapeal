@@ -1,5 +1,9 @@
 /**
- * MySQL file.
+ * MySQL file used to move data from old style database tables to new ones.
+ *
+ * Only use this if you know what you are doing as it can cause data loss or
+ * otherwise cause problems with your database. Never use it without a complete
+ * backup.
  *
  * PHP version 5
  *
@@ -30,12 +34,9 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Alter `utilRegisteredCharacter`
+-- Table `utilconfig`
 -- -----------------------------------------------------
-ALTER TABLE `%prefix%charWalletTransactions`
-  DROP COLUMN `characterID`;
-ALTER TABLE `%prefix%charWalletTransactions`
-  DROP COLUMN `characterName`;
+UPDATE `%prefix%utilConfig` SET `Value` = '$Revision: 694 $' WHERE `Name` = 'version';
 
 -- -----------------------------------------------------
 SET SQL_MODE=@OLD_SQL_MODE;

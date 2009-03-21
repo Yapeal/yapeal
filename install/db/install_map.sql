@@ -30,12 +30,10 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Table `mapKills`
+-- Table `mapJumps`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%mapKills` (
-  `factionKills` BIGINT UNSIGNED NOT NULL ,
-  `podKills` BIGINT UNSIGNED NOT NULL ,
-  `shipKills` BIGINT UNSIGNED NOT NULL ,
+CREATE TABLE `%prefix%mapJumps` (
+  `shipJumps` BIGINT UNSIGNED NOT NULL ,
   `solarSystemID` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`solarSystemID`) )
 ENGINE = InnoDB
@@ -43,10 +41,12 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
 -- -----------------------------------------------------
--- Table `mapJumps`
+-- Table `mapKills`
 -- -----------------------------------------------------
-CREATE TABLE `%prefix%mapJumps` (
-  `shipJumps` BIGINT UNSIGNED NOT NULL ,
+CREATE TABLE `%prefix%mapKills` (
+  `factionKills` BIGINT UNSIGNED NOT NULL ,
+  `podKills` BIGINT UNSIGNED NOT NULL ,
+  `shipKills` BIGINT UNSIGNED NOT NULL ,
   `solarSystemID` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`solarSystemID`) )
 ENGINE = InnoDB

@@ -30,7 +30,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 -- -----------------------------------------------------
--- Table `utilconfig`
+-- Table `utilCachedUntil`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%utilCachedUntil` (
+  `cachedUntil` DATETIME NOT NULL ,
+  `ownerID` BIGINT UNSIGNED NOT NULL ,
+  `tableName` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`tableName`, `ownerID`) )
+ENGINE = MEMORY
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `utilConfig`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%utilConfig` (
   `Name` varchar(90) COLLATE utf8_unicode_ci NOT NULL,
@@ -41,7 +53,7 @@ DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci;
 
 -- -----------------------------------------------------
--- Data `utilconfig`
+-- Data `utilConfig`
 -- -----------------------------------------------------
 INSERT INTO `%prefix%utilConfig` VALUES('dbPrefix', '%prefix%');
 INSERT INTO `%prefix%utilConfig` VALUES('accountData', '%accountData%');
@@ -62,47 +74,18 @@ INSERT INTO `%prefix%utilConfig` VALUES('password', '%password%');
 INSERT INTO `%prefix%utilConfig` VALUES('version', '$Revision$');
 
 -- -----------------------------------------------------
--- Table `utilCachedUntil`
--- -----------------------------------------------------
-CREATE TABLE `%prefix%utilCachedUntil` (
-  `ownerID` BIGINT UNSIGNED NOT NULL ,
-  `tableName` VARCHAR(255) NOT NULL ,
-  `cachedUntil` DATETIME NOT NULL ,
-  PRIMARY KEY (`tableName`, `ownerID`) )
-ENGINE = MEMORY
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
-
--- -----------------------------------------------------
--- Table `utilRegisteredUser`
--- -----------------------------------------------------
-CREATE TABLE `%prefix%utilRegisteredUser` (
-  `userID` BIGINT UNSIGNED NOT NULL ,
-  `fullApiKey` VARCHAR(64) NULL DEFAULT NULL ,
-  `limitedApiKey` VARCHAR(64) NULL DEFAULT NULL ,
-  PRIMARY KEY (`userID`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci;
-
--- -----------------------------------------------------
--- Data `utilRegisteredUser`
--- -----------------------------------------------------
-INSERT INTO `%prefix%utilRegisteredUser` VALUES('%userID%', '%fullApiKey%', '%limitedApiKey%');
-
--- -----------------------------------------------------
 -- Table `utilRegisteredCharacter`
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%utilRegisteredCharacter` (
   `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this character' ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
-  `userID` BIGINT UNSIGNED NOT NULL ,
-  `name` VARCHAR(255) NOT NULL ,
   `corporationID` BIGINT UNSIGNED NOT NULL ,
   `corporationName` VARCHAR(255) NOT NULL ,
-  `isActive` BOOLEAN NOT NULL DEFAULT FALSE ,
   `graphic` BLOB NULL DEFAULT NULL ,
   `graphicType` VARCHAR(16) NULL DEFAULT NULL COMMENT 'One of jpg, png, gif' ,
+  `isActive` BOOLEAN NOT NULL DEFAULT FALSE ,
+  `name` VARCHAR(255) NOT NULL ,
+  `userID` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`characterID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
@@ -118,11 +101,11 @@ INSERT INTO `%prefix%utilRegisteredCharacter` VALUES('%activeCharAPI%', '%charac
 -- -----------------------------------------------------
 CREATE TABLE `%prefix%utilRegisteredCorporation` (
   `activeAPI` TEXT COMMENT 'A space separated list of APIs to get for this corporation' ,
-  `corporationID` BIGINT UNSIGNED NOT NULL ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
-  `isActive` BOOLEAN NOT NULL DEFAULT FALSE ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
   `graphic` BLOB NULL DEFAULT NULL ,
   `graphicType` VARCHAR(16) NULL DEFAULT NULL COMMENT 'One of jpg, png, gif' ,
+  `isActive` BOOLEAN NOT NULL DEFAULT FALSE ,
   PRIMARY KEY (`corporationID`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
@@ -134,6 +117,24 @@ COLLATE = utf8_unicode_ci;
 INSERT INTO `%prefix%utilRegisteredCorporation` VALUES('%activeCorpAPI%', '%corporationID%', '%characterID%', '%corpisactive%', null, null);
 
 -- -----------------------------------------------------
+-- Table `utilRegisteredUser`
+-- -----------------------------------------------------
+CREATE TABLE `%prefix%utilRegisteredUser` (
+  `fullApiKey` VARCHAR(64) NOT NULL ,
+  `limitedApiKey` VARCHAR(64) NULL DEFAULT NULL ,
+  `userID` BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`userID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+-- -----------------------------------------------------
+-- Data `utilRegisteredUser`
+-- -----------------------------------------------------
+INSERT INTO `%prefix%utilRegisteredUser` VALUES('%userID%', '%fullApiKey%', '%limitedApiKey%');
+
+-- -----------------------------------------------------
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

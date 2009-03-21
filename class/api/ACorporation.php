@@ -170,7 +170,7 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
         case 115: // Assets already downloaded.
         case 116: // Industry jobs already downloaded.
         case 117: // Market orders already downloaded.
-        case 120: // Kills exhausted.
+        case 119: // Kills exhausted.
           $cuntil = substr($e->getMessage() , -21, 20);
           $data = array( 'tableName' => $tableName,
             'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil

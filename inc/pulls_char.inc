@@ -36,7 +36,7 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 * Per character API pulls
 ****************************************************************************/
 $availableApis = array('charAccountBalance', 'charAssetList',
-  'charCharacterSheet', 'charIndustryJobs', 'charMarketOrders',
+  'charCharacterSheet', 'charIndustryJobs', 'charKillLog', 'charMarketOrders',
   'charSkillQueue', 'charStandings', 'charWalletJournal',
   'charWalletTransactions'
 );

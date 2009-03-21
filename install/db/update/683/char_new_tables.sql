@@ -31,7 +31,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- -----------------------------------------------------
 -- Table `charSkillQueue`
 -- -----------------------------------------------------
-CREATE `%prefix%charSkillQueue` (
+CREATE TABLE `%prefix%charSkillQueue` (
   `endSP` BIGINT UNSIGNED NOT NULL ,
   `endTime` DATETIME NOT NULL ,
   `level` SMALLINT UNSIGNED NOT NULL ,
@@ -43,7 +43,7 @@ CREATE `%prefix%charSkillQueue` (
   PRIMARY KEY (`ownerID`, `queuePosition`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci
+COLLATE = utf8_unicode_ci;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

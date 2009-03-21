@@ -40,6 +40,11 @@ DROP TABLE IF EXISTS `%prefix%corpAccountBalance`;
 DROP TABLE IF EXISTS `%prefix%corpAssetList`;
 
 -- -----------------------------------------------------
+-- Table `corpAttackers`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpAttackers`;
+
+-- -----------------------------------------------------
 -- Table `corpCorporationSheet`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%corpCorporationSheet`;
@@ -58,6 +63,16 @@ DROP TABLE IF EXISTS `%prefix%corpdivisions`;
 -- Table `corpIndustryJobs`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%corpIndustryJobs`;
+
+-- -----------------------------------------------------
+-- Table `corpItems`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpItems`;
+
+-- -----------------------------------------------------
+-- Table `corpKillLog`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpKillLog`;
 
 -- -----------------------------------------------------
 -- Table `corplogo`
@@ -108,6 +123,11 @@ DROP TABLE IF EXISTS `%prefix%corpStandingsToCorporations`;
 -- Table `corpStarbaseList`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%corpStarbaseList`;
+
+-- -----------------------------------------------------
+-- Table `corpVictim`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%corpVictim`;
 
 -- -----------------------------------------------------
 -- Table `corpwalletDivisions`

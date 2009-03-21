@@ -28,7 +28,7 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE  TABLE IF NOT EXISTS `charAccountBalance` (
+CREATE TABLE IF NOT EXISTS `charAccountBalance` (
   `accountID` BIGINT UNSIGNED NOT NULL ,
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `balance` DECIMAL(17,2) NOT NULL ,
@@ -38,7 +38,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charAssetList` (
+CREATE TABLE IF NOT EXISTS `charAssetList` (
   `flag` SMALLINT UNSIGNED NOT NULL ,
   `itemID` BIGINT UNSIGNED NOT NULL ,
   `lft` BIGINT UNSIGNED NULL DEFAULT NULL ,
@@ -52,6 +52,25 @@ CREATE  TABLE IF NOT EXISTS `charAssetList` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `charAttackers` (
+  `allianceID` BIGINT UNSIGNED NOT NULL ,
+  `allianceName` VARCHAR(255) NULL ,
+  `characterID` BIGINT UNSIGNED NOT NULL ,
+  `characterName` VARCHAR(255) NULL ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
+  `corporationName` VARCHAR(255) NULL ,
+  `damageDone` BIGINT UNSIGNED NOT NULL ,
+  `finalBlow` BOOLEAN DEFAULT FALSE ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `securityStatus` FLOAT NOT NULL DEFAULT 0.0 ,
+  `shipTypeID`  BIGINT UNSIGNED NOT NULL ,
+  `weaponTypeID`  BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `characterID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
 
 CREATE TABLE IF NOT EXISTS `charAttributes` (
   `charisma` SMALLINT UNSIGNED NOT NULL ,
@@ -77,7 +96,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet';
 
-CREATE  TABLE IF NOT EXISTS `charCertificates` (
+CREATE TABLE IF NOT EXISTS `charCertificates` (
   `certificateID` BIGINT UNSIGNED NOT NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`ownerID`, `certificateID`) )
@@ -86,7 +105,7 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci
 COMMENT = 'Sub-table from CharacterSheet';
 
-CREATE  TABLE IF NOT EXISTS `charCharacterSheet` (
+CREATE TABLE IF NOT EXISTS `charCharacterSheet` (
   `balance` DECIMAL(17,2) NOT NULL ,
   `bloodLine` VARCHAR(255) NOT NULL ,
   `characterID` BIGINT UNSIGNED NOT NULL ,
@@ -147,7 +166,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charIndustryJobs` (
+CREATE TABLE IF NOT EXISTS `charIndustryJobs` (
   `activityID` SMALLINT UNSIGNED NOT NULL ,
   `assemblyLineID` BIGINT UNSIGNED NOT NULL ,
   `beginProductionTime` DATETIME NOT NULL ,
@@ -187,7 +206,32 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charMarketOrders` (
+CREATE TABLE IF NOT EXISTS `charItems` (
+  `flag` SMALLINT UNSIGNED NOT NULL ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `qtyDropped` BIGINT UNSIGNED NOT NULL ,
+  `qtyDestroyed` BIGINT UNSIGNED NOT NULL ,
+  `typeID` BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `typeID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
+
+CREATE TABLE IF NOT EXISTS `charKillLog` (
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `lastKillboard` VARCHAR(255) NOT NULL ,
+  `moonID` BIGINT UNSIGNED NOT NULL ,
+  `originalKillboard` VARCHAR(255) NOT NULL ,
+  `solarSystemID` BIGINT UNSIGNED NOT NULL ,
+  `killTime` DATETIME NOT NULL ,
+  `stratum` SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`killID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `charMarketOrders` (
   `accountKey` SMALLINT UNSIGNED NOT NULL ,
   `bid` BOOLEAN NOT NULL ,
   `changed` TIMESTAMP NOT NULL COMMENT 'Added to API to allow tracking of when order was last active. Auto updated by MySQL' ,
@@ -210,7 +254,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charSkillQueue` (
+CREATE TABLE IF NOT EXISTS `charSkillQueue` (
   `endSP` BIGINT UNSIGNED NOT NULL ,
   `endTime` DATETIME NOT NULL ,
   `level` SMALLINT UNSIGNED NOT NULL ,
@@ -222,9 +266,9 @@ CREATE  TABLE IF NOT EXISTS `charSkillQueue` (
   PRIMARY KEY (`ownerID`, `queuePosition`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_unicode_ci
+COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charSkills` (
+CREATE TABLE IF NOT EXISTS `charSkills` (
   `level` SMALLINT UNSIGNED NOT NULL ,
   `ownerID` BIGINT UNSIGNED NOT NULL ,
   `skillpoints` BIGINT UNSIGNED NOT NULL ,
@@ -291,7 +335,23 @@ DEFAULT CHARSET=utf8
 COLLATE=utf8_unicode_ci
 COMMENT='Sub-table from Standings API';
 
-CREATE  TABLE IF NOT EXISTS `charWalletJournal` (
+CREATE TABLE IF NOT EXISTS `charVictim` (
+  `allianceID` BIGINT UNSIGNED NOT NULL ,
+  `allianceName` VARCHAR(255) NULL ,
+  `characterID` BIGINT UNSIGNED NOT NULL ,
+  `characterName` VARCHAR(255) NULL ,
+  `corporationID` BIGINT UNSIGNED NOT NULL ,
+  `corporationName` VARCHAR(255) NULL ,
+  `damageTaken` BIGINT UNSIGNED NOT NULL ,
+  `killID` BIGINT UNSIGNED NOT NULL ,
+  `shipTypeID`  BIGINT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`killID`, `characterID`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_unicode_ci;
+COMMENT = 'Sub-table from KillLog';
+
+CREATE TABLE IF NOT EXISTS `charWalletJournal` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
   `amount` DECIMAL(17,2) NOT NULL ,
   `argID1` BIGINT UNSIGNED NULL ,
@@ -311,7 +371,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_unicode_ci;
 
-CREATE  TABLE IF NOT EXISTS `charWalletTransactions` (
+CREATE TABLE IF NOT EXISTS `charWalletTransactions` (
   `accountKey` SMALLINT UNSIGNED NOT NULL COMMENT 'Nothing in XML results IDs which wallet it is for we have to add it. Taken from POST call params.' ,
   `clientID` BIGINT UNSIGNED NULL ,
   `clientName` VARCHAR(255) NULL ,

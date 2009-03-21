@@ -376,7 +376,7 @@ function DisableChecker($value) {
 // Table Creator
 function createTables($type) {
   // Load sql file
-  global $link, $config, $conf;
+  global $link, $config, $conf, $setupversion;
   if (isset($_GET['install'])) {
     if ($config['db_account']==0) { $accountData = 2; } else { $accountData = $config['db_account']; };
     if ($config['db_char']==0) { $charData = 2; } else { $charData = $config['db_char']; };
@@ -408,7 +408,8 @@ function createTables($type) {
                    'corpisactive'     => $config['db_corp'], 
                    'activeCharAPI'    => $config['charAPIs'], 
                    'activeCorpAPI'    => $config['corpAPIs'], 
-                   'password'         => $replacepass
+                   'password'         => $replacepass,
+                   'setupversion'     => $setupversion
                    );
   $sql = subsFile($replace,'install_'.$type.'.sql');
   if ($sql===false) { return false; };
@@ -665,10 +666,9 @@ LOGTEXT;
 }
 // Update database to the newest revision
 function UpdateDB() {
-  global $link, $config, $conf;
+  global $link, $config, $conf, $updateversions;
   $types = array('util','server','account','char','corp','eve','map');
-  $updateversions = array('471', '616', '643', '683');
-	/*
+  /*
    * Set some replacement values that is needed for the sql files
    */
   if (isset($_GET['install'])) {

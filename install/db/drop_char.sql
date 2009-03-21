@@ -40,6 +40,11 @@ DROP TABLE IF EXISTS `%prefix%charAccountBalance`;
 DROP TABLE IF EXISTS `%prefix%charAssetList`;
 
 -- -----------------------------------------------------
+-- Table `charAttackers`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charAttackers`;
+
+-- -----------------------------------------------------
 -- Table `charAttributes`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%charAttributes`;
@@ -88,6 +93,16 @@ DROP TABLE IF EXISTS `%prefix%charCorporationTitles`;
 -- Table `charIndustryJobs`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `%prefix%charIndustryJobs`;
+
+-- -----------------------------------------------------
+-- Table `charItems`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charItems`;
+
+-- -----------------------------------------------------
+-- Table `charKillLog`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `%prefix%charKillLog`;
 
 -- -----------------------------------------------------
 -- Table `charMarketOrders`

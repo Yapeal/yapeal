@@ -36,7 +36,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store corp Standings API.
  *
  * @package Yapeal
- * @subpackage Api_coporation
+ * @subpackage Api_corporation
  */
 class corpStandings extends ACorporation {
   /**

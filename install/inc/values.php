@@ -35,7 +35,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 737;
+$setupversion = 747;
 /*
  * config tables used to test if this is an older version
  */
@@ -43,7 +43,7 @@ $cfgtables = array('utilconfig','utilConfig');
 /*
  * This is schema xml files to use in AXMLS + it curently version
  */
-$schemas = array('util'=>737, 'account'=>737, 'char'=>740, 'corp'=>740, 'eve'=>737, 'map'=>737, 'server'=>737);
+$schemas = array('util'=>747, 'account'=>747, 'char'=>747, 'corp'=>747, 'eve'=>747, 'map'=>747, 'server'=>747);
 /*****************************************************************
  * Define what APIs the Character can pull with a description
  * To use:

@@ -50,7 +50,8 @@ function GetLang($lang){
 
 // Select browser language
 function GetBrowserLang() {
-$langs = array();
+  global $knownlang;
+  $langs = array();
   if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     // break up string into pieces (languages and q factors)
     preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
@@ -65,96 +66,67 @@ $langs = array();
       arsort($langs, SORT_NUMERIC);
     }; // if count $lang_parse[1]
   }; // if isset $_SERVER['HTTP_ACCEPT_LANGUAGE']
-  foreach ($langs as $lang => $val) {
-    if (strpos($lang, 'da') === 0) {
-      // show Danish site
-      return "da";
-    } else if (strpos($lang, 'ru') === 0) {
-      // show English site
-      return "ru";
-    } else if (strpos($lang, 'en') === 0) {
-      // show English site
-      return "en";
-    }; 
+  foreach($knownlang as $Kval=>$Klang) {
+    foreach ($langs as $lang => $val) {
+  		if (strpos($lang, $Kval) === 0) {
+        // show Danish site
+        return $Kval;
+      }; 
+    }
   }
   return "en";
 }
 
 // Input standard Site header
 function OpenSite($subtitle = "") {
-  if ($subtitle != "") {
+  global $ini,$knownlang;
+	if ($subtitle != "") {
     $subtitle = ' - '.$subtitle;
   };
   /*
    * Language selector
    */
   $count = 0;
-  /*
-   * Make url query
-   */
-  foreach ($_GET as $getName=>$getValue) {
-    if ($count==0) {
-      $getParse = '?'.$getName.'='.$getValue;
-      $count++;
-    } else {
-      $getParse .= '&amp;'.$getName.'='.$getValue;
-    }; // if ($count==0)
-  }
-  /*
-   * Setup the language selector bar
-   */
-  $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
-                     .'<select name="lang" onchange="submit();">' . PHP_EOL
-                     .'  <option value="en"'; if ($_POST['lang'] == 'en') { $languageselector .= ' selected="selected"'; } $languageselector .= '>English</option>' . PHP_EOL
-                     .'  <option value="da"'; if ($_POST['lang'] == 'da') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Danish</option>' . PHP_EOL
-                     .'  <option value="ru"'; if ($_POST['lang'] == 'ru') { $languageselector .= ' selected="selected"'; } $languageselector .= '>Russian</option>' . PHP_EOL
-                     .'</select>' . PHP_EOL;
-  /*
-   * Make post query
-   */
-  foreach ($_POST as $postName=>$postValue) {
-    if ($postName=='lang') { continue; };
+  if (count($knownlang) > 1) {
     /*
-     * check if the value is a array
+     * Make url query
      */
-    if (is_array($postValue)) {
-      foreach ($postValue as $postName1=>$postValue1) {
-        /*
-         * check if the value is a array
-         */
-        if (is_array($postValue1)) {
-          foreach ($postValue1 as $postName2=>$postValue2) {
-            /*
-             * check if the value is a array
-             */
-            if (is_array($postValue2)) {
-              foreach ($postValue2 as $postName3=>$postValue3) {
-                $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']['.$postName2.']['.$postName3.']" value="'.$postValue3.'" />' . PHP_EOL;
-              }
-            } else {
-             $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']['.$postName2.']" value="'.$postValue2.'" />' . PHP_EOL;
-            }; // if is_array($postValue2)
-          }
-        } else {
-          $languageselector .= '<input type="hidden" name="'.$postName.'['.$postName1.']" value="'.$postValue1.'" />' . PHP_EOL;
-        }; // if is_array($postValue1)
-      }
-    } else {
-      $languageselector .= '<input type="hidden" name="'.$postName.'" value="'.$postValue.'" />' . PHP_EOL;
-    }; // if is_array($postValue)
-  }
-  $languageselector .='<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL
-                     .'</form>' . PHP_EOL;
+    $getParse = '';
+    foreach ($_GET as $getName=>$getValue) {
+      if ($count==0) {
+        $getParse .= '?'.$getName.'='.$getValue;
+        $count++;
+      } else {
+        $getParse .= '&amp;'.$getName.'='.$getValue;
+      }; // if ($count==0)
+    }
+    /*
+     * Setup the language selector bar
+     */
+    $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
+                       .'<select name="lang" onchange="submit();">' . PHP_EOL;
+    foreach($knownlang as $langValue => $langName) {
+      $languageselector .= '  <option value="'.$langValue.'"'; if ($_POST['lang'] == $langValue) { $languageselector .= ' selected="selected"'; } $languageselector .= '>'.$langName.'</option>' . PHP_EOL;
+    }
+    $languageselector .= '</select>' . PHP_EOL;
+    /*
+     * Make post query
+     */
+    $excp = array('lang');
+    $languageselector .= inputHiddenPost($excp);
+    $languageselector .='<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL
+                       .'</form>' . PHP_EOL;
+  } else {
+    $languageselector = '';
+  };
   /*
    * Set page title
    */
-  if (isset($_GET['install'])) {
-    $pagetitle = '<h1>'.SETUP.'</h1>';
-  } elseif (isset($_GET['edit'])) {
+  if (isset($ini)) {
     $pagetitle = '<h1>'.CONFIG.'</h1>';
   } else {
-    $pagetitle = '';
-  }; // if / else
+    $pagetitle = '<h1>'.SETUP.'</h1>';
+  }; // if isset $ini
   echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' . PHP_EOL
       .'<html xmlns="http://www.w3.org/1999/xhtml">' . PHP_EOL
       .'<head>' . PHP_EOL
@@ -176,142 +148,216 @@ function CloseSite() {
       .'</html>' . PHP_EOL;
 }
 
-// DB Handler
-function DBHandler($info, $dbtype = "CON", $checker = "") {
-  global $link, $output, $stop, $config, $logtime, $logtype;
-  $select = false;
-  if ($dbtype==="CON") {
-    // Check Connection
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_CONNECT_TO;
-    $request_type_log = 'Database: Connect to';
-    $okay = CONNECTED;
-    $okay_log = 'Connected';
-    $select = $link;
-    if ($link) { @mysqli_query($link,"SET NAMES utf8"); };
-    $errortext = @mysqli_connect_error();
-  } else if ($dbtype==="DS") {
-    // Check Selected DB
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_SELECT_DB;
-    $request_type_log = 'Database: Select Database';
-    $okay = SELECTED;
-    $okay_log = 'Selected';
-    $select = @mysqli_select_db($link,$checker);
-    $errortext = DATABASE.' '.$info.' '.INSTALLER_WAS_NOT_FOUND;
-  } else if ($dbtype==="DCT") {
-    // Check Table Create
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_CREATE_TABLE;
-    $request_type_log = 'Database: Create Table';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="DII") {
-    // Check Insert Into
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_INSERT_INTO;
-    $request_type_log = 'Database: Insert Into';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="DMOD") {
-    // Move old data
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_MOVE_OLD_DATA;
-    $request_type_log = 'Database: Move Old Data To';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="DDOT") {
-    // Remove old data
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_REMOVE_OLD_TABLES;
-    $request_type_log = 'Database: Remove Old Tables';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="DAT") {
-    // Remove old data
-    $errorval = 1;
-    $request_type = DATABASE.": ".UPD_ALTER_TABLE;
-    $request_type_log = 'Database: Alter Table';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="SUR") {
-    // Remove old data
-    $errorval = 0;
-    $request_type = UPD_START_UPDATE;
-    $request_type_log = 'Database: Start Update';
-    $okay = $checker;
-    $okay_log = $checker;
-    $select = true;
-  } else if ($dbtype==="EUR") {
-    // Add revision start
-    $errorval = 0;
-    $request_type = UPD_END_UPDATE;
-    $request_type_log = 'Database: End Update';
-    $okay = $checker;
-    $okay_log = $checker;
-    $select = true;
-  } else if ($dbtype==="DU") {
-    // Update data
-    $errorval = 1;
-    $request_type = DATABASE.": ".UPDATE;
-    $request_type_log = 'Database: Update';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="DDT") {
-    // Check Drop Table
-    $errorval = 1;
-    $request_type = DATABASE.": ".INSTALLER_DROP_TABLE;
-    $request_type_log = 'Database: Drop Table';
-    $okay = DONE;
-    $okay_log = 'Done';
-    $select = @mysqli_query($link,$checker);
-    $errortext = @mysqli_error($link);
-  } else if ($dbtype==="CHKTABLE") {
-    // Check If Table Exists
-    $query = "SELECT count(*) FROM information_schema.tables
-              WHERE table_schema = '".$config['DB_Database']."'
-              AND table_name = '".$info."'";
-    $resid = mysqli_query($link,$query);
-    $result = mysqli_fetch_array($resid);
-    if ($result[0]>0) {
-      return true;
-    } else {
-      return false;
-    }; // if ($result[0]>0)
-  } else if ($dbtype==="CLOSE") {
-    // Check Close DB
-    if (!$link) { return false; };
-    $errorval = 0;
-    $request_type = DATABASE.": ".INSTALLER_CLOSE_CONNECTION;
-    $request_type_log = 'Database: Close Connection';
-    $okay = CLOSED;
-    $okay_log = 'Closed';
-    $select = @mysqli_close($link);
-  } else {
-    // Return false.
-    return false;
-  };
-  if (!$select) {
-    /**
-     * Log where in the setup progress we are
+/*
+ * Create <input> hidden post list array
+ */
+function configMenu() {
+  echo '<table>' . PHP_EOL
+      .'  <tr>' . PHP_EOL
+      .'    <th>'.CONFIG_MENU.'</th>' . PHP_EOL
+      .'  </tr>' . PHP_EOL
+      .'  <tr>' . PHP_EOL
+      .'    <td style="text-align: center;">' . PHP_EOL
+      .'      <table class="notable">' . PHP_EOL
+      .'        <tr>' . PHP_EOL
+      .'          <td class="notd">' . PHP_EOL
+      .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configini" method="post">' . PHP_EOL
+      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
+      .'              <input type="submit" value="'.INI_SETUP.'" />' . PHP_EOL
+      .'            </form>' . PHP_EOL
+      .'          </td><td class="notd">' . PHP_EOL
+      .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configdb" method="post">' . PHP_EOL
+      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
+      .'              <input type="submit" value="'.DB_SETTING.'" />' . PHP_EOL
+      .'            </form>' . PHP_EOL
+      .'          </td><td class="notd">' . PHP_EOL
+      .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configapi" method="post">' . PHP_EOL
+      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
+      .'              <input type="submit" value="'.TEST_CHAR.'" />' . PHP_EOL
+      .'            </form>' . PHP_EOL
+      .'          </td>' . PHP_EOL
+      .'        </tr>' . PHP_EOL
+      .'      </table>' . PHP_EOL
+      .'    </td>' . PHP_EOL
+      .'  </tr>' . PHP_EOL
+      .'</table>' . PHP_EOL;
+}
+
+/*
+ * Create <input> hidden post list array
+ */
+function inputHiddenPostArray($postValueArray, $Name) {
+  $hiddenPost = '';
+  foreach ($postValueArray as $postName=>$postValue) {
+    /*
+     * check if the value is a array
      */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] $request_type_log => $info => $errortext
-LOGTEXT;
-    c_logging($log,$logtime,$logtype);
+    if (is_array($postValue)) {
+      $hiddenPost .= inputHiddenPostArray($postValue, $Name.'['.$postName.']');
+    } else {
+      $hiddenPost .= '<input type="hidden" name="'.$Name.'['.$postName.']" value="'.$postValue.'" />' . PHP_EOL;
+    }; // if is_array($postValue1)
+  }
+  return $hiddenPost;
+}
+
+/*
+ * Create <input> hidden post list
+ */
+function inputHiddenPost($exceptions = '') {
+  $hiddenPost = '';
+  foreach ($_POST as $postName=>$postValue) {
+    /*
+     * Check for exceptions to leave out of the post list
+     */
+    if (is_array($exceptions) && in_array($postName,$exceptions)){
+      continue;
+    } elseif ($exceptions=='ALL_POST_CLEAN') {
+      continue;
+    };
+    /*
+     * check if the value is a array
+     */
+    if (is_array($postValue)) {
+      $hiddenPost .= inputHiddenPostArray($postValue, $postName);
+    } else {
+      $hiddenPost .= '<input type="hidden" name="'.$postName.'" value="'.$postValue.'" />' . PHP_EOL;
+    }; // if is_array($postValue)
+  }
+	return $hiddenPost;
+}
+
+/**
+ * Function to build a multi-values insert ... on duplicate key update query
+ * Example of how to use:
+ * <code>
+ * $data=array(
+ * array('tableName'=>'eve-api-pull','ownerID'=>0,
+ *   'cachedUntil'=>'2008-01-01 00:00:01'), ...
+ * );
+ * $types=array('tableName'=>'text','ownerID'=>'integer',
+ *   'cachedUntil'=>'timestamp');
+ * InsertUpdate($data,$types,'CacheUntil');
+ * </code>
+ *
+ *
+ * @param array $data Values to be put into query
+ * @param array $types Keys are parameter names and values their types
+ * @param string $table Table to use in query's from clause
+ *
+ * @return string Returns a complete SQL statement ready to be used by a
+ * ADOdb exec
+ *
+ * @throws ADODB_Exception if connection used to do quoting fails.
+ */
+function BuildInsertUpdateQuery(array $data, array $types, $table) {
+  global $config, $con;
+  if (empty($data) || empty($types)) {
+    return FALSE;
+  };
+  $pkeys = array_keys($types);
+  $dkeys = array_keys($data[0]);
+  $fields = array_intersect($pkeys, $dkeys);
+  // Need this so we can do quoting.
+  $needsQuote = array('C', 'X', 'D', 'T');
+  // Build query sections
+  $insert = 'INSERT INTO `' . $table . '` (`';
+  $insert .= implode('`,`', $pkeys) . '`)';
+  $values = ' VALUES';
+  $sets = array();
+  foreach ($data as $row) {
+    $set = array();
+    foreach ($fields as $field) {
+      if (in_array($types[$field], $needsQuote)) {
+        $set[] = $con->qstr($row[$field]);
+      } else {
+        $set[] = $row[$field];
+      };// else in_array $params...
+    };// foreach $fields ...
+    $sets[] = '(' . implode(',', $set) . ')';
+  };
+  $values .= ' ' . implode(',', $sets);
+  $dupup = ' ON DUPLICATE KEY UPDATE ';
+  // Loop thru and build update section.
+  $updates = array();
+  foreach ($types as $k => $v) {
+    $updates[] = '`' . $k . '`=VALUES(`' . $k . '`)';
+  };
+  $dupup .= implode(',', $updates);
+  return $insert . $values . $dupup;
+}// function makeMultiUpsert
+
+/*
+ * DB Handler
+ */
+function DBHandler($dbtype, $info = "", $data = "", $types = "") {
+  global $con, $output, $stop, $ini, $dbconerror, $config;
+  $select = false;
+  $prefix = '';
+	if (isset($ini['Database']['table_prefix'])) { $prefix = $ini['Database']['table_prefix']; }
+	if (isset($config['DB_Prefix'])) { $prefix = $config['DB_Prefix']; }
+	switch($dbtype) {
+    case 'CON':
+      // Check Connection
+      $errorval = 1;
+      $request_type = DATABASE.": ".CONNECT_TO;
+      $okay = CONNECTED;
+      if (isset($con)) {
+        $select = $con->IsConnected();
+      } else {
+        $select = false;
+      };
+      if ($select) { 
+        try {
+          $con->Execute("SET NAMES utf8");
+        } catch (ADODB_Exception $e) {
+          trigger_error($e->getMessage(),E_USER_NOTICE);
+        }
+      } else {
+        $errortext = $dbconerror;
+      }; // if $select
+		  break;
+    case 'UPD':
+      // Check Connection
+      $errorval = 1;
+      $request_type = DATABASE.": ".UPDATE;
+      $okay = DONE;
+      $info = $prefix.$info;
+      if (isset($con)) {
+        $select = BuildInsertUpdateQuery($data, $types, $info);
+      } else {
+        $select = false;
+      };
+      if ($select) { 
+        try {
+          $con->Execute($select);
+        } catch (ADODB_Exception $e) {
+          trigger_error($e->getMessage(),E_USER_NOTICE);
+        }
+      } else {
+        $errortext = FAILED;
+      }; // if $select
+		  break;
+    case 'CHKTAB':
+      // Check If Table Exists
+      $query = "SELECT count(*) FROM information_schema.tables
+                WHERE table_schema = '".$ini['Database']['database']."'
+                AND table_name = '".$prefix.$info."'";
+      if (!isset($con)) { return false; }
+      $rs = $con->GetOne($query);
+      if ($rs>0) {
+        return true;
+      } else {
+        return false;
+      }; // if ($result[0]>0)
+      break;
+    default:
+		  return false;
+  }
+  /*
+   * Show action
+   */
+	if (!$select) {
     /**
      * Output error
      */
@@ -323,14 +369,6 @@ LOGTEXT;
     $output .= '  </tr>' . PHP_EOL;
     return false;
   } else {
-    /**
-     * Log where in the setup progress we are
-     */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] $request_type_log => $info => $okay_log
-LOGTEXT;
-    c_logging($log,$logtime,$logtype);
     /**
      * Output success
      */
@@ -347,11 +385,11 @@ LOGTEXT;
 function WritChecker($path) {
   global $content2, $chmodcheck;
   if (is_file('..'.DIRECTORY_SEPARATOR.$path)) {
-    $type = '('.INSTALLER_FILE.')';
-    $cmod = INSTALLER_FILE_TO.' 666';
+    $type = '('.TYPE_FILE.')';
+    $cmod = TYPE_FILE_TO.' 666';
   } else {
-    $type = '('.INSTALLER_DIR.')';
-    $cmod = INSTALLER_DIR_TO.' 777';
+    $type = '('.TYPE_DIR.')';
+    $cmod = TYPE_DIR_TO.' 777';
   }
   $content2 .= '  <tr>' . PHP_EOL;
   $content2 .= '    <td width="220">'.$type.' '.$path.'</td>' . PHP_EOL;
@@ -364,662 +402,8 @@ function WritChecker($path) {
   $content2 .= '  </tr>' . PHP_EOL;
 }
 
-// Check disabled form values
-function DisableChecker($value) {
-  if ($value == "") {
-    return '0';
-  } else {
-    return $value;
-  };
-}
-
-// Table Creator
-function createTables($type) {
-  // Load sql file
-  global $link, $config, $conf, $setupversion;
-  if (isset($_GET['install'])) {
-    if ($config['db_account']==0) { $accountData = 2; } else { $accountData = $config['db_account']; };
-    if ($config['db_char']==0) { $charData = 2; } else { $charData = $config['db_char']; };
-    if ($config['db_corp']==0) { $corpData = 2; } else { $corpData = $config['db_corp']; };
-    if ($config['db_eve']==0) { $eveData = 2; } else { $eveData = $config['db_eve']; };
-    if ($config['db_map']==0) { $mapData = 2; } else { $mapData = $config['db_map']; };
-  } else {
-    $accountData = $config['db_account'];
-    $charData = $config['db_char'];
-    $corpData = $config['db_corp'];
-    $eveData = $config['db_eve'];
-    $mapData = $config['db_map'];
-  }
-  if (isset($config['db_action']) && $config['db_action']==2) { $replacepass = $conf['password']; } else { $replacepass = md5($config['config_pass']); }
-  $replace = array('prefix'           => $config['DB_Prefix'], 
-                   'accountData'      => $accountData, 
-                   'charData'         => $charData, 
-                   'corpData'         => $corpData, 
-                   'eveData'          => $eveData, 
-                   'mapData'          => $mapData, 
-                   'fullApiKey'       => $config['api_full_key'], 
-                   'limitedApiKey'    => '',
-                   'userID'           => $config['api_user_id'], 
-                   'characterID'      => $config['api_char_id'], 
-                   'corporationID'    => $config['api_corp_id'],
-                   'corporationName'  => $config['api_corp_name'], 
-                   'name'             => $config['api_char_name'], 
-                   'charisactive'     => $config['db_char'],
-                   'corpisactive'     => $config['db_corp'], 
-                   'activeCharAPI'    => $config['charAPIs'], 
-                   'activeCorpAPI'    => $config['corpAPIs'], 
-                   'password'         => $replacepass,
-                   'setupversion'     => $setupversion
-                   );
-  $sql = subsFile($replace,'install_'.$type.'.sql');
-  if ($sql===false) { return false; };
-  // Remove comments in sql file
-  $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-  $sql = preg_replace('/-- .*/', '', $sql);
-  // Spliting up the sql file into query's
-  $sql = explode(';', $sql);
-  // Execute query's
-  $insint = 0;
-  foreach ($sql as $query) {
-    $query = trim($query);
-    if (empty($query)) { continue; };
-    // Create table or Inset table
-    if (eregi('CREATE TABLE',$query)) {
-      $start = strpos($query,'`',(strpos($query,'CREATE TABLE') + 12)) + 1;
-      $end = strpos($query,'`',($start)) - $start;
-      $tablename = substr($query, $start, $end);
-      DBHandler($tablename, $dbtype = "DCT", $query);
-      $insint = 0;
-    } else if (eregi('INSERT INTO',$query)) {
-      if ($insint==0) {
-        $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
-        $end = strpos($query,'`',($start)) - $start;
-        $tablename = substr($query, $start, $end);
-        DBHandler($tablename, $dbtype = "DII", $query);
-        $insint = 1;
-      } else {
-        @mysqli_query($link,$query);
-      };
-    } else {
-      @mysqli_query($link,$query);
-      $insint = 0;
-    };
-  }
-  return true;
-}
-// Table Drop
-function dropTables($type, $dropold=false) {
-  /**
-   * Setting Global values
-   */
-  global $link, $config, $conf, $logtime, $logtype;
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Setting Global values
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Set replace values
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Set replace values
-  if ($dropold) { $dropprefix = $conf['dbPrefix']; } else { $dropprefix = $config['DB_Prefix']; };
-  $replace = array('prefix' => $dropprefix);
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Load sql file drop_$type.sql
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Load sql file
-  $sql = subsFile($replace,'drop_'.$type.'.sql');
-  if ($sql===false) { return false; };
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Remove comments in sql file
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Remove comments in sql file
-  $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-  $sql = preg_replace('/-- .*/', '', $sql);
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Spliting up the sql file into query's
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Spliting up the sql file into query's
-  $sql = explode(';', $sql);
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Execute query's
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Execute query's
-  foreach ($sql as $query) {
-    /**
-     * Log where in the setup progress we are
-     */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] Query: $query
-[$logtimenow] Trim Query
-LOGTEXT;
-    c_logging($log,$logtime,$logtype);
-    // trim query
-		$query = trim($query);
-    /**
-     * Log where in the setup progress we are
-     */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] Check if the query is a blank
-LOGTEXT;
-    c_logging($log,$logtime,$logtype);
-    // Check if the query is a blank
-		if (empty($query)) { 
-      /**
-       * Log where in the setup progress we are
-       */
-      $logtimenow = date('H:i:s',time());
-      $log = <<<LOGTEXT
-[$logtimenow] Query is blank. Continue to next query.
-LOGTEXT;
-      c_logging($log,$logtime,$logtype);
-      // Check if the query is a blank
-		  continue;
-    };
-    /**
-     * Log where in the setup progress we are
-     */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] Check if the query is DROP TABLE
-LOGTEXT;
-    c_logging($log,$logtime,$logtype);
-    // Check if the query is DROP TABLE
-		if (eregi('DROP TABLE',$query)) {
-      $start = strpos($query,'`',(strpos($query,'DROP TABLE') + 10)) + 1;
-      $end = strpos($query,'`',($start)) - $start;
-      $tablename = substr($query, $start, $end);
-      DBHandler($tablename, $dbtype = "DDT", $query);
-    } else {
-      /**
-       * Log where in the setup progress we are
-       */
-      $logtimenow = date('H:i:s',time());
-      $log = <<<LOGTEXT
-[$logtimenow] Execute query silent
-LOGTEXT;
-      c_logging($log,$logtime,$logtype);
-      // Execute query silent
-      @mysqli_query($link,$query);
-    };
-  }
-  /**
-   * Log where in the setup progress we are
-   */
-  $logtimenow = date('H:i:s',time());
-  $log = <<<LOGTEXT
-[$logtimenow] Done dropping tables for $type
-LOGTEXT;
-  c_logging($log,$logtime,$logtype);
-  // Done dropping tables for $type
-  return true;
-}
-/**
- * Function to do string substitution in file.
- *
- * @param array $subs Keys are the string to be replaced and value the new values.
- * @param string $fileName Name of file to do substitutions in.
- *
- * @return string Returns the file as string with all substitions done.
- */
-function subsFile($subs,$fileName) {
-  $file = 'db' . DIRECTORY_SEPARATOR . $fileName;
-  if (file_exists($file) && is_readable($file)) {
-    $template=file_get_contents($file);
-    if ($template===false) {
-      return false;
-    };// if $template===false
-    foreach ($subs as $k=>$v) {
-      $template=str_replace('%' . $k . '%', $v, $template);
-    };
-  } else {
-    return false;
-  };
-  return $template;
-}
-// Edit data in DB
-function editData($type) {
-  global $link,$config,$conf;
-  if ($conf[$type.'Data'] == 0) {
-    if ($config['db_'.$type] == 1) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 1 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-    } elseif ($config['db_'.$type] == 2) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 2 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-      dropTables($type);
-    };
-  } else if ($conf[$type.'Data'] == 1) {
-    if ($config['db_'.$type] == 0) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 0 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-    } elseif ($config['db_'.$type] == 2) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 2 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-      dropTables($type);
-    };
-  } else if ($conf[$type.'Data'] == 2) {
-    if ($config['db_'.$type] == 0) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 0 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-      createTables($type);
-    } elseif ($config['db_'.$type] == 1) {
-      $query = "UPDATE `".$config['DB_Prefix']."utilConfig` SET `Value` = 1 WHERE `Name` = '".$type."Data'";
-      DBHandler($config['DB_Prefix']."utilConfig => ".$type."Data", "DU", $query);
-      createTables($type);
-    };
-  };
-}
-
-// Update Checker
-function check_c_action() {
-  global $logtime;
-	if (isset($_POST['c_action']) && $_POST['c_action']==0) {
-    /**
-     * Log where in the setup progress we are
-     */
-    $logtimenow = date('H:i:s',time());
-    $log = <<<LOGTEXT
-[$logtimenow] post['c_action'] was set to 0.
---------------------------------------------------------------------------------
-Log Setup_$logtime.log End
-LOGTEXT;
-    c_logging($log,$logtime,'Setup');
-    OpenSite(INSTALLER_NO_C_ACTION);
-    echo  INSTALLER_NO_C_ACTION_DES . PHP_EOL
-         .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?lang=' . $_GET['lang'] . '&amp;install=welcome" method="post">' . PHP_EOL
-         .'  <input type="submit" value="'.BACK.'" />' . PHP_EOL
-         .'</form>' . PHP_EOL;
-    CloseSite();
-    exit();
-  }; // if isset $_POST['c_action'] & $_POST['c_action']==0
-}
-// Update database to the newest revision
-function UpdateDB() {
-  global $link, $config, $conf, $updateversions;
-  $types = array('util','server','account','char','corp','eve','map');
-  /*
-   * Set some replacement values that is needed for the sql files
-   */
-  if (isset($_GET['install'])) {
-    if ($config['db_account']==0) { $accountData = 2; } else { $accountData = $config['db_account']; };
-    if ($config['db_char']==0) { $charData = 2; } else { $charData = $config['db_char']; };
-    if ($config['db_corp']==0) { $corpData = 2; } else { $corpData = $config['db_corp']; };
-    if ($config['db_eve']==0) { $eveData = 2; } else { $eveData = $config['db_eve']; };
-    if ($config['db_map']==0) { $mapData = 2; } else { $mapData = $config['db_map']; };
-  } else {
-    $accountData = $config['db_account'];
-    $charData = $config['db_char'];
-    $corpData = $config['db_corp'];
-    $eveData = $config['db_eve'];
-    $mapData = $config['db_map'];
-  }
-  if (isset($config['db_action']) && $config['db_action']==2) { $replacepass = $conf['password']; } else { $replacepass = md5($config['config_pass']); }
-  $replace = array('prefix'           => $config['DB_Prefix'], 
-                   'accountData'      => $accountData, 
-                   'charData'         => $charData, 
-                   'corpData'         => $corpData, 
-                   'eveData'          => $eveData, 
-                   'mapData'          => $mapData, 
-                   'fullApiKey'       => $config['api_full_key'], 
-                   'limitedApiKey'    => '',
-                   'userID'           => $config['api_user_id'], 
-                   'characterID'      => $config['api_char_id'], 
-                   'corporationID'    => $config['api_corp_id'],
-                   'corporationName'  => $config['api_corp_name'], 
-                   'name'             => $config['api_char_name'], 
-                   'charisactive'     => $config['db_char'],
-                   'corpisactive'     => $config['db_corp'], 
-                   'activeCharAPI'    => $config['charAPIs'], 
-                   'activeCorpAPI'    => $config['corpAPIs'], 
-                   'password'         => $replacepass,
-                   );
-  /*
-   * Loop throu the versions and run them if curent version number is out of date
-   */
-  foreach ($updateversions as $version) {
-    if (getConfigRevision()==false) {
-      $runversion = true;
-    } elseif (getConfigRevision()<$version) {
-      $runversion = true;
-    } else {
-      $runversion = false;
-    }; // if getConfigRevision()
-    if ($runversion) {
-      /*
-       * Show Revision Update Start
-       */
-      DBHandler(UPD_REVISION, "SUR", $version);
-      /*
-       * Loop throu the types
-       */
-      foreach ($types as $type) {
-        /*
-         * Check if the type should be runned
-         */
-        if ($type=='util') {
-          $run = true;
-        } elseif ($type=='server') {
-          $run = true;
-        } elseif ($type=='account' && $config['db_account']==1) {
-          $run = true;
-        } elseif ($type=='char' && $config['db_char']==1) {
-          $run = true;
-        } elseif ($type=='corp' && $config['db_corp']==1) {
-          $run = true;
-        } elseif ($type=='eve' && $config['db_eve']==1) {
-          $run = true;
-        } elseif ($type=='map' && $config['db_map']==1) {
-          $run = true;
-        } else {
-          $run = false;
-        }; // if ($type=='xxx')
-				/*
-         * Run the update if $run is set to true
-         */
-        if ($run) {
-          /*
-           * Load xxx_new_tables.sql file with replaced values
-           */
-          $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.$type.'_new_tables.sql');
-          if ($sql) {
-            /*
-             * Remove comments in sql file
-             */
-            $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-            $sql = preg_replace('/-- .*/', '', $sql);
-            /*
-             * Spliting up the sql file into query's
-             */
-            $sql = explode(';', $sql);
-            /*
-             * Execute query's
-             */
-            $insint = 0;
-            foreach ($sql as $query) {
-              /*
-              * Trim the query for not needed spaces
-              */
-              $query = trim($query);
-              /*
-              * If query is empty continue to the next query
-              */
-              if (empty($query)) { continue; };
-              /*
-               * Create table or Inset Into table
-               */
-              if (eregi('CREATE TABLE',$query)) {
-                $start = strpos($query,'`',(strpos($query,'CREATE TABLE') + 12)) + 1;
-                $end = strpos($query,'`',($start)) - $start;
-                $tablename = substr($query, $start, $end);
-                DBHandler($tablename, "DCT", $query);
-                $insint = 0;
-              /*
-               * Inset Into table
-               */
-              } elseif (eregi('INSERT INTO',$query)) {
-                if ($insint==0) {
-                  $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
-                  $end = strpos($query,'`',($start)) - $start;
-                  $tablename = substr($query, $start, $end);
-                  DBHandler($tablename, "DII", $query);
-                  $insint = 1;
-                } else {
-                  @mysqli_query($link,$query);
-                };
-              /*
-               * Execute query with no message
-               */
-              } else {
-                @mysqli_query($link,$query);
-                $insint = 0;
-              };
-            }
-          }; // if ($sql)
-          /*
-           * Load xxx_alter_tables.sql file with replaced values
-           */
-          $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.$type.'_alter_tables.sql');
-          if ($sql) {
-            /*
-             * Remove comments in sql file
-             */
-            $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-            $sql = preg_replace('/-- .*/', '', $sql);
-            /*
-             * Spliting up the sql file into query's
-             */
-            $sql = explode(';', $sql);
-            /*
-             * Execute query's
-             */
-            $insint = 0;
-            foreach ($sql as $query) {
-              /*
-              * Trim the query for not needed spaces
-              */
-              $query = trim($query);
-              /*
-              * If query is empty continue to the next query
-              */
-              if (empty($query)) { continue; };
-              /*
-               * Alter Table
-               */
-              if (eregi('ALTER TABLE',$query)) {
-                $start = strpos($query,'`',(strpos($query,'ALTER TABLE') + 11)) + 1;
-                $end = strpos($query,'`',($start)) - $start;
-                $tablename = substr($query, $start, $end);
-                DBHandler($tablename, "DAT", $query);
-                $insint = 0;
-              /*
-               * Update
-               */
-              } elseif (eregi('UPDATE',$query)) {
-                $start = strpos($query,'`',(strpos($query,'UPDATE') + 6)) + 1;
-                $end = strpos($query,'`',($start)) - $start;
-                $tablename = substr($query, $start, $end);
-                DBHandler($tablename, "DU", $query);
-              /*
-               * Inset Into table
-               */
-              } elseif (eregi('INSERT INTO',$query)) {
-                if ($insint==0) {
-                  $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
-                  $end = strpos($query,'`',($start)) - $start;
-                  $tablename = substr($query, $start, $end);
-                  DBHandler($tablename, "DII", $query);
-                  $insint = 1;
-                } else {
-                  @mysqli_query($link,$query);
-                };
-              /*
-               * Execute query with no message
-               */
-              } else {
-                @mysqli_query($link,$query);
-                $insint = 0;
-              };
-            }
-          }; // if ($sql)
-          /*
-           * Load xxx_datamove.sql file with replaced values
-           */
-          $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.$type.'_datamove.sql');
-          if ($sql) {
-            /*
-             * Remove comments in sql file
-             */
-            $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-            $sql = preg_replace('/-- .*/', '', $sql);
-            /*
-             * Spliting up the sql file into query's
-             */
-            $sql = explode(';', $sql);
-            /*
-             * Execute query's
-             */
-            foreach ($sql as $query) {
-              /*
-              * Trim the query for not needed spaces
-              */
-              $query = trim($query);
-              /*
-              * If query is empty continue to the next query
-              */
-              if (empty($query)) { continue; };
-              /*
-               * Move old data to new table
-               */
-              if (eregi('INSERT INTO',$query)) {
-                $start = strpos($query,'`',(strpos($query,'FROM') + 4)) + 1;
-                $end = strpos($query,'`',($start)) - $start;
-                $tablename = substr($query, $start, $end);
-                if (DBHandler($tablename, "CHKTABLE")) {
-                  $start = strpos($query,'`',(strpos($query,'INSERT INTO') + 11)) + 1;
-                  $end = strpos($query,'`',($start)) - $start;
-                  $tablename = substr($query, $start, $end);
-                  DBHandler($tablename, "DMOD", $query);
-                } else { continue; };
-              /*
-               * Execute query with no message
-               */
-              } else {
-                @mysqli_query($link,$query);
-              };
-            }
-          }; // if ($sql)
-          /*
-           * Load xxx_setversion.sql file with replaced values
-           */
-          $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.$type.'_setversion.sql');
-          if ($sql) {
-            /*
-             * Remove comments in sql file
-             */
-            $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-            $sql = preg_replace('/-- .*/', '', $sql);
-            /*
-             * Spliting up the sql file into query's
-             */
-            $sql = explode(';', $sql);
-            /*
-             * Execute query's
-             */
-            foreach ($sql as $query) {
-              /*
-              * Trim the query for not needed spaces
-              */
-              $query = trim($query);
-              /*
-              * If query is empty continue to the next query
-              */
-              if (empty($query)) { continue; };
-              /*
-               * Update to new revision number
-               */
-              if (eregi('UPDATE',$query)) {
-                $start = strpos($query,'`',(strpos($query,'UPDATE') + 6)) + 1;
-                $end = strpos($query,'`',($start)) - $start;
-                $tablename = substr($query, $start, $end);
-                DBHandler($tablename." => version", "DU", $query);
-							/*
-               * Execute query with no message
-               */
-              } else {
-                @mysqli_query($link,$query);
-              };
-            }
-          }; // if ($sql)
-        }; // if ($run)
-      }; // if (getConfigRevision()===false || getConfigRevision()<=$version)
-      unset($type);
-      /*
-       * Load drop_old_tables.sql file with replaced values
-       */
-      $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.'drop_old_tables.sql');
-      /*
-       * Run the sql file if there is one
-       */
-      if ($sql) {
-        /*
-         * Remove comments in sql file
-         */
-        $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-        $sql = preg_replace('/-- .*/', '', $sql);
-        /*
-         * Spliting up the sql file into query's
-         */
-        $sql = explode(';', $sql);
-        /*
-         * Execute query's
-         */
-        foreach ($sql as $query) {
-          /*
-           * Trim the query for not needed spaces
-           */
-          $query = trim($query);
-          /*
-           * If query is empty continue to the next query
-           */
-          if (empty($query)) { continue; };
-          /*
-           * Drop Tables
-           */
-          if (eregi('DROP TABLE',$query)) {
-            $start = strpos($query,'`',(strpos($query,'DROP TABLE') + 10)) + 1;
-            $end = strpos($query,'`',($start)) - $start;
-            $tablename = substr($query, $start, $end);
-            DBHandler(INSTALLER_OLD_TABLE.$tablename, "DDOT", $query);
-          /*
-           * Execute query with no message
-           */
-          } else {
-            @mysqli_query($link,$query);
-          }; // if (eregi('DROP TABLE',$query)
-        }
-      }; // if ($sql)
-      /*
-       * Show Revision Update Start
-       */
-      DBHandler(UPD_REVISION, "EUR", $version);
-    }
-  }
-  unset($version);
-  return true;
-}
 /*
- * Get revision to a integer value
+ * Get converted revision string to a integer value
  */
 function conRev($rev) {
   $rev = preg_replace('/\$Revision: /', '', $rev);
@@ -1027,62 +411,8 @@ function conRev($rev) {
   return (int)$rev;
 }
 /*
- * Get revision from utilConfig
+ * Get API info from cURL request
  */
-function getConfigRevision() {
-  global $link,$config;
-  // Check If Table Exists
-  $query = "SELECT count(*) FROM information_schema.tables
-            WHERE table_schema = '".$config['DB_Database']."'
-            AND table_name = '".$config['DB_Prefix']."utilConfig'";
-  $resid = mysqli_query($link,$query);
-  $result = mysqli_fetch_array($resid);
-  if ($result[0]>0) {
-    $query = "SELECT `Value` FROM `".$config['DB_Prefix']."utilConfig`
-            WHERE `Name` = 'version'";
-    $resid = mysqli_query($link,$query);
-    $result = mysqli_fetch_array($resid);
-    return conRev($result[0]);
-  } else {
-    return false;
-  }; // if ($result[0]>0)
-}
-// Drop Old Tables
-function dropOldTables($version) {
-  global $link, $config, $conf;
-  // Load sql file
-  if ($dropold) { $dropprefix = $conf['dbPrefix']; } else { $dropprefix = $config['DB_Prefix']; };
-  $replace = array('prefix' => $dropprefix);
-  $sql = subsFile($replace,'update'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.'drop_old_tables.sql');
-  if ($sql===false) { return false; };
-  // Remove comments in sql file
-  $sql = preg_replace('/\/\*(.|[\r\n])*?\*\//', '', $sql);
-  $sql = preg_replace('/-- .*/', '', $sql);
-  // Spliting up the sql file into query's
-  $sql = explode(';', $sql);
-  // Execute query's
-  foreach ($sql as $query) {
-    $query = trim($query);
-    if (empty($query)) { continue; };
-    //
-    if (eregi('DROP TABLE',$query)) {
-      $tablename = INSTALLER_FROM_REVISION.$version;
-      DBHandler($tablename, $dbtype = "DDOT", $query);
-    };
-  }
-  return true;
-}
-/*
- * Get revision from utilConfig
- */
-function c_logging($text,$timestamp,$type) {
-  if (is_writable('..'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'log')) {
-    $fp = fopen('..'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR.$type.'_'.$timestamp.'.log', 'a');
-    fwrite($fp, $text.PHP_EOL);
-    fclose($fp);
-  }
-}
-
 function getApiInfo($ch) {
   $result = cURLRequest($ch);
   // Now check for errors.
@@ -1104,8 +434,9 @@ function getApiInfo($ch) {
   };
   return simplexml_load_string($result['body']);
 }
-  
-	
+/*
+ * Do cURL Request
+ */
 function cURLRequest($ch) {
   $response = curl_exec($ch);
   $error = curl_error($ch);
@@ -1126,5 +457,27 @@ function cURLRequest($ch) {
   $result['http_code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   $result['last_url'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
   return $result;
+}
+/*
+ * Check if Browser is EVE IGB
+ * @internal Return true or false.
+ */
+function checkIGB() {
+  // Parse agent string by spliting on the '/'
+  $parts = explode("/", @$_SERVER['HTTP_USER_AGENT']);
+  // Test for Eve Minibrowser also test against broken Shiva IGB Agent
+  if (($parts[0] == "EVE-minibrowser") or ($parts[0] == "Python-urllib")) {
+    // IGB always sends this set to yes, or no,
+    // so if it is missing, we smell something.
+    if (!isset($_SERVER['HTTP_EVE_TRUSTED'])) {
+      return false;
+    };
+    // return true at this point, User Agent matches,
+    // and no phishy headers
+    return true;
+  } else {
+    // User Agent, does not match required.
+    return false;
+  };
 }
 ?>

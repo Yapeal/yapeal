@@ -51,6 +51,12 @@ table {
   text-align : left;
   width: 40em;
 }
+.notable {
+  background-color: #606060;
+  margin : 0.0em auto;
+  text-align : left;
+  width: 1em;
+}
 .input_text {
   width: 250px;
 }
@@ -63,7 +69,7 @@ th {
   font-weight: bold;
 }
 .tableinfolbl {
- background-color: #5E6E79;
+  background-color: #5E6E79;
   color: white;
   font-weight: bold;
   text-align: right;
@@ -74,6 +80,13 @@ td {
   color: white;
   margin: 0.25em auto;
   padding: 3px;
+  vertical-align: top;
+}
+.notd {
+  background-color: #606060;
+  color: white;
+  margin: 0.0em auto;
+  padding: 0px;
   vertical-align: top;
 }
 .warning {
@@ -91,10 +104,6 @@ a {
 }
 a:hover {
   color: #09C500;
-  text-decoration: none;
-}
-a:visited {
-  color: #FFA800;
   text-decoration: none;
 }
 #wrapper {

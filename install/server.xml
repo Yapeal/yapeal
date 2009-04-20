@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version="0.3" xmlns="http://www.mgcummings.com/xsd/yapeal/xmlschema03">
+<!--
+/**
+ * XML from Yapeal.
+ *
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
+ *
+ *  Yapeal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Yapeal is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Michael Cummings <mgcummings@yahoo.com>
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
+ * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @package Yapeal
+ */
+-->
+  <!-- Server Section -->
+  <table name="serverServerStatus">
+    <field name="`onlinePlayers`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`serverName`" type="C" size="32">
+      <KEY/>
+    </field>
+    <field name="`serverOpen`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PserverServerStatus` MODIFY `serverOpen` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('serverVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
+  </sql>
+</schema>

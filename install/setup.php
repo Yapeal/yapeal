@@ -27,23 +27,18 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
-
-/*
- * Set what version we are using
- */
-$setupversion = 694;
-/*
- * Set what update versions there is
- */
-$updateversions = array('471', '616', '643', '683', '694');
 /*
  * make a short value for Directory Separators
  */
-$DS = DIRECTORY_SEPARATOR;
+$ds = DIRECTORY_SEPARATOR;
 /*
  * Require the function file
  */
-require_once('inc'.$DS.'function.php');
+require_once('inc'.$ds.'function.php');
+/*
+ * Languages.
+ */
+$knownlang = array('da' => 'Danish','en' => 'English'/* ,'ru' => 'Russian' */);
 /*
  * Set Language
  */
@@ -53,86 +48,36 @@ if (isset($_POST['lang'])) {
   $_POST['lang'] = GetBrowserLang();
   GetLang($_POST['lang']);
 };
-/*****************************************************************
- * Define what APIs the Character can pull with a description
- * To use:
- * If you have added a new char API pull, add it down here.
- * array('The name of the API' => the description on that it is.);
- * The description should be defined in the language files!
- *****************************************************************/
-$charAPIs = array('charAccountBalance'     => UPD_GET_charAccountBalance_DES,
-                  'charAssetList'          => UPD_GET_charAssetList_DES,
-                  'charCharacterSheet'     => UPD_GET_charCharacterSheet_DES,
-                  'charIndustryJobs'       => UPD_GET_charIndustryJobs_DES,
-                  'charKillLog'            => UPD_GET_charKillLog_DES,
-                  'charMarketOrders'       => UPD_GET_charMarketOrders_DES,
-                  'charSkillQueue'         => UPD_GET_charSkillQueue_DES,
-                  'charStandings'          => UPD_GET_charStandings_DES,
-                  'charWalletJournal'      => UPD_GET_charWalletJournal_DES,
-                  'charWalletTransactions' => UPD_GET_charWalletTransactions_DES);
-/*****************************************************************
- * Define what APIs the Corporation can pull with a description
- * To use:
- * If you have added a new corp API pull, add it down here.
- * array('The name of the API' => the description on that it is.);
- * The description should be defined in the language files!
- *****************************************************************/
-$corpAPIs = array('corpAccountBalance'     => UPD_GET_corpAccountBalance_DES,
-                  'corpAssetList'          => UPD_GET_corpAssetList_DES,
-                  'corpCorporationSheet'   => UPD_GET_corpCorporationSheet_DES,
-                  'corpIndustryJobs'       => UPD_GET_corpIndustryJobs_DES,
-                  'corpKillLog'            => UPD_GET_corpKillLog_DES,
-                  'corpMarketOrders'       => UPD_GET_corpMarketOrders_DES,
-                  'corpMemberTracking'     => UPD_GET_corpMemberTracking_DES,
-                  'corpStandings'          => UPD_GET_corpStandings_DES,
-                  'corpStarbaseList'       => UPD_GET_corpStarbaseList_DES,
-                  'corpWalletJournal'      => UPD_GET_corpWalletJournal_DES,
-                  'corpWalletTransactions' => UPD_GET_corpWalletTransactions_DES);
-
-
-////////////////////////////////
-// Check if Browser is EVE IGB
-////////////////////////////////
-
-// Parse agent string by spliting on the '/'
-$parts = explode("/", @$_SERVER['HTTP_USER_AGENT']);
-// Test for Eve Minibrowser also test against broken Shiva IGB Agent
-if (($parts[0] == "EVE-minibrowser") or ($parts[0] == "Python-urllib")) {
-  // IGB always sends this set to yes, or no,
-  // so if it is missing, we smell something.
-  if (!isset($_SERVER['HTTP_EVE_TRUSTED'])) {
-    $IGB = false;
-  };
-  // return true at this point, User Agent matches,
-  // and no phishy headers
-  $IGB = true;
-} else {
-  // User Agent, does not match required.
-  $IGB = false;
-};
-// If Ingame Browser
-if ($IGB) {
-  $log = <<<LOGTEXT
---------------------
-Trying to open setup.php from the EVE Ingame Browser.
-Retunring error and give a shellexec link to an normal browser.
---------------------
-LOGTEXT;
-  c_logging($log,date('Y-m-d_H.i.s',time()),'IGB');
-  OpenSite(NOIGB_HEADLINE);
+/*
+ * Require the value file
+ * 
+ * VALUES IN THE FILE:
+ * 1. Version of the database that we are using.
+ * 2. PerAPI for the Character
+ * 3. PerAPI for the Corporation
+ * 4. Define where error log files are located
+ * 5. Define error log level
+ */
+require_once('inc'.$ds.'values.php');
+/*
+ * Require the mainfile file that handle all the basic stuff that need on all pages
+ */
+require_once('inc'.$ds.'mainfile.php');
+/*
+ * Check if the browser is IGB (Ingame Browser)
+ */
+if (checkIGB()) {
+  // Generate IGB error site
+	OpenSite(NOIGB_HEADLINE);
   echo NOIGB_TEXT
     .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
   CloseSite();
-  // If not the Ingame Browser
+  // if not the Ingame Browser
 } else {
-  // Check if there is an existing yapeal.ini file.
-  // If so, then tell open Yapeal config updater.
-  if (file_exists('..'.$DS.'config'.$DS.'yapeal.ini')) {
-    // Config Updater
-    require_once('inc'.$DS.'update'.$DS.'main.php');
-  } else{
-    // Welcome Page
-    require_once('inc'.$DS.'install'.$DS.'main.php');
-  };
+  // Welcome Page
+  require_once('inc'.$ds.'config'.$ds.'main.php');
 };
+if (isset($con) && $con->IsConnected()) {
+  $con->Close();
+}
 ?>

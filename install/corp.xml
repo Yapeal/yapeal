@@ -1,0 +1,896 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version="0.3" xmlns="http://www.mgcummings.com/xsd/yapeal/xmlschema03">
+<!--
+/**
+ * XML from Yapeal.
+ *
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
+ *
+ *  Yapeal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Yapeal is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Michael Cummings <mgcummings@yahoo.com>
+ * @copyright Copyright (c) 2008-2009, Michael Cummings
+ * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @package Yapeal
+ */
+-->
+  <!-- Corporation Section -->
+  <table name="corpAccountBalance">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`balance`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpAssetList">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`flag`" type="I1" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`itemID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`lft`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`locationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`quantity`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`rgt`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`singleton`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpAttackers">
+    <field name="`killID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allianceID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allianceName`" type="C" size="255"/>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255"/>
+    <field name="`corporationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`corporationName`" type="C" size="255"/>
+    <field name="`damageDone`" type="I8" size="20">
+      <NOTNULL/>
+      <DEFAULT value="0"/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`finalBlow`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`securityStatus`" type="F">
+      <NOTNULL/>
+    </field>
+    <field name="`shipTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`weaponTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpContainerLog">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`action`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`actorID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`actorName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`flag`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`itemID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`itemTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`locationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`logTime`" type="T">
+      <KEY/>
+    </field>
+    <field name="`newConfiguration`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`oldConfiguration`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`passwordType`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`quantity`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpCorporationSheet">
+    <field name="`allianceID`" type="I8" size="20">
+      <NOTNULL/>
+      <DEFAULT value="0"/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allianceName`" type="C" size="255"/>
+    <field name="`ceoID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`ceoName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`corporationID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`corporationName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`description`" type="X"/>
+    <field name="`memberCount`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`memberLimit`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`shares`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stationName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`taxRate`" type="N" size="5.2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`ticker`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`url`" type="C" size="255"/>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpDivisions">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`description`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpIndustryJobs">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`activityID`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`assemblyLineID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`beginProductionTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`charMaterialMultiplier`" type="N" size="4.2">
+      <NOTNULL/>
+    </field>
+    <field name="`charTimeMultiplier`" type="N" size="4.2">
+      <NOTNULL/>
+    </field>
+    <field name="`completed`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`completedStatus`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`completedSuccessfully`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`containerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`containerLocationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`containerTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`endProductionTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`installedInSolarSystemID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemCopy`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemFlag`" type="I1" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemLicensedProductionRunsRemaining`" type="I8" size="20">
+      <NOTNULL/>
+    </field>
+    <field name="`installedItemLocationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemMaterialLevel`" type="I8" size="20">
+      <NOTNULL/>
+    </field>
+    <field name="`installedItemProductivityLevel`" type="I8" size="20">
+      <NOTNULL/>
+    </field>
+    <field name="`installedItemQuantity`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installedItemTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`installTime`" type="T">
+      <KEY/>
+    </field>
+    <field name="`jobID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`licensedProductionRuns`" type="I8" size="20">
+      <NOTNULL/>
+    </field>
+    <field name="`materialMultiplier`" type="N" size="4.2">
+      <NOTNULL/>
+    </field>
+    <field name="`outputFlag`" type="I1" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`outputLocationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`outputTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`pauseProductionTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`runs`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`timeMultiplier`" type="N" size="4.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpItems">
+    <field name="`flag`" type="I1" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`killID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`lft`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`lvl`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`rgt`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`qtyDropped`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`qtyDestroyed`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpKillLog">
+    <field name="`killID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`killTime`" type="T">
+      <KEY/>
+    </field>
+    <field name="`lastKillboard`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`moonID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`originalKillboard`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`solarSystemID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stratum`" type="I1" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpLogo">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`color1`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`color2`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`color3`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`graphicID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`shape1`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`shape2`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`shape3`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpMarketOrders">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`bid`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`changed`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`charID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`duration`" type="I2" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`escrow`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`issued`" type="T">
+      <KEY/>
+    </field>
+    <field name="`minVolume`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`orderID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`orderState`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`price`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`range`" type="I2">
+      <NOTNULL/>
+    </field>
+    <field name="`stationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`volEntered`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`volRemaining`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpMemberTracking">
+    <field name="`base`" type="C" size="255"/>
+    <field name="`baseID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`grantableRoles`" type="C" size="64">
+      <NOTNULL/>
+    </field>
+    <field name="`location`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`locationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`logoffDateTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`logonDateTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`name`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`ownerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`roles`" type="C" size="64">
+      <NOTNULL/>
+    </field>
+    <field name="`shipType`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`shipTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`startDateTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`title`" type="X"/>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsFromAgents">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsFromFactions">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsFromNPCCorporations">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`fromName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsToAlliances">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+     <NOTNULL/>
+    </field>
+    <field name="`toID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsToCharacters">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <field name="`toID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsToCorporations">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <field name="`toID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStarbaseList">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`itemID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`locationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`moonID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onlineTimestamp`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`state`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stateTimestamp`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpVictim">
+    <field name="`killID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allianceID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allianceName`" type="C" size="255"/>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255"/>
+    <field name="`corporationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`corporationName`" type="C" size="255"/>
+    <field name="`damageTaken`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionID`" type="I8" size="20">
+      <NOTNULL/>
+      <DEFAULT value="0"/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`shipTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpWalletDivisions">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`description`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpWalletJournal">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`amount`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`argID1`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`argName1`" type="C" size="255"/>
+    <field name="`balance`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`date`" type="T">
+      <KEY/>
+    </field>
+    <field name="`ownerID1`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`ownerID2`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`ownerName1`" type="C" size="255"/>
+    <field name="`ownerName2`" type="C" size="255"/>
+    <field name="`reason`" type="X"/>
+    <field name="`refID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`refTypeID`" type="I" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpWalletTransactions">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accountKey`" type="I2" size="4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255"/>
+    <field name="`clientID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`clientName`" type="C" size="255"/>
+    <field name="`price`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`quantity`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stationID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`stationName`" type="C" size="255"/>
+    <field name="`transactionDateTime`" type="T">
+      <KEY/>
+    </field>
+    <field name="`transactionFor`" type="C" size="255">
+      <NOTNULL/>
+      <DEFAULT value="corporation"/>
+    </field>
+    <field name="`transactionID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`transactionType`" type="C" size="255">
+      <NOTNULL/>
+      <DEFAULT value="sell"/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpAssetList` MODIFY `singleton` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpAttackers` MODIFY `finalBlow` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpMemberTracking` ADD INDEX `corpMemberTrackingindex1` (`ownerID`)</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('corpVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
+  </sql>
+</schema>

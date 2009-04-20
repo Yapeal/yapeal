@@ -41,27 +41,45 @@ function trueorfalse($checker) {
     return 'FALSE';
   };
 }
-if (isset($_GET['edit'])) {
-  if ($config['db_action']==2) {
-    $host = $config['DB_Host'];
-    $username = $config['DB_Username'];
-    $password = $config['DB_Password'];
-    $database = $config['DB_Database'];
-    $table_prefix = $config['DB_Prefix'];
-  } elseif ($config['db_action']==1) {
-    $host = $config['DB_Host'];
-    $username = $config['DB_Username'];
-    $password = $config['DB_Password'];
-    $database = $ini_yapeal['Database']['database'];
-    $table_prefix = $ini_yapeal['Database']['table_prefix'];
-  } else {
-    $host = $ini_yapeal['Database']['host'];
-    $username = $ini_yapeal['Database']['username'];
-    $password = $ini_yapeal['Database']['password'];
-    $database = $ini_yapeal['Database']['database'];
-    $table_prefix = $ini_yapeal['Database']['table_prefix'];
-  }
-  if ($config['debug']==1) {
+if (isset($ini)) {
+  /*
+   * Set default values for database
+   */
+  $host = $ini['Database']['host'];
+  $username = $ini['Database']['username'];
+  $password = $ini['Database']['password'];
+  $database = $ini['Database']['database'];
+  $table_prefix = $ini['Database']['table_prefix'];
+  /*
+   * Overwrite default values for database
+   */
+  if (isset($config['DB_Host'])) { $host = $config['DB_Host']; }; // if isset $config['DB_Host']
+  if (isset($config['DB_Username'])) { $username = $config['DB_Username']; }; // if isset $config['DB_Username']
+  if (isset($config['DB_Password'])) { $password = $config['DB_Password']; }; // if isset $config['DB_Password']
+  if (isset($config['DB_Database'])) { $database = $config['DB_Database']; }; // if isset $config['DB_Database']
+  if (isset($config['DB_Prefix'])) { $table_prefix = $config['DB_Prefix']; }; // if isset $config['DB_Prefix']
+  /*
+   * Set default values for Api
+   */
+  $cache_xml = trueorfalse($ini['Api']['cache_xml']);
+  $account_active = trueorfalse($ini['Api']['account_active']);
+  $char_active = trueorfalse($ini['Api']['char_active']);
+  $corp_active = trueorfalse($ini['Api']['corp_active']);
+  $eve_active = trueorfalse($ini['Api']['eve_active']);
+  $map_active = trueorfalse($ini['Api']['map_active']);
+  /*
+   * Overwrite default values for Api
+   */
+  if (isset($config['api_cache_xml'])) { $cache_xml = trueorfalse($config['api_cache_xml']); }; // if isset $config['api_cache_xml']
+	if (isset($config['api_account'])) { $account_active = trueorfalse($config['api_account']); }; // if isset $config['api_account']
+	if (isset($config['api_char'])) { $char_active = trueorfalse($config['api_char']); }; // if isset $config['api_char']
+	if (isset($config['api_corp'])) { $corp_active = trueorfalse($config['api_corp']); }; // if isset $config['api_corp']
+	if (isset($config['api_eve'])) { $eve_active = trueorfalse($config['api_eve']); }; // if isset $config['api_eve']
+	if (isset($config['api_map'])) { $map_active = trueorfalse($config['api_map']); }; // if isset $config['api_map']
+	/*
+   * Set debug handler for Yapeal
+   */
+  if (isset($config['api_debug']) && $config['api_debug']==1) {
     $log_level = 'E_ALL';
     $trace_active = 'TRUE';
     $trace_level = '1';
@@ -72,17 +90,37 @@ if (isset($_GET['edit'])) {
     $trace_level = '0';
     $trace_section = 'YAPEAL_TRACE_NONE';
   }
+  /*
+   * Output updating yapeal.ini
+   */
+  $iniaction = UPDATE_FILE;
 } else {
   $host = $config['DB_Host'];
   $username = $config['DB_Username'];
   $password = $config['DB_Password'];
   $database = $config['DB_Database'];
   $table_prefix = $config['DB_Prefix'];
+  /*
+   * Set default values for Api
+   */
+  $cache_xml = trueorfalse($config['api_cache_xml']);
+	$account_active = trueorfalse($config['api_account']);
+	$char_active = trueorfalse($config['api_char']);
+	$corp_active = trueorfalse($config['api_corp']);
+	$eve_active = trueorfalse($config['api_eve']);
+	$map_active = trueorfalse($config['api_map']);
+	/*
+   * Turn off debug handler for Yapeal since this is the first setup we are doing
+   */
   $log_level = 'E_ERROR|E_WARNING|E_USER_ERROR|E_USER_WARNING';
   $trace_active = 'FALSE';
   $trace_level = '0';
   $trace_section = 'YAPEAL_TRACE_NONE';
-}
+  /*
+   * Output creating yapeal.ini
+   */
+  $iniaction = CREATE_FILE;
+}; // if isset $ini
 $inidata = ';;;;;
 ; Comments on setting up config/yapeal.ini manually can be found in
 ; config/yapeal-example.ini or in config/yapeal_ini_docs.txt.
@@ -96,14 +134,14 @@ stability="beta"
 
 version="$Revision: '.$setupversion.' $"
 [Api]
-cache_xml='.trueorfalse($config['cache_xml']).'
+cache_xml='.$cache_xml.'
 file_suffix=".xml.aspx"
 url_base="http://api.eve-online.com"
-account_active='.trueorfalse($config['db_account']).'
-char_active='.trueorfalse($config['db_char']).'
-corp_active='.trueorfalse($config['db_corp']).'
-eve_active='.trueorfalse($config['db_eve']).'
-map_active='.trueorfalse($config['db_map']).'
+account_active='.$account_active.'
+char_active='.$char_active.'
+corp_active='.$corp_active.'
+eve_active='.$eve_active.'
+map_active='.$map_active.'
 server_active=TRUE
 
 [Database]
@@ -125,19 +163,17 @@ trace_level='.$trace_level.'
 trace_log="yapeal_trace.log"
 trace_output="file"
 trace_section='.$trace_section;
-$fp = fopen('..'.$DS.'config'.$DS.'yapeal.ini', 'w');
+$fp = fopen(YAPEAL_CONFIG.'yapeal.ini', 'w');
 fwrite($fp, $inidata);
 fclose($fp);
-if (isset($_GET['edit'])) { $iniaction = ED_UPDATE_FILE; } else { $iniaction = INSTALLER_CREATE_FILE; }; // if isset $_GET['edit']
-if (!(@is_readable('..'.$DS.'config'.$DS.'yapeal.ini') || @is_file('..'.$DS.'config'.$DS.'yapeal.ini') || @parse_ini_file('..'.$DS.'config'.$DS.'yapeal.ini'))) {
+if (!(@is_readable(YAPEAL_CONFIG.'yapeal.ini') || @is_file(YAPEAL_CONFIG.'yapeal.ini') || @parse_ini_file(YAPEAL_CONFIG.'yapeal.ini'))) {
   $stop++;
   $output .= '<tr>' . PHP_EOL;
   $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;
-  $output .= '  <td class="warning">yapeal.ini '.INSTALLER_CREATE_ERROR.'</td>' . PHP_EOL;
+  $output .= '  <td class="warning">yapeal.ini '.INI_CREATE_ERROR.'</td>' . PHP_EOL;
   $output .= '</tr>' . PHP_EOL;
 } else {
-  
   $output .= '<tr>' . PHP_EOL;
   $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;

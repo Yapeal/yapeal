@@ -26,7 +26,17 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
+/**
+ * @internal Only let this code be ran directly.
+ */
+if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
+  exit();
+};
+// Used to over come path issues caused by how script is ran on server.
+$dir = realpath(dirname(__FILE__));
+chdir($dir);
 /*
  * make a short value for Directory Separators
  */
@@ -34,19 +44,18 @@ $ds = DIRECTORY_SEPARATOR;
 /*
  * Require the function file
  */
-require_once('inc'.$ds.'function.php');
+require_once('inc' . $ds . 'function.php');
 /*
  * Languages.
  */
-$knownlang = array('da' => 'Danish','en' => 'English'/* ,'ru' => 'Russian' */);
+$knownlang = array('da' => 'Danish', 'en' => 'English');
 /*
  * Set Language
  */
 if (isset($_POST['lang'])) {
   GetLang($_POST['lang']);
 } else {
-  $_POST['lang'] = GetBrowserLang();
-  GetLang($_POST['lang']);
+  GetLang(GetBrowserLang());
 };
 /*
  * Require the value file
@@ -58,24 +67,25 @@ if (isset($_POST['lang'])) {
  * 4. Define where error log files are located
  * 5. Define error log level
  */
-require_once('inc'.$ds.'values.php');
+require_once('inc' . $ds . 'values.php');
 /*
  * Require the mainfile file that handle all the basic stuff that need on all pages
  */
-require_once('inc'.$ds.'mainfile.php');
+require_once('inc' . $ds . 'mainfile.php');
 /*
  * Check if the browser is IGB (Ingame Browser)
  */
 if (checkIGB()) {
   // Generate IGB error site
 	OpenSite(NOIGB_HEADLINE);
-  echo NOIGB_TEXT
-    .'<a href="shellexec:'.$_SERVER['SCRIPT_NAME'].'">'.NOIGB_YAPEAL_SETUP.'</a>' . PHP_EOL;
+  echo NOIGB_TEXT .
+    '<a href="shellexec:' . $_SERVER['SCRIPT_NAME'] . '">' .
+    NOIGB_YAPEAL_SETUP . '</a>' . PHP_EOL;
   CloseSite();
   // if not the Ingame Browser
 } else {
   // Welcome Page
-  require_once('inc'.$ds.'config'.$ds.'main.php');
+  require_once('inc' . $ds . 'config' . $ds . 'main.php');
 };
 if (isset($con) && $con->IsConnected()) {
   $con->Close();

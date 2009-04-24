@@ -26,6 +26,7 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
 
 /**

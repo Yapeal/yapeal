@@ -26,6 +26,7 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
 
 /**
@@ -40,7 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 OpenSite(WELCOME);
 echo WELCOME_TEXT
     .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=req" method="post">' . PHP_EOL
-    .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL
+    .'<input type="submit" value="' . NEXT . '" />' . PHP_EOL
     .'</form>' . PHP_EOL;
 CloseSite();
 ?>

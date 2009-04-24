@@ -26,6 +26,7 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
 
 /**
@@ -33,7 +34,9 @@
  */
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
-}
+};
+
+$ds = DIRECTORY_SEPARATOR;
 
 //////////////////////////////////
 // Functions
@@ -41,11 +44,16 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 
 // Get language
 function GetLang($lang){
-  if (file_exists("inc".DIRECTORY_SEPARATOR."language".DIRECTORY_SEPARATOR."lang_".$lang.".php")) {
-    include("inc".DIRECTORY_SEPARATOR."language".DIRECTORY_SEPARATOR."lang_".$lang.".php");
-  } else {
-    include("inc".DIRECTORY_SEPARATOR."language".DIRECTORY_SEPARATOR."lang_en.php");
-  }
+  global $dir, $ds;
+  $langStrings = array();
+  $rp = realpath($dir . $ds . 'inc' . $ds . 'language' . $ds);
+  require($rp . $ds . 'lang_en.php');
+  if (file_exists($rp . $ds . 'lang_' . $lang . '.php')) {
+    require($rp . $ds . 'lang_' . $lang . '.php');
+  };
+  foreach ($langStrings as $k=>$v) {
+    define($k, $v);
+  };
 }
 
 // Select browser language
@@ -72,8 +80,8 @@ function GetBrowserLang() {
         // show Danish site
         return $Kval;
       }; 
-    }
-  }
+    };
+  };
   return "en";
 }
 
@@ -384,7 +392,7 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
 // Dir and File writ anabled checker
 function WritChecker($path) {
   global $content2, $chmodcheck;
-  if (is_file('..'.DIRECTORY_SEPARATOR.$path)) {
+  if (is_file('..'. $ds .$path)) {
     $type = '('.TYPE_FILE.')';
     $cmod = TYPE_FILE_TO.' 666';
   } else {
@@ -393,7 +401,7 @@ function WritChecker($path) {
   }
   $content2 .= '  <tr>' . PHP_EOL;
   $content2 .= '    <td width="220">'.$type.' '.$path.'</td>' . PHP_EOL;
-  if (is_writable('..'.DIRECTORY_SEPARATOR.$path)) {
+  if (is_writable('..'. $ds .$path)) {
     $content2 .= '    <td class="good">'.YES.'</td>' . PHP_EOL;
   } else {
     $content2 .= '    <td class="warning">'.NO.' - Chmod '.$cmod.'</td>' . PHP_EOL;

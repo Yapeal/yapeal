@@ -160,6 +160,9 @@ if (defined('YAPEAL_DEBUG')) {
     'trace_section');
   foreach ($settings as $setting) {
     if (isset($iniVars['Logging'][$setting])) {
+      /**
+       * @ignore
+       */
       define('YAPEAL_' . strtoupper($setting), $iniVars['Logging'][$setting]);
     } else {
       trigger_error($req1 . $setting . $req2, E_USER_ERROR);

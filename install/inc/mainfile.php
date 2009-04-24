@@ -26,6 +26,7 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
 
 /**
@@ -39,16 +40,35 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  ***********************************************************
  * Require Exception files
  */
-require_once('..'.$ds.'inc'.$ds.'common_paths.inc');
+require_once('..' . $ds . 'inc' . $ds . 'common_paths.inc');
 require_once YAPEAL_CLASS . 'ADODB_Exception.class.php';
 require_once YAPEAL_CLASS . 'LoggingExceptionObserver.class.php';
 require_once YAPEAL_CLASS . 'PrintingExceptionObserver.class.php';
+// log_dir is relative to YAPEAL_CACHE
+$realpath = realpath(YAPEAL_CACHE . 'log');
+if ($realpath && is_dir($realpath)) {
+  /**
+   * @ignore
+   */
+  define('YAPEAL_LOG', $realpath . $ds);
+} else {
+  trigger_error('Nonexistent directory defined for log', E_USER_ERROR);
+};
 /*
  * Define log file path
  */
-define("YAPEAL_ERROR_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_error.log");
-define("YAPEAL_WARNING_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_warning.log");
-define("YAPEAL_NOTICE_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_notice.log");
+/**
+ * @ignore
+ */
+define('YAPEAL_ERROR_LOG', YAPEAL_LOG . 'setup_error.log');
+/**
+ * @ignore
+ */
+define('YAPEAL_WARNING_LOG', YAPEAL_LOG . 'setup_warning.log');
+/**
+ * @ignore
+ */
+define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . 'setup_notice.log');
 /*
  * Setup error reporting.
  */
@@ -83,20 +103,38 @@ set_error_handler(array('YapealErrorHandler', 'handle'));
  * Check if there is an existing yapeal.ini file.
  * If so, then tell open Yapeal config updater.
  */
-if (file_exists(YAPEAL_CONFIG.'yapeal.ini')) {
+if (file_exists(YAPEAL_CONFIG . 'yapeal.ini')) {
   /*
    * Get yapeal.ini info
    */
-  $ini = parse_ini_file(YAPEAL_CONFIG.'yapeal.ini', true);
-  $dbconerror = false;
+  // Set vars use in error messages.
+  $req1 = 'Missing required setting ';
+  $req2 = ' in ' . YAPEAL_CONFIG . 'yapeal.ini';
+  $ini = parse_ini_file(YAPEAL_CONFIG . 'yapeal.ini', TRUE);
+  $dbconerror = FALSE;
+  $settings = array('database', 'host', 'table_prefix', 'username', 'password');
+  $data = array();
+  foreach ($settings as $setting) {
+    if (isset($ini['Database'][$setting])) {
+      $data[$setting] = $ini['Database'][$setting];
+    } else {
+      $mess = $req1 . $setting . $req2 . ' section [Database].';
+      trigger_error($mess, E_USER_ERROR);
+    };
+  };// foreach $settings ...
+  // Extract the required fields from array.
+  extract($data);
+  /**
+   * Defines the DSN used for ADOdb connection.
+   */
+  $dsn = 'mysql://' . $username . ':' . $password . '@' . $host . '/' . $database;
   /*
    * Try connecting to database
    */
   try {
-    $dsn = 'mysql://'.$ini['Database']['username'].':'.$ini['Database']['password'].'@'.$ini['Database']['host'].'/'.$ini['Database']['database']; 
     $con = ADONewConnection($dsn);  # no need for Connect()
   } catch (ADODB_Exception $e) {
-    trigger_error($e->getMessage(),E_USER_NOTICE);
+    trigger_error($e->getMessage(), E_USER_NOTICE);
     $dbconerror = $e->getMessage();
     unset($con);
   }
@@ -109,20 +147,20 @@ if (file_exists(YAPEAL_CONFIG.'yapeal.ini')) {
     if ($foundTable) {
       $configTable = $table;
     };
-  }
+  };
   /*
    * Get config info
    */
   if ($configTable) {
     try {
-      $query = "SELECT * FROM `".$ini['Database']['table_prefix'].$configTable."`";
+      $query = 'SELECT * FROM `' . $table_prefix . $configTable . '`';
       $rs = $con->GetAssoc($query);
       foreach ($rs as $name=>$value) {
         $conf[$name] = $value;
       }
       unset($rs);
     } catch (ADODB_Exception $e) {
-      trigger_error($e->getMessage(),E_USER_NOTICE);
+      trigger_error($e->getMessage(), E_USER_NOTICE);
       $dbconerror = $e->getMessage();
     }
   } else {
@@ -137,7 +175,9 @@ if (file_exists(YAPEAL_CONFIG.'yapeal.ini')) {
 if (isset($_GET['funk']) && ($_GET['funk'] == 'dodb' || $_GET['funk'] == 'doini') && !isset($ini)) {
   $dbconerror = false;
   try {
-    $dsn = 'mysql://'.$_POST['config']['DB_Username'].':'.$_POST['config']['DB_Password'].'@'.$_POST['config']['DB_Host'].'/'.$_POST['config']['DB_Database']; 
+    $config = $_POST['config'];
+    $dsn = 'mysql://' . $config['DB_Username'] . ':' . $config['DB_Password'];
+    $dsn .= '@' . $config['DB_Host'] . '/' . $config['DB_Database']; 
     $con = ADONewConnection($dsn);  # no need for Connect()
   } catch (ADODB_Exception $e) {
     trigger_error($e->getMessage(),E_USER_NOTICE);

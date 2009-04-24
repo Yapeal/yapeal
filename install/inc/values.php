@@ -24,6 +24,7 @@
  * @copyright Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Setup
  */
 
 /**
@@ -39,11 +40,12 @@ $setupversion = 747;
 /*
  * config tables used to test if this is an older version
  */
-$cfgtables = array('utilconfig','utilConfig');
+$cfgtables = array('utilconfig', 'utilConfig');
 /*
  * This is schema xml files to use in AXMLS + it curently version
  */
-$schemas = array('util'=>747, 'account'=>747, 'char'=>747, 'corp'=>747, 'eve'=>747, 'map'=>747, 'server'=>747);
+$schemas = array('util'=>747, 'account'=>747, 'char'=>747, 'corp'=>747,
+  'eve'=>747, 'map'=>747, 'server'=>747);
 /*****************************************************************
  * Define what APIs the Character can pull with a description
  * To use:
@@ -82,7 +84,7 @@ $corpAPIs = array('corpAccountBalance'     => GET_corpAccountBalance_DES,
 /*
  * Require common_paths.inc to define the path in yapeal
  */
-require_once('..'.$ds.'inc'.$ds.'common_paths.inc');
+require_once('..' . $ds . 'inc' . $ds . 'common_paths.inc');
 /*
  * Require adodb.inc.php to be able to create connection to db
  */
@@ -91,15 +93,4 @@ require_once(YAPEAL_ADODB . 'adodb.inc.php');
  * Require adodb-xmlschema03.inc.php to be able to use AXMLS
  */
 require_once(YAPEAL_ADODB . 'adodb-xmlschema03.inc.php');
-/*
- * Define the setup error log files
- */
-define("YAPEAL_ERROR_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_error.log");
-define("YAPEAL_WARNING_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_warning.log");
-define("YAPEAL_NOTICE_LOG",YAPEAL_CACHE.$ds."log".$ds."setup_notice.log");
-/*
- * Define the setup log level.
- */
-define("YAPEAL_LOG_LEVEL",E_NOTICE|E_ERROR|E_WARNING|E_USER_NOTICE|E_USER_ERROR|E_USER_WARNING);
-
 ?>

@@ -74,7 +74,7 @@ function GetBrowserLang() {
       arsort($langs, SORT_NUMERIC);
     }; // if count $lang_parse[1]
   }; // if isset $_SERVER['HTTP_ACCEPT_LANGUAGE']
-  foreach($knownlang as $Kval=>$Klang) {
+  $knownlang as $Kval=>$Klang) {
     foreach ($langs as $lang => $val) {
   		if (strpos($lang, $Kval) === 0) {
         // show Danish site
@@ -113,7 +113,7 @@ function OpenSite($subtitle = "") {
      */
     $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
                        .'<select name="lang" onchange="submit();">' . PHP_EOL;
-    foreach($knownlang as $langValue => $langName) {
+    $knownlang as $langValue => $langName) {
       $languageselector .= '  <option value="'.$langValue.'"'; if ($_POST['lang'] == $langValue) { $languageselector .= ' selected="selected"'; } $languageselector .= '>'.$langName.'</option>' . PHP_EOL;
     }
     $languageselector .= '</select>' . PHP_EOL;

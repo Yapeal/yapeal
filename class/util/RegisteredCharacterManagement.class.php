@@ -166,7 +166,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $field = '`' . $field .'`';
       $cols = array();
       $sql = 'select';
-      foreach(array_keys(self::$types) as $column) {
+      array_keys(self::$types) as $column) {
         $cols[] = '`' . $column .'`';
       };
       $sql .= ' ' . implode(',', $cols);
@@ -214,7 +214,7 @@ class RegisteredCharacterManagement implements IFetchApiTable, ILoadApiTable,
       $item = $con->qstr($item);
       $field = '`' . $field .'`';
       $cols = array();
-      foreach(array_keys(self::$types) as $column) {
+      array_keys(self::$types) as $column) {
         $cols[] = '`' . $column .'`';
       };
       $sql = 'select ' . implode(',', $cols);

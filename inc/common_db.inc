@@ -361,7 +361,7 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn,
   if (count($datum) > 0) {
     $data = array();
     $row = array();
-    foreach($datum as $record) {
+    foreach ($datum as $record) {
       $row = $extras;
       foreach ($record->attributes() as $k => $v) {
         $row[$k] = (string)$v;

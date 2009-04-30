@@ -51,7 +51,7 @@ chdir($dir);
 if (PHP_SAPI == 'cli') {
   if (function_exists('getopt')) {
     $options = getopt('hVc:d:');
-    foreach($options as $opt => $value) {
+    foreach ($options as $opt => $value) {
       switch ($opt) {
         case 'c':
           $iniFile = realpath($value);

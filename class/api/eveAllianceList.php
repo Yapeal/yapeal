@@ -265,7 +265,7 @@ class eveAllianceList implements IFetchApiTable, IStoreApiTable {
       };// if isset $node['allianceID']...
     };// if $nodeName=='row' || $nodeName=='result'
     if ($children = $node->children()) {
-      foreach($children as $child) {
+      $children as $child) {
         $alliance = $this->editMemberCorporations($child, $alliance);
       };// foreach children as child
     };

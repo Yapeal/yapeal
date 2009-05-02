@@ -65,8 +65,8 @@ $langStrings = array(
 'CORP_API_PULL_SELECT_DES' => 'Select what corporation API data, that is needed to be pulled', 
 'CORP_INFO' => 'Corp Info', 'CREATE_FILE' => 'Create File', 
 'CREATE_TABLES_FROM' => 'Create Tables From', 
-'CREATED_SQL_ON_MISSED_STUFF' => '.sql file have been created.<br>'.PHP_EOL
-                                    .'This contain the missed tables.<br>'.PHP_EOL
+'CREATED_SQL_ON_MISSED_STUFF' => '.sql file have been created.<br>' . PHP_EOL
+                                    .'This contain the missed tables.<br>' . PHP_EOL
                                     .'Use it to create the tables manual.', 
 'DB_SETTING' => 'Database Settings', 
 'DB_SETUP_DONE' => '<h2>Database setup is done.</h2>' . PHP_EOL,
@@ -79,9 +79,9 @@ $langStrings = array(
 'API_UPDATING_FAILED' => '<h2>Test character creation/update was not completed.</h2><br />' . PHP_EOL
                            .'You might have mistyped some info.<br />',
 'DB_WARNING_CHANGE_DB_NAME_PREFIX_DES' => 'WARNING:<br />' . PHP_EOL
-                                             .'If you change the Host, Database or Prefix,' . PHP_EOL
-                                             .'your old tables and data is still at your old location.<br />' . PHP_EOL
-                                             .'You will need to move the data and drop the tables manual', 
+                                             . 'If you change the Host, Database or Prefix,' . PHP_EOL
+                                             . 'your old tables and data is still at your old location.<br />' . PHP_EOL
+                                             . 'You will need to move the data and drop the tables manual', 
 'ERROR_API_SERVER_OFFLINE' => 'Error<br>EVE API Server if Offline. Please try later.', 
 'ERROR_NO_API_INFO' => 'You must provide API Info', 
 'EVE_API_CENTER' => 'EVE API Center', 'EVE_INFO' => 'Eve Info', 
@@ -148,6 +148,6 @@ $langStrings = array(
                      .'This setup will make Yapeal EVE API Library run on your site.<br />' . PHP_EOL
                      .'<br />' . PHP_EOL,
 'WRITEABLE' => 'Writable', 
-'XML_NOT_FOUND_OR_BAD' => '.xml file was not found<br>'.PHP_EOL.'or a bad XML file'
+'XML_NOT_FOUND_OR_BAD' => '.xml file was not found<br>' . PHP_EOL . 'or a bad XML file'
 );
 ?>

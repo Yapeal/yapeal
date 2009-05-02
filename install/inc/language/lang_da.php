@@ -41,8 +41,9 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 $langStrings = array(
   'BACK' => 'Tilbage', 'CHOSELANGUAGE' => 'Vælg Sprog',
-  'CONFIG' => 'Konfiguration',   'CONNECTED' => 'Forbindelse Oprettet', 'DATABASE' => 'Database',
-  'DEBUGING', 'Debugging', 'DISABLED' => 'Inaktiv', 'DONE' => 'Færdig',
+  'CONFIG' => 'Konfiguration',   'CONNECTED' => 'Forbindelse Oprettet',
+  'DATABASE' => 'Database', 'DEBUGING' => 'Debugging',
+  'DISABLED' => 'Inaktiv', 'DONE' => 'Færdig',
   'ERROR' => 'Fejl', 'FAILED' => 'Fjelede', 'FILE' => 'fil',
   'GOBACK' => '<a href="javascript:history.go(-1)">Go Back</a>',
   'HOST' => 'Host', 'LOADED' => 'Indlæst', 'LOGIN' => 'Login',
@@ -153,6 +154,6 @@ $langStrings = array(
                        .'Denne setup vil opsætte Yapeal EVE API Library til at kunne køre på din hjemmeside.<br />' . PHP_EOL
                        .'<br />' . PHP_EOL,
   'WRITEABLE' => 'Skrivebeskyttelse',
-  'XML_NOT_FOUND_OR_BAD' => '.xml fil blev ikke fundet<br>'.PHP_EOL.'eller en dårlig XML fil'
+  'XML_NOT_FOUND_OR_BAD' => '.xml fil blev ikke fundet<br>' . PHP_EOL . 'eller en dårlig XML fil'
 );
 ?>

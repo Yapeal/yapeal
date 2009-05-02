@@ -71,33 +71,27 @@ class charAssetList extends ACharacter {
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         // Call recursive function to modify XML.
         $rgt = $this->editAssets($data);
-        // Use generated owner node as root for tree.
-        $nodeData = array('flag' => '0', 'itemID' => $this->characterID,
-          'lft' => $lft, 'locationID' => 0, 'lvl' => 0,
-          'ownerID' => $this->characterID, 'quantity' => 1, 'rgt' => $rgt,
-          'singleton' => '0', 'typeID' => 25
-        );
         try {
           $con = connect(YAPEAL_DSN, $tableName);
           $sql = 'delete from ' . $tableName;
           $sql .= ' where ownerID=' . $this->characterID;
           $mess = 'Before delete for ' . $tableName;
-          $mess .= ' from char section in ' . __FILE__;
+          $mess .= ' in ' . __FILE__;
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Clear out old tree for this owner.
           $con->Execute($sql);
-          $mess = 'Before upsert owner node for ' . $tableName;
-          $mess .= ' from char section in ' . __FILE__;
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          // Insert the new owner's root node.
-          upsert($nodeData, $this->types, $tableName, YAPEAL_DSN);
           //Just need the rows from XML now
           $datum = $data->xpath('//row');
-          $extras = array('locationID' => 0, 'ownerID' => $this->characterID);
+          // Use generated owner node as root for tree.
+          $nodeData = '<row itemID="' . $this->characterID .
+            '" typeID="25" quantity="1" flag="0" singleton="0"' .
+            ' lft="1" locationID="0" lvl="0" rgt="' . $rgt . '" />';
+          $root = new SimpleXMLElement($nodeData);
+          array_unshift($datum, $root);
+          $extras = array('ownerID' => $this->characterID);
           $mess = 'multipleUpsertAttributes for ' . $tableName;
-          $mess .= ' from char section in ' . __FILE__;
+          $mess .= ' in ' . __FILE__;
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           multipleUpsertAttributes($datum, $this->types, $tableName,
@@ -168,7 +162,7 @@ class charAssetList extends ACharacter {
     };// elseif $nodeName == 'rowset' ...
     if ($children = $node->children()) {
       foreach ($children as $child) {
-        $index = $this->editItems($child, $locationID, $index, $level);
+        $index = $this->editAssets($child, $locationID, $index, $level);
       };// foreach children ...
     };
     if ($nodeName == 'row') {

@@ -69,6 +69,15 @@ class charSkillQueue extends ACharacter {
       $datum = $this->xml->xpath($this->xpath);
       if (count($datum) > 0) {
         try {
+          $con = connect(YAPEAL_DSN, $tableName);
+          $sql = 'delete from ' . $tableName;
+          $sql .= ' where ownerID=' . $this->characterID;
+          $mess = 'Before delete for ' . $tableName;
+          $mess .= ' in ' . __FILE__;
+          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+          // Clear out old tree for this owner.
+          $con->Execute($sql);
           $extras = array('ownerID' => $this->characterID);
           $mess = 'multipleUpsertAttributes for ' . $tableName;
           $mess .= ' in ' . __FILE__;

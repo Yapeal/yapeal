@@ -114,7 +114,7 @@ function OpenSite($subtitle = "") {
     $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
       .'<select name="lang" onchange="submit();">' . PHP_EOL;
     foreach ($knownlang as $langValue => $langName) {
-      $languageselector .= '  <option value="'.$langValue.'"'; if ($_POST['lang'] == $langValue) { $languageselector .= ' selected="selected"'; } $languageselector .= '>'.$langName.'</option>' . PHP_EOL;
+      $languageselector .= '  <option value="'.$langValue.'"'; if (isset($_POST['lang']) && $_POST['lang'] == $langValue) { $languageselector .= ' selected="selected"'; } $languageselector .= '>'.$langName.'</option>' . PHP_EOL;
     }
     $languageselector .= '</select>' . PHP_EOL;
     /*
@@ -392,7 +392,7 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
 // Dir and File writ anabled checker
 function WritChecker($path) {
   global $content2, $chmodcheck;
-  if (is_file('..'. $ds .$path)) {
+  if (is_file(YAPEAL_BASE . $path)) {
     $type = '('.TYPE_FILE.')';
     $cmod = TYPE_FILE_TO.' 666';
   } else {
@@ -401,7 +401,7 @@ function WritChecker($path) {
   }
   $content2 .= '  <tr>' . PHP_EOL;
   $content2 .= '    <td width="220">'.$type.' '.$path.'</td>' . PHP_EOL;
-  if (is_writable('..'. $ds .$path)) {
+  if (is_writable(YAPEAL_BASE . $path)) {
     $content2 .= '    <td class="good">'.YES.'</td>' . PHP_EOL;
   } else {
     $content2 .= '    <td class="warning">'.NO.' - Chmod '.$cmod.'</td>' . PHP_EOL;

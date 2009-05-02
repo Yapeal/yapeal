@@ -41,7 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 $langStrings = array(
   'BACK' => 'Tilbage', 'CHOSELANGUAGE' => 'Vælg Sprog',
-  'CONFIG' => 'Konfiguration',   'CONNECTED', 'Forbindelse Oprettet', 'DATABASE', 'Database',
+  'CONFIG' => 'Konfiguration',   'CONNECTED' => 'Forbindelse Oprettet', 'DATABASE' => 'Database',
   'DEBUGING', 'Debugging', 'DISABLED' => 'Inaktiv', 'DONE' => 'Færdig',
   'ERROR' => 'Fejl', 'FAILED' => 'Fjelede', 'FILE' => 'fil',
   'GOBACK' => '<a href="javascript:history.go(-1)">Go Back</a>',
@@ -59,7 +59,7 @@ $langStrings = array(
   'API_SETUP' => 'API Setup', 'API_USERID' => 'API Bruger ID',
   'CHAR_API_PULL_SELECT' => 'Karakter API træk vælger',
   'CHAR_API_PULL_SELECT_DES' => 'Vælg hvilke API den enkeldte karakter skal hente',
-  'CHAR_INFO', 'Karanter Info' => 'CHAR_SELECT', 'Vælg Karakter',
+  'CHAR_INFO' => 'Karanter Info', 'CHAR_SELECT' => 'Vælg Karakter',
   'CHECKING_TABLES_FROM' => 'Kontroler Tabeller Fra',
   'CHK_FILE_DIR_WRITE_PREM' => 'Kontroler filer og mapper om de er skrivebeskyttet.',
   'CHMOD_CHECK_FAIL' => 'Nogle filer eller mapper var skrive beskyttet.<br />' . PHP_EOL

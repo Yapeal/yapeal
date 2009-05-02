@@ -69,6 +69,10 @@ define('YAPEAL_WARNING_LOG', YAPEAL_LOG . 'setup_warning.log');
  * @ignore
  */
 define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . 'setup_notice.log');
+/**
+ * @ignore
+ */
+define('YAPEAL_LOG_LEVEL',E_ERROR|E_USER_ERROR|E_WARNING|E_USER_WARNING);
 /*
  * Setup error reporting.
  */

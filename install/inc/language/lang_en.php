@@ -65,9 +65,9 @@ $langStrings = array(
 'CORP_API_PULL_SELECT_DES' => 'Select what corporation API data, that is needed to be pulled', 
 'CORP_INFO' => 'Corp Info', 'CREATE_FILE' => 'Create File', 
 'CREATE_TABLES_FROM' => 'Create Tables From', 
-'CREATED_SQL_ON_MISSED_STUFF' => '.sql file have been created.<br>".PHP_EOL
-                                    ."This contain the missed tables.<br>".PHP_EOL
-                                    ."Use it to create the tables manual.', 
+'CREATED_SQL_ON_MISSED_STUFF' => '.sql file have been created.<br>'.PHP_EOL
+                                    .'This contain the missed tables.<br>'.PHP_EOL
+                                    .'Use it to create the tables manual.', 
 'DB_SETTING' => 'Database Settings', 
 'DB_SETUP_DONE' => '<h2>Database setup is done.</h2>' . PHP_EOL,
 'DB_SETUP_FAILED' => '<h2>Database setup was not completed.</h2><br />' . PHP_EOL
@@ -78,10 +78,10 @@ $langStrings = array(
 'API_UPDATING_DONE' => '<h2>Test character creation/update is done.</h2>',
 'API_UPDATING_FAILED' => '<h2>Test character creation/update was not completed.</h2><br />' . PHP_EOL
                            .'You might have mistyped some info.<br />',
-'DB_WARNING_CHANGE_DB_NAME_PREFIX_DES' => 'WARNING:<br />" . PHP_EOL
-                                             ."If you change the Host, Database or Prefix," . PHP_EOL
-                                             ."your old tables and data is still at your old location.<br />" . PHP_EOL
-                                             ."You will need to move the data and drop the tables manual', 
+'DB_WARNING_CHANGE_DB_NAME_PREFIX_DES' => 'WARNING:<br />' . PHP_EOL
+                                             .'If you change the Host, Database or Prefix,' . PHP_EOL
+                                             .'your old tables and data is still at your old location.<br />' . PHP_EOL
+                                             .'You will need to move the data and drop the tables manual', 
 'ERROR_API_SERVER_OFFLINE' => 'Error<br>EVE API Server if Offline. Please try later.', 
 'ERROR_NO_API_INFO' => 'You must provide API Info', 
 'EVE_API_CENTER' => 'EVE API Center', 'EVE_INFO' => 'Eve Info', 
@@ -133,14 +133,14 @@ $langStrings = array(
 'SAVE_XML_DES' => '      Turns on caching of API XML data to local files.<br />' . PHP_EOL
                      .'      "No" = Save web space but still adds to the database.' . PHP_EOL,
 'SETUP_PASS' => 'Setup Password', 
-'SETUP_PASS_DES' => 'This is a password you can use if you need to make changes<br />" . PHP_EOL
-                       ."to this setup, when you have completed this setup.', 
-'SETUP_PASS_DES_BLANK' => '<br />" . PHP_EOL . "Leave blank to disable the login section.', 
+'SETUP_PASS_DES' => 'This is a password you can use if you need to make changes<br />' . PHP_EOL
+                       .'to this setup, when you have completed this setup.', 
+'SETUP_PASS_DES_BLANK' => '<br />' . PHP_EOL . 'Leave blank to disable the login section.', 
 'TEST_CHAR' => 'Test Character', 
 'TEST_CHAR_DES' => 'This is only meant to be used to test Yapeal.<br />' . PHP_EOL
-                      ."If you need info on how to add characters to Yapeal so it can pull the info from it,<br />" . PHP_EOL
-                      ."look at install/inc/config/configapi.php to see how this page is done<br />" . PHP_EOL
-                      ."and install/inc/config/goapi.php to see how it input the data to Yapeal." . PHP_EOL,
+                      .'If you need info on how to add characters to Yapeal so it can pull the info from it,<br />' . PHP_EOL
+                      .'look at install/inc/config/configapi.php to see how this page is done<br />' . PHP_EOL
+                      .'and install/inc/config/goapi.php to see how it input the data to Yapeal.' . PHP_EOL,
 'TYPE_DIR' => 'Dir', 'TYPE_DIR_TO' => 'dir to', 'TYPE_FILE' => 'File', 
 'TYPE_FILE_TO' => 'file to', 'UPDATE_FILE' => 'Update File', 
 'UPDATE_TABLES_FROM' => 'Update Tables From', 
@@ -148,6 +148,6 @@ $langStrings = array(
                      .'This setup will make Yapeal EVE API Library run on your site.<br />' . PHP_EOL
                      .'<br />' . PHP_EOL,
 'WRITEABLE' => 'Writable', 
-'XML_NOT_FOUND_OR_BAD' => '.xml file was not found<br>".PHP_EOL."or a bad XML file'
+'XML_NOT_FOUND_OR_BAD' => '.xml file was not found<br>'.PHP_EOL.'or a bad XML file'
 );
 ?>

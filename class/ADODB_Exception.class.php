@@ -139,7 +139,7 @@ class ADODB_Exception extends Exception implements YapealSubject {
    * Used to notify all the observers.
    */
   public function notify() {
-    self::$observers as $observer) {
+    foreach (self::$observers as $observer) {
       $observer->YapealUpdate($this);
     };
   }

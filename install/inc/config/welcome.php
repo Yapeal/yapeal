@@ -41,6 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 OpenSite(WELCOME);
 echo WELCOME_TEXT
     .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=req" method="post">' . PHP_EOL
+		.'<input type="hidden" name="lang" value="'.GetBrowserLang().'" />' . PHP_EOL
     .'<input type="submit" value="' . NEXT . '" />' . PHP_EOL
     .'</form>' . PHP_EOL;
 CloseSite();

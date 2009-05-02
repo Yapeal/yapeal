@@ -46,7 +46,7 @@ class corpAssetList extends ACorporation {
    * @var array Holds the database column names and ADOdb types.
    */
   private $types = array('flag' => 'I', 'itemID' => 'I', 'lft' => 'I',
-    'locationID' => 'I', 'ownerID' => 'I', 'quantity' => 'I', 'rgt' => 'I',
+    'locationID' => 'I', 'lvl' => 'I', 'ownerID' => 'I', 'quantity' => 'I', 'rgt' => 'I',
     'singleton' => 'L', 'typeID' => 'I'
   );
   /**

@@ -469,21 +469,11 @@
     <field name="`killTime`" type="T">
       <KEY/>
     </field>
-    <field name="`lastKillboard`" type="C" size="255">
-      <NOTNULL/>
-    </field>
     <field name="`moonID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`originalKillboard`" type="C" size="255">
-      <NOTNULL/>
-    </field>
     <field name="`solarSystemID`" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <field name="`stratum`" type="I1" size="3">
       <NOTNULL/>
       <UNSIGNED/>
     </field>

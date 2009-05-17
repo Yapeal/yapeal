@@ -37,11 +37,15 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 }
 if (isset($ini)) {
   if (md5('') !== $conf['password']) {
-    if ($_COOKIE['yapealsetup'] == "" && !isset($_POST['login'])) {
+    if ((!isset($_COOKIE['yapealsetup']) || $_COOKIE['yapealsetup'] == "") && !isset($_POST['login'])) {
       // Login Page
+      $func = '';
+      if (isset($_GET['funk'])) {
+        $func = '?funk='.$_GET['funk'];
+      }; // if (isset($_GET['funk']))
       OpenSite(LOGIN);
       echo '<h3>'.LOGIN.'</h3><br />' . PHP_EOL
-          .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk='.$_GET['funk'].'" method="post">' . PHP_EOL
+          .'<form action="' . $_SERVER['SCRIPT_NAME'] . $func . '" method="post">' . PHP_EOL
           .PASSWORD.' <input type="password" name="setuppass" /><br />' . PHP_EOL
           .'<input type="hidden" name="login" value="login" />' . PHP_EOL
           .'<input type="submit" value="'.LOGIN.'" />' . PHP_EOL
@@ -51,7 +55,11 @@ if (isset($ini)) {
     } elseif (isset($_POST['login']) && $_POST['login'] == 'login') {
       if (md5($_POST['setuppass']) === $conf['password']) {
         setcookie('yapealsetup',$conf['password']);
-        header("Location: " . $_SERVER['SCRIPT_NAME'] . "?funk=".$_GET['funk']);
+        $func = '';
+        if (isset($_GET['funk'])) {
+          $func = '?funk='.$_GET['funk'];
+        }; // if (isset($_GET['funk']))
+        header("Location: " . $_SERVER['SCRIPT_NAME'] . $func);
       } else {
         // Login Page
         OpenSite(LOGIN);

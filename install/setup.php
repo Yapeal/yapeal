@@ -56,6 +56,7 @@ if (isset($_POST['lang'])) {
   GetLang($_POST['lang']);
 } else {
   GetLang(GetBrowserLang());
+  $_POST['lang'] = GetBrowserLang();
 };
 /*
  * Require the value file

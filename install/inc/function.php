@@ -160,12 +160,6 @@ function CloseSite() {
  * Create <input> hidden post list array
  */
 function configMenu() {
-  if (isset($_POST['lang'])) {
-    $lang = $_POST['lang'];
-  } else {
-    $lang = GetBrowserLang();
-  }; // if isset $_POST['lang']
-
   echo '<table>' . PHP_EOL
       .'  <tr>' . PHP_EOL
       .'    <th>'.CONFIG_MENU.'</th>' . PHP_EOL

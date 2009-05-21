@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents Custom Yapeal API exception class.
+ * Contents PrintingExceptionObserver class.
  *
  * PHP version 5
  *
@@ -31,13 +31,33 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'YapealApiException.class.php';
+require_once YAPEAL_CLASS . 'IYapealObserver.php';
+require_once YAPEAL_INC . 'elog.php';
 /**
- * Thrown when API return a error code as response to our request.
+ * Prints out any exceptions being observed if PHP is in CLI mode.
  *
  * @package Yapeal
- * @subpackage Exceptions
- * @uses YapealApiException
+ * @subpackage Observer
+ * @uses YapealObserver
  */
-class YapealApiErrorException extends YapealApiException {}
+class PrintingExceptionObserver implements YapealObserver {
+  /**
+   * Method the 'object' calls to let us know something has happened.
+   *
+   * @param object $e The 'object' we're observering.
+   */
+  public function YapealUpdate(YapealSubject $e) {
+    $message = <<<MESS
+EXCEPTION:
+     Code: {$e->getCode()}
+  Message: {$e->getMessage()}
+     File: {$e->getFile()}
+     Line: {$e->getLine()}
+Backtrace:
+{$e->getTraceAsString()}
+MESS;
+    $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
+    print_on_command($message);
+  }
+}
 ?>

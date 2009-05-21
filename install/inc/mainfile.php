@@ -40,10 +40,10 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  ***********************************************************
  * Require Exception files
  */
-require_once('..' . $ds . 'inc' . $ds . 'common_paths.inc');
-require_once YAPEAL_CLASS . 'ADODB_Exception.class.php';
-require_once YAPEAL_CLASS . 'LoggingExceptionObserver.class.php';
-require_once YAPEAL_CLASS . 'PrintingExceptionObserver.class.php';
+require_once('..' . $ds . 'inc' . $ds . 'common_paths.php');
+require_once YAPEAL_CLASS . 'ADODB_Exception.php';
+require_once YAPEAL_CLASS . 'LoggingExceptionObserver.php';
+require_once YAPEAL_CLASS . 'PrintingExceptionObserver.php';
 // log_dir is relative to YAPEAL_CACHE
 $realpath = realpath(YAPEAL_CACHE . 'log');
 if ($realpath && is_dir($realpath)) {
@@ -94,8 +94,8 @@ unset($logObserver, $printObserver);
 /*
  * Load error handler
  */
-require_once YAPEAL_INC . 'elog.inc';
-require_once YAPEAL_CLASS . 'YapealErrorHandler.class.php';
+require_once YAPEAL_INC . 'elog.php';
+require_once YAPEAL_CLASS . 'YapealErrorHandler.php';
 /*
  * Start using custom error handler.
  */

@@ -51,7 +51,7 @@ class YapealTracing {
    * Constructor
    */
   public function __construct() {
-    require_once YAPEAL_INC . 'elog.inc';
+    require_once YAPEAL_INC . 'elog.php';
     if (defined('YAPEAL_DEBUG')) {
       $this->fileTrace = str_pad(' Trace log ', 75, '-', STR_PAD_BOTH) . PHP_EOL;
     };

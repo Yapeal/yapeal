@@ -36,7 +36,7 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'IYapealSubject.class.php';
+require_once YAPEAL_CLASS . 'IYapealSubject.php';
 if (!defined('ADODB_ERROR_HANDLER_TYPE')) define('ADODB_ERROR_HANDLER_TYPE', E_USER_ERROR);
 define('ADODB_ERROR_HANDLER', 'adodb_throw');
 /**

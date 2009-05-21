@@ -87,16 +87,16 @@ if (PHP_SAPI == 'cli') {
 /* **************************************************************************
 * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
 * **************************************************************************/
-// Move down to 'inc' directory to read common_backend.inc
+// Move down to 'inc' directory to read common_backend.php
 $ds = DIRECTORY_SEPARATOR;
-$path = $dir . $ds . 'inc' . $ds . 'common_backend.inc';
+$path = $dir . $ds . 'inc' . $ds . 'common_backend.php';
 require_once realpath($path);
 /* **************************************************************************
 * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
 * **************************************************************************/
-require_once YAPEAL_INC . 'common_db.inc';
-require_once YAPEAL_CLASS . 'YapealApiRequests.class.php';
+require_once YAPEAL_INC . 'common_db.php';
+require_once YAPEAL_CLASS . 'YapealApiRequests.php';
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
@@ -140,10 +140,10 @@ try {
         /* **********************************************************************
         * Per user API pulls
         * **********************************************************************/
-        $mess = 'Before require pulls_account.inc for user ' . $userID;
+        $mess = 'Before require pulls_account.php for user ' . $userID;
         $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
-        require YAPEAL_INC . 'pulls_account.inc';
+        require YAPEAL_INC . 'pulls_account.php';
       }; // foreach $userList
     }
     catch (ADODB_Exception $e) {
@@ -168,10 +168,10 @@ try {
         /* **********************************************************************
         * Per character API pulls
         * **********************************************************************/
-        $mess = 'Before require pulls_char.inc for character ' . $charID;
+        $mess = 'Before require pulls_char.php for character ' . $charID;
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        require YAPEAL_INC . 'pulls_char.inc';
+        require YAPEAL_INC . 'pulls_char.php';
       }; // foreach $charList
     }
     catch (ADODB_Exception $e) {
@@ -196,10 +196,10 @@ try {
         /* ********************************************************************
         * Per corp API pulls
         * ********************************************************************/
-        $mess = 'Before require pulls_corp.inc for corporation ' . $corpID;
+        $mess = 'Before require pulls_corp.php for corporation ' . $corpID;
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        require YAPEAL_INC . 'pulls_corp.inc';
+        require YAPEAL_INC . 'pulls_corp.php';
       }; // foreach $corpList
     }
     catch (ADODB_Exception $e) {
@@ -215,10 +215,10 @@ try {
     $mess = 'Eve section active in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    $mess = 'Before require pulls_eve.inc';
+    $mess = 'Before require pulls_eve.php';
     $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    require YAPEAL_INC . 'pulls_eve.inc';
+    require YAPEAL_INC . 'pulls_eve.php';
     $tracing->flushTrace();
   }; // if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -229,10 +229,10 @@ try {
     $mess = 'Eve section active in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_MAP, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-    $mess = 'Before require pulls_map.inc';
+    $mess = 'Before require pulls_map.php';
     $tracing->activeTrace(YAPEAL_TRACE_MAP, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-    require YAPEAL_INC . 'pulls_map.inc';
+    require YAPEAL_INC . 'pulls_map.php';
     $tracing->flushTrace();
   };// if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************
@@ -243,10 +243,10 @@ try {
     $mess = 'Server section active in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-    $mess = 'Before require pulls_server.inc';
+    $mess = 'Before require pulls_server.php';
     $tracing->activeTrace(YAPEAL_TRACE_SERVER, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-    require YAPEAL_INC . 'pulls_server.inc';
+    require YAPEAL_INC . 'pulls_server.php';
     $tracing->flushTrace();
   };// if YAPEAL_EVE_ACTIVE...
   /* ************************************************************************

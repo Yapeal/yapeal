@@ -1,6 +1,6 @@
 <?php
 /**
- * Includes LoggingExceptionObserver class.
+ * Contents Custom Yapeal API exception class.
  *
  * PHP version 5
  *
@@ -31,49 +31,13 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'IYapealObserver.class.php';
-require_once YAPEAL_INC . 'elog.inc';
+require_once YAPEAL_CLASS . 'YapealApiException.php';
 /**
- * Logs any exceptions its observing to a log file.
+ * Thrown when API return a error code as response to our request.
  *
  * @package Yapeal
- * @subpackage Observer
- * @uses YapealObserver
- * @uses elog
+ * @subpackage Exceptions
+ * @uses YapealApiException
  */
-class LoggingExceptionObserver implements YapealObserver {
-  /**
-   * @var string Holds the name of the log file to use.
-   */
-  private $file = YAPEAL_ERROR_LOG;
-  /**
-   * Constructor
-   *
-   * @param string $filename Optional filename to log messages to.
-   */
-  public function __construct($filename = YAPEAL_ERROR_LOG) {
-    if (!empty($filename) && is_string($filename)) {
-      $this->file = $filename;
-    };
-  }
-  /**
-   * Method the 'object' calls to let us know something has happened.
-   *
-   * @param object $e The 'object' we're observing.
-   */
-  public function YapealUpdate(YapealSubject $e) {
-    $message = PHP_EOL;
-    $message .= <<<MESS
-EXCEPTION:
-     Code: {$e->getCode()}
-  Message: {$e->getMessage()}
-     File: {$e->getFile()}
-     Line: {$e->getLine()}
-Backtrace:
-{$e->getTraceAsString()}
-MESS;
-    $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
-    elog($message, $this->file);
-  }
-}
+class YapealApiErrorException extends YapealApiException {}
 ?>

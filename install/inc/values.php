@@ -82,9 +82,9 @@ $corpAPIs = array('corpAccountBalance'     => GET_corpAccountBalance_DES,
                   'corpWalletJournal'      => GET_corpWalletJournal_DES,
                   'corpWalletTransactions' => GET_corpWalletTransactions_DES);
 /*
- * Require common_paths.inc to define the path in yapeal
+ * Require common_paths.php to define the path in yapeal
  */
-require_once('..' . $ds . 'inc' . $ds . 'common_paths.inc');
+require_once('..' . $ds . 'inc' . $ds . 'common_paths.php');
 /*
  * Require adodb.inc.php to be able to create connection to db
  */

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE schema PUBLIC "-//ADOdb//DTD schema 0.3 //EN"
+  "http://www.mgcummings.com/xsd/yapeal/xmlschema03.dtd">
 <schema version="0.3" xmlns="http://www.mgcummings.com/xsd/yapeal/xmlschema03">
 <!--
 /**

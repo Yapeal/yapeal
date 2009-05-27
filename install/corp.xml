@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<schema version="0.3" xmlns="http://www.mgcummings.com/xsd/yapeal/xmlschema03">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE schema SYSTEM "../ADOdb/xmlschema03.dtd">
+<schema version="0.3" xmlns="http://yapeal.googlecode.com/files/xmlschema03">
 <!--
 /**
  * XML from Yapeal.
@@ -31,6 +32,7 @@
 -->
   <!-- Corporation Section -->
   <table name="corpAccountBalance">
+    <descr>Test text</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -135,6 +137,37 @@
       <UNSIGNED/>
     </field>
     <field name="`weaponTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpCombatSettings">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`posID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onAggressionEnabled`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onCorporationWarEnabled`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onStandingDropStanding`" type="N" size="5.2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onStatusDropEnabled`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onStatusDropStanding`" type="N" size="5.2">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -256,6 +289,54 @@
       <UNSIGNED/>
     </field>
     <field name="`description`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpFuel">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`posID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`typeID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`quantity`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpGeneralSettings">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`posID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allowAllianceMembers`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`allowCorporationMembers`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`claimSovereignty`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`deployFlags`" type="I1" size="2">
+      <NOTNULL/>
+    </field>
+    <field name="`usageFlags`" type="I1" size="2">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
@@ -691,6 +772,27 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="corpStarbaseDetail">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`posID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`onlineTimestamp`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`state`" type="I1" size="2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stateTimestamp`" type="T">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="corpStarbaseList">
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
@@ -874,6 +976,24 @@
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpAttackers` MODIFY `finalBlow` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpCombatSettings` MODIFY `onAggressionEnabled` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpCombatSettings` MODIFY `onCorporationWarEnabled` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpCombatSettings` MODIFY `onStatusDropEnabled` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpGeneralSettings` MODIFY `allowAllianceMembers` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpGeneralSettings` MODIFY `allowCorporationMembers` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcorpGeneralSettings` MODIFY `claimSovereignty` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>

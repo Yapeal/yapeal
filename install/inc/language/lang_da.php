@@ -111,6 +111,7 @@ $langStrings = array(
   'GET_corpMarketOrders_DES' => 'Hent Market Ordere fra corporation',
   'GET_corpMemberTracking_DES' => 'Hent Medlem Liste fra corporation',
   'GET_corpStandings_DES' => 'Hent Standings fra corporation',
+  'GET_corpStarbaseDetail_DES' => 'Hent Starbase Details fra corporation',
   'GET_corpStarbaseList_DES' => 'Hent Starbase Liste fra corporation',
   'GET_corpWalletJournal_DES' => 'Hent Konto Journal fra corporation',
   'GET_corpWalletTransactions_DES' => 'Hent Konto Transaktioner fra corporation',

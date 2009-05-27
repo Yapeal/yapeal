@@ -49,6 +49,9 @@ class corpStarbaseList extends ACorporation {
       'onlineTimestamp' => 'T', 'ownerID' => 'I', 'state' => 'I',
       'stateTimestamp' => 'T', 'typeID' => 'I'
   );
+  /**
+   * @var string Xpath used to select data from XML.
+   */
   private $xpath = '//row';
   /**
    * Used to store XML to StarbaseList table.

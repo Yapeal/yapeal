@@ -36,7 +36,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 747;
+$setupversion = 786;
 /*
  * config tables used to test if this is an older version
  */
@@ -78,6 +78,7 @@ $corpAPIs = array('corpAccountBalance'     => GET_corpAccountBalance_DES,
                   'corpMarketOrders'       => GET_corpMarketOrders_DES,
                   'corpMemberTracking'     => GET_corpMemberTracking_DES,
                   'corpStandings'          => GET_corpStandings_DES,
+                  'corpStarbaseDetail'     => GET_corpStarbaseDetail_DES,
                   'corpStarbaseList'       => GET_corpStarbaseList_DES,
                   'corpWalletJournal'      => GET_corpWalletJournal_DES,
                   'corpWalletTransactions' => GET_corpWalletTransactions_DES);

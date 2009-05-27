@@ -336,10 +336,10 @@ class charKillLog extends ACharacter {
     if (!empty($data)) {
       foreach ($data as $row) {
         $row->addAttribute('killID', $killID);
-        $this->attackersList[] = $row;
+        $this->attackersList[] = simplexml_load_string($row->asXML());
       };
     };
-  }
+  }//function attackers
   /**
    * Used to store XML to KillLog table.
    *
@@ -356,7 +356,7 @@ class charKillLog extends ACharacter {
       unset($datum->victim[0], $datum->rowset[1], $datum->rowset[0]);
       $this->killList[] = simplexml_load_string($datum->asXML());
     };
-  }
+  }// function killLog
   /**
    * Handles the items rowsets.
    *
@@ -375,7 +375,7 @@ class charKillLog extends ACharacter {
     $data .= $rgt . '" qtyDestroyed="1" qtyDropped="0" typeID="' . $typeID . '"/>';
     $root = new SimpleXMLElement($data);
     array_unshift($this->itemsList, $root);
-  }
+  }// function items
   /**
    * Handles the victim element.
    *
@@ -393,7 +393,7 @@ class charKillLog extends ACharacter {
       $data->addAttribute('killID', $killID);
       $this->victimList[] = simplexml_load_string($data->asXML());
     };
-  }
+  }// function victim
   /**
    * Navigates XML and adds lft and rgt attributes.
    *

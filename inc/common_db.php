@@ -102,8 +102,8 @@ function dontWait($api, $owner = 0, $randomize = TRUE) {
     // Get to wait a while longer
     if ($rand == $mod) {
       return FALSE;
-    }; // if $rand==$mod ...
-  }; // if $randomize ...
+    };// if $rand==$mod ...
+  };// if $randomize ...
     $mess .= 'Get ' . $api . ' for ' . $owner;
     trigger_error($mess, E_USER_NOTICE);
   return TRUE;
@@ -222,10 +222,10 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
   $pkeys = array_keys($params);
   $dkeys = array_keys($data[0]);
   // Check for missing fields
-  $missing = array_diff($pkeys,$dkeys);
+  $missing = array_diff($pkeys, $dkeys);
   if (count($missing)) {
     $mess = 'Missing required fields (' . implode(', ', $missing);
-    $mess .= ') found while making upsert for ' .$table;
+    $mess .= ') found while making upsert for ' . $table;
     throw new UnexpectedValueException($mess,1);
   };
   // Check for extra unknown fields
@@ -254,7 +254,7 @@ function makeMultiUpsert(array $data, array $params, $table, $dsn) {
       };// else in_array $params...
     };// foreach $fields ...
     $sets[] = '(' . implode(',', $set) . ')';
-  };
+  };// foreach $data ...
   $values .= ' ' . implode(',', $sets);
   $dupup = ' on duplicate key update ';
   // Loop thru and build update section.
@@ -333,7 +333,7 @@ function multipleUpsert(array $data, array $types, $table, $dsn) {
       // the caller to catch.
       $con->RollbackTrans();
     }
-  }; // if count $data > 10&&...
+  };// if count $data > 10&&...
   $mess = 'Before non-transaction Execute for ' . $table . ' in ' . basename(__FILE__);
   $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
   $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
@@ -367,12 +367,12 @@ function multipleUpsertAttributes($datum, array $types, $table, $dsn,
         $row[$k] = (string)$v;
       };
       $data[] = $row;
-    }; // foreach $datum
+    };// foreach $datum
     $mess = 'Before multipleUpsert for ' . $table . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     multipleUpsert($data, $types, $table, $dsn);
-  }; // if $datum>0
+  };// if $datum>0
 }// function multipleUpsertAttributes
 /**
  * Function to build, prepare, execute an insert ... on duplicate key update

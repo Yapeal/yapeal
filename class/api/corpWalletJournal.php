@@ -66,11 +66,10 @@ class corpWalletJournal extends ACorporation {
   public function apiFetch() {
     global $tracing;
     global $cachetypes;
-    $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
-    foreach ($accounts as $account) {
+    foreach (range(1000, 1006) as $account) {
       $beforeID = 0;
       do {
         $cnt = 0;
@@ -157,11 +156,11 @@ class corpWalletJournal extends ACorporation {
             case 211: // Login denied by account status.
               // The corporation's account isn't active no use trying any of the
               // other APIs.
-              break 4;// switch, while, foreach $accounts, foreach $apis
+              break 3;// switch, while, foreach range
             default:
               // Do nothing but logging by default
           };// switch $e->getCode()
-          continue 2;// while, foreach $accounts
+          continue 2;// while, foreach range
         }
         catch (YapealApiException $e) {
           continue 2;
@@ -171,7 +170,7 @@ class corpWalletJournal extends ACorporation {
         }
       } while ($cnt == 1000);
       ++$ret;
-    };// foreach $accounts ...
+    };// foreach range(1000, 1006) ...
     if ($ret == 7) {
       return TRUE;
     };
@@ -185,7 +184,6 @@ class corpWalletJournal extends ACorporation {
   public function apiStore() {
     global $tracing;
     global $cachetypes;
-    $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
     $tableName = $this->tablePrefix . $this->api;
@@ -195,7 +193,7 @@ class corpWalletJournal extends ACorporation {
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };// if empty $this->xml ...
-    foreach ($accounts as $account) {
+    foreach (range(1000, 1006) as $account) {
       if (empty($this->xml[$account])) {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
         $mess .= ' in ' . __FILE__;
@@ -236,7 +234,7 @@ class corpWalletJournal extends ACorporation {
         };// else count $datum ...
       };// foreach $this->xml[$account] ...
       ++$ret;
-    };// foreach $accounts ...
+    };// foreach range...
     try {
       // Update CachedUntil time since we updated records and have new one.
       // API returning wrong cache until time need to set cachedUntil to

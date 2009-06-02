@@ -333,11 +333,13 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`deployFlags`" type="I1" size="2">
+    <field name="`deployFlags`" type="I2" size="3">
       <NOTNULL/>
+      <UNSIGNED/>
     </field>
-    <field name="`usageFlags`" type="I1" size="2">
+    <field name="`usageFlags`" type="I2" size="3">
       <NOTNULL/>
+      <UNSIGNED/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>

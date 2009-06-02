@@ -36,7 +36,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 786;
+$setupversion = 789;
 /*
  * config tables used to test if this is an older version
  */

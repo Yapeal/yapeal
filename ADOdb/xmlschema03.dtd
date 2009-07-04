@@ -2,7 +2,7 @@
 <!ATTLIST schema
   version CDATA #REQUIRED
   xmlns CDATA #IMPLIED>
-<!ELEMENT table (descr?, (DROP|field*), constraint*, opt*, index*, data*)>
+<!ELEMENT table (descr?, (DROP|field+), constraint*, opt*, index*, data*)>
 <!ATTLIST table
   name CDATA #REQUIRED
   platform CDATA #IMPLIED

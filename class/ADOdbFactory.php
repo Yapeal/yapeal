@@ -85,16 +85,20 @@ class ADOdbFactory {
    *
    * @return object Returns an ADOdb connection.
    *
-   * @throws InvalidArgumentException for bad missing or if $dsn isn't a string.
+   * @throws InvalidArgumentException if $dsn is empty or if $dsn isn't a string.
+   * @throws InvalidArgumentException if $section isn't a string.
    * @throws ADODB_Exception Passes through any problem with actual connection.
    */
   public function factory($dsn, $section='') {
     global $tracing;
-    if (empty($dsn) || !is_string($dsn) || !is_string($section)) {
+    if (empty($dsn) || !is_string($dsn)) {
       throw new InvalidArgumentException('Bad value passed for $dsn');
     };
+    if (!is_string($section)) {
+      throw new InvalidArgumentException('Bad value passed for $section');
+    };
     $hash = sha1($dsn . $section);
-    if (!array_key_exists($hash,$this->connections)) {
+    if (!array_key_exists($hash, $this->connections)) {
       require_once YAPEAL_CLASS . 'ADODB_Exception.php';
       require_once YAPEAL_ADODB . 'adodb.inc.php';
       $mess = 'Before NewADOConnection in ' . basename(__FILE__);

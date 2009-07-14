@@ -28,8 +28,7 @@
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-$sectionFile = basename(__FILE__);
-if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
@@ -60,12 +59,7 @@ class YapealTracing {
    * destructor outputs the trace to log file.
    */
   public function __destruct() {
-    if (!empty($this->fileTrace)) {
-      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
-    };
-    if (!empty($this->dbTrace)) {
-      // This is where the code to store trace into database will go.
-    };
+    $this->flushTrace();
   }
   /**
    * Function used to check for tracing and output a message if enabled.

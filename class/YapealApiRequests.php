@@ -58,13 +58,18 @@ class YapealApiRequests {
    * @param integer $postType See class constants for allowed values.
    * @param array $postData Is an array of data ready to be used in
    * http_build_query.
+   * @param string $urlBase Allows overriding API server for example to use a
+   * different proxy on a per char/corp basis.
+   * @param string $fileSuffix File suffix that will be added to $api to make
+   * complete file name.
    *
    * @return mixed Returns SimpleXML object or FALSE
    *
    * @throws YapealApiFileException for API file errors
    * @throws YapealApiErrorException for API errors
    */
-  static function getAPIinfo($api, $postType, $postData = array()) {
+  static function getAPIinfo($api, $postType, $postData = array(),
+    $urlBase = YAPEAL_URL_BASE, $fileSuffix = YAPEAL_FILE_SUFFIX) {
     global $tracing;
     require_once YAPEAL_CLASS . 'CurlRequest.php';
     if (!array_key_exists($postType, self::$apiSections)) {
@@ -76,7 +81,7 @@ class YapealApiRequests {
     $xml = NULL;
     // Build http parameter.
     $http = array('timeout' => 60,
-      'url' => YAPEAL_URL_BASE . self::$apiSections[$postType] . $api . YAPEAL_FILE_SUFFIX
+      'url' => $urlBase . self::$apiSections[$postType] . $api . $fileSuffix
     );
     if ($postType == YAPEAL_API_EVE || $postType == YAPEAL_API_MAP ||
       $postType == YAPEAL_API_SERVER) {
@@ -86,7 +91,7 @@ class YapealApiRequests {
       // Setup for POST query.
       $http['method'] = 'POST';
       $http['content'] = http_build_query($postData, NULL, '&');
-    }; // if $postType=YAPEAL_API_EVE||...
+    };// if $postType=YAPEAL_API_EVE||...
     $mess = 'Setup cURL connection in ' . __FILE__;
     $tracing->activeTrace(YAPEAL_TRACE_CURL, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CURL, $mess);
@@ -213,7 +218,7 @@ class YapealApiRequests {
           return $xml;
         };// if $ctime ...
       };// if file_exists $cacheFile ...
-    };
+    };// if YAPEAL_CACHE_XML ...
     return FALSE;
   }// function getCachedXml
   /**

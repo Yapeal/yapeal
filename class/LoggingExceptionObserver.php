@@ -45,7 +45,7 @@ class LoggingExceptionObserver implements YapealObserver {
   /**
    * @var string Holds the name of the log file to use.
    */
-  private $file = YAPEAL_ERROR_LOG;
+  private $file;
   /**
    * Constructor
    *

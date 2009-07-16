@@ -38,7 +38,6 @@ if ($sectionFile == basename($_SERVER['PHP_SELF'])) {
 $apis = array('serverServerStatus');
 $serverName = 'Tranquility';
 foreach ($apis as $api) {
-  require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
   $tableName = YAPEAL_TABLE_PREFIX . $api;
   $mess = 'dontWait for ' . $tableName . ' in ' . $sectionFile;
   $tracing->activeTrace(YAPEAL_TRACE_SERVER, 2) &&

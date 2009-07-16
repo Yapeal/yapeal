@@ -31,7 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'YapealApiException.php';
 /**
  * Use when can't get file from API mostly but can be used for related IO type
  * problems other places too.

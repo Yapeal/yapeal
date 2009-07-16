@@ -36,21 +36,21 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 789;
+$setupversion = 800;
 /*
  * config tables used to test if this is an older version
  */
 $cfgtables = array('utilconfig', 'utilConfig');
 /*
- * This is schema xml files to use in AXMLS + it curently version
+ * This is schema xml files to use in AXMLS + it's current version
  */
-$schemas = array('util'=>747, 'account'=>747, 'char'=>747, 'corp'=>747,
-  'eve'=>747, 'map'=>747, 'server'=>747);
+$schemas = array('util'=>753, 'account'=>753, 'char'=>786, 'corp'=>800,
+  'eve'=>753, 'map'=>753, 'server'=>753);
 /*****************************************************************
  * Define what APIs the Character can pull with a description
  * To use:
  * If you have added a new char API pull, add it down here.
- * array('The name of the API' => the description on that it is.);
+ * array('The name of the API' => the description on what it is.);
  * The description should be defined in the language files!
  *****************************************************************/
 $charAPIs = array('charAccountBalance'     => GET_charAccountBalance_DES,
@@ -67,7 +67,7 @@ $charAPIs = array('charAccountBalance'     => GET_charAccountBalance_DES,
  * Define what APIs the Corporation can pull with a description
  * To use:
  * If you have added a new corp API pull, add it down here.
- * array('The name of the API' => the description on that it is.);
+ * array('The name of the API' => the description on what it is.);
  * The description should be defined in the language files!
  *****************************************************************/
 $corpAPIs = array('corpAccountBalance'     => GET_corpAccountBalance_DES,

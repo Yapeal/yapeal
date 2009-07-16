@@ -96,7 +96,6 @@ require_once realpath($path);
 * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
 * **************************************************************************/
 require_once YAPEAL_INC . 'common_db.php';
-require_once YAPEAL_CLASS . 'YapealApiRequests.php';
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';

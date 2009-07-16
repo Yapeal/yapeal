@@ -31,7 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'IYapealObserver.php';
 require_once YAPEAL_INC . 'elog.php';
 /**
  * Logs any exceptions its observing to a log file.

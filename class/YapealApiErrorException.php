@@ -31,7 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'YapealApiException.php';
 /**
  * Thrown when API return a error code as response to our request.
  *

@@ -31,8 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'IFetchApiTable.php';
-require_once YAPEAL_CLASS . 'IStoreApiTable.php';
 /**
  * Abstract class for Character APIs.
  *

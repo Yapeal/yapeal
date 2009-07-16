@@ -87,17 +87,19 @@ if (DBHandler('CON',$host)) {
     $schema->ContinueOnError(FALSE);
     $schema->SetUpgradeMethod('ALTER');
     $schema->SetPrefix($prefix, FALSE);
-    $xml = _file_get_contents($schemaFile . '.xml');
+    $xml = file_get_contents($schemaFile . '.xml');
     $sql = $schema->ParseSchemaString($xml);
+    $schema->SaveSQL(YAPEAL_CACHE . $schemaFile . '.sql');
     $result = $schema->ExecuteSchema($sql);
     if ($result == 2) {
       $output .= '    <td class="good">'.DONE.'</td>' . PHP_EOL;
     } elseif ($result == 1) {
       $output .= '    <td class="warning">'.ERROR.'<br />'.$schemaFile.CREATED_SQL_ON_MISSED_STUFF.'</td>' . PHP_EOL;
- 		$schema->SaveSQL($schemaFile . '_missed_tables.sql');
+ 		$schema->SaveSQL(YAPEAL_CACHE . $schemaFile . '_missed_tables.sql');
       $stop += 1;
     } else {
       $output .= '    <td class="warning">'.FAILED.'<br />'.$schemaFile.XML_NOT_FOUND_OR_BAD.'</td>' . PHP_EOL;
+ 		$schema->SaveSQL(YAPEAL_CACHE . $schemaFile . '_failed_tables.sql');
       $stop += 1;
     }; // if $result
     $schema = NULL;

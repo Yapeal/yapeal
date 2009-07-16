@@ -670,6 +670,10 @@
       <NOTNULL/>
     </field>
     <field name="`title`" type="X"/>
+    <index name="`corpMemberTrackingindex1`">
+      <col>`ownerID`</col>
+      <UNIQUE/>
+    </index>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsFromAgents">
@@ -1003,9 +1007,6 @@
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP</query>
-  </sql>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PcorpMemberTracking` ADD INDEX `corpMemberTrackingindex1` (`ownerID`)</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('corpVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>

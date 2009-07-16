@@ -71,7 +71,6 @@ class YapealApiRequests {
   static function getAPIinfo($api, $postType, $postData = array(),
     $urlBase = YAPEAL_URL_BASE, $fileSuffix = YAPEAL_FILE_SUFFIX) {
     global $tracing;
-    require_once YAPEAL_CLASS . 'CurlRequest.php';
     if (!array_key_exists($postType, self::$apiSections)) {
       $mess = '$postType param was not equal to one of the allowed values';
       $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
@@ -111,7 +110,6 @@ class YapealApiRequests {
       $mess .= 'Error code: ' . $result['curl_errno'];
       $mess .= 'Error message: ' . $result['curl_error'];
       // Throw exception
-      require_once YAPEAL_CLASS . 'YapealApiFileException.php';
       throw new YapealApiFileException($mess, 1);
     };
     if (200 != $result['http_code']) {
@@ -121,7 +119,6 @@ class YapealApiRequests {
       };
       $mess .= 'Error code: ' . $result['http_code'] . PHP_EOL;
       // Throw exception
-      require_once YAPEAL_CLASS . 'YapealApiFileException.php';
       throw new YapealApiFileException($mess, 2);
     };
     if (!$result['body']) {
@@ -130,7 +127,6 @@ class YapealApiRequests {
         $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
       };
       // Throw exception
-      require_once YAPEAL_CLASS . 'YapealApiFileException.php';
       throw new YapealApiFileException($mess, 3);
     };
     if (!strpos($result['body'], '<eveapi version="')) {
@@ -140,7 +136,6 @@ class YapealApiRequests {
       };
       $mess .= 'No XML returned' . PHP_EOL;
       // Throw exception
-      require_once YAPEAL_CLASS . 'YapealApiFileException.php';
       throw new YapealApiFileException($mess, 4);
     };
     $mess = 'Before simplexml_load_string';
@@ -166,7 +161,6 @@ class YapealApiRequests {
         self::cacheXml($result['body'], $cacheName, $postType);
       };// if YAPEAL_CACHE_XML
       // Throw exception
-      require_once YAPEAL_CLASS . 'YapealApiErrorException.php';
       // Have to use API error code for special API error handling to work.
       throw new YapealApiErrorException($mess, (int)$xml->error[0]['code']);
     };

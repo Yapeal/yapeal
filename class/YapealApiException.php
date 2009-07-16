@@ -31,7 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_CLASS . 'IYapealSubject.php';
 /**
  * Base class used for all API type exception.
  *

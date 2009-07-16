@@ -31,8 +31,6 @@
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-// Assumes this file is in same directory as common_backend.php
-require_once YAPEAL_CLASS . 'ADOdbFactory.php';
 /**
  * Function used to connect to a DB.
  * @param string $dsn An ADOdb compatible connection string.

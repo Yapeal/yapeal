@@ -41,6 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Require Exception files
  */
 require_once('..' . $ds . 'inc' . $ds . 'common_paths.php');
+require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 require_once YAPEAL_CLASS . 'ADODB_Exception.php';
 require_once YAPEAL_CLASS . 'LoggingExceptionObserver.php';
 require_once YAPEAL_CLASS . 'PrintingExceptionObserver.php';
@@ -172,7 +173,7 @@ if (file_exists(YAPEAL_CONFIG . 'yapeal.ini')) {
     $con->Close();
   }; // if $configTable
 };
-  
+
 /*
  * Connect to database if yapeal.ini is false and we are on a progress page
  */
@@ -181,7 +182,7 @@ if (isset($_GET['funk']) && ($_GET['funk'] == 'dodb' || $_GET['funk'] == 'doini'
   try {
     $config = $_POST['config'];
     $dsn = 'mysql://' . $config['DB_Username'] . ':' . $config['DB_Password'];
-    $dsn .= '@' . $config['DB_Host'] . '/' . $config['DB_Database']; 
+    $dsn .= '@' . $config['DB_Host'] . '/' . $config['DB_Database'];
     $con = ADONewConnection($dsn);  # no need for Connect()
   } catch (ADODB_Exception $e) {
     trigger_error($e->getMessage(),E_USER_NOTICE);

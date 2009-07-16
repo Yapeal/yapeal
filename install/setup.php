@@ -41,6 +41,7 @@ chdir($dir);
  * make a short value for Directory Separators
  */
 $ds = DIRECTORY_SEPARATOR;
+try {
 /*
  * Require the function file
  */
@@ -60,7 +61,7 @@ if (isset($_POST['lang'])) {
 };
 /*
  * Require the value file
- * 
+ *
  * VALUES IN THE FILE:
  * 1. Version of the database that we are using.
  * 2. PerAPI for the Character
@@ -90,5 +91,20 @@ if (checkIGB()) {
 };
 if (isset($con) && $con->IsConnected()) {
   $con->Close();
+}
+}
+catch (Exception $e) {
+  elog('Uncaught exception in ' . basename(__FILE__), YAPEAL_ERROR_LOG);
+  $message = <<<MESS
+EXCEPTION:
+     Code: {$e->getCode() }
+  Message: {$e->getMessage() }
+     File: {$e->getFile() }
+     Line: {$e->getLine() }
+Backtrace:
+{$e->getTraceAsString() }
+\t--- END TRACE ---
+MESS;
+  elog($message, YAPEAL_ERROR_LOG);
 }
 ?>

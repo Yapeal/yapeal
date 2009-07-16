@@ -40,7 +40,6 @@ $apis = array('eveAllianceList', 'eveConquerableStationList', 'eveErrorList',
 );
 $serverName = 'Tranquility';
 foreach ($apis as $api) {
-  require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
   $tableName = YAPEAL_TABLE_PREFIX . $api;
   $mess = 'Before dontWait for ' . $tableName . ' in ' . $sectionFile;
   $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&

@@ -48,7 +48,6 @@ if (count($apis) == 0) {
   continue;
 };
 $serverName = 'Tranquility';
-require_once YAPEAL_CLASS . 'api' . $ds . 'ACharacter.php';
 foreach ($apis as $api) {
   $api = trim($api);
   if (!in_array($api, $availableApis)) {
@@ -57,7 +56,6 @@ foreach ($apis as $api) {
     trigger_error($mess, E_USER_WARNING);
     continue;
   };
-  require_once YAPEAL_CLASS . 'api' . $ds . $api . '.php';
   $tableName = YAPEAL_TABLE_PREFIX . $api;
   $mess = 'Before dontWait for ' . $tableName . $charID;
   $mess .= ' in ' . $sectionFile;

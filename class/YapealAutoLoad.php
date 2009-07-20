@@ -87,8 +87,8 @@ class YapealAutoLoad {
     foreach (self::$dirList as $dir) {
       $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
       foreach ($files as $name => $object) {
+        $bn = basename($name);
         foreach (self::$suffixList as $suffix) {
-          $bn = basename($name);
           if ($bn == $className . $suffix ||
             $bn == strtolower($className) . $suffix ||
             $bn == 'I' . $className . $suffix ||

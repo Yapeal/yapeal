@@ -26,6 +26,13 @@
  * @package Yapeal
  */
 /**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
+/**
  * @internal Only let this code be included or required not ran directly.
  */
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
@@ -143,7 +150,7 @@ class corpAssetList extends ACorporation {
    * @param integer $level Level of nesting.
    *
    * @return integer Current index for lft/rgt counting.
-   * 
+   *
    * @todo Look at pre-sort the <row>s by flag so items in the same hanger etc
    * are grouped together for lft/rgt.
    */

@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal installer php functions.
- *
  *
  * PHP version 5
  *
@@ -28,20 +26,23 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-
 $ds = DIRECTORY_SEPARATOR;
-
 //////////////////////////////////
 // Functions
 //////////////////////////////////
-
 // Get language
 function GetLang($lang){
   global $dir, $ds;
@@ -70,7 +71,7 @@ function GetBrowserLang() {
       foreach ($langs as $lang => $val) {
         if ($val === '') $langs[$lang] = 1;
       }
-      // sort list based on value	
+      // sort list based on value
       arsort($langs, SORT_NUMERIC);
     }; // if count $lang_parse[1]
   }; // if isset $_SERVER['HTTP_ACCEPT_LANGUAGE']
@@ -79,7 +80,7 @@ function GetBrowserLang() {
   		if (strpos($lang, $Kval) === 0) {
         // show Danish site
         return $Kval;
-      }; 
+      };
     };
   };
   return "en";
@@ -315,7 +316,7 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
       } else {
         $select = false;
       };
-      if ($select) { 
+      if ($select) {
         try {
           $con->Execute("SET NAMES utf8");
         } catch (ADODB_Exception $e) {
@@ -336,7 +337,7 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
       } else {
         $select = false;
       };
-      if ($select) { 
+      if ($select) {
         try {
           $con->Execute($select);
         } catch (ADODB_Exception $e) {

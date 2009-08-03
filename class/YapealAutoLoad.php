@@ -28,6 +28,13 @@
  * @package Yapeal
  */
 /**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
+/**
  * @internal Only let this code be included or required not ran directly.
  */
 if (basename(__FILE__) == basename($_SERVER['SCRIPT_NAME'])) {

@@ -2,7 +2,6 @@
 /**
  * Yapeal Setup - Values
  *
- *
  * PHP version 5
  *
  * LICENSE: This file is part of Yet Another Php Eve Api library also know as Yapeal.
@@ -26,7 +25,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */

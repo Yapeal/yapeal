@@ -24,6 +24,13 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
 /** Any errors that are trigger in this file are reported to the system default
  * logging location until we're done setting up some of the required vars and
  * we can start our own logging.

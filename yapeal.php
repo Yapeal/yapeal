@@ -31,6 +31,13 @@
  * @since revision 561
  */
 /**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if ($_REQUEST['viewSource']) {
+  highlight_file(__FILE__);
+  exit();
+};
+/**
  * Track stability of script.
  */
 define('YAPEAL_STABILITY', 'beta');

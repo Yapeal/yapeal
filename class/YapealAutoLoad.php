@@ -30,7 +30,7 @@
 /**
  * @internal Allow viewing of the source code in web browser.
  */
-if ($_REQUEST['viewSource']) {
+if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };

@@ -547,6 +547,39 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="charSkillInTraining">
+    <field name="`currentTQTime`" type="T"/>
+    <field name="`offset`" type="I1" size="2">
+      <NOTNULL/>
+    </field>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`skillInTraining`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`trainingDestinationSP`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`trainingEndTime`" type="T"/>
+    <field name="`trainingStartSP`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`trainingStartTime`" type="T"/>
+    <field name="`trainingToLevel`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`trainingTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="charSkillQueue">
     <field name="`endSP`" type="I8" size="20">
       <NOTNULL/>

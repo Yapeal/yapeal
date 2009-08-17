@@ -40,6 +40,8 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['SCRIPT_NAME'])) {
   exit();
 };
+// Need to require one last class before autoloader can take over.
+require_once YAPEAL_CLASS . 'FilterFileFinder.php';
 /**
  * Class used to manage auto loading of other classes/interfaces.
  *
@@ -63,7 +65,7 @@ class YapealAutoLoad {
    * Only way to make instance is through {@link getInstance() getInstance()}.
    */
   private function __construct() {
-    self::$dirList = array(YAPEAL_CLASS, YAPEAL_ADODB);
+    self::$dirList = array(YAPEAL_CLASS, YAPEAL_EXT);
     self::$suffixList = array('.php', '.class.php', '.inc.php', '.class', '.inc');
   }
   /**
@@ -92,7 +94,7 @@ class YapealAutoLoad {
   public static function autoLoad($className) {
     self::getInstance();
     foreach (self::$dirList as $dir) {
-      $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+      $files = new FilterFileFinder($dir, $className, FilterFileFinder::CONTAINS);
       foreach ($files as $name => $object) {
         $bn = basename($name);
         foreach (self::$suffixList as $suffix) {
@@ -101,10 +103,10 @@ class YapealAutoLoad {
             $bn == 'I' . $className . $suffix ||
             $bn == 'I' . strtolower($className) . $suffix) {
             include_once($name);
-            // does the class/interface requested actually exist now?
+            // Does the class/interface requested actually exist now?
             if (class_exists($className, FALSE) ||
               interface_exists($className, FALSE)) {
-              // yes, we're done
+              // Yes, we're done.
               return TRUE;
             };// if class_exists...
           };// if basename...
@@ -144,11 +146,15 @@ class YapealAutoLoad {
     return TRUE;
   }
 }
-// Now activate the EMPAAutoLoad autoloader.
+// Now activate the YapealAutoLoad autoloader.
 if (FALSE == spl_autoload_functions()) {
   spl_autoload_register(array('YapealAutoLoad', 'autoLoad'));
   if (function_exists('__autoload')) {
     spl_autoload_register('__autoload', FALSE);
   };
-}
+  spl_autoload_register(NULL, TRUE);
+} else {
+  // Prepend if other autoloaders already exist.
+  spl_autoload_register(array('YapealAutoLoad', 'autoLoad'), FALSE, TRUE);
+};// else FALSE == spl_autoload_functions() ...
 ?>

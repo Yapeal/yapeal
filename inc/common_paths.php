@@ -40,26 +40,43 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 };
 // Used to over come path issues caused by how script is ran on server.
 $incDir = realpath(dirname(__FILE__));
-$ds = DIRECTORY_SEPARATOR;
+// Define shortened name for DIRECTORY_SEPARATOR
+if (!defined('DS')) {
+  define('DS', DIRECTORY_SEPARATOR);
+};
 /**
  * Since this file has to be in the 'inc' directory we can set that path now and
  * all the other paths are relative to it.
  *
  */
-define('YAPEAL_INC', $incDir . $ds);
+define('YAPEAL_INC', $incDir . DS);
 /* **************************************************************************
- * Paths
- * **************************************************************************/
-$settings = array('ADODB' => '../ADOdb/', 'BASE' => '../',
-  'CACHE' => '../cache/', 'CLASS' => '../class/', 'CONFIG' => '../config/');
+* Paths
+* **************************************************************************/
+$settings = array(
+  'BASE' => '..' . DS,
+  'CACHE' => '..' . DS . 'cache' . DS,
+  'CLASS' => '..' . DS . 'class' . DS,
+  'CONFIG' => '..' . DS . 'config' . DS,
+  'EXT' => '..' . DS . 'ext' . DS,
+  'INSTALL' => '..' . DS . 'install' . DS
+);
 foreach ($settings as $k => $v) {
-  $realpath = realpath($incDir . $ds . $v);
+  $realpath = realpath($incDir . DS . $v);
   if ($realpath && is_dir($realpath)) {
-    define('YAPEAL_' . $k, $realpath . $ds);
+    define('YAPEAL_' . $k, $realpath . DS);
   } else {
     $mess = 'Nonexistent directory defined for YAPEAL_' . $k . ' constant';
     trigger_error($mess, E_USER_ERROR);
   };
 };// foreach $settings ...
-
+/* **************************************************************************
+* Specific Extension Library Paths
+* **************************************************************************/
+$exts = new DirectoryIterator(YAPEAL_EXT);
+foreach ($exts as $ext) {
+  if ($ext->isDir()) {
+    define('YAPEAL_' . strtoupper($ext), $ext->getPath() . DS);
+  };
+};// foreach $exts ...
 ?>

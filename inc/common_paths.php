@@ -76,7 +76,7 @@ foreach ($settings as $k => $v) {
 $exts = new DirectoryIterator(YAPEAL_EXT);
 foreach ($exts as $ext) {
   if ($ext->isDir()) {
-    define('YAPEAL_' . strtoupper($ext), $ext->getPath() . DS);
+    define('YAPEAL_' . strtoupper($ext), $ext->getPathname() . DS);
   };
 };// foreach $exts ...
 ?>

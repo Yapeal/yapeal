@@ -152,7 +152,6 @@ if (FALSE == spl_autoload_functions()) {
   if (function_exists('__autoload')) {
     spl_autoload_register('__autoload', FALSE);
   };
-  spl_autoload_register(NULL, TRUE);
 } else {
   // Prepend if other autoloaders already exist.
   spl_autoload_register(array('YapealAutoLoad', 'autoLoad'), FALSE, TRUE);

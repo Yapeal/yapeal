@@ -212,6 +212,18 @@ class charCharacterSheet  extends ACharacter {
       'bonusName' => 'C', 'ownerID' => 'I'
     );
     $datum = $this->xml->xpath('//attributeEnhancers');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       $cnt = 0;
       foreach ($datum[0]->children() as $k) {
@@ -293,6 +305,18 @@ class charCharacterSheet  extends ACharacter {
     // Set the field types of query by name.
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRoles"]/row');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
@@ -327,6 +351,18 @@ class charCharacterSheet  extends ACharacter {
     // Set the field types of query by name.
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtBase"]/row');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
@@ -361,6 +397,18 @@ class charCharacterSheet  extends ACharacter {
     // Set the field types of query by name.
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtHQ"]/row');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
@@ -395,6 +443,18 @@ class charCharacterSheet  extends ACharacter {
     // Set the field types of query by name.
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtOther"]/row');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
@@ -429,6 +489,18 @@ class charCharacterSheet  extends ACharacter {
     // Set the field types of query by name.
     $types = array('ownerID' => 'I', 'titleID' => 'I', 'titleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationTitles"]/row');
+    try {
+      $con = connect(YAPEAL_DSN, $tableName);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->characterID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);

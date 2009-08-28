@@ -79,11 +79,11 @@ class corpCorporationSheet  extends ACorporation {
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-          YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $cachetypes,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         // Already logged nothing to do here.
@@ -111,13 +111,13 @@ class corpCorporationSheet  extends ACorporation {
     );
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
-    $mess = 'Clone for ' . $tableName . ' in ' . __FILE__;
+    $mess = 'Clone for ' . $tableName . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $datum = clone $this->xml->result[0]->children();
     // Get rid of child table stuff
     $mess = 'Delete children for ' . $tableName;
-    $mess .= ' in ' . __FILE__;
+    $mess .= ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     unset($datum->rowset[1], $datum->rowset[0], $datum->logo);
@@ -128,10 +128,10 @@ class corpCorporationSheet  extends ACorporation {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -139,7 +139,6 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -161,11 +160,11 @@ class corpCorporationSheet  extends ACorporation {
       try {
         $extras = array('ownerID' => $this->corporationID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -173,7 +172,6 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -199,10 +197,10 @@ class corpCorporationSheet  extends ACorporation {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -210,7 +208,6 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -232,11 +229,11 @@ class corpCorporationSheet  extends ACorporation {
       try {
         $extras = array('ownerID' => $this->corporationID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -244,7 +241,6 @@ class corpCorporationSheet  extends ACorporation {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...

@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal installer - Setup.
- *
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -45,10 +49,13 @@ if (isset($ini)) {
   $db_name =    $ini['Database']['database'];
   $db_prefix =  $ini['Database']['table_prefix'];
   $db_info =  '  <tr>' . PHP_EOL
-               .'    <td colspan="2" style="text-align: center;" class="warning">'.DB_WARNING_CHANGE_DB_NAME_PREFIX_DES.'</td>' . PHP_EOL
-               .'  </tr>' . PHP_EOL;
+    . '    <td colspan="2" style="text-align: center;" class="warning">WARNING:<br />' . PHP_EOL
+    . 'If you change the Host, Database or Prefix,' . PHP_EOL
+    . 'your old tables and data is still at your old location.<br />' . PHP_EOL
+    . 'You will need to move the data and drop the tables manual'.'</td>' . PHP_EOL
+    . '  </tr>' . PHP_EOL;
   $passnologin = '';
-  $passchange = ' '.ONLY_CHANGE_PASS_IF;
+  $passchange = ' Change only if you need a new one';
 } else {
   $db_host =    'localhost';
   $db_user =    'username';
@@ -56,50 +63,49 @@ if (isset($ini)) {
   $db_name =    'yapeal';
   $db_prefix =  '';
   $db_info =  '';
-  $passnologin = SETUP_PASS_DES_BLANK;
+  $passnologin = '<br />' . PHP_EOL . 'Leave blank to disable the login section.';
   $passchange = '';
 }; // if isset $ini
 /**
  * Create site
  */
-OpenSite(DB_SETTING);
+OpenSite('Database Settings');
 if (isset($ini)) {
   configMenu();
 }; // if isset $ini
 echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=dodb" method="post">' . PHP_EOL
     .'<!-- Database Setup -->' . PHP_EOL
-    .'<table>' . PHP_EOL
+    .'<table summary="">' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <th colspan="2">'.DB_SETTING.'</th>' . PHP_EOL
+    .'    <th colspan="2">Database Settings</th>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.HOST.':</td>' . PHP_EOL
+    .'    <td class="tableinfolbl">Host:</td>' . PHP_EOL
     .'    <td><input type="text" name="config[DB_Host]" value="'.$db_host.'" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.USERNAME.':</td>' . PHP_EOL
+    .'    <td class="tableinfolbl">Username:</td>' . PHP_EOL
     .'    <td><input type="text" name="config[DB_Username]" value="'.$db_user.'" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.PASSWORD.':</td>' . PHP_EOL
+    .'    <td class="tableinfolbl">Password:</td>' . PHP_EOL
     .'    <td><input type="password" name="config[DB_Password]" value="'.$db_pass.'" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.DATABASE.':</td>' . PHP_EOL
+    .'    <td class="tableinfolbl">Database:</td>' . PHP_EOL
     .'    <td><input type="text" name="config[DB_Database]" value="'.$db_name.'" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.PREFIX.':</td>' . PHP_EOL
+    .'    <td class="tableinfolbl">Prefix:</td>' . PHP_EOL
     .'    <td><input type="text" name="config[DB_Prefix]" value="'.$db_prefix.'" /></td>' . PHP_EOL
     .'  </tr>' . PHP_EOL
     .$db_info
     .'</table>' . PHP_EOL;
 if (isset($ini)) {
-  echo '<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'<input type="submit" value="'.UPDATE.'" />' . PHP_EOL;
+  echo '<input type="submit" value="Update" />' . PHP_EOL;
 } else {
   echo inputHiddenPost()
-      .'<input type="submit" value="'.NEXT.'" />' . PHP_EOL;
+      .'<input type="submit" value="Next" />' . PHP_EOL;
 }; // if isset $ini
 echo '</form>' . PHP_EOL;
 CloseSite();

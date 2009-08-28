@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents Custom Yapeal API exception class.
+ * Contains Custom Yapeal API exception class.
  *
  * The original code for this was lifted from the original adodb-exception.inc.php.
  * @version V5.07 18 Dec 2008   (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.
@@ -50,9 +50,9 @@ define('ADODB_ERROR_HANDLER', 'adodb_throw');
  *
  * @package Yapeal
  * @subpackage ADOdb
- * @uses YapealSubject
+ * @uses IYapealSubject
  */
-class ADODB_Exception extends Exception implements YapealSubject {
+class ADODB_Exception extends Exception implements IYapealSubject {
   /**
    * @var array Hold the references to our observers.
    */
@@ -124,18 +124,18 @@ class ADODB_Exception extends Exception implements YapealSubject {
   /**
    * Used by observers to register so they can be notified.
    *
-   * @param YapealObserver $observer The observer being added.
+   * @param IYapealObserver $observer The observer being added.
    */
-  public static function attach(YapealObserver $observer) {
+  public static function attach(IYapealObserver $observer) {
     $idx = spl_object_hash($observer);
     self::$observers[$idx] = $observer;
   }
   /**
    * Used by observers to unregister from being notified.
    *
-   * @param YapealObserver $observer The observer being removed.
+   * @param IYapealObserver $observer The observer being removed.
    */
-  public static function detach(YapealObserver $observer) {
+  public static function detach(IYapealObserver $observer) {
     $idx = spl_object_hash($observer);
     if (array_key_exists($idx, self::$observers)) {
       unset(self::$observers[$idx]);

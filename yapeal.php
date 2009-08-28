@@ -54,6 +54,8 @@ define('YAPEAL_DATE', trim(str_replace(
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
+// Define shortened name for DIRECTORY_SEPARATOR
+define('DS', DIRECTORY_SEPARATOR);
 // If being run from command-line look for options there if function available.
 if (PHP_SAPI == 'cli') {
   if (function_exists('getopt')) {
@@ -92,16 +94,15 @@ if (PHP_SAPI == 'cli') {
   notAWebPage();
 };// else PHP_SAPI == 'cli' ...
 /* **************************************************************************
-* THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
-* **************************************************************************/
+ * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
+ * **************************************************************************/
 // Move down to 'inc' directory to read common_backend.php
-$ds = DIRECTORY_SEPARATOR;
-$path = $dir . $ds . 'inc' . $ds . 'common_backend.php';
+$path = $dir . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
 /* **************************************************************************
-* NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
-* SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
-* **************************************************************************/
+ * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
+ * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
+ * **************************************************************************/
 require_once YAPEAL_INC . 'common_db.php';
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
@@ -112,7 +113,10 @@ try {
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (dontWait($api, 0, FALSE)) {
-    // Give ourself up to 5 minutes to finish.
+    /**
+     * Give ourself up to 5 minutes to finish.
+     */
+    define('YAPEAL_MAX_EXECUTE', strtotime('5 minutes'));
     /**
      * Used to have the same time on all script that error out and need to be
      * ran again.
@@ -123,141 +127,64 @@ try {
     $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-    upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-      YAPEAL_DSN);
+    YapealDBConnection::upsert($data, $cachetypes,
+      YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
   } else {
     // Someone else has set timer need to wait it out.
     exit;
   };// else dontwait $api ...
   /* ************************************************************************
-  * Generate user list
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_ACCOUNT_ACTIVE) {
-    $mess = 'Account section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
+   * Generate section list
+   * ************************************************************************/
+  $mess = 'Start section list in ' . basename(__FILE__);
+  $tracing->activeTrace(YAPEAL_TRACE_SECTION, 0) &&
+  $tracing->logTrace(YAPEAL_TRACE_SECTION, $mess);
+  // Build sql to get section list from DB.
+  $sql = 'select `activeAPI`,`proxy`,`sectionName`';
+  $sql .= ' from ';
+  $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+  $sql .= ' where isActive=1';
+  $sql .= ' order by sectionName asc';
+  try {
+    $con = YapealDBConnection::connect(YAPEAL_DSN);
+    $mess = 'Before GetAll sections in ' . basename(__FILE__);
+    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+    $sections = $con->GetAll($sql);
+  }
+  catch (ADODB_Exception $e) {
+    // Do nothing use observers to log info
+  }
+  $sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
+  // Now take list of sections and call each in turn
+  foreach ($sections as $section) {
+    extract($section);
+    // Skip if section file not found.
+    if (!in_array(ucfirst($sectionName), $sectionList)) {
+      $mess = 'Class file not found for section ' . $sectionName;
+      trigger_error($mess, E_USER_NOTICE);
+      continue;
+    };// if !in_array(ucfirst($sectionName),...
+    $class = 'Section' . ucfirst($sectionName);
+    $apis = explode(' ', $activeAPI);
+    // Skip if there's no active APIs for this section.
+    if (count($apis) == 0) {
+      $mess = 'No active APIs listed for section ' . $sectionName;
+      trigger_error($mess, E_USER_NOTICE);
+      continue;
+    };
     try {
-      $userList = getRegisteredUsers();
-      // Ok now that we have a list of users that need updated
-      // we can check API for updates to their infomation.
-      foreach ($userList as $user) {
-        extract($user);
-        /* **********************************************************************
-        * Per user API pulls
-        * **********************************************************************/
-        $mess = 'Before require pulls_account.php for user ' . $userID;
-        $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
-        require YAPEAL_INC . 'pulls_account.php';
-      }; // foreach $userList
+      $instance = new $class($proxy, $apis);
+      $instance->pullXML();
     }
     catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
     $tracing->flushTrace();
-  };// if YAPEAL_ACCOUNT_ACTIVE...
+  };// foreach $section ...
   /* ************************************************************************
-  * Generate character list
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_CHAR_ACTIVE) {
-    $mess = 'Character section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-    try {
-      $charList = getRegisteredCharacters();
-      // Ok now that we have a list of characters that need updated
-      // we can check API for updates to their infomation.
-      foreach ($charList as $char) {
-        extract($char);
-        /* **********************************************************************
-        * Per character API pulls
-        * **********************************************************************/
-        $mess = 'Before require pulls_char.php for character ' . $charID;
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        require YAPEAL_INC . 'pulls_char.php';
-      }; // foreach $charList
-    }
-    catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
-    }
-    $tracing->flushTrace();
-  };// if YAPEAL_CHAR_ACTIVE...
-  /* ************************************************************************
-  * Generate corp list
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_CORP_ACTIVE) {
-    $mess = 'Corporation section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-    try {
-      $corpList = getRegisteredCorporations();
-      // Ok now that we have a list of corporations that need updated
-      // we can check API for updates to their infomation.
-      foreach ($corpList as $corp) {
-        extract($corp);
-        /* ********************************************************************
-        * Per corp API pulls
-        * ********************************************************************/
-        $mess = 'Before require pulls_corp.php for corporation ' . $corpID;
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        require YAPEAL_INC . 'pulls_corp.php';
-      }; // foreach $corpList
-    }
-    catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
-    }
-    $tracing->flushTrace();
-  };// if YAPEAL_CORP_ACTIVE...
-  /* ************************************************************************
-  * /eve/ API pulls
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_EVE_ACTIVE) {
-    $mess = 'Eve section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    $mess = 'Before require pulls_eve.php';
-    $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-    require YAPEAL_INC . 'pulls_eve.php';
-    $tracing->flushTrace();
-  }; // if YAPEAL_EVE_ACTIVE...
-  /* ************************************************************************
-  * /map/ API pulls
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_MAP_ACTIVE) {
-    $mess = 'Eve section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_MAP, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-    $mess = 'Before require pulls_map.php';
-    $tracing->activeTrace(YAPEAL_TRACE_MAP, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-    require YAPEAL_INC . 'pulls_map.php';
-    $tracing->flushTrace();
-  };// if YAPEAL_EVE_ACTIVE...
-  /* ************************************************************************
-  * /server/ API pulls
-  * ************************************************************************/
-  // Only pull if activated.
-  if (YAPEAL_SERVER_ACTIVE) {
-    $mess = 'Server section active in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-    $mess = 'Before require pulls_server.php';
-    $tracing->activeTrace(YAPEAL_TRACE_SERVER, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-    require YAPEAL_INC . 'pulls_server.php';
-    $tracing->flushTrace();
-  };// if YAPEAL_EVE_ACTIVE...
-  /* ************************************************************************
-  * Final admin stuff
-  * ************************************************************************/
+   * Final admin stuff
+   * ************************************************************************/
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
   $ctime2 = getCachedUntil($api, 0);
@@ -265,8 +192,8 @@ try {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => $cuntil);
-    upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-      YAPEAL_DSN);
+    YapealDBConnection::upsert($data, $cachetypes,
+      YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
   } else {
     // Lost Mutex we should log that as warning.
     $mess = $api . ' ' . YAPEAL_START_TIME . ' ran long';

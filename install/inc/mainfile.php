@@ -44,7 +44,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  ***********************************************************
  * Require Exception files
  */
-require_once('..' . $ds . 'inc' . $ds . 'common_paths.php');
+require_once('..' . DS . 'inc' . DS . 'common_paths.php');
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 require_once YAPEAL_CLASS . 'ADODB_Exception.php';
 require_once YAPEAL_CLASS . 'LoggingExceptionObserver.php';
@@ -55,7 +55,7 @@ if ($realpath && is_dir($realpath)) {
   /**
    * @ignore
    */
-  define('YAPEAL_LOG', $realpath . $ds);
+  define('YAPEAL_LOG', $realpath . DS);
 } else {
   trigger_error('Nonexistent directory defined for log', E_USER_ERROR);
 };

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class contenting some static api functions.
+ * Contains YapealApiRequests class.
  *
  * PHP version 5
  *
@@ -47,63 +47,51 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class YapealApiRequests {
   /**
-   * @var array Holds the map from constants to API sections.
-   */
-  static $apiSections = array(
-    YAPEAL_API_ACCOUNT => '/account/',
-    YAPEAL_API_CHAR => '/char/',
-    YAPEAL_API_CORP => '/corp/',
-    YAPEAL_API_EVE => '/eve/',
-    YAPEAL_API_MAP => '/map/',
-    YAPEAL_API_SERVER => '/server/'
-  );
-  /**
-   * Function used to get info from Eve API.
+   * Function used to get info from API.
    *
    * @param string $api Needs to be set to base part of name for example:
    * /corp/StarbaseDetail.xml.aspx would just be StarbaseDetail
-   * @param integer $postType See class constants for allowed values.
+   * @param string $section The api section that $api belongs to. For Eve APIs
+   * will be one of account, char, corp, eve, map, or server.
+   * @param string $proxy Allows overriding API server for example to use a
+   * different proxy on a per char/corp basis. It should contain a url format
+   * string made to used in sprintf() to replace %1$s with $api and %2$s with
+   * $section as needed to complete the url. For example:
+   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
    * @param array $postData Is an array of data ready to be used in
    * http_build_query.
-   * @param string $urlBase Allows overriding API server for example to use a
-   * different proxy on a per char/corp basis.
-   * @param string $fileSuffix File suffix that will be added to $api to make
-   * complete file name.
    *
    * @return mixed Returns SimpleXML object or FALSE
    *
    * @throws YapealApiFileException for API file errors
    * @throws YapealApiErrorException for API errors
    */
-  static function getAPIinfo($api, $postType, $postData = array(),
-    $urlBase = YAPEAL_URL_BASE, $fileSuffix = YAPEAL_FILE_SUFFIX) {
+  static function getAPIinfo($api, $section, $postData = array(),
+    $proxy = NULL) {
     global $tracing;
-    if (!array_key_exists($postType, self::$apiSections)) {
-      $mess = '$postType param was not equal to one of the allowed values';
-      $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
-    };
+    $postParams = '';
     $result = array();
     $xml = NULL;
     // Build http parameter.
-    $http = array('timeout' => 60,
-      'url' => $urlBase . self::$apiSections[$postType] . $api . $fileSuffix
-    );
-    if ($postType == YAPEAL_API_EVE || $postType == YAPEAL_API_MAP ||
-      $postType == YAPEAL_API_SERVER) {
+    if (empty($proxy)) {
+      $proxy = 'http://api.eve-online.com/%2$s/%1$s.xml.aspx';
+    };
+    $http = array('timeout' => 60, 'url' => sprintf($proxy, $api, $section));
+    if ($section == 'eve' || $section == 'map' || $section == 'server') {
       // Global APIs like eve, map, and server don't use POST data.
       $http['method'] = 'GET';
     } else {
       // Setup for POST query.
       $http['method'] = 'POST';
       $http['content'] = http_build_query($postData, NULL, '&');
+      $postParams = 'Post parameters: ' . $http['content'] . PHP_EOL;
     };// if $postType=YAPEAL_API_EVE||...
-    $mess = 'Setup cURL connection in ' . __FILE__;
+    $mess = 'Setup cURL connection in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CURL, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CURL, $mess);
     // Setup new cURL connection with options.
     $sh = new CurlRequest($http);
-    $mess = 'cURL connect to Eve API in ' . __FILE__;
+    $mess = 'cURL connect to Eve API in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CURL, 1) &&
     $tracing->logTrace(YAPEAL_TRACE_CURL, $mess);
     // Try to get XML.
@@ -111,9 +99,7 @@ class YapealApiRequests {
     // Now check for errors.
     if ($result['curl_error']) {
       $mess = 'cURL error for ' . $http['url'] . PHP_EOL;
-      if (isset($http['content'])) {
-        $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
-      };
+      $mess .= $postParams;
       $mess .= 'Error code: ' . $result['curl_errno'];
       $mess .= 'Error message: ' . $result['curl_error'];
       // Throw exception
@@ -121,26 +107,20 @@ class YapealApiRequests {
     };
     if (200 != $result['http_code']) {
       $mess = 'HTTP error for ' . $http['url'] . PHP_EOL;
-      if (isset($http['content'])) {
-        $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
-      };
+      $mess .= $postParams;
       $mess .= 'Error code: ' . $result['http_code'] . PHP_EOL;
       // Throw exception
       throw new YapealApiFileException($mess, 2);
     };
     if (!$result['body']) {
       $mess = 'API data empty for ' . $http['url'] . PHP_EOL;
-      if (isset($http['content'])) {
-        $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
-      };
+      $mess .= $postParams;
       // Throw exception
       throw new YapealApiFileException($mess, 3);
     };
     if (!strpos($result['body'], '<eveapi version="')) {
       $mess = 'API data error for ' . $http['url'] . PHP_EOL;
-      if (isset($http['content'])) {
-        $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
-      };
+      $mess .= $postParams;
       $mess .= 'No XML returned' . PHP_EOL;
       // Throw exception
       throw new YapealApiFileException($mess, 4);
@@ -151,9 +131,7 @@ class YapealApiRequests {
     $xml = simplexml_load_string($result['body']);
     if (isset($xml->error[0])) {
       $mess = 'Eve API error for ' . $http['url'] . PHP_EOL;
-      if (isset($http['content'])) {
-        $mess .= 'Post parameters: ' . $http['content'] . PHP_EOL;
-      };
+      $mess .= $postParams;
       $mess .= 'Error code: ' . (int)$xml->error[0]['code'] . PHP_EOL;
       $mess .= 'Error message: ' . (string)$xml->error[0] . PHP_EOL;
       if (YAPEAL_CACHE_XML) {
@@ -177,22 +155,17 @@ class YapealApiRequests {
    * Function used to fetch API XML from file.
    *
    * @param string $cacheName Name of file to write to.
-   * @param integer $postType See class constants for allowed values.
+   * @param istring $section The api section that $api belongs to. For Eve APIs
+   * will be one of account, char, corp, eve, map, or server.
    *
    * @return mixed Returns XML if file is available and not expired, FALSE otherwise.
    */
-  static function getCachedXml($cacheName, $postType) {
+  static function getCachedXml($cacheName, $section) {
     global $tracing;
-    if (!array_key_exists($postType, self::$apiSections)) {
-      $mess = '$postType param was not equal to one of the allowed values';
-      $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
-    };
     // If using cache file check for it first.
     if (YAPEAL_CACHE_XML) {
       // Build cache file path
-      $cachePath = realpath(YAPEAL_CACHE . self::$apiSections[$postType]);
-      $cachePath .= DIRECTORY_SEPARATOR;
+      $cachePath = realpath(YAPEAL_CACHE . $section) . DS;
       if (!is_dir($cachePath)) {
         $mess = 'XML cache ' . $cachePath . ' is not a directory or does not exist';
         trigger_error($mess, E_USER_WARNING);
@@ -200,7 +173,7 @@ class YapealApiRequests {
       };
       $cacheFile = $cachePath . $cacheName;
       if (file_exists($cacheFile) && is_readable($cacheFile)) {
-        $mess = 'Loading ' . $cacheFile . ' in ' . __FILE__;
+        $mess = 'Loading ' . $cacheFile . ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 2) &&
         $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
         $file = file_get_contents($cacheFile);
@@ -213,7 +186,7 @@ class YapealApiRequests {
         $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
         $ctime = time();
         if ($ctime <= $cuntil) {
-          $mess = 'Returning ' . $cacheFile . ' in ' . __FILE__;
+          $mess = 'Returning ' . $cacheFile . ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
           return $xml;
@@ -223,29 +196,24 @@ class YapealApiRequests {
     return FALSE;
   }// function getCachedXml
   /**
-   * Function used to fetch API XML from file.
+   * Function used to save API XML into file.
    *
    * @param string $xml The Eve API XML to be cached.
    * @param string $cacheName Name of cache item.
-   * @param integer $postType See class constants for allowed values.
+   * @param istring $section The api section that $api belongs to. For Eve APIs
+   * will be one of account, char, corp, eve, map, or server.
    *
    * @return bool Returns TRUE if XML was cached, FALSE otherwise.
    */
-  static function cacheXml($xml, $cacheName, $postType) {
+  static function cacheXml($xml, $cacheName, $section) {
     global $tracing;
-    if (!array_key_exists($postType, self::$apiSections)) {
-      $mess = '$postType param was not equal to one of the allowed values';
-      $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
-    };
     // If using cache file check for it first.
     if (YAPEAL_CACHE_XML) {
       // Build cache file path
-      $cachePath = realpath(YAPEAL_CACHE . self::$apiSections[$postType]);
-      $cachePath .= DIRECTORY_SEPARATOR;
+      $cachePath = realpath(YAPEAL_CACHE . $section) . DS;
       if (!is_dir($cachePath)) {
         $mess = 'XML cache ' . $cachePath . ' is not a directory or does not exist';
-        trigger_error($mess, YAPEAL_WARNING_LOG);
+        trigger_error($mess, E_USER_WARNING);
         $result = FALSE;
       };
       if (!is_writable($cachePath)) {
@@ -254,6 +222,8 @@ class YapealApiRequests {
       };
       $cacheFile = $cachePath . $cacheName;
       if (is_dir($cachePath) && is_writeable($cachePath)) {
+        $mess = 'Caching XML to ' . $cacheFile;
+        trigger_error($mess, E_USER_NOTICE);
         file_put_contents($cacheFile, $xml);
         return TRUE;
       };
@@ -276,29 +246,29 @@ class YapealApiRequests {
 /**
  * Account APIs
  */
-define('YAPEAL_API_ACCOUNT', 0);
+define('YAPEAL_API_ACCOUNT', 'account');
 /**
  * Char APIs
  */
-define('YAPEAL_API_CHAR',  1);
+define('YAPEAL_API_CHAR',  'char');
 /**
  * Corp APIs
  */
-define('YAPEAL_API_CORP', 2);
+define('YAPEAL_API_CORP', 'corp');
 /**
  * Eve APIs
  */
-define('YAPEAL_API_EVE', 3);
+define('YAPEAL_API_EVE', 'eve');
 /**
  * Map APIs
  */
-define('YAPEAL_API_MAP', 4);
+define('YAPEAL_API_MAP', 'map');
 /**
  * Server APIs
  */
-define('YAPEAL_API_SERVER', 5);
+define('YAPEAL_API_SERVER', 'server');
 /**
  * Reserved
  */
-define('YAPEAL_API_UTIL', 65535);
+define('YAPEAL_API_UTIL', 'util');
 ?>

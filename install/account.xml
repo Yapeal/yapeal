@@ -52,6 +52,12 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
+      VALUES('Characters',0,1,'account')
+      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`isActive`=VALUES(`isActive`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('accountVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
   </sql>
 </schema>

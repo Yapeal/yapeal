@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents Custom Yapeal API exception class.
+ * Contains Custom Yapeal API exception class.
  *
  * PHP version 5
  *

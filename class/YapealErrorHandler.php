@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents Yapeal's custom error handler.
+ * Contains Yapeal's custom error handler.
  *
  * PHP version 5
  *
@@ -38,6 +38,7 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
+require_once YAPEAL_INC . 'elog.php';
 /**
  * Yapeal's custom error handler.
  *
@@ -80,27 +81,27 @@ class YapealErrorHandler {
    * @param array $vars Array contenting all the defined variables and constants.
    */
   public static function handle($errno, $errmsg, $filename, $line, $vars) {
+    // obey @ protocol
     if (error_reporting() == 0) {
       return FALSE;
-    };// obey @ protocol
+    };
     $self = new self($errmsg, $filename, $line, $vars);
     if (($errno & YAPEAL_LOG_LEVEL) == $errno) {
       switch ($errno) {
-        case E_USER_NOTICE:
-        case E_NOTICE:
-          return $self->handleNotice();
-        case E_USER_WARNING:
-        case E_WARNING:
-          return $self->handleWarning();
         case E_USER_ERROR:
         case E_ERROR:
           return $self->handleError();
-        default:
-          return FALSE;
-      };
-    } else {
-      return FALSE;
-    };
+        case E_USER_NOTICE:
+        case E_NOTICE:
+          return $self->handleNotice();
+        case E_STRICT:
+          return $self->handleStrict();
+        case E_USER_WARNING:
+        case E_WARNING:
+          return $self->handleWarning();
+      };// switch $errno ...
+    };// if $errno & ...
+    return FALSE;
   }
   /**
    * Called to handle error type messages.
@@ -133,28 +134,6 @@ EOT;
     exit(1);
   }
   /**
-   * Called to handle warning type messages.
-   */
-  private function handleWarning() {
-    $body = PHP_EOL;
-    if ($this->line) {
-      $body .= <<<EOT
-WARNING:
-  Message: {$this->message}
-     File: {$this->filename}
-     Line: {$this->line}
-EOT;
-    } else {
-      $body .= <<<EOT
-WARNING:
-  Message: {$this->message}
-     File: {$this->filename}
-EOT;
-    };
-    print_on_command($body);
-    return elog($body, YAPEAL_WARNING_LOG);
-  }
-  /**
    * Called to handle notice type messages.
    */
   private function handleNotice() {
@@ -175,6 +154,50 @@ EOT;
     };
     print_on_command($body);
     return elog($body, YAPEAL_NOTICE_LOG);
+  }
+  /**
+   * Called to handle dtrict type messages.
+   */
+  private function handleStrict() {
+    $body = PHP_EOL;
+    if ($this->line) {
+      $body .= <<<EOT
+STRICT:
+  Message: {$this->message}
+     File: {$this->filename}
+     Line: {$this->line}
+EOT;
+    } else {
+      $body .= <<<EOT
+NOTICE:
+  Message: {$this->message}
+     File: {$this->filename}
+EOT;
+    };
+    print_on_command($body);
+    return elog($body, YAPEAL_STRICT_LOG);
+  }
+  /**
+   * Called to handle warning type messages.
+   */
+  private function handleWarning() {
+    $body = PHP_EOL;
+    if ($this->line) {
+      $body .= <<<EOT
+WARNING:
+  Message: {$this->message}
+     File: {$this->filename}
+     Line: {$this->line}
+EOT;
+    } else {
+      $body .= <<<EOT
+WARNING:
+  Message: {$this->message}
+     File: {$this->filename}
+EOT;
+    };
+    print_on_command($body);
+    return elog($body, YAPEAL_WARNING_LOG);
   }
 }
 ?>

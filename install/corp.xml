@@ -1009,6 +1009,12 @@
     <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP</query>
   </sql>
   <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
+      VALUES('AccountBalance AssetList CorporationSheet IndustryJobs KillLog MarketOrders MemberTracking Standings StarbaseList StarbaseDetail WalletJournal WalletTransactions',0,3,'corp')
+      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`isActive`=VALUES(`isActive`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('corpVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
   </sql>
 </schema>

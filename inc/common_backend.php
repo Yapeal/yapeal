@@ -38,7 +38,6 @@ if (isset($_REQUEST['viewSource'])) {
 // Used to over come path issues caused by how script is ran on server.
 $incDir = realpath(dirname(__FILE__));
 chdir($incDir);
-$ds = DIRECTORY_SEPARATOR;
 // Set some basic common settings so we know we'll get to see any errors etc.
 error_reporting(E_ALL);
 ini_set('ignore_repeated_errors', 0);
@@ -79,7 +78,7 @@ foreach ($required as $ext) {
 if (!isset($iniFile)) {
   // Default assumes that this file and yapeal.ini file are in 'neighboring'
   // directories.
-  $iniFile = realpath($incDir . $ds . '..' . $ds . 'config' . $ds . 'yapeal.ini');
+  $iniFile = realpath($incDir . DS . '..' . DS . 'config' . DS . 'yapeal.ini');
 }
 if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
   $mess = 'The required ' . $iniFile . ' configuration file is missing';
@@ -88,7 +87,7 @@ if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
 // Grab the info from ini file.
 $iniVars = parse_ini_file($iniFile, TRUE);
 // Abort if required sections aren't defined
-$sections = array('Api', 'Database', 'Logging');
+$sections = array('Database', 'Logging');
 $mess = '';
 foreach ($sections as $section) {
   if (!isset($iniVars[$section])) {
@@ -107,26 +106,15 @@ $nonexist = 'Nonexistent directory defined for ';
 /* **************************************************************************
  * Paths
  * **************************************************************************/
-require_once $incDir . $ds . 'common_paths.php';
+require_once $incDir . DS . 'common_paths.php';
 // Check writable paths
 if (!is_writable(YAPEAL_CACHE)) {
   trigger_error($realpath . ' is not writeable', E_USER_ERROR);
 };
-$sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
-foreach ($sections as $section) {
-  $realpath = realpath(YAPEAL_CACHE . $section);
-  if (!$realpath || !is_dir($realpath)) {
-    $mess = 'Missing required directory ' . YAPEAL_CACHE . $section;
-    trigger_error($mess, E_USER_ERROR);
-  };
-  if (!is_writable($realpath)) {
-    trigger_error(YAPEAL_CACHE . $section . ' is not writeable', E_USER_ERROR);
-  };
-};// foreach $sections ...
 // log_dir is relative to YAPEAL_CACHE
 $realpath = realpath(YAPEAL_CACHE . 'log');
 if ($realpath && is_dir($realpath)) {
-  define('YAPEAL_LOG', $realpath . $ds);
+  define('YAPEAL_LOG', $realpath . DS);
 } else {
   trigger_error($nonexist . 'log', E_USER_ERROR);
 };
@@ -140,20 +128,22 @@ require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 /* **************************************************************************
  * Logging section
  * **************************************************************************/
+require_once YAPEAL_INC . 'elog.php';
+// Get an instance of tracing so we can pass it on.
+$tracing = new YapealTracing();
 // Grab the info from ini file again now that our constants are defined.
 $iniVars = parse_ini_file($iniFile, TRUE);
-// Get an instance of our tracing so we can pass it on.
-$tracing = new YapealTracing();
 // Special debugging command-line override.
 if (defined('YAPEAL_DEBUG')) {
   error_reporting(E_ALL);
   define('YAPEAL_ERROR_LOG', YAPEAL_DEBUG);
   define('YAPEAL_NOTICE_LOG', YAPEAL_DEBUG);
+  define('YAPEAL_STRICT_LOG', YAPEAL_DEBUG);
   define('YAPEAL_TRACE_ACTIVE', TRUE);
   define('YAPEAL_TRACE_LEVEL', 2);
   define('YAPEAL_TRACE_LOG', YAPEAL_DEBUG);
   define('YAPEAL_TRACE_OUTPUT', 'file');
-  define('YAPEAL_TRACE_SECTION', YAPEAL_TRACE_ALL);
+  define('YAPEAL_TRACE_SECTIONS', YAPEAL_TRACE_ALL);
   define('YAPEAL_WARNING_LOG', YAPEAL_DEBUG);
 } else {
   $settings = array('error_log', 'notice_log', 'trace_log', 'warning_log');
@@ -166,7 +156,7 @@ if (defined('YAPEAL_DEBUG')) {
     };// else isset $iniVars...
   };// foreach $settings ...
   $settings = array('log_level', 'trace_active', 'trace_level', 'trace_output',
-    'trace_section');
+    'trace_sections');
   foreach ($settings as $setting) {
     if (isset($iniVars['Logging'][$setting])) {
       /**
@@ -190,7 +180,6 @@ if (defined('YAPEAL_DEBUG')) {
 // Change some error logging settings.
 ini_set('error_log', YAPEAL_ERROR_LOG);
 ini_set('log_errors', 1);
-require_once YAPEAL_INC . 'elog.php';
 // Start using custom error handler.
 set_error_handler(array('YapealErrorHandler', 'handle'));
 if (defined('YAPEAL_DEBUG')) {
@@ -220,7 +209,7 @@ if (defined('YAPEAL_DEBUG')) {
       $mess .= $setting . ' = ' . $iniVars[$setting] . PHP_EOL;
     };
   };
-  $sections = array('Api', 'Database', 'Logging');
+  $sections = array('Cache', 'Database', 'Logging');
   $hidden = array('username', 'password');
   foreach ($sections as $section) {
     if (isset($iniVars[$section])) {
@@ -241,19 +230,32 @@ if (defined('YAPEAL_DEBUG')) {
   trigger_error($mess, E_USER_NOTICE);
 };// if defined YAPEAL_DEBUG ...
 /* **************************************************************************
- * Api section
+ * Cache section
  * **************************************************************************/
-$settings = array('account_active', 'cache_xml', 'char_active', 'corp_active',
-  'eve_active', 'file_suffix', 'map_active', 'server_active', 'url_base');
+$settings = array('cache_output', 'cache_xml');
 foreach ($settings as $setting) {
   // Set to section value if it exists.
-  if (isset($iniVars['Api'][$setting])) {
+  if (isset($iniVars['Cache'][$setting])) {
     /** @ignore */
-    define('YAPEAL_' . strtoupper($setting), $iniVars['Api'][$setting]);
+    define('YAPEAL_' . strtoupper($setting), $iniVars['Cache'][$setting]);
   } else {
     trigger_error($req1 . $setting . $req2, E_USER_ERROR);
   };// else isset $iniVars...
 };// foreach $settings ...
+if (YAPEAL_CACHE_XML == TRUE &&
+  (YAPEAL_CACHE_OUTPUT == 'file' || YAPEAL_CACHE_OUTPUT == 'both')) {
+  $sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
+  foreach ($sections as $section) {
+    $realpath = realpath(YAPEAL_CACHE . $section);
+    if (!$realpath || !is_dir($realpath)) {
+      $mess = 'Missing required directory ' . YAPEAL_CACHE . $section;
+      trigger_error($mess, E_USER_ERROR);
+    };
+    if (!is_writable($realpath)) {
+      trigger_error(YAPEAL_CACHE . $section . ' is not writeable', E_USER_ERROR);
+    };
+  };// foreach $sections ...
+};// if YAPEAL_CACHE_XML == TRUE && ...
 /* **************************************************************************
  * Datebase section
  * **************************************************************************/

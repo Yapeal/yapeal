@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
- * Yapeal installer - Character Select for no JavaScript User.
- *
+ * Yapeal installer - Character Select for non-JavaScript User.
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -45,7 +49,7 @@ if ($apiuserid !="" && $apikey !="") {
   $params = array();
   $params['userID'] = $apiuserid;
   $params['apiKey'] = $apikey;
-  
+
   // poststring
   if (count($params) > 0) {
     $poststring = http_build_query($params, NULL, '&');
@@ -90,7 +94,7 @@ if ($apiuserid !="" && $apikey !="") {
       /*
        * Show XML error is there is one
        */
-      echo '<font class="warning">'.ERROR.': '.$xml->error.'</font>';
+      echo '<font class="warning">Error: '.$xml->error.'</font>';
     } else {
       /**
        * Set hidden post values
@@ -98,9 +102,9 @@ if ($apiuserid !="" && $apikey !="") {
       echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=doapi" method="post">' . PHP_EOL;
       $exceptions = array('getlist');
       echo inputHiddenPost($exceptions);
-      echo '<table>' . PHP_EOL
+      echo '<table summary="Table show Eve characters with thier pictures and corporation symbols">' . PHP_EOL
           .'  <tr>' . PHP_EOL
-          .'    <th colspan="2">'.CHAR_SELECT.'</th>' . PHP_EOL
+          .'    <th colspan="2">Character Select</th>' . PHP_EOL
           .'  </tr>' . PHP_EOL;
       /**
        * Generate character list
@@ -109,30 +113,32 @@ if ($apiuserid !="" && $apikey !="") {
         if (isset($conf['creatorCharacterID']) && $conf['creatorCharacterID']==$row['characterID']) { $checked = ' checked="checked"'; } else { $checked = ''; };
         echo '<tr>' . PHP_EOL
             .'  <td style="width: 15px; vertical-align:middle;">' . PHP_EOL
-            .'    <input type="radio" name="config[api_char_info]" value="'.$row['name'].'^-_-^'.$row['characterID'].'^-_-^'.$row['corporationName'].'^-_-^'.$row['corporationID'].'"'.$checked.' />' . PHP_EOL
+            .'    <input type="radio" name="config[api_char_info]" value="'
+            .$row['name'] . '^-_-^' . $row['characterID'] . '^-_-^'
+            .$row['corporationName'] . '^-_-^' . $row['corporationID'] . '"'
+            .$checked . ' />' . PHP_EOL
             .'  </td>' . PHP_EOL
             .'  <td>' . PHP_EOL
-            .'    <table class="notable" style="width: 100%;">' . PHP_EOL
+            .'    <table class="notable" style="width: 100%;" summary="">' . PHP_EOL
             .'      <tr>' . PHP_EOL
-            .'        <td style="width: 64px;"><img src="http://img.eve.is/serv.asp?s=64&amp;c='.$row['characterID'].'" width="64" height="64" /></td>' . PHP_EOL
-            .'        <td>'.$row['name'].'<br />'.$row['corporationName'].'</td>' . PHP_EOL
-            .'        <td style="width: 64px;"><img src="http://www.evecorplogo.net/logo.php?id='.$row['corporationID'].'&amp;bgc=606060" width="64" height="64" /></td>' . PHP_EOL
+            .'        <td style="width: 66px;">'
+            .'<img src="http://img.eve.is/serv.asp?s=64&amp;c='
+            .$row['characterID'] . '" width="64" height="64"'
+            .' alt="' . $row['name'] . '"'
+            .' title="' . $row['name'] . '" /></td>' . PHP_EOL
+            .'        <td>' . $row['name'] . '<br />'
+            .$row['corporationName'] . '</td>' . PHP_EOL
+            .'        <td style="width: 66px;">'
+            .'<img src="http://www.evecorplogo.net/logo.php?id='
+            .$row['corporationID'] . '&amp;bgc=606060" width="64" height="64"'
+            .' alt="' . $row['corporationName'] . '"'
+            .' title="' . $row['corporationName'] . '" /></td>' . PHP_EOL
             .'      </tr>' . PHP_EOL
             .'    </table>' . PHP_EOL
             .'  </td>' . PHP_EOL
             .'</tr>' . PHP_EOL;
       };
-      /*
-       * List API Selection for Character
-       */
-      echo '</table><br />' . PHP_EOL
-          .'<table>' . PHP_EOL
-          .'  <tr>' . PHP_EOL
-          .'    <th colspan="2">'.CHAR_API_PULL_SELECT.'</th>' . PHP_EOL
-          .'  </tr>' . PHP_EOL
-          .'  <tr>' . PHP_EOL
-          .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'.CHAR_API_PULL_SELECT_DES.'</td>' . PHP_EOL
-          .'  </tr>' . PHP_EOL;
+      echo '</table><br />' . PHP_EOL;
       /*
        * Get the selected Character APIs from the database config
        */
@@ -141,29 +147,54 @@ if ($apiuserid !="" && $apikey !="") {
       } else {
         $charSelectedAPIs = array();
       }; // if is set $conf['charAPIs']
+      echo '<table summary="">' . PHP_EOL
+        .'  <tr>' . PHP_EOL
+        .'    <th colspan="2">Character API Pull Select</th>' . PHP_EOL
+        .'  </tr>' . PHP_EOL
+        .'  <tr>' . PHP_EOL
+        .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'
+        .'Select which API data you wish to pull for this character</td>' . PHP_EOL
+        .'  </tr>' . PHP_EOL;
       /*
        * Build the Character API list
        */
       foreach ($charAPIs as $API=>$APIDes) {
-			  if (in_array($API,$charSelectedAPIs)) { $check = ' checked="checked"'; } else { $check = ''; }; // if (in_array($API,$corpSelectedAPIs))
+			  if (in_array($API,$charSelectedAPIs)) {
+          $check = ' checked="checked"';
+        } else {
+          $check = '';
+        };// if (in_array($API,$corpSelectedAPIs))
 				echo '  <tr>' . PHP_EOL
-            .'    <td width="15" style="vertical-align:middle;">' . PHP_EOL
-            .'      <input type="checkbox" name="config[charAPIs][]" value="'.$API.'"'.$check.' />' . PHP_EOL
-            .'    </td>' . PHP_EOL
-            .'    <td>'.$APIDes.'</td>' . PHP_EOL
-            .'  </tr>' . PHP_EOL;
-      }
+          .'    <td width="15" style="vertical-align:middle;">' . PHP_EOL
+          .'      <input type="checkbox" name="config[charAPIs][]" value="'.$API.'"'.$check.' />' . PHP_EOL
+          .'    </td>' . PHP_EOL
+          .'    <td>'.$APIDes.'</td>' . PHP_EOL
+          .'  </tr>' . PHP_EOL;
+      };
       /*
-       * List API Selection for Corporation
+       * Get Character API proxy from the database config
        */
-      echo '</table><br />' . PHP_EOL
-          .'<table>' . PHP_EOL
-          .'  <tr>' . PHP_EOL
-          .'    <th colspan="2">'.CORP_API_PULL_SELECT.'</th>' . PHP_EOL
+      if (isset($conf['charProxy']) && !empty($conf['charProxy'])) {
+        $charProxy = $conf['charProxy'];
+      } else {
+        $charProxy = 'http://api.eve-online.com/%2$s/%1$s.xml.aspx';
+      };// if is set $conf['charAPIs']
+      /*
+       * List API Selection for Character
+       */
+      echo '  <tr>' . PHP_EOL
+          .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">Character API Proxy</td>' . PHP_EOL
           .'  </tr>' . PHP_EOL
           .'  <tr>' . PHP_EOL
-          .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'.CORP_API_PULL_SELECT_DES.'</td>' . PHP_EOL
-          .'  </tr>' . PHP_EOL;
+          .'    <td colspan="2" class="tableinfolbl" style="text-align:left;">'
+          .'<input type="text" name="config[charProxy]" value="' . $charProxy . '" size="60" /><br />' . PHP_EOL
+          .'%2$s and %1$s is automatic filled in by Yapeal. <br />' . PHP_EOL
+          .'%2$s is filled with the API section.<br />' . PHP_EOL
+          .'and %1$s with the API name.<br />' . PHP_EOL
+          .'An example of the default proxy setting for Medals in the API char section would look like this:<br />' . PHP_EOL
+          .'http://api.eve-online.com/char/Medals.xml.aspx</td>' . PHP_EOL
+          .'  </tr>' . PHP_EOL
+          .'</table>' . PHP_EOL;
       /*
        * Get the selected Corporation APIs from the database config
        */
@@ -172,37 +203,72 @@ if ($apiuserid !="" && $apikey !="") {
       } else {
         $corpSelectedAPIs = array();
       }; // if is set $conf['corpAPIs']
+      echo '<table summary="">' . PHP_EOL
+        .'  <tr>' . PHP_EOL
+        .'    <th colspan="2">Corporation API Pull Select</th>' . PHP_EOL
+        .'  </tr>' . PHP_EOL
+        .'  <tr>' . PHP_EOL
+        .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">'
+        .'Select which API data you wish to pull for this corporation</td>' . PHP_EOL
+        .'  </tr>' . PHP_EOL;
       /*
        * Build the Corporation API list
        */
       foreach ($corpAPIs as $API=>$APIDes) {
-			  if (in_array($API,$corpSelectedAPIs)) { $check = ' checked="checked"'; } else { $check = ''; }; // if (in_array($API,$corpSelectedAPIs))
+			  if (in_array($API,$corpSelectedAPIs)) {
+          $check = ' checked="checked"';
+        } else {
+          $check = '';
+        };// if (in_array($API,$corpSelectedAPIs))
 				echo '  <tr>' . PHP_EOL
-            .'    <td width="15" style="vertical-align:middle;">' . PHP_EOL
-            .'      <input type="checkbox" name="config[corpAPIs][]" value="'.$API.'"'.$check.' />' . PHP_EOL
-            .'    </td>' . PHP_EOL
-            .'    <td>'.$APIDes.'</td>' . PHP_EOL
-            .'  </tr>' . PHP_EOL;
-      }
+          .'    <td width="15" style="vertical-align:middle;">' . PHP_EOL
+          .'      <input type="checkbox" name="config[corpAPIs][]" value="'.$API.'"'.$check.' />' . PHP_EOL
+          .'    </td>' . PHP_EOL
+          .'    <td>'.$APIDes.'</td>' . PHP_EOL
+          .'  </tr>' . PHP_EOL;
+      };
+      /*
+       * Get Corporation API proxy from the database config
+       */
+      if (isset($conf['corpProxy']) && !empty($conf['corpProxy'])) {
+        $corpProxy = $conf['corpProxy'];
+      } else {
+        $corpProxy = 'http://api.eve-online.com/%2$s/%1$s.xml.aspx';
+      }; // if is set $conf['charAPIs']
+      /*
+       * List API Selection for Corporation
+       */
+      echo '  <tr>' . PHP_EOL
+          .'    <td colspan="2" class="tableinfolbl" style="text-align:center;">Corporation API Proxy</td>' . PHP_EOL
+          .'  </tr>' . PHP_EOL
+          .'  <tr>' . PHP_EOL
+          .'    <td colspan="2" class="tableinfolbl" style="text-align:left;">'
+          .'<input type="text" name="config[corpProxy]" value="' . $corpProxy . '" size="60" /><br />' . PHP_EOL
+          .'%2$s and %1$s is automatic filled in by Yapeal. <br />' . PHP_EOL
+          .'%2$s is filled with the API section.<br />' . PHP_EOL
+          .'and %1$s with the API name.<br />' . PHP_EOL
+          .'An example of the default proxy setting for Medals in the API corp section would look like this:<br />' . PHP_EOL
+          .'http://api.eve-online.com/corp/Medals.xml.aspx</td>' . PHP_EOL
+          .'  </tr>' . PHP_EOL;
       echo '</table>' . PHP_EOL
       /*
        * Add Submit button
        */
           .'<input type="hidden" name="config[api_user_id]" value="'.$apiuserid.'" />' . PHP_EOL
           .'<input type="hidden" name="config[api_key]" value="'.$apikey.'" />' . PHP_EOL
-          .'<input type="submit" value="'.UPDATE.'" />' . PHP_EOL
+          .'<input type="submit" value="Update" />' . PHP_EOL
           .'</form>' . PHP_EOL;
     };
   } else {
     /**
      * Api server is offline
      */
-    echo '<font class="warning">'.ERROR_API_SERVER_OFFLINE.'</font>';
+    echo '<font class="warning">Error<br />EVE API Server if Offline. Please try later.</font>';
   };
 } else {
   /**
    * Api info not set
    */
-  echo '<font class="warning">'.ERROR_NO_API_INFO.'</font>';
+  echo '<font class="warning">You must provide API Info</font>';
 };
 ?>

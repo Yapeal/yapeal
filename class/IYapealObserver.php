@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents IYapealObserver Interface.
+ * Contains IYapealObserver Interface.
  *
  * PHP version 5
  *
@@ -44,10 +44,10 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Observer
  */
-interface YapealObserver {
+interface IYapealObserver {
   /**
    * Method that the 'subject' will call to let us know something happened.
    */
-  public function YapealUpdate(YapealSubject $e);
+  public function YapealUpdate(IYapealSubject $e);
 }
 ?>

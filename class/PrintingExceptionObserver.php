@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents PrintingExceptionObserver class.
+ * Contains PrintingExceptionObserver class.
  *
  * PHP version 5
  *
@@ -44,15 +44,15 @@ require_once YAPEAL_INC . 'elog.php';
  *
  * @package Yapeal
  * @subpackage Observer
- * @uses YapealObserver
+ * @uses IYapealObserver
  */
-class PrintingExceptionObserver implements YapealObserver {
+class PrintingExceptionObserver implements IYapealObserver {
   /**
    * Method the 'object' calls to let us know something has happened.
    *
    * @param object $e The 'object' we're observering.
    */
-  public function YapealUpdate(YapealSubject $e) {
+  public function YapealUpdate(IYapealSubject $e) {
     $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode()}

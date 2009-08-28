@@ -43,49 +43,6 @@ $ds = DIRECTORY_SEPARATOR;
 //////////////////////////////////
 // Functions
 //////////////////////////////////
-// Get language
-function GetLang($lang){
-  global $dir, $ds;
-  $langStrings = array();
-  $rp = realpath($dir . $ds . 'inc' . $ds . 'language' . $ds);
-  require($rp . $ds . 'lang_en.php');
-  if (file_exists($rp . $ds . 'lang_' . $lang . '.php')) {
-    require($rp . $ds . 'lang_' . $lang . '.php');
-  };
-  foreach ($langStrings as $k=>$v) {
-    define($k, $v);
-  };
-}
-
-// Select browser language
-function GetBrowserLang() {
-  global $knownlang;
-  $langs = array();
-  if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    // break up string into pieces (languages and q factors)
-    preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
-    if (count($lang_parse[1])) {
-      // create a list like "en" => 0.8
-      $langs = array_combine($lang_parse[1], $lang_parse[4]);
-      // set default to 1 for any without q factor
-      foreach ($langs as $lang => $val) {
-        if ($val === '') $langs[$lang] = 1;
-      }
-      // sort list based on value
-      arsort($langs, SORT_NUMERIC);
-    }; // if count $lang_parse[1]
-  }; // if isset $_SERVER['HTTP_ACCEPT_LANGUAGE']
-  foreach ($knownlang as $Kval=>$Klang) {
-    foreach ($langs as $lang => $val) {
-  		if (strpos($lang, $Kval) === 0) {
-        // show Danish site
-        return $Kval;
-      };
-    };
-  };
-  return "en";
-}
-
 // Input standard Site header
 function OpenSite($subtitle = "") {
   global $ini,$knownlang;
@@ -93,48 +50,12 @@ function OpenSite($subtitle = "") {
     $subtitle = ' - '.$subtitle;
   };
   /*
-   * Language selector
-   */
-  $count = 0;
-  if (count($knownlang) > 1) {
-    /*
-     * Make url query
-     */
-    $getParse = '';
-    foreach ($_GET as $getName=>$getValue) {
-      if ($count==0) {
-        $getParse .= '?'.$getName.'='.$getValue;
-        $count++;
-      } else {
-        $getParse .= '&amp;'.$getName.'='.$getValue;
-      }; // if ($count==0)
-    }
-    /*
-     * Setup the language selector bar
-     */
-    $languageselector = '<form action="'.$_SERVER['SCRIPT_NAME'].$getParse.'" method="post">' . PHP_EOL
-      .'<select name="lang" onchange="submit();">' . PHP_EOL;
-    foreach ($knownlang as $langValue => $langName) {
-      $languageselector .= '  <option value="'.$langValue.'"'; if (isset($_POST['lang']) && $_POST['lang'] == $langValue) { $languageselector .= ' selected="selected"'; } $languageselector .= '>'.$langName.'</option>' . PHP_EOL;
-    }
-    $languageselector .= '</select>' . PHP_EOL;
-    /*
-     * Make post query
-     */
-    $excp = array('lang');
-    $languageselector .= inputHiddenPost($excp);
-    $languageselector .='<input type="submit" value="'.CHOSELANGUAGE.'" />' . PHP_EOL
-                       .'</form>' . PHP_EOL;
-  } else {
-    $languageselector = '';
-  };
-  /*
    * Set page title
    */
   if (isset($ini)) {
-    $pagetitle = '<h1>'.CONFIG.'</h1>';
+    $pagetitle = '<h1>Config</h1>';
   } else {
-    $pagetitle = '<h1>'.SETUP.'</h1>';
+    $pagetitle = '<h1>Setup</h1>';
   }; // if isset $ini
   echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' . PHP_EOL
       .'<html xmlns="http://www.w3.org/1999/xhtml">' . PHP_EOL
@@ -144,7 +65,6 @@ function OpenSite($subtitle = "") {
       .'<link href="inc/style.css" rel="stylesheet" type="text/css" />' . PHP_EOL
       .'</head>' . PHP_EOL
       .'<body>' . PHP_EOL
-      .$languageselector
       .'<div id="wrapper">' . PHP_EOL
       .'<img src="../pics/yapealblue.png" width="150" height="50" alt="Yapeal logo" /><br />' . PHP_EOL
       .$pagetitle . PHP_EOL;
@@ -161,28 +81,25 @@ function CloseSite() {
  * Create <input> hidden post list array
  */
 function configMenu() {
-  echo '<table>' . PHP_EOL
+  echo '<table summary="">' . PHP_EOL
       .'  <tr>' . PHP_EOL
-      .'    <th>'.CONFIG_MENU.'</th>' . PHP_EOL
+      .'    <th>Config Menu</th>' . PHP_EOL
       .'  </tr>' . PHP_EOL
       .'  <tr>' . PHP_EOL
       .'    <td style="text-align: center;">' . PHP_EOL
-      .'      <table class="notable">' . PHP_EOL
+      .'      <table summary="" class="notable">' . PHP_EOL
       .'        <tr>' . PHP_EOL
       .'          <td class="notd">' . PHP_EOL
       .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configini" method="post">' . PHP_EOL
-      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'              <input type="submit" value="'.INI_SETUP.'" />' . PHP_EOL
+      .'              <input type="submit" value="Yapeal Setup" />' . PHP_EOL
       .'            </form>' . PHP_EOL
       .'          </td><td class="notd">' . PHP_EOL
       .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configdb" method="post">' . PHP_EOL
-      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'              <input type="submit" value="'.DB_SETTING.'" />' . PHP_EOL
+      .'              <input type="submit" value="Database Settings" />' . PHP_EOL
       .'            </form>' . PHP_EOL
       .'          </td><td class="notd">' . PHP_EOL
       .'            <form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=configapi" method="post">' . PHP_EOL
-      .'              <input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'              <input type="submit" value="'.TEST_CHAR.'" />' . PHP_EOL
+      .'              <input type="submit" value="Test Character" />' . PHP_EOL
       .'            </form>' . PHP_EOL
       .'          </td>' . PHP_EOL
       .'        </tr>' . PHP_EOL
@@ -246,7 +163,7 @@ function inputHiddenPost($exceptions = '') {
  * );
  * $types=array('tableName'=>'text','ownerID'=>'integer',
  *   'cachedUntil'=>'timestamp');
- * InsertUpdate($data,$types,'CacheUntil');
+ * BuildInsertUpdateQuery($data,$types,'CacheUntil');
  * </code>
  *
  *
@@ -309,8 +226,8 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
     case 'CON':
       // Check Connection
       $errorval = 1;
-      $request_type = DATABASE.": ".CONNECT_TO;
-      $okay = CONNECTED;
+      $request_type = "Database: Connecting To";
+      $okay = 'Connected';
       if (isset($con)) {
         $select = $con->IsConnected();
       } else {
@@ -329,8 +246,8 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
     case 'UPD':
       // Check Connection
       $errorval = 1;
-      $request_type = DATABASE.": ".UPDATE;
-      $okay = DONE;
+      $request_type = "Database: Update";
+      $okay = 'Done';
       $info = $prefix.$info;
       if (isset($con)) {
         $select = BuildInsertUpdateQuery($data, $types, $info);
@@ -344,8 +261,47 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
           trigger_error($e->getMessage(),E_USER_NOTICE);
         }
       } else {
-        $errortext = FAILED;
+        $errortext = 'Failed';
       }; // if $select
+		  break;
+    case 'UPDUS':
+      // Update utilSection isActive
+      $errorval = 1;
+      $request_type = "Database: Update";
+      $okay = 'Done';
+      $info = $prefix.$info;
+      if (isset($con)) {
+        $select = "UPDATE ".$info." SET `isActive` = ".$data." WHERE `sectionName` = '".$types."'";
+      } else {
+        $select = false;
+      };
+      if ($select) {
+        try {
+          $con->Execute($select);
+					$info = $info . ' -> ' . $types;
+        } catch (ADODB_Exception $e) {
+          trigger_error($e->getMessage(),E_USER_NOTICE);
+					$info = $info . ' -> ' . $types;
+          $errortext = $e->getMessage();
+        }
+      } else {
+        $errortext = 'Failed';
+      }; // if $select
+		  break;
+    case 'USACTIVE':
+      $info = $prefix.$info;
+      if (isset($con)) {
+        $select = "SELECT `isActive` FROM ".$info." WHERE `sectionName` = '".$types."'";
+      } else {
+        $select = false;
+      };
+      try {
+        $rs = $con->GetOne($select);
+        return $rs;
+      } catch (ADODB_Exception $e) {
+        trigger_error($e->getMessage(),E_USER_NOTICE);
+      }
+			return 0;
 		  break;
     case 'CHKTAB':
       // Check If Table Exists
@@ -394,18 +350,18 @@ function DBHandler($dbtype, $info = "", $data = "", $types = "") {
 function WritChecker($path) {
   global $content2, $chmodcheck;
   if (is_file(YAPEAL_BASE . $path)) {
-    $type = '('.TYPE_FILE.')';
-    $cmod = TYPE_FILE_TO.' 666';
+    $type = '(File)';
+    $cmod = 'file to 666';
   } else {
-    $type = '('.TYPE_DIR.')';
-    $cmod = TYPE_DIR_TO.' 777';
+    $type = '(Dir)';
+    $cmod = 'dir to 777';
   }
   $content2 .= '  <tr>' . PHP_EOL;
   $content2 .= '    <td width="220">'.$type.' '.$path.'</td>' . PHP_EOL;
   if (is_writable(YAPEAL_BASE . $path)) {
-    $content2 .= '    <td class="good">'.YES.'</td>' . PHP_EOL;
+    $content2 .= '    <td class="good">Yes</td>' . PHP_EOL;
   } else {
-    $content2 .= '    <td class="warning">'.NO.' - Chmod '.$cmod.'</td>' . PHP_EOL;
+    $content2 .= '    <td class="warning">No - Chmod '.$cmod.'</td>' . PHP_EOL;
     $chmodcheck++;
   };
   $content2 .= '  </tr>' . PHP_EOL;
@@ -488,5 +444,16 @@ function checkIGB() {
     // User Agent, does not match required.
     return false;
   };
+}
+/*
+ * Convert to bool value
+ * @internal Return 1 or 0.
+ */
+function convertToBool($value) {
+  if ($value == 1) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 ?>

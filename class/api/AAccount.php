@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains abstract class for corp section.
+ * Contains abstract class for account section.
  *
  * PHP version 5
  *
@@ -39,28 +39,20 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Abstract class for Corporation APIs.
+ * Abstract class for Account APIs.
  *
  * @package Yapeal
- * @subpackage Api_corporation
+ * @subpackage Api_account
  */
-abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
+abstract class AAccount implements IFetchApiTable, IStoreApiTable {
   /**
    * @var string Apikey for this user.
    */
   protected $apiKey;
   /**
-   * @var int characterID for this user.
-   */
-  protected $characterID;
-  /**
    * @var string Holds proxy info.
    */
   protected $proxy;
-  /**
-   * @var int corporationID for this user.
-   */
-  protected $corporationID;
   /**
    * @var string Name of Eve server.
    */
@@ -74,15 +66,13 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
    */
   protected $userID;
   /**
-   * @var SimpleXMLElement Hold the XML return from API.
-   */
-  protected $xml;
-  /**
    * Constructor
    *
    * @param string $proxy Allows overriding API server for example to use a
    * different proxy on a per char/corp basis. It should contain a url format
    * string made to used in sprintf() to replace %1$s with $api and %2$s with
+   * $section as needed to complete the url. For example:
+   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
    * @param array $params Holds the required parameters like userID, apiKey,
    * etc as needed.
    *
@@ -91,7 +81,7 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
    * @throws LengthException for any missing required $params.
    */
   public function __construct($proxy, array $params = array()) {
-    $this->tablePrefix = YAPEAL_TABLE_PREFIX . 'corp';
+    $this->tablePrefix = YAPEAL_TABLE_PREFIX . 'account';
     $this->proxy = $proxy;
     if (isset($params['apiKey']) && is_string($params['apiKey'])) {
       $this->apiKey = $params['apiKey'];
@@ -100,71 +90,54 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
       $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
       throw new LengthException($mess, 1);
     };// else isset $params['apikey'] ...
-    if (isset($params['characterID']) && is_numeric($params['characterID'])) {
-      $this->characterID = $params['characterID'];
-    } else {
-      $mess = 'Missing required parameter $params["characterID"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 2);
-    };// else isset $params['characterID'] ...
-    if (isset($params['corporationID']) && is_numeric($params['corporationID'])) {
-      $this->corporationID = $params['corporationID'];
-    } else {
-      $mess = 'Missing required parameter $params["corporationID"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 3);
-    };// else isset $params['corporationID'] ...
     if (isset($params['serverName']) && is_string($params['serverName'])) {
       $this->serverName = $params['serverName'];
     } else {
       $mess = 'Missing required parameter $params["serverName"] to constructor';
       $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 4);
+      throw new LengthException($mess, 1);
     };// else isset $params['serverName'] ...
     if (isset($params['userID']) && is_numeric($params['userID'])) {
       $this->userID = $params['userID'];
     } else {
       $mess = 'Missing required parameter $params["userID"] to constructor';
       $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 5);
+      throw new LengthException($mess, 1);
     };// else isset $params['userID'] ...
   }// function __construct
   /**
    * Used to get an item from Eve API.
    *
+   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
+   *
    * @return boolean Returns TRUE if item received.
    */
-  public function apiFetch() {
+  function apiFetch() {
     global $tracing;
-    global $cachetypes;
-    $postdata = array('apiKey' => $this->apiKey,
-      'characterID' => $this->characterID, 'userID' => $this->userID);
+    $postData = array('userID' => $this->userID, 'apiKey' => $this->apiKey);
     $tableName = $this->tablePrefix . $this->api;
-    $xml = FALSE;
     try {
       // Build base part of cache file name.
-      $cacheName = $this->serverName . $tableName;
-      $cacheName .= $this->corporationID . '.xml';
+      $cacheName = $this->serverName . $tableName . $this->userID . '.xml';
       // Try to get XML from local cache first if we can.
       $mess = 'getCachedXml for ' . $cacheName;
       $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-      $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
-      if ($xml === FALSE) {
+      $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
+      $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_ACCOUNT);
+      if (empty($xml)) {
         $mess = 'getAPIinfo for ' . $this->api;
         $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
-          $postdata, $this->proxy);
+        $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
+        $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
+        $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_ACCOUNT,
+          $postData, $this->proxy);
         if ($xml instanceof SimpleXMLElement) {
           // Store XML in local cache.
-          YapealApiRequests::cacheXml($xml->asXML(), $cacheName,
-            YAPEAL_API_CORP);
-        };// if $xml === FALSE ...
+          YapealApiRequests::cacheXml($xml->asXML(), $cacheName, YAPEAL_API_ACCOUNT);
+        };// if $xml ...
       };// if empty $xml ...
-      if ($xml !== FALSE) {
+      if (!empty($xml)) {
         $this->xml = $xml;
         return TRUE;
       } else {
@@ -197,20 +170,6 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
     global $tracing;
     try {
       switch ($code) {
-        // All of these codes give a new cachedUntil time to use.
-        case 101: // Wallet exhausted: retry after {0}.
-        case 103: // Already returned one week of data: retry after {0}.
-        case 115: // Assets already downloaded: retry after {0}.
-        case 116: // Industry jobs already downloaded: retry after {0}.
-        case 117: // Market orders already downloaded. retry after {0}.
-        case 119: // Kills exhausted: retry after {0}.
-          $cuntil = substr($e->getMessage() , -21, 20);
-          $data = array( 'tableName' => $this->tablePrefix . $this->api,
-            'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
-          );
-          YapealDBConnection::upsert($data, $cachetypes,
-            YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-          break;
         case 105:// Invalid characterID.
         case 201:// Character does not belong to account.
         case 202:// API key authentication failure.
@@ -219,37 +178,27 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
         case 205:// Authentication failure (final pass).
         case 210:// Authentication failure.
         case 212:// Authentication failure (final pass).
-          $mess = 'Deactivating corporationID: ' . $this->corporationID;
+          $mess = 'Deactivating characterID: ' . $this->characterID;
           $mess .= ' as their Eve API information is incorrect';
           trigger_error($mess, E_USER_WARNING);
           $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `isActive`=0';
-          $sql .= ' where `corporationID`=' . $this->corporationID;
-          $mess = 'Before update utilRegisteredCorporation in ' . basename(__FILE__);
+          $sql .= ' where `characterID`=' . $this->characterID;
+          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 200:// Current security level not high enough. (Wrong API key)
-        case 206:// Character must have Accountant or Junior Accountant roles.
-        case 207:// Not available for NPC corporations.
-        case 208:// Character must have Accountant, Junior Accountant, or Trader roles.
-        case 209:// Character must be a Director or CEO.
-        case 213:// Character must have Factory Manager role.
           $mess = 'Deactivating Eve API: ' . $this->api;
-          $mess .= ' for corporation ' . $this->corporationID;
-          $mess .= ' as character ' .  $this->characterID;
-          if ($code != 200) {
-            $mess .= ' does not currently have access';
-          } else {
-            $mess .= ' did not give the required full API key';
-          };
+          $mess .= ' for ' . $this->characterID;
+          $mess .= ' as did not give the required full API key';
           trigger_error($mess, E_USER_WARNING);
           $con = YapealDBConnection::connect(YAPEAL_DSN);
           $sql = 'select `activeAPI`';
-          $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
-          $sql .= ' where `corporationID`=' . $this->corporationID;
+          $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+          $sql .= ' where `characterID`=' . $this->characterID;
           $mess = 'Before select activeAPI in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
@@ -257,10 +206,10 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
           // Split the string on spaces and put into the keys.
           $apis = array_flip(explode(' ', $result));
           unset($apis[$this->api]);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
-          $sql .= ' where `corporationID`=' . $this->corporationID;
-          $mess = 'Before update utilRegisteredCorporation in ' . basename(__FILE__);
+          $sql .= ' where `characterID`=' . $this->characterID;
+          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);

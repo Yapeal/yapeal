@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents IYapealObserver Interface.
+ * Contains IYapealSubject Interface.
  *
  * PHP version 5
  *
@@ -44,19 +44,19 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Observer
  */
-interface YapealSubject {
+interface IYapealSubject {
   /**
    * Used by observers to register so they can be notified.
    *
    * @param SplObserver $observer The observer being added.
    */
-  public static function attach(YapealObserver $observer);
+  public static function attach(IYapealObserver $observer);
   /**
    * Used by observers to unregister from being notified.
    *
    * @param SplObserver $observer The observer being removed.
    */
-  public static function detach(YapealObserver $observer);
+  public static function detach(IYapealObserver $observer);
   /**
    * Used to notify all the observers.
    */

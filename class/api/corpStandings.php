@@ -74,11 +74,11 @@ class corpStandings extends ACorporation {
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-          YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $cachetypes,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         // Already logged nothing to do here.
@@ -221,14 +221,26 @@ class corpStandings extends ACorporation {
     $extras = array('ownerID' => $this->corporationID);
 
     $datum = $this->xml->xpath($currentPath);
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->corporationID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        multipleUpsertAttributes($datum, $typesTo, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $typesTo,
+          $tableName, YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -236,7 +248,6 @@ class corpStandings extends ACorporation {
       $ret = TRUE;
     } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
     };// else count $datum ...
@@ -258,14 +269,26 @@ class corpStandings extends ACorporation {
       'standing' => 'N', 'ownerID' => 'I');
     $extras = array('ownerID' => $this->corporationID);
     $datum = $this->xml->xpath($currentPath);
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $sql = 'delete from ' . $tableName;
+      $sql .= ' where ownerID=' . $this->corporationID;
+      $mess = 'Before delete for ' . $tableName;
+      $mess .= ' in ' . __FILE__;
+      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      // Clear out old info for this owner.
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        multipleUpsertAttributes($datum, $typesFrom, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $typesFrom,
+          $tableName, YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -273,7 +296,6 @@ class corpStandings extends ACorporation {
       $ret = TRUE;
     } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
     };// else count $datum ...

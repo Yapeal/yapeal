@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
- * Yapeal installer - Wellcome page.
- *
+ * Yapeal installer - Welcome page.
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -38,11 +42,12 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /**
  * output the page
  */
-OpenSite(WELCOME);
-echo WELCOME_TEXT
-    .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=req" method="post">' . PHP_EOL
-		.'<input type="hidden" name="lang" value="'.GetBrowserLang().'" />' . PHP_EOL
-    .'<input type="submit" value="' . NEXT . '" />' . PHP_EOL
-    .'</form>' . PHP_EOL;
+OpenSite('Welcome');
+echo '<h3>Welcome to Yapeal Setup.</h3><br />' . PHP_EOL
+  . 'This setup will make Yapeal EVE API Library run on your site.<br />' . PHP_EOL
+  . '<br />' . PHP_EOL
+  . '<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk=req" method="post">' . PHP_EOL
+  . '<input type="submit" value="Next" />' . PHP_EOL
+  . '</form>' . PHP_EOL;
 CloseSite();
 ?>

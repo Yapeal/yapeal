@@ -67,23 +67,23 @@ class charAssetList extends ACharacter {
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' from char section in ' . __FILE__;
+      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $data = $this->xml;
       if (count($data) > 0) {
         $mess = 'Before editAssets for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 3) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         // Call recursive function to modify XML.
         $rgt = $this->editAssets($data);
         try {
-          $con = connect(YAPEAL_DSN, $tableName);
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
           $sql = 'delete from ' . $tableName;
           $sql .= ' where ownerID=' . $this->characterID;
           $mess = 'Before delete for ' . $tableName;
-          $mess .= ' in ' . __FILE__;
+          $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Clear out old tree for this owner.
@@ -96,13 +96,20 @@ class charAssetList extends ACharacter {
             ' lft="1" locationID="0" lvl="0" rgt="' . $rgt . '" />';
           $root = new SimpleXMLElement($nodeData);
           array_unshift($datum, $root);
+          unset($root);
           $extras = array('ownerID' => $this->characterID);
-          $mess = 'multipleUpsertAttributes for ' . $tableName;
-          $mess .= ' in ' . __FILE__;
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          multipleUpsertAttributes($datum, $this->types, $tableName,
-            YAPEAL_DSN, $extras);
+          $cnt = count($datum);
+          $maxUpsert = 1000;
+          for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
+              $i < $grp;++$i, $pos += $maxUpsert) {
+            $group = array_slice($datum, $pos, $maxUpsert, TRUE);
+            $mess = 'multipleUpsertAttributes for ' . $tableName;
+            $mess .= ' in ' . basename(__FILE__);
+            $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
+            $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
+              $tableName, YAPEAL_DSN, $extras);
+          };// for $i = 0...
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -110,7 +117,6 @@ class charAssetList extends ACharacter {
         $ret = TRUE;
       } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' from char section in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
       };// else count $datum ...
@@ -121,11 +127,11 @@ class charAssetList extends ACharacter {
           'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-          YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $cachetypes,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         // Already logged nothing to do here.

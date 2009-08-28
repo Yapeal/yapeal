@@ -31,6 +31,7 @@
 -->
   <!-- Utility Section -->
   <table name="utilCachedUntil">
+    <descr>Used to track cache times of the APIs</descr>
     <field name="`cachedUntil`" type="T">
       <NOTNULL/>
     </field>
@@ -72,6 +73,7 @@
     <field name="`name`" type="C" size="255">
       <NOTNULL/>
     </field>
+    <field name="`proxy`" type="C" size="255"/>
     <field name="`userID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -94,11 +96,16 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`proxy`" type="C" size="255"/>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilRegisteredUser">
     <field name="`fullApiKey`" type="C" size="64">
       <NOTNULL/>
+    </field>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
     </field>
     <field name="`limitedApiKey`" type="C" size="64"/>
     <field name="`userID`" type="I8" size="20">
@@ -107,6 +114,28 @@
     </field>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="utilSections">
+    <field name="`activeAPI`" type="X"/>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`proxy`" type="C" size="255">
+      <DEFAULT value="http://api.eve-online.com/%2$s/%1$s.xml.aspx"/>
+    </field>
+    <field name="`sectionID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`sectionName`" type="C" size="255">
+      <KEY/>
+    </field>
+    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('dbPrefix', '%%P') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
+    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('utilVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
+  </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `graphic` BLOB DEFAULT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `isActive` BOOLEAN NOT NULL</query>
@@ -116,7 +145,9 @@
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCorporation` MODIFY `isActive` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('dbPrefix', '%%P') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
-    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('utilVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
+    <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `isActive` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `isActive` BOOLEAN NOT NULL</query>
   </sql>
 </schema>

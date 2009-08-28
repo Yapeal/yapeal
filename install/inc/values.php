@@ -41,7 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 800;
+$setupversion = 849;
 /*
  * config tables used to test if this is an older version
  */
@@ -49,8 +49,8 @@ $cfgtables = array('utilconfig', 'utilConfig');
 /*
  * This is schema xml files to use in AXMLS + it's current version
  */
-$schemas = array('util'=>753, 'account'=>753, 'char'=>786, 'corp'=>800,
-  'eve'=>753, 'map'=>753, 'server'=>753);
+$schemas = array('util'=>846, 'account'=>846, 'char'=>846, 'corp'=>846,
+  'eve'=>846, 'map'=>846, 'server'=>846);
 /*****************************************************************
  * Define what APIs the Character can pull with a description
  * To use:
@@ -58,16 +58,17 @@ $schemas = array('util'=>753, 'account'=>753, 'char'=>786, 'corp'=>800,
  * array('The name of the API' => the description on what it is.);
  * The description should be defined in the language files!
  *****************************************************************/
-$charAPIs = array('charAccountBalance'     => GET_charAccountBalance_DES,
-                  'charAssetList'          => GET_charAssetList_DES,
-                  'charCharacterSheet'     => GET_charCharacterSheet_DES,
-                  'charIndustryJobs'       => GET_charIndustryJobs_DES,
-                  'charKillLog'            => GET_charKillLog_DES,
-                  'charMarketOrders'       => GET_charMarketOrders_DES,
-                  'charSkillQueue'         => GET_charSkillQueue_DES,
-                  'charStandings'          => GET_charStandings_DES,
-                  'charWalletJournal'      => GET_charWalletJournal_DES,
-                  'charWalletTransactions' => GET_charWalletTransactions_DES);
+$charAPIs = array('AccountBalance'     => 'Get Account Balance from character',
+                  'AssetList'          => 'Get Asset List from character',
+                  'CharacterSheet'     => 'Get Character Sheet',
+                  'IndustryJobs'       => 'Get Industry Jobs from character',
+                  'KillLog'            => 'Get Kill Log from character',
+                  'MarketOrders'       => 'Get Market Orders from character',
+                  'SkillInTraining'    => 'Get Skill In Training from character',
+                  'SkillQueue'         => 'Get Skill Queue from character',
+                  'Standings'          => 'Get Standings from character',
+                  'WalletJournal'      => 'Get Wallet Journal from character',
+                  'WalletTransactions' => 'Get Wallet Transactions from character');
 /*****************************************************************
  * Define what APIs the Corporation can pull with a description
  * To use:
@@ -75,22 +76,22 @@ $charAPIs = array('charAccountBalance'     => GET_charAccountBalance_DES,
  * array('The name of the API' => the description on what it is.);
  * The description should be defined in the language files!
  *****************************************************************/
-$corpAPIs = array('corpAccountBalance'     => GET_corpAccountBalance_DES,
-                  'corpAssetList'          => GET_corpAssetList_DES,
-                  'corpCorporationSheet'   => GET_corpCorporationSheet_DES,
-                  'corpIndustryJobs'       => GET_corpIndustryJobs_DES,
-                  'corpKillLog'            => GET_corpKillLog_DES,
-                  'corpMarketOrders'       => GET_corpMarketOrders_DES,
-                  'corpMemberTracking'     => GET_corpMemberTracking_DES,
-                  'corpStandings'          => GET_corpStandings_DES,
-                  'corpStarbaseDetail'     => GET_corpStarbaseDetail_DES,
-                  'corpStarbaseList'       => GET_corpStarbaseList_DES,
-                  'corpWalletJournal'      => GET_corpWalletJournal_DES,
-                  'corpWalletTransactions' => GET_corpWalletTransactions_DES);
+$corpAPIs = array('AccountBalance'     => 'Get Account Balance from corporation',
+                  'AssetList'          => 'Get Asset List from corporation',
+                  'CorporationSheet'   => 'Get Corporation Sheet',
+                  'IndustryJobs'       => 'Get Industry Jobs from corporation',
+                  'KillLog'            => 'Get Kill Log from corporation',
+                  'MarketOrders'       => 'Get Market Orders from corporation',
+                  'MemberTracking'     => 'Get Member Tracking from corporation',
+                  'Standings'          => 'Get Standings from corporation',
+                  'StarbaseDetail'     => 'Get Starbase Details from corporation',
+                  'StarbaseList'       => 'Get Starbase List from corporation',
+                  'WalletJournal'      => 'Get Wallet Journal from corporation',
+                  'WalletTransactions' => 'Get Wallet Transactions from corporation');
 /*
  * Require common_paths.php to define the path in yapeal
  */
-require_once('..' . $ds . 'inc' . $ds . 'common_paths.php');
+require_once('..' . DS . 'inc' . DS . 'common_paths.php');
 /*
  * Require adodb.inc.php to be able to create connection to db
  */

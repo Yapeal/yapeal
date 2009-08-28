@@ -94,17 +94,17 @@ class corpWalletTransactions extends ACorporation {
           $cacheName .= $this->corporationID . $account . $beforeID . '.xml';
           // Try to get XML from local cache first if we can.
           $mess = 'getCachedXml for ' . $cacheName;
-          $mess .= ' in ' . __FILE__;
+          $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
           if ($xml === FALSE) {
             $mess = 'getAPIinfo for ' . $this->api;
-            $mess .= ' in ' . __FILE__;
+            $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
-              $postData);
+              $postData, $this->proxy);
             if ($xml instanceof SimpleXMLElement) {
               // Get current API time and add an hour to it.
               $currentTime = strtotime((string)$xml->currentTime[0] . ' +0000');
@@ -117,18 +117,16 @@ class corpWalletTransactions extends ACorporation {
             };// if $xml ...
           };// if $xml === FALSE ...
           if ($xml !== FALSE) {
-            print 'Storing XML' . PHP_EOL;
             $this->xml[$account][] = $xml;
             $datum = $xml->xpath($this->xpath);
             $cnt = count($datum);
-            print 'Row count: ' .$cnt . PHP_EOL;
             if ($cnt > 0) {
               // Get date/time of last record
               $lastDT = strtotime($datum[$cnt - 1]['transactionDateTime'] . ' +0000');
               // If last record is less than a week old we might be able to
               // continue walking backwards through records.
               if ($oldest < $lastDT) {
-                $beforeID = (int)$datum[$cnt - 1]['transactionID'];
+                $beforeID = $datum[$cnt - 1]['transactionID'];
                 // Pause to let CCP figure out we got last 1000 records before
                 // trying to getting another batch :P
                 sleep(2);
@@ -138,41 +136,24 @@ class corpWalletTransactions extends ACorporation {
               }; // if $oldest<$lastDT
             } else {
               $mess = 'No records for ' . $tableName;
-              $mess .= ' in ' . __FILE__;
               trigger_error($mess, E_USER_NOTICE);
               break;
             }
           } else {
             $mess = 'No XML found for ' . $tableName;
-            $mess .= ' in ' . __FILE__;
             trigger_error($mess, E_USER_NOTICE);
             continue 2;
           };// else $xml !== FALSE ...
         }
         catch (YapealApiErrorException $e) {
-          // Some error codes give us a new time to retry after that should be
-          // used for cached until time.
-          switch ($e->getCode()) {
-            case 101: // Wallet exhausted.
-            case 103: // Already returned one week of data.
-              $cuntil = substr($e->getMessage() , -21, 20);
-              print 'Error cachedUntil: ' . $cuntil . PHP_EOL;
-              $data = array( 'tableName' => $tableName,
-                'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
-              );
-              upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-                YAPEAL_DSN);
-              break;
-            case 211: // Login denied by account status.
-              // The corporation's account isn't active no use trying any of the
-              // other APIs.
-              break 4;// switch, while, foreach $accounts, foreach $apis
-            default:
-              // Do nothing but logging by default
-          };// switch $e->getCode()
-          continue 2;// while, foreach $accounts
+          if ($this->handleApiRetry($e->getCode())) {
+            continue 2;
+          } else if ($this->handleApiError($e->getCode())) {
+            return FALSE;
+          };
+          continue 2;
         }
-        catch (YapealApiException $e) {
+        catch (YapealApiFileException $e) {
           continue 2;
         }
         catch (ADODB_Exception $e) {
@@ -200,19 +181,18 @@ class corpWalletTransactions extends ACorporation {
     $tableName = $this->tablePrefix . $this->api;
     if (empty($this->xml)) {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };// if empty $this->xml ...
     foreach ($accounts as $account) {
       if (empty($this->xml[$account])) {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
-        $mess .= ' in ' . __FILE__;
         trigger_error($mess, E_USER_NOTICE);
+        continue;
       };// if empty $this->xml[$account] ...
       foreach ($this->xml[$account] as $xml) {
         $mess = 'Xpath for ' . $tableName . $account;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         $datum = $xml->xpath($this->xpath);
@@ -221,12 +201,17 @@ class corpWalletTransactions extends ACorporation {
           try {
             $extras = array('ownerID' => $this->corporationID,
               'accountKey' => $account);
-            $mess = 'multipleUpsertAttributes for ' . $tableName . $account;
-            $mess .= ' in ' . __FILE__;
-            $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-            multipleUpsertAttributes($datum, $this->types, $tableName, YAPEAL_DSN,
-              $extras);
+            $maxUpsert = 1000;
+            for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
+                $i < $grp;++$i, $pos += $maxUpsert) {
+              $group = array_slice($datum, $pos, $maxUpsert, TRUE);
+              $mess = 'multipleUpsertAttributes for ' . $tableName . $account;
+              $mess .= ' in ' . basename(__FILE__);
+              $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
+              $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+              YapealDBConnection::multipleUpsertAttributes($group, $this->types,
+                $tableName, YAPEAL_DSN, $extras);
+            };// for $i = 0...
           }
           catch (ADODB_Exception $e) {
             // Any failure to store XML on any account returns FALSE;
@@ -240,7 +225,6 @@ class corpWalletTransactions extends ACorporation {
           //};
         } else {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
-        $mess .= ' in ' . __FILE__;
         trigger_error($mess, E_USER_NOTICE);
         };// else count $datum ...
       };// foreach $this->xml[$account] ...
@@ -257,11 +241,11 @@ class corpWalletTransactions extends ACorporation {
         'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
       );
       $mess = 'Upsert for '. $tableName;
-      $mess .= ' in ' . __FILE__;
+      $mess .= ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-      upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-        YAPEAL_DSN);
+      YapealDBConnection::upsert($data, $cachetypes,
+        YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
       // Already logged nothing to do here.
@@ -272,5 +256,36 @@ class corpWalletTransactions extends ACorporation {
     };
     return FALSE;
   }// function apiStore
+  /**
+   * Handles some Eve API error codes in special ways.
+   *
+   * @param integer $code Eve API error code returned.
+   *
+   * @return bool Returns TRUE if handled the error else FALSE.
+   */
+  private function handleApiRetry($code) {
+    global $tracing;
+    try {
+      switch ($code) {
+        // All of these codes give a new cachedUntil time to use.
+        case 101: // Wallet exhausted: retry after {0}.
+        case 103: // Already returned one week of data: retry after {0}.
+        case 115: // Assets already downloaded: retry after {0}.
+        case 116: // Industry jobs already downloaded: retry after {0}.
+        case 117: // Market orders already downloaded. retry after {0}.
+        case 119: // Kills exhausted: retry after {0}.
+          $cuntil = substr($e->getMessage() , -21, 20);
+          $data = array( 'tableName' => $this->tablePrefix . $this->api,
+            'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
+          );
+            YapealDBConnection::upsert($data, $cachetypes,
+              YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+          return TRUE;
+          break;
+      };// switch $code ...
+    }
+    catch (ADODB_Exception $e) {}
+    return FALSE;
+  }// function handleApiRetry
 }
 ?>

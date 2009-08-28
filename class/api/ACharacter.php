@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents abstract class for char section.
+ * Contains abstract class for char section.
  *
  * PHP version 5
  *
@@ -54,6 +54,10 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    */
   protected $characterID;
   /**
+   * @var string Holds proxy info.
+   */
+  protected $proxy;
+  /**
    * @var string Name of Eve server.
    */
   protected $serverName;
@@ -72,6 +76,9 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
   /**
    * Constructor
    *
+   * @param string $proxy Allows overriding API server for example to use a
+   * different proxy on a per char/corp basis. It should contain a url format
+   * string made to used in sprintf() to replace %1$s with $api and %2$s with
    * @param array $params Holds the required parameters like userID, apiKey,
    * etc as needed.
    *
@@ -79,35 +86,36 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    *
    * @throws LengthException for any missing required $params.
    */
-  public function __construct(array $params = array()) {
+  public function __construct($proxy, array $params = array()) {
     $this->tablePrefix = YAPEAL_TABLE_PREFIX . 'char';
+    $this->proxy = $proxy;
     if (isset($params['apiKey']) && is_string($params['apiKey'])) {
       $this->apiKey = $params['apiKey'];
     } else {
       $mess = 'Missing required parameter $params["apiKey"] to constructor';
-      $mess .= ' for ' . $this->api . ' from char section in ' . __FILE__;
+      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
       throw new LengthException($mess, 1);
     };// else isset $params['apikey'] ...
-    if (isset($params['characterID']) && is_int($params['characterID'])) {
+    if (isset($params['characterID']) && is_numeric($params['characterID'])) {
       $this->characterID = $params['characterID'];
     } else {
       $mess = 'Missing required parameter $params["characterID"] to constructor';
-      $mess .= ' for ' . $this->api . ' from char section in ' . __FILE__;
+      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
       throw new LengthException($mess, 2);
     };// else isset $params['characterID'] ...
     if (isset($params['serverName']) && is_string($params['serverName'])) {
       $this->serverName = $params['serverName'];
     } else {
       $mess = 'Missing required parameter $params["serverName"] to constructor';
-      $mess .= ' for ' . $this->api . ' from char section in ' . __FILE__;
-      throw new LengthException($mess, 4);
+      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
+      throw new LengthException($mess, 3);
     };// else isset $params['serverName'] ...
-    if (isset($params['userID']) && is_int($params['userID'])) {
+    if (isset($params['userID']) && is_numeric($params['userID'])) {
       $this->userID = $params['userID'];
     } else {
       $mess = 'Missing required parameter $params["userID"] to constructor';
-      $mess .= ' for ' . $this->api . ' from char section in ' . __FILE__;
-      throw new LengthException($mess, 5);
+      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
+      throw new LengthException($mess, 4);
     };// else isset $params['userID'] ...
   }// function __construct
   /**
@@ -128,17 +136,17 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
       $cacheName .= $this->characterID . '.xml';
       // Try to get XML from local cache first if we can.
       $mess = 'getCachedXml for ' . $cacheName;
-      $mess .= ' from char section in ' . __FILE__;
+      $mess .= ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CHAR);
       if ($xml === FALSE) {
         $mess = 'getAPIinfo for ' . $this->api;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CHAR,
-          $postdata);
+          $postdata, $this->proxy);
         if ($xml instanceof SimpleXMLElement) {
           // Store XML in local cache.
           YapealApiRequests::cacheXml($xml->asXML(), $cacheName,
@@ -150,42 +158,115 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
         return TRUE;
       } else {
         $mess = 'No XML found for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
         trigger_error($mess, E_USER_NOTICE);
         return FALSE;
       };
     }
     catch (YapealApiErrorException $e) {
-      // Some error codes give us a new time to retry after that should be
-      // used for cached until time.
-      switch ($e->getCode()) {
-        case 101: // Wallet exhausted.
-        case 103: // Already returned one week of data.
-        case 115: // Assets already downloaded.
-        case 116: // Industry jobs already downloaded.
-        case 117: // Market orders already downloaded.
-        case 119: // Kills exhausted.
-          $cuntil = substr($e->getMessage() , -21, 20);
-          $data = array( 'tableName' => $tableName,
-            'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-          );
-          upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-            YAPEAL_DSN);
-          break;
-        case 211: // Login denied by account status.
-          // The character's account isn't active no use trying any of the other APIs.
-          break 2;// switch, foreach $apis
-        default:
-          // Do nothing but logging by default
-      };// switch $e->getCode()
+      // Any API errors that need to be handled in some way are handled in this
+      // function.
+      $this->handleApiError($e->getCode());
       return FALSE;
     }
-    catch (YapealApiException $e) {
+    catch (YapealApiFileException $e) {
       return FALSE;
     }
     catch (ADODB_Exception $e) {
       return FALSE;
     }
   }// function apiFetch
+  /**
+   * Handles some Eve API error codes in special ways.
+   *
+   * @param integer $code Eve API error code returned.
+   *
+   * @return bool Returns TRUE if handled the error else FALSE.
+   */
+  protected function handleApiError($code) {
+    global $tracing;
+    try {
+      switch ($code) {
+        // All of these codes give a new cachedUntil time to use.
+        case 101: // Wallet exhausted: retry after {0}.
+        case 103: // Already returned one week of data: retry after {0}.
+        case 115: // Assets already downloaded: retry after {0}.
+        case 116: // Industry jobs already downloaded: retry after {0}.
+        case 117: // Market orders already downloaded. retry after {0}.
+        case 119: // Kills exhausted: retry after {0}.
+          $cuntil = substr($e->getMessage() , -21, 20);
+          $data = array( 'tableName' => $this->tablePrefix . $this->api,
+            'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
+          );
+          YapealDBConnection::upsert($data, $cachetypes,
+            YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+          break;
+        case 105:// Invalid characterID.
+        case 201:// Character does not belong to account.
+        case 202:// API key authentication failure.
+        case 203:// Authentication failure.
+        case 204:// Authentication failure.
+        case 205:// Authentication failure (final pass).
+        case 210:// Authentication failure.
+        case 212:// Authentication failure (final pass).
+          $mess = 'Deactivating characterID: ' . $this->characterID;
+          $mess .= ' as their Eve API information is incorrect';
+          trigger_error($mess, E_USER_WARNING);
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+          $sql .= ' set `isActive`=0';
+          $sql .= ' where `characterID`=' . $this->characterID;
+          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
+          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+          $con->Execute($sql);
+          break;
+        case 200:// Current security level not high enough. (Wrong API key)
+          $mess = 'Deactivating Eve API: ' . $this->api;
+          $mess .= ' for ' . $this->characterID;
+          $mess .= ' as did not give the required full API key';
+          trigger_error($mess, E_USER_WARNING);
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
+          $sql = 'select `activeAPI`';
+          $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+          $sql .= ' where `characterID`=' . $this->characterID;
+          $mess = 'Before select activeAPI in ' . basename(__FILE__);
+          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+          $result = $con->GetOne($sql);
+          // Split the string on spaces and put into the keys.
+          $apis = array_flip(explode(' ', $result));
+          unset($apis[$this->api]);
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+          $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
+          $sql .= ' where `characterID`=' . $this->characterID;
+          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
+          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+          $con->Execute($sql);
+          break;
+        case 211:// Login denied by account status.
+          // The user's account isn't active deactivate it.
+          $mess = 'Deactivating userID: ' . $this->userID;
+          $mess .= ' as their Eve account is currently suspended';
+          trigger_error($mess, E_USER_WARNING);
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
+          $sql .= ' set `isActive`=0';
+          $sql .= ' where `userID`=' . $this->userID;
+          $mess = 'Before update utilRegisteredUser in ' . basename(__FILE__);
+          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
+          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
+          $con->Execute($sql);
+          break;
+        default:
+          return FALSE;
+          break;
+      };// switch $code ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }// function handleApiError
 }
 ?>

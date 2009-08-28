@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents ADOdbFactory class.
+ * Contains ADOdbFactory class.
  *
  * The original code for this was lifted from the original adodb-exception.inc.php.
  * @version V5.07 18 Dec 2008   (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.

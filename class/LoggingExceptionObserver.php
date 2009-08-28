@@ -1,6 +1,6 @@
 <?php
 /**
- * Includes LoggingExceptionObserver class.
+ * Contains LoggingExceptionObserver class.
  *
  * PHP version 5
  *
@@ -44,10 +44,10 @@ require_once YAPEAL_INC . 'elog.php';
  *
  * @package Yapeal
  * @subpackage Observer
- * @uses YapealObserver
+ * @uses IYapealObserver
  * @uses elog
  */
-class LoggingExceptionObserver implements YapealObserver {
+class LoggingExceptionObserver implements IYapealObserver {
   /**
    * @var string Holds the name of the log file to use.
    */
@@ -67,7 +67,7 @@ class LoggingExceptionObserver implements YapealObserver {
    *
    * @param object $e The 'object' we're observing.
    */
-  public function YapealUpdate(YapealSubject $e) {
+  public function YapealUpdate(IYapealSubject $e) {
     $message = PHP_EOL;
     $message .= <<<MESS
 EXCEPTION:

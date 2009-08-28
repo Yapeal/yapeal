@@ -69,7 +69,7 @@ class charCharacterSheet  extends ACharacter {
       if ($this->certificates()) {
         ++$ret;
       };
-      if ($this->charSheet()) {
+      if ($this->characterSheet()) {
         ++$ret;
       };
       if ($this->corporationRoles()) {
@@ -97,11 +97,11 @@ class charCharacterSheet  extends ACharacter {
           'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-          YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $cachetypes,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         // Already logged nothing to do here.
@@ -118,7 +118,7 @@ class charCharacterSheet  extends ACharacter {
    *
    * @return Bool Return TRUE if store was successful.
    */
-  protected function charSheet() {
+  protected function characterSheet() {
     global $tracing;
     $types = array(
       'balance' => 'N', 'bloodLine' => 'C', 'characterID' => 'I',
@@ -127,13 +127,13 @@ class charCharacterSheet  extends ACharacter {
     );
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
-    $mess = 'Clone for ' . $tableName . ' from char section in ' . __FILE__;
+    $mess = 'Clone for ' . $tableName . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $datum = clone $this->xml->result[0];
     // Get rid of child table stuff
     $mess = 'Delete children for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
+    $mess .= ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     unset($datum->rowset, $datum->attributes, $datum->attributeEnhancers);
@@ -145,10 +145,10 @@ class charCharacterSheet  extends ACharacter {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -156,7 +156,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -182,10 +181,10 @@ class charCharacterSheet  extends ACharacter {
       };
       try {
         $mess = 'Upsert for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -193,7 +192,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -213,7 +211,7 @@ class charCharacterSheet  extends ACharacter {
     );
     $datum = $this->xml->xpath('//attributeEnhancers');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -236,10 +234,10 @@ class charCharacterSheet  extends ACharacter {
       if (count($data) > 0) {
         try {
           $mess = 'Upsert for ' . $tableName;
-          $mess .= ' from char section in ' . __FILE__;
+          $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          multipleUpsert($data, $types, $tableName, YAPEAL_DSN);
+          YapealDBConnection::multipleUpsert($data, $types, $tableName, YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -247,13 +245,11 @@ class charCharacterSheet  extends ACharacter {
         $ret = TRUE;
       } else {
         $mess = 'No implants for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
         trigger_error($mess, E_USER_NOTICE);
         $ret = FALSE;
       };// else count $data ...
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -275,11 +271,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -287,7 +283,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -306,7 +301,7 @@ class charCharacterSheet  extends ACharacter {
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRoles"]/row');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -321,11 +316,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -333,7 +328,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -352,7 +346,7 @@ class charCharacterSheet  extends ACharacter {
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtBase"]/row');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -367,11 +361,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -379,7 +373,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -398,7 +391,7 @@ class charCharacterSheet  extends ACharacter {
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtHQ"]/row');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -413,11 +406,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -425,7 +418,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -444,7 +436,7 @@ class charCharacterSheet  extends ACharacter {
     $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtOther"]/row');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -459,11 +451,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -471,7 +463,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -490,7 +481,7 @@ class charCharacterSheet  extends ACharacter {
     $types = array('ownerID' => 'I', 'titleID' => 'I', 'titleName' => 'C');
     $datum = $this->xml->xpath('//rowset[@name="corporationTitles"]/row');
     try {
-      $con = connect(YAPEAL_DSN, $tableName);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from ' . $tableName;
       $sql .= ' where ownerID=' . $this->characterID;
       $mess = 'Before delete for ' . $tableName;
@@ -505,11 +496,11 @@ class charCharacterSheet  extends ACharacter {
       try {
         $extras = array('ownerID' => $this->characterID);
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -517,7 +508,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...
@@ -542,11 +532,11 @@ class charCharacterSheet  extends ACharacter {
           'unpublished' => 0
         );
         $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' from char section in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        multipleUpsertAttributes($datum, $types, $tableName, YAPEAL_DSN,
-          $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -554,7 +544,6 @@ class charCharacterSheet  extends ACharacter {
       $ret = TRUE;
     } else {
     $mess = 'There was no XML data to store for ' . $tableName;
-    $mess .= ' from char section in ' . __FILE__;
     trigger_error($mess, E_USER_NOTICE);
     $ret = FALSE;
     };// else count $datum ...

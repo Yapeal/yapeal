@@ -64,23 +64,17 @@ if (isset($ini)) {
   if (isset($config['DB_Database'])) { $database = $config['DB_Database']; }; // if isset $config['DB_Database']
   if (isset($config['DB_Prefix'])) { $table_prefix = $config['DB_Prefix']; }; // if isset $config['DB_Prefix']
   /*
-   * Set default values for Api
+   * Set default values for Cache
    */
-  $cache_xml = trueorfalse($ini['Api']['cache_xml']);
-  $account_active = trueorfalse($ini['Api']['account_active']);
-  $char_active = trueorfalse($ini['Api']['char_active']);
-  $corp_active = trueorfalse($ini['Api']['corp_active']);
-  $eve_active = trueorfalse($ini['Api']['eve_active']);
-  $map_active = trueorfalse($ini['Api']['map_active']);
+  if (isset($_POST['updatedb']) && conRev($ini['version'])<=800) {
+    $cache_xml = trueorfalse($ini['Api']['cache_xml']);
+  } else {
+    $cache_xml = trueorfalse($ini['Cache']['cache_xml']);
+  }
   /*
-   * Overwrite default values for Api
+   * Overwrite default values for Cache
    */
   if (isset($config['api_cache_xml'])) { $cache_xml = trueorfalse($config['api_cache_xml']); }; // if isset $config['api_cache_xml']
-	if (isset($config['api_account'])) { $account_active = trueorfalse($config['api_account']); }; // if isset $config['api_account']
-	if (isset($config['api_char'])) { $char_active = trueorfalse($config['api_char']); }; // if isset $config['api_char']
-	if (isset($config['api_corp'])) { $corp_active = trueorfalse($config['api_corp']); }; // if isset $config['api_corp']
-	if (isset($config['api_eve'])) { $eve_active = trueorfalse($config['api_eve']); }; // if isset $config['api_eve']
-	if (isset($config['api_map'])) { $map_active = trueorfalse($config['api_map']); }; // if isset $config['api_map']
 	/*
    * Set debug handler for Yapeal
    */
@@ -98,7 +92,7 @@ if (isset($ini)) {
   /*
    * Output updating yapeal.ini
    */
-  $iniaction = UPDATE_FILE;
+  $iniaction = 'Update File';
 } else {
   $host = $config['DB_Host'];
   $username = $config['DB_Username'];
@@ -106,14 +100,9 @@ if (isset($ini)) {
   $database = $config['DB_Database'];
   $table_prefix = $config['DB_Prefix'];
   /*
-   * Set default values for Api
+   * Set default values for Cache
    */
   $cache_xml = trueorfalse($config['api_cache_xml']);
-	$account_active = trueorfalse($config['api_account']);
-	$char_active = trueorfalse($config['api_char']);
-	$corp_active = trueorfalse($config['api_corp']);
-	$eve_active = trueorfalse($config['api_eve']);
-	$map_active = trueorfalse($config['api_map']);
 	/*
    * Turn off debug handler for Yapeal since this is the first setup we are doing
    */
@@ -124,7 +113,7 @@ if (isset($ini)) {
   /*
    * Output creating yapeal.ini
    */
-  $iniaction = CREATE_FILE;
+  $iniaction = 'Create File';
 }; // if isset $ini
 $inidata = ';;;;;
 ; Comments on setting up config/yapeal.ini manually can be found in
@@ -138,36 +127,31 @@ date="$Date::                      $"
 stability="beta"
 
 version="$Revision: '.$setupversion.' $"
-[Api]
+
+[Cache]
+cache_output="file"
 cache_xml='.$cache_xml.'
-file_suffix=".xml.aspx"
-url_base="http://api.eve-online.com"
-account_active='.$account_active.'
-char_active='.$char_active.'
-corp_active='.$corp_active.'
-eve_active='.$eve_active.'
-map_active='.$map_active.'
-server_active=TRUE
 
 [Database]
+database="'.$database.'"
+driver="mysqli://"
 host="'.$host.'"
+suffix="?new"
+table_prefix="'.$table_prefix.'"
 username="'.$username.'"
 password="'.$password.'"
-database="'.$database.'"
-table_prefix="'.$table_prefix.'"
-driver="mysqli://"
-suffix="?new"
 
 [Logging]
 error_log="yapeal_error.log"
 log_level='.$log_level.'
 notice_log="yapeal_notice.log"
-warning_log="yapeal_warning.log"
+strict_log="yapeal_strict.log"
 trace_active='.$trace_active.'
 trace_level='.$trace_level.'
 trace_log="yapeal_trace.log"
 trace_output="file"
-trace_section='.$trace_section;
+trace_sections='.$trace_section.'
+warning_log="yapeal_warning.log"';
 $fp = fopen(YAPEAL_CONFIG.'yapeal.ini', 'w');
 fwrite($fp, $inidata);
 fclose($fp);
@@ -176,13 +160,13 @@ if (!(@is_readable(YAPEAL_CONFIG.'yapeal.ini') || @is_file(YAPEAL_CONFIG.'yapeal
   $output .= '<tr>' . PHP_EOL;
   $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;
-  $output .= '  <td class="warning">yapeal.ini '.INI_CREATE_ERROR.'</td>' . PHP_EOL;
+  $output .= '  <td class="warning">yapeal.ini was not created or is not a valid ini file</td>' . PHP_EOL;
   $output .= '</tr>' . PHP_EOL;
 } else {
   $output .= '<tr>' . PHP_EOL;
   $output .= '  <td class="tableinfolbl" style="text-align: left;">'.$iniaction.':</td>' . PHP_EOL;
   $output .= '  <td class="notis">yapeal.ini</td>' . PHP_EOL;
-  $output .= '  <td class="good">'.DONE.'</td>' . PHP_EOL;
+  $output .= '  <td class="good">Done</td>' . PHP_EOL;
   $output .= '</tr>' . PHP_EOL;
 };
 ?>

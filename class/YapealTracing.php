@@ -66,7 +66,14 @@ class YapealTracing {
    * destructor outputs the trace to log file.
    */
   public function __destruct() {
-    $this->flushTrace();
+    if (!empty($this->fileTrace)) {
+      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
+      $this->fileTrace = '';
+    };
+    if (!empty($this->dbTrace)) {
+      // This is where the code to store trace into database will go.
+      $this->dbTrace = '';
+    };
   }
   /**
    * Function used to check for tracing and output a message if enabled.
@@ -77,7 +84,7 @@ class YapealTracing {
    * @return bool TRUE if this type and level of tracing is on.
    */
   function activeTrace($section, $level) {
-    if (YAPEAL_TRACE_ACTIVE && (YAPEAL_TRACE_SECTION & $section) == $section &&
+    if (YAPEAL_TRACE_ACTIVE && (YAPEAL_TRACE_SECTIONS & $section) == $section &&
       YAPEAL_TRACE_LEVEL >= $level) {
       return TRUE;
     }; // if YAPEAL_TRACE&&...
@@ -101,7 +108,8 @@ class YapealTracing {
       YAPEAL_TRACE_CACHE => 'CACHE: ',
       YAPEAL_TRACE_CURL => 'CURL: ',
       YAPEAL_TRACE_DATABASE => 'DATABASE: ',
-      YAPEAL_TRACE_REQUEST => 'REQUEST: '
+      YAPEAL_TRACE_REQUEST => 'REQUEST: ',
+      YAPEAL_TRACE_SECTION => 'SECTION: '
     );
     $mess = $sections[$section] . $message .PHP_EOL;
     if (YAPEAL_TRACE_OUTPUT == 'file' || YAPEAL_TRACE_OUTPUT == 'both') {
@@ -187,4 +195,8 @@ define('YAPEAL_TRACE_FILES', 1048576);
  * Use to turn on request tracing.
  */
 define('YAPEAL_TRACE_REQUEST', 2097152);
+/**
+ * Use to turn on section tracing.
+ */
+define('YAPEAL_TRACE_SECTION', 4194304);
 ?>

@@ -75,7 +75,9 @@ class CurlRequest {
    */
   public function __construct($params) {
     $this->ch = curl_init();
-    $user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3';
+    $curl = curl_version();
+    $user_agent = 'Yapeal/'. YAPEAL_VERSION . YAPEAL_STABILITY . ' (' . PHP_OS .
+      ' ' . php_uname('m') . ') libcurl/' . $curl['version'];
     $header = array(
       "Accept: text/xml,application/xml,application/xhtml+xml;q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;q=0.5",
       "Accept-Language: en-us;q=0.9,en;q=0.8,*;q=0.7",

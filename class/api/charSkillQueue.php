@@ -70,28 +70,28 @@ class charSkillQueue extends ACharacter {
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' in ' . __FILE__;
+      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $datum = $this->xml->xpath($this->xpath);
       if (count($datum) > 0) {
         try {
-          $con = connect(YAPEAL_DSN, $tableName);
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
           $sql = 'delete from ' . $tableName;
           $sql .= ' where ownerID=' . $this->characterID;
           $mess = 'Before delete for ' . $tableName;
-          $mess .= ' in ' . __FILE__;
+          $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Clear out old tree for this owner.
           $con->Execute($sql);
           $extras = array('ownerID' => $this->characterID);
           $mess = 'multipleUpsertAttributes for ' . $tableName;
-          $mess .= ' in ' . __FILE__;
+          $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          multipleUpsertAttributes($datum, $this->types, $tableName, YAPEAL_DSN,
-            $extras);
+          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
+            $tableName, YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -99,7 +99,6 @@ class charSkillQueue extends ACharacter {
         $ret = TRUE;
       } else {
       $mess = 'There was no XML data to store for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
       };// else count $datum ...
@@ -110,11 +109,11 @@ class charSkillQueue extends ACharacter {
           'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
         );
         $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . __FILE__;
+        $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        upsert($data, $cachetypes, YAPEAL_TABLE_PREFIX . 'utilCachedUntil',
-          YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $cachetypes,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         // Already logged nothing to do here.

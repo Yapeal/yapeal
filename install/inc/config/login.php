@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal Setup - Login page.
- *
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -43,12 +47,12 @@ if (isset($ini)) {
       if (isset($_GET['funk'])) {
         $func = '?funk='.$_GET['funk'];
       }; // if (isset($_GET['funk']))
-      OpenSite(LOGIN);
-      echo '<h3>'.LOGIN.'</h3><br />' . PHP_EOL
+      OpenSite('Login');
+      echo '<h3>Login</h3><br />' . PHP_EOL
           .'<form action="' . $_SERVER['SCRIPT_NAME'] . $func . '" method="post">' . PHP_EOL
-          .PASSWORD.' <input type="password" name="setuppass" /><br />' . PHP_EOL
+          .'Password <input type="password" name="setuppass" /><br />' . PHP_EOL
           .'<input type="hidden" name="login" value="login" />' . PHP_EOL
-          .'<input type="submit" value="'.LOGIN.'" />' . PHP_EOL
+          .'<input type="submit" value="Login" />' . PHP_EOL
           .'</form>' . PHP_EOL;
       CloseSite();
       exit;
@@ -62,12 +66,12 @@ if (isset($ini)) {
         header("Location: " . $_SERVER['SCRIPT_NAME'] . $func);
       } else {
         // Login Page
-        OpenSite(LOGIN);
-        echo '<h3>'.LOGIN.' '.FAILED.'</h3><br />' . PHP_EOL
+        OpenSite('Login');
+        echo '<h3>Login Failed</h3><br />' . PHP_EOL
             .'<form action="' . $_SERVER['SCRIPT_NAME'] . '?funk='.$_GET['funk'].'" method="post">' . PHP_EOL
-            .PASSWORD.' <input type="password" name="setuppass" /><br />' . PHP_EOL
+            .'Password <input type="password" name="setuppass" /><br />' . PHP_EOL
             .'<input type="hidden" name="login" value="login" />' . PHP_EOL
-            .'<input type="submit" value="'.LOGIN.'" />' . PHP_EOL
+            .'<input type="submit" value="Login" />' . PHP_EOL
             .'</form>' . PHP_EOL;
         CloseSite();
         exit;

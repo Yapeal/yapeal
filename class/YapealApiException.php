@@ -1,6 +1,6 @@
 <?php
 /**
- * Contents Custom Yapeal API exception class.
+ * Contains Custom Yapeal API exception class.
  *
  * PHP version 5
  *
@@ -43,9 +43,9 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  *
  * @package Yapeal
  * @subpackage Exceptions
- * @uses YapealSubject
+ * @uses IYapealSubject
  */
-class YapealApiException extends Exception implements YapealSubject {
+class YapealApiException extends Exception implements IYapealSubject {
   /**
    * @var array Hold the references to our observers.
    */
@@ -63,18 +63,18 @@ class YapealApiException extends Exception implements YapealSubject {
   /**
    * Used by observers to register so they can be notified.
    *
-   * @param YapealObserver $observer The observer being added.
+   * @param IYapealObserver $observer The observer being added.
    */
-  public static function attach(YapealObserver $observer) {
+  public static function attach(IYapealObserver $observer) {
     $idx = spl_object_hash($observer);
     self::$observers[$idx] = $observer;
   }
   /**
    * Used by observers to unregister from being notified.
    *
-   * @param YapealObserver $observer The observer being removed.
+   * @param IYapealObserver $observer The observer being removed.
    */
-  public static function detach(YapealObserver $observer) {
+  public static function detach(IYapealObserver $observer) {
     $idx = spl_object_hash($observer);
     if (array_key_exists($idx, self::$observers)) {
       unset(self::$observers[$idx]);

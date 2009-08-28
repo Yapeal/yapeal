@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal installer - Setup.
- *
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -42,29 +46,29 @@ if (isset($ini)) {
   /*
    * Get values from ini
    */
-  $cache_xml = $ini['Api']['cache_xml'];
-  $account_active = $ini['Api']['account_active'];
-  $char_active = $ini['Api']['char_active'];
-  $corp_active = $ini['Api']['corp_active'];
-  $eve_active = $ini['Api']['eve_active'];
-  $map_active = $ini['Api']['map_active'];
+  $cache_xml = $ini['Cache']['cache_xml'];
+  $account_active = DBHandler('USACTIVE', 'utilSections', $config['api_account'], 'account');
+  $char_active = DBHandler('USACTIVE', 'utilSections', $config['api_char'], 'char');
+  $corp_active = DBHandler('USACTIVE', 'utilSections', $config['api_corp'], 'corp');
+  $eve_active = DBHandler('USACTIVE', 'utilSections', $config['api_eve'], 'eve');
+  $map_active = DBHandler('USACTIVE', 'utilSections', $config['api_map'], 'map');
   /*
    * Show debuging
    */
   $debug = '  <tr>' . PHP_EOL
-          .'    <td class="tableinfolbl">'.DEBUGING.':</td>' . PHP_EOL
-          .'    <td>' . PHP_EOL
-          .'      <select name="config[api_debug]">' . PHP_EOL
-          .'        <option value="0"'; if ($ini['Logging']['trace_active']=='0') { $debug .= ' selected="selected"'; } $debug .= '>'.OFF.'</option>' . PHP_EOL
-          .'        <option value="1"'; if ($ini['Logging']['trace_active']=='1') { $debug .= ' selected="selected"'; } $debug .= '>'.ON.'</option>' . PHP_EOL
-          .'      </select>' . PHP_EOL
-          .'    </td>' . PHP_EOL
-          .'  </tr>' . PHP_EOL;
+    . '    <td class="tableinfolbl">Debugging:</td>' . PHP_EOL
+    . '    <td>' . PHP_EOL
+    . '      <select name="config[api_debug]">' . PHP_EOL
+    . '        <option value="0"'; if ($ini['Logging']['trace_active']=='0') { $debug .= ' selected="selected"'; } $debug .= '>Off</option>' . PHP_EOL
+    . '        <option value="1"'; if ($ini['Logging']['trace_active']=='1') { $debug .= ' selected="selected"'; } $debug .= '>On</option>' . PHP_EOL
+    . '      </select>' . PHP_EOL
+    . '    </td>' . PHP_EOL
+    . '  </tr>' . PHP_EOL;
   /*
    * Set some setup password description
    */
   $passnologin = '';
-  $passchange = ' '.ONLY_CHANGE_PASS_IF;
+  $passchange = ' Change only if you need a new one';
 } else {
   /*
    * Set standard values
@@ -82,99 +86,102 @@ if (isset($ini)) {
   /*
    * Set some setup password description
    */
-  $passnologin = SETUP_PASS_DES_BLANK;
+  $passnologin = '<br />' . PHP_EOL . 'Leave blank to disable the login section.';
   $passchange = '';
 }; // if isset $ini
 /**
  * Create site
  */
-OpenSite(SETUP);
+OpenSite('Setup');
 if (isset($ini)) {
   configMenu();
 }; // if isset $ini
 echo '<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=doini" method="post">' . PHP_EOL
-    .'<!-- Config Setup -->' . PHP_EOL
-    .'<table>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <th colspan="2">'.INI_SETUP.'</th>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.SAVE_XML_FILES.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_cache_xml]">' . PHP_EOL
-    .'        <option value="0"'; if ($cache_xml==false) { echo ' selected="selected"'; } echo '>'.NO.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($cache_xml==true) { echo ' selected="selected"'; } echo '>'.YES.'</option>' . PHP_EOL
-    .'      </select><br />' . PHP_EOL
-    . SAVE_XML_DES
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.ACCOUNT_INFO.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_account]">' . PHP_EOL
-    .'        <option value="0"'; if ($account_active==false) { echo ' selected="selected"'; } echo '>'.DISABLED.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($account_active==true) { echo ' selected="selected"'; } echo '>'.GET_DATA.'</option>' . PHP_EOL
-    .'      </select>' . PHP_EOL
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.CHAR_INFO.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_char]">' . PHP_EOL
-    .'        <option value="0"'; if ($char_active==false) { echo ' selected="selected"'; } echo '>'.DISABLED.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($char_active==true) { echo ' selected="selected"'; } echo '>'.GET_DATA.'</option>' . PHP_EOL
-    .'      </select>' . PHP_EOL
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.CORP_INFO.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_corp]">' . PHP_EOL
-    .'        <option value="0"'; if ($corp_active==false) { echo ' selected="selected"'; } echo '>'.DISABLED.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($corp_active==true) { echo ' selected="selected"'; } echo '>'.GET_DATA.'</option>' . PHP_EOL
-    .'      </select>' . PHP_EOL
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.EVE_INFO.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_eve]">' . PHP_EOL
-    .'        <option value="0"'; if ($eve_active==false) { echo ' selected="selected"'; } echo '>'.DISABLED.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($eve_active==true) { echo ' selected="selected"'; } echo '>'.GET_DATA.'</option>' . PHP_EOL
-    .'      </select>' . PHP_EOL
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.MAP_INFO.':</td>' . PHP_EOL
-    .'    <td>' . PHP_EOL
-    .'      <select name="config[api_map]">' . PHP_EOL
-    .'        <option value="0"'; if ($map_active==false) { echo ' selected="selected"'; } echo '>'.DISABLED.'</option>' . PHP_EOL
-    .'        <option value="1"'; if ($map_active==true) { echo ' selected="selected"'; } echo '>'.GET_DATA.'</option>' . PHP_EOL
-    .'      </select>' . PHP_EOL
-    .'    </td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .$debug
-    .'</table>' . PHP_EOL
-    .'<br />' . PHP_EOL
-    .'<!-- Config Password Setup -->' . PHP_EOL
-    .'<table>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <th colspan="2">'.SETUP_PASS.'</th>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td colspan="2" style="text-align: center;">'.SETUP_PASS_DES.$passnologin.'</td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.PASSWORD.':</td>' . PHP_EOL
-    .'    <td><input type="password" name="config[config_pass]" value="" />'.$passchange.'</td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'</table>' . PHP_EOL;
+   . '<!-- Config Setup -->' . PHP_EOL
+   . '<table summary="">' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <th colspan="2">Yapeal Setup</th>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Save XML files:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_cache_xml]">' . PHP_EOL
+   . '        <option value="0"'; if ($cache_xml==false) { echo ' selected="selected"'; } echo '>No</option>' . PHP_EOL
+   . '        <option value="1"'; if ($cache_xml==true) { echo ' selected="selected"'; } echo '>Yes</option>' . PHP_EOL
+   . '      </select><br />' . PHP_EOL
+   . '       Turns on caching of API XML data to local files.<br />' . PHP_EOL
+   . '      "No" = Save web space but still adds to the database.' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Account Info:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_account]">' . PHP_EOL
+   . '        <option value="0"'; if ($account_active==false) { echo ' selected="selected"'; } echo '>Disabled</option>' . PHP_EOL
+   . '        <option value="1"'; if ($account_active==true) { echo ' selected="selected"'; } echo '>Get Data</option>' . PHP_EOL
+   . '      </select>' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Character Info:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_char]">' . PHP_EOL
+   . '        <option value="0"'; if ($char_active==false) { echo ' selected="selected"'; } echo '>Disabled</option>' . PHP_EOL
+   . '        <option value="1"'; if ($char_active==true) { echo ' selected="selected"'; } echo '>Get Data</option>' . PHP_EOL
+   . '      </select>' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Corp Info:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_corp]">' . PHP_EOL
+   . '        <option value="0"'; if ($corp_active==false) { echo ' selected="selected"'; } echo '>Disabled</option>' . PHP_EOL
+   . '        <option value="1"'; if ($corp_active==true) { echo ' selected="selected"'; } echo '>Get Data</option>' . PHP_EOL
+   . '      </select>' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Eve Info:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_eve]">' . PHP_EOL
+   . '        <option value="0"'; if ($eve_active==false) { echo ' selected="selected"'; } echo '>Disabled</option>' . PHP_EOL
+   . '        <option value="1"'; if ($eve_active==true) { echo ' selected="selected"'; } echo '>Get Data</option>' . PHP_EOL
+   . '      </select>' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Map Info:</td>' . PHP_EOL
+   . '    <td>' . PHP_EOL
+   . '      <select name="config[api_map]">' . PHP_EOL
+   . '        <option value="0"'; if ($map_active==false) { echo ' selected="selected"'; } echo '>Disabled</option>' . PHP_EOL
+   . '        <option value="1"'; if ($map_active==true) { echo ' selected="selected"'; } echo '>Get Data</option>' . PHP_EOL
+   . '      </select>' . PHP_EOL
+   . '    </td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . $debug
+   . '</table>' . PHP_EOL
+   . '<br />' . PHP_EOL
+   . '<!-- Config Password Setup -->' . PHP_EOL
+   . '<table summary="">' . PHP_EOL
+   . '  <tr>' . PHP_EOL
+   . '    <th colspan="2">Setup Password</th>' . PHP_EOL
+   . '  </tr>' . PHP_EOL;
+if (!isset($ini)) {
+  echo '  <tr>' . PHP_EOL
+     . '    <td colspan="2" style="text-align: center;">This is a password you can use if you need to make changes<br />' . PHP_EOL
+     . 'to this setup, when you have completed this setup.'.$passnologin.'</td>' . PHP_EOL
+     . '  </tr>' . PHP_EOL;
+}
+echo '  <tr>' . PHP_EOL
+   . '    <td class="tableinfolbl">Password:</td>' . PHP_EOL
+   . '    <td><input type="password" name="config[config_pass]" value="" />'.$passchange.'</td>' . PHP_EOL
+   . '  </tr>' . PHP_EOL
+   . '</table>' . PHP_EOL;
 if (isset($ini)) {
-  echo '<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'<input type="submit" value="'.UPDATE.'" />' . PHP_EOL;
+  echo '<input type="submit" value="Update" />' . PHP_EOL;
 } else {
   echo inputHiddenPost()
-      .'<input type="submit" value="'.FINISH_SETUP.'" />' . PHP_EOL;
+    . '<input type="submit" value="Finish Setup" />' . PHP_EOL;
 }; // if isset $ini
 echo '</form>' . PHP_EOL;
 CloseSite();

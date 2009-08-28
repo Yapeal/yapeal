@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal installer - Setup.
- *
  *
  * PHP version 5
  *
@@ -28,14 +26,20 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 }
-/**
+/*
  * Get config if it's set
  */
 if (isset($_POST['config'])) {
@@ -60,35 +64,37 @@ if (isset($_POST['getlist'])) {
 /*
  * Create site
  */
-OpenSite(TEST_CHAR);
+OpenSite('Test Character');
 configMenu();
-echo '<h2>'.TEST_CHAR.'</h2>' . PHP_EOL
-    .TEST_CHAR_DES
-    .'<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=configapi" method="post">' . PHP_EOL
-    .'<!-- Api Setup -->' . PHP_EOL
-    .'<table>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <th colspan="2">'.API_SETUP.'</th>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td colspan="2" style="text-align: center;">'.GET_API_INFO_HERE.':<br /><a href="http://myeve.eve-online.com/api/default.asp">'.EVE_API_CENTER.'</a></td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.API_USERID.':</td>' . PHP_EOL
-    .'    <td><input size="10" type="text" name="config[api_user_id]" value="'.$apiuserid.'" /></td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'  <tr>' . PHP_EOL
-    .'    <td class="tableinfolbl">'.API_KEY.':</td>' . PHP_EOL
-    .'    <td><input class="input_text" type="text" name="config[api_key]" value="'.$apikey.'" /></td>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    .'</table>' . PHP_EOL
-    .'<input type="hidden" name="getlist" value="true" />' . PHP_EOL
-    .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-    .'<input type="submit" value="'.GET_CHAR_LIST.'" />' . PHP_EOL
-    .'</form>' . PHP_EOL;
+echo '<h2>Test Character</h2>' . PHP_EOL
+  . 'This is only meant to be used to test Yapeal.<br />' . PHP_EOL
+  . 'If you need info on how to add characters to Yapeal so it can pull the info from it,<br />' . PHP_EOL
+  . 'look at install/inc/config/configapi.php to see how this page is done<br />' . PHP_EOL
+  . 'and install/inc/config/goapi.php to see how it input the data to Yapeal.' . PHP_EOL
+  . '<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=configapi" method="post">' . PHP_EOL
+  . '<!-- Api Setup -->' . PHP_EOL
+  . '<table summary="">' . PHP_EOL
+  . '  <tr>' . PHP_EOL
+  . '    <th colspan="2">API Setup</th>' . PHP_EOL
+  . '  </tr>' . PHP_EOL
+  . '  <tr>' . PHP_EOL
+  . '    <td colspan="2" style="text-align: center;">You can get your API info here:<br /><a href="http://myeve.eve-online.com/api/default.asp">EVE API Center</a></td>' . PHP_EOL
+  . '  </tr>' . PHP_EOL
+  . '  <tr>' . PHP_EOL
+  . '    <td class="tableinfolbl">API User ID:</td>' . PHP_EOL
+  . '    <td><input size="10" type="text" name="config[api_user_id]" value="'.$apiuserid.'" /></td>' . PHP_EOL
+  . '  </tr>' . PHP_EOL
+  . '  <tr>' . PHP_EOL
+  . '    <td class="tableinfolbl">API Key:</td>' . PHP_EOL
+  . '    <td><input class="input_text" type="text" name="config[api_key]" value="'.$apikey.'" /></td>' . PHP_EOL
+  . '  </tr>' . PHP_EOL
+  . '</table>' . PHP_EOL
+  . '<input type="hidden" name="getlist" value="true" />' . PHP_EOL
+  . '<input type="submit" value="Get Character List" />' . PHP_EOL
+  . '</form>' . PHP_EOL;
 if (isset($loadcharsel)) {
   echo '<br />' . PHP_EOL;
-  require_once('inc'.$ds.'config'.$ds.'char_select.php');
+  require_once('inc'.DS.'config'.DS.'char_select.php');
 }
 echo '<br />' . PHP_EOL;
 CloseSite();

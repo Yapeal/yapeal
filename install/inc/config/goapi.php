@@ -1,9 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2: */
-
 /**
  * Yapeal installer - Setup Progress.
- *
  *
  * PHP version 5
  *
@@ -28,7 +26,13 @@
  * @package Yapeal
  * @subpackage Setup
  */
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
 /**
  * @internal Only let this code be included or required not ran directly.
  */
@@ -40,7 +44,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 $config = $_POST['config'];
 /*
- * Get Character infoes
+ * Get Character info
  */
 $charinfo = explode("^-_-^",$config['api_char_info']);
 $charname = $charinfo[0];
@@ -99,58 +103,62 @@ if (DBHandler('CON',$ini['Database']['host'])) {
             array('Name'=>'creatorCorporationName','Value'=>$corpname),
             array('Name'=>'creatorName','Value'=>$charname),
             array('Name'=>'charAPIs','Value'=>$charSelAPIs),
-            array('Name'=>'corpAPIs','Value'=>$corpSelAPIs)
+            array('Name'=>'charProxy','Value'=>$config['charProxy']),
+            array('Name'=>'corpAPIs','Value'=>$corpSelAPIs),
+            array('Name'=>'corpProxy','Value'=>$config['corpProxy'])
           );
   $types = array('Name'=>'C','Value'=>'C');
   DBHandler('UPD', 'utilConfig', $data, $types);
   /*
    * Create/Update utilRegisteredCharacter
    */
+  if ($config['charProxy'] == 'http://api.eve-online.com/%2$s/%1$s.xml.aspx') $config['charProxy'] = NULL;
   $data = array(
-            array('activeAPI'=>$charSelAPIs,'characterID'=>$charid,'corporationID'=>$corpid,'corporationName'=>$corpname,'isActive'=>1,'name'=>$charname,'userID'=>$config['api_user_id'])
+            array('activeAPI'=>$charSelAPIs,'characterID'=>$charid,'corporationID'=>$corpid,'corporationName'=>$corpname,'isActive'=>1,'name'=>$charname,'userID'=>$config['api_user_id'],'proxy'=>$config['charProxy'])
           );
-  $types = array('activeAPI'=>'X','characterID'=>'I','corporationID'=>'I','corporationName'=>'C','isActive'=>'I','name'=>'C','userID'=>'I');
+  $types = array('activeAPI'=>'X','characterID'=>'I','corporationID'=>'I','corporationName'=>'C','isActive'=>'I','name'=>'C','userID'=>'I','proxy'=>'C');
   DBHandler('UPD', 'utilRegisteredCharacter', $data, $types);
   /*
    * Create/Update utilRegisteredCorporation
    */
+  if ($config['corpProxy'] == 'http://api.eve-online.com/%2$s/%1$s.xml.aspx') $config['corpProxy'] = NULL;
   $data = array(
-            array('activeAPI'=>$corpSelAPIs,'characterID'=>$charid,'corporationID'=>$corpid,'isActive'=>1)
+            array('activeAPI'=>$corpSelAPIs,'characterID'=>$charid,'corporationID'=>$corpid,'isActive'=>1,'proxy'=>$config['corpProxy'])
           );
-  $types = array('activeAPI'=>'X','characterID'=>'I','corporationID'=>'I','isActive'=>'I');
+  $types = array('activeAPI'=>'X','characterID'=>'I','corporationID'=>'I','isActive'=>'I','proxy'=>'C');
   DBHandler('UPD', 'utilRegisteredCorporation', $data, $types);
   /*
    * Create/Update utilRegisteredUser
    */
   $data = array(
-            array('fullApiKey'=>$config['api_key'],'userID'=>$config['api_user_id'])
+            array('fullApiKey'=>$config['api_key'],'userID'=>$config['api_user_id'],'isActive'=>1)
           );
-  $types = array('fullApiKey'=>'C','userID'=>'I');
+  $types = array('fullApiKey'=>'C','isActive'=>'I','userID'=>'I');
   DBHandler('UPD', 'utilRegisteredUser', $data, $types);
 }; // if DBHandler('CON')
 /*
  * Generate Page
  */
-OpenSite(PROGRESS);
+OpenSite('Progress');
 configMenu();
-echo '<table>'
-    .'  <tr>' . PHP_EOL
-    .'    <th colspan="3">'.PROGRESS.'</th>' . PHP_EOL
-    .'  </tr>' . PHP_EOL
-    . $output . PHP_EOL
-    .'</table>' . PHP_EOL;
+echo '<table summary="">'
+  .'  <tr>' . PHP_EOL
+  .'    <th colspan="3">Progress</th>' . PHP_EOL
+  .'  </tr>' . PHP_EOL
+  . $output . PHP_EOL
+  .'</table>' . PHP_EOL;
 if ($stop==0) {
   echo '<hr />' . PHP_EOL
-      .API_UPDATING_DONE . PHP_EOL
-      .'<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=configapi" method="post">' . PHP_EOL
-      .'<input type="hidden" name="lang" value="'.$_POST['lang'].'" />' . PHP_EOL
-      .'<input type="submit" value="'.GO_TO.TEST_CHAR.'" />' . PHP_EOL
-      .'</form>' . PHP_EOL;
+    .'<h2>Test character creation/update is done.</h2>' . PHP_EOL
+    .'<form action="'.$_SERVER['SCRIPT_NAME'].'?funk=configapi" method="post">' . PHP_EOL
+    .'<input type="submit" value="Go To Test Character" />' . PHP_EOL
+    .'</form>' . PHP_EOL;
 } else {
   echo '<hr />' . PHP_EOL
-      .API_UPDATING_FAILED . PHP_EOL
-      .'<hr />' . PHP_EOL
-      .GOBACK . PHP_EOL;
+    .'<h2>Test character creation/update was not completed.</h2><br />' . PHP_EOL
+    .'You might have mistyped some info.<br />' . PHP_EOL
+    .'<hr />' . PHP_EOL
+    .'<a href="javascript:history.go(-1)">Go Back</a>' . PHP_EOL;
 };
 CloseSite();
 ?>

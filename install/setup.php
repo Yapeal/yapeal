@@ -44,28 +44,13 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-/*
- * make a short value for Directory Separators
- */
-$ds = DIRECTORY_SEPARATOR;
+// Define shortened name for DIRECTORY_SEPARATOR
+define('DS', DIRECTORY_SEPARATOR);
 try {
 /*
  * Require the function file
  */
-require_once('inc' . $ds . 'function.php');
-/*
- * Languages.
- */
-$knownlang = array('da' => 'Danish', 'en' => 'English');
-/*
- * Set Language
- */
-if (isset($_POST['lang'])) {
-  GetLang($_POST['lang']);
-} else {
-  GetLang(GetBrowserLang());
-  $_POST['lang'] = GetBrowserLang();
-};
+require_once('inc' . DS . 'function.php');
 /*
  * Require the value file
  *
@@ -76,25 +61,26 @@ if (isset($_POST['lang'])) {
  * 4. Define where error log files are located
  * 5. Define error log level
  */
-require_once('inc' . $ds . 'values.php');
+require_once('inc' . DS . 'values.php');
 /*
  * Require the mainfile file that handle all the basic stuff that need on all pages
  */
-require_once('inc' . $ds . 'mainfile.php');
+require_once('inc' . DS . 'mainfile.php');
 /*
  * Check if the browser is IGB (Ingame Browser)
  */
 if (checkIGB()) {
   // Generate IGB error site
-	OpenSite(NOIGB_HEADLINE);
-  echo NOIGB_TEXT .
+	OpenSite('No IGB Support');
+  echo 'This setup can only be run in a normal browser and not the IGB.<br />' . PHP_EOL .
+    'Press the link and you will be popped out of EVE and this setup will re-openned in a normal browser.<br />' . PHP_EOL .
     '<a href="shellexec:' . $_SERVER['SCRIPT_NAME'] . '">' .
-    NOIGB_YAPEAL_SETUP . '</a>' . PHP_EOL;
+    'Yapeal Setup</a>' . PHP_EOL;
   CloseSite();
   // if not the Ingame Browser
 } else {
   // Welcome Page
-  require_once('inc' . $ds . 'config' . $ds . 'main.php');
+  require_once('inc' . DS . 'config' . DS . 'main.php');
 };
 if (isset($con) && $con->IsConnected()) {
   $con->Close();

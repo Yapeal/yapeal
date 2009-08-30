@@ -103,7 +103,6 @@ require_once realpath($path);
  * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
  * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
  * **************************************************************************/
-require_once YAPEAL_INC . 'common_db.php';
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
@@ -112,7 +111,7 @@ try {
   $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
-  if (dontWait($api, 0, FALSE)) {
+  if (YapealDBConnection::dontWait($api, 0, FALSE)) {
     /**
      * Give ourself up to 5 minutes to finish.
      */
@@ -187,7 +186,7 @@ try {
    * ************************************************************************/
   $api = 'eve-api-pull';
   // Reset Mutex if we still own it.
-  $ctime2 = getCachedUntil($api, 0);
+  $ctime2 = YapealDBConnection::getCachedUntil($api, 0);
   if (YAPEAL_START_TIME == $ctime2) {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array('tableName' => $api, 'ownerID' => 0,

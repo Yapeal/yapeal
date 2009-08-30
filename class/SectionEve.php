@@ -101,7 +101,7 @@ class SectionEve {
         $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
         $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
         // Should we wait to get API data
-        if (dontWait($tableName)) {
+        if (YapealDBConnection::dontWait($tableName)) {
           // Set it so we wait a bit before trying again if something goes wrong.
           $data = array('tableName' => $tableName,
             'ownerID' => 0, 'cachedUntil' => YAPEAL_START_TIME);

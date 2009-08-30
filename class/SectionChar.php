@@ -118,7 +118,7 @@ class SectionChar {
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Should we wait to get API data
-          if (dontWait($tableName, $charID)) {
+          if (YapealDBConnection::dontWait($tableName, $charID)) {
             // Set it so we wait a bit before trying again if something goes wrong.
             $data = array('tableName' => $tableName,
               'ownerID' => $charID, 'cachedUntil' => YAPEAL_START_TIME);

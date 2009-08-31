@@ -165,7 +165,7 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
     catch (YapealApiErrorException $e) {
       // Any API errors that need to be handled in some way are handled in this
       // function.
-      $this->handleApiError($e->getCode());
+      $this->handleApiError($e);
       return FALSE;
     }
     catch (YapealApiFileException $e) {
@@ -178,14 +178,14 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
   /**
    * Handles some Eve API error codes in special ways.
    *
-   * @param integer $code Eve API error code returned.
+   * @param object $e Eve API exception returned.
    *
    * @return bool Returns TRUE if handled the error else FALSE.
    */
-  protected function handleApiError($code) {
+  protected function handleApiError($e) {
     global $tracing;
     try {
-      switch ($code) {
+      switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.
         case 101: // Wallet exhausted: retry after {0}.
         case 103: // Already returned one week of data: retry after {0}.

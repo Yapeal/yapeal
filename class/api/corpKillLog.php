@@ -145,7 +145,7 @@ class corpKillLog extends ACorporation {
       catch (YapealApiErrorException $e) {
         // Any API errors that need to be handled in some way are handled in this
         // function.
-        $this->handleApiError($e->getCode());
+        $this->handleApiError($e);
         return FALSE;
       }
       catch (YapealApiFileException $e) {

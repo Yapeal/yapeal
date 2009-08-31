@@ -149,7 +149,7 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
     catch (YapealApiErrorException $e) {
       // Any API errors that need to be handled in some way are handled in this
       // function.
-      $this->handleApiError($e->getCode());
+      $this->handleApiError($e);
       return FALSE;
     }
     catch (YapealApiFileException $e) {
@@ -162,14 +162,14 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
   /**
    * Handles some Eve API error codes in special ways.
    *
-   * @param integer $code Eve API error code returned.
+   * @param object $e Eve API exception returned.
    *
    * @return bool Returns TRUE if handled the error else FALSE.
    */
-  protected function handleApiError($code) {
+  protected function handleApiError($e) {
     global $tracing;
     try {
-      switch ($code) {
+      switch ($e->getCode()) {
         case 105:// Invalid characterID.
         case 201:// Character does not belong to account.
         case 202:// API key authentication failure.

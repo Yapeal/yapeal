@@ -143,9 +143,9 @@ class corpWalletJournal extends ACorporation {
           };// else $xml !== FALSE ...
         }
         catch (YapealApiErrorException $e) {
-          if ($this->handleApiRetry($e->getCode())) {
+          if ($this->handleApiRetry($e)) {
             continue 2;
-          } else if ($this->handleApiError($e->getCode())) {
+          } else if ($this->handleApiError($e)) {
             return FALSE;
           };
           continue 2;
@@ -255,14 +255,14 @@ class corpWalletJournal extends ACorporation {
   /**
    * Handles some Eve API error codes in special ways.
    *
-   * @param integer $code Eve API error code returned.
+   * @param object $e Eve API exception returned.
    *
    * @return bool Returns TRUE if handled the error else FALSE.
    */
-  private function handleApiRetry($code) {
+  private function handleApiRetry($e) {
     global $tracing;
     try {
-      switch ($code) {
+      switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.
         case 101: // Wallet exhausted: retry after {0}.
         case 103: // Already returned one week of data: retry after {0}.

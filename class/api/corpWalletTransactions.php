@@ -265,6 +265,7 @@ class corpWalletTransactions extends ACorporation {
    */
   private function handleApiRetry($e) {
     global $tracing;
+    global $cachetypes;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.

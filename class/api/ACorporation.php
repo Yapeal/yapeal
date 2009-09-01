@@ -195,6 +195,7 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
    */
   protected function handleApiError($e) {
     global $tracing;
+    global $cachetypes;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.

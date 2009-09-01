@@ -124,7 +124,7 @@ class charWalletJournal extends ACharacter {
               // If last record is less than a week old we might be able to
               // continue walking backwards through records.
               if ($oldest < $lastDT) {
-                $beforeID = $datum[$cnt - 1]['refID'];
+                $beforeID = (string)$datum[$cnt - 1]['refID'];
                 // Pause to let CCP figure out we got last 1000 records before
                 // trying to getting another batch :P
                 sleep(2);

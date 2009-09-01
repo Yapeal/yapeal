@@ -126,7 +126,7 @@ class corpWalletTransactions extends ACorporation {
               // If last record is less than a week old we might be able to
               // continue walking backwards through records.
               if ($oldest < $lastDT) {
-                $beforeID = $datum[$cnt - 1]['transactionID'];
+                $beforeID = (string)$datum[$cnt - 1]['transactionID'];
                 // Pause to let CCP figure out we got last 1000 records before
                 // trying to getting another batch :P
                 sleep(2);
@@ -175,7 +175,6 @@ class corpWalletTransactions extends ACorporation {
   public function apiStore() {
     global $tracing;
     global $cachetypes;
-    $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
     $tableName = $this->tablePrefix . $this->api;
@@ -184,7 +183,7 @@ class corpWalletTransactions extends ACorporation {
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };// if empty $this->xml ...
-    foreach ($accounts as $account) {
+    foreach (range(1000, 1006) as $account) {
       if (empty($this->xml[$account])) {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
         trigger_error($mess, E_USER_NOTICE);

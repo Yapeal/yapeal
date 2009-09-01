@@ -123,7 +123,7 @@ class corpKillLog extends ACorporation {
             // If last record is less than a week old we might be able to
             // continue walking backwards through records.
             if ($oldest < $lastDT) {
-              $beforeID = $datum[$cnt - 1]['killID'];
+              $beforeID = (string)$datum[$cnt - 1]['killID'];
               // Pause to let CCP figure out we got last group of records before
               // trying to getting another batch :P
               sleep(2);

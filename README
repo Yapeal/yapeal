@@ -1,6 +1,9 @@
 Welcome to Yapeal (Yet Another PHP Eve Api Library)
 
-If you're reading this on your server then you seem to have got Yapeal installed.
+If you're reading this on your server then you seem to have got Yapeal on it
+and now you'll need to go to
+http://MyHostName.com/Path/to/Yapeal/install/setup.php
+with a web browser to finish the install.
 In the future I hope to have sections on installing, configuring, setup, and
 troubleshooting but for now best I can do is refer you to the project Wiki at
 http://code.google.com/p/yapeal/

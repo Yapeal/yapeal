@@ -20,10 +20,12 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008-2009, Michael Cummings
- * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package Yapeal
+ * @author     Michael Cummings <mgcummings@yahoo.com>
+ * @copyright  Copyright (c) 2008-2009, Michael Cummings
+ * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @package    Yapeal
+ * @link       http://code.google.com/p/yapeal/
+ * @link       http://www.eve-online.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -187,6 +189,7 @@ class SectionChar {
     $sql .= ' chr.isActive=1';
     $sql .= ' and u.isActive=1';
     $sql .= ' and chr.userID=u.userID';
+    $sql .= ' order by chr.userID asc, chr.characterID asc';
     $mess = 'Before GetAll active characters in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);

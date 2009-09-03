@@ -89,7 +89,7 @@ if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
 // Grab the info from ini file.
 $iniVars = parse_ini_file($iniFile, TRUE);
 // Abort if required sections aren't defined
-$sections = array('Database', 'Logging');
+$sections = array('Cache', 'Database', 'Logging');
 $mess = '';
 foreach ($sections as $section) {
   if (!isset($iniVars[$section])) {

@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * Used to get information from Eve-online API and store in database.
+ * Used to get information from Eve-online API and store in database..
  *
  * This script expects to be ran from a command line or from a crontab job that
  * can optionally pass a config file name with -c option.

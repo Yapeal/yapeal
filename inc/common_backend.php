@@ -148,7 +148,7 @@ if (defined('YAPEAL_DEBUG')) {
   define('YAPEAL_TRACE_SECTIONS', YAPEAL_TRACE_ALL);
   define('YAPEAL_WARNING_LOG', YAPEAL_DEBUG);
 } else {
-  $settings = array('error_log', 'notice_log', 'trace_log', 'warning_log');
+  $settings = array('error_log', 'notice_log', 'strict_log', 'trace_log', 'warning_log');
   foreach ($settings as $setting) {
     if (isset($iniVars['Logging'][$setting])) {
       define('YAPEAL_' . strtoupper($setting),
@@ -190,6 +190,9 @@ if (defined('YAPEAL_DEBUG')) {
 };
 // Printing for CLI will be handled in our custom handler from now on.
 $mess = str_pad(' Custom handler started ', 75, '-', STR_PAD_BOTH);
+trigger_error($mess, E_USER_NOTICE);
+$mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+$mess .= YAPEAL_DATE;
 trigger_error($mess, E_USER_NOTICE);
 // Setup exception observers.
 $logObserver = new LoggingExceptionObserver(YAPEAL_WARNING_LOG);

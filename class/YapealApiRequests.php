@@ -145,7 +145,7 @@ class YapealApiRequests {
          $cacheName .= sha1(http_build_query($postData, NULL, '&'));
         };
         $cacheName .= '.xml';
-        self::cacheXml($result['body'], $cacheName, $postType);
+        self::cacheXml($result['body'], $cacheName, $section);
       };// if YAPEAL_CACHE_XML
       // Throw exception
       // Have to use API error code for special API error handling to work.

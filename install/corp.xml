@@ -673,7 +673,6 @@
     <field name="`title`" type="X"/>
     <index name="`corpMemberTrackingindex1`">
       <col>`ownerID`</col>
-      <UNIQUE/>
     </index>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>

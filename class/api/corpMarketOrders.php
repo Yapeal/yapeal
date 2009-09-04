@@ -88,7 +88,7 @@ class corpMarketOrders extends ACorporation {
               $i < $grp;++$i, $pos += $maxUpsert) {
             $group = array_slice($datum, $pos, $maxUpsert, TRUE);
             $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' from corp section in ' . basename(__FILE__);
+            $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             YapealDBConnection::multipleUpsertAttributes($group, $this->types,

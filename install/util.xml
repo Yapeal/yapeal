@@ -42,7 +42,7 @@
     <field name="`tableName`" type="C" size="255">
       <KEY/>
     </field>
-    <opt platform="mysql"> ENGINE=MEMORY COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilConfig">
     <field name="`Name`" type="C" size="90">

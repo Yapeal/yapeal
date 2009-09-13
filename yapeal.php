@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * Used to get information from Eve-online API and store in database..
+ * Used to get information from Eve-online API and store in database.
  *
  * This script expects to be ran from a command line or from a crontab job that
  * can optionally pass a config file name with -c option.
@@ -39,25 +39,14 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
-/**
- * Track stability of script.
- */
-define('YAPEAL_STABILITY', 'beta');
-/**
- * Track version of script.
- */
-define('YAPEAL_VERSION',
-  (int)trim(str_replace(array('$', 'Revision:'), '', '$Revision$')));
-/**
- * Track date of script.
- */
-define('YAPEAL_DATE', trim(str_replace(
-  array('$', '#', 'Date::') , '', '$Date::                      $')));
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
 // Define shortened name for DIRECTORY_SEPARATOR
 define('DS', DIRECTORY_SEPARATOR);
+// Pull in Yapeal revision constants.
+$path = $dir . DS . 'revision.php';
+require_once realpath($path);
 // If being run from command-line look for options there if function available.
 if (PHP_SAPI == 'cli') {
   if (function_exists('getopt')) {
@@ -95,16 +84,9 @@ if (PHP_SAPI == 'cli') {
 } else {
   notAWebPage();
 };// else PHP_SAPI == 'cli' ...
-/* **************************************************************************
- * THESE SETTINGS MAY NEED TO BE CHANGED WHEN PORTING TO NEW SERVER.
- * **************************************************************************/
 // Move down to 'inc' directory to read common_backend.php
 $path = $dir . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
-/* **************************************************************************
- * NOTHING BELOW THIS POINT SHOULD NEED TO BE CHANGED WHEN PORTING TO NEW
- * SERVER. YOU SHOULD ONLY NEED TO CHANGE SETTINGS IN INI FILE.
- * **************************************************************************/
 $cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';

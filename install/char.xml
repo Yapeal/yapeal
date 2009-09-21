@@ -509,7 +509,7 @@
       <NOTNULL/>
     </field>
     <field name="`issued`" type="T">
-      <KEY/>
+      <NOTNULL/>
     </field>
     <field name="`minVolume`" type="I8" size="20">
       <NOTNULL/>
@@ -530,11 +530,11 @@
       <NOTNULL/>
     </field>
     <field name="`stationID`" type="I8" size="20">
-      <NOTNULL/>
+      <KEY/>
       <UNSIGNED/>
     </field>
     <field name="`typeID`" type="I8" size="20">
-      <NOTNULL/>
+      <KEY/>
       <UNSIGNED/>
     </field>
     <field name="`volEntered`" type="I8" size="20">

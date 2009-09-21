@@ -48,7 +48,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /**
  * Track version of script.
  */
-define('YAPEAL_VERSION', str_replace('@','', '@895M@'));
+define('YAPEAL_VERSION', str_replace('@','', '@898@'));
 /**
  * Track stability of script.
  */

@@ -114,14 +114,8 @@ if (!is_writable(YAPEAL_CACHE)) {
   trigger_error($realpath . ' is not writeable', E_USER_ERROR);
 };
 // log_dir is relative to YAPEAL_CACHE
-$realpath = realpath(YAPEAL_CACHE . 'log');
-if ($realpath && is_dir($realpath)) {
-  define('YAPEAL_LOG', $realpath . DS);
-} else {
-  trigger_error($nonexist . 'log', E_USER_ERROR);
-};
-if (!is_writable($realpath)) {
-  trigger_error($realpath . ' is not writeable', E_USER_ERROR);
+if (!is_writable(YAPEAL_LOG)) {
+  trigger_error(YAPEAL_LOG . ' is not writeable', E_USER_ERROR);
 };
 /* **************************************************************************
  * Class autoloader section
@@ -151,8 +145,8 @@ if (defined('YAPEAL_DEBUG')) {
   $settings = array('error_log', 'notice_log', 'strict_log', 'trace_log', 'warning_log');
   foreach ($settings as $setting) {
     if (isset($iniVars['Logging'][$setting])) {
-      define('YAPEAL_' . strtoupper($setting),
-        YAPEAL_LOG . $iniVars['Logging'][$setting]);
+      $constant = 'YAPEAL_' . strtoupper($setting);
+      define($constant, YAPEAL_LOG . $iniVars['Logging'][$setting]);
     } else {
       trigger_error($req1 . $setting . $req2, E_USER_ERROR);
     };// else isset $iniVars...
@@ -161,10 +155,8 @@ if (defined('YAPEAL_DEBUG')) {
     'trace_sections');
   foreach ($settings as $setting) {
     if (isset($iniVars['Logging'][$setting])) {
-      /**
-       * @ignore
-       */
-      define('YAPEAL_' . strtoupper($setting), $iniVars['Logging'][$setting]);
+      $constant = 'YAPEAL_' . strtoupper($setting);
+      define($constant, $iniVars['Logging'][$setting]);
     } else {
       trigger_error($req1 . $setting . $req2, E_USER_ERROR);
     };// else isset $iniVars...
@@ -241,8 +233,8 @@ $settings = array('cache_output', 'cache_xml');
 foreach ($settings as $setting) {
   // Set to section value if it exists.
   if (isset($iniVars['Cache'][$setting])) {
-    /** @ignore */
-    define('YAPEAL_' . strtoupper($setting), $iniVars['Cache'][$setting]);
+    $constant = 'YAPEAL_' . strtoupper($setting);
+    define($constant, $iniVars['Cache'][$setting]);
   } else {
     trigger_error($req1 . $setting . $req2, E_USER_ERROR);
   };// else isset $iniVars...

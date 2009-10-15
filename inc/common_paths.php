@@ -53,7 +53,7 @@ define('YAPEAL_INC', $incDir . DS);
 /**
  * We know the 'base' directory has to be just above 'inc'.
  */
-$dir = realpath($incDir . '..');
+$dir = realpath(YAPEAL_INC . '..');
 define('YAPEAL_BASE', $dir . DS);
 /**
  * The 'cache' directory is normally a neighbor to 'inc' but can be moved in some

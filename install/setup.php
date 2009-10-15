@@ -46,6 +46,10 @@ $dir = realpath(dirname(__FILE__));
 chdir($dir);
 // Define shortened name for DIRECTORY_SEPARATOR
 define('DS', DIRECTORY_SEPARATOR);
+/*
+ * Require elog file
+ */
+require_once('..' . DS . 'inc' . DS . 'elog.php');
 try {
 /*
  * Require the function file

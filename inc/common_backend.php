@@ -56,6 +56,8 @@ if (defined('YAPEAL_DEBUG')) {
 } else {
   ini_set('track_errors', 0);
 };// else defined YAPEAL_DEBUG ...
+// Set the default timezone for GMT.
+date_default_timezone_set('GMT');
 // Log Yapeal version information.
 $mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
 $mess .= YAPEAL_DATE;

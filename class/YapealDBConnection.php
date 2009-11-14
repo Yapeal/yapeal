@@ -99,6 +99,7 @@ class YapealDBConnection {
       $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
       $con = NewADOConnection($dsn);
       $con->Execute('set names utf8');
+      $con->Execute('set time_zone="+0:00"');
       $this->connections[$hash] = $con;
     };
     return $this->connections[$hash];

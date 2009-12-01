@@ -67,7 +67,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`constellationSovereignty`" type="I8" size="20">
+    <field name="`corporationID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -82,7 +82,31 @@
     <field name="`solarSystemName`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <field name="`sovereigntyLevel`" type="I1" size="2">
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="mapSovereigntyStatus">
+    <field name="`completionTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`ownerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`solarSystemID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`startTime`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`state`" type="I1" size="3">
+      <NOTNULL/>
+    </field>
+    <field name="`structureID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`structureTypeID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -90,7 +114,7 @@
   </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
-      VALUES('Kills Jumps Sovereignty',0,5,'map')
+      VALUES('Kills Jumps Sovereignty SovereigntyStatus',0,5,'map')
       ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`isActive`=VALUES(`isActive`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
     </query>
   </sql>

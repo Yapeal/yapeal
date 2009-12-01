@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Sovereignty API.
+ * Class used to fetch and store SovereigntyStatus API.
  *
  * PHP version 5
  *
@@ -41,27 +41,28 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Class used to fetch and store Sovereignty API.
+ * Class used to fetch and store SovereigntyStatus API.
  *
  * @package Yapeal
  * @subpackage Api_map
  */
-class mapSovereignty extends AMap {
+class mapSovereigntyStatus extends AMap {
   /**
    * @var string Holds the name of the API.
    */
-  protected $api = 'Sovereignty';
+  protected $api = 'SovereigntyStatus';
   /**
    * @var array Holds the database column names and ADOdb types.
    */
-  private $types = array('allianceID' => 'I', 'corporationID' => 'I',
-    'factionID' => 'I', 'solarSystemID' => 'I', 'solarSystemName' => 'C');
+  private $types = array('completionTime' => 'T', 'ownerID' => 'I',
+    'solarSystemID' => 'I', 'startTime' => 'T', 'state' => 'I',
+    'structureID' => 'I', 'structureTypeID' => 'I');
   /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
   /**
-   * Used to store XML to Sovereignty table.
+   * Used to store XML to SovereigntyStatus table.
    *
    * @return Bool Return TRUE if store was successful.
    */

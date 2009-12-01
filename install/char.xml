@@ -481,6 +481,51 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="charMailingLists">
+    <field name="`displayName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`listID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charMailMessages">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`messageID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`read`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`senderID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`sentDate`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`title`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`toCharacterIDs`" type="X"/>
+    <field name="`toCorpOrAllianceID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toListIDs`" type="X"/>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="charMarketOrders">
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
@@ -542,6 +587,32 @@
       <UNSIGNED/>
     </field>
     <field name="`volRemaining`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charNotifications">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`notificationID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`read`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`senderID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`sentDate`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`typeID`" type="I2" size="3">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -855,15 +926,21 @@
     <query platform="mysql">ALTER TABLE `%%PcharIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcharMailMessages` MODIFY `read` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP</query>
     <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcharNotifications` MODIFY `read` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `unpublished` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
-      VALUES('AccountBalance AssetList CharacterSheet IndustryJobs KillLog MarketOrders SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
+      VALUES('AccountBalance AssetList CharacterSheet IndustryJobs KillLog MailingLists MailMessages MarketOrders Notifications SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
       ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`isActive`=VALUES(`isActive`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
     </query>
   </sql>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Sovereignty API.
+ * Class used to fetch and store char MailingLists API.
  *
  * PHP version 5
  *
@@ -41,83 +41,65 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Class used to fetch and store Sovereignty API.
+ * Class used to fetch and store char MailingLists API.
  *
  * @package Yapeal
- * @subpackage Api_map
+ * @subpackage Api_character
  */
-class mapSovereignty extends AMap {
+class charMailingLists extends ACharacter {
   /**
    * @var string Holds the name of the API.
    */
-  protected $api = 'Sovereignty';
+  protected $api = 'MailingLists';
   /**
    * @var array Holds the database column names and ADOdb types.
    */
-  private $types = array('allianceID' => 'I', 'corporationID' => 'I',
-    'factionID' => 'I', 'solarSystemID' => 'I', 'solarSystemName' => 'C');
+  private $types = array('displayName' => 'C', 'listID' => 'I', 'ownerID' => 'I');
   /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
   /**
-   * Used to store XML to Sovereignty table.
+   * Used to store XML to MailingLists table.
    *
    * @return Bool Return TRUE if store was successful.
    */
-  function apiStore() {
+  public function apiStore() {
     global $tracing;
     global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
       $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_MAP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
+      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
+      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $datum = $this->xml->xpath($this->xpath);
-      // Grab the cachedUntil from XML while we can.
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      unset($this->xml);
-      $cnt = count($datum);
-      if ($cnt > 0) {
+      if (count($datum) > 0) {
         try {
-          $mess = 'Connect for '. $tableName;
+          $extras = array('ownerID' => $this->characterID);
+          $mess = 'multipleUpsertAttributes for ' . $tableName;
           $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_MAP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $mess = 'Before truncate ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_MAP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-          // Empty out old data then upsert (insert) new
-          $sql = 'truncate table ' . $this->tablePrefix . $this->api;
-          $con->Execute($sql);
-          $maxUpsert = 1000;
-          for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
-              $i < $grp;++$i, $pos += $maxUpsert) {
-            $group = array_slice($datum, $pos, $maxUpsert, TRUE);
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_MAP, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-              $tableName, YAPEAL_DSN);
-          };// for $i = 0...
+          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
+          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
+            $tableName, YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
         }
         $ret = TRUE;
       } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
+      $mess = 'There was no XML data to store for ' . $this->characterID;
+      $mess .= ' in ' . $tableName;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
       };// else count $datum ...
       try {
         // Update CachedUntil time since we should have a new one.
-        $data = array('tableName' => $tableName, 'ownerID' => 0,
-          'cachedUntil' => $cuntil);
+        $cuntil = (string)$this->xml->cachedUntil[0];
+        $data = array( 'tableName' => $tableName,
+          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
+        );
         $mess = 'Upsert for '. $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&

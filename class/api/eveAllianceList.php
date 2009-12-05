@@ -203,7 +203,7 @@ class eveAllianceList extends AEve {
       } else {
         $node->addAttribute('allianceID', $alliance);
       };// if isset $node['allianceID']...
-    };// if $nodeName=='row' || $nodeName=='result'
+    };// if $nodeName=='row' ...
     if ($children = $node->children()) {
       foreach ($children as $child) {
         $alliance = $this->editMemberCorporations($child, $alliance);

@@ -52,6 +52,10 @@ class charAssetList extends ACharacter {
    */
   protected $api = 'AssetList';
   /**
+   * @var array Holds copy of the XML rows.
+   */
+  private $itemsList = array();
+  /**
    * @var array Holds the database column names and ADOdb types.
    */
   private $types = array('flag' => 'I', 'itemID' => 'I', 'lft' => 'I',
@@ -72,14 +76,13 @@ class charAssetList extends ACharacter {
       $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-      $data = $this->xml;
-      if (count($data) > 0) {
+      if (count($this->xml) > 0) {
         $mess = 'Before editAssets for ' . $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 3) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         // Call recursive function to modify XML.
-        $rgt = $this->editAssets($data);
+        $rgt = $this->editAssets($this->xml);
         try {
           $con = YapealDBConnection::connect(YAPEAL_DSN);
           $sql = 'delete from ' . $tableName;
@@ -90,21 +93,19 @@ class charAssetList extends ACharacter {
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Clear out old tree for this owner.
           $con->Execute($sql);
-          //Just need the rows from XML now
-          $datum = $data->xpath('//row');
           // Use generated owner node as root for tree.
           $nodeData = '<row itemID="' . $this->characterID .
             '" typeID="25" quantity="1" flag="0" singleton="0"' .
             ' lft="1" locationID="0" lvl="0" rgt="' . $rgt . '" />';
           $root = new SimpleXMLElement($nodeData);
-          array_unshift($datum, $root);
+          array_unshift($this->itemsList, $root);
           unset($root);
           $extras = array('ownerID' => $this->characterID);
-          $cnt = count($datum);
+          $cnt = count($this->itemsList);
           $maxUpsert = 1000;
           for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
               $i < $grp;++$i, $pos += $maxUpsert) {
-            $group = array_slice($datum, $pos, $maxUpsert, TRUE);
+            $group = array_slice($this->itemsList, $pos, $maxUpsert, TRUE);
             $mess = 'multipleUpsertAttributes for ' . $tableName;
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
@@ -182,6 +183,7 @@ class charAssetList extends ACharacter {
     };
     if ($nodeName == 'row') {
       $node->addAttribute('rgt', $index++);
+      // While here make a new array with just rows needed.
       $this->itemsList[] = simplexml_load_string($node->asXML());
     };
     return $index;

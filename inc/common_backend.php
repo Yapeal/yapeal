@@ -78,11 +78,13 @@ foreach ($required as $ext) {
     exit(2);
   };
 };// foreach $exts ...
+// Get path constants so they can be used.
+require_once $incDir . DS . 'common_paths.php';
 // Set a constant for location of configuration file.
 if (!isset($iniFile)) {
   // Default assumes that this file and yapeal.ini file are in 'neighboring'
   // directories.
-  $iniFile = realpath($incDir . DS . '..' . DS . 'config' . DS . 'yapeal.ini');
+  $iniFile = realpath(YAPEAL_CONFIG . 'yapeal.ini');
 }
 if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
   $mess = 'The required ' . $iniFile . ' configuration file is missing';
@@ -110,7 +112,6 @@ $nonexist = 'Nonexistent directory defined for ';
 /* **************************************************************************
  * Paths
  * **************************************************************************/
-require_once $incDir . DS . 'common_paths.php';
 // Check writable paths
 if (!is_writable(YAPEAL_CACHE)) {
   trigger_error($realpath . ' is not writeable', E_USER_ERROR);

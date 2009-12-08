@@ -55,7 +55,7 @@ class serverServerStatus extends AServer {
    * @var array Holds the database column names and ADOdb types.
    */
   private $types = array('onlinePlayers' => 'I', 'serverName' =>'C',
-    'serverOpen' => 'L');
+    'serverOpen' => 'C');
   /**
    * @var string Xpath used to select data from XML.
    */

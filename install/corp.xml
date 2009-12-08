@@ -33,7 +33,6 @@
 -->
   <!-- Corporation Section -->
   <table name="corpAccountBalance">
-    <descr>Test text</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>

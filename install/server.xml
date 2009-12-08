@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema version="0.3" xmlns="http://www.mgcummings.com/xsd/yapeal/xmlschema03">
+<schema version="0.3" xmlns="http://yapeal.googlecode.com/files/xmlschema03">
 <!--
 /**
  * XML from Yapeal.
@@ -40,15 +40,12 @@
     <field name="`serverName`" type="C" size="32">
       <KEY/>
     </field>
-    <field name="`serverOpen`" type="I1" size="1">
+    <field name="`serverOpen`" type="C" size="32">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PserverServerStatus` MODIFY `serverOpen` BOOLEAN NOT NULL</query>
-  </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
       VALUES('ServerStatus',1,6,'server')

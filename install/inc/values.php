@@ -41,7 +41,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /*
  * Set what version we are using
  */
-$setupversion = 849;
+$setupversion = 939;
 /*
  * config tables used to test if this is an older version
  */
@@ -49,8 +49,8 @@ $cfgtables = array('utilconfig', 'utilConfig');
 /*
  * This is schema xml files to use in AXMLS + it's current version
  */
-$schemas = array('util'=>846, 'account'=>846, 'char'=>846, 'corp'=>846,
-  'eve'=>846, 'map'=>846, 'server'=>846);
+$schemas = array('util'=>939, 'account'=>939, 'char'=>939, 'corp'=>939,
+  'eve'=>939, 'map'=>939, 'server'=>939);
 /*****************************************************************
  * Define what APIs the Character can pull with a description
  * To use:
@@ -63,7 +63,10 @@ $charAPIs = array('AccountBalance'     => 'Get Account Balance from character',
                   'CharacterSheet'     => 'Get Character Sheet',
                   'IndustryJobs'       => 'Get Industry Jobs from character',
                   'KillLog'            => 'Get Kill Log from character',
+                  'MailingLists'       => 'Get list of Mailing Lists subscriptions',
+                  'MailMessages'       => 'Get list of Mail Messages headers',
                   'MarketOrders'       => 'Get Market Orders from character',
+                  'Notifications'      => 'Get list of Notifications from character',
                   'SkillInTraining'    => 'Get Skill In Training from character',
                   'SkillQueue'         => 'Get Skill Queue from character',
                   'Standings'          => 'Get Standings from character',

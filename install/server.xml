@@ -42,7 +42,6 @@
     </field>
     <field name="`serverOpen`" type="C" size="32">
       <NOTNULL/>
-      <UNSIGNED/>
     </field>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>

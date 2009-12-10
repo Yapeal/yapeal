@@ -259,9 +259,8 @@ class corpStarbaseDetail extends ACorporation {
     if (!empty($this->generalSettingsList)) {
       // Set the field types of query by name.
       $types = array('allowAllianceMembers' => 'L',
-        'allowCorporationMembers' => 'L', 'claimSovereignty' => 'L',
-        'deployFlags' => 'I', 'ownerID' => 'I', 'posID' => 'I',
-        'usageFlags' => 'I'
+        'allowCorporationMembers' => 'L', 'deployFlags' => 'I',
+        'ownerID' => 'I', 'posID' => 'I', 'usageFlags' => 'I'
       );
       try {
         $mess = 'multipleUpsert for ' . $tableName;

@@ -79,7 +79,8 @@ class charMailMessages extends ACharacter {
       $datum = $this->xml->xpath($this->xpath);
       if (count($datum) > 0) {
         try {
-          $extras = array('ownerID' => $this->characterID);
+          $extras = array('ownerID' => $this->characterID,
+            'toCorpOrAllianceID' => 0);
           $mess = 'multipleUpsertAttributes for ' . $tableName;
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&

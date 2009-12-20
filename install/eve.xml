@@ -99,7 +99,7 @@
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
       VALUES('AllianceList ConquerableStationList ErrorList RefTypes',0,4,'eve')
-      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`isActive`=VALUES(`isActive`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
+      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">

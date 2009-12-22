@@ -515,9 +515,7 @@
     <field name="`sentDate`" type="T">
       <NOTNULL/>
     </field>
-    <field name="`title`" type="C" size="255">
-      <NOTNULL/>
-    </field>
+    <field name="`title`" type="C" size="255"/>
     <field name="`toCharacterIDs`" type="X"/>
     <field name="`toCorpOrAllianceID`" type="I8" size="20">
       <NOTNULL/>

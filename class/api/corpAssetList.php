@@ -170,7 +170,7 @@ class corpAssetList extends ACorporation {
       $node->addAttribute('lft', $index++);
       $node->addAttribute('lvl', $level);
       if (isset($node['locationID'])) {
-        $locationID = $node['locationID'];
+        $locationID = (string)$node['locationID'];
       } else {
         $node->addAttribute('locationID', $locationID);
       };//if isset $node['locationID']...

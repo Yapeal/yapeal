@@ -180,16 +180,18 @@ class SectionChar {
     global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     /* Generate a list of character(s) we need to do updates for */
-    $sql = 'select u.userID "userID",u.fullApiKey "apiKey",';
-    $sql .= 'chr.characterID "charID",chr.activeAPI,chr.proxy';
+    $sql = 'select chr.`activeAPI`,';
+    $sql .= 'coalesce(u.`fullApiKey`,u.`limitedApiKey`) as apiKey,';
+    $sql .= 'chr.`characterID` as charID,';
+    $sql .= 'chr.`proxy`,u.`userID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
     $sql .= ' where';
-    $sql .= ' chr.isActive=1';
-    $sql .= ' and u.isActive=1';
-    $sql .= ' and chr.userID=u.userID';
-    $sql .= ' order by chr.userID asc, chr.characterID asc';
+    $sql .= ' chr.`isActive`=1';
+    $sql .= ' and u.`isActive`=1';
+    $sql .= ' and chr.`userID`=u.`userID`';
+    $sql .= ' order by chr.`userID` asc, chr.`characterID` asc';
     $mess = 'Before GetAll active characters in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);

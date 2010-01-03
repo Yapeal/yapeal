@@ -230,6 +230,15 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
+        case 901:// Web site database temporarily disabled.
+        case 902:// EVE backend database temporarily disabled.
+          $cuntil = gmdate('Y-m-d H:i:s', strtotime('6 hours'));
+          $data = array( 'tableName' => $this->tablePrefix . $this->api,
+            'ownerID' => $this->userID, 'cachedUntil' => $cuntil
+          );
+          YapealDBConnection::upsert($data, $cachetypes,
+            YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+          break;
         default:
           return FALSE;
           break;

@@ -184,18 +184,20 @@ class SectionCorp {
     global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of corporation(s) we need to do updates for
-    $sql = 'select cp.corporationID "corpID",u.userID "userID",';
-    $sql .= 'u.fullApiKey "apiKey",cp.characterID "charID",cp.activeAPI,cp.proxy';
+    $sql = 'select cp.`activeAPI`,';
+    $sql .= 'coalesce(u.`fullApiKey`,u.`limitedApiKey`) as apiKey,';
+    $sql .= 'cp.`characterID` as charID,cp.`corporationID` as corpID,';
+    $sql .= 'cp.`proxy`,u.`userID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation` as cp,';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
     $sql .= ' where';
-    $sql .= ' cp.isActive=1';
-    $sql .= ' and u.isActive=1';
-    $sql .= ' and cp.characterID=chr.characterID';
-    $sql .= ' and chr.userID=u.userID';
-    $sql .= ' order by u.userID asc, cp.corporationID asc';
+    $sql .= ' cp.`isActive`=1';
+    $sql .= ' and u.`isActive`=1';
+    $sql .= ' and cp.`characterID`=chr.`characterID`';
+    $sql .= ' and chr.`userID`=u.`userID`';
+    $sql .= ' order by u.`userID` asc, cp.`corporationID` asc';
     $mess = 'Before GetAll active corporations in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);

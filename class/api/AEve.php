@@ -127,6 +127,12 @@ abstract class AEve implements IFetchApiTable, IStoreApiTable {
         return FALSE;
       };
     }
+    catch (YapealApiErrorException $e) {
+      // Any API errors that need to be handled in some way are handled in this
+      // function.
+      $this->handleApiError($e);
+      return FALSE;
+    }
     catch (YapealApiException $e) {
       return FALSE;
     }
@@ -137,5 +143,35 @@ abstract class AEve implements IFetchApiTable, IStoreApiTable {
       return FALSE;
     }
   }// function apiFetch
+  /**
+   * Handles some Eve API error codes in special ways.
+   *
+   * @param object $e Eve API exception returned.
+   *
+   * @return bool Returns TRUE if handled the error else FALSE.
+   */
+  protected function handleApiError($e) {
+    global $tracing;
+    try {
+      switch ($e->getCode()) {
+        case 901:// Web site database temporarily disabled.
+        case 902:// EVE backend database temporarily disabled.
+          $cuntil = gmdate('Y-m-d H:i:s', strtotime('6 hours'));
+          $data = array( 'tableName' => $this->tablePrefix . $this->api,
+            'ownerID' => 0, 'cachedUntil' => $cuntil
+          );
+          YapealDBConnection::upsert($data, $cachetypes,
+            YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+          break;
+        default:
+          return FALSE;
+          break;
+      };// switch $code ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }// function handleApiError
 }
 ?>

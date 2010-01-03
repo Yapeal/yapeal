@@ -177,12 +177,12 @@ class SectionAccount {
   private function getRegisteredUsers() {
     global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
-    /* Generate a list of user(s) we need to do updates for */
-    $sql = 'select `userID`,`fullApiKey` "apiKey"';
+    // Generate a list of user(s) we need to do updates for
+    $sql = 'select coalesce(`fullApiKey`,`limitedApiKey`) as apiKey,`userID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
-    $sql .= ' where isActive=1';
-    $sql .= ' order by userID asc';
+    $sql .= ' where `isActive`=1';
+    $sql .= ' order by `userID` asc';
     $mess = 'Before GetAll users in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);

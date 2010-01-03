@@ -100,9 +100,7 @@
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilRegisteredUser">
-    <field name="`fullApiKey`" type="C" size="64">
-      <NOTNULL/>
-    </field>
+    <field name="`fullApiKey`" type="C" size="64"/>
     <field name="`isActive`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>

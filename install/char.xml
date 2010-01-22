@@ -616,6 +616,29 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="charResearch">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`agentID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`pointsPerDay`" type="N" size="4.2">
+      <NOTNULL/>
+    </field>
+    <field name="`skillTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`remainderPoints`" type="F" size="52">
+      <NOTNULL/>
+    </field>
+    <field name="`researchStartDate`" type="T">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="charSkillInTraining">
     <field name="`currentTQTime`" type="T"/>
     <field name="`offset`" type="I1" size="2">
@@ -864,6 +887,10 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`taxAmount`" type="N" size="17.2"/>
+    <field name="`taxReceiverID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charWalletTransactions">
@@ -938,7 +965,7 @@
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
-      VALUES('AccountBalance AssetList CharacterSheet IndustryJobs KillLog MailingLists MailMessages MarketOrders Notifications SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
+      VALUES('AccountBalance AssetList CharacterSheet IndustryJobs KillLog MailingLists MailMessages MarketOrders Notifications Research SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
       ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
     </query>
   </sql>

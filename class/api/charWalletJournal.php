@@ -57,7 +57,8 @@ class charWalletJournal extends ACharacter {
   private $types = array('accountKey' => 'I', 'amount' => 'N', 'argID1' => 'I',
     'argName1' => 'C', 'balance' => 'N', 'date' => 'T', 'ownerID' => 'I',
     'ownerID1' => 'I', 'ownerID2' => 'I', 'ownerName1' => 'C',
-    'ownerName2' => 'C', 'reason' => 'X', 'refID' => 'I', 'refTypeID' => 'I'
+    'ownerName2' => 'C', 'reason' => 'X', 'refID' => 'I', 'refTypeID' => 'I',
+    'taxAmount' => 'N', 'taxReceiverID' => 'I'
   );
   /**
    * @var array Hold an array of the XML return from API.

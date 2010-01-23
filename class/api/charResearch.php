@@ -46,7 +46,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Api_character
  */
-class charMailingLists extends ACharacter {
+class charResearch extends ACharacter {
   /**
    * @var string Holds the name of the API.
    */

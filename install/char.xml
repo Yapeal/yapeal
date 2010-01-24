@@ -887,6 +887,12 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`taxAmount`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`taxReceiverID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charWalletTransactions">

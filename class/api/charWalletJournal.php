@@ -57,7 +57,8 @@ class charWalletJournal extends ACharacter {
   private $types = array('accountKey' => 'I', 'amount' => 'N', 'argID1' => 'I',
     'argName1' => 'C', 'balance' => 'N', 'date' => 'T', 'ownerID' => 'I',
     'ownerID1' => 'I', 'ownerID2' => 'I', 'ownerName1' => 'C',
-    'ownerName2' => 'C', 'reason' => 'X', 'refID' => 'I', 'refTypeID' => 'I'
+    'ownerName2' => 'C', 'reason' => 'X', 'refID' => 'I', 'refTypeID' => 'I',
+    'taxAmount' => 'D', 'taxReceiverID' => 'I'
   );
   /**
    * @var array Hold an array of the XML return from API.
@@ -199,10 +200,18 @@ class charWalletJournal extends ACharacter {
         $cnt = count($datum);
         if ($cnt > 0) {
           try {
+            foreach ($datum as $row) {
+              if (empty($row['taxAmount'])) {
+                $row['taxAmount'] = 0.0;
+              };
+              if (empty($row['taxReceiverID'])) {
+                $row['taxReceiverID'] = 0;
+              };
+            };
             $extras = array('ownerID' => $this->characterID,
               'accountKey' => $account);
             $maxUpsert = 1000;
-            for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
+            for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert), $pos = 0;
                 $i < $grp;++$i, $pos += $maxUpsert) {
               $group = array_slice($datum, $pos, $maxUpsert, TRUE);
               $mess = 'multipleUpsertAttributes for ' . $tableName . $account;

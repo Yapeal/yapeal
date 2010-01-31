@@ -33,6 +33,12 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
+/**
+ * @internal Only let this code be included or required not ran directly.
+ */
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
+  exit();
+};
 /** Any errors that are trigger in this file are reported to the system default
  * logging location until we're done setting up some of the required vars and
  * we can start our own logging.

@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/php -Cq
 <?php
 /**
  * Used to get information from Eve-online API and store in database.
@@ -47,10 +47,15 @@ define('DS', DIRECTORY_SEPARATOR);
 // Pull in Yapeal revision constants.
 $path = $dir . DS . 'revision.php';
 require_once realpath($path);
+# Make CGI work like CLI.
+if (PHP_SAPI != 'cli') {
+  ini_set('implicit_flush', '1');
+  ini_set('register_argc_argv', '1');
+};
 // If being run from command-line look for options there if function available.
-if (PHP_SAPI == 'cli') {
-  if (function_exists('getopt')) {
-    $options = getopt('hVc:d:');
+if (function_exists('getopt')) {
+  $options = getopt('hVc:d:');
+  if (!empty($options)) {
     foreach ($options as $opt => $value) {
       switch ($opt) {
         case 'c':
@@ -80,10 +85,8 @@ if (PHP_SAPI == 'cli') {
           exit(1);
       };// switch $opt
     };// foreach $options...
-  };// if function_exists getopt ...
-} else {
-  notAWebPage();
-};// else PHP_SAPI == 'cli' ...
+  };// if !empty $options ...
+};// if function_exists getopt ...
 // Move down to 'inc' directory to read common_backend.php
 $path = $dir . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
@@ -218,31 +221,4 @@ Version $scriptversion
 USAGE_MESSAGE;
   fwrite(STDOUT, $use);
 };
-/**
- * Function use to show an error web page if run from web browser.
- */
-function notAWebPage () {
-  $page = <<<WEBPAGE
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http:www.w3.org/TR/xhtml1" xml:lang="en" lang="en">
-  <head>
-    <title>Yapeal is not a web application</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  </head>
-  <body>
-    <h1 style="font-size: xx-large;color: #ff1010;">USER ERROR USER ERROR USER ERROR</h1>
-    <p>
-    If you are seeing this you have tried to run Yapeal as a web page which is
-    incorrect.
-    Yapeal is made to <b>ONLY</b> ran from the command line.
-    See the <a href="http://code.google.com/p/yapeal/w/list">Yapeal Wiki</a> for
-    more information on using it.
-    </p>
-  </body>
-</html>
-WEBPAGE;
-print $page . PHP_EOL;
-exit(128);
-}
 ?>

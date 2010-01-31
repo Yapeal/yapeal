@@ -39,7 +39,7 @@ if (isset($_REQUEST['viewSource'])) {
 /**
  * @internal Only let this code be included or required not ran directly.
  */
-if (basename(__FILE__) == basename($_SERVER['SCRIPT_NAME'])) {
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 // Need to require one last class before autoloader can take over.

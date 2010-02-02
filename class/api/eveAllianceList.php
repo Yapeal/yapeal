@@ -52,11 +52,6 @@ class eveAllianceList extends AEve {
    */
   protected $api = 'AllianceList';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('allianceID' => 'I', 'executorCorpID' => 'I',
-    'memberCount' => 'I', 'name' => 'C', 'shortName' => 'C', 'startDate' => 'T');
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//result/rowset[@name="alliances"]/row';
@@ -69,7 +64,6 @@ class eveAllianceList extends AEve {
    */
   function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -100,8 +94,8 @@ class eveAllianceList extends AEve {
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-              $tableName, YAPEAL_DSN);
+            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+              YAPEAL_DSN);
           };// for $i = 0...
         }
         catch (ADODB_Exception $e) {
@@ -123,7 +117,7 @@ class eveAllianceList extends AEve {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -141,16 +135,12 @@ class eveAllianceList extends AEve {
     global $tracing;
     $pos =0;
     $ret = FALSE;
+    $tempFile = YAPEAL_CACHE . DS . 'eve' . DS . 'temp.xml';
     $tableName = $this->tablePrefix . 'MemberCorporations';
-    // Set the field types of query by name.
-    $types = array('allianceID' => 'I', 'corporationID' => 'I',
-      'startDate' => 'T');
-    $xml = clone $this->xml->result[0];
-    $this->editMemberCorporations($xml);
-    $data = simplexml_load_string($xml->asXML());
-    unset($xml);
-    $datum = $data->xpath('//row//row');
-    unset($data);
+    $this->editMemberCorporations($this->xml);
+    file_put_contents($tempFile, $this->xml->asXML());
+    $this->xml = simplexml_load_file($tempFile);
+    $datum = $this->xml->xpath('//row//row');
     $cnt = count($datum);
     if ($cnt > 0) {
       try {
@@ -170,8 +160,8 @@ class eveAllianceList extends AEve {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-          YapealDBConnection::multipleUpsertAttributes($group, $types,
-            $tableName, YAPEAL_DSN);
+          YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+            YAPEAL_DSN);
         };// for $i = 0...
       }
       catch (ADODB_Exception $e) {

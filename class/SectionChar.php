@@ -90,7 +90,6 @@ class SectionChar {
    */
   public function pullXML() {
     global $tracing;
-    global $cachetypes;
     $apiCount = 0;
     $apiSuccess = 0;
     try {
@@ -128,7 +127,7 @@ class SectionChar {
             $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
             try {
-              YapealDBConnection::upsert($data, $cachetypes,
+              YapealDBConnection::upsert($data,
                 YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
             }
             catch(ADODB_Exception $e) {}
@@ -146,7 +145,10 @@ class SectionChar {
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           $instance = new $class($proxy, $params);
-          if ($instance->apiFetch() && $instance->apiStore()) {
+          if ($instance->apiFetch()) {
+            ++$apiSuccess;
+          };
+          if ($instance->apiStore()) {
             ++$apiSuccess;
           };
           $instance = null;
@@ -163,7 +165,7 @@ class SectionChar {
       // Do nothing use observers to log info
     }
     // Only truly successful if API was fetched and stored.
-    if ($apiCount == $apiSuccess) {
+    if ($apiCount * 2 == $apiSuccess) {
       return TRUE;
     } else {
       return FALSE;

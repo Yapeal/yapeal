@@ -52,11 +52,6 @@ class serverServerStatus extends AServer {
    */
   protected $api = 'ServerStatus';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('onlinePlayers' => 'I', 'serverName' =>'C',
-    'serverOpen' => 'C');
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//result';
@@ -69,7 +64,6 @@ class serverServerStatus extends AServer {
    */
   function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -92,7 +86,7 @@ class serverServerStatus extends AServer {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_SERVER, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-          YapealDBConnection::upsert($data, $this->types, $tableName, YAPEAL_DSN);
+          YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -112,7 +106,7 @@ class serverServerStatus extends AServer {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

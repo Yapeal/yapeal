@@ -52,15 +52,6 @@ class corpMemberTracking extends ACorporation {
    */
   protected $api = 'MemberTracking';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('base' => 'C', 'baseID' => 'I', 'characterID' => 'I',
-    'grantableRoles' => 'C', 'location' => 'C', 'locationID' => 'I',
-    'logoffDateTime' => 'T', 'logonDateTime' => 'T', 'name' => 'C',
-    'ownerID' => 'I', 'roles' => 'C', 'shipType' => 'C', 'shipTypeID' => 'I',
-    'startDateTime' => 'T', 'title' => 'C'
-  );
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -71,7 +62,6 @@ class corpMemberTracking extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -95,8 +85,8 @@ class corpMemberTracking extends ACorporation {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
-            $tableName, YAPEAL_DSN, $extras);
+          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+            YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -117,7 +107,7 @@ class corpMemberTracking extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

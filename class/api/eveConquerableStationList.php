@@ -52,12 +52,6 @@ class eveConquerableStationList extends AEve {
    */
   protected $api = 'ConquerableStationList';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('corporationID' => 'I', 'corporationName' => 'C',
-    'solarSystemID' => 'I', 'stationID' => 'I', 'stationName' => 'C',
-    'stationTypeID' => 'I');
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -70,7 +64,6 @@ class eveConquerableStationList extends AEve {
    */
   function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -96,8 +89,8 @@ class eveConquerableStationList extends AEve {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
-            $tableName, YAPEAL_DSN);
+          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+            YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -117,7 +110,7 @@ class eveConquerableStationList extends AEve {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

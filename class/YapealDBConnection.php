@@ -131,10 +131,73 @@ class YapealDBConnection {
     return $con;
   }// function connect
   /**
+   * Function to return an array of column names and generic ADOdb types.
+   *
+   * @param string $table Table to use in query's from clause.
+   * @param string $dsn A valid ADOdb DSN.
+   *
+   * @return array Returns array of column names and their generic ADOdb types.
+   *
+   * @throws ADODB_Exception if connection fails.
+   */
+  private static function getColumnTypes($table, $dsn) {
+    global $tracing;
+    $con = self::connect($dsn);
+    $columns = $con->MetaColumns($table, FALSE);
+    $types = array();
+    foreach ($columns as $col) {
+      $types[$col->name] = self::metaType($col);
+    };// foreach $columns ...
+    return $types;
+  }// function getColumnTypes
+  /**
+   * Function to return an array of optional column names.
+   *
+   * @param string $table Table to use in query's from clause.
+   * @param string $dsn A valid ADOdb DSN.
+   *
+   * @return array Returns an array of optional column names.
+   *
+   * @throws ADODB_Exception if connection fails.
+   */
+  private static function getOptionalColumns($table, $dsn) {
+    global $tracing;
+    $con = self::connect($dsn);
+    $columns = $con->MetaColumns($table, FALSE);
+    $types = array();
+    foreach ($columns as $col) {
+      if (TRUE == $col->has_default) {
+        $types[] = $col->name;
+      };// if TRUE == $col->has_default ...
+    };// foreach $columns ...
+    return $types;
+  }// function getOptionalColumns
+  /**
+   * Function to return an array of required column names.
+   *
+   * @param string $table Table to use in query's from clause.
+   * @param string $dsn A valid ADOdb DSN.
+   *
+   * @return array Returns an array of required column names.
+   *
+   * @throws ADODB_Exception if connection fails.
+   */
+  private static function getRequiredColumns($table, $dsn) {
+    global $tracing;
+    $con = self::connect($dsn);
+    $columns = $con->MetaColumns($table, FALSE);
+    $types = array();
+    foreach ($columns as $col) {
+      if (FALSE == $col->has_default) {
+        $types[] = $col->name;
+      };// if FALSE == $col->has_default ...
+    };// foreach $columns ...
+    return $types;
+  }// function getRequiredColumns
+  /**
    * Function to build a multi-values insert ... on duplicate key update query
    *
    * @param array $data Values to be put into query
-   * @param array $params Keys are parameter names and values their types
    * @param string $table Table to use in query's from clause
    * @param string $dsn A valid ADOdb DSN.
    *
@@ -143,50 +206,57 @@ class YapealDBConnection {
    *
    * @throws ADODB_Exception if connection used to do quoting fails.
    */
-  private static function makeMultiUpsert(array $data, array $params, $table, $dsn) {
+  private static function makeMultiUpsert(array $data, $table, $dsn) {
     global $tracing;
-    $pkeys = array_keys($params);
     $dkeys = array_keys($data[0]);
-    // Check for missing fields
-    $missing = array_diff($pkeys, $dkeys);
+    $okeys = YapealDBConnection::getOptionalColumns($table, $dsn);
+    $rkeys = YapealDBConnection::getRequiredColumns($table, $dsn);
+    // Make an array of required and optional fields
+    $akeys = array_merge($rkeys, $okeys);
+    // Check for missing required fields
+    $missing = array_diff($rkeys, $dkeys);
     if (count($missing)) {
       $mess = 'Missing required fields (' . implode(', ', $missing);
       $mess .= ') found while making upsert for ' . $table;
-      throw new UnexpectedValueException($mess,1);
+      throw new UnexpectedValueException($mess, 1);
     };
-    // Check for extra unknown fields
-    $extras = array_diff($dkeys, $pkeys);
+    // Check for extra unknown fields in the data. This should only happen when
+    // API has changed and the version of Yapeal is out of date.
+    $extras = array_diff($dkeys, $akeys);
     if (count($extras)) {
       $mess = 'Extra unknown fields (' . implode(', ', $extras);
       $mess .= ') found while making upsert for ' . $table;
       trigger_error($mess, E_USER_WARNING);
     };
-    $fields = array_intersect($pkeys, $dkeys);
+    // Make a new array where database fields and API data fields overlap.
+    $fields = array_intersect($akeys, $dkeys);
+    // Get an array of database fields and their generic ADOdb types.
+    $types = YapealDBConnection::getColumnTypes($table, $dsn);
     // Need this so we can do quoting.
     $con = self::connect($dsn);
     $needsQuote = array('C', 'X', 'D', 'T');
     // Build query sections
     $insert = 'insert into `' . $table . '` (`';
-    $insert .= implode('`,`', $pkeys) . '`)';
+    $insert .= implode('`,`', $fields) . '`)';
     $values = ' values';
     $sets = array();
-    foreach ($data as $row) {
+    // Shift first row off the start of $data and quote value as needed.
+    while (NULL != $row = array_shift($data)) {
       $set = array();
       foreach ($fields as $field) {
-        if (in_array($params[$field], $needsQuote)) {
+        if (in_array($types[$field], $needsQuote)) {
           $set[] = $con->qstr($row[$field]);
         } else {
           $set[] = (string)$row[$field];
         };// else in_array $params...
       };// foreach $fields ...
       $sets[] = '(' . implode(',', $set) . ')';
-      //unset($row);
-    };// foreach $data ...
+    };// while NULL != $row...
     $values .= ' ' . implode(',', $sets);
     $dupup = ' on duplicate key update ';
     // Loop thru and build update section.
     $updates = array();
-    foreach ($pkeys as $k) {
+    foreach ($fields as $k) {
       $updates[] = '`' . $k . '`=values(`' . $k . '`)';
     };
     $dupup .= implode(',', $updates);
@@ -196,6 +266,70 @@ class YapealDBConnection {
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $insert . $values . $dupup;
   }// function makeMultiUpsert
+  /**
+   * Function that will return ADOdb generic data type for an ADOFieldObject
+   *
+   * @param object $fieldobj An ADOFieldObject to figure out generic type of.
+   *
+   * @return string Returns a single character string of the ADOdb generic type.
+   *
+   * @throws InvalidArgumentException If $fieldobj isn't an object throws an
+   * InvalidArgumentException.
+   */
+  private static function metaType($fieldobj) {
+    if (is_object($fieldobj)) {
+        $t = $fieldobj->type;
+        $len = $fieldobj->max_length;
+    } else {
+      $mess = 'Parameter $fieldobj must be an ADOFieldObject';
+      throw new InvalidArgumentException($mess, 1);
+    };// else is_object $fieldobj
+    switch (strtoupper($t)) {
+      case 'STRING':
+      case 'CHAR':
+      case 'VARCHAR':
+      case 'TINYBLOB':
+      case 'TINYTEXT':
+      case 'ENUM':
+      case 'SET':
+        if ($len <= 255) return 'C';
+      case 'TEXT':
+      case 'LONGTEXT':
+      case 'MEDIUMTEXT':
+         return 'X';
+      // php_mysql extension always returns 'blob' even if 'text'
+      // so we have to check whether binary...
+      case 'IMAGE':
+      case 'LONGBLOB':
+      case 'BLOB':
+      case 'MEDIUMBLOB':
+        return !empty($fieldobj->binary) ? 'B' : 'X';
+      case 'YEAR':
+      case 'DATE':
+        return 'D';
+      case 'TIME':
+      case 'DATETIME':
+      case 'TIMESTAMP':
+        return 'T';
+      case 'INT':
+      case 'INTEGER':
+      case 'BIGINT':
+      case 'TINYINT':
+      case 'MEDIUMINT':
+      case 'SMALLINT':
+        //if (!empty($fieldobj->primary_key)) return 'R';
+        return 'I';
+      // Added floating-point types
+      // Maybe not necessery.
+      case 'FLOAT':
+      case 'DOUBLE':
+      case 'DECIMAL':
+      case 'DEC':
+      case 'FIXED':
+      default:
+        return 'N';
+    };// switch
+  }// function metaType
   /**
    * Function to build, prepare, execute an insert ... on duplicate key update
    * for an array of records
@@ -209,14 +343,11 @@ class YapealDBConnection {
    * array('tableName'=>'eve-api-pull','ownerID'=>0,
    *   'cachedUntil'=>'2008-01-01 00:00:01'), ...
    * );
-   * $types=array('tableName'=>'text','ownerID'=>'integer',
-   *   'cachedUntil'=>'timestamp');
-   * YapealDBConnection::multipleUpsert($data,$types,'CacheUntil',YAPEAL_DSN);
+   * YapealDBConnection::multipleUpsert($data, 'CacheUntil', YAPEAL_DSN);
    * </code>
    *
    * @param array $data An array of assoc arrays of column names and values to be
    * Upserted.
-   * @param array $types Assoc array of column names and ADOdb types.
    * @param string $table Name of table to Upsert into.
    * @param string $dsn A valid ADOdb DSN.
    *
@@ -227,9 +358,9 @@ class YapealDBConnection {
    *
    * @uses YapealDBConnection::makeMultiUpsert()
    */
-  public static function multipleUpsert(array $data, array $types, $table, $dsn) {
+  public static function multipleUpsert(array $data, $table, $dsn) {
     global $tracing;
-    if (empty($data) || empty($types)) {
+    if (empty($data)) {
       return FALSE;
     };
     $cnt = count($data);
@@ -239,7 +370,7 @@ class YapealDBConnection {
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $mess = 'Upserting ' . $cnt . ' records for ' . $table;
     trigger_error($mess, E_USER_NOTICE);
-    $upsert = self::makeMultiUpsert($data, $types, $table, $dsn);
+    $upsert = self::makeMultiUpsert($data, $table, $dsn);
     // Use a transaction for larger upserts to make them faster when we can.
     if ($cnt > 10) {
       try {
@@ -275,17 +406,16 @@ class YapealDBConnection {
    * @param mixed $datum SimpleXMLElement object who's element attributes will
    * be inserted into table or an array of SimpleXMLElement objects with
    * attributes
-   * @param array $types Keys are DB field names and values are thier ADOdb type
-   * i.e. 'ID'=>'integer','name'=>'text' ...
    * @param string $table Name of the table to use in query's from clause
    * @param string $dsn The connection infomation needed to connect to DB
    * @param array $extras Used when you need to add any extra table fields that
    * aren't included in attributes
+   *
    * @return mixed Number of records inserted/update or FALSE
    *
    * @uses YapealDBConnection::multipleUpsert()
    */
-  public static function multipleUpsertAttributes($datum, array $types, $table, $dsn,
+  public static function multipleUpsertAttributes($datum, $table, $dsn,
     $extras = array()) {
     global $tracing;
     if (count($datum) > 0) {
@@ -301,7 +431,7 @@ class YapealDBConnection {
       $mess = 'Before multipleUpsert for ' . $table . ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
       $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
-      return self::multipleUpsert($data, $types, $table, $dsn);
+      return self::multipleUpsert($data, $table, $dsn);
     };// if $datum>0
     return FALSE;
   }// function multipleUpsertAttributes
@@ -312,32 +442,28 @@ class YapealDBConnection {
    * <code>
    * $data=array('tableName'=>'eve-api-pull','ownerID'=>0,
    *   'cachedUntil'=>'2008-01-01 00:00:01');
-   * $types=array('tableName'=>'text','ownerID'=>'integer',
-   *   'cachedUntil'=>'timestamp');
-   * YapealDBConnection::upsert($data,$types,'CacheUntil',YAPEAL_DSN);
+   * YapealDBConnection::upsert($data, 'CacheUntil', YAPEAL_DSN);
    * </code>
    *
-   * @param array $data Assoc array of column names and value to be Upserted.
-   * @param array $types Assoc array of column names and ADOdb types.
    * @param string $table Name of table to Upsert into.
    * @param string $dsn A valid ADOdb DSN.
    *
-   * @return mixed Number rows effected (1),
-   * FALSE if either $data or $types is empty
+   * @return mixed Number rows effected (1), FALSE if either $data or $types is
+   * empty
    *
    * @throws ADODB_Exception for any errors.
    *
    * @uses YapealDBConnection::makeMultiUpsert()
    */
-  public static function upsert(array $data, array $types, $table, $dsn) {
+  public static function upsert(array $data, $table, $dsn) {
     global $tracing;
-    if (empty($data) || empty($types)) {
+    if (empty($data)) {
       return FALSE;
     };
     $mess = 'Before makeMultiUpsert for ' . $table . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
     $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
-    $upsert = self::makeMultiUpsert(array($data) , $types, $table, $dsn);
+    $upsert = self::makeMultiUpsert(array($data), $table, $dsn);
     $con = self::connect($dsn);
     return $con->Execute($upsert);
   }// function upsert

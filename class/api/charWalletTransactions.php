@@ -52,15 +52,6 @@ class charWalletTransactions extends ACharacter {
    */
   protected $api = 'WalletTransactions';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('accountKey' => 'I', 'clientID' => 'I',
-    'clientName' => 'C', 'ownerID' => 'I', 'price' => 'N', 'quantity' => 'I',
-    'stationID' => 'I', 'stationName' => 'C', 'transactionDateTime' => 'T',
-    'transactionFor' => 'C', 'transactionID' => 'I', 'transactionType' => 'C',
-    'typeID' => 'I', 'typeName' => 'C'
-  );
-  /**
    * @var array Hold an array of the XML return from API.
    */
   protected $xml = array();
@@ -75,7 +66,6 @@ class charWalletTransactions extends ACharacter {
    */
   public function apiFetch() {
     global $tracing;
-    global $cachetypes;
     $accounts = array(1000);
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
@@ -175,7 +165,6 @@ class charWalletTransactions extends ACharacter {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $accounts = array(1000);
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
@@ -210,8 +199,8 @@ class charWalletTransactions extends ACharacter {
               $mess .= ' in ' . basename(__FILE__);
               $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
               $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-              YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-                $tableName, YAPEAL_DSN, $extras);
+              YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+                YAPEAL_DSN, $extras);
             };// for $i = 0...
           }
           catch (ADODB_Exception $e) {
@@ -245,7 +234,7 @@ class charWalletTransactions extends ACharacter {
       $mess .= ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-      YapealDBConnection::upsert($data, $cachetypes,
+      YapealDBConnection::upsert($data,
         YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
@@ -266,7 +255,6 @@ class charWalletTransactions extends ACharacter {
    */
   private function handleApiRetry($e) {
     global $tracing;
-    global $cachetypes;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.
@@ -280,7 +268,7 @@ class charWalletTransactions extends ACharacter {
           $data = array( 'tableName' => $this->tablePrefix . $this->api,
             'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
           );
-            YapealDBConnection::upsert($data, $cachetypes,
+            YapealDBConnection::upsert($data,
               YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
           return TRUE;
           break;

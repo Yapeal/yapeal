@@ -52,15 +52,6 @@ class corpMarketOrders extends ACorporation {
    */
   protected $api = 'MarketOrders';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('accountKey' => 'I', 'bid' => 'I', 'charID' => 'I',
-    'duration' => 'I', 'escrow' => 'N', 'issued' => 'T', 'minVolume' => 'I',
-    'orderID' => 'I', 'orderState' => 'I', 'ownerID' => 'I', 'price' => 'N',
-    'range' => 'I', 'stationID' => 'I', 'typeID' => 'I', 'volEntered' => 'I',
-    'volRemaining' => 'I'
-  );
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -71,7 +62,6 @@ class corpMarketOrders extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -91,8 +81,8 @@ class corpMarketOrders extends ACorporation {
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-              $tableName, YAPEAL_DSN, $extras);
+            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+              YAPEAL_DSN, $extras);
           };// for $i = 0...
         }
         catch (ADODB_Exception $e) {
@@ -114,7 +104,7 @@ class corpMarketOrders extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

@@ -52,13 +52,6 @@ class charResearch extends ACharacter {
    */
   protected $api = 'Research';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('agentID' => 'I', 'ownerID' => 'I',
-    'pointsPerDay' => 'N', 'skillTypeID' => 'I', 'remainderPoints' => 'F',
-    'researchStartDate' => 'T'
-  );
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -69,7 +62,6 @@ class charResearch extends ACharacter {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -84,8 +76,8 @@ class charResearch extends ACharacter {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
-            $tableName, YAPEAL_DSN, $extras);
+          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+            YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -107,7 +99,7 @@ class charResearch extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

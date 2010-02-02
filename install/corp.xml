@@ -329,10 +329,6 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`claimSovereignty`" type="I1" size="1">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
     <field name="`deployFlags`" type="I2" size="3">
       <NOTNULL/>
       <UNSIGNED/>

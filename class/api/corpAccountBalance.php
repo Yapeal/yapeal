@@ -52,11 +52,6 @@ class corpAccountBalance extends ACorporation {
    */
   protected $api = 'AccountBalance';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('accountID' => 'I', 'accountKey' => 'I',
-    'balance' => 'N', 'ownerID' => 'I');
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -67,7 +62,6 @@ class corpAccountBalance extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -82,8 +76,8 @@ class corpAccountBalance extends ACorporation {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
-            $tableName, YAPEAL_DSN, $extras);
+          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+            YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -104,7 +98,7 @@ class corpAccountBalance extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

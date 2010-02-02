@@ -947,7 +947,7 @@
     <query platform="mysql">ALTER TABLE `%%PcharAssetList` MODIFY `singleton` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PcharAttackers` MODIFY `finalblow` BOOLEAN NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PcharAttackers` MODIFY `finalBlow` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcharIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>

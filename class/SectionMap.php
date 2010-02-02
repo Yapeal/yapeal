@@ -90,7 +90,6 @@ class SectionMap {
    */
   public function pullXML() {
     global $tracing;
-    global $cachetypes;
     $apiCount = 0;
     $apiSuccess = 0;
     try {
@@ -111,7 +110,7 @@ class SectionMap {
           $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
           try {
-            YapealDBConnection::upsert($data, $cachetypes,
+            YapealDBConnection::upsert($data,
               YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
           }
           catch(ADODB_Exception $e) {}

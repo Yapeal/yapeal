@@ -82,7 +82,6 @@ class corpKillLog extends ACorporation {
    */
   public function apiFetch() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
@@ -170,7 +169,6 @@ class corpKillLog extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
     $tableName = $this->tablePrefix . $this->api;
@@ -199,21 +197,14 @@ class corpKillLog extends ACorporation {
         };// for $i = 0...
         if (!empty($this->attackersList)) {
           $tableName = $this->tablePrefix . 'Attackers';
-          // Set the field types of query by name.
-          $types = array(
-            'allianceID' => 'I', 'allianceName' => 'C', 'characterID' => 'I',
-            'characterName' => 'C', 'corporationID' => 'I',
-            'corporationName' => 'C', 'damageDone' => 'I', 'factionID' => 'I',
-            'factionName' => 'C', 'finalBlow' => 'L', 'killID' => 'I',
-            'securityStatus' => 'N', 'shipTypeID' => 'I', 'weaponTypeID' => 'I'
-          );
+          $extras = array('finalBlow' => 0);
           try {
             $mess = 'multipleUpsertAttributes for ' . $tableName;
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->attackersList,
-              $types, $tableName, YAPEAL_DSN);
+              $tableName, YAPEAL_DSN);
             ++$ret;
           }
           catch (ADODB_Exception $e) {
@@ -222,18 +213,13 @@ class corpKillLog extends ACorporation {
         };// if !empty $this->attackersList ...
         if (!empty($this->itemsList)) {
           $tableName = $this->tablePrefix . 'Items';
-          // Set the field types of query by name.
-          $types = array('flag' => 'I', 'killID' => 'I', 'lft' => 'I',
-            'lvl' => 'I', 'rgt' => 'I', 'typeID' => 'I', 'qtyDestroyed' => 'I',
-            'qtyDropped' => 'I'
-          );
           try {
             $mess = 'multipleUpsertAttributes for ' . $tableName;
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->itemsList,
-              $types, $tableName, YAPEAL_DSN);
+              $tableName, YAPEAL_DSN);
             ++$ret;
           }
           catch (ADODB_Exception $e) {
@@ -242,15 +228,12 @@ class corpKillLog extends ACorporation {
         };// if !empty $this->itemsList ...
         if (!empty($this->killList)) {
           $tableName = $this->tablePrefix . 'KillLog';
-          // Set the field types of query by name.
-          $types = array('killID' => 'I', 'killTime' => 'T', 'moonID' => 'I',
-            'solarSystemID' => 'I');
           try {
             $mess = 'multipleUpsertAttributes for ' . $tableName;
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-            YapealDBConnection::multipleUpsertAttributes($this->killList, $types,
+            YapealDBConnection::multipleUpsertAttributes($this->killList,
               $tableName, YAPEAL_DSN);
             ++$ret;
           }
@@ -260,20 +243,13 @@ class corpKillLog extends ACorporation {
         };// if !empty $this->killList ...
         if (!empty($this->victimList)) {
           $tableName = $this->tablePrefix . 'Victim';
-          // Set the field types of query by name.
-          $types = array(
-            'allianceID' => 'I', 'allianceName' => 'C', 'characterID' => 'I',
-            'characterName' => 'C', 'corporationID' => 'I',
-            'corporationName' => 'C', 'damageTaken' => 'I', 'factionID' => 'I',
-            'factionName' => 'C', 'killID' => 'I', 'shipTypeID' => 'I'
-          );
           try {
             $mess = 'multipleUpsertAttributes for ' . $tableName;
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->victimList,
-              $types, $tableName, YAPEAL_DSN);
+              $tableName, YAPEAL_DSN);
             ++$ret;
           }
           catch (ADODB_Exception $e) {
@@ -296,7 +272,7 @@ class corpKillLog extends ACorporation {
       $mess .= ' in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
       $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-      YapealDBConnection::upsert($data, $cachetypes,
+      YapealDBConnection::upsert($data,
         YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {

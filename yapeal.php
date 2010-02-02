@@ -90,7 +90,6 @@ if (function_exists('getopt')) {
 // Move down to 'inc' directory to read common_backend.php
 $path = $dir . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
-$cachetypes = array('tableName' => 'C', 'ownerID' => 'I', 'cachedUntil' => 'T');
 try {
   $api = 'eve-api-pull';
   $mess = 'Before dontWait for ' . $api . ' in ' . basename(__FILE__);
@@ -113,7 +112,7 @@ try {
     $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
     $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
     $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-    YapealDBConnection::upsert($data, $cachetypes,
+    YapealDBConnection::upsert($data,
       YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
   } else {
     // Someone else has set timer need to wait it out.
@@ -178,7 +177,7 @@ try {
     $cuntil = gmdate('Y-m-d H:i:s');
     $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => $cuntil);
-    YapealDBConnection::upsert($data, $cachetypes,
+    YapealDBConnection::upsert($data,
       YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
   } else {
     // Lost Mutex we should log that as warning.

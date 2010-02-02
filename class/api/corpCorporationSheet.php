@@ -58,7 +58,6 @@ class corpCorporationSheet  extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -84,7 +83,7 @@ class corpCorporationSheet  extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -133,7 +132,7 @@ class corpCorporationSheet  extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -155,8 +154,6 @@ class corpCorporationSheet  extends ACorporation {
     global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Divisions';
-    // Set the field types of query by name.
-    $types = array('accountKey' => 'I', 'description' => 'C', 'ownerID' => 'I');
     $datum = $this->xml->xpath('//rowset[@name="divisions"]/row');
     if (count($datum) > 0) {
       try {
@@ -165,7 +162,7 @@ class corpCorporationSheet  extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -188,9 +185,6 @@ class corpCorporationSheet  extends ACorporation {
     global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Logo';
-    $types = array('color1' => 'I', 'color2' => 'I', 'color3' => 'I',
-      'graphicID' => 'I', 'ownerID' => 'I', 'shape1' => 'I', 'shape2' => 'I',
-      'shape3' => 'I');
     $datum = $this->xml->xpath('//logo');
     if (count($datum) > 0) {
       $data = array('ownerID' => $this->corporationID);
@@ -202,7 +196,7 @@ class corpCorporationSheet  extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -224,8 +218,6 @@ class corpCorporationSheet  extends ACorporation {
     global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'WalletDivisions';
-    // Set the field types of query by name.
-    $types = array('accountKey' => 'I', 'description' => 'C', 'ownerID' => 'I');
     $datum = $this->xml->xpath('//rowset[@name="walletDivisions"]/row');
     if (count($datum) > 0) {
       try {
@@ -234,7 +226,7 @@ class corpCorporationSheet  extends ACorporation {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {

@@ -58,7 +58,6 @@ class charCharacterSheet  extends ACharacter {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -102,7 +101,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -122,11 +121,6 @@ class charCharacterSheet  extends ACharacter {
    */
   protected function characterSheet() {
     global $tracing;
-    $types = array(
-      'balance' => 'N', 'bloodLine' => 'C', 'characterID' => 'I',
-      'cloneName' => 'C', 'cloneSkillPoints' => 'I', 'corporationID' => 'I',
-      'corporationName' => 'C', 'gender' => 'C', 'name' => 'C', 'race' => 'C'
-    );
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     $mess = 'Clone for ' . $tableName . ' in ' . basename(__FILE__);
@@ -150,7 +144,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -172,9 +166,6 @@ class charCharacterSheet  extends ACharacter {
     global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Attributes';
-    // Set the field types of query by name.
-    $types = array('charisma' => 'I', 'intelligence' => 'I', 'memory' => 'I',
-      'ownerID' => 'I', 'perception' => 'I', 'willpower' => 'I');
     $datum = $this->xml->result->attributes;
     if (count($datum) > 0) {
       $data = array('ownerID' => $this->characterID);
@@ -186,7 +177,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::upsert($data, $types, $tableName, YAPEAL_DSN);
+        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -239,7 +230,7 @@ class charCharacterSheet  extends ACharacter {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-          YapealDBConnection::multipleUpsert($data, $types, $tableName, YAPEAL_DSN);
+          YapealDBConnection::multipleUpsert($data, $tableName, YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -276,7 +267,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -321,7 +312,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -366,7 +357,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -411,7 +402,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -456,7 +447,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -501,7 +492,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
@@ -537,7 +528,7 @@ class charCharacterSheet  extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $types, $tableName,
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {

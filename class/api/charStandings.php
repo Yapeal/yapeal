@@ -59,7 +59,6 @@ class charStandings extends ACharacter {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -79,7 +78,7 @@ class charStandings extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -203,8 +202,6 @@ class charStandings extends ACharacter {
   protected function standingsToCommon($tableName, $currentPath) {
     global $tracing;
     $ret = FALSE;
-    $typesTo = array('toID' => 'I', 'toName' => 'T',
-      'standing' => 'N', 'ownerID' => 'I');
     $extras = array('ownerID' => $this->characterID);
     $datum = $this->xml->xpath($currentPath);
     try {
@@ -225,8 +222,8 @@ class charStandings extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $typesTo,
-          $tableName, YAPEAL_DSN, $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
@@ -251,8 +248,6 @@ class charStandings extends ACharacter {
   protected function standingsFromCommon($tableName, $currentPath) {
     global $tracing;
     $ret = FALSE;
-    $typesFrom = array('fromID' => 'I', 'fromName' => 'T',
-      'standing' => 'N', 'ownerID' => 'I');
     $extras = array('ownerID' => $this->characterID);
     $datum = $this->xml->xpath($currentPath);
     try {
@@ -273,8 +268,8 @@ class charStandings extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::multipleUpsertAttributes($datum, $typesFrom,
-          $tableName, YAPEAL_DSN, $extras);
+        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+          YAPEAL_DSN, $extras);
       }
       catch (ADODB_Exception $e) {
         return FALSE;

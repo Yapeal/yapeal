@@ -52,11 +52,6 @@ class accountCharacters extends AAccount {
    */
   protected $api = 'Characters';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('characterID' => 'I', 'corporationID' => 'I',
-    'corporationName' => 'C', 'name' => 'C', 'userID' => 'I');
-  /**
    * @var SimpleXMLElement Hold the XML return from API.
    */
   protected $xml;
@@ -73,7 +68,6 @@ class accountCharacters extends AAccount {
    */
   function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -88,8 +82,8 @@ class accountCharacters extends AAccount {
           $mess .= ' in ' . basename(__FILE__);
           $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 1) &&
           $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $this->types,
-            $tableName, YAPEAL_DSN, $extras);
+          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+            YAPEAL_DSN, $extras);
         }
         catch (ADODB_Exception $e) {
           return FALSE;
@@ -109,7 +103,7 @@ class accountCharacters extends AAccount {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

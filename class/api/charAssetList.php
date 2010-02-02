@@ -56,20 +56,12 @@ class charAssetList extends ACharacter {
    */
   private $itemsList = array();
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('flag' => 'I', 'itemID' => 'I', 'lft' => 'I',
-    'locationID' => 'I', 'lvl' => 'I', 'ownerID' => 'I', 'quantity' => 'I',
-    'rgt' => 'I', 'singleton' => 'L', 'typeID' => 'I'
-  );
-  /**
    * Used to store XML to AssetList table.
    *
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -110,8 +102,8 @@ class charAssetList extends ACharacter {
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-              $tableName, YAPEAL_DSN, $extras);
+            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+              YAPEAL_DSN, $extras);
           };// for $i = 0...
         }
         catch (ADODB_Exception $e) {
@@ -133,7 +125,7 @@ class charAssetList extends ACharacter {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

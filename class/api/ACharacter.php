@@ -88,37 +88,40 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    *
    * @throws LengthException for any missing required $params.
    */
-  public function __construct($proxy, array $params = array()) {
+  public function __construct($proxy, array $params) {
     $this->tablePrefix = YAPEAL_TABLE_PREFIX . 'char';
     $this->proxy = $proxy;
-    if (isset($params['apiKey']) && is_string($params['apiKey'])) {
-      $this->apiKey = $params['apiKey'];
-    } else {
-      $mess = 'Missing required parameter $params["apiKey"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 1);
-    };// else isset $params['apikey'] ...
-    if (isset($params['characterID']) && is_numeric($params['characterID'])) {
-      $this->characterID = $params['characterID'];
-    } else {
-      $mess = 'Missing required parameter $params["characterID"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 2);
-    };// else isset $params['characterID'] ...
-    if (isset($params['serverName']) && is_string($params['serverName'])) {
-      $this->serverName = $params['serverName'];
-    } else {
-      $mess = 'Missing required parameter $params["serverName"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 3);
-    };// else isset $params['serverName'] ...
-    if (isset($params['userID']) && is_numeric($params['userID'])) {
-      $this->userID = $params['userID'];
-    } else {
-      $mess = 'Missing required parameter $params["userID"] to constructor';
-      $mess .= ' for ' . $this->api . ' in ' . basename(__FILE__);
-      throw new LengthException($mess, 4);
-    };// else isset $params['userID'] ...
+    $required = array('apiKey' => 'C', 'characterID' => 'I',
+      'serverName' => 'C', 'userID' => 'I');
+    foreach ($required as $k => $v) {
+      if (!isset($params[$k])) {
+        $mess = 'Missing required parameter $params["' . $k . '"]';
+        $mess .= ' to constructor for ' . $this->api;
+        $mess .= ' in ' . basename(__FILE__);
+        throw new LengthException($mess, 1);
+      };// if !isset $params[$k] ...
+      switch ($v) {
+        case 'C':
+        case 'X':
+          if (!is_string($params[$k])) {
+            $mess = '$params["' . $k . '"] must be a string for ' . $this->api;
+            $mess .= ' in ' . basename(__FILE__);
+            throw new LengthException($mess, 2);
+          };// if !is_string $params[$k] ...
+          break;
+        case 'I':
+          if (0 != strlen(str_replace(range(0,9),'',$params[$k]))) {
+            $mess = '$params["' . $k . '"] must be an integer for ' . $this->api;
+            $mess .= ' in ' . basename(__FILE__);
+            throw new LengthException($mess, 3);
+          };// if 0 == strlen(...
+          break;
+      };// switch $v ...
+    };// foreach $required ...
+    $this->apiKey = $params['apiKey'];
+    $this->characterID = $params['characterID'];
+    $this->serverName = $params['serverName'];
+    $this->userID = $params['userID'];
   }// function __construct
   /**
    * Used to get an item from Eve API.
@@ -127,7 +130,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    */
   public function apiFetch() {
     global $tracing;
-    global $cachetypes;
     $postdata = array('apiKey' => $this->apiKey,
       'characterID' => $this->characterID, 'userID' => $this->userID);
     $tableName = $this->tablePrefix . $this->api;
@@ -186,7 +188,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    */
   protected function handleApiError($e) {
     global $tracing;
-    global $cachetypes;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.
@@ -200,7 +201,7 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $data = array( 'tableName' => $this->tablePrefix . $this->api,
             'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
           );
-          YapealDBConnection::upsert($data, $cachetypes,
+          YapealDBConnection::upsert($data,
             YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
           break;
         case 105:// Invalid characterID.
@@ -267,7 +268,7 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $data = array( 'tableName' => $this->tablePrefix . $this->api,
             'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
           );
-          YapealDBConnection::upsert($data, $cachetypes,
+          YapealDBConnection::upsert($data,
             YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
           break;
         default:

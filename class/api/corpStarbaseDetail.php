@@ -52,13 +52,6 @@ class corpStarbaseDetail extends ACorporation {
    */
   protected $api = 'StarbaseDetail';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('itemID' => 'I', 'locationID' => 'I', 'moonID' => 'I',
-      'onlineTimestamp' => 'T', 'ownerID' => 'I', 'state' => 'I',
-      'stateTimestamp' => 'T', 'typeID' => 'I'
-  );
-  /**
    * @var array Hold an array of the data return from API.
    */
   protected $combatSettingsList = array();
@@ -89,7 +82,6 @@ class corpStarbaseDetail extends ACorporation {
    */
   public function apiFetch() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     $list = $this->posList();
@@ -155,7 +147,6 @@ class corpStarbaseDetail extends ACorporation {
    */
   public function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if (empty($this->xml)) {
@@ -193,18 +184,12 @@ class corpStarbaseDetail extends ACorporation {
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->combatSettingsList)) {
-      // Set the field types of query by name.
-      $types = array('onAggressionEnabled' => 'I',
-        'onCorporationWarEnabled' => 'I',
-        'onStandingDropStanding' => 'I', 'onStatusDropEnabled' => 'I',
-        'onStatusDropStanding' => 'I', 'ownerID' => 'I', 'posID' => 'I'
-      );
       try {
         $mess = 'multipleUpsert for ' . $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsert($this->combatSettingsList, $types,
+        YapealDBConnection::multipleUpsert($this->combatSettingsList,
           $tableName, YAPEAL_DSN);
         ++$ret;
       }
@@ -226,16 +211,12 @@ class corpStarbaseDetail extends ACorporation {
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->fuelList)) {
-      // Set the field types of query by name.
-      $types = array('ownerID' => 'I', 'posID' => 'I', 'quantity' => 'I',
-        'typeID' => 'I'
-      );
       try {
         $mess = 'multipleUpsertAttributes for ' . $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsertAttributes($this->fuelList, $types,
+        YapealDBConnection::multipleUpsertAttributes($this->fuelList,
           $tableName, YAPEAL_DSN);
         ++$ret;
       }
@@ -257,17 +238,12 @@ class corpStarbaseDetail extends ACorporation {
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->generalSettingsList)) {
-      // Set the field types of query by name.
-      $types = array('allowAllianceMembers' => 'L',
-        'allowCorporationMembers' => 'L', 'deployFlags' => 'I',
-        'ownerID' => 'I', 'posID' => 'I', 'usageFlags' => 'I'
-      );
       try {
         $mess = 'multipleUpsert for ' . $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsert($this->generalSettingsList, $types,
+        YapealDBConnection::multipleUpsert($this->generalSettingsList,
           $tableName, YAPEAL_DSN);
         ++$ret;
       }
@@ -289,16 +265,12 @@ class corpStarbaseDetail extends ACorporation {
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->starbaseDetailList)) {
-      // Set the field types of query by name.
-      $types = array('onlineTimestamp' => 'T', 'ownerID' => 'I', 'posID' => 'I',
-        'state' => 'I', 'stateTimestamp' => 'T'
-      );
       try {
         $mess = 'multipleUpsert for ' . $tableName;
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
         $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        YapealDBConnection::multipleUpsert($this->starbaseDetailList, $types,
+        YapealDBConnection::multipleUpsert($this->starbaseDetailList,
           $tableName, YAPEAL_DSN);
         ++$ret;
       }

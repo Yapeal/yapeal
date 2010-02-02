@@ -52,12 +52,6 @@ class mapSovereigntyStatus extends AMap {
    */
   protected $api = 'SovereigntyStatus';
   /**
-   * @var array Holds the database column names and ADOdb types.
-   */
-  private $types = array('completionTime' => 'T', 'ownerID' => 'I',
-    'solarSystemID' => 'I', 'startTime' => 'T', 'state' => 'I',
-    'structureID' => 'I', 'structureTypeID' => 'I');
-  /**
    * @var string Xpath used to select data from XML.
    */
   private $xpath = '//row';
@@ -68,7 +62,6 @@ class mapSovereigntyStatus extends AMap {
    */
   function apiStore() {
     global $tracing;
-    global $cachetypes;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -102,8 +95,8 @@ class mapSovereigntyStatus extends AMap {
             $mess .= ' in ' . basename(__FILE__);
             $tracing->activeTrace(YAPEAL_TRACE_MAP, 1) &&
             $tracing->logTrace(YAPEAL_TRACE_MAP, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $this->types,
-              $tableName, YAPEAL_DSN);
+            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+              YAPEAL_DSN);
           };// for $i = 0...
         }
         catch (ADODB_Exception $e) {
@@ -123,7 +116,7 @@ class mapSovereigntyStatus extends AMap {
         $mess .= ' in ' . basename(__FILE__);
         $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
         $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
-        YapealDBConnection::upsert($data, $cachetypes,
+        YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {

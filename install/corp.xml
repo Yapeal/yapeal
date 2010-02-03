@@ -994,9 +994,6 @@
     <query platform="mysql">ALTER TABLE `%%PcorpGeneralSettings` MODIFY `allowCorporationMembers` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PcorpGeneralSettings` MODIFY `claimSovereignty` BOOLEAN NOT NULL</query>
-  </sql>
-  <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">

@@ -23,7 +23,7 @@
  *
  * @author     Claus Pedersen <satissis@gmail.com>
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2009, Claus Pedersen, Michael Cummings
+ * @copyright  Copyright (c) 2008-2010, Claus Pedersen, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @subpackage Setup

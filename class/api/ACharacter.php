@@ -136,8 +136,7 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
     $xml = FALSE;
     try {
       // Build base part of cache file name.
-      $cacheName = $this->serverName . $tableName;
-      $cacheName .= $this->characterID . '.xml';
+      $cacheName = $this->serverName . $tableName . $this->characterID;
       // Try to get XML from local cache first if we can.
       $mess = 'getCachedXml for ' . $cacheName;
       $mess .= ' in ' . basename(__FILE__);

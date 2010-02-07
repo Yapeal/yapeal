@@ -130,6 +130,21 @@
     </field>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="utilXmlCache">
+    <field name="`hash`" type="C" size="64">
+      <KEY/>
+    </field>
+    <field name="`cacheName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`section`" type="C" size="32">
+      <NOTNULL/>
+    </field>
+    <field name="`xml`" type="X2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('dbPrefix', '%%P') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
     <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('utilVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
@@ -147,5 +162,8 @@
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `isActive` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT NOT NULL</query>
   </sql>
 </schema>

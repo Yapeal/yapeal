@@ -82,7 +82,7 @@ class corpWalletTransactions extends ACorporation {
         try {
           // Build base part of cache file name.
           $cacheName = $this->serverName . $tableName;
-          $cacheName .= $this->corporationID . $account . $beforeID . '.xml';
+          $cacheName .= $this->corporationID . $account . $beforeID;
           // Try to get XML from local cache first if we can.
           $mess = 'getCachedXml for ' . $cacheName;
           $mess .= ' in ' . basename(__FILE__);

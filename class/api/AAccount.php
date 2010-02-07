@@ -128,7 +128,7 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
     $tableName = $this->tablePrefix . $this->api;
     try {
       // Build base part of cache file name.
-      $cacheName = $this->serverName . $tableName . $this->userID . '.xml';
+      $cacheName = $this->serverName . $tableName . $this->userID;
       // Try to get XML from local cache first if we can.
       $mess = 'getCachedXml for ' . $cacheName;
       $mess .= ' in ' . basename(__FILE__);

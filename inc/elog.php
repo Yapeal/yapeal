@@ -54,8 +54,6 @@ function elog($str, $filename = YAPEAL_ERROR_LOG) {
 /**
  * Only prints message if in command line mode.
  *
- * NOTE: This function will strip any tags in the output.
- *
  * @param string $str Message to be printed.
  * @param bool $newline PHP_EOL will be added to end of $str
  * @param bool $timestamp Add Timestamp in front of $str
@@ -72,7 +70,7 @@ function print_on_command($str, $newline = TRUE, $timestamp = TRUE) {
     if ($newline) {
       $mess .= PHP_EOL;
     };
-    print $mess;
+    fwrite(STDERR, $mess);
   };
 }
 ?>

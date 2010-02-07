@@ -76,7 +76,7 @@ class SectionCorp {
    * fetched.
    */
   public function __construct($proxy, $allowedAPIs) {
-    $this->section ='corp';
+    $this->section = 'corp';
     $path = YAPEAL_CLASS . 'api' . DS;
     $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
     $this->apiList = array_intersect($allowedAPIs, $knownApis);

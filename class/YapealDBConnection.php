@@ -93,6 +93,7 @@ class YapealDBConnection {
     };
     $hash = sha1($dsn);
     if (!array_key_exists($hash, $this->connections)) {
+      require_once YAPEAL_CLASS . 'ADODB_Exception.php';
       require_once YAPEAL_ADODB . 'adodb.inc.php';
       $mess = 'Before NewADOConnection in ' . basename(__FILE__);
       $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 0) &&

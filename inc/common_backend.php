@@ -77,13 +77,13 @@ if (version_compare(PHP_VERSION, '5.2.1', '<')) {
 // Check for some required extensions
 $required = array('curl', 'date', 'mysqli', 'SimpleXML', 'SPL');
 $exts = get_loaded_extensions();
-foreach ($required as $ext) {
-  if (!in_array($ext, $exts)) {
-    $mess = 'The required PHP extension ' . $ext . ' is missing!';
-    trigger_error($mess, E_USER_ERROR);
-    exit(2);
-  };
-};// foreach $exts ...
+$missing = array_diff($required, $exts);
+if (count($missing) > 0) {
+  $mess = 'The required PHP extensions: ';
+  $mess .= implode(', ', $missing) . ' are missing!';
+  trigger_error($mess, E_USER_ERROR);
+  exit(2);
+};
 // Get path constants so they can be used.
 require_once $incDir . DS . 'common_paths.php';
 // Set a constant for location of configuration file.
@@ -122,7 +122,6 @@ $nonexist = 'Nonexistent directory defined for ';
 if (!is_writable(YAPEAL_CACHE)) {
   trigger_error($realpath . ' is not writeable', E_USER_ERROR);
 };
-// log_dir is relative to YAPEAL_CACHE
 if (!is_writable(YAPEAL_LOG)) {
   trigger_error(YAPEAL_LOG . ' is not writeable', E_USER_ERROR);
 };

@@ -61,11 +61,6 @@ define('YAPEAL_BASE', $dir . DS);
  */
 define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
 /**
- * The 'log' directory is normally in the 'cache' directory but can be moved in
- * some configurations.
- */
-define('YAPEAL_LOG', YAPEAL_CACHE . 'log' . DS);
-/**
  * The 'class' directory is a neighbor to us.
  */
 define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
@@ -83,6 +78,15 @@ define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
  * The 'install' directory is a neighbor to 'inc'.
  */
 define('YAPEAL_INSTALL', YAPEAL_BASE . 'install' . DS);
+/**
+ * The 'log' directory is normally a neighbor to 'inc' but can be moved in
+ * some configurations.
+ */
+define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
+/**
+ * The 'pics' directory is normally a neighbor to 'inc'.
+ */
+define('YAPEAL_PICS', YAPEAL_BASE . 'pics' . DS);
 /* **************************************************************************
  * Specific Extension Library Paths
  * **************************************************************************/

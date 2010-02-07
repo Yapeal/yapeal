@@ -445,6 +445,7 @@ class YapealDBConnection {
    * YapealDBConnection::upsert($data, 'CacheUntil', YAPEAL_DSN);
    * </code>
    *
+   * @param array $data Record to be upsert into database table.
    * @param string $table Name of table to Upsert into.
    * @param string $dsn A valid ADOdb DSN.
    *
@@ -460,9 +461,6 @@ class YapealDBConnection {
     if (empty($data)) {
       return FALSE;
     };
-    $mess = 'Before makeMultiUpsert for ' . $table . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $upsert = self::makeMultiUpsert(array($data), $table, $dsn);
     $con = self::connect($dsn);
     return $con->Execute($upsert);

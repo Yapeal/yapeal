@@ -129,7 +129,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    * @return boolean Returns TRUE if item received.
    */
   public function apiFetch() {
-    global $tracing;
     $postdata = array('apiKey' => $this->apiKey,
       'characterID' => $this->characterID, 'userID' => $this->userID);
     $tableName = $this->tablePrefix . $this->api;
@@ -138,16 +137,8 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
       // Build base part of cache file name.
       $cacheName = $this->serverName . $tableName . $this->characterID;
       // Try to get XML from local cache first if we can.
-      $mess = 'getCachedXml for ' . $cacheName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CHAR);
       if ($xml === FALSE) {
-        $mess = 'getAPIinfo for ' . $this->api;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CHAR,
           $postdata, $this->proxy);
         if ($xml instanceof SimpleXMLElement) {
@@ -186,7 +177,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    global $tracing;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.
@@ -218,9 +208,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `isActive`=0';
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 200:// Current security level not high enough. (Wrong API key)
@@ -232,9 +219,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $sql = 'select `activeAPI`';
           $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before select activeAPI in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $result = $con->GetOne($sql);
           // Split the string on spaces and put into the keys.
           $apis = array_flip(explode(' ', $result));
@@ -242,9 +226,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 211:// Login denied by account status.
@@ -256,9 +237,6 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
           $sql .= ' set `isActive`=0';
           $sql .= ' where `userID`=' . $this->userID;
-          $mess = 'Before update utilRegisteredUser in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 901:// Web site database temporarily disabled.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Corp WalletTransactions API.
+ * Contains WalletTransactions class.
  *
  * PHP version 5
  *
@@ -65,12 +65,10 @@ class corpWalletTransactions extends ACorporation {
    * @return boolean Returns TRUE if item received.
    */
   public function apiFetch() {
-    global $tracing;
-    $accounts = array(1000, 1001, 1002, 1003, 1004, 1005, 1006);
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     $oldest = strtotime('7 days ago');
-    foreach ($accounts as $account) {
+    foreach (range(1000, 1006) as $account) {
       $beforeID = 0;
       do {
         $cnt = 0;
@@ -84,16 +82,8 @@ class corpWalletTransactions extends ACorporation {
           $cacheName = $this->serverName . $tableName;
           $cacheName .= $this->corporationID . $account . $beforeID;
           // Try to get XML from local cache first if we can.
-          $mess = 'getCachedXml for ' . $cacheName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
           if ($xml === FALSE) {
-            $mess = 'getAPIinfo for ' . $this->api;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-            $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
               $postData, $this->proxy);
             if ($xml instanceof SimpleXMLElement) {
@@ -164,7 +154,6 @@ class corpWalletTransactions extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
     $tableName = $this->tablePrefix . $this->api;
@@ -180,24 +169,16 @@ class corpWalletTransactions extends ACorporation {
         continue;
       };// if empty $this->xml[$account] ...
       foreach ($this->xml[$account] as $xml) {
-        $mess = 'Xpath for ' . $tableName . $account;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-        $datum = $xml->xpath($this->xpath);
-        $cnt = count($datum);
+        $cuntil = (string)$xml->cachedUntil[0];
+        $xml = $xml->xpath($this->xpath);
+        $cnt = count($xml);
         if ($cnt > 0) {
           try {
             $extras = array('ownerID' => $this->corporationID,
               'accountKey' => $account);
-            $maxUpsert = 1000;
-            for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
-                $i < $grp;++$i, $pos += $maxUpsert) {
-              $group = array_slice($datum, $pos, $maxUpsert, TRUE);
-              $mess = 'multipleUpsertAttributes for ' . $tableName . $account;
-              $mess .= ' in ' . basename(__FILE__);
-              $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-              $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+            for ($i = 0, $grp = (int)ceil($cnt / YAPEAL_MAX_UPSERT),$pos = 0;
+                $i < $grp;++$i, $pos += YAPEAL_MAX_UPSERT) {
+              $group = array_slice($xml, $pos, YAPEAL_MAX_UPSERT, TRUE);
               YapealDBConnection::multipleUpsertAttributes($group, $tableName,
                 YAPEAL_DSN, $extras);
             };// for $i = 0...
@@ -206,12 +187,6 @@ class corpWalletTransactions extends ACorporation {
             // Any failure to store XML on any account returns FALSE;
             continue 2;
           }
-          // This doesn't work until CCP fixes thier cachedUntil timer.
-          // Now correcting the time in XML instead.
-          $until = (string)$xml->cachedUntil[0];
-          //if ($until > $cuntil) {
-          //  $cuntil = $until;
-          //};
         } else {
         $mess = 'There was no XML data to store for ' . $tableName . $account;
         trigger_error($mess, E_USER_NOTICE);
@@ -220,19 +195,9 @@ class corpWalletTransactions extends ACorporation {
       ++$ret;
     };// foreach $accounts ...
     try {
-      // Update CachedUntil time since we updated records and have new one.
-      // API returning wrong cache until time need to set cachedUntil to
-      // 60 minutes
-      //$cuntil = gmdate('Y-m-d H:i:s', strtotime('60 minutes'));
-      // Now correcting the time in XML instead.
-      $cuntil = (string)$xml->cachedUntil[0];
       $data = array( 'tableName' => $tableName,
         'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
       );
-      $mess = 'Upsert for '. $tableName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
       YapealDBConnection::upsert($data,
         YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
     }
@@ -253,7 +218,6 @@ class corpWalletTransactions extends ACorporation {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   private function handleApiRetry($e) {
-    global $tracing;
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.

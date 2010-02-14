@@ -92,9 +92,6 @@ $path = $dir . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
 try {
   $api = 'eve-api-pull';
-  $mess = 'Before dontWait for ' . $api . ' in ' . basename(__FILE__);
-  $tracing->activeTrace(YAPEAL_TRACE_API, 2) &&
-  $tracing->logTrace(YAPEAL_TRACE_API, $mess);
   // Mutex to keep from having more than one pull going at once most the time.
   // Turned logging off here since this runs every minute.
   if (YapealDBConnection::dontWait($api, 0, FALSE)) {
@@ -109,9 +106,6 @@ try {
     define('YAPEAL_START_TIME',gmdate('Y-m-d H:i:s', strtotime('5 minutes')));
     $data = array('tableName' => $api, 'ownerID' => 0,
       'cachedUntil' => YAPEAL_START_TIME);
-    $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
     YapealDBConnection::upsert($data,
       YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
   } else {
@@ -121,9 +115,6 @@ try {
   /* ************************************************************************
    * Generate section list
    * ************************************************************************/
-  $mess = 'Start section list in ' . basename(__FILE__);
-  $tracing->activeTrace(YAPEAL_TRACE_SECTION, 0) &&
-  $tracing->logTrace(YAPEAL_TRACE_SECTION, $mess);
   // Build sql to get section list from DB.
   $sql = 'select `activeAPI`,`proxy`,`sectionName`';
   $sql .= ' from ';
@@ -132,9 +123,6 @@ try {
   $sql .= ' order by sectionName asc';
   try {
     $con = YapealDBConnection::connect(YAPEAL_DSN);
-    $mess = 'Before GetAll sections in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $sections = $con->GetAll($sql);
   }
   catch (ADODB_Exception $e) {
@@ -165,7 +153,6 @@ try {
     catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
-    $tracing->flushTrace();
   };// foreach $section ...
   /* ************************************************************************
    * Final admin stuff

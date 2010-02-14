@@ -70,7 +70,6 @@ class YapealApiRequests {
    */
   static function getAPIinfo($api, $section, $postData = array(),
     $proxy = NULL) {
-    global $tracing;
     $postParams = '';
     $result = array();
     $xml = NULL;
@@ -88,14 +87,8 @@ class YapealApiRequests {
       $http['content'] = http_build_query($postData, NULL, '&');
       $postParams = 'Post parameters: ' . $http['content'] . PHP_EOL;
     };// if $postType=YAPEAL_API_EVE||...
-    $mess = 'Setup cURL connection in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CURL, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_CURL, $mess);
     // Setup new cURL connection with options.
     $sh = new CurlRequest($http);
-    $mess = 'cURL connect to Eve API in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CURL, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_CURL, $mess);
     // Try to get XML.
     $result = $sh->exec();
     // Now check for errors.
@@ -127,10 +120,7 @@ class YapealApiRequests {
       // Throw exception
       throw new YapealApiFileException($mess, 4);
     };
-    $mess = 'Before simplexml_load_string';
-    $tracing->activeTrace(YAPEAL_TRACE_REQUEST, 0) &&
-    $tracing->logTrace(YAPEAL_TRACE_REQUEST, $mess);
-    $xml = simplexml_load_string($result['body']);
+    $xml = simplexml_load_string($result['body'], 'SimpleXMLIterator');
     if (isset($xml->error[0])) {
       $mess = 'Eve API error for ' . $http['url'] . PHP_EOL;
       $mess .= $postParams;
@@ -211,7 +201,7 @@ class YapealApiRequests {
         trigger_error($mess, E_USER_WARNING);
         return FALSE;
       };
-      $xml = simplexml_load_string($file);
+      $xml = simplexml_load_string($file, 'SimpleXMLIterator');
       $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
       $ctime = time();
       if ($ctime <= $cuntil) {
@@ -244,7 +234,7 @@ class YapealApiRequests {
           trigger_error($mess, E_USER_WARNING);
           return FALSE;
         };
-        $xml = simplexml_load_string($result);
+        $xml = simplexml_load_string($result, 'SimpleXMLIterator');
         $cuntil = strtotime((string)$xml->cachedUntil[0] . ' +0000');
         $ctime = time();
         if ($ctime <= $cuntil) {

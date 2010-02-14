@@ -87,7 +87,6 @@ class YapealDBConnection {
    * @throws ADODB_Exception Passes through any problem with actual connection.
    */
   private function factory($dsn) {
-    global $tracing;
     if (empty($dsn) || !is_string($dsn)) {
       throw new InvalidArgumentException('Bad value passed for $dsn');
     };
@@ -95,9 +94,6 @@ class YapealDBConnection {
     if (!array_key_exists($hash, $this->connections)) {
       require_once YAPEAL_CLASS . 'ADODB_Exception.php';
       require_once YAPEAL_ADODB . 'adodb.inc.php';
-      $mess = 'Before NewADOConnection in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
       $con = NewADOConnection($dsn);
       $con->Execute('set names utf8');
       $con->Execute('set time_zone="+0:00"');
@@ -114,20 +110,9 @@ class YapealDBConnection {
    * @throws ADODB_Exception for any errors.
    */
   public static function connect($dsn) {
-    global $tracing;
-    $mess = 'Before getInstance in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $instance = self::getInstance();
-    $mess = 'Before factory in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $con = $instance->factory($dsn);
-    if ($tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2)) {
-      $con->debug = TRUE;
-    } else {
-      $con->debug = FALSE;
-    };
+    $con->debug = FALSE;
     $con->SetFetchMode(ADODB_FETCH_ASSOC);
     return $con;
   }// function connect
@@ -142,7 +127,6 @@ class YapealDBConnection {
    * @throws ADODB_Exception if connection fails.
    */
   private static function getColumnTypes($table, $dsn) {
-    global $tracing;
     $con = self::connect($dsn);
     $columns = $con->MetaColumns($table, FALSE);
     $types = array();
@@ -162,7 +146,6 @@ class YapealDBConnection {
    * @throws ADODB_Exception if connection fails.
    */
   private static function getOptionalColumns($table, $dsn) {
-    global $tracing;
     $con = self::connect($dsn);
     $columns = $con->MetaColumns($table, FALSE);
     $types = array();
@@ -184,7 +167,6 @@ class YapealDBConnection {
    * @throws ADODB_Exception if connection fails.
    */
   private static function getRequiredColumns($table, $dsn) {
-    global $tracing;
     $con = self::connect($dsn);
     $columns = $con->MetaColumns($table, FALSE);
     $types = array();
@@ -208,7 +190,6 @@ class YapealDBConnection {
    * @throws ADODB_Exception if connection used to do quoting fails.
    */
   private static function makeMultiUpsert(array $data, $table, $dsn) {
-    global $tracing;
     $dkeys = array_keys($data[0]);
     $okeys = YapealDBConnection::getOptionalColumns($table, $dsn);
     $rkeys = YapealDBConnection::getRequiredColumns($table, $dsn);
@@ -261,10 +242,6 @@ class YapealDBConnection {
       $updates[] = '`' . $k . '`=values(`' . $k . '`)';
     };
     $dupup .= implode(',', $updates);
-    $mess = 'makeMutliUpsert query: ' . PHP_EOL;
-    $mess .= $insert . $values . $dupup;
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 3) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $insert . $values . $dupup;
   }// function makeMultiUpsert
   /**
@@ -360,24 +337,17 @@ class YapealDBConnection {
    * @uses YapealDBConnection::makeMultiUpsert()
    */
   public static function multipleUpsert(array $data, $table, $dsn) {
-    global $tracing;
     if (empty($data)) {
       return FALSE;
     };
     $cnt = count($data);
     $con = self::connect($dsn);
-    $mess = 'Before makeMultiUpsert for ' . $table . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $mess = 'Upserting ' . $cnt . ' records for ' . $table;
     trigger_error($mess, E_USER_NOTICE);
     $upsert = self::makeMultiUpsert($data, $table, $dsn);
     // Use a transaction for larger upserts to make them faster when we can.
     if ($cnt > 10) {
       try {
-        $mess = 'Before transaction for ' . $table . ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
         $con->BeginTrans();
         $ok = $con->Execute($upsert);
         if (!$ok) {
@@ -396,9 +366,6 @@ class YapealDBConnection {
         $con->RollbackTrans();
       }
     };// if count $data > 10&&...
-    $mess = 'Before non-transaction Execute for ' . $table . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $con->Execute($upsert);
   }// function multipleUpsert
   /**
@@ -418,7 +385,6 @@ class YapealDBConnection {
    */
   public static function multipleUpsertAttributes($datum, $table, $dsn,
     $extras = array()) {
-    global $tracing;
     if (count($datum) > 0) {
       $data = array();
       $row = array();
@@ -429,9 +395,6 @@ class YapealDBConnection {
         };
         $data[] = $row;
       };// foreach $datum
-      $mess = 'Before multipleUpsert for ' . $table . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
       return self::multipleUpsert($data, $table, $dsn);
     };// if $datum>0
     return FALSE;
@@ -458,7 +421,6 @@ class YapealDBConnection {
    * @uses YapealDBConnection::makeMultiUpsert()
    */
   public static function upsert(array $data, $table, $dsn) {
-    global $tracing;
     if (empty($data)) {
       return FALSE;
     };
@@ -477,13 +439,9 @@ class YapealDBConnection {
    * @throws ADODB_Exception for any errors.
    */
   public static function hasDatabase($name, $dsn) {
-    global $tracing;
     if (empty($name) || empty($dsn)) {
       return FALSE;
     };
-    $mess = 'Before MetaDatabases in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $con = self::connect($dsn);
     return in_array($name, $con->MetaDatabases());
   }// function hasDatabase
@@ -498,13 +456,9 @@ class YapealDBConnection {
    * @throws ADODB_Exception for any errors.
    */
   public static function hasTable($name, $dsn) {
-    global $tracing;
     if (empty($name) || empty($dsn)) {
       return FALSE;
     };
-    $mess = 'Before MetaDatabases in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $con = self::connect($dsn);
     return in_array($name, $con->MetaTables('TABLES'));
   }// function hasDatabase
@@ -521,10 +475,6 @@ class YapealDBConnection {
    * @return Boolean Returns true when we need to get API data.
    */
   public static function dontWait($api, $owner = 0, $randomize = TRUE) {
-    global $tracing;
-    $mess = 'Before getCachedUntil for ' . $api . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 1) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     $now = time() - 5; // 5 seconds for EVE API time offset added :P
     $ctime = strtotime(self::getCachedUntil($api, $owner) . ' +0000');
     // hard limited to maximum delay of 6 minutes for randomized pulls.

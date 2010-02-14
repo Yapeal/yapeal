@@ -89,7 +89,6 @@ class SectionAccount {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    global $tracing;
     $apiCount = 0;
     $apiSuccess = 0;
     try {
@@ -106,25 +105,15 @@ class SectionAccount {
         /* **********************************************************************
         * Per user API pulls
         * **********************************************************************/
-        $mess = 'Pulling XML for user ' . $userID;
-        $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
         foreach ($this->apiList as $api) {
           ++$apiCount;
           $class = $this->section . $api;
           $tableName = YAPEAL_TABLE_PREFIX . $class;
-          $mess = 'Before dontWait for ' . $tableName . $userID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
           // Should we wait to get API data
           if (YapealDBConnection::dontWait($tableName, $userID)) {
             // Set it so we wait a bit before trying again if something goes wrong.
             $data = array('tableName' => $tableName,
               'ownerID' => $userID, 'cachedUntil' => YAPEAL_START_TIME);
-            $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
             try {
               YapealDBConnection::upsert($data,
                 YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
@@ -135,10 +124,6 @@ class SectionAccount {
           };// else dontWait ...
           $params = array('apiKey' => $apiKey, 'serverName' => $this->serverName,
             'userID' => $userID);
-          $mess = 'Before instance for ' . $tableName . $userID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
           $instance = new $class($this->proxy, $params);
           if ($instance->apiFetch()) {
             ++$apiSuccess;
@@ -146,6 +131,7 @@ class SectionAccount {
           if ($instance->apiStore()) {
             ++$apiSuccess;
           };
+          trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
           $instance = null;
           // See if we've taken to long to run and exit if TRUE.
           if (YAPEAL_MAX_EXECUTE < time()) {
@@ -174,7 +160,6 @@ class SectionAccount {
    * @throws ADODB_Exception for any errors.
    */
   private function getRegisteredUsers() {
-    global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of user(s) we need to do updates for
     $sql = 'select coalesce(`fullApiKey`,`limitedApiKey`) as apiKey,`userID`';
@@ -182,9 +167,6 @@ class SectionAccount {
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
     $sql .= ' where `isActive`=1';
     $sql .= ' order by `userID` asc';
-    $mess = 'Before GetAll users in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $con->GetAll($sql);
   }// function getRegisteredUsers
 }

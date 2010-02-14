@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Corp StarbaseDetail API.
+ * Contains StarbaseDetail class.
  *
  * PHP version 5
  *
@@ -81,7 +81,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return boolean Returns TRUE if item received.
    */
   public function apiFetch() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     $list = $this->posList();
@@ -98,16 +97,8 @@ class corpStarbaseDetail extends ACorporation {
           $cacheName = $this->serverName . $tableName;
           $cacheName .= $this->corporationID . $posID;
           // Try to get XML from local cache first if we can.
-          $mess = 'getCachedXml for ' . $cacheName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
           if ($xml === FALSE) {
-            $mess = 'getAPIinfo for ' . $this->api;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-            $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
             $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
               $postData, $this->proxy);
             if ($xml instanceof SimpleXMLElement) {
@@ -146,7 +137,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if (empty($this->xml)) {
@@ -173,22 +163,14 @@ class corpStarbaseDetail extends ACorporation {
     $tableName = $this->tablePrefix . 'CombatSettings';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->combatSettingsList)) {
       try {
-        $mess = 'multipleUpsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsert($this->combatSettingsList,
           $tableName, YAPEAL_DSN);
         ++$ret;
@@ -200,22 +182,14 @@ class corpStarbaseDetail extends ACorporation {
     $tableName = $this->tablePrefix . 'Fuel';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->fuelList)) {
       try {
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsertAttributes($this->fuelList,
           $tableName, YAPEAL_DSN);
         ++$ret;
@@ -227,22 +201,14 @@ class corpStarbaseDetail extends ACorporation {
     $tableName = $this->tablePrefix . 'GeneralSettings';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->generalSettingsList)) {
       try {
-        $mess = 'multipleUpsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsert($this->generalSettingsList,
           $tableName, YAPEAL_DSN);
         ++$ret;
@@ -254,22 +220,14 @@ class corpStarbaseDetail extends ACorporation {
     $tableName = $this->tablePrefix . 'StarbaseDetail';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (!empty($this->starbaseDetailList)) {
       try {
-        $mess = 'multipleUpsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsert($this->starbaseDetailList,
           $tableName, YAPEAL_DSN);
         ++$ret;
@@ -289,7 +247,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return void
    */
   protected function combatSettings($pos, $posID) {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CombatSettings';
     $datum = $pos->xpath('//combatSettings');
@@ -319,7 +276,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return void
    */
   protected function fuel($pos, $posID) {
-    global $tracing;
     $tableName = $this->tablePrefix . 'Fuel';
     $data = $pos->xpath('//row');
     if (!empty($data)) {
@@ -339,7 +295,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return void
    */
   protected function generalSettings($pos, $posID) {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'GeneralSettings';
     $datum = $pos->xpath('//generalSettings');
@@ -363,7 +318,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return mixed List of itemIDs for this corp's POSes or FALSE.
    */
   protected function posList() {
-    global $tracing;
     $tableName = $this->tablePrefix . 'StarbaseList';
     $list = array();
     try {
@@ -371,11 +325,7 @@ class corpStarbaseDetail extends ACorporation {
       $sql = 'select itemID';
       $sql .= ' from ';
       $sql .= '`' . $tableName . '`';
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before GetAll ' . $this->api . ' for ' . $this->corporationID;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       $list = $con->GetAll($sql);
     }
     catch (ADODB_Exception $e) {
@@ -393,7 +343,6 @@ class corpStarbaseDetail extends ACorporation {
    * @return void
    */
   protected function starbaseDetail($pos, $posID) {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . 'StarbaseDetail';
     $nodes = array('onlineTimestamp', 'state', 'stateTimestamp');

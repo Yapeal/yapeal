@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Corp MarketOrders API.
+ * Contains MarketOrders class.
  *
  * PHP version 5
  *
@@ -61,26 +61,18 @@ class corpMarketOrders extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
-      $datum = $this->xml->xpath($this->xpath);
-      $cnt = count($datum);
+      $cuntil = (string)$this->xml->cachedUntil[0];
+      $this->xml = $this->xml->xpath($this->xpath);
+      $cnt = count($this->xml);
       if ($cnt > 0) {
         try {
           $extras = array('ownerID' => $this->corporationID);
-          $maxUpsert = 1000;
-          for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
-              $i < $grp;++$i, $pos += $maxUpsert) {
-            $group = array_slice($datum, $pos, $maxUpsert, TRUE);
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+          for ($i = 0, $grp = (int)ceil($cnt / YAPEAL_MAX_UPSERT),$pos = 0;
+              $i < $grp;++$i, $pos += YAPEAL_MAX_UPSERT) {
+            $group = array_slice($this->xml, $pos, YAPEAL_MAX_UPSERT, TRUE);
             YapealDBConnection::multipleUpsertAttributes($group, $tableName,
               YAPEAL_DSN, $extras);
           };// for $i = 0...
@@ -96,14 +88,9 @@ class corpMarketOrders extends ACorporation {
       };// else count $datum ...
       try {
         // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
         $data = array( 'tableName' => $tableName,
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }

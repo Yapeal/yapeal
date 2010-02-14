@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store SkillInTraining API.
+ * Contains SkillInTraining class.
  *
  * PHP version 5
  *
@@ -57,45 +57,48 @@ class charSkillInTraining  extends ACharacter {
    * @return boolean Returns TRUE if item was saved to database.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
-    $datum = $this->xml->result;
-    if (count($datum) > 0) {
-      $data = array('currentTQTime' => YAPEAL_START_TIME, 'offset' => 0,
-        'ownerID' => $this->characterID, 'skillInTraining' => 0,
-        'trainingDestinationSP' => 0, 'trainingEndTime' => YAPEAL_START_TIME,
-        'trainingStartSP' => 0, 'trainingStartTime' => YAPEAL_START_TIME,
-        'trainingToLevel' => 0, 'trainingTypeID' => 0);
-      foreach ($datum->children() as $k => $v) {
-        $data[(string)$k] = (string)$v;
-      };
-      if (isset($datum->currentTQTime) &&
-        isset($datum->currentTQTime['offset'])) {
-        $data['offset'] = (string)$datum->currentTQTime['offset'];
-      };
-      $types = array('currentTQTime' => 'T', 'offset' => 'I', 'ownerID' => 'I',
-        'skillInTraining' => 'I', 'trainingDestinationSP' => 'I',
-        'trainingEndTime' => 'T', 'trainingStartSP' => 'I',
-        'trainingStartTime' => 'T', 'trainingToLevel' => 'I',
-        'trainingTypeID' => 'I'
-      );
+    if ($this->xml instanceof SimpleXMLElement) {
+      $cuntil = (string)$this->xml->cachedUntil[0];
+      $datum = $this->xml->result;
+      if (count($datum) > 0) {
+        $data = array('currentTQTime' => YAPEAL_START_TIME, 'offset' => 0,
+          'ownerID' => $this->characterID, 'skillInTraining' => 0,
+          'trainingDestinationSP' => 0, 'trainingEndTime' => YAPEAL_START_TIME,
+          'trainingStartSP' => 0, 'trainingStartTime' => YAPEAL_START_TIME,
+          'trainingToLevel' => 0, 'trainingTypeID' => 0);
+        foreach ($datum->children() as $k => $v) {
+          $data[(string)$k] = (string)$v;
+        };
+        if (isset($datum->currentTQTime) &&
+          isset($datum->currentTQTime['offset'])) {
+          $data['offset'] = (string)$datum->currentTQTime['offset'];
+        };
+        try {
+          YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
+        }
+        catch (ADODB_Exception $e) {
+          return FALSE;
+        }
+        $ret = TRUE;
+      } else {
+      $mess = 'There was no XML data to store for ' . $tableName;
+      trigger_error($mess, E_USER_NOTICE);
+      $ret = FALSE;
+      };// else count $datum ...
       try {
-        $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
-        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
+        // Update CachedUntil time since we should have a new one.
+        $data = array( 'tableName' => $tableName,
+          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
+        );
+        YapealDBConnection::upsert($data,
+          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
-        return FALSE;
+        // Already logged nothing to do here.
       }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
+    };// if $this->xml ...
     return $ret;
   }// function apiStore()
 }

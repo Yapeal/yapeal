@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store ErrorList API.
+ * Contains ErrorList class.
  *
  * PHP version 5
  *
@@ -63,33 +63,18 @@ class eveErrorList extends AEve {
    * @return boolean Returns TRUE if item was saved to database.
    */
   function apiStore() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-      $datum = $this->xml->xpath($this->xpath);
-      if (count($datum) > 0) {
+      $cuntil = (string)$this->xml->cachedUntil[0];
+      $this->xml = $this->xml->xpath($this->xpath);
+      if (count($this->xml) > 0) {
         try {
-          $mess = 'Connect for '. $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
           $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $mess = 'Before truncate ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
           // Empty out old data then upsert (insert) new
-          $sql = 'truncate table ' . $this->tablePrefix . $this->api;
+          $sql = 'truncate table ' . $tableName;
           $con->Execute($sql);
-          $mess = 'multipleUpsertAttributes for ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-          YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
+          YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
             YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
@@ -100,16 +85,11 @@ class eveErrorList extends AEve {
       $mess = 'There was no XML data to store for ' . $tableName;
       trigger_error($mess, E_USER_NOTICE);
       $ret = FALSE;
-      };// else count $datum ...
+      };// else count $this->xml ...
       try {
         // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
         $data = array('tableName' => $tableName, 'ownerID' => 0,
           'cachedUntil' => $cuntil);
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }

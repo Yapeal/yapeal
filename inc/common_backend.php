@@ -64,6 +64,9 @@ if (defined('YAPEAL_DEBUG')) {
 };// else defined YAPEAL_DEBUG ...
 // Set the default timezone for GMT.
 date_default_timezone_set('GMT');
+// Set max SQL insert size. This is a trade off of memory use and number of
+// inserts needed for larger APIs.
+define('YAPEAL_MAX_UPSERT', 1000);
 // Log Yapeal version information.
 $mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
 $mess .= YAPEAL_DATE;
@@ -133,8 +136,6 @@ require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
  * Logging section
  * **************************************************************************/
 require_once YAPEAL_INC . 'elog.php';
-// Get an instance of tracing so we can pass it on.
-$tracing = new YapealTracing();
 // Grab the info from ini file again now that our constants are defined.
 $iniVars = parse_ini_file($iniFile, TRUE);
 // Special debugging command-line override.

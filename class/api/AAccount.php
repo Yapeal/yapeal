@@ -123,23 +123,14 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
    * @return boolean Returns TRUE if item received.
    */
   function apiFetch() {
-    global $tracing;
     $postData = array('userID' => $this->userID, 'apiKey' => $this->apiKey);
     $tableName = $this->tablePrefix . $this->api;
     try {
       // Build base part of cache file name.
       $cacheName = $this->serverName . $tableName . $this->userID;
       // Try to get XML from local cache first if we can.
-      $mess = 'getCachedXml for ' . $cacheName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
       $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_ACCOUNT);
       if (empty($xml)) {
-        $mess = 'getAPIinfo for ' . $this->api;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_ACCOUNT, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_ACCOUNT, $mess);
         $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_ACCOUNT,
           $postData, $this->proxy);
         if ($xml instanceof SimpleXMLElement) {
@@ -177,7 +168,6 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    global $tracing;
     try {
       switch ($e->getCode()) {
         case 105:// Invalid characterID.
@@ -195,9 +185,6 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `isActive`=0';
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 200:// Current security level not high enough. (Wrong API key)
@@ -209,9 +196,6 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           $sql = 'select `activeAPI`';
           $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before select activeAPI in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $result = $con->GetOne($sql);
           // Split the string on spaces and put into the keys.
           $apis = array_flip(explode(' ', $result));
@@ -219,9 +203,6 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
           $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
           $sql .= ' where `characterID`=' . $this->characterID;
-          $mess = 'Before update utilRegisteredCharacter in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 211:// Login denied by account status.
@@ -233,9 +214,6 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
           $sql .= ' set `isActive`=0';
           $sql .= ' where `userID`=' . $this->userID;
-          $mess = 'Before update utilRegisteredUser in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
           $con->Execute($sql);
           break;
         case 901:// Web site database temporarily disabled.

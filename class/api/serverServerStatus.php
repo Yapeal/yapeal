@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains ServerStatus API class.
+ * Contains ServerStatus class.
  *
  * PHP version 5
  *
@@ -63,29 +63,18 @@ class serverServerStatus extends AServer {
    * @return boolean Returns TRUE if item was saved to database.
    */
   function apiStore() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_SERVER, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
-      $datum = $this->xml->xpath($this->xpath);
-      if (count($datum) > 0) {
+      $cuntil = (string)$this->xml->cachedUntil[0];
+      $this->xml = $this->xml->xpath($this->xpath);
+      if (count($this->xml) > 0) {
         try {
-          $mess = 'Connect for '. $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_SERVER, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
           $con = YapealDBConnection::connect(YAPEAL_DSN);
           $data = array('serverName' => $this->serverName);
-          foreach ($datum[0]->children() as $k=>$v) {
+          foreach ($this->xml[0]->children() as $k=>$v) {
             $data[$k] = (string)$v;
           };
-          $mess = 'Upsert for ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_SERVER, 1) &&
-          $tracing->logTrace(YAPEAL_TRACE_SERVER, $mess);
           YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
@@ -99,13 +88,8 @@ class serverServerStatus extends AServer {
       };// else count $datum ...
       try {
         // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
         $data = array('tableName' => $tableName, 'ownerID' => 0,
           'cachedUntil' => $cuntil);
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store CorporationSheet API.
+ * Contains CorporationSheet class.
  *
  * PHP version 5
  *
@@ -57,7 +57,6 @@ class corpCorporationSheet  extends ACorporation {
    * @return boolean Returns TRUE if item was saved to database.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -79,10 +78,6 @@ class corpCorporationSheet  extends ACorporation {
         $data = array( 'tableName' => $tableName,
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
@@ -102,25 +97,10 @@ class corpCorporationSheet  extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corpSheet() {
-    global $tracing;
-    $types = array(
-      'allianceID' => 'I', 'allianceName' => 'C', 'ceoID' => 'I', 'ceoName' => 'C',
-      'corporationID' => 'I', 'corporationName' => 'C', 'description' => 'X',
-      'memberCount' => 'I', 'memberLimit' => 'I', 'shares' => 'I',
-      'stationID' => 'I', 'stationName' => 'C', 'taxRate' => 'N', 'ticker' => 'C',
-      'url' => 'C'
-    );
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
-    $mess = 'Clone for ' . $tableName . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     $datum = clone $this->xml->result[0]->children();
     // Get rid of child table stuff
-    $mess = 'Delete children for ' . $tableName;
-    $mess .= ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
     unset($datum->rowset[1], $datum->rowset[0], $datum->logo);
     if (count($datum) > 0) {
       $data = array('allianceName' => '');
@@ -128,10 +108,6 @@ class corpCorporationSheet  extends ACorporation {
         $data[$k] = (string)$v;
       };
       try {
-        $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -151,17 +127,12 @@ class corpCorporationSheet  extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function divisions() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Divisions';
     $datum = $this->xml->xpath('//rowset[@name="divisions"]/row');
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->corporationID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -182,7 +153,6 @@ class corpCorporationSheet  extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function logo() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Logo';
     $datum = $this->xml->xpath('//logo');
@@ -192,10 +162,6 @@ class corpCorporationSheet  extends ACorporation {
         $data[$k] = (string)$v;
       };
       try {
-        $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -215,17 +181,12 @@ class corpCorporationSheet  extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function walletDivisions() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'WalletDivisions';
     $datum = $this->xml->xpath('//rowset[@name="walletDivisions"]/row');
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->corporationID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store char killLog API.
+ * Contains killLog class.
  *
  * PHP version 5
  *
@@ -81,7 +81,6 @@ class charKillLog extends ACharacter {
    * @return boolean Returns TRUE if item received.
    */
   public function apiFetch() {
-    global $tracing;
     $ret = 0;
     $xml = FALSE;
     $tableName = $this->tablePrefix . $this->api;
@@ -97,16 +96,8 @@ class charKillLog extends ACharacter {
         $cacheName = $this->serverName . $tableName;
         $cacheName .= $this->characterID . $beforeID;
         // Try to get XML from local cache first if we can.
-        $mess = 'getCachedXml for ' . $cacheName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CHAR);
         if ($xml === FALSE) {
-          $mess = 'getAPIinfo for ' . $this->api;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CHAR,
             $postData, $this->proxy);
           if ($xml instanceof SimpleXMLElement) {
@@ -168,7 +159,6 @@ class charKillLog extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $cuntil = '1970-01-01 00:00:01';
     $tableName = $this->tablePrefix . $this->api;
@@ -178,13 +168,8 @@ class charKillLog extends ACharacter {
       return FALSE;
     };// if empty $this->xml ...
     foreach ($this->xml as $xml) {
-      $mess = 'Xpath for ' . $tableName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
       $kills = $xml->xpath('//rowset[@name="kills"]/row');
       $cnt = count($kills);
-      print $cnt . PHP_EOL;
       if ($cnt > 0) {
         for ($i = 0; $i < $cnt; ++$i) {
           $kill = $kills[$i];
@@ -200,10 +185,6 @@ class charKillLog extends ACharacter {
           $tableName = $this->tablePrefix . 'Attackers';
           $extras = array('finalBlow' => 0);
           try {
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->attackersList,
               $tableName, YAPEAL_DSN, $extras);
             ++$ret;
@@ -215,10 +196,6 @@ class charKillLog extends ACharacter {
         if (!empty($this->itemsList)) {
           $tableName = $this->tablePrefix . 'Items';
           try {
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->itemsList,
               $tableName, YAPEAL_DSN);
             ++$ret;
@@ -230,10 +207,6 @@ class charKillLog extends ACharacter {
         if (!empty($this->killList)) {
           $tableName = $this->tablePrefix . 'KillLog';
           try {
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->killList,
               $tableName, YAPEAL_DSN);
             ++$ret;
@@ -245,10 +218,6 @@ class charKillLog extends ACharacter {
         if (!empty($this->victimList)) {
           $tableName = $this->tablePrefix . 'Victim';
           try {
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
             YapealDBConnection::multipleUpsertAttributes($this->victimList,
               $tableName, YAPEAL_DSN);
             ++$ret;
@@ -269,10 +238,6 @@ class charKillLog extends ACharacter {
       $data = array( 'tableName' => $tableName,
         'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
       );
-      $mess = 'Upsert for '. $tableName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-      $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
       YapealDBConnection::upsert($data,
         YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
     }
@@ -294,7 +259,6 @@ class charKillLog extends ACharacter {
    * @return void
    */
   protected function attackers($kill, $killID) {
-    global $tracing;
     $tableName = $this->tablePrefix . 'Attackers';
     $xml = simplexml_load_string($kill->rowset[0]->asXML());
     $data = $xml->xpath('//row');
@@ -314,7 +278,6 @@ class charKillLog extends ACharacter {
    * @return void
    */
   protected function killLog($kill, $killID) {
-    global $tracing;
     $tableName = $this->tablePrefix . 'KillLog';
     $datum = simplexml_load_string($kill->asXML());
     if (!empty($datum)) {
@@ -331,7 +294,6 @@ class charKillLog extends ACharacter {
    * @return void
    */
   protected function items($kill, $killID) {
-    global $tracing;
     $tableName = $this->tablePrefix . 'Items';
     $typeID = $kill->victim['shipTypeID'];
     // Walking the items and add nested set stuff.
@@ -350,7 +312,6 @@ class charKillLog extends ACharacter {
    * @return void
    */
   protected function victim($kill, $killID) {
-    global $tracing;
     $tableName = $this->tablePrefix . 'Attackers';
     $xml = simplexml_load_string($kill->asXML());
     $data = $xml->victim[0];

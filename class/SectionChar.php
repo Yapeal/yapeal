@@ -89,7 +89,6 @@ class SectionChar {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    global $tracing;
     $apiCount = 0;
     $apiSuccess = 0;
     try {
@@ -106,26 +105,16 @@ class SectionChar {
         /* **********************************************************************
         * Per char API pulls
         * **********************************************************************/
-        $mess = 'Pulling XML for char ' . $charID;
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
         foreach ($apis as $api) {
           ++$apiCount;
           $class = $this->section . $api;
           $tableName = YAPEAL_TABLE_PREFIX . $class;
-          $mess = 'Before dontWait for ' . $tableName . $charID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           // Should we wait to get API data
           if (YapealDBConnection::dontWait($tableName, $charID)) {
             // Set it so we wait a bit before trying again if something goes wrong.
             $data = array('tableName' => $tableName,
               'ownerID' => $charID, 'cachedUntil' => YAPEAL_START_TIME);
-            $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
             try {
               YapealDBConnection::upsert($data,
                 YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
@@ -140,10 +129,6 @@ class SectionChar {
           if (empty($proxy)) {
             $proxy = $this->proxy;
           };
-          $mess = 'Before instance for ' . $tableName . $charID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           $instance = new $class($proxy, $params);
           if ($instance->apiFetch()) {
             ++$apiSuccess;
@@ -151,6 +136,7 @@ class SectionChar {
           if ($instance->apiStore()) {
             ++$apiSuccess;
           };
+          trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
           $instance = null;
           // See if we've taken to long to run and exit if TRUE.
           if (YAPEAL_MAX_EXECUTE < time()) {
@@ -179,7 +165,6 @@ class SectionChar {
    * @throws ADODB_Exception for any errors.
    */
   function getRegisteredCharacters() {
-    global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     /* Generate a list of character(s) we need to do updates for */
     $sql = 'select chr.`activeAPI`,';
@@ -194,9 +179,6 @@ class SectionChar {
     $sql .= ' and u.`isActive`=1';
     $sql .= ' and chr.`userID`=u.`userID`';
     $sql .= ' order by chr.`userID` asc, chr.`characterID` asc';
-    $mess = 'Before GetAll active characters in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $con->GetAll($sql);
   }// function getRegisteredCharacters
 }

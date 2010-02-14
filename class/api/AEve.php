@@ -115,22 +115,13 @@ abstract class AEve implements IFetchApiTable, IStoreApiTable {
    * @return boolean Returns TRUE if item received.
    */
   function apiFetch() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api;
     try {
       // Build base part of cache file name.
       $cacheName = $this->serverName . $tableName;
       // Try to get XML from local cache first if we can.
-      $mess = 'getCachedXml for ' . $cacheName;
-      $mess .= ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
       $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_EVE);
       if (empty($xml)) {
-        $mess = 'getAPIinfo for ' . $this->api;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
         $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_EVE, NULL,
           $this->proxy);
         if ($xml instanceof SimpleXMLElement) {
@@ -171,7 +162,6 @@ abstract class AEve implements IFetchApiTable, IStoreApiTable {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    global $tracing;
     try {
       switch ($e->getCode()) {
         case 901:// Web site database temporarily disabled.

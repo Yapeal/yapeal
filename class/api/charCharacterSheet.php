@@ -57,7 +57,6 @@ class charCharacterSheet  extends ACharacter {
    * @return boolean Returns TRUE if item was saved to database.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -97,10 +96,6 @@ class charCharacterSheet  extends ACharacter {
         $data = array( 'tableName' => $tableName,
           'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
         );
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
@@ -120,18 +115,10 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function characterSheet() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . $this->api;
-    $mess = 'Clone for ' . $tableName . ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     $datum = clone $this->xml->result[0];
     // Get rid of child table stuff
-    $mess = 'Delete children for ' . $tableName;
-    $mess .= ' in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
     unset($datum->rowset, $datum->attributes, $datum->attributeEnhancers);
     $data = array();
     if (count($datum) > 0) {
@@ -140,10 +127,6 @@ class charCharacterSheet  extends ACharacter {
         $data[$k] = (string)$v;
       };
       try {
-        $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -163,7 +146,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributes() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Attributes';
     $datum = $this->xml->result->attributes;
@@ -173,10 +155,6 @@ class charCharacterSheet  extends ACharacter {
         $data[$k] = (string)$v;
       };
       try {
-        $mess = 'Upsert for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
       }
       catch (ADODB_Exception $e) {
@@ -196,7 +174,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributeEnhancers() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'AttributeEnhancers';
     $types = array('augmentatorName' => 'C', 'augmentatorValue' => 'I',
@@ -205,12 +182,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//attributeEnhancers');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -226,10 +199,6 @@ class charCharacterSheet  extends ACharacter {
       };
       if (count($data) > 0) {
         try {
-          $mess = 'Upsert for ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-          $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
           YapealDBConnection::multipleUpsert($data, $tableName, YAPEAL_DSN);
         }
         catch (ADODB_Exception $e) {
@@ -254,7 +223,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function certificates() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Certificates';
     // Set the field types of query by name.
@@ -263,10 +231,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -287,7 +251,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corporationRoles() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CorporationRoles';
     // Set the field types of query by name.
@@ -295,12 +258,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//rowset[@name="corporationRoles"]/row');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -308,10 +267,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -332,7 +287,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corporationRolesAtBase() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CorporationRolesAtBase';
     // Set the field types of query by name.
@@ -340,12 +294,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtBase"]/row');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -353,10 +303,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -377,7 +323,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corporationRolesAtHQ() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CorporationRolesAtHQ';
     // Set the field types of query by name.
@@ -385,12 +330,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtHQ"]/row');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -398,10 +339,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -422,7 +359,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corporationRolesAtOther() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CorporationRolesAtOther';
     // Set the field types of query by name.
@@ -430,12 +366,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtOther"]/row');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -443,10 +375,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -467,7 +395,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function corporationTitles() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'CorporationTitles';
     // Set the field types of query by name.
@@ -475,12 +402,8 @@ class charCharacterSheet  extends ACharacter {
     $datum = $this->xml->xpath('//rowset[@name="corporationTitles"]/row');
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->characterID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CHAR, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->characterID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
@@ -488,10 +411,6 @@ class charCharacterSheet  extends ACharacter {
     if (count($datum) > 0) {
       try {
         $extras = array('ownerID' => $this->characterID);
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }
@@ -512,7 +431,6 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function skills() {
-    global $tracing;
     $ret = FALSE;
     $tableName = $this->tablePrefix . 'Skills';
     // Set the field types of query by name.
@@ -524,10 +442,6 @@ class charCharacterSheet  extends ACharacter {
         $extras = array('ownerID' => $this->characterID, 'level' => 0,
           'unpublished' => 0
         );
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CHAR, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CHAR, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }

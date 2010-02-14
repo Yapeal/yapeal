@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store AllianceList API.
+ * Contains AllianceList class.
  *
  * PHP version 5
  *
@@ -48,13 +48,17 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class eveAllianceList extends AEve {
   /**
+   * @var array Group of alliance rows to be added to table.
+   */
+  private $alliances = array();
+  /**
    * @var string Holds the name of the API.
    */
   protected $api = 'AllianceList';
   /**
-   * @var string Xpath used to select data from XML.
+   * @var array Group of corporation rows to be added to table.
    */
-  private $xpath = '//result/rowset[@name="alliances"]/row';
+  private $corporations = array();
   /**
    * Used to save an item into database.
    *
@@ -63,45 +67,39 @@ class eveAllianceList extends AEve {
    * @return boolean Returns TRUE if item was saved to database.
    */
   function apiStore() {
-    global $tracing;
     $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
-      $mess = 'Xpath for ' . $tableName . ' in ' . basename(__FILE__);
-      $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-      $datum = $this->xml->xpath($this->xpath);
-      $cnt = count($datum);
-      if ($cnt > 0) {
+      if (count($this->xml->result->rowset->row) > 0) {
         try {
-          $mess = 'Connect for '. $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
+          $tableName = $this->tablePrefix . $this->api;
           $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $mess = 'Before truncate ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
           // Empty out old data then upsert (insert) new
-          $sql = 'truncate table ' . $this->tablePrefix . $this->api;
+          $sql = 'truncate table ' . $tableName;
           $con->Execute($sql);
-          $maxUpsert = 1000;
-          for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
-              $i < $grp;++$i, $pos += $maxUpsert) {
-            $group = array_slice($datum, $pos, $maxUpsert, TRUE);
-            $mess = 'multipleUpsertAttributes for ' . $tableName;
-            $mess .= ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
+          $tableName = $this->tablePrefix . 'MemberCorporations';
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
+          // Empty out old data then upsert (insert) new
+          $sql = 'truncate table ' . $tableName;
+          $con->Execute($sql);
+          // Recurse through the XML and insert groups of alliances and member
+          // corporations.
+          $this->recursion($this->xml);
+          // Insert any leftover alliances.
+          if (count($this->alliances) > 0) {
+            $tableName = $this->tablePrefix . $this->api;
+            YapealDBConnection::multipleUpsert($this->alliances, $tableName,
               YAPEAL_DSN);
-          };// for $i = 0...
+          };
+          if (count($this->corporations) > 0) {
+            $tableName = $this->tablePrefix . 'MemberCorporations';
+            YapealDBConnection::multipleUpsert($this->corporations, $tableName,
+              YAPEAL_DSN);
+          };
         }
         catch (ADODB_Exception $e) {
           return FALSE;
         }
-        $this->memberCorporations();
+        //$this->memberCorporations();
         $ret = TRUE;
       } else {
       $mess = 'There was no XML data to store for ' . $tableName;
@@ -109,14 +107,11 @@ class eveAllianceList extends AEve {
       $ret = FALSE;
       };// else count $datum ...
       try {
+        $tableName = $this->tablePrefix . $this->api;
         // Update CachedUntil time since we should have a new one.
         $cuntil = (string)$this->xml->cachedUntil[0];
         $data = array('tableName' => $tableName, 'ownerID' => 0,
           'cachedUntil' => $cuntil);
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
@@ -127,56 +122,8 @@ class eveAllianceList extends AEve {
     return $ret;
   }// function apiStore()
   /**
-   * Used to store XML to AllianceList's memberCorporations table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function memberCorporations() {
-    global $tracing;
-    $pos =0;
-    $ret = FALSE;
-    $tempFile = YAPEAL_CACHE . DS . 'eve' . DS . 'temp.xml';
-    $tableName = $this->tablePrefix . 'MemberCorporations';
-    $this->editMemberCorporations($this->xml);
-    file_put_contents($tempFile, $this->xml->asXML());
-    $this->xml = simplexml_load_file($tempFile);
-    $datum = $this->xml->xpath('//row//row');
-    $cnt = count($datum);
-    if ($cnt > 0) {
-      try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
-        $mess = 'Before truncate ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_EVE, 2) &&
-        $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-        // Empty out old data then upsert (insert) new
-        $sql = 'truncate table ' . $tableName;
-        $con->Execute($sql);
-        $maxUpsert = 1000;
-        for ($i = 0, $grp = (int)ceil($cnt / $maxUpsert),$pos = 0;
-            $i < $grp;++$i, $pos += $maxUpsert) {
-          $group = array_slice($datum, $pos, $maxUpsert, TRUE);
-          $mess = 'multipleUpsertAttributes for ' . $tableName;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_EVE, 1) &&
-          $tracing->logTrace(YAPEAL_TRACE_EVE, $mess);
-          YapealDBConnection::multipleUpsertAttributes($group, $tableName,
-            YAPEAL_DSN);
-        };// for $i = 0...
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function division
-  /**
-   * Navigates XML and adds allianceID attribute.
+   * Navigates XML and groups of alliances and member corporations to be added
+   * to tables.
    *
    * @param SimpleXMLElement $node Current element from tree.
    * @param integer $alliance allianceID of corporation.
@@ -185,18 +132,44 @@ class eveAllianceList extends AEve {
    *
    * @return integer Current alliance of corporation.
    */
-  protected function editMemberCorporations($node, $alliance = 0) {
+  protected function recursion($node, $alliance = 0) {
     $nodeName = $node->getName();
     if ($nodeName == 'row') {
       if (isset($node['allianceID'])) {
         $alliance = $node['allianceID'];
+        $row = array();
+        foreach ($node->attributes() as $k => $v) {
+          $row[(string)$k] = (string)$v;
+        };
+        $this->alliances[] = $row;
+        // Insert alliances as group is filled.
+        if (YAPEAL_MAX_UPSERT == count($this->alliances)) {
+          $tableName = $this->tablePrefix . $this->api;
+          YapealDBConnection::multipleUpsert($this->alliances,
+            $tableName, YAPEAL_DSN);
+          $this->alliances = array();
+        };
       } else {
         $node->addAttribute('allianceID', $alliance);
       };// if isset $node['allianceID']...
+      if (isset($node['corporationID'])) {
+        $row = array();
+        foreach ($node->attributes() as $k => $v) {
+          $row[(string)$k] = (string)$v;
+        };
+        $this->corporations[] = $row;
+        // Insert corporations as group is filled.
+        if (YAPEAL_MAX_UPSERT == count($this->corporations)) {
+          $tableName = $this->tablePrefix . 'MemberCorporations';
+          YapealDBConnection::multipleUpsert($this->corporations,
+            $tableName, YAPEAL_DSN);
+          $this->corporations = array();
+        };
+      };
     };// if $nodeName=='row' ...
     if ($children = $node->children()) {
       foreach ($children as $child) {
-        $alliance = $this->editMemberCorporations($child, $alliance);
+        $alliance = $this->recursion($child, $alliance);
       };// foreach children as child
     };
     return $alliance;

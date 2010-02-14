@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store corp Standings API.
+ * Contains Standings class.
  *
  * PHP version 5
  *
@@ -57,7 +57,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    global $tracing;
     $ret = 0;
     $tableName = $this->tablePrefix . $this->api;
     if ($this->xml instanceof SimpleXMLElement) {
@@ -73,10 +72,6 @@ class corpStandings extends ACorporation {
         $data = array( 'tableName' => $tableName,
           'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
         );
-        $mess = 'Upsert for '. $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CACHE, 0) &&
-        $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
         YapealDBConnection::upsert($data,
           YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
       }
@@ -96,7 +91,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful for all sub-tables.
    */
   protected function standingsTo() {
-    global $tracing;
     $retTo = 0;
     if ($this->standingsToCharacters()) {
       ++$retTo;
@@ -119,7 +113,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful for all sub-tables.
    */
   protected function standingsFrom() {
-    global $tracing;
     $retFrom = 0;
     if ($this->standingsFromAgents()) {
       ++$retFrom;
@@ -142,7 +135,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsToCharacters() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'ToCharacters';
     $currentPath = '//standingsTo/rowset[@name="characters"]/row';
     return $this->standingsToCommon($tableName, $currentPath);
@@ -153,7 +145,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsToCorporations() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'ToCorporations';
     $currentPath = '//standingsTo/rowset[@name="corporations"]/row';
     return $this->standingsToCommon($tableName, $currentPath);
@@ -164,7 +155,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsToAlliances() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'ToAlliances';
     $currentPath = '//standingsTo/rowset[@name="alliances"]/row';
     return $this->standingsToCommon($tableName, $currentPath);
@@ -175,7 +165,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsFromAgents() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'FromAgents';
     $currentPath = '//standingsFrom/rowset[@name="agents"]/row';
     return $this->standingsFromCommon($tableName, $currentPath);
@@ -186,7 +175,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsFromNPCCorporations() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'FromNPCCorporations';
     $currentPath = '//standingsFrom/rowset[@name="NPCCorporations"]/row';
     return $this->standingsFromCommon($tableName, $currentPath);
@@ -197,7 +185,6 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsFromFactions() {
-    global $tracing;
     $tableName = $this->tablePrefix . $this->api . 'FromFactions';
     $currentPath = '//standingsFrom/rowset[@name="factions"]/row';
     return $this->standingsFromCommon($tableName, $currentPath);
@@ -214,29 +201,20 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsToCommon($tableName, $currentPath) {
-    global $tracing;
     $ret = FALSE;
     $extras = array('ownerID' => $this->corporationID);
 
     $datum = $this->xml->xpath($currentPath);
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
             YAPEAL_DSN, $extras);
       }
@@ -261,28 +239,19 @@ class corpStandings extends ACorporation {
    * @return Bool Return TRUE if store was successful.
    */
   protected function standingsFromCommon($tableName, $currentPath) {
-    global $tracing;
     $ret = FALSE;
     $extras = array('ownerID' => $this->corporationID);
     $datum = $this->xml->xpath($currentPath);
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from ' . $tableName;
-      $sql .= ' where ownerID=' . $this->corporationID;
-      $mess = 'Before delete for ' . $tableName;
-      $mess .= ' in ' . __FILE__;
-      $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-      $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
+      $sql = 'delete from `' . $tableName . '`';
+      $sql .= ' where `ownerID`=' . $this->corporationID;
       // Clear out old info for this owner.
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {}
     if (count($datum) > 0) {
       try {
-        $mess = 'multipleUpsertAttributes for ' . $tableName;
-        $mess .= ' in ' . basename(__FILE__);
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
           YAPEAL_DSN, $extras);
       }

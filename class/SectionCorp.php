@@ -89,7 +89,6 @@ class SectionCorp {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    global $tracing;
     $apiCount = 0;
     $apiSuccess = 0;
     try {
@@ -106,26 +105,16 @@ class SectionCorp {
         /* **********************************************************************
         * Per corp API pulls
         * **********************************************************************/
-        $mess = 'Pulling XML for corp ' . $corpID;
-        $tracing->activeTrace(YAPEAL_TRACE_CORP, 1) &&
-        $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
         $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
         foreach ($apis as $api) {
           ++$apiCount;
           $class = $this->section . $api;
           $tableName = YAPEAL_TABLE_PREFIX . $class;
-          $mess = 'Before dontWait for ' . $tableName . $corpID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           // Should we wait to get API data
           if (YapealDBConnection::dontWait($tableName, $corpID)) {
             // Set it so we wait a bit before trying again if something goes wrong.
             $data = array('tableName' => $tableName,
               'ownerID' => $corpID, 'cachedUntil' => YAPEAL_START_TIME);
-            $mess = 'Before upsert for ' . $api . ' in ' . basename(__FILE__);
-            $tracing->activeTrace(YAPEAL_TRACE_CACHE, 1) &&
-            $tracing->logTrace(YAPEAL_TRACE_CACHE, $mess);
             try {
               YapealDBConnection::upsert($data,
                 YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
@@ -141,10 +130,6 @@ class SectionCorp {
           if (empty($proxy)) {
             $proxy = $this->proxy;
           };
-          $mess = 'Before instance for ' . $tableName . $corpID;
-          $mess .= ' in ' . basename(__FILE__);
-          $tracing->activeTrace(YAPEAL_TRACE_CORP, 2) &&
-          $tracing->logTrace(YAPEAL_TRACE_CORP, $mess);
           $instance = new $class($proxy, $params);
           if ($instance->apiFetch()) {
             ++$apiSuccess;
@@ -152,6 +137,7 @@ class SectionCorp {
           if ($instance->apiStore()) {
             ++$apiSuccess;
           };
+          trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
           $instance = null;
           // See if we've taken to long to run and exit if TRUE.
           if (YAPEAL_MAX_EXECUTE < time()) {
@@ -180,7 +166,6 @@ class SectionCorp {
    * @throws ADODB_Exception for any errors.
    */
   function getRegisteredCorporations() {
-    global $tracing;
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of corporation(s) we need to do updates for
     $sql = 'select cp.`activeAPI`,';
@@ -197,9 +182,6 @@ class SectionCorp {
     $sql .= ' and cp.`characterID`=chr.`characterID`';
     $sql .= ' and chr.`userID`=u.`userID`';
     $sql .= ' order by u.`userID` asc, cp.`corporationID` asc';
-    $mess = 'Before GetAll active corporations in ' . basename(__FILE__);
-    $tracing->activeTrace(YAPEAL_TRACE_DATABASE, 2) &&
-    $tracing->logTrace(YAPEAL_TRACE_DATABASE, $mess);
     return $con->GetAll($sql);
   }// function getRegisteredCorporations
 }

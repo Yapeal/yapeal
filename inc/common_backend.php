@@ -122,9 +122,6 @@ $nonexist = 'Nonexistent directory defined for ';
  * Paths
  * **************************************************************************/
 // Check writable paths
-if (!is_writable(YAPEAL_CACHE)) {
-  trigger_error($realpath . ' is not writeable', E_USER_ERROR);
-};
 if (!is_writable(YAPEAL_LOG)) {
   trigger_error(YAPEAL_LOG . ' is not writeable', E_USER_ERROR);
 };
@@ -250,6 +247,9 @@ foreach ($settings as $setting) {
 };// foreach $settings ...
 if (YAPEAL_CACHE_XML == TRUE &&
   (YAPEAL_CACHE_OUTPUT == 'file' || YAPEAL_CACHE_OUTPUT == 'both')) {
+  if (!is_writable(YAPEAL_CACHE)) {
+    trigger_error(YAPEAL_CACHE . ' is not writeable', E_USER_ERROR);
+  };
   $sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
   foreach ($sections as $section) {
     $realpath = realpath(YAPEAL_CACHE . $section);

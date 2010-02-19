@@ -518,7 +518,7 @@
     <field name="`title`" type="C" size="255"/>
     <field name="`toCharacterIDs`" type="X"/>
     <field name="`toCorpOrAllianceID`" type="I8" size="20">
-      <NOTNULL/>
+      <DEFAULT value="0"/>
       <UNSIGNED/>
     </field>
     <field name="`toListIDs`" type="X"/>
@@ -970,8 +970,5 @@
       VALUES('AccountBalance AssetList CharacterSheet IndustryJobs KillLog MailingLists MailMessages MarketOrders Notifications Research SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
       ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
     </query>
-  </sql>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('charVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
   </sql>
 </schema>

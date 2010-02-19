@@ -55,6 +55,9 @@ class corpStandings extends ACorporation {
    * Used to store XML to Standings tables.
    *
    * @return Bool Return TRUE if store was successful.
+   *
+   * @todo Need to impliment missing allianceStandings group that somehow has
+   * been missed.
    */
   public function apiStore() {
     $ret = 0;

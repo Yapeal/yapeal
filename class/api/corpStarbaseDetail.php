@@ -322,7 +322,7 @@ class corpStarbaseDetail extends ACorporation {
     $list = array();
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'select itemID';
+      $sql = 'select `itemID`';
       $sql .= ' from ';
       $sql .= '`' . $tableName . '`';
       $sql .= ' where `ownerID`=' . $this->corporationID;

@@ -90,6 +90,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`corporationName`" type="C" size="255"/>
     <field name="`graphic`" type="B"/>
     <field name="`graphicType`" type="C" size="16"/>
     <field name="`isActive`" type="I1" size="1">
@@ -145,10 +146,6 @@
     </field>
     <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('dbPrefix', '%%P') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
-    <query platform="mysql">INSERT INTO `%%PutilConfig` (`Name`,`Value`) VALUES('utilVersion', '$Revision$') ON DUPLICATE KEY UPDATE `Value`=VALUES(`Value`)</query>
-  </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `graphic` BLOB DEFAULT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `isActive` BOOLEAN NOT NULL</query>

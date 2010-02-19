@@ -84,6 +84,15 @@ class corpStarbaseList extends ACorporation {
       } else {
       $mess = 'There was no XML data to store for ' . $tableName;
       trigger_error($mess, E_USER_NOTICE);
+      try {
+        // If there was no POS in list still need to delete old ones.
+        $sql = 'delete from `' . $tableName . '`';
+        $sql .= ' where `ownerID`=' . $this->corporationID;
+        $con->Execute($sql);
+      }
+      catch (ADODB_Exception $e) {
+        return FALSE;
+      }
       $ret = FALSE;
       };// else count $this->xml ...
       try {

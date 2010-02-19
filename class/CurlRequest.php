@@ -88,7 +88,7 @@ class CurlRequest {
     );
     $options = array(
       CURLOPT_ENCODING => '',
-      CURLOPT_FOLLOWLOCATION => TRUE,
+      CURLOPT_FOLLOWLOCATION => FALSE,
       CURLOPT_HEADER => TRUE,
       CURLOPT_MAXREDIRS => 5,
       CURLOPT_RETURNTRANSFER => TRUE,

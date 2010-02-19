@@ -70,6 +70,11 @@ class charMailMessages extends ACharacter {
         try {
           $extras = array('ownerID' => $this->characterID,
             'toCorpOrAllianceID' => 0);
+          foreach ($this->xml as $row) {
+            if ($row['toCorpOrAllianceID'] == '') {
+              $row['toCorpOrAllianceID'] = 0;
+            };// if $row['toCorpOrAllianceID'] ...
+          };// foreach $this->xml ...
           YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
             YAPEAL_DSN, $extras);
         }

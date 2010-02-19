@@ -73,7 +73,7 @@ if (function_exists('getopt')) {
         case 'V':
           $mess = $argv[0] . ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
           $mess .= YAPEAL_DATE . PHP_EOL;
-          $mess .= "Copyright (C) 2008, 2009, Michael Cummings" . PHP_EOL;
+          $mess .= "Copyright (C) 2008-2010, Michael Cummings" . PHP_EOL;
           $mess .= "This program comes with ABSOLUTELY NO WARRANTY." . PHP_EOL;
           $mess .= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
           $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;

@@ -58,33 +58,19 @@ class YapealAutoLoad {
   /**
    * @var array
    */
-  private static $dirList;
+  private static $dirList = array(YAPEAL_CLASS, YAPEAL_EXT);
   /**
    * @var array
    */
-  private static $suffixList;
+  private static $suffixList = array('.php', '.class.php', '.inc.php', '.class', '.inc');
   /**
-   * Only way to make instance is through {@link getInstance() getInstance()}.
+   * Pure static class.
    */
-  private function __construct() {
-    self::$dirList = array(YAPEAL_CLASS, YAPEAL_EXT);
-    self::$suffixList = array('.php', '.class.php', '.inc.php', '.class', '.inc');
-  }
+  private function __construct() {}
   /**
    * No backdoor through cloning either.
    */
   private function __clone() {}
-  /**
-   * Used to get an instance of the class.
-   *
-   * @return YapealAutoLoad Returns an instance of the class.
-   */
-  public static function getInstance() {
-    if (!(self::$instance instanceof self)) {
-      self::$instance = new self();
-    };
-    return self::$instance;
-  }
   /**
    * Searches through the common class directory locations for the file
    * containing the class/interface we need.
@@ -94,7 +80,6 @@ class YapealAutoLoad {
    * @return bool TRUE if class/interface is found.
    */
   public static function autoLoad($className) {
-    self::getInstance();
     foreach (self::$dirList as $dir) {
       $files = new FilterFileFinder($dir, $className, FilterFileFinder::CONTAINS);
       foreach ($files as $name => $object) {
@@ -125,7 +110,6 @@ class YapealAutoLoad {
    * @return bool TRUE if extension was already in the list.
    */
   static public function addExtension($ext) {
-    self::getInstance();
     if (!in_array($ext, self::$suffixList)) {
       self::$suffixList[] = $ext;
       return FALSE;
@@ -140,7 +124,6 @@ class YapealAutoLoad {
    * @return bool TRUE if directory was already in the list.
    */
   static public function addPath($dir) {
-    self::getInstance();
     if (!in_array($dir, self::$dirList)) {
       self::$dirList[] = $dir;
       return FALSE;

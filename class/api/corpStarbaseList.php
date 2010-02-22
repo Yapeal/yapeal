@@ -85,6 +85,7 @@ class corpStarbaseList extends ACorporation {
       $mess = 'There was no XML data to store for ' . $tableName;
       trigger_error($mess, E_USER_NOTICE);
       try {
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
         // If there was no POS in list still need to delete old ones.
         $sql = 'delete from `' . $tableName . '`';
         $sql .= ' where `ownerID`=' . $this->corporationID;

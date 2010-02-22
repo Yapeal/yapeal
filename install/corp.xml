@@ -31,8 +31,8 @@
  * @link       http://www.eve-online.com/
  */
 -->
-  <!-- Corporation Section -->
   <table name="corpAccountBalance">
+    <descr>Table for /corp/AccountBalance.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -51,6 +51,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAssetList">
+    <descr>Table for /corp/AssetList.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -94,6 +95,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAttackers">
+    <descr>Sub table from /corp/KillLog.xml.aspx</descr>
     <field name="`killID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -143,6 +145,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCombatSettings">
+    <descr>Sub table from /corp/StarbaseDetail.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -174,6 +177,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpContainerLog">
+    <descr>Table for /corp/ContainerLog.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -229,6 +233,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCorporationSheet">
+    <descr>Main table for /corp/CorporationSheet.xml.aspx</descr>
     <field name="`allianceID`" type="I8" size="20">
       <NOTNULL/>
       <DEFAULT value="0"/>
@@ -280,6 +285,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpDivisions">
+    <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -294,6 +300,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpFuel">
+    <descr>Sub table from /corp/StarbaseDetail.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -313,6 +320,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpGeneralSettings">
+    <descr>Sub table from /corp/KillLog.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -340,6 +348,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpIndustryJobs">
+    <descr>Table for /corp/IndustryJobs.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -467,6 +476,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpItems">
+    <descr>Sub table from /corp/KillLog.xml.aspx</descr>
     <field name="`flag`" type="I1" size="3">
       <NOTNULL/>
       <UNSIGNED/>
@@ -502,6 +512,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpKillLog">
+    <descr>Main table for /corp/KillLog.xml.aspx</descr>
     <field name="`killID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -520,6 +531,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpLogo">
+    <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -555,6 +567,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMarketOrders">
+    <descr>Table for /corp/MarketOrders.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -621,6 +634,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMemberTracking">
+    <descr>Table for /corp/MemberTracking.xml.aspx</descr>
     <field name="`base`" type="C" size="255"/>
     <field name="`baseID`" type="I8" size="20">
       <UNSIGNED/>
@@ -671,7 +685,44 @@
     </index>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="corpStandingsAllianceToAlliances">
+    <descr>Sub table from /corp/Standings.xml.aspx that is only available if corporation is in an alliance</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+     <NOTNULL/>
+    </field>
+    <field name="`toID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpStandingsAllianceToCorporations">
+    <descr>Sub table from /corp/Standings.xml.aspx that is only available if corporation is in an alliance</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <field name="`toID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`toName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="corpStandingsFromAgents">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -689,6 +740,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsFromFactions">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -706,6 +758,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsFromNPCCorporations">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -723,6 +776,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsToAlliances">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -740,6 +794,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsToCharacters">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -757,6 +812,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsToCorporations">
+    <descr>Sub table from /corp/Standings.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -774,6 +830,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStarbaseDetail">
+    <descr>Main table from /corp/StarbaseDetail.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -795,6 +852,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStarbaseList">
+    <descr>Table for /corp/StarbaseList.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -828,6 +886,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpVictim">
+    <descr>Sub table from /corp/KillLog.xml.aspx</descr>
     <field name="`killID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -866,6 +925,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletDivisions">
+    <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -880,6 +940,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletJournal">
+    <descr>Table for /corp/WalletJournal.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -921,6 +982,7 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletTransactions">
+    <descr>Table for /corp/WalletTransactions.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>

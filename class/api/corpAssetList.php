@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Corp AssetList API.
+ * Contains AssetList class.
  *
  * PHP version 5
  *

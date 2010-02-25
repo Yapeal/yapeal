@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store char IndustryJobs API.
+ * Contains IndustryJobs class.
  *
  * PHP version 5
  *

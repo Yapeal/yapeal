@@ -40,7 +40,6 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_INC . 'elog.php';
 /**
  * Yapeal's custom error handler.
  *
@@ -131,8 +130,8 @@ Backtrace:
 {$backtrace}
 EOT;
     };
-    print_on_command($body);
-    elog($body, YAPEAL_ERROR_LOG);
+    self::print_on_command($body);
+    self::elog($body, YAPEAL_ERROR_LOG);
     exit(1);
   }
   /**
@@ -154,11 +153,11 @@ NOTICE:
      File: {$this->filename}
 EOT;
     };
-    print_on_command($body);
-    return elog($body, YAPEAL_NOTICE_LOG);
+    self::print_on_command($body);
+    return self::elog($body, YAPEAL_NOTICE_LOG);
   }
   /**
-   * Called to handle dtrict type messages.
+   * Called to handle strict type messages.
    */
   private function handleStrict() {
     $body = PHP_EOL;
@@ -176,8 +175,8 @@ NOTICE:
      File: {$this->filename}
 EOT;
     };
-    print_on_command($body);
-    return elog($body, YAPEAL_STRICT_LOG);
+    self::print_on_command($body);
+    return self::elog($body, YAPEAL_STRICT_LOG);
   }
   /**
    * Called to handle warning type messages.
@@ -198,8 +197,41 @@ WARNING:
      File: {$this->filename}
 EOT;
     };
-    print_on_command($body);
-    return elog($body, YAPEAL_WARNING_LOG);
+    self::print_on_command($body);
+    return self::elog($body, YAPEAL_WARNING_LOG);
   }
+  /**
+   * Used to send message to a log file.
+   *
+   * @param string $str Message to be sent to log file.
+   * @param string $filename File to use for logging message.
+   */
+  static function elog($str, $filename = YAPEAL_ERROR_LOG) {
+    $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
+    $mess .= $str . PHP_EOL;
+    error_log($mess, 3, $filename);
+  }// function elog
+  /**
+   * Only prints message if in command line mode.
+   *
+   * @param string $str Message to be printed.
+   * @param bool $newline PHP_EOL will be added to end of $str
+   * @param bool $timestamp Add Timestamp in front of $str
+   *
+   * @return void
+   */
+  static function print_on_command($str, $newline = TRUE, $timestamp = TRUE) {
+    if (PHP_SAPI == 'cli') {
+      $mess = '';
+      if ($timestamp) {
+        $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
+      };
+      $mess .= $str;
+      if ($newline) {
+        $mess .= PHP_EOL;
+      };
+      fwrite(STDERR, $mess);
+    }
+  }// function print_on_command
 }
 ?>

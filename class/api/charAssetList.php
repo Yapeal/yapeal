@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store char AssetList API.
+ * Contains AssetList class.
  *
  * PHP version 5
  *

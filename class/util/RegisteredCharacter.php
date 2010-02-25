@@ -58,6 +58,11 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    */
   private $recordExists;
   /**
+   * Table name
+   * @var string
+   */
+  private $table;
+  /**
    * Constructor
    *
    * @param mixed $id Id of Character wanted.
@@ -72,11 +77,11 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   public function __construct($id = NULL, $create = TRUE) {
     $path = YAPEAL_CLASS . 'api' . DS;
     $this->apiList = FilterFileFinder::getStrippedFiles($path, 'char');
-    $this->types = array('activeAPI' => 'X', 'characterID' => 'I',
-      'corporationID' => 'I', 'corporationName' => 'C', 'graphic' => 'B',
-      'graphicType' => 'C', 'isActive' => 'L', 'name' => 'C', 'proxy' => 'C',
-      'userID' => 'I'
-    );
+    $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter';
+    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
+    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
+    // Make an array of required and optional fields
+    $this->types = array_merge($rkeys, $okeys);
     // Was $id set?
     if (!empty($id)) {
       // If $id is a number and doesn't exist yet set characterID with it.
@@ -164,8 +169,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool TRUE if char was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     $sql .= ' where `characterID`=' . $id;
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -190,8 +195,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool TRUE if item was retrieved else FALSE.
    */
   public function getItemByName($name) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql .= ' where `name`=' . $con->qstr($name);
@@ -223,8 +228,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    */
   public function store() {
     try {
-      YapealDBConnection::upsert($this->properties, $this->types,
-        YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter', YAPEAL_DSN);
+      YapealDBConnection::upsert($this->properties,
+        $this->table, YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
       return FALSE;

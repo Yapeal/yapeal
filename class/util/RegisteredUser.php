@@ -53,6 +53,11 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    */
   private $recordExists;
   /**
+   * Table name
+   * @var string
+   */
+  private $table;
+  /**
    * Constructor
    *
    * @param integer $id Id of user wanted.
@@ -61,11 +66,15 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    *
    * @throws InvalidArgumentException If $id isn't a number throws an
    * InvalidArgumentException.
+   * @throws DomainException If $create is FALSE and a database record for $id
+   * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    $this->types = array('fullApiKey' => 'C', 'isActive' => 'L',
-      'limitedApiKey' => 'C', 'userID' => 'I'
-    );
+    $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredUser';
+    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
+    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
+    // Make an array of required and optional fields
+    $this->types = array_merge($rkeys, $okeys);
     // Was $id set?
     if (!empty($id)) {
       // If $id is a number and doesn't exist yet set userID with it.
@@ -93,8 +102,8 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * @return bool TRUE if user was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     $sql .= ' where `userID`=' . $id;
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -139,8 +148,8 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    */
   public function store() {
     try {
-      YapealDBConnection::upsert($this->properties, $this->types,
-        YAPEAL_TABLE_PREFIX . 'utilRegisteredUser', YAPEAL_DSN);
+      YapealDBConnection::upsert($this->properties,
+        $this->table, YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
       return FALSE;

@@ -58,6 +58,11 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    */
   private $recordExists;
   /**
+   * Table name
+   * @var string
+   */
+  private $table;
+  /**
    * Constructor
    *
    * @param mixed $id Id of corporation wanted.
@@ -66,14 +71,17 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    *
    * @throws InvalidArgumentException If $id isn't a number or string throws an
    * InvalidArgumentException.
+   * @throws DomainException If $create is FALSE and a database record for $id
+   * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $path = YAPEAL_CLASS . 'api' . DS;
     $this->apiList = FilterFileFinder::getStrippedFiles($path, 'corp');
-    $this->types = array('activeAPI' => 'X', 'characterID' => 'I',
-      'corporationID' => 'I', 'corporationName' => 'C', 'graphic' => 'B',
-      'graphicType' => 'C', 'isActive' => 'L', 'proxy' => 'C'
-    );
+    $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation';
+    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
+    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
+    // Make an array of required and optional fields
+    $this->types = array_merge($rkeys, $okeys);
     // Was $id set?
     if (!empty($id)) {
       // If $id is a number and doesn't exist yet set corporationID with it.
@@ -161,8 +169,8 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool TRUE if corp was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     $sql .= ' where `corporationID`=' . $id;
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -187,8 +195,8 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool TRUE if item was retrieved else FALSE.
    */
   public function getItemByName($name) {
-    $sql = 'select urc.`' . implode('`,urc.`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation` as urc,';
+    $sql = 'select urc.`' . implode('`,urc.`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '` as urc,';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'corpCorporationSheet` as ccs,';
     $sql .= ' where urc.`corporationID`=ccs.`corporationID`';
     try {
@@ -222,8 +230,8 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    */
   public function store() {
     try {
-      YapealDBConnection::upsert($this->properties, $this->types,
-        YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation', YAPEAL_DSN);
+      YapealDBConnection::upsert($this->properties,
+        $this->table, YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
       return FALSE;

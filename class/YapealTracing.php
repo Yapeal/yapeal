@@ -1,6 +1,6 @@
 <?php
 /**
- * Stuff used to trace program flow in Yapeal.
+ * Contains YapealTracing class.
  *
  * PHP version 5
  *
@@ -45,6 +45,8 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  *
  * @package Yapeal
  * @subpackage Tracing
+ * @deprecated Since revision 990 but may be brought back in changed form using
+ * Xdebug instead.
  */
 class YapealTracing {
   /**
@@ -59,7 +61,6 @@ class YapealTracing {
    * Constructor
    */
   public function __construct() {
-    require_once YAPEAL_INC . 'elog.php';
     if (defined('YAPEAL_DEBUG')) {
       $this->fileTrace = str_pad(' Trace log ', 75, '-', STR_PAD_BOTH) . PHP_EOL;
     };
@@ -69,7 +70,7 @@ class YapealTracing {
    */
   public function __destruct() {
     if (!empty($this->fileTrace)) {
-      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
+      YapealErrorHandler::elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
       $this->fileTrace = '';
     };
     if (!empty($this->dbTrace)) {
@@ -129,7 +130,7 @@ class YapealTracing {
    */
   public function flushTrace() {
     if (!empty($this->fileTrace)) {
-      elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
+      YapealErrorHandler::elog(PHP_EOL . $this->fileTrace, YAPEAL_TRACE_LOG);
       $this->fileTrace = '';
     };
     if (!empty($this->dbTrace)) {

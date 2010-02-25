@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store CharacterSheet API.
+ * Contains CharacterSheet class.
  *
  * PHP version 5
  *

@@ -40,14 +40,13 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_INC . 'elog.php';
 /**
  * Logs any exceptions its observing to a log file.
  *
  * @package Yapeal
  * @subpackage Observer
  * @uses IYapealObserver
- * @uses elog
+ * @uses YapealErrorHandler::elog()
  */
 class LoggingExceptionObserver implements IYapealObserver {
   /**
@@ -63,7 +62,7 @@ class LoggingExceptionObserver implements IYapealObserver {
     if (!empty($filename) && is_string($filename)) {
       $this->file = $filename;
     };
-  }
+  }// function __construct
   /**
    * Method the 'object' calls to let us know something has happened.
    *
@@ -81,7 +80,7 @@ Backtrace:
 {$e->getTraceAsString()}
 MESS;
     $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
-    elog($message, $this->file);
-  }
+    YapealErrorHandler::elog($message, $this->file);
+  }// function YapealUpdate
 }
 ?>

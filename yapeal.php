@@ -173,7 +173,9 @@ try {
   }; // else $timer==get_cacheduntil $api ...
 }
 catch (Exception $e) {
-  elog('Uncaught exception in ' . basename(__FILE__), YAPEAL_ERROR_LOG);
+  require_once YAPEAL_CLASS . 'YapealErrorHandler.php';
+  $mess = 'Uncaught exception in ' . basename(__FILE__);
+  YapealErrorHandler::elog($mess, YAPEAL_ERROR_LOG);
   $message = <<<MESS
 EXCEPTION:
      Code: {$e->getCode() }
@@ -184,7 +186,7 @@ Backtrace:
 {$e->getTraceAsString() }
 \t--- END TRACE ---
 MESS;
-  elog($message, YAPEAL_ERROR_LOG);
+  YapealErrorHandler::elog($message, YAPEAL_ERROR_LOG);
 }
 trigger_error('Peak memory used:' . memory_get_peak_usage(TRUE), E_USER_NOTICE);
 exit;

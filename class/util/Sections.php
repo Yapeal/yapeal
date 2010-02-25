@@ -48,10 +48,20 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class Sections extends ALimitedObject implements IGetBy {
   /**
+   * List of all sections
+   * @var array
+   */
+  private $sectionList;
+  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
   private $recordExists;
+  /**
+   * Table name
+   * @var string
+   */
+  private $table;
   /**
    * Constructor
    *
@@ -65,25 +75,29 @@ class Sections extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    $this->types = array('activeAPI' => 'X', 'isActive' => 'L', 'proxy' => 'C',
-      'sectionID' => 'I', 'sectionName' => 'C'
-    );
+    $this->sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
+    $this->table = YAPEAL_TABLE_PREFIX . 'utilSections';
+    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
+    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
+    // Make an array of required and optional fields
+    $this->types = array_merge($rkeys, $okeys);
     // Was $id set?
     if (!empty($id)) {
       // If $id is a number and doesn't exist yet set sectionID with it.
-      if (is_numeric($id)) {
+      // If $id has any characters other than 0-9 it's not a sectionID.
+      if (0 == strlen(str_replace(range(0,9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
-          if ($create) {
+          if (TRUE == $create) {
             $this->properties['sectionID'] = $id;
           } else {
             $mess = 'Unknown section ' . $id;
             throw new DomainException($mess, 1);
           };// else ...
         };
-        // else if it's a string and doesn't exist set name with it.
+        // else if it's a string ...
       } else if (is_string($id)) {
         if (FALSE === $this->getItemByName($id)) {
-          if ($create) {
+          if (TRUE == $create) {
             $this->properties['sectionName'] = $id;
           } else {
             $mess = 'Unknown section ' . $id;
@@ -104,8 +118,8 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool TRUE if section was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     $sql .= ' where `sectionID`=' . $id;
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -124,10 +138,16 @@ class Sections extends ALimitedObject implements IGetBy {
    * @param $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
+   *
+   * @throws DomainException If $name not in $this->sectionList.
    */
   public function getItemByName($name) {
-    $sql = 'select `' . implode('`,`', array_keys($this->types)) . '`';
-    $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+    if (!in_array($name, $this->sectionList)) {
+      $mess = 'Unknown section: ' . $name;
+      throw new DomainException($mess, 4);
+    };// if !in_array...
+    $sql = 'select `' . implode('`,`', $this->types) . '`';
+    $sql .= ' from `' . $this->table . '`';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql .= ' where `SectionName`=' . $con->qstr($name);
@@ -148,7 +168,7 @@ class Sections extends ALimitedObject implements IGetBy {
   public function store() {
     try {
       YapealDBConnection::upsert($this->properties,
-        YAPEAL_TABLE_PREFIX . 'utilSections', YAPEAL_DSN);
+        $this->table, YAPEAL_DSN);
     }
     catch (ADODB_Exception $e) {
       return FALSE;

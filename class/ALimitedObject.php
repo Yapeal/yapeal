@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /**
  * Contains ALimitedObject class.
@@ -67,7 +66,7 @@ abstract class ALimitedObject {
    * @throws DomainException If $name not in $this->types throws DomainException.
    */
   public function __get($name) {
-    if (!key_exists($name, $this->types)) {
+    if (!in_array($name, $this->types)) {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...
@@ -103,7 +102,7 @@ abstract class ALimitedObject {
     if (is_array($value)) {
       $this->$name = $value;
     };
-    if (!key_exists($name, $this->types)) {
+    if (!in_array($name, $this->types)) {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...

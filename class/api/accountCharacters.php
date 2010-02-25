@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store Characters API.
+ * Contains Characters class.
  *
  * PHP version 5
  *

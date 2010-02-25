@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store char AccountBalance API.
+ * Contains AccountBalance class.
  *
  * PHP version 5
  *

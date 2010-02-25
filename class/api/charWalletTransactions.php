@@ -1,6 +1,6 @@
 <?php
 /**
- * Class used to fetch and store char WalletTransactions API.
+ * Contains WalletTransactions class.
  *
  * PHP version 5
  *

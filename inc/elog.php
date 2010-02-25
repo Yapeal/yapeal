@@ -45,6 +45,8 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  *
  * @param string $str Message to be sent to log file.
  * @param string $filename File to use for logging message.
+ * @deprecated Since revision 999 when function was changed to
+ * {@link YapealErrorHandler::elog() YapealErrorHandler::elog()} method.
  */
 function elog($str, $filename = YAPEAL_ERROR_LOG) {
   $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE) , 1, 4) . '] ';
@@ -59,6 +61,9 @@ function elog($str, $filename = YAPEAL_ERROR_LOG) {
  * @param bool $timestamp Add Timestamp in front of $str
  *
  * @return void
+ * @deprecated Since revision 999 when function was changed to
+ * {@link YapealErrorHandler::print_on_command() YapealErrorHandler::print_on_command()}
+ * method.
  */
 function print_on_command($str, $newline = TRUE, $timestamp = TRUE) {
   if (PHP_SAPI == 'cli') {

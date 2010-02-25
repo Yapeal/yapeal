@@ -46,6 +46,13 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $incDir = realpath(dirname(__FILE__));
 chdir($incDir);
+// Define shortened name for DIRECTORY_SEPARATOR
+if (!defined('DS')) {
+  define('DS', DIRECTORY_SEPARATOR);
+};
+// Set max SQL insert size. This is a trade off of memory use and number of
+// inserts needed for larger APIs.
+define('YAPEAL_MAX_UPSERT', 1000);
 // Set some basic common settings so we know we'll get to see any errors etc.
 error_reporting(E_ALL);
 ini_set('ignore_repeated_errors', 0);
@@ -57,16 +64,16 @@ ini_set('log_errors', 0);
 // Special debugging command-line override.
 if (defined('YAPEAL_DEBUG')) {
   ob_start();
-  trigger_error(str_pad(' Pre-custom ', 75, '-', STR_PAD_BOTH), E_USER_NOTICE);
+  trigger_error(str_pad(' Pre-custom ', 65, '-', STR_PAD_BOTH), E_USER_NOTICE);
   ini_set('track_errors', 1);
 } else {
   ini_set('track_errors', 0);
 };// else defined YAPEAL_DEBUG ...
-// Set the default timezone for GMT.
-date_default_timezone_set('GMT');
-// Set max SQL insert size. This is a trade off of memory use and number of
-// inserts needed for larger APIs.
-define('YAPEAL_MAX_UPSERT', 1000);
+// Get Yapeal version if not already defined.
+if (!defined('YAPEAL_VERSION')) {
+  $path = $incDir . DS . '..' . DS . 'revision.php';
+  require_once realpath($path);
+}
 // Log Yapeal version information.
 $mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
 $mess .= YAPEAL_DATE;
@@ -87,6 +94,8 @@ if (count($missing) > 0) {
   trigger_error($mess, E_USER_ERROR);
   exit(2);
 };
+// Set the default timezone for GMT.
+date_default_timezone_set('GMT');
 // Get path constants so they can be used.
 require_once $incDir . DS . 'common_paths.php';
 // Set a constant for location of configuration file.
@@ -119,20 +128,16 @@ $req1 = 'Missing required setting ';
 $req2 = ' in ' . $iniFile;
 $nonexist = 'Nonexistent directory defined for ';
 /* **************************************************************************
- * Paths
- * **************************************************************************/
-// Check writable paths
-if (!is_writable(YAPEAL_LOG)) {
-  trigger_error(YAPEAL_LOG . ' is not writeable', E_USER_ERROR);
-};
-/* **************************************************************************
  * Class autoloader section
  * **************************************************************************/
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 /* **************************************************************************
  * Logging section
  * **************************************************************************/
-require_once YAPEAL_INC . 'elog.php';
+// Check writable paths
+if (!is_writable(YAPEAL_LOG)) {
+  trigger_error(YAPEAL_LOG . ' is not writeable', E_USER_ERROR);
+};
 // Grab the info from ini file again now that our constants are defined.
 $iniVars = parse_ini_file($iniFile, TRUE);
 // Special debugging command-line override.
@@ -141,11 +146,11 @@ if (defined('YAPEAL_DEBUG')) {
   define('YAPEAL_ERROR_LOG', YAPEAL_DEBUG);
   define('YAPEAL_NOTICE_LOG', YAPEAL_DEBUG);
   define('YAPEAL_STRICT_LOG', YAPEAL_DEBUG);
-  define('YAPEAL_TRACE_ACTIVE', TRUE);
-  define('YAPEAL_TRACE_LEVEL', 2);
-  define('YAPEAL_TRACE_LOG', YAPEAL_DEBUG);
-  define('YAPEAL_TRACE_OUTPUT', 'file');
-  define('YAPEAL_TRACE_SECTIONS', YAPEAL_TRACE_ALL);
+  //define('YAPEAL_TRACE_ACTIVE', TRUE);
+  //define('YAPEAL_TRACE_LEVEL', 2);
+  //define('YAPEAL_TRACE_LOG', YAPEAL_DEBUG);
+  //define('YAPEAL_TRACE_OUTPUT', 'file');
+  //define('YAPEAL_TRACE_SECTIONS', YAPEAL_TRACE_ALL);
   define('YAPEAL_WARNING_LOG', YAPEAL_DEBUG);
 } else {
   $settings = array('error_log', 'notice_log', 'strict_log', 'trace_log', 'warning_log');
@@ -187,7 +192,7 @@ if (defined('YAPEAL_DEBUG')) {
   file_put_contents(YAPEAL_DEBUG, $mess);
 };
 // Printing for CLI will be handled in our custom handler from now on.
-$mess = str_pad(' Custom handler started ', 75, '-', STR_PAD_BOTH);
+$mess = str_pad(' Custom handler started ', 65, '-', STR_PAD_BOTH);
 trigger_error($mess, E_USER_NOTICE);
 $mess = 'Yapeal version ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
 $mess .= YAPEAL_DATE;
@@ -205,7 +210,7 @@ unset($logObserver, $printObserver);
  * Logging init file if debugging.
  * **************************************************************************/
 if (defined('YAPEAL_DEBUG')) {
-  $mess = str_pad(' '. $iniFile .' ', 75, '-', STR_PAD_BOTH) . PHP_EOL;
+  $mess = str_pad(' '. $iniFile .' ', 65, '-', STR_PAD_BOTH) . PHP_EOL;
   $settings = array('version', 'stability', 'date');
   foreach ($settings as $setting) {
     if (isset($iniVars[$setting])) {
@@ -229,7 +234,7 @@ if (defined('YAPEAL_DEBUG')) {
       };// foreach $settings ...
     };// if isset $iniVars...
   };//foreach $sections ...
-  $mess .= str_pad(' End config file ', 75, '-', STR_PAD_BOTH);
+  $mess .= str_pad(' End config file ', 65, '-', STR_PAD_BOTH);
   trigger_error($mess, E_USER_NOTICE);
 };// if defined YAPEAL_DEBUG ...
 /* **************************************************************************

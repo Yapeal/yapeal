@@ -48,6 +48,11 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class RegisteredUser extends ALimitedObject implements IGetBy {
   /**
+   * List of all section APIs
+   * @var array
+   */
+  private $apiList;
+  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
@@ -70,6 +75,8 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
+    $path = YAPEAL_CLASS . 'api' . DS;
+    $this->apiList = FilterFileFinder::getStrippedFiles($path, 'account');
     $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredUser';
     $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
     $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
@@ -94,6 +101,56 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
       };// else ...
     };// if !empty $id ...
   }// function __construct
+  /**
+   * Used to add an API to the list in activeAPI.
+   *
+   * @param string $name Name of the API to add without 'account' part i.e.
+   * 'accountCharacters' would just be 'Characters'
+   *
+   * @return bool Returns TRUE if $name already exists else FALSE.
+   *
+   * @throws DomainException If $name not in $this->apiList.
+   */
+  public function addActiveAPI($name) {
+    if (!in_array($name, $this->apiList)) {
+      $mess = 'Unknown API: ' . $name;
+      throw new DomainException($mess, 1);
+    };// if !in_array...
+    $apis = explode(' ', $this->properties['activeAPI']);
+    if (in_array($name, $apis)) {
+      $ret = TRUE;
+    } else {
+      $ret = FALSE;
+      $apis[] = $name;
+    };// if isset...
+    $this->properties['activeAPI'] = implode(' ', $apis);
+    return $ret;
+  }// function addActiveAPI
+  /**
+   * Used to delete an API from the list in activeAPI.
+   *
+   * @param string $name Name of the API to delete without 'char' part i.e.
+   * 'charAccountBalance' would just be 'AccountBalance'
+   *
+   * @return bool Returns TRUE if $name existed else FALSE.
+   *
+   * @throws DomainException If $name not in $this->apiList.
+   */
+  public function deleteActiveAPI($name) {
+    if (!in_array($name, $this->apiList)) {
+      $mess = 'Unknown API: ' . $name;
+      throw new DomainException($mess, 1);
+    };// if !in_array...
+    $apis = explode(' ', $this->properties['activeAPI']);
+    if (in_array($name, $apis)) {
+      $ret = TRUE;
+      unset($apis[$name]);
+    } else {
+      $ret = FALSE;
+    };// if isset...
+    $this->properties['activeAPI'] = implode(' ', $apis);
+    return $ret;
+  }// function deleteActiveAPI
   /**
    * Used to get user from RegisteredUser table by user ID.
    *

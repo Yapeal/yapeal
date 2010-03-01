@@ -55,13 +55,13 @@ class YapealApiRequests {
    * /corp/StarbaseDetail.xml.aspx would just be StarbaseDetail
    * @param string $section The api section that $api belongs to. For Eve APIs
    * will be one of account, char, corp, eve, map, or server.
+   * @param array $postData Is an array of data ready to be used in
+   * http_build_query.
    * @param string $proxy Allows overriding API server for example to use a
    * different proxy on a per char/corp basis. It should contain a url format
    * string made to used in sprintf() to replace %1$s with $api and %2$s with
    * $section as needed to complete the url. For example:
    * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
-   * @param array $postData Is an array of data ready to be used in
-   * http_build_query.
    *
    * @return mixed Returns SimpleXML object or FALSE
    *

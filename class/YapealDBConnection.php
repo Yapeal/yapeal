@@ -145,12 +145,12 @@ class YapealDBConnection {
    *
    * @throws ADODB_Exception if connection fails.
    */
-  private static function getOptionalColumns($table, $dsn) {
+  public static function getOptionalColumns($table, $dsn) {
     $con = self::connect($dsn);
     $columns = $con->MetaColumns($table, FALSE);
     $types = array();
     foreach ($columns as $col) {
-      if (TRUE == $col->has_default) {
+      if (isset($col->has_default) && TRUE == $col->has_default) {
         $types[] = $col->name;
       };// if TRUE == $col->has_default ...
     };// foreach $columns ...
@@ -166,12 +166,12 @@ class YapealDBConnection {
    *
    * @throws ADODB_Exception if connection fails.
    */
-  private static function getRequiredColumns($table, $dsn) {
+  public static function getRequiredColumns($table, $dsn) {
     $con = self::connect($dsn);
     $columns = $con->MetaColumns($table, FALSE);
     $types = array();
     foreach ($columns as $col) {
-      if (FALSE == $col->has_default) {
+      if (empty($col->has_default) || FALSE == $col->has_default) {
         $types[] = $col->name;
       };// if FALSE == $col->has_default ...
     };// foreach $columns ...
@@ -216,7 +216,6 @@ class YapealDBConnection {
     $types = YapealDBConnection::getColumnTypes($table, $dsn);
     // Need this so we can do quoting.
     $con = self::connect($dsn);
-    $needsQuote = array('C', 'X', 'D', 'T');
     // Build query sections
     $insert = 'insert into `' . $table . '` (`';
     $insert .= implode('`,`', $fields) . '`)';
@@ -226,11 +225,25 @@ class YapealDBConnection {
     while (NULL != $row = array_shift($data)) {
       $set = array();
       foreach ($fields as $field) {
-        if (in_array($types[$field], $needsQuote)) {
-          $set[] = $con->qstr($row[$field]);
-        } else {
+        switch ($types[$field]) {
+          case 'C':
+          case 'D':
+          case 'T':
+          case 'X':
+            // Quote all text, decimal or date type fields.
+            $set[] = $con->qstr($row[$field]);
+            break;
+          case 'B':
+            // BLOBs need to be converted to hex strings if they aren't already.
+            if ('0x' !== substr($row[$field], 0, 2)) {
+              $row[$field] = '0x' . bin2hex($row[$field]);
+            } else {
+              $set[] = (string)$row[$field];
+            };// else '0x' !== substr($row[$field], 0, 2) ...
+            break;
+          default:
           $set[] = (string)$row[$field];
-        };// else in_array $params...
+        };// switch $types($field) ...
       };// foreach $fields ...
       $sets[] = '(' . implode(',', $set) . ')';
     };// while NULL != $row...
@@ -530,5 +543,12 @@ class YapealDBConnection {
     };
     return $until;
   }// function getCachedUntil
+  /**
+   * Allows resetting of class instance for testing with PHPUnit. WARNING: This
+   * is for internal testing only!
+   */
+  public static function reset() {
+    self::$instance = NULL;
+  }// function reset
 }
 ?>

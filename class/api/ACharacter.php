@@ -204,40 +204,37 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           $mess = 'Deactivating characterID: ' . $this->characterID;
           $mess .= ' as their Eve API information is incorrect';
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
-          $sql .= ' set `isActive`=0';
-          $sql .= ' where `characterID`=' . $this->characterID;
-          $con->Execute($sql);
+          $char = new RegisteredCharacter($this->characterID, FALSE);
+          $char->isActive = 0;
+          if (!$char->store()) {
+            $mess = 'Could not deactivate characterID: ' . $this->characterID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$char->store() ...
           break;
         case 200:// Current security level not high enough. (Wrong API key)
           $mess = 'Deactivating Eve API: ' . $this->api;
           $mess .= ' for ' . $this->characterID;
           $mess .= ' as did not give the required full API key';
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'select `activeAPI`';
-          $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
-          $sql .= ' where `characterID`=' . $this->characterID;
-          $result = $con->GetOne($sql);
-          // Split the string on spaces and put into the keys.
-          $apis = array_flip(explode(' ', $result));
-          unset($apis[$this->api]);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
-          $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
-          $sql .= ' where `characterID`=' . $this->characterID;
-          $con->Execute($sql);
+          $char = new RegisteredCharacter($this->characterID, FALSE);
+          $char->deleteActiveAPI($this->api);
+          if (!$char->store()) {
+            $mess = 'Could not deactivate ' . $this->api;
+            $mess .= ' for ' . $this->characterID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$char->store() ...
           break;
         case 211:// Login denied by account status.
           // The user's account isn't active deactivate it.
           $mess = 'Deactivating userID: ' . $this->userID;
           $mess .= ' as their Eve account is currently suspended';
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
-          $sql .= ' set `isActive`=0';
-          $sql .= ' where `userID`=' . $this->userID;
-          $con->Execute($sql);
+          $user = new RegisteredUser($this->userID, FALSE);
+          $user->isActive = 0;
+          if (!$user->store()) {
+            $mess = 'Could not deactivate userID: ' . $this->userID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$user->store() ...
           break;
         case 901:// Web site database temporarily disabled.
         case 902:// EVE backend database temporarily disabled.

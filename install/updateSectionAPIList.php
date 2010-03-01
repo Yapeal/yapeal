@@ -65,7 +65,7 @@ for ($i = 1; $i < $argc; ++$i) {
   $argv[$i] = str_replace($replace, '', $argv[$i]);
 };
 try {
-  $section = new Sections($argv[1]);
+  $section = new Sections($argv[1], FALSE);
   $section->activeAPI = $argv[2];
   if (TRUE == $section->store()) {
     fwrite(STDOUT, 'true');

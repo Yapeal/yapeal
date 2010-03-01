@@ -103,9 +103,10 @@ class SectionAccount {
       foreach ($userList as $user) {
         extract($user);
         /* **********************************************************************
-        * Per user API pulls
-        * **********************************************************************/
-        foreach ($this->apiList as $api) {
+         * Per user API pulls
+         * **********************************************************************/
+        $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
+        foreach ($apis as $api) {
           ++$apiCount;
           $class = $this->section . $api;
           $tableName = YAPEAL_TABLE_PREFIX . $class;
@@ -162,7 +163,8 @@ class SectionAccount {
   private function getRegisteredUsers() {
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of user(s) we need to do updates for
-    $sql = 'select coalesce(`fullApiKey`,`limitedApiKey`) as apiKey,`userID`';
+    $sql = 'select `activeAPI`,';
+    $sql .= 'coalesce(`fullApiKey`,`limitedApiKey`) as apiKey,`userID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
     $sql .= ' where `isActive`=1';

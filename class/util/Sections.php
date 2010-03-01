@@ -142,7 +142,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @throws DomainException If $name not in $this->sectionList.
    */
   public function getItemByName($name) {
-    if (!in_array($name, $this->sectionList)) {
+    if (!in_array(ucfirst($name), $this->sectionList)) {
       $mess = 'Unknown section: ' . $name;
       throw new DomainException($mess, 4);
     };// if !in_array...

@@ -82,10 +82,8 @@ try {
       $corp->activeAPI = (string)$section->activeAPI;
       $corp->characterID = (string)$row['characterID'];
       $corp->corporationName = (string)$row['corporationName'];
-      $postData = array('id' => $corporationID);
-      $http = array('timeout' => 15, 'method' => 'POST',
-        'url' => 'http://www.evecorplogo.net/logo.php');
-      $http['content'] = http_build_query($postData, NULL, '&');
+      $http = array('timeout' => 15, 'method' => 'GET',
+        'url' => 'http://www.evecorplogo.net/logo.php?id=' . $corporationID);
       $curl = new CurlRequest($http);
       $result = $curl->exec();
       // Now check for errors.

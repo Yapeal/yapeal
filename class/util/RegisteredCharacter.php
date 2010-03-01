@@ -127,7 +127,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
       throw new DomainException($mess, 1);
     };// if !in_array...
     $apis = explode(' ', $this->properties['activeAPI']);
-    if(in_array($name, $apis)) {
+    if (in_array($name, $apis)) {
       $ret = TRUE;
     } else {
       $ret = FALSE;
@@ -152,7 +152,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
       throw new DomainException($mess, 1);
     };// if !in_array...
     $apis = explode(' ', $this->properties['activeAPI']);
-    if(in_array($name, $apis)) {
+    if (in_array($name, $apis)) {
       $ret = TRUE;
       unset($apis[$name]);
     } else {

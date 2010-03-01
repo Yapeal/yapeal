@@ -72,7 +72,10 @@ $fullAPIKey = $argv[2];
 $limitedAPIKey = $argv[3];
 $isActive = $argv[4];
 try {
+  // Need list of allowed APIs
+  $section = new Sections('account', FALSE);
   $user = new RegisteredUser($userID);
+  $user->activeAPI = (string)$section->activeAPI;
   $user->fullApiKey = $fullAPIKey;
   $user->limitedApiKey = $limitedAPIKey;
   $user->isActive = $isActive;

@@ -103,8 +103,8 @@ class SectionChar {
       foreach ($charList as $char) {
         extract($char);
         /* **********************************************************************
-        * Per char API pulls
-        * **********************************************************************/
+         * Per char API pulls
+         * **********************************************************************/
         $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
         foreach ($apis as $api) {
           ++$apiCount;

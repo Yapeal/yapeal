@@ -70,7 +70,7 @@ abstract class ALimitedObject {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...
-    if(isset($this->properties[$name])) {
+    if (isset($this->properties[$name])) {
       return $this->properties[$name];
     } else {
       return NULL;
@@ -106,7 +106,7 @@ abstract class ALimitedObject {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...
-    if(isset($this->properties[$name])) {
+    if (isset($this->properties[$name])) {
       $ret = TRUE;
     };// if isset...
     $this->properties[$name] = $value;

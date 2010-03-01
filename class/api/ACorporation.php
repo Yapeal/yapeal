@@ -209,11 +209,12 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
           $mess = 'Deactivating corporationID: ' . $this->corporationID;
           $mess .= ' as their Eve API information is incorrect';
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
-          $sql .= ' set `isActive`=0';
-          $sql .= ' where `corporationID`=' . $this->corporationID;
-          $con->Execute($sql);
+          $corp = new RegisteredCorporation($this->corporationID, FALSE);
+          $corp->isActive = 0;
+          if (!$corp->store()) {
+            $mess = 'Could not deactivate corporationID: ' . $this->corporationID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$corp->store() ...
           break;
         case 200:// Current security level not high enough. (Wrong API key)
         case 206:// Character must have Accountant or Junior Accountant roles.
@@ -230,29 +231,25 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
             $mess .= ' did not give the required full API key';
           };
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'select `activeAPI`';
-          $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
-          $sql .= ' where `corporationID`=' . $this->corporationID;
-          $result = $con->GetOne($sql);
-          // Split the string on spaces and put into the keys.
-          $apis = array_flip(explode(' ', $result));
-          unset($apis[$this->api]);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
-          $sql .= ' set `activeAPI`=' . $con->qstr(implode(' ', array_flip($apis)));
-          $sql .= ' where `corporationID`=' . $this->corporationID;
-          $con->Execute($sql);
+          $corp = new RegisteredCorporation($this->corporationID, FALSE);
+          $corp->deleteActiveAPI($this->api);
+          if (!$corp->store()) {
+            $mess = 'Could not deactivate ' . $this->api;
+            $mess .= ' for ' . $this->corporationID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$corp->store() ...
           break;
         case 211:// Login denied by account status.
           // The user's account isn't active deactivate it.
           $mess = 'Deactivating userID: ' . $this->userID;
           $mess .= ' as their Eve account is currently suspended';
           trigger_error($mess, E_USER_WARNING);
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
-          $sql .= ' set `isActive`=0';
-          $sql .= ' where `userID`=' . $this->userID;
-          $con->Execute($sql);
+          $user = new RegisteredUser($this->userID, FALSE);
+          $user->isActive = 0;
+          if (!$user->store()) {
+            $mess = 'Could not deactivate userID: ' . $this->userID;
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$user->store() ...
           break;
         case 901:// Web site database temporarily disabled.
         case 902:// EVE backend database temporarily disabled.

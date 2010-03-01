@@ -89,7 +89,7 @@ try {
       $curl = new CurlRequest($http);
       $result = $curl->exec();
       // Now check for errors.
-      if ($result['curl_error'] != ''  ||  200 != $result['http_code'] ||
+      if ($result['curl_error'] != '' || 200 != $result['http_code'] ||
         $result['body'] == '') {
         $picFile = realpath(YAPEAL_PICS . 'blank.png');
         $char->graphic = '0x' . bin2hex(file_get_contents($picFile));

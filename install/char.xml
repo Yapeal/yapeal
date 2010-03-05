@@ -625,7 +625,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`pointsPerDay`" type="N" size="4.2">
+    <field name="`pointsPerDay`" type="N" size="5.2">
       <NOTNULL/>
     </field>
     <field name="`skillTypeID`" type="I8" size="20">

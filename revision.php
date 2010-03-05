@@ -48,8 +48,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
 /**
  * Track date of script.
  */
-define('YAPEAL_DATE', trim(str_replace(
-  array('$', '#', 'Date::') , '', '$Date::                      $')));
+define('YAPEAL_DATE', str_replace('@', '', '@builddate@'));
 /**
  * Track stability of script.
  */
@@ -57,5 +56,5 @@ define('YAPEAL_STABILITY', 'beta');
 /**
  * Track version of script.
  */
-define('YAPEAL_VERSION', str_replace('@','', '@898@'));
+define('YAPEAL_VERSION', str_replace('@', '', '@svnversion@'));
 ?>

@@ -233,7 +233,7 @@ abstract class ACorporation implements IFetchApiTable, IStoreApiTable {
           trigger_error($mess, E_USER_WARNING);
           $corp = new RegisteredCorporation($this->corporationID, FALSE);
           $corp->deleteActiveAPI($this->api);
-          if (!$corp->store()) {
+          if (FALSE === $corp->store()) {
             $mess = 'Could not deactivate ' . $this->api;
             $mess .= ' for ' . $this->corporationID;
             trigger_error($mess, E_USER_WARNING);

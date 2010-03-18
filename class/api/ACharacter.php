@@ -218,7 +218,7 @@ abstract class ACharacter implements IFetchApiTable, IStoreApiTable {
           trigger_error($mess, E_USER_WARNING);
           $char = new RegisteredCharacter($this->characterID, FALSE);
           $char->deleteActiveAPI($this->api);
-          if (!$char->store()) {
+          if (FALSE === $char->store()) {
             $mess = 'Could not deactivate ' . $this->api;
             $mess .= ' for ' . $this->characterID;
             trigger_error($mess, E_USER_WARNING);

@@ -177,7 +177,7 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
           trigger_error($mess, E_USER_WARNING);
           $user = new RegisteredUser($this->userID, FALSE);
           $user->deleteActiveAPI($this->api);
-          if (!$user->store()) {
+          if (FALSE === $user->store()) {
             $mess = 'Could not deactivate ' . $this->api;
             $mess .= ' for ' . $this->userID;
             trigger_error($mess, E_USER_WARNING);

@@ -142,12 +142,14 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
       throw new DomainException($mess, 1);
     };// if !in_array...
     $apis = explode(' ', $this->properties['activeAPI']);
-    if (in_array($name, $apis)) {
-      $ret = TRUE;
-      unset($apis[$name]);
-    } else {
-      $ret = FALSE;
-    };// if isset...
+    $ret = FALSE;
+    foreach ($apis as $k => $v) {
+      if ($name == $v) {
+        $ret = TRUE;
+        unset($apis[$k]);
+        break;
+      };// if $name == $v ...
+    };// foreach $apis ...
     $this->properties['activeAPI'] = implode(' ', $apis);
     return $ret;
   }// function deleteActiveAPI

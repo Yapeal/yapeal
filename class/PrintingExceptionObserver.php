@@ -65,7 +65,7 @@ Backtrace:
 {$e->getTraceAsString()}
 MESS;
     $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
-    print_on_command($message);
+    YapealErrorHandler::print_on_command($message);
   }
 }
 ?>

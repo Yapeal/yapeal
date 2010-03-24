@@ -40,7 +40,6 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-require_once YAPEAL_INC . 'elog.php';
 /**
  * Prints out any exceptions being observed if PHP is in CLI mode.
  *

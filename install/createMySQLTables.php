@@ -55,7 +55,7 @@ require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_ADODB . 'adodb-xmlschema03.inc.php';
 if ($argc < 5) {
   $mess = 'Host, Username, Password, DB are required in ' . $argv[0] . PHP_EOL;
-  $mess .= 'TablePrefix, XMLfile is optional' . PHP_EOL;
+  $mess .= 'TablePrefix, XMLfile are optional' . PHP_EOL;
   fwrite(STDERR, $mess);
   fwrite(STDOUT, 'error');
   exit(1);

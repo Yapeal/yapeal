@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /**
  * Used to set revision information for Yapeal.

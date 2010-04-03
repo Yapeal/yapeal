@@ -236,7 +236,7 @@ class YapealDBConnection {
           case 'B':
             // BLOBs need to be converted to hex strings if they aren't already.
             if ('0x' !== substr($row[$field], 0, 2)) {
-              $row[$field] = '0x' . bin2hex($row[$field]);
+              $set[] = '0x' . bin2hex($row[$field]);
             } else {
               $set[] = (string)$row[$field];
             };// else '0x' !== substr($row[$field], 0, 2) ...

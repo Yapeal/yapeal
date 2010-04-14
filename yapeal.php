@@ -47,7 +47,7 @@ define('DS', DIRECTORY_SEPARATOR);
 // Pull in Yapeal revision constants.
 $path = $dir . DS . 'revision.php';
 require_once realpath($path);
-# Make CGI work like CLI.
+// Make CGI work like CLI.
 if (PHP_SAPI != 'cli') {
   ini_set('implicit_flush', '1');
   ini_set('register_argc_argv', '1');

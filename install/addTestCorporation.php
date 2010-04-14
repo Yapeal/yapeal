@@ -1,3 +1,4 @@
+#!/usr/bin/php -Cq
 <?php
 /**
  * Used to add test corporation to utilRegisteredCorporation table.
@@ -34,6 +35,11 @@
 if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
+};
+// Make CGI work like CLI.
+if (PHP_SAPI != 'cli') {
+  ini_set('implicit_flush', '1');
+  ini_set('register_argc_argv', '1');
 };
 /**
  * @internal Only let this code be ran directly.

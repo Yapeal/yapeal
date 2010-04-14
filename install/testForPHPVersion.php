@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/php -Cq
 <?php
 /**
  * Contains code that test version of PHP run script.
@@ -36,11 +36,19 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
+// Make CGI work like CLI.
+if (PHP_SAPI != 'cli') {
+  ini_set('implicit_flush', '1');
+  ini_set('register_argc_argv', '1');
+};
 /**
- * @internal Don't let this code be ran directly.
+ * @internal Only let this code be ran directly.
  */
 if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
-  exit();
+  $mess = 'Including of ' . $argv[0] . ' is not allowed' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  fwrite(STDOUT, 'error');
+  exit(1);
 };
 if (version_compare(PHP_VERSION,"5.2.1","<")) {
   fwrite(STDOUT, "old");

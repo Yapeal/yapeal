@@ -40,6 +40,9 @@ if (isset($_REQUEST['viewSource'])) {
 if (PHP_SAPI != 'cli') {
   ini_set('implicit_flush', '1');
   ini_set('register_argc_argv', '1');
+  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
+  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
+  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
 };
 /**
  * @internal Only let this code be ran directly.

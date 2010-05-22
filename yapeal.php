@@ -51,6 +51,9 @@ require_once realpath($path);
 if (PHP_SAPI != 'cli') {
   ini_set('implicit_flush', '1');
   ini_set('register_argc_argv', '1');
+  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
+  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
+  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
 };
 // If being run from command-line look for options there if function available.
 if (function_exists('getopt')) {

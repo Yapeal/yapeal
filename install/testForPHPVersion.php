@@ -40,6 +40,9 @@ if (isset($_REQUEST['viewSource'])) {
 if (PHP_SAPI != 'cli') {
   ini_set('implicit_flush', '1');
   ini_set('register_argc_argv', '1');
+  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
+  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
+  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
 };
 /**
  * @internal Only let this code be ran directly.
@@ -52,7 +55,7 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 };
 if (version_compare(PHP_VERSION,"5.2.1","<")) {
   fwrite(STDOUT, "old");
-} else if (version_compare(PHP_VERSION,"5.3.1",">")) {
+} else if (version_compare(PHP_VERSION,"5.3.2",">")) {
   fwrite(STDOUT, "untested");
 } else {
   fwrite(STDOUT, "tested");

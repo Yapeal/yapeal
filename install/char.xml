@@ -184,6 +184,23 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="charCalendarEventAttendees">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`response`" type="C" size="32">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="charCertificates">
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
@@ -227,6 +244,27 @@
       <NOTNULL/>
     </field>
     <field name="`race`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charContactList">
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`inWatchList`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
@@ -521,7 +559,10 @@
       <DEFAULT value="0"/>
       <UNSIGNED/>
     </field>
-    <field name="`toListIDs`" type="X"/>
+    <field name="`toListID`" type="I8" size="20">
+      <DEFAULT value="0"/>
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charMarketOrders">

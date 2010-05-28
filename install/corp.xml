@@ -174,6 +174,10 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`useStandingsFromOwnerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpContainerLog">
@@ -871,6 +875,10 @@
     </field>
     <field name="`onlineTimestamp`" type="T">
       <NOTNULL/>
+    </field>
+    <field name="`standingOwnerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
     </field>
     <field name="`state`" type="I1" size="2">
       <NOTNULL/>

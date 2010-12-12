@@ -50,41 +50,26 @@ class SectionAccount {
   /**
    * @var array Holds the list of APIs for this section.
    */
-  private $apiList = array();
+  private $apiList;
   /**
-   * @var string Hold proxy string to pass to this section's APIs.
+   * @var string Holds section name.
    */
-  private $proxy = '';
-  /**
-   * @var string Hold section name.
-   */
-  private $section = '';
-  /**
-   * @var string Holds the Eve server name.
-   */
-  private $serverName = '';
+  private $section;
   /**
    * Constructor
    *
-   * @param string $proxy Allows overriding API server for example to use a
-   * different proxy on a per char/corp basis. It should contain a url format
-   * string made to used in sprintf() to replace %1$s with $api and %2$s with
-   * $section as needed to complete the url. For example:
-   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
    * @param array $allowedAPIs An array of admin allowed APIs in this section.
    * Used to limit which APIs out of the list of APIs from this section will be
    * fetched.
    */
-  public function __construct($proxy, $allowedAPIs) {
-    $this->section ='account';
+  public function __construct($allowedAPIs) {
+    $this->section = strtolower(str_replace('Section', '', __CLASS__));
     $path = YAPEAL_CLASS . 'api' . DS;
     $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
     $this->apiList = array_intersect($allowedAPIs, $knownApis);
-    $this->proxy = $proxy;
-    $this->serverName = 'Tranquility';
   }
   /**
-   * Function called by  Yapeal.php to start section pulling XML from servers.
+   * Function called by Yapeal.php to start section pulling XML from servers.
    *
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
@@ -93,61 +78,93 @@ class SectionAccount {
     $apiSuccess = 0;
     try {
       $userList = $this->getRegisteredUsers();
-      if (empty($userList)) {
-        $mess = 'No users for account section';
+      if (count($userList) == 0) {
+        $mess = 'No active users for account section';
         trigger_error($mess, E_USER_NOTICE);
         return FALSE;
       };// if empty $userList ...
-      // Ok now that we have a list of users that need updated
-      // we can check API for updates to their information.
-      foreach ($userList as $user) {
-        extract($user);
-        /* **********************************************************************
-         * Per user API pulls
-         * **********************************************************************/
-        $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
+      // Ok now that we have a list of users we can check which APIs need updated.
+      foreach ($userList as $usr) {
+        $userID = $usr['userID'];
+        try {
+          // Grab a user object.
+          $user = new RegisteredUser($userID, FALSE);
+        }
+        catch (Exception $e) {
+          // Can't update users that don't exist or cause errors.
+          continue;
+        }
+        if ($user->isActive == 0) {
+          // Skip inactive users.
+          continue;
+        };
+        if (isset($user->fullApiKey)) {
+          $apiKey = $user->fullApiKey;
+        } else {
+          $apiKey = $user->limitedApiKey;
+        };
+        // Get a list of allowed APIs
+        $apis = array_intersect($this->apiList, explode(' ', $user->activeAPI));
+        if (count($apis) == 0) {
+          $mess = 'None of the allowed APIs are currently active for ' . $userID;
+          trigger_error($mess, E_USER_NOTICE);
+          continue;
+        };
+        // Randomize order in which APIs are tried if there is a list.
+        if (count($apis) > 1) {
+          shuffle($apis);
+        };
         foreach ($apis as $api) {
-          ++$apiCount;
-          $class = $this->section . $api;
-          $tableName = YAPEAL_TABLE_PREFIX . $class;
-          // Should we wait to get API data
-          if (YapealDBConnection::dontWait($tableName, $userID)) {
-            // Set it so we wait a bit before trying again if something goes wrong.
-            $data = array('tableName' => $tableName,
-              'ownerID' => $userID, 'cachedUntil' => YAPEAL_START_TIME);
+          // If the cache for this API has expire try to get update.
+          if (CachedUntil::cacheExpired($api, $userID) === TRUE) {
+            ++$apiCount;
+            $class = $this->section . $api;
+            $tableName = YAPEAL_TABLE_PREFIX . $class;
+            // These are passed on to the API class instance and used as part of
+            // hash for lock.
+            $params = array('apiKey' => $apiKey, 'userID' => $userID);
+            $parameters = '';
+            foreach ($params as $k => $v) {
+              $parameters .= $k . '=' . $v;
+            };
+            $hash = hash('sha1', $class . $parameters);
+            // Use lock to keep from wasting time trying to do API that another
+            // Yapeal is already working on.
             try {
-              YapealDBConnection::upsert($data,
-                YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+              $con = YapealDBConnection::connect(YAPEAL_DSN);
+              $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
+              if ($con->GetOne($sql) != 1) {
+                $mess = 'Failed to get lock for ' . $class . $hash;
+                trigger_error($mess, E_USER_NOTICE);
+                continue;
+              };// if $con->GetOne($sql) ...
             }
-            catch(ADODB_Exception $e) {}
-          } else {
-            continue;
-          };// else dontWait ...
-          $params = array('apiKey' => $apiKey, 'serverName' => $this->serverName,
-            'userID' => $userID);
-          $instance = new $class($this->proxy, $params);
-          if ($instance->apiFetch()) {
-            ++$apiSuccess;
-          };
-          if ($instance->apiStore()) {
-            ++$apiSuccess;
-          };
-          trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
-          $instance = null;
-          // See if we've taken to long to run and exit if TRUE.
+            catch(ADODB_Exception $e) {
+              continue;
+            }
+            // Give each API 60 seconds to finish. This should never happen but is
+            // here to catch runaways.
+            set_time_limit(60);
+            $instance = new $class($params);
+            if ($instance->apiStore()) {
+              ++$apiSuccess;
+            };
+            $instance = null;
+          };// if CachedUntil::cacheExpired...
+          // See if Yapeal has been running for longer than 'soft' limit.
           if (YAPEAL_MAX_EXECUTE < time()) {
-            $mess = 'Yapeal took to long to execute';
+            $mess = 'Yapeal has been working very hard and needs a break';
             trigger_error($mess, E_USER_NOTICE);
             exit;
-          };// if YAPEAL_START_TIME < $cuntil ...
+          };// if YAPEAL_MAX_EXECUTE < time() ...
         };// foreach $apis ...
-      }; // foreach $userList
+      };// foreach $userList
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      // Do nothing use observers to log info.
     }
-    // Only truly successful if API was fetched and stored.
-    if ($apiCount * 2 == $apiSuccess) {
+    // Only truly successful if all APIs were fetched and stored.
+    if ($apiCount == $apiSuccess) {
       return TRUE;
     } else {
       return FALSE;
@@ -163,13 +180,16 @@ class SectionAccount {
   private function getRegisteredUsers() {
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of user(s) we need to do updates for
-    $sql = 'select `activeAPI`,';
-    $sql .= 'coalesce(`fullApiKey`,`limitedApiKey`) as apiKey,`userID`';
+    $sql = 'select `userID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser`';
-    $sql .= ' where `isActive`=1';
-    $sql .= ' order by `userID` asc';
-    return $con->GetAll($sql);
+    $result = $con->GetAll($sql);
+    // Randomize order so no one user can starve the rest in case of errors,
+    // etc.
+    if (count($result) > 1) {
+      shuffle($result);
+    };
+    return $result;
   }// function getRegisteredUsers
 }
 ?>

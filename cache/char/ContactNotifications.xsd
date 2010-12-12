@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="notificationID" use="required" type="eveID"/>
+    <xs:attribute name="senderID" use="required" type="eveID"/>
+    <xs:attribute name="senderName" use="required" type="xs:string"/>
+    <xs:attribute name="sentDate" use="required" type="eveDT"/>
+    <xs:attribute name="messageData" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

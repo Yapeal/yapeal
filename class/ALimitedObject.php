@@ -47,10 +47,9 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 abstract class ALimitedObject {
   /**
-   * List of column names and their ADOdb generic types.
-   * @var array
+   * @var array List of columns and their generic ADO types.
    */
-  protected $types;
+  protected $colTypes = array();
   /**
    * Holds the current properties.
    * @var array
@@ -63,10 +62,11 @@ abstract class ALimitedObject {
    *
    * @return mixed Value of $name from $properties if it exists or NULL if not.
    *
-   * @throws DomainException If $name not in $this->types throws DomainException.
+   * @throws DomainException If $name not in $this->colTypes throws a
+   * DomainException.
    */
   public function __get($name) {
-    if (!in_array($name, $this->types)) {
+    if (!array_key_exists($name, $this->colTypes)) {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...
@@ -101,8 +101,9 @@ abstract class ALimitedObject {
     // This will only happen if a new property that doesn't exist is being made.
     if (is_array($value)) {
       $this->$name = $value;
+      return FALSE;
     };
-    if (!in_array($name, $this->types)) {
+    if (!array_key_exists($name, $this->colTypes)) {
       $mess = 'Unknown field: ' . $name;
       throw new DomainException($mess, 1);
     };// if !in_array...
@@ -112,6 +113,43 @@ abstract class ALimitedObject {
     $this->properties[$name] = $value;
     return $ret;
   }// function __set
+  /**
+   * Magic function to show object when being printed.
+   *
+   * The output is formatted as CSV (Comma Separated Values) with a header line
+   * and string quoted. Note that decimal values are treated like strings and
+   * blobs are in hexdecminal form with 0x appended but not quoted.
+   *
+   * @return string Returns the rows ready to be printed.
+   */
+  public function __toString() {
+    $value = '"' . implode('","', array_keys($this->properties)) . '"' . PHP_EOL;
+    $set = array();
+    foreach ($this->properties as $k => $v) {
+      switch ($this->colTypes[$k]) {
+        case 'C':
+        case 'D':
+        case 'N':
+        case 'T':
+        case 'X':
+          // Quote all text, decimal or date type fields.
+          $set[] = '"' . $v . '"';
+          break;
+        case 'B':
+          // BLOBs need to be converted to hex strings if they aren't already.
+          if ('0x' !== substr($v, 0, 2)) {
+            $set[] = '0x' . bin2hex($v);
+          } else {
+            $set[] = (string)$v;
+          };// else '0x' !== substr($row[$field], 0, 2) ...
+          break;
+        default:
+        $set[] = (string)$v;
+      };// switch $this->colTypes[$k] ...
+    };// foreach $this->properties ...
+    $value .= implode(',', $set) . PHP_EOL;
+    return $value;
+  }// function __toString ...
   /**
    * Used to unset fields of $properties array.
    *

@@ -48,6 +48,19 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class RegisteredCharacter extends ALimitedObject implements IGetBy {
   /**
+   * @var string Holds an instance of the DB connection.
+   */
+  protected $con;
+  /**
+   * @var string Holds the table name of the query is being built.
+   */
+  protected $tableName;
+  /**
+   * Holds query builder object.
+   * @var object
+   */
+  protected $qb;
+  /**
    * List of all section APIs
    * @var array
    */
@@ -57,11 +70,6 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @var bool
    */
   private $recordExists;
-  /**
-   * Table name
-   * @var string
-   */
-  private $table;
   /**
    * Constructor
    *
@@ -77,40 +85,56 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   public function __construct($id = NULL, $create = TRUE) {
     $path = YAPEAL_CLASS . 'api' . DS;
     $this->apiList = FilterFileFinder::getStrippedFiles($path, 'char');
-    $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter';
-    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
-    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
-    // Make an array of required and optional fields
-    $this->types = array_merge($rkeys, $okeys);
+    $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
+    try {
+      // Get a database connection.
+      $this->con = YapealDBConnection::connect(YAPEAL_DSN);
+    }
+    catch (ADODB_Exception $e) {
+      $mess = 'Failed to get database connection in ' . __CLASS__;
+      throw new RuntimeException($mess, 1);
+    }
+    // Get a new query builder object.
+    $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
+    // Get a list of column names and their ADOdb generic types.
+    $this->colTypes = $this->qb->getColumnTypes();
     // Was $id set?
     if (!empty($id)) {
-      // If $id is a number and doesn't exist yet set characterID with it.
       // If $id has any characters other than 0-9 it's not a characterID.
-      if (0 == strlen(str_replace(range(0,9),'',$id))) {
+      if (0 == strlen(str_replace(range(0,9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
           if (TRUE == $create) {
+            // If $id is a number and doesn't exist yet set characterID with it.
             $this->properties['characterID'] = $id;
           } else {
             $mess = 'Unknown character ' . $id;
-            throw new DomainException($mess, 1);
+            throw new DomainException($mess, 2);
           };// else ...
         };
         // else if it's a string ...
       } else if (is_string($id)) {
         if (FALSE === $this->getItemByName($id)) {
           if (TRUE == $create) {
+            // If $id is a string and doesn't exist yet set name with it.
             $this->properties['name'] = $id;
           } else {
             $mess = 'Unknown character ' . $id;
-            throw new DomainException($mess, 2);
+            throw new DomainException($mess, 3);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer or a string';
-        throw new InvalidArgumentException($mess, 3);
+        throw new InvalidArgumentException($mess, 4);
       };// else ...
     };// if !empty $id ...
   }// function __construct
+  /**
+   * Destructor used to make sure to release ADOdb resource correctly more for
+   * peace of mind than actual need.
+   */
+  public function __destruct() {
+    $this->con = NULL;
+  }// function __destruct
   /**
    * Used to add an API to the list in activeAPI.
    *
@@ -124,7 +148,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   public function addActiveAPI($name) {
     if (!in_array($name, $this->apiList)) {
       $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 1);
+      throw new DomainException($mess, 5);
     };// if !in_array...
     $apis = explode(' ', $this->properties['activeAPI']);
     if (in_array($name, $apis)) {
@@ -149,7 +173,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   public function deleteActiveAPI($name) {
     if (!in_array($name, $this->apiList)) {
       $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 1);
+      throw new DomainException($mess, 6);
     };// if !in_array...
     $apis = explode(' ', $this->properties['activeAPI']);
     $ret = FALSE;
@@ -171,14 +195,22 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool TRUE if char was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', $this->types) . '`';
-    $sql .= ' from `' . $this->table . '`';
+    $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
+    $sql .= ' from `' . $this->tableName . '`';
     $sql .= ' where `characterID`=' . $id;
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $result = $con->GetRow($sql);
+      $result = $this->con->GetRow($sql);
       if (!empty($result)) {
         $this->properties = $result;
+        $parent = $this->parentTableExists();
+        if (!empty($parent)) {
+          $mess = 'Parent record(s) missing from ';
+          $mess .= implode(', ', array_keys($parent)) . ' for ';
+          $mess .= implode(', ', $parent);
+          $mess .= ' making characterID ' . $this->properties['characterID'];
+          $mess .= ' in utilRegisteredCharacter incomplete.';
+          trigger_error($mess, E_USER_WARNING);
+        };
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
@@ -187,7 +219,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     catch (ADODB_Exception $e) {
       $this->recordExists = FALSE;
     }
-    return $this->recordExists;
+    return $this->recordExists();
   }// function getItemById
   /**
    * Used to get item from table by name.
@@ -197,14 +229,22 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool TRUE if item was retrieved else FALSE.
    */
   public function getItemByName($name) {
-    $sql = 'select `' . implode('`,`', $this->types) . '`';
-    $sql .= ' from `' . $this->table . '`';
+    $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
+    $sql .= ' from `' . $this->tableName . '`';
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql .= ' where `name`=' . $con->qstr($name);
-      $result = $con->GetRow($sql);
+      $sql .= ' where `name`=' . $this->con->qstr($name);
+      $result = $this->con->GetRow($sql);
       if (!empty($result)) {
         $this->properties = $result;
+        $parent = $this->parentTableExists();
+        if (!empty($parent)) {
+          $mess = 'Parent record(s) missing from ';
+          $mess .= implode(', ', array_keys($parent)) . ' for ';
+          $mess .= implode(', ', $parent);
+          $mess .= ' making characterID ' . $this->properties['characterID'];
+          $mess .= ' in utilRegisteredCharacter incomplete.';
+          trigger_error($mess, E_USER_WARNING);
+        };
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
@@ -213,8 +253,24 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     catch (ADODB_Exception $e) {
       $this->recordExists = FALSE;
     }
-    return $this->recordExists;
+    return $this->recordExists();
   }// function getItemByName
+  /**
+   * Used to check for required record in parent table(s) that must exist.
+   *
+   * @return array Returns empty array if parent table record(s) exists else an
+   * assoc array of table name and ID of missing record(s).
+   */
+  private function parentTableExists() {
+    $result = array();
+    try {
+      $user = new RegisteredUser($this->properties['userID'], FALSE);
+    }
+    catch (Exception $e) {
+      $result['utilRegisteredUser'] = $this->properties['userID'];
+    }
+    return $result;
+  }// function parentTableExists
   /**
    * Function used to check if database record already existed.
    *
@@ -224,19 +280,52 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     return $this->recordExists;
   }// function recordExists
   /**
+   * Used to set default for column.
+   *
+   * @param string $name Name of the column.
+   * @param mixed $value Value to be used as default for column.
+   *
+   * @return bool Returns TRUE if column exists in table and default was set.
+   */
+  public function setDefault($name, $value) {
+    return $this->qb->setDefault($name, $value);
+  }// function setDefault
+  /**
+   * Used to set defaults for multiple columns.
+   *
+   * @param array $defaults List of column names and new default values.
+   *
+   * @return bool Returns TRUE if all column defaults could be set, else FALSE.
+   */
+  public function setDefaults(array $defaults) {
+    return $this->qb->setDefaults($defaults);
+  }// function setDefaults
+  /**
    * Used to store data into table.
    *
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    try {
-      YapealDBConnection::upsert($this->properties,
-        $this->table, YAPEAL_DSN);
-    }
-    catch (ADODB_Exception $e) {
+    $apis = explode(' ', $this->properties['activeAPI']);
+    $unknowns = array_diff($apis, $this->apiList);
+    if (!empty($unknowns)) {
+      $mess = 'activeAPI contains the following unknown APIs: ';
+      $mess .= implode(', ', $unknowns);
+      trigger_error($mess, E_USER_WARNING);
+    };
+    $parent = $this->parentTableExists();
+    if (!empty($parent)) {
+      $mess = 'Parent record(s) missing from ';
+      $mess .= implode(', ', array_keys($parent)) . ' for ';
+      $mess .= implode(', ', $parent);
+      $mess .= ' making characterID ' . $this->properties['characterID'];
+      $mess .= ' in utilRegisteredCharacter incomplete and could not store.';
+      throw new LogicException($mess, 7);
+    };
+    if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
-    }
-    return TRUE;
+    };// if FALSE === ...
+    return $this->qb->store();
   }// function store
 }
 ?>

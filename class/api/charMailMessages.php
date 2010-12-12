@@ -44,66 +44,76 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store char MailMessages API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charMailMessages extends ACharacter {
+class charMailMessages extends AChar {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'MailMessages';
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to store XML to MailMessages table.
+   * Constructor
    *
-   * @return Bool Return TRUE if store was successful.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $this->xml = $this->xml->xpath($this->xpath);
-      if (count($this->xml) > 0) {
-        try {
-          $extras = array('ownerID' => $this->characterID,
-            'toCorpOrAllianceID' => 0, 'toListID' => 0);
-          foreach ($this->xml as $row) {
-            if ($row['toCorpOrAllianceID'] == '') {
-              $row['toCorpOrAllianceID'] = 0;
-            };// if $row['toCorpOrAllianceID'] ...
-            if ($row['toListID'] == '') {
-              $row['toListID'] = 0;
-            };// if $row['toCorpOrAllianceID'] ...
-          };// foreach $this->xml ...
-          YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
-            YAPEAL_DSN, $extras);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $this->characterID;
-      $mess .= ' in ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $this->xml ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
+  /**
+   * Simple <rowset> per API parser for XML.
+   *
+   * Most common API style is a simple <rowset>. This implementation allows most
+   * API classes to be empty except for a constructor which sets $this->api and
+   * calls their parent constructor.
+   *
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Set any column defaults needed.
+    $qb->setDefault('ownerID', $this->ownerID);
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  if (($this->xr->name == 'toCorpOrAllianceID' ||
+                    $this->xr->name == 'toListID') &&
+                    $this->xr->value == '') {
+                    $row[$this->xr->name] = 0;
+                  } else {
+                    $row[$this->xr->name] = $this->xr->value;
+                  };// else $this->xr->name ...
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                break;
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Insert any leftovers.
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+        };// switch $this->xr->nodeType
+      };// while $xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
 }
 ?>

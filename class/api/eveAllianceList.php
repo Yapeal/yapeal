@@ -48,131 +48,138 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class eveAllianceList extends AEve {
   /**
-   * @var array Group of alliance rows to be added to table.
+   * @var object Query instance for corporation rows to be added to table.
    */
-  private $alliances = array();
+  private $corporations;
   /**
-   * @var string Holds the name of the API.
+   * Constructor
+   *
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  protected $api = 'AllianceList';
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
   /**
-   * @var array Group of corporation rows to be added to table.
+   * Per API parser for XML.
+   *
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  private $corporations = array();
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Get a new query instance.
+    $this->corporations = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations', YAPEAL_DSN);
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                // Grab allianceID for memberCorporation table.
+                $allianceID = $this->xr->getAttribute('allianceID');
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  $row[$this->xr->name] = $this->xr->value;
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                // Process member corporations.
+                if ($this->xr->isEmptyElement != 1) {
+                  $this->rowset($allianceID);
+                };// if $this->xr->isEmptyElement ...
+                break;
+              default:// Nothing to do.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Insert any leftovers.
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              // Insert any leftovers.
+              if (count($this->corporations) > 0) {
+                $this->corporations->store();
+              };// if count $rows ...
+              $this->corporations = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
   /**
-   * Used to save an item into database.
+   * Used to store XML to rowset tables.
    *
-   * Parent item (object) should call all child(ren)'s apiStore() as appropriate.
+   * @param string $allianceID ID of alliance that member corps belong to.
    *
-   * @return boolean Returns TRUE if item was saved to database.
+   * @return Bool Return TRUE if store was successful.
    */
-  function apiStore() {
-    $ret = FALSE;
-    if ($this->xml instanceof SimpleXMLElement) {
-      if (count($this->xml->result->rowset->row) > 0) {
-        try {
-          $tableName = $this->tablePrefix . $this->api;
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          // Empty out old data then upsert (insert) new
-          $sql = 'truncate table ' . $tableName;
-          $con->Execute($sql);
-          $tableName = $this->tablePrefix . 'MemberCorporations';
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          // Empty out old data then upsert (insert) new
-          $sql = 'truncate table ' . $tableName;
-          $con->Execute($sql);
-          // Recurse through the XML and insert groups of alliances and member
-          // corporations.
-          $this->recursion($this->xml);
-          // Insert any leftover alliances.
-          if (count($this->alliances) > 0) {
-            $tableName = $this->tablePrefix . $this->api;
-            YapealDBConnection::multipleUpsert($this->alliances, $tableName,
-              YAPEAL_DSN);
-          };
-          if (count($this->corporations) > 0) {
-            $tableName = $this->tablePrefix . 'MemberCorporations';
-            YapealDBConnection::multipleUpsert($this->corporations, $tableName,
-              YAPEAL_DSN);
-          };
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        //$this->memberCorporations();
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $datum ...
-      try {
-        $tableName = $this->tablePrefix . $this->api;
-        // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
-        $data = array('tableName' => $tableName, 'ownerID' => 0,
-          'cachedUntil' => $cuntil);
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore()
+  protected function rowset($allianceID) {
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              $row['allianceID'] = $allianceID;
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $this->corporations->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function rowset
   /**
-   * Navigates XML and groups of alliances and member corporations to be added
-   * to tables.
+   * Method used to prepare database table(s) before parsing API XML data.
    *
-   * @param SimpleXMLElement $node Current element from tree.
-   * @param integer $alliance allianceID of corporation.
-   * Used to propagate information from parents to children that don't include it
-   * by default.
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
    *
-   * @return integer Current alliance of corporation.
+   * @return bool Will return TRUE if table(s) were prepared correctly.
    */
-  protected function recursion($node, $alliance = 0) {
-    $nodeName = $node->getName();
-    if ($nodeName == 'row') {
-      if (isset($node['allianceID'])) {
-        $alliance = $node['allianceID'];
-        $row = array();
-        foreach ($node->attributes() as $k => $v) {
-          $row[(string)$k] = (string)$v;
-        };
-        $this->alliances[] = $row;
-        // Insert alliances as group is filled.
-        if (YAPEAL_MAX_UPSERT == count($this->alliances)) {
-          $tableName = $this->tablePrefix . $this->api;
-          YapealDBConnection::multipleUpsert($this->alliances,
-            $tableName, YAPEAL_DSN);
-          $this->alliances = array();
-        };
-      } else {
-        $node->addAttribute('allianceID', $alliance);
-      };// if isset $node['allianceID']...
-      if (isset($node['corporationID'])) {
-        $row = array();
-        foreach ($node->attributes() as $k => $v) {
-          $row[(string)$k] = (string)$v;
-        };
-        $this->corporations[] = $row;
-        // Insert corporations as group is filled.
-        if (YAPEAL_MAX_UPSERT == count($this->corporations)) {
-          $tableName = $this->tablePrefix . 'MemberCorporations';
-          YapealDBConnection::multipleUpsert($this->corporations,
-            $tableName, YAPEAL_DSN);
-          $this->corporations = array();
-        };
-      };
-    };// if $nodeName=='row' ...
-    if ($children = $node->children()) {
-      foreach ($children as $child) {
-        $alliance = $this->recursion($child, $alliance);
-      };// foreach children as child
-    };
-    return $alliance;
-  }// function editMemberCorporations
+  protected function prepareTables() {
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      // Empty out old data then upsert (insert) new.
+      $sql = 'truncate table `';
+      $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
+      $con->Execute($sql);
+      // Empty out old data then upsert (insert) new.
+      $sql = 'truncate table `';
+      $sql .= YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations' . '`';
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }// function prepareTables
 }
 ?>

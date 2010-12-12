@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:include schemaLocation="../rowset.xsd"/>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowset" type="rowset"/>
+        <xs:element name="dataTime" type="eveDT"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="rowType">
+    <xs:attribute name="allianceID" use="required" type="eveID"/>
+    <xs:attribute name="corporationID" use="required" type="eveID"/>
+    <xs:attribute name="factionID" use="required" type="eveID"/>
+    <xs:attribute name="solarSystemID" use="required" type="eveID"/>
+    <xs:attribute name="solarSystemName" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

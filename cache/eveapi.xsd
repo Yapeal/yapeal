@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="eveapi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="currentTime" type="eveDT"/>
+        <xs:choice maxOccurs="1">
+          <xs:element ref="result"/>
+          <xs:element name="error">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="cachedUntil" type="eveDT"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- Eve types -->
+  <xs:simpleType name="eveBoolean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="True"/>
+      <xs:enumeration value="False"/>
+      <xs:enumeration value="true"/>
+      <xs:enumeration value="false"/>
+      <xs:enumeration value="TRUE"/>
+      <xs:enumeration value="FALSE"/>
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="eveColumns">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="(\w+)|(\w+(,\w+)*,\w+)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="eveDT">
+    <xs:restriction base="xs:string">
+      <xs:pattern value=""/>
+      <xs:pattern value="(\d{4})-(((0[13578])|10|12)-((0[1-9])|([1-2]\d)|30|31)|((0[469])|11)-((0[1-9])|([1-2]\d)|30)|(02-((0[1-9])|([1-2]\d))))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="eveID">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" fixed="true"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- Eve Attributes -->
+  <xs:attributeGroup name="rowsetAttrs">
+    <xs:attribute name="columns" use="required" type="eveColumns"/>
+    <xs:attribute name="key" use="required" type="xs:NCName"/>
+    <xs:attribute name="name" use="required" type="xs:NCName"/>
+  </xs:attributeGroup>
+</xs:schema>

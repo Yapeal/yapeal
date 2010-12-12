@@ -44,16 +44,29 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-/**
- * Track date of script.
- */
-define('YAPEAL_DATE', str_replace('@', '', '@builddate@'));
-/**
- * Track stability of script.
- */
-define('YAPEAL_STABILITY', 'beta');
-/**
- * Track version of script.
- */
-define('YAPEAL_VERSION', str_replace('@', '', '@svnversion@'));
+// Define short name for directory separator which always uses unix '/'.
+if (!defined('DS')) {
+  /**
+   * @ignore
+   */
+  define('DS', '/');
+};
+if (!defined('YAPEAL_DATE')) {
+  /**
+   * Track date of script.
+   */
+  define('YAPEAL_DATE', str_replace('@', '', '@builddate@'));
+};
+if (!defined('YAPEAL_STABILITY')) {
+  /**
+   * Track stability of script.
+   */
+  define('YAPEAL_STABILITY', str_replace('@', '', '@svnstability@'));
+};
+if (!defined('YAPEAL_VERSION')) {
+  /**
+   * Track version of script.
+   */
+  define('YAPEAL_VERSION', str_replace('@', '', '@svnversion@'));
+};
 ?>

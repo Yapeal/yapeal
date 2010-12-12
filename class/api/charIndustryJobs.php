@@ -44,56 +44,21 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store char IndustryJobs API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charIndustryJobs extends ACharacter {
+class charIndustryJobs extends AChar {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'IndustryJobs';
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to store XML to IndustryJobs table.
+   * Constructor
    *
-   * @return Bool Return TRUE if store was successful.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $this->xml = $this->xml->xpath($this->xpath);
-      if (count($this->xml) > 0) {
-        try {
-          $extras = array('ownerID' => $this->characterID);
-          YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
-            YAPEAL_DSN, $extras);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $datum ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
 }
 ?>

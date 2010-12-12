@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="base" use="required" type="xs:string"/>
+    <xs:attribute name="baseID" use="required" type="eveID"/>
+    <xs:attribute name="characterID" use="required" type="eveID"/>
+    <xs:attribute name="grantableRoles" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="location" use="required" type="xs:string"/>
+    <xs:attribute name="locationID" use="required" type="eveID"/>
+    <xs:attribute name="logoffDateTime" use="required" type="eveDT"/>
+    <xs:attribute name="logonDateTime" use="required" type="eveDT"/>
+    <xs:attribute name="name" use="required" type="xs:string"/>
+    <xs:attribute name="roles" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="shipType" use="required" type="xs:string"/>
+    <xs:attribute name="shipTypeID" use="required" type="eveID"/>
+    <xs:attribute name="startDateTime" use="required" type="eveDT"/>
+    <xs:attribute name="title" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

@@ -25,6 +25,7 @@
  * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Install
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -50,7 +51,7 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
   fwrite(STDOUT, 'error');
   exit(1);
 };
-$ret = 'error';
+$ret = 'false';
 if ($argc != 5) {
   $mess = 'Host, Username, Password, DB are required in ' . $argv[0] . PHP_EOL;
   fwrite(STDERR, $mess);
@@ -70,11 +71,8 @@ if ($mysqli->connect_error || mysqli_connect_error()) {
   fwrite(STDOUT, $ret);
   exit(2);
 };
-$query = 'select count(*)';
-$query .= ' from `SCHEMATA`';
-$query .= ' where `SCHEMA_NAME`=';
-$query .= "'" . $mysqli->real_escape_string($argv[4]) . "'";
-if ($result = $mysqli->query($query)) {
+$sql = 'show databases';
+if ($result = $mysqli->query($sql)) {
   if ($mysqli->connect_error || mysqli_connect_error()) {
     $mess = 'Connection error (' . mysqli_connect_errno() . ') ' .
       mysqli_connect_error() . PHP_EOL;
@@ -82,19 +80,17 @@ if ($result = $mysqli->query($query)) {
     fwrite(STDOUT, $ret);
     exit(3);
   };
-  $count = $result->fetch_row();
-  $result->free();
-  if ($count[0] == 1) {
-    $ret = 'true';
-    $mess = $argv[4] . ' database does exist' . PHP_EOL;
-    fwrite(STDERR, $mess);
-  } else {
-    $ret = 'false';
-    $mess = $argv[4] . ' database does not exist' . PHP_EOL;
-    fwrite(STDERR, $mess);
+  $mess = $argv[4] . ' database does not exist' . PHP_EOL;
+  while ($row = $result->fetch_row()) {
+    if ((string)$row[0] == (string)$argv[4]) {
+      $ret = 'true';
+      $mess = $argv[4] . ' database does exist' . PHP_EOL;
+    };
   };
+  $result->free();
 };
 $mysqli->close();
+fwrite(STDERR, $mess);
 fwrite(STDOUT, $ret);
 exit(0);
 ?>

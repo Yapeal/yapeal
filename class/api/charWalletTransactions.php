@@ -44,203 +44,176 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store char WalletTransactions API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charWalletTransactions extends ACharacter {
+class charWalletTransactions extends AChar {
   /**
-   * @var string Holds the name of the API.
+   * @var string Holds the refID from each row in turn to use when walking.
    */
-  protected $api = 'WalletTransactions';
+  protected $beforeID;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var string Holds the date from each row in turn to use when walking.
    */
-  protected $xml = array();
+  protected $date;
   /**
-   * @var string Xpath used to select data from XML.
+   * @var integer Hold row count used in walking.
    */
-  private $xpath = '//row';
+  protected $rowCount;
   /**
-   * Used to get an item from Eve API.
+   * Constructor
    *
-   * @return boolean Returns TRUE if item received.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiFetch() {
-    $accounts = array(1000);
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    $oldest = strtotime('7 days ago');
-    foreach ($accounts as $account) {
-      $beforeID = 0;
-      do {
-        $cnt = 0;
-        $postData = array('accountKey' => $account, 'apiKey' => $this->apiKey,
-          'beforeTransID' => $beforeID, 'characterID' => $this->characterID,
-          'userID' => $this->userID
-        );
-        $xml = FALSE;
-        try {
-          // Build base part of cache file name.
-          $cacheName = $this->serverName . $tableName;
-          $cacheName .= $this->characterID . $account . $beforeID;
-          // Try to get XML from local cache first if we can.
-          $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CHAR);
-          if ($xml === FALSE) {
-            $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CHAR,
-              $postData, $this->proxy);
-            if ($xml instanceof SimpleXMLElement) {
-              // Get current API time and add an hour to it.
-              $currentTime = strtotime((string)$xml->currentTime[0] . ' +0000');
-              $ncu = gmdate('Y-m-d H:i:s', $currentTime + 3600);
-              // Change XML cachedUntil to correct value.
-              $xml->cachedUntil[0] = $ncu;
-              // Store XML in local cache.
-              YapealApiRequests::cacheXml($xml->asXML(), $cacheName,
-                YAPEAL_API_CHAR);
-            };// if $xml ...
-          };// if $xml === FALSE ...
-          if ($xml !== FALSE) {
-            $this->xml[$account][] = $xml;
-            $datum = $xml->xpath($this->xpath);
-            $cnt = count($datum);
-            if ($cnt > 0) {
-              // Get date/time of last record
-              $lastDT = strtotime($datum[$cnt - 1]['transactionDateTime'] . ' +0000');
-              // If last record is less than a week old we might be able to
-              // continue walking backwards through records.
-              if ($oldest < $lastDT) {
-                $beforeID = (string)$datum[$cnt - 1]['transactionID'];
-                // Pause to let CCP figure out we got last 1000 records before
-                // trying to getting another batch :P
-                sleep(2);
-              } else {
-                // Leave while loop if we can't walk back anymore.
-                break;
-              }; // if $oldest<$lastDT
-            } else {
-              $mess = 'No records for ' . $tableName;
-              trigger_error($mess, E_USER_NOTICE);
-              break;
-            }
-          } else {
-            $mess = 'No XML found for ' . $tableName;
-            trigger_error($mess, E_USER_NOTICE);
-            continue 2;// while, foreach $accounts
-          };// else $xml !== FALSE ...
-        }
-        catch (YapealApiErrorException $e) {
-          if ($this->handleApiRetry($e)) {
-            continue 2;
-          } else if ($this->handleApiError($e)) {
-            return FALSE;
-          };
-          continue 2;
-        }
-        catch (YapealApiFileException $e) {
-          continue 2;
-        }
-        catch (ADODB_Exception $e) {
-          continue 2;
-        }
-      } while ($cnt == 1000);
-      ++$ret;
-    };// foreach $accounts ...
-    if ($ret == 1) {
-      return TRUE;
-    };
-    return FALSE;
-  }// function apiFetch
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
   /**
-   * Used to store XML to WalletJournal table.
+   * Used to store XML to MySQL table(s).
    *
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    $accounts = array(1000);
-    $ret = 0;
-    $cuntil = '1970-01-01 00:00:01';
-    $tableName = $this->tablePrefix . $this->api;
-    if (empty($this->xml)) {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      return FALSE;
-    };// if empty $this->xml ...
-    foreach ($accounts as $account) {
-      if (empty($this->xml[$account])) {
-        $mess = 'There was no XML data to store for ' . $tableName . $account;
-        trigger_error($mess, E_USER_NOTICE);
-        continue;
-      };// if empty $this->xml[$account] ...
-      foreach ($this->xml[$account] as $xml) {
-        $cuntil = (string)$xml->cachedUntil[0];
-        $xml = $xml->xpath($this->xpath);
-        $cnt = count($xml);
-        if ($cnt > 0) {
-          try {
-            $extras = array('ownerID' => $this->characterID,
-              'accountKey' => $account);
-            for ($i = 0, $grp = (int)ceil($cnt / YAPEAL_MAX_UPSERT),$pos = 0;
-                $i < $grp;++$i, $pos += YAPEAL_MAX_UPSERT) {
-              $group = array_slice($xml, $pos, YAPEAL_MAX_UPSERT, TRUE);
-              YapealDBConnection::multipleUpsertAttributes($group, $tableName,
-                YAPEAL_DSN, $extras);
-            };// for $i = 0...
-          }
-          catch (ADODB_Exception $e) {
-            // Any failure to store XML on any account returns FALSE;
-            continue 2;
-          }
-        } else {
-        $mess = 'There was no XML data to store for ' . $tableName . $account;
-        trigger_error($mess, E_USER_NOTICE);
-        };// else count $datum ...
-      };// foreach $this->xml[$account] ...
-      ++$ret;
-    };// foreach $accounts ...
+    // This counter is used to insure do ... while can't become infinite loop.
+    $counter = 1000;
+    $this->date = gmdate('Y-m-d H:i:s');
+    $this->beforeID = '0';
     try {
-      $data = array( 'tableName' => $tableName,
-        'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-      );
-      YapealDBConnection::upsert($data,
-        YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+      do {
+        // Give each API 60 seconds to finish. This should never happen but is
+        // here to catch runaways.
+        set_time_limit(60);
+        /* Not going to assume here that API servers figure oldest allowed
+         * entry based on a saved time from first pull but instead use current
+         * time. The few seconds of difference shouldn't cause any missed data
+         * and is safer than assuming.
+         */
+        $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
+        // Need to add extra stuff to normal parameters to make walking work.
+        $apiParams = $this->params;
+        // Added the accountKey to params.
+        $apiParams['accountKey'] = 1000;
+        // This tells API server where to start from when walking.
+        $apiParams['beforeTransID'] = $this->beforeID;
+        // First get a new cache instance.
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        // See if there is a valid cached copy of the API XML.
+        $result = $cache->getCachedApi();
+        // If it's not cached need to try to get it.
+        if (FALSE === $result) {
+          $proxy = $this->getProxy();
+          $con = new YapealNetworkConnection();
+          $result = $con->retrieveXml($proxy, $apiParams);
+          // FALSE means there was an error and it has already been report so just
+          // return to caller.
+          if (FALSE === $result) {
+            return FALSE;
+          };
+          // Cache the received XML.
+          $cache->cacheXml($result);
+          // Check if XML is valid.
+          if (FALSE === $cache->isValid()) {
+            // No use going any farther if the XML isn't valid.
+            return FALSE;
+          };
+        };// if FALSE === $result ...
+        // Create XMLReader.
+        $this->xr = new XMLReader();
+        // Pass XML to reader.
+        $this->xr->XML($result);
+        // Outer structure of XML is processed here.
+        while ($this->xr->read()) {
+          if ($this->xr->nodeType == XMLReader::ELEMENT &&
+            $this->xr->localName == 'result') {
+            $result = $this->parserAPI();
+          };// if $this->xr->nodeType ...
+        };// while $this->xr->read() ...
+        $this->xr->close();
+        // Leave loop if already got as many entries as API servers allow.
+        if ($this->rowCount != 1000 || $this->date < $oldest) {
+          break;
+        };
+      } while ($counter--);
+    }
+    catch (YapealApiErrorException $e) {
+      // Any API errors that need to be handled in some way are handled in this
+      // function.
+      $this->handleApiError($e);
+      return FALSE;
     }
     catch (ADODB_Exception $e) {
-      // Already logged nothing to do here.
+      return FALSE;
     }
-    // If we stored everything correctly return TRUE.
-    if ($ret == 1) {
-      return TRUE;
-    };
-    return FALSE;
+    return $result;
   }// function apiStore
   /**
-   * Handles some Eve API error codes in special ways.
+   * Simple <rowset> per API parser for XML.
    *
-   * @param object $e Eve API exception returned.
+   * Most common API style is a simple <rowset>. This implementation allows most
+   * API classes to be empty except for a constructor which sets $this->api and
+   * calls their parent constructor.
    *
-   * @return bool Returns TRUE if handled the error else FALSE.
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  private function handleApiRetry($e) {
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Set any column defaults needed.
+    $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
+    $qb->setDefaults($defaults);
     try {
-      switch ($e->getCode()) {
-        // All of these codes give a new cachedUntil time to use.
-        case 101: // Wallet exhausted: retry after {0}.
-        case 103: // Already returned one week of data: retry after {0}.
-        case 115: // Assets already downloaded: retry after {0}.
-        case 116: // Industry jobs already downloaded: retry after {0}.
-        case 117: // Market orders already downloaded. retry after {0}.
-        case 119: // Kills exhausted: retry after {0}.
-          $cuntil = substr($e->getMessage() , -21, 20);
-          $data = array( 'tableName' => $this->tablePrefix . $this->api,
-            'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-          );
-            YapealDBConnection::upsert($data,
-              YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-          return TRUE;
-          break;
-      };// switch $code ...
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  $row[$this->xr->name] = $this->xr->value;
+                  switch ($this->xr->name) {
+                    case 'transactionDateTime':
+                      // Save date for walking.
+                      $date = $this->xr->value;
+                      if ($date < $this->date) {
+                        $this->date = $date;
+                      };
+                      break;
+                    case 'transactionID':
+                      // Save ID for walking.
+                      $this->beforeID = $this->xr->value;
+                      break;
+                    default:// Nothing to do here.
+                  };// switch $this->xr->name ...
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                break;
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Save row count and store rows.
+              $this->rowCount = count($qb);
+              if ($this->rowCount > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+        };// switch $this->xr->nodeType
+      };// while $xr->read() ...
     }
-    catch (ADODB_Exception $e) {}
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
     return FALSE;
-  }// function handleApiRetry
+  }// function parserAPI
 }
 ?>

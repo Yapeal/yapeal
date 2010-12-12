@@ -48,7 +48,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class FilterFileFinder extends FilterIterator {
   /**
-   * @var string Contents the filesystem path to be searched.
+   * @var string Contains the filesystem path to be searched.
    */
   protected $path;
   /**
@@ -137,14 +137,14 @@ class FilterFileFinder extends FilterIterator {
    *
    * @param string $path The path being checked.
    * @param integer $options You can specify which elements are returned with
-   * optional parameter options . It composes from PATHINFO_DIRNAME,
+   * optional parameter options. It composes from PATHINFO_DIRNAME,
    * PATHINFO_BASENAME, PATHINFO_EXTENSION and PATHINFO_FILENAME. It defaults to
    * return all elements.
    *
    * @return mixed  The following associative array elements are returned:
    * dirname, basename, extension (if any), and filename.
-   * If options is used, this function will return a string if not all elements
-   * are requested.
+   * If options is used, this function will return a string else all elements
+   * are returned as an associative array.
    */
   static public function pathinfo_utf($path, $options = 0) {
     if (strpos($path, '/') !== FALSE) {
@@ -200,7 +200,7 @@ class FilterFileFinder extends FilterIterator {
    * @return string Returns $str in reverse order.
    */
   protected function strrev_utf($str, $preserve_numbers = FALSE) {
-    //split string into string-portions (1 byte characters, numerical entitiesor numbers)
+    //split string into string-portions (1 byte characters, numerical entities or numbers)
     $parts = array();
     while ($str) {
       if ($preserve_numbers && preg_match('/^([0-9]+)(.*)$/', $str, $m)) {

@@ -44,71 +44,43 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store corp StarbaseList API.
  *
  * @package Yapeal
- * @subpackage Api_corporation
+ * @subpackage Api_corp
  */
-class corpStarbaseList extends ACorporation {
+class corpStarbaseList extends ACorp {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'StarbaseList';
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to store XML to StarbaseList table.
+   * Constructor
    *
-   * @return Bool Return TRUE if store was successful.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $this->xml = $this->xml->xpath($this->xpath);
-      if (count($this->xml) > 0) {
-        try {
-          $con = YapealDBConnection::connect(YAPEAL_DSN);
-          // Empty out old data then upsert (insert) new
-          $sql = 'delete from `' . $tableName . '`';
-          $sql .= ' where `ownerID`=' . $this->corporationID;
-          $con->Execute($sql);
-          $extras = array('ownerID' => $this->corporationID);
-          YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
-            YAPEAL_DSN, $extras);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
-        // If there was no POS in list still need to delete old ones.
-        $sql = 'delete from `' . $tableName . '`';
-        $sql .= ' where `ownerID`=' . $this->corporationID;
-        $con->Execute($sql);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = FALSE;
-      };// else count $this->xml ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
+  /**
+   * Method used to prepare database table(s) before parsing API XML data.
+   *
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
+   *
+   * @return bool Will return TRUE if table(s) were prepared correctly.
+   */
+  protected function prepareTables() {
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      // Empty out old data then upsert (insert) new.
+      $sql = 'delete from `';
+      $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
+      $sql .= ' where `ownerID`=' . $this->ownerID;
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }// function prepareTables
 }
 ?>

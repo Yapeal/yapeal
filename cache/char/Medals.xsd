@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="issued" use="required"/>
+    <xs:attribute name="issuerID" use="required" type="eveID"/>
+    <xs:attribute name="medalID" use="required" type="eveID"/>
+    <xs:attribute name="reason" use="required" type="xs:string"/>
+    <xs:attribute name="status" use="required" type="xs:NCName"/>
+  </xs:complexType>
+</xs:schema>

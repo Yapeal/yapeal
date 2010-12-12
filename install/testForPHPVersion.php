@@ -1,4 +1,4 @@
-#!/usr/bin/php -Cq
+#!/usr/bin/php
 <?php
 /**
  * Contains code that test version of PHP run script.
@@ -25,6 +25,7 @@
  * @copyright  Copyright (c) 2008-2009, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
+ * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eve-online.com/
  * @since      revision 921
@@ -36,26 +37,15 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
-// Make CGI work like CLI.
-if (PHP_SAPI != 'cli') {
-  ini_set('implicit_flush', '1');
-  ini_set('register_argc_argv', '1');
-  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
-  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
-  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
-};
 /**
- * @internal Only let this code be ran directly.
+ * @internal Don't let this code be ran directly.
  */
 if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
-  $mess = 'Including of ' . $argv[0] . ' is not allowed' . PHP_EOL;
-  fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error');
-  exit(1);
+  exit();
 };
 if (version_compare(PHP_VERSION,"5.2.1","<")) {
   fwrite(STDOUT, "old");
-} else if (version_compare(PHP_VERSION,"5.3.2",">")) {
+} else if (version_compare(PHP_VERSION,"5.4",">=")) {
   fwrite(STDOUT, "untested");
 } else {
   fwrite(STDOUT, "tested");

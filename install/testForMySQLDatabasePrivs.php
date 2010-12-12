@@ -25,6 +25,7 @@
  * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Install
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -70,22 +71,31 @@ if ($mysqli->connect_error || mysqli_connect_error()) {
   fwrite(STDOUT, $ret);
   exit(3);
 };
-$query = 'select `PRIVILEGE_TYPE`';
-$query .= ' from `SCHEMA_PRIVILEGES`';
-$query .= ' where `TABLE_SCHEMA`=';
-$query .= '"' . $mysqli->real_escape_string($argv[4]) . '"';
-$query .= ' and `GRANTEE`=';
-$query .= "\"'" . $mysqli->real_escape_string($argv[2]) . "'@'";
-$query .= $mysqli->real_escape_string($argv[1]) . "'\"";
-$query .= ' order by `PRIVILEGE_TYPE`';
-if ($result = $mysqli->query($query)) {
-  $rows = array();
+$split = array();
+$sql = 'show grants';
+if ($result = $mysqli->query($sql)) {
   while ($row = $result->fetch_row()) {
-    $rows[] = strtolower($row[0]);
-  };
+    $dbPos = strpos($row[0], '`' . $argv[4] . '`');
+    // If not the right table continue.
+    if (FALSE !== $dbPos) {
+      // Trim grant off the front.
+      $split = str_replace('GRANT ', '', $row[0]);
+      // Find the end part and strip it off.
+      $end = substr($split, strpos($split, ' ON '));
+      $split = str_replace($end, '', $split);
+      // Delete the spaces.
+      $split = str_replace(' ', '', $split);
+      // If $split isn't empty there are privs.
+      if (!empty($split)) {
+        $split = explode(',' , strtolower($split));
+      };// if !empty $split ...
+    } else {
+      continue;
+    };// else FALSE !== $dbPos ...
+  };// while $row ...
   $privs = explode(' ', $argv[5]);
-  $missing = array_diff($privs, $rows);
-  if (count($missing) > 0) {
+  $missing = array_diff($privs, $split);
+  if (count($missing) > 0 && FALSE === array_search('allprivileges', $split)) {
     $mess = $argv[2] . ' lacks the needed privileges: ' .
       implode(', ', $missing) . ' on the ' . $argv[4] . ' database';
     fwrite(STDERR, $mess);

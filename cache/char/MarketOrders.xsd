@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="accountKey" use="required" type="xs:integer"/>
+    <xs:attribute name="bid" use="required" type="xs:integer"/>
+    <xs:attribute name="charID" use="required" type="eveID"/>
+    <xs:attribute name="duration" use="required" type="xs:integer"/>
+    <xs:attribute name="escrow" use="required" type="xs:decimal"/>
+    <xs:attribute name="issued" use="required" type="eveDT"/>
+    <xs:attribute name="minVolume" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="orderID" use="required" type="eveID"/>
+    <xs:attribute name="orderState" use="required" type="xs:integer"/>
+    <xs:attribute name="price" use="required" type="xs:decimal"/>
+    <xs:attribute name="range" use="required" type="xs:integer"/>
+    <xs:attribute name="stationID" use="required" type="eveID"/>
+    <xs:attribute name="typeID" use="required" type="eveID"/>
+    <xs:attribute name="volEntered" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="volRemaining" use="required" type="xs:unsignedLong"/>
+  </xs:complexType>
+</xs:schema>

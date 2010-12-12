@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:include schemaLocation="../rowset.xsd"/>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowset" type="rowset"/>
+        <xs:element name="dataTime" type="eveDT"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="rowType">
+    <xs:attribute name="solarSystemID" use="required" type="eveID"/>
+    <xs:attribute name="shipKills" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="factionKills" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="podKills" use="required" type="xs:unsignedLong"/>
+  </xs:complexType>
+</xs:schema>

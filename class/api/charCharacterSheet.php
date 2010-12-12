@@ -44,129 +44,158 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store CharacterSheet API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charCharacterSheet  extends ACharacter {
+class charCharacterSheet  extends AChar {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'CharacterSheet';
-  /**
-   * Used to store XML to CharacterSheet tables.
+   * Constructor
    *
-   * @return boolean Returns TRUE if item was saved to database.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      if ($this->attributes()) {
-        ++$ret;
-      };
-      if ($this->attributeEnhancers()) {
-        ++$ret;
-      };
-      if ($this->certificates()) {
-        ++$ret;
-      };
-      if ($this->characterSheet()) {
-        ++$ret;
-      };
-      if ($this->corporationRoles()) {
-        ++$ret;
-      };
-      if ($this->corporationRolesAtBase()) {
-        ++$ret;
-      };
-      if ($this->corporationRolesAtHQ()) {
-        ++$ret;
-      };
-      if ($this->corporationRolesAtOther()) {
-        ++$ret;
-      };
-      if ($this->corporationTitles()) {
-        ++$ret;
-      };
-      if ($this->skills()) {
-        ++$ret;
-      };
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    if ($ret == 10) {
-      return TRUE;
-    } else {
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
+  /**
+   * Per API parser for XML.
+   *
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb->setDefault('allianceName', '');
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'allianceID':
+              case 'allianceName':
+              case 'ancestry':
+              case 'balance':
+              case 'bloodLine':
+              case 'characterID':
+              case 'cloneName':
+              case 'cloneSkillPoints':
+              case 'corporationID':
+              case 'corporationName':
+              case 'DoB':
+              case 'gender':
+              case 'name':
+              case 'race':
+                // Grab node name.
+                $name = $this->xr->localName;
+                if ($name == 'allianceName' && $this->xr->isEmptyElement == TRUE) {
+                  $row[$name] = '';
+                } else {
+                  // Move to text node.
+                  $this->xr->read();
+                  $value = $this->xr->value;
+                  $row[$name] = $this->xr->value;
+                };
+                break;
+              case 'attributes':
+              case 'attributeEnhancers':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == TRUE) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab node name.
+                $subTable = $this->xr->localName;
+                // Check for method with same name as node.
+                if (!is_callable(array($this, $subTable))) {
+                  $mess = 'Unknown what-to-be rowset ' . $subTable;
+                  $mess .= ' found in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  return FALSE;
+                };
+                $this->$subTable();
+                break;
+              case 'rowset':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == TRUE) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab rowset name.
+                $subTable = $this->xr->getAttribute('name');
+                if (empty($subTable)) {
+                  $mess = 'Name of rowset is missing in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  return FALSE;
+                };
+                if ($subTable == 'skills') {
+                  $this->$subTable();
+                } else {
+                $this->rowset($subTable);
+                };// else $subTable ...
+                break;
+              default:// Nothing to do here.
+            };// $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
       return FALSE;
-    };
-  }// function apiStore()
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
   /**
-   * Used to store XML to main CorporationSheet table.
+   * Handles attributes table.
    *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function characterSheet() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    $datum = clone $this->xml->result[0];
-    // Get rid of child table stuff
-    unset($datum->rowset, $datum->attributes, $datum->attributeEnhancers);
-    $data = array();
-    if (count($datum) > 0) {
-      $data = array();
-      foreach ($datum->children() as $k => $v) {
-        $data[$k] = (string)$v;
-      };
-      try {
-        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function charSheet
-  /**
-   * Used to store XML to CharacterSheet's attributes table.
-   *
-   * @return Bool Return TRUE if store was successful.
+   * @return bool Returns TRUE if data stored to database table.
    */
   protected function attributes() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'Attributes';
-    $datum = $this->xml->result->attributes;
-    if (count($datum) > 0) {
-      $data = array('ownerID' => $this->characterID);
-      foreach ($datum->children() as $k => $v) {
-        $data[$k] = (string)$v;
-      };
-      try {
-        YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $row = array('ownerID' => $this->ownerID);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'charisma':
+            case 'intelligence':
+            case 'memory':
+            case 'perception':
+            case 'willpower':
+              $name = $this->xr->localName;
+              $this->xr->read();
+              $row[$name] = $this->xr->value;
+              break;
+          };// switch $xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'attributes') {
+            $qb->addRow($row);
+            return $qb->store();
+          };// if $this->xr->localName ...
+          break;
+        default:// Nothing to do here.
+      };// switch $this->xr->nodeType ...
+    };// while $xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
   }// function attributes
   /**
    * Used to store XML to CharacterSheet's attributeEnhancers table.
@@ -174,287 +203,161 @@ class charCharacterSheet  extends ACharacter {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributeEnhancers() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'AttributeEnhancers';
-    $types = array('augmentatorName' => 'C', 'augmentatorValue' => 'I',
-      'bonusName' => 'C', 'ownerID' => 'I'
-    );
-    $datum = $this->xml->xpath('//attributeEnhancers');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      $cnt = 0;
-      foreach ($datum[0]->children() as $k) {
-        $data[$cnt]['augmentatorName'] = (string)$k->augmentatorName[0];
-        $data[$cnt]['augmentatorValue'] = (int)$k->augmentatorValue[0];
-        $data[$cnt]['bonusName'] = $k->getName();
-        $data[$cnt]['ownerID'] = $this->characterID;
-        ++$cnt;
-      };
-      if (count($data) > 0) {
-        try {
-          YapealDBConnection::multipleUpsert($data, $tableName, YAPEAL_DSN);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-        $mess = 'No implants for ' . $tableName;
-        trigger_error($mess, E_USER_NOTICE);
-        $ret = FALSE;
-      };// else count $data ...
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'charismaBonus':
+            case 'intelligenceBonus':
+            case 'memoryBonus':
+            case 'perceptionBonus':
+            case 'willpowerBonus':
+              $row = array('ownerID' => $this->ownerID);
+              $row['bonusName'] = $this->xr->localName;
+              break;
+            case 'augmentatorName':
+            case 'augmentatorValue':
+              $name = $this->xr->localName;
+              $this->xr->read();
+              $row[$name] = $this->xr->value;
+              break;
+            default:// Nothing to do here.
+          };// switch $xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          switch ($this->xr->localName) {
+            case 'charismaBonus':
+            case 'intelligenceBonus':
+            case 'memoryBonus':
+            case 'perceptionBonus':
+            case 'willpowerBonus':
+              $qb->addRow($row);
+              break;
+            case 'attributeEnhancers':
+              return $qb->store();
+            default:// Nothing to do here.
+          };// switch $xr->localName ...
+          break;
+        default:// Nothing to do here.
+      };// switch $this->xr->nodeType ...
+    };// while $xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
   }// function attributeEnhancers
   /**
-   * Used to store XML to CharacterSheet's certificates table.
+   * Used to store XML to rowset tables.
+   *
+   * @param string $table Name of the table for this rowset.
    *
    * @return Bool Return TRUE if store was successful.
    */
-  protected function certificates() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'Certificates';
-    // Set the field types of query by name.
-    $types = array('certificateID' => 'I', 'ownerID' => 'I');
-    $datum = $this->xml->xpath('//rowset[@name="certificates"]/row');
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function certificates
-  /**
-   * Used to store XML to CharacterSheet's corporationRoles table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function corporationRoles() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CorporationRoles';
-    // Set the field types of query by name.
-    $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
-    $datum = $this->xml->xpath('//rowset[@name="corporationRoles"]/row');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function corporationRoles
-  /**
-   * Used to store XML to CharacterSheet's corporationRolesAtBase table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function corporationRolesAtBase() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CorporationRolesAtBase';
-    // Set the field types of query by name.
-    $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
-    $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtBase"]/row');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function corporationRolesAtBase
-  /**
-   * Used to store XML to CharacterSheet's corporationRolesAtHQ table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function corporationRolesAtHQ() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CorporationRolesAtHQ';
-    // Set the field types of query by name.
-    $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
-    $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtHQ"]/row');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function corporationRolesAtHQ
-  /**
-   * Used to store XML to CharacterSheet's corporationRolesAtOther table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function corporationRolesAtOther() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CorporationRolesAtOther';
-    // Set the field types of query by name.
-    $types = array('ownerID' => 'I', 'roleID' => 'I', 'roleName' => 'C');
-    $datum = $this->xml->xpath('//rowset[@name="corporationRolesAtOther"]/row');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function corporationRolesAtOther
-  /**
-   * Used to store XML to CharacterSheet's corporationTitles table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function corporationTitles() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CorporationTitles';
-    // Set the field types of query by name.
-    $types = array('ownerID' => 'I', 'titleID' => 'I', 'titleName' => 'C');
-    $datum = $this->xml->xpath('//rowset[@name="corporationTitles"]/row');
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        $extras = array('ownerID' => $this->characterID);
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function corporationTitles
+  protected function rowset($table) {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb->setDefault('ownerID', $this->ownerID);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $qb->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            // Insert any leftovers.
+            if (count($qb) > 0) {
+              $qb->store();
+            };// if count $rows ...
+            $qb = NULL;
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function rowset
   /**
    * Used to store XML to CharacterSheet's skills table.
    *
    * @return Bool Return TRUE if store was successful.
    */
   protected function skills() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'Skills';
-    // Set the field types of query by name.
-    $types = array('level' => 'I', 'ownerID' => 'I', 'skillpoints' => 'I',
-      'typeID' => 'I', 'unpublished' => 'L');
-    $datum = $this->xml->xpath('//rowset[@name="skills"]/row');
-    if (count($datum) > 0) {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $defaults = array('level' => 0, 'ownerID' => $this->ownerID,
+      'unpublished' => 0
+    );
+    $qb->setDefaults($defaults);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $qb->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            // Insert any leftovers.
+            if (count($qb) > 0) {
+              $qb->store();
+            };// if count $rows ...
+            $qb = NULL;
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function skills
+  /**
+   * Method used to prepare database table(s) before parsing API XML data.
+   *
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
+   *
+   * @return bool Will return TRUE if table(s) were prepared correctly.
+   */
+  protected function prepareTables() {
+    $tables = array('AttributeEnhancers', 'Certificates', 'CorporationRoles',
+      'CorporationRolesAtBase', 'CorporationRolesAtHQ',
+      'CorporationRolesAtOther', 'CorporationTitles', 'Skills'
+    );
+    foreach ($tables as $table) {
       try {
-        $extras = array('ownerID' => $this->characterID, 'level' => 0,
-          'unpublished' => 0
-        );
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        // Empty out old data then upsert (insert) new.
+        $sql = 'delete from `';
+        $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
+        $sql .= ' where `ownerID`=' . $this->ownerID;
+        $con->Execute($sql);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
       }
-      $ret = TRUE;
-    } else {
-    $mess = 'There was no XML data to store for ' . $tableName;
-    trigger_error($mess, E_USER_NOTICE);
-    $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function skills
+    };// foreach $tables ...
+    return TRUE;
+  }// function prepareTables
 }
 ?>

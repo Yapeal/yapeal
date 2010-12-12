@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="amount" use="required" type="xs:decimal"/>
+    <xs:attribute name="argID1" use="required" type="eveID"/>
+    <xs:attribute name="argName1" use="required" type="xs:string"/>
+    <xs:attribute name="balance" use="required" type="xs:decimal"/>
+    <xs:attribute name="date" use="required" type="eveDT"/>
+    <xs:attribute name="ownerID1" use="required" type="eveID"/>
+    <xs:attribute name="ownerID2" use="required" type="eveID"/>
+    <xs:attribute name="ownerName1" use="required" type="xs:string"/>
+    <xs:attribute name="ownerName2" use="required" type="xs:string"/>
+    <xs:attribute name="reason" use="required" type="xs:string"/>
+    <xs:attribute name="refID" use="required" type="eveID"/>
+    <xs:attribute name="refTypeID" use="required" type="xs:integer"/>
+  </xs:complexType>
+</xs:schema>

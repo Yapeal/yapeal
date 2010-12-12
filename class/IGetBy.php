@@ -49,9 +49,16 @@ interface IGetBy {
   /**
    * Used to get item from table by Id.
    *
-   * @param $id Id of record wanted.
+   * For database tables that don't have an 'id' type field that can be use
+   * they should throw a LogicException. To put it in other words this method is
+   * optional for some tables because it doesn't make logical sense to impliment it.
+   *
+   * @param mixed $id Id of record wanted.
    *
    * @return bool Returns TRUE if item was retrieved.
+   *
+   * @throws LogicException Should throw a LogicException if there is no 'id'
+   * type field that can be use in retrieving the database table.
    */
   public function getItemById($id);
   /**
@@ -61,7 +68,7 @@ interface IGetBy {
    * they should throw a LogicException. To put it in other words this method is
    * optional for some tables because it doesn't make logical sense to impliment it.
    *
-   * @param $name Name of record wanted.
+   * @param mixed $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
    *

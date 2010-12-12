@@ -50,39 +50,24 @@ class SectionCorp {
   /**
    * @var array Holds the list of APIs for this section.
    */
-  private $apiList = array();
-  /**
-   * @var string Hold proxy string to pass to this section's APIs.
-   */
-  private $proxy = '';
+  private $apiList;
   /**
    * @var string Hold section name.
    */
-  private $section = '';
-  /**
-   * @var string Holds the Eve server name.
-   */
-  private $serverName = '';
+  private $section;
   /**
    * Constructor
    *
-   * @param string $proxy Allows overriding API server for example to use a
-   * different proxy on a per char/corp basis. It should contain a url format
-   * string made to used in sprintf() to replace %1$s with $api and %2$s with
-   * $section as needed to complete the url. For example:
-   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
    * @param array $allowedAPIs An array of admin allowed APIs in this section.
    * Used to limit which APIs out of the list of APIs from this section will be
    * fetched.
    */
-  public function __construct($proxy, $allowedAPIs) {
-    $this->section = 'corp';
+  public function __construct($allowedAPIs) {
+    $this->section = strtolower(str_replace('Section', '', __CLASS__));
     $path = YAPEAL_CLASS . 'api' . DS;
     $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
     $this->apiList = array_intersect($allowedAPIs, $knownApis);
-    $this->proxy = $proxy;
-    $this->serverName = 'Tranquility';
-  }// function __construct
+  }
   /**
    * Function called by  Yapeal.php to start section pulling XML from servers.
    *
@@ -93,66 +78,106 @@ class SectionCorp {
     $apiSuccess = 0;
     try {
       $corpList = $this->getRegisteredCorporations();
-      if (empty($corpList)) {
-        $mess = 'No corporations for char section';
+      if (count($corpList) == 0) {
+        $mess = 'No active corporations for corp section';
         trigger_error($mess, E_USER_NOTICE);
         return FALSE;
-      };// if empty $corpList ...
-      // Ok now that we have a list of corp that need updated
-      // we can check API for updates to their information.
-      foreach ($corpList as $corp) {
-        extract($corp);
-        /* **********************************************************************
-        * Per corp API pulls
-        * **********************************************************************/
-        $apis = array_intersect($this->apiList, explode(' ', $activeAPI));
-        foreach ($apis as $api) {
-          ++$apiCount;
-          $class = $this->section . $api;
-          $tableName = YAPEAL_TABLE_PREFIX . $class;
-          // Should we wait to get API data
-          if (YapealDBConnection::dontWait($tableName, $corpID)) {
-            // Set it so we wait a bit before trying again if something goes wrong.
-            $data = array('tableName' => $tableName,
-              'ownerID' => $corpID, 'cachedUntil' => YAPEAL_START_TIME);
-            try {
-              YapealDBConnection::upsert($data,
-                YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-            }
-            catch(ADODB_Exception $e) {}
-          } else {
+      };// if empty $userList ...
+      // Ok now that we have a list of corps we can check which APIs need updated.
+      foreach ($corpList as $crp) {
+        $corpID = $crp['corporationID'];
+        try {
+          // Grab a corporation object.
+          // Can't update corps that don't exist or cause errors.
+          $corp = new RegisteredCorporation($corpID, FALSE);
+          if ($corp->isActive == 0) {
+            // Skip inactive corps.
             continue;
-          };// else dontWait ...
-          $params = array('apiKey' => $apiKey, 'characterID' => $charID,
-            'corporationID' => $corpID, 'serverName' => $this->serverName,
-            'userID' => $userID);
-          // Use section proxy setting if doesn't have own.
-          if (empty($proxy)) {
-            $proxy = $this->proxy;
           };
-          $instance = new $class($proxy, $params);
-          if ($instance->apiFetch()) {
-            ++$apiSuccess;
-          };
-          if ($instance->apiStore()) {
-            ++$apiSuccess;
-          };
-          trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
-          $instance = null;
-          // See if we've taken to long to run and exit if TRUE.
+          $charID = (string)$corp->characterID;
+          // Grab a character object.
+          // Can't update if char doesn't exist or cause errors.
+          $char = new RegisteredCharacter($charID, FALSE);
+          $userID = (string)$char->userID;
+          // Grab a user object.
+          // Can't update if user doesn't exist.
+          $user = new RegisteredUser($userID, FALSE);
+        }
+        catch (Exception $e) {
+          // Can't update if any exception happens while getting info.
+          continue;
+        }
+        if ($user->isActive == 0) {
+          // User has to be active as well to get corp APIs.
+          continue;
+        };
+        if (isset($user->fullApiKey)) {
+          $apiKey = $user->fullApiKey;
+        } else {
+          $apiKey = $user->limitedApiKey;
+        };
+        $apis = array_intersect($this->apiList, explode(' ', $corp->activeAPI));
+        if (count($apis) == 0) {
+          $mess = 'None of the allowed APIs are currently active for ' . $corpID;
+          trigger_error($mess, E_USER_NOTICE);
+          continue;
+        };
+        // Randomize order in which APIs are tried if there is a list.
+        if (count($apis) > 1) {
+          shuffle($apis);
+        };
+        foreach ($apis as $api) {
+          // If the cache for this API has expire try to get update.
+          if (CachedUntil::cacheExpired($api, $charID) === TRUE) {
+            ++$apiCount;
+            $class = $this->section . $api;
+            $tableName = YAPEAL_TABLE_PREFIX . $class;
+            // These are passed on to the API class instance and used as part of
+            // hash for lock.
+            $params = array('apiKey' => $apiKey, 'characterID' => $charID,
+              'corporationID' => $corpID, 'userID' => $userID);
+            $parameters = '';
+            foreach ($params as $k => $v) {
+              $parameters .= $k . '=' . $v;
+            };
+            $hash = hash('sha1', $class . $parameters);
+            // Use lock to keep from wasting time trying to do API that another
+            // Yapeal is already working on.
+            try {
+              $con = YapealDBConnection::connect(YAPEAL_DSN);
+              $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
+              if ($con->GetOne($sql) != 1) {
+                $mess = 'Failed to get lock for ' . $class . $hash;
+                trigger_error($mess, E_USER_NOTICE);
+                continue;
+              };// if $con->GetOne($sql) ...
+            }
+            catch(ADODB_Exception $e) {
+              continue;
+            }
+            // Give each API 60 seconds to finish. This should never happen but is
+            // here to catch runaways.
+            set_time_limit(60);
+            $instance = new $class($params);
+            if ($instance->apiStore()) {
+              ++$apiSuccess;
+            };
+            $instance = null;
+          };// if CachedUntil::cacheExpired...
+          // See if Yapeal has been running for longer than 'soft' limit.
           if (YAPEAL_MAX_EXECUTE < time()) {
-            $mess = 'Yapeal took to long to execute';
+            $mess = 'Yapeal has been working very hard and needs a break';
             trigger_error($mess, E_USER_NOTICE);
             exit;
-          };// if YAPEAL_START_TIME < $cuntil ...
+          };// if YAPEAL_MAX_EXECUTE < time() ...
         };// foreach $apis ...
-      }; // foreach $corpList
+      };// foreach $corpList
     }
     catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
     // Only truly successful if API was fetched and stored.
-    if ($apiCount * 2 == $apiSuccess) {
+    if ($apiCount == $apiSuccess) {
       return TRUE;
     } else {
       return FALSE;
@@ -168,21 +193,16 @@ class SectionCorp {
   function getRegisteredCorporations() {
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     // Generate a list of corporation(s) we need to do updates for
-    $sql = 'select cp.`activeAPI`,';
-    $sql .= 'coalesce(u.`fullApiKey`,u.`limitedApiKey`) as apiKey,';
-    $sql .= 'cp.`characterID` as charID,cp.`corporationID` as corpID,';
-    $sql .= 'cp.`proxy`,u.`userID`';
+    $sql = 'select `corporationID`';
     $sql .= ' from ';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation` as cp,';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as chr,';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` as u';
-    $sql .= ' where';
-    $sql .= ' cp.`isActive`=1';
-    $sql .= ' and u.`isActive`=1';
-    $sql .= ' and cp.`characterID`=chr.`characterID`';
-    $sql .= ' and chr.`userID`=u.`userID`';
-    $sql .= ' order by u.`userID` asc, cp.`corporationID` asc';
-    return $con->GetAll($sql);
+    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`';
+    $result = $con->GetAll($sql);
+    // Randomize order so no one corporation can starve the rest in case of
+    // errors, etc.
+    if (count($result) > 1) {
+      shuffle($result);
+    };
+    return $result;
   }// function getRegisteredCorporations
 }
 ?>

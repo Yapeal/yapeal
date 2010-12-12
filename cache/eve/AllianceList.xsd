@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="rowset" type="rowset"/>
+    </xs:sequence>
+    <xs:attribute name="allianceID" type="eveID"/>
+    <xs:attribute name="corporationID" type="eveID"/>
+    <xs:attribute name="executorCorpID" type="eveID"/>
+    <xs:attribute name="memberCount" type="xs:unsignedLong"/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="shortName" type="xs:string"/>
+    <xs:attribute name="startDate" use="required" type="eveDT"/>
+  </xs:complexType>
+</xs:schema>

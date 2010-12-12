@@ -44,62 +44,81 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store CharacterSheet API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charSkillInTraining  extends ACharacter {
+class charSkillInTraining  extends AChar {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'SkillInTraining';
-  /**
-   * Used to store XML to SkillInTraining table.
+   * Constructor
    *
-   * @return boolean Returns TRUE if item was saved to database.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $datum = $this->xml->result;
-      if (count($datum) > 0) {
-        $data = array('currentTQTime' => YAPEAL_START_TIME, 'offset' => 0,
-          'ownerID' => $this->characterID, 'skillInTraining' => 0,
-          'trainingDestinationSP' => 0, 'trainingEndTime' => YAPEAL_START_TIME,
-          'trainingStartSP' => 0, 'trainingStartTime' => YAPEAL_START_TIME,
-          'trainingToLevel' => 0, 'trainingTypeID' => 0);
-        foreach ($datum->children() as $k => $v) {
-          $data[(string)$k] = (string)$v;
-        };
-        if (isset($datum->currentTQTime) &&
-          isset($datum->currentTQTime['offset'])) {
-          $data['offset'] = (string)$datum->currentTQTime['offset'];
-        };
-        try {
-          YapealDBConnection::upsert($data, $tableName, YAPEAL_DSN);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $datum ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore()
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
+  /**
+   * Per API parser for XML.
+   *
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $row = array('currentTQTime' => YAPEAL_START_TIME, 'offset' => 0,
+      'ownerID' => $this->params['characterID'], 'skillInTraining' => 0,
+      'trainingDestinationSP' => 0, 'trainingEndTime' => YAPEAL_START_TIME,
+      'trainingStartSP' => 0, 'trainingStartTime' => YAPEAL_START_TIME,
+      'trainingToLevel' => 0, 'trainingTypeID' => 0);
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'skillInTraining':
+              case 'trainingDestinationSP':
+              case 'trainingEndTime':
+              case 'trainingStartSP':
+              case 'trainingStartTime':
+              case 'trainingToLevel':
+              case 'trainingTypeID':
+                // Grab node name.
+                $name = $this->xr->localName;
+                // Move to text node.
+                $this->xr->read();
+                $row[$name] = $this->xr->value;
+                break;
+              case 'currentTQTime':
+                $row['offset'] = $this->xr->getAttribute('offset');
+                // Move to text node.
+                $this->xr->read();
+                $row['currentTQTime'] = $this->xr->value;
+                break;
+              default:// Nothing to do.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              $qb->store();
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
 }
 ?>

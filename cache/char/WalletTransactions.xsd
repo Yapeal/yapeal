@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="transactionDateTime" use="required" type="eveDT"/>
+    <xs:attribute name="transactionID" use="required" type="eveID"/>
+    <xs:attribute name="quantity" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="typeName" use="required" type="xs:string"/>
+    <xs:attribute name="typeID" use="required" type="eveID"/>
+    <xs:attribute name="price" use="required" type="xs:decimal"/>
+    <xs:attribute name="clientID" use="required" type="eveID"/>
+    <xs:attribute name="clientName" use="required" type="xs:string"/>
+    <xs:attribute name="characterID" use="required" type="eveID"/>
+    <xs:attribute name="characterName" use="required" type="xs:string"/>
+    <xs:attribute name="stationID" use="required" type="eveID"/>
+    <xs:attribute name="stationName" use="required" type="xs:string"/>
+    <xs:attribute name="transactionType" use="required" type="xs:string"/>
+    <xs:attribute name="transactionFor" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

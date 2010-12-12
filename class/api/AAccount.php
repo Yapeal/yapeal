@@ -46,51 +46,25 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Api_account
  */
-abstract class AAccount implements IFetchApiTable, IStoreApiTable {
-  /**
-   * @var string Apikey for this user.
-   */
-  protected $apiKey;
-  /**
-   * @var string Holds proxy info.
-   */
-  protected $proxy;
-  /**
-   * @var string Name of Eve server.
-   */
-  protected $serverName;
-  /**
-   * @var string DB table prefix.
-   */
-  protected $tablePrefix;
-  /**
-   * @var int userID for this user.
-   */
-  protected $userID;
+abstract class AAccount extends AApiRequest {
   /**
    * Constructor
    *
-   * @param string $proxy Allows overriding API server for example to use a
-   * different proxy on a per char/corp basis. It should contain a url format
-   * string made to used in sprintf() to replace %1$s with $api and %2$s with
-   * $section as needed to complete the url. For example:
-   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
-   * @param array $params Holds the required parameters like userID, apiKey,
-   * etc as needed.
-   *
-   * @return object Returns the instance of the class.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
    *
    * @throws LengthException for any missing required $params.
    */
-  public function __construct($proxy, array $params) {
-    $this->tablePrefix = YAPEAL_TABLE_PREFIX . 'account';
-    $this->proxy = $proxy;
-    $required = array('apiKey' => 'C', 'serverName' => 'C', 'userID' => 'I');
+  public function __construct(array $params) {
+    // Cut off 'A' and lower case abstract class name to make section name.
+    $this->section = strtolower(substr(__CLASS__, 1));
+    $required = array('apiKey' => 'C', 'userID' => 'I');
     foreach ($required as $k => $v) {
       if (!isset($params[$k])) {
         $mess = 'Missing required parameter $params["' . $k . '"]';
         $mess .= ' to constructor for ' . $this->api;
-        $mess .= ' in ' . basename(__FILE__);
+        $mess .= ' in ' . __CLASS__;
         throw new LengthException($mess, 1);
       };// if !isset $params[$k] ...
       switch ($v) {
@@ -98,68 +72,68 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
         case 'X':
           if (!is_string($params[$k])) {
             $mess = '$params["' . $k . '"] must be a string for ' . $this->api;
-            $mess .= ' in ' . basename(__FILE__);
+            $mess .= ' in ' . __CLASS__;
             throw new LengthException($mess, 2);
           };// if !is_string $params[$k] ...
           break;
         case 'I':
           if (0 != strlen(str_replace(range(0,9),'',$params[$k]))) {
             $mess = '$params["' . $k . '"] must be an integer for ' . $this->api;
-            $mess .= ' in ' . basename(__FILE__);
+            $mess .= ' in ' . __CLASS__;
             throw new LengthException($mess, 3);
           };// if 0 == strlen(...
           break;
       };// switch $v ...
     };// foreach $required ...
-    $this->apiKey = $params['apiKey'];
-    $this->serverName = $params['serverName'];
-    $this->userID = $params['userID'];
+    $this->ownerID = $params['userID'];
+    $this->params = $params;
   }// function __construct
   /**
-   * Used to get an item from Eve API.
+   * Per API section function that returns API proxy.
    *
-   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
+   * For a description of how to design a format string look at the description
+   * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+   * be available as well as anything included in $params for __construct().
    *
-   * @return boolean Returns TRUE if item received.
+   * @return string Returns the URL for proxy as string if found else it will
+   * return the default string needed to use API server directly.
    */
-  function apiFetch() {
-    $postData = array('userID' => $this->userID, 'apiKey' => $this->apiKey);
-    $tableName = $this->tablePrefix . $this->api;
+  protected function getProxy() {
+    $default = 'http://api.eve-online.com/' . $this->section;
+    $default .= '/' . $this->api . '.xml.aspx';
+    $sql = 'select proxy from ';
     try {
-      // Build base part of cache file name.
-      $cacheName = $this->serverName . $tableName . $this->userID;
-      // Try to get XML from local cache first if we can.
-      $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_ACCOUNT);
-      if (empty($xml)) {
-        $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_ACCOUNT,
-          $postData, $this->proxy);
-        if ($xml instanceof SimpleXMLElement) {
-          // Store XML in local cache.
-          YapealApiRequests::cacheXml($xml->asXML(), $cacheName, YAPEAL_API_ACCOUNT);
-        };// if $xml ...
-      };// if empty $xml ...
-      if (!empty($xml)) {
-        $this->xml = $xml;
-        return TRUE;
-      } else {
-        $mess = 'No XML found for ' . $tableName;
-        trigger_error($mess, E_USER_NOTICE);
-        return FALSE;
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $tables = array(
+        '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` where `userID`=' .
+        $this->params['userID'],
+        '`' . YAPEAL_TABLE_PREFIX . 'utilSections` where `section`=' .
+        $con->qstr($this->section)
+      );
+      // Look for a set proxy in each table.
+      foreach ($tables as $table) {
+        $result = $con->GetOne($sql . $table);
+        // 4 is random and not magic. It just sounded good.
+        if (strlen($result) > 4) {
+          break;
+        };
+      };// foreach ...
+      if (empty($result)) {
+        return $default;
+      };// if empty $result ...
+      // Need to make substitution array by adding api, section, and params.
+      $subs = array('api' => $this->api, 'section' => $this->section);
+      $subs = array_merge($subs, $this->params);
+      $proxy = self::sprintfn($result, $subs);
+      if (FALSE === $proxy) {
+        return $default;
       };
-    }
-    catch (YapealApiErrorException $e) {
-      // Any API errors that need to be handled in some way are handled in this
-      // function.
-      $this->handleApiError($e);
-      return FALSE;
-    }
-    catch (YapealApiFileException $e) {
-      return FALSE;
+      return $proxy;
     }
     catch (ADODB_Exception $e) {
-      return FALSE;
+      return $default;
     }
-  }// function apiFetch
+  }// function getProxy
   /**
    * Handles some Eve API error codes in special ways.
    *
@@ -172,14 +146,14 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
       switch ($e->getCode()) {
         case 200:// Current security level not high enough. (Wrong API key)
           $mess = 'Deactivating Eve API: ' . $this->api;
-          $mess .= ' for ' . $this->userID;
+          $mess .= ' for ' . $this->params['userID'];
           $mess .= ' as did not give the required full API key';
           trigger_error($mess, E_USER_WARNING);
-          $user = new RegisteredUser($this->userID, FALSE);
+          $user = new RegisteredUser($this->params['userID'], FALSE);
           $user->deleteActiveAPI($this->api);
           if (FALSE === $user->store()) {
             $mess = 'Could not deactivate ' . $this->api;
-            $mess .= ' for ' . $this->userID;
+            $mess .= ' for ' . $this->params['userID'];
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
@@ -189,36 +163,36 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
         case 205:// Authentication failure (final pass).
         case 210:// Authentication failure.
         case 212:// Authentication failure (final pass).
-          $mess = 'Deactivating userID: ' . $this->userID;
+          $mess = 'Deactivating userID: ' . $this->params['userID'];
           $mess .= ' as their Eve API information is incorrect';
           trigger_error($mess, E_USER_WARNING);
-          $user = new RegisteredUser($this->userID, FALSE);
+          $user = new RegisteredUser($this->params['userID'], FALSE);
           $user->isActive = 0;
-          if (!$user->store()) {
-            $mess = 'Could not deactivate userID: ' . $this->userID;
+          if (FALSE === $user->store()) {
+            $mess = 'Could not deactivate userID: ' . $this->params['userID'];
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
         case 211:// Login denied by account status.
           // The user's account isn't active deactivate it.
-          $mess = 'Deactivating userID: ' . $this->userID;
+          $mess = 'Deactivating userID: ' . $this->params['userID'];
           $mess .= ' as their Eve account is currently suspended';
           trigger_error($mess, E_USER_WARNING);
-          $user = new RegisteredUser($this->userID, FALSE);
+          $user = new RegisteredUser($this->params['userID'], FALSE);
           $user->isActive = 0;
-          if (!$user->store()) {
-            $mess = 'Could not deactivate userID: ' . $this->userID;
+          if (FALSE === $user->store()) {
+            $mess = 'Could not deactivate userID: ' . $this->params['userID'];
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
         case 901:// Web site database temporarily disabled.
         case 902:// EVE backend database temporarily disabled.
           $cuntil = gmdate('Y-m-d H:i:s', strtotime('6 hours'));
-          $data = array( 'tableName' => $this->tablePrefix . $this->api,
-            'ownerID' => $this->userID, 'cachedUntil' => $cuntil
+          $data = array( 'api' => $this->api, 'cachedUntil' => $cuntil,
+            'ownerID' => $this->ownerID, 'section' => $this->section
           );
-          YapealDBConnection::upsert($data,
-            YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+          $cu = new CachedUntil($data);
+          $cu->store();
           break;
         default:
           return FALSE;
@@ -230,5 +204,54 @@ abstract class AAccount implements IFetchApiTable, IStoreApiTable {
     }
     return TRUE;
   }// function handleApiError
+  /**
+   * Simple <rowset> per API parser for XML.
+   *
+   * Most common API style is a simple <rowset>. This implementation allows most
+   * API classes to be empty except for a constructor which sets $this->api and
+   * calls their parent constructor.
+   *
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Set any column defaults needed.
+    $qb->setDefault('userID', $this->ownerID);
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  $row[$this->xr->name] = $this->xr->value;
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                break;
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Insert any leftovers.
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+        };// switch $this->xr->nodeType
+      };// while $xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
 }
 ?>

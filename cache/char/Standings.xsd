@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="characterNPCStandings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="rowset">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="row"/>
+                  </xs:sequence>
+                  <xs:attribute name="columns" use="required" type="eveColumns"/>
+                  <xs:attribute name="key" use="required" type="xs:NCName"/>
+                  <xs:attribute name="name" use="required" fixed="agents"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="rowset">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="row"/>
+                  </xs:sequence>
+                  <xs:attribute name="columns" use="required" type="eveColumns"/>
+                  <xs:attribute name="key" use="required" type="xs:NCName"/>
+                  <xs:attribute name="name" use="required" fixed="NPCCorporations"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="rowset">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="row"/>
+                  </xs:sequence>
+                  <xs:attribute name="columns" use="required" type="eveColumns"/>
+                  <xs:attribute name="key" use="required" type="xs:NCName"/>
+                  <xs:attribute name="name" use="required" fixed="factions"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="row">
+    <xs:attribute name="fromID" use="required" type="eveID"/>
+    <xs:attribute name="fromName" use="required" type="xs:string"/>
+    <xs:attribute name="standing" use="required" type="xs:decimal"/>
+  </xs:complexType>
+</xs:schema>

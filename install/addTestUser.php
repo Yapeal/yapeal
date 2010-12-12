@@ -88,6 +88,7 @@ try {
   $user->fullApiKey = $fullAPIKey;
   $user->limitedApiKey = $limitedAPIKey;
   $user->isActive = $isActive;
+  $user->proxy = '';
   if (TRUE == $user->store()) {
     fwrite(STDOUT, 'true');
   } else {

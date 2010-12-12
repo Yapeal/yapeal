@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rowset" type="rowset"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rowset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="row"/>
+      </xs:sequence>
+      <xs:attribute name="columns" use="required"/>
+      <xs:attribute name="key" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="row">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="victim"/>
+        <xs:element minOccurs="0" ref="rowset"/>
+      </xs:sequence>
+      <xs:attribute name="allianceID" type="xs:integer"/>
+      <xs:attribute name="allianceName"/>
+      <xs:attribute name="characterID" type="xs:integer"/>
+      <xs:attribute name="characterName"/>
+      <xs:attribute name="corporationID" type="xs:integer"/>
+      <xs:attribute name="corporationName"/>
+      <xs:attribute name="damageDone" type="xs:integer"/>
+      <xs:attribute name="factionID" type="xs:integer"/>
+      <xs:attribute name="factionName"/>
+      <xs:attribute name="finalBlow" type="xs:integer"/>
+      <xs:attribute name="flag" type="xs:integer"/>
+      <xs:attribute name="killID" type="xs:integer"/>
+      <xs:attribute name="killTime"/>
+      <xs:attribute name="moonID" type="xs:integer"/>
+      <xs:attribute name="qtyDestroyed" type="xs:integer"/>
+      <xs:attribute name="qtyDropped" type="xs:integer"/>
+      <xs:attribute name="securityStatus" type="xs:decimal"/>
+      <xs:attribute name="shipTypeID" type="xs:integer"/>
+      <xs:attribute name="solarSystemID" type="xs:integer"/>
+      <xs:attribute name="typeID" type="xs:integer"/>
+      <xs:attribute name="weaponTypeID" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="victim">
+    <xs:complexType>
+      <xs:attribute name="allianceID" use="required" type="xs:integer"/>
+      <xs:attribute name="allianceName" use="required"/>
+      <xs:attribute name="characterID" use="required" type="xs:integer"/>
+      <xs:attribute name="characterName" use="required" type="xs:NCName"/>
+      <xs:attribute name="corporationID" use="required" type="xs:integer"/>
+      <xs:attribute name="corporationName" use="required" type="xs:NCName"/>
+      <xs:attribute name="damageTaken" use="required" type="xs:integer"/>
+      <xs:attribute name="factionID" use="required" type="xs:integer"/>
+      <xs:attribute name="factionName" use="required"/>
+      <xs:attribute name="shipTypeID" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

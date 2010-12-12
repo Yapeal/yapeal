@@ -45,212 +45,134 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store char Standings API.
  *
  * @package Yapeal
- * @subpackage Api_character
+ * @subpackage Api_char
  */
-class charStandings extends ACharacter {
+class charStandings extends AChar {
   /**
-   * @var string Holds the name of the API.
+   * Constructor
+   *
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  protected $api = 'Standings';
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
   /**
-   * Used to store XML to Standings tables.
+   * Per API parser for XML.
    *
-   * @return Bool Return TRUE if store was successful.
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  public function apiStore() {
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      if ($this->standingsTo()) {
-        ++$ret;
-      };
-      if ($this->standingsFrom()) {
-        ++$ret;
-      };
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $cuntil = (string)$this->xml->cachedUntil[0];
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->characterID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    if ($ret == 2) {
-      return TRUE;
-    } else {
-      return FALSE;
-    };
-  }// function apiStore()
-  /**
-   * Used to store XML to the charStandingsTo* tables.
-   *
-   * @return Bool Return TRUE if store was successful for all sub-tables.
-   */
-  protected function standingsTo() {
-    $retTo = 0;
-    if ($this->standingsToCharacters()) {
-      ++$retTo;
-    };
-    if ($this->standingsToCorporations()) {
-      ++$retTo;
-    };
-    if ($retTo == 2) {
-      return TRUE;
-    } else {
-      return FALSE;
-    };
-  }// function standingsTo
-  /**
-   * Used to store XML to the charStandingsFrom* tables.
-   *
-   * @return Bool Return TRUE if store was successful for all sub-tables.
-   */
-  protected function standingsFrom() {
-    $retFrom = 0;
-    if ($this->standingsFromAgents()) {
-      ++$retFrom;
-    };
-    if ($this->standingsFromNPCCorporations()) {
-      ++$retFrom;
-    };
-    if ($this->standingsFromFactions()) {
-      ++$retFrom;
-    };
-    if ($retFrom == 3) {
-      return TRUE;
-    } else {
-      return FALSE;
-    };
-  }// function standingsFrom
-  /**
-   * Used to store XML to charStandingsToCharacters table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsToCharacters() {
-    $tableName = $this->tablePrefix . $this->api . 'ToCharacters';
-    $currentPath = '//standingsTo/rowset[@name="characters"]/row';
-    return $this->standingsToCommon($tableName, $currentPath);
-  }// function standingsToCharacters
-  /**
-   * Used to store XML to charStandingsToCorporations table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsToCorporations() {
-    $tableName = $this->tablePrefix . $this->api . 'ToCorporations';
-    $currentPath = '//standingsTo/rowset[@name="corporations"]/row';
-    return $this->standingsToCommon($tableName, $currentPath);
-  }// function standingsToCorporations
-  /**
-   * Used to store XML to charStandingsFromAgents table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsFromAgents() {
-    $tableName = $this->tablePrefix . $this->api . 'FromAgents';
-    $currentPath = '//standingsFrom/rowset[@name="agents"]/row';
-    return $this->standingsFromCommon($tableName, $currentPath);
-  }// function standingsFromAgents
-  /**
-   * Used to store XML to charStandingsFromNPCCorporations table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsFromNPCCorporations() {
-    $tableName = $this->tablePrefix . $this->api . 'FromNPCCorporations';
-    $currentPath = '//standingsFrom/rowset[@name="NPCCorporations"]/row';
-    return $this->standingsFromCommon($tableName, $currentPath);
-  }// function standingsFromNPCCorporations
-  /**
-   * Used to store XML to charStandingsFromFactions table.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsFromFactions() {
-    $tableName = $this->tablePrefix . $this->api . 'FromFactions';
-    $currentPath = '//standingsFrom/rowset[@name="factions"]/row';
-    return $this->standingsFromCommon($tableName, $currentPath);
-  }// function standingsFromFactions
-  /**
-   * Common code used to store XML to charStandingsTo* tables.
-   * All the different standingsTo* functions call this function.
-   * It's to keep the number of lines to be maintained low.
-   *
-   * @param String $tableName      Name of the table to store the data to.
-   * @param String $currentPath    String to be used for xpath.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsToCommon($tableName, $currentPath) {
-    $ret = FALSE;
-    $extras = array('ownerID' => $this->characterID);
-    $datum = $this->xml->xpath($currentPath);
+  protected function parserAPI() {
+    $prefix = 'StandingsFrom';
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'rowset':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == 1) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab rowset name.
+                $subTable = $this->xr->getAttribute('name');
+                if (empty($subTable)) {
+                  $mess = 'Name of rowset is missing in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  return FALSE;
+                };
+                $this->rowset($prefix . ucfirst($subTable));
+                break;
+              default:// Nothing to do here.
+            };// $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
     }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
+  /**
+   * Used to store XML to rowset tables.
+   *
+   * @param string $table Name of the table for this rowset.
+   *
+   * @return Bool Return TRUE if store was successful.
+   */
+  protected function rowset($table) {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $table;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb->setDefault('ownerID', $this->params['characterID']);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $qb->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            // Insert any leftovers.
+            if (count($qb) > 0) {
+              $qb->store();
+            };// if count $rows ...
+            $qb = NULL;
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function rowset
+  /**
+   * Method used to prepare database table(s) before parsing API XML data.
+   *
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
+   *
+   * @return bool Will return TRUE if table(s) were prepared correctly.
+   */
+  protected function prepareTables() {
+    $tables = array('StandingsFromAgents', 'StandingsFromNPCCorporations',
+      'StandingsFromFactions'
+    );
+    foreach ($tables as $table) {
       try {
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        // Empty out old data then upsert (insert) new.
+        $sql = 'delete from `';
+        $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
+        $sql .= ' where `ownerID`=' . $this->ownerID;
+        $con->Execute($sql);
       }
       catch (ADODB_Exception $e) {
         return FALSE;
       }
-      $ret = TRUE;
-    } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function standingsToCommon
-  /**
-   * Common code used to store XML to charStandingsFrom* tables.
-   * All the different standingsFrom* functions call this function.
-   *
-   * @param String $tableName      Name of the table to store the data to.
-   * @param String $currentPath    String to be used for xpath.
-   *
-   * @return Bool Return TRUE if store was successful.
-   */
-  protected function standingsFromCommon($tableName, $currentPath) {
-    $ret = FALSE;
-    $extras = array('ownerID' => $this->characterID);
-    $datum = $this->xml->xpath($currentPath);
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->characterID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (count($datum) > 0) {
-      try {
-        YapealDBConnection::multipleUpsertAttributes($datum, $tableName,
-          YAPEAL_DSN, $extras);
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-      $ret = TRUE;
-    } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
-  }// function standingsFromCommon
+    };// foreach $tables ...
+    return TRUE;
+  }// function prepareTables
 }
 ?>

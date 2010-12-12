@@ -44,325 +44,410 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store corp StarbaseDetail API.
  *
  * @package Yapeal
- * @subpackage Api_corporation
+ * @subpackage Api_corp
  */
-class corpStarbaseDetail extends ACorporation {
+class corpStarbaseDetail extends ACorp {
   /**
-   * @var string Holds the name of the API.
+   * @var integer Holds current POS ID.
    */
-  protected $api = 'StarbaseDetail';
+  private $posID;
   /**
-   * @var array Hold an array of the data return from API.
+   * @var object Query instance for combatSettings table.
    */
-  protected $combatSettingsList = array();
+  private $combat;
   /**
-   * @var array Hold an array of the data return from API.
+   * @var object Query instance for fuel table.
    */
-  protected $fuelList = array();
+  private $fuel;
   /**
-   * @var array Hold an array of the data return from API.
+   * @var object Query instance for generalSettings table.
    */
-  protected $generalSettingsList = array();
+  private $general;
   /**
-   * @var array Hold an array of the data return from API.
-   */
-  protected $starbaseDetailList = array();
-  /**
-   * @var array Hold an array of the XML return from API.
-   */
-  protected $xml = array();
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to get an item from Eve API.
+   * Constructor
    *
-   * @return boolean Returns TRUE if item received.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiFetch() {
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    $list = $this->posList();
-    if (!empty($list)) {
-      foreach ($list as $pos) {
-        $posID = $pos['itemID'];
-        $postData = array('apiKey' => $this->apiKey,
-          'characterID' => $this->characterID, 'itemID' => $posID,
-          'userID' => $this->userID
-        );
-        $xml = FALSE;
-        try {
-          // Build base part of cache file name.
-          $cacheName = $this->serverName . $tableName;
-          $cacheName .= $this->corporationID . $posID;
-          // Try to get XML from local cache first if we can.
-          $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
-          if ($xml === FALSE) {
-            $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
-              $postData, $this->proxy);
-            if ($xml instanceof SimpleXMLElement) {
-              YapealApiRequests::cacheXml($xml->asXML(), $cacheName,
-                YAPEAL_API_CORP);
-            };// if $xml ...
-          };// if $xml === FALSE ...
-          if ($xml !== FALSE) {
-            $mess = 'Got XML for ' . $tableName . $posID;
-            trigger_error($mess, E_USER_NOTICE);
-            $this->xml[$posID] = $xml;
-          } else {
-            $mess = 'No XML found for ' . $tableName . $posID;
-            trigger_error($mess, E_USER_NOTICE);
-            continue;
-          };// else $xml !== FALSE ...
-        }
-        catch (YapealApiErrorException $e) {
-          // Any API errors that need to be handled in some way are handled in this
-          // function.
-          $this->handleApiError($e);
-          continue;
-        }
-        catch (YapealApiFileException $e) {
-          continue;
-        }
-        catch (ADODB_Exception $e) {
-          continue;
-        }
-      }// foreach $list ...
-    }// if !empty $list ...
-  }// function apiFetch ...
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
   /**
-   * Used to store XML to StarbaseDetail table.
+   * Used to store XML to MySQL table(s).
    *
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    $ret = 0;
-    $tableName = $this->tablePrefix . $this->api;
-    if (empty($this->xml)) {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
+    $posList = $this->posList();
+    if (FALSE === $posList) {
       return FALSE;
-    };// if empty $this->xml ...
-    foreach ($this->xml as $posID => $xml) {
-      if ($xml instanceof SimpleXMLElement) {
-        if ($this->combatSettings($xml, $posID)) {
-          ++$ret;
-        };
-        if ($this->fuel($xml, $posID)) {
-          ++$ret;
-        };
-        if ($this->generalSettings($xml, $posID)) {
-          ++$ret;
-        };
-        if ($this->starbaseDetail($xml, $posID)) {
-          ++$ret;
-        };
-      };// if $this->xml ...
-    };// foreach $this->xml ...
-    $tableName = $this->tablePrefix . 'CombatSettings';
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->corporationID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (!empty($this->combatSettingsList)) {
+    };// if FALSE ...
+    $ret = TRUE;
+    $this->prepareTables();
+    foreach ($posList as $this->posID) {
       try {
-        YapealDBConnection::multipleUpsert($this->combatSettingsList,
-          $tableName, YAPEAL_DSN);
-        ++$ret;
+        // Give each POS 60 seconds to finish. This should never happen but is
+        // here to catch runaways.
+        set_time_limit(60);
+        // Need to add extra stuff to normal parameters to make walking work.
+        $apiParams = $this->params;
+        // This tells API server which tower we want.
+        $apiParams['itemID'] = (string)$this->posID['itemID'];
+        // First get a new cache instance.
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        // See if there is a valid cached copy of the API XML.
+        $result = $cache->getCachedApi();
+        // If it's not cached need to try to get it.
+        if (FALSE === $result) {
+          $proxy = $this->getProxy();
+          $con = new YapealNetworkConnection();
+          $result = $con->retrieveXml($proxy, $apiParams);
+          // FALSE means there was an error and it has already been report so just
+          // return to caller.
+          if (FALSE === $result) {
+            return FALSE;
+          };
+          // Cache the received XML.
+          $cache->cacheXml($result);
+          // Check if XML is valid.
+          if (FALSE === $cache->isValid()) {
+            // No use going any farther if the XML isn't valid.
+            $ret = FALSE;
+            break;
+          };
+        };// if FALSE === $result ...
+        // Create XMLReader.
+        $this->xr = new XMLReader();
+        // Pass XML to reader.
+        $this->xr->XML($result);
+        // Outer structure of XML is processed here.
+        while ($this->xr->read()) {
+          if ($this->xr->nodeType == XMLReader::ELEMENT &&
+            $this->xr->localName == 'result') {
+            $result = $this->parserAPI();
+            if ($result === FALSE) {
+              $ret = FALSE;
+            };// if $result ...
+          };// if $this->xr->nodeType ...
+        };// while $this->xr->read() ...
+        $this->xr->close();
+      }
+      catch (YapealApiErrorException $e) {
+        // Any API errors that need to be handled in some way are handled in
+        // this function.
+        $this->handleApiError($e);
+        if ($e->getCode() == 114) {
+          $mess = 'Deleted ' . $this->posID['itemID'];
+          $mess .= ' from StarbaseList for ' . $this->ownerID;
+          $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList';
+          try {
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $sql = 'delete from ';
+            $sql .= '`' . $tableName . '`';
+            $sql .= ' where `ownerID`=' . $this->ownerID;
+            $sql .= ' and `itemID`=' . $this->posID['itemID'];
+            $con->Execute($sql);
+          }
+          catch (ADODB_Exception $e) {
+            $mess = 'Could not delete ' . $this->posID['itemID'];
+            $mess .= ' from StarbaseList for ' . $this->ownerID;
+            trigger_error($mess, E_USER_WARNING);
+            // Something wrong with query return FALSE.
+            return FALSE;
+          }
+          trigger_error($mess, E_USER_WARNING);
+        };// if $e->getCode() == 114 ...
+        $ret = FALSE;
+        continue;
       }
       catch (ADODB_Exception $e) {
-        // Just logging here.
+        $ret = FALSE;
+        continue;
       }
-    };// if !empty $this->combatSettingsList ...
-    $tableName = $this->tablePrefix . 'Fuel';
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->corporationID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (!empty($this->fuelList)) {
-      try {
-        YapealDBConnection::multipleUpsertAttributes($this->fuelList,
-          $tableName, YAPEAL_DSN);
-        ++$ret;
-      }
-      catch (ADODB_Exception $e) {
-        // Just logging here.
-      }
-    };// if !empty $this->fuelList ...
-    $tableName = $this->tablePrefix . 'GeneralSettings';
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->corporationID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (!empty($this->generalSettingsList)) {
-      try {
-        YapealDBConnection::multipleUpsert($this->generalSettingsList,
-          $tableName, YAPEAL_DSN);
-        ++$ret;
-      }
-      catch (ADODB_Exception $e) {
-        // Just logging here.
-      }
-    };// if !empty $this->generalSettingsList ...
-    $tableName = $this->tablePrefix . 'StarbaseDetail';
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $sql = 'delete from `' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->corporationID;
-      // Clear out old info for this owner.
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {}
-    if (!empty($this->starbaseDetailList)) {
-      try {
-        YapealDBConnection::multipleUpsert($this->starbaseDetailList,
-          $tableName, YAPEAL_DSN);
-        ++$ret;
-      }
-      catch (ADODB_Exception $e) {
-        // Just logging here.
-      }
-    };// if !empty $this->starbaseDetailList ...
+    };// foreach $posList ...
     return $ret;
   }// function apiStore
   /**
-   * Handles the combatSettings table.
+   * Per API parser for XML.
    *
-   * @param SimpleXMLElement $pos Current pos to extract settings from.
-   * @param integer $posID The Id for this pos.
-   *
-   * @return void
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  protected function combatSettings($pos, $posID) {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'CombatSettings';
-    $datum = $pos->xpath('//combatSettings');
-    if (count($datum) > 0) {
-      $row = array('ownerID' => $this->corporationID, 'posID' => $posID);
-      foreach ($datum[0]->children() as $cn => $child) {
-        foreach ($child->attributes() as $k => $v) {
-          // Combine element and attrubute names.
-          $row[(string)$cn . ucfirst($k)] = (string)$v;
-        };
-      };// foreach $datum[0]->children() ...
-      $this->combatSettingsList[] = $row;
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    $defaults = array('ownerID' => $this->ownerID);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb->setDefaults($defaults);
+    // Get a new query instance.
+    $this->combat = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
+    );
+    $this->combat->setDefaults($defaults);
+    // Get a new query instance.
+    $this->fuel = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
+    );
+    $this->fuel->setDefaults($defaults);
+    // Get a new query instance.
+    $this->general = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
+    );
+    $this->general->setDefaults($defaults);
+    try {
       $ret = TRUE;
-    } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
+      $row = array('posID' => $this->posID['itemID']);
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'onlineTimestamp':
+              case 'state':
+              case 'stateTimestamp':
+                // Grab node name.
+                $name = $this->xr->localName;
+                // Move to text node.
+                $this->xr->read();
+                $row[$name] = $this->xr->value;
+                break;
+              case 'combatSettings':
+              case 'generalSettings':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == 1) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab node name.
+                $subTable = $this->xr->localName;
+                // Check for method with same name as node.
+                if (!is_callable(array($this, $subTable))) {
+                  $mess = 'Unknown what-to-be rowset ' . $subTable;
+                  $mess .= ' found in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  $ret = FALSE;
+                  continue;
+                };
+                $result = $this->$subTable();
+                if (FALSE === $result) {
+                  $ret = FALSE;
+                };// if FALSE ...
+                break;
+              case 'rowset':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == 1) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab rowset name.
+                $subTable = $this->xr->getAttribute('name');
+                if (empty($subTable)) {
+                  $mess = 'Name of rowset is missing in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  $ret = FALSE;
+                  continue;
+                };
+                $result = $this->rowset($subTable);
+                if (FALSE === $result) {
+                  $ret = FALSE;
+                };// if FALSE ...
+                break;
+              default:// Nothing to do here.
+            };// $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              if (count($this->combat) > 0) {
+                $this->combat->store();
+              };// if count $rows ...
+              $this->combat = NULL;
+              if (count($this->fuel) > 0) {
+                $this->fuel->store();
+              };// if count $rows ...
+              $this->fuel = NULL;
+              if (count($this->general) > 0) {
+                $this->general->store();
+              };// if count $rows ...
+              $this->general = NULL;
+              return $ret;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
+  /**
+   * Used to store XML to StarbaseDetail CombatSettings table.
+   *
+   * @return Bool Return TRUE if store was successful.
+   */
+  protected function combatSettings() {
+    $row = array('posID' => $this->posID['itemID']);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'onAggression':
+            case 'onCorporationWar':
+            case 'onStandingDrop':
+            case 'onStatusDrop':
+            case 'useStandingsFrom':
+              // Save element name to use as prefix for attributes.
+              $prefix = $this->xr->localName;
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$prefix . ucfirst($this->xr->name)] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              break;
+          };// switch $xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'combatSettings') {
+            $this->combat->addRow($row);
+            return TRUE;
+          };// if $this->xr->localName ...
+          break;
+        default:// Nothing to do here.
+      };// switch $this->xr->nodeType ...
+    };// while $xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
   }// function combatSettings
   /**
-   * Handles the fuel rowset.
+   * Used to store XML to StarbaseDetail GeneralSettings table.
    *
-   * @param SimpleXMLElement $pos Current pos to extract fuel from.
-   * @param integer $posID The Id for this pos.
-   *
-   * @return void
+   * @return Bool Return TRUE if store was successful.
    */
-  protected function fuel($pos, $posID) {
-    $tableName = $this->tablePrefix . 'Fuel';
-    $data = $pos->xpath('//row');
-    if (!empty($data)) {
-      foreach ($data as $row) {
-        $row->addAttribute('ownerID', $this->corporationID);
-        $row->addAttribute('posID', $posID);
-        $this->fuelList[] = simplexml_load_string($row->asXML());
-      };
-    };
-  }// function fuel
-  /**
-   * Handles the generalSettings table.
-   *
-   * @param SimpleXMLElement $pos Current pos to extract settings from.
-   * @param integer $posID The Id for this pos.
-   *
-   * @return void
-   */
-  protected function generalSettings($pos, $posID) {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . 'GeneralSettings';
-    $datum = $pos->xpath('//generalSettings');
-    if (count($datum) > 0) {
-      $data = array('ownerID' => $this->corporationID, 'posID' => $posID);
-      foreach ($datum[0]->children() as $k => $v) {
-        $data[(string)$k] = (string)$v;
-      };
-      $this->generalSettingsList[] = $data;
-      $ret = TRUE;
-    } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-    };// else count $datum ...
-    return $ret;
+  protected function generalSettings() {
+    $row = array('posID' => $this->posID['itemID']);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'allowAllianceMembers':
+            case 'allowCorporationMembers':
+            case 'deployFlags':
+            case 'usageFlags':
+              $name = $this->xr->localName;
+              $this->xr->read();
+              $row[$name] = $this->xr->value;
+              break;
+          };// switch $xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'generalSettings') {
+            $this->general->addRow($row);
+            return TRUE;
+          };// if $this->xr->localName ...
+          break;
+        default:// Nothing to do here.
+      };// switch $this->xr->nodeType ...
+    };// while $xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
   }// function generalSettings
+  /**
+   * Used to store XML to rowset tables.
+   *
+   * @param string $table Name of the table for this rowset.
+   *
+   * @return Bool Return TRUE if store was successful.
+   */
+  protected function rowset($table) {
+    $row = array('posID' => $this->posID['itemID']);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $this->$table->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function rowset
   /**
    * Get per corp list of starbases from corpStarbaseList.
    *
-   * @return mixed List of itemIDs for this corp's POSes or FALSE.
+   * @return mixed List of itemIDs for this corp's POSes or FALSE if error or
+   * no POSes found for corporation.
    */
   protected function posList() {
-    $tableName = $this->tablePrefix . 'StarbaseList';
     $list = array();
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select `itemID`';
       $sql .= ' from ';
-      $sql .= '`' . $tableName . '`';
-      $sql .= ' where `ownerID`=' . $this->corporationID;
+      $sql .= '`' . YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList' . '`';
+      $sql .= ' where `ownerID`=' . $this->ownerID;
       $list = $con->GetAll($sql);
     }
     catch (ADODB_Exception $e) {
       // Something wrong with query return FALSE.
       return FALSE;
     }
+    if (count($list) == 0) {
+      return FALSE;
+    };// if count($list) ...
+    // Randomize order so no one POS can starve the rest in case of
+    // errors, etc.
+    if (count($list) > 1) {
+      shuffle($list);
+    };
     return $list;
   }// function posList
   /**
-   * Handles the StarbaseDetail table.
+   * Method used to prepare database table(s) before parsing API XML data.
    *
-   * @param SimpleXMLElement $pos Current pos to extract details from.
-   * @param integer $posID The Id for this pos.
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
    *
-   * @return void
+   * @return bool Will return TRUE if table(s) were prepared correctly.
    */
-  protected function starbaseDetail($pos, $posID) {
-    $ret = 0;
-    $tableName = $this->tablePrefix . 'StarbaseDetail';
-    $nodes = array('onlineTimestamp', 'state', 'stateTimestamp');
-    $row = array();
-    foreach ($nodes as $node) {
-      $datum = $pos->xpath('//' . $node);
-      if (count($datum) > 0) {
-        $row[$node] = (string)$datum[0];
-      };
-    };// foreach $nodes ...
-    if (!empty($row)) {
-      $row['ownerID'] = $this->corporationID;
-      $row['posID'] = $posID;
-      $this->starbaseDetailList[] = $row;
-      $ret = TRUE;
-    } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-    };// else count $datum ...
-    return $ret;
-  }// function starbaseDetail
+  protected function prepareTables() {
+    $tables = array('CombatSettings', 'Fuel', 'GeneralSettings',
+      'StarbaseDetail');
+    foreach ($tables as $table) {
+      try {
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        // Empty out old data then upsert (insert) new.
+        $sql = 'delete from `';
+        $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
+        $sql .= ' where `ownerID`=' . $this->ownerID;
+        $con->Execute($sql);
+      }
+      catch (ADODB_Exception $e) {
+        return FALSE;
+      }
+    };// foreach $tables ...
+    return TRUE;
+  }// function prepareTables
 }
 ?>

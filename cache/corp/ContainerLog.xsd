@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:include schemaLocation="../rowset.xsd"/>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="rowset" type="rowset"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="rowType">
+    <xs:attribute name="action" use="required"/>
+    <xs:attribute name="actorID" use="required" type="eveID"/>
+    <xs:attribute name="actorName" use="required" type="xs:string"/>
+    <xs:attribute name="flag" use="required" type="xs:integer"/>
+    <xs:attribute name="itemID" use="required" type="eveID"/>
+    <xs:attribute name="itemTypeID" use="required" type="eveID"/>
+    <xs:attribute name="locationID" use="required" type="eveID"/>
+    <xs:attribute name="logTime" use="required" type="eveDT"/>
+    <xs:attribute name="newConfiguration" use="required" type="xs:string"/>
+    <xs:attribute name="oldConfiguration" use="required" type="xs:string"/>
+    <xs:attribute name="passwordType" use="required" type="xs:string"/>
+    <xs:attribute name="quantity" use="required" type="xs:string"/>
+    <xs:attribute name="typeID" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

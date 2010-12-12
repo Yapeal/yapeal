@@ -69,18 +69,14 @@ class LoggingExceptionObserver implements IYapealObserver {
    * @param object $e The 'object' we're observing.
    */
   public function YapealUpdate(IYapealSubject $e) {
-    $message = PHP_EOL;
-    $message .= <<<MESS
-EXCEPTION:
-     Code: {$e->getCode()}
-  Message: {$e->getMessage()}
-     File: {$e->getFile()}
-     Line: {$e->getLine()}
-Backtrace:
-{$e->getTraceAsString()}
-MESS;
-    $message .= PHP_EOL . str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
-    YapealErrorHandler::elog($message, $this->file);
+    $mess = 'EXCEPTION:' . PHP_EOL;
+    $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
+    $mess .= '  Message: ' . $e->getMessage() . PHP_EOL;
+    $mess .= '     File: ' . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL;
+    $mess .= 'Backtrace:' . PHP_EOL;
+    $mess .= $e->getTraceAsString() . PHP_EOL;
+    $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
+    YapealErrorHandler::elog($mess, $this->file);
   }// function YapealUpdate
 }
 ?>

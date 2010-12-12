@@ -48,6 +48,19 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class RegisteredUser extends ALimitedObject implements IGetBy {
   /**
+   * @var string Holds an instance of the DB connection.
+   */
+  protected $con;
+  /**
+   * @var string Holds the table name of the query is being built.
+   */
+  protected $tableName;
+  /**
+   * Holds query builder object.
+   * @var object
+   */
+  protected $qb;
+  /**
    * List of all section APIs
    * @var array
    */
@@ -57,11 +70,6 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * @var bool
    */
   private $recordExists;
-  /**
-   * Table name
-   * @var string
-   */
-  private $table;
   /**
    * Constructor
    *
@@ -77,30 +85,45 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
   public function __construct($id = NULL, $create = TRUE) {
     $path = YAPEAL_CLASS . 'api' . DS;
     $this->apiList = FilterFileFinder::getStrippedFiles($path, 'account');
-    $this->table = YAPEAL_TABLE_PREFIX . 'utilRegisteredUser';
-    $okeys = YapealDBConnection::getOptionalColumns($this->table, YAPEAL_DSN);
-    $rkeys = YapealDBConnection::getRequiredColumns($this->table, YAPEAL_DSN);
-    // Make an array of required and optional fields
-    $this->types = array_merge($rkeys, $okeys);
+    $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
+    try {
+      // Get a database connection.
+      $this->con = YapealDBConnection::connect(YAPEAL_DSN);
+    }
+    catch (ADODB_Exception $e) {
+      $mess = 'Failed to get database connection in ' . __CLASS__;
+      throw new RuntimeException($mess, 1);
+    }
+    // Get a new query builder object.
+    $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
+    // Get a list of column names and their ADOdb generic types.
+    $this->colTypes = $this->qb->getColumnTypes();
     // Was $id set?
     if (!empty($id)) {
-      // If $id is a number and doesn't exist yet set userID with it.
       // If $id has any characters other than 0-9 it's not an userID.
-      if (0 == strlen(str_replace(range(0,9),'',$id))) {
+      if (0 == strlen(str_replace(range(0,9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
           if (TRUE == $create) {
+            // If $id is a number and doesn't exist yet set userID with it.
             $this->properties['userID'] = $id;
           } else {
             $mess = 'Unknown user ' . $id;
-            throw new DomainException($mess, 1);
+            throw new DomainException($mess, 3);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer';
-        throw new InvalidArgumentException($mess, 3);
+        throw new InvalidArgumentException($mess, 4);
       };// else ...
     };// if !empty $id ...
   }// function __construct
+  /**
+   * Destructor used to make sure to release ADOdb resource correctly more for
+   * peace of mind than actual need.
+   */
+  public function __destruct() {
+    $this->con = NULL;
+  }// function __destruct
   /**
    * Used to add an API to the list in activeAPI.
    *
@@ -161,12 +184,11 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * @return bool TRUE if user was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', $this->types) . '`';
-    $sql .= ' from `' . $this->table . '`';
+    $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
+    $sql .= ' from `' . $this->tableName . '`';
     $sql .= ' where `userID`=' . $id;
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $result = $con->GetRow($sql);
+      $result = $this->con->GetRow($sql);
       if (!empty($result)) {
         $this->properties = $result;
         $this->recordExists = TRUE;
@@ -190,7 +212,7 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * field for this database table.
    */
   public function getItemByName($name) {
-    throw new LogicException('Not implimented for RegisteredUser table', 1);
+    throw new LogicException('Not implimented for ' . __CLASS__ . ' table', 1);
   }// function getItemByName
   /**
    * Function used to check if database record already existed.
@@ -201,19 +223,43 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
     return $this->recordExists;
   }// function recordExists
   /**
+   * Used to set default for column.
+   *
+   * @param string $name Name of the column.
+   * @param mixed $value Value to be used as default for column.
+   *
+   * @return bool Returns TRUE if column exists in table and default was set.
+   */
+  public function setDefault($name, $value) {
+    return $this->qb->setDefault($name, $value);
+  }// function setDefault
+  /**
+   * Used to set defaults for multiple columns.
+   *
+   * @param array $defaults List of column names and new default values.
+   *
+   * @return bool Returns TRUE if all column defaults could be set, else FALSE.
+   */
+  public function setDefaults(array $defaults) {
+    return $this->qb->setDefaults($defaults);
+  }// function setDefaults
+  /**
    * Used to store data into table.
    *
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    try {
-      YapealDBConnection::upsert($this->properties,
-        $this->table, YAPEAL_DSN);
-    }
-    catch (ADODB_Exception $e) {
+    $apis = explode(' ', $this->properties['activeAPI']);
+    $unknowns = array_diff($apis, $this->apiList);
+    if (!empty($unknowns)) {
+      $mess = 'activeAPI contains the following unknown APIs: ';
+      $mess .= implode(', ', $unknowns);
+      trigger_error($mess, E_USER_WARNING);
+    };
+    if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
-    }
-    return TRUE;
+    };// if FALSE === ...
+    return $this->qb->store();
   }// function store
 }
 ?>

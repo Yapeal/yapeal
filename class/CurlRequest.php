@@ -47,7 +47,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * {@link http://us3.php.net/manual/en/function.curl-exec.php#80442 php net}
  *
  * @package Yapeal
- * @subpackage cURL
+ * @subpackage Network
  */
 class CurlRequest {
   /**
@@ -55,7 +55,13 @@ class CurlRequest {
    */
   private $ch;
   /**
-   * Init curl session in constructor.
+   * Start curl session in constructor.
+   */
+  public function __construct() {
+    $this->ch = curl_init();
+  }// function __construct
+  /**
+   * Init curl session.
    *
    * $params=array(
    *   'method' => '',
@@ -71,15 +77,13 @@ class CurlRequest {
    *   ['user_agent' => '']
    * );
    *
-   * @param array $params An array of params that are used to set curl options
+   *
+   * @param array $params An array of parameters that are used to set curl options
    *
    * @return void
    */
-  public function __construct($params) {
-    $this->ch = curl_init();
+  public function init(array $params) {
     $curl = curl_version();
-    $user_agent = 'Yapeal/'. YAPEAL_VERSION . YAPEAL_STABILITY . ' (' . PHP_OS .
-      ' ' . php_uname('m') . ') libcurl/' . $curl['version'];
     $header = array(
       "Accept: text/xml,application/xml,application/xhtml+xml;q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;q=0.5",
       "Accept-Language: en-us;q=0.9,en;q=0.8,*;q=0.7",
@@ -99,9 +103,9 @@ class CurlRequest {
     if (isset($params['user_agent']) && $params['user_agent']) {
       $options[CURLOPT_USERAGENT] = $params['user_agent'];
     } else {
-      $options[CURLOPT_USERAGENT] = $user_agent;
+      $options[CURLOPT_USERAGENT] = YAPEAL_APPLICATION_AGENT;
     };
-    // Set unchanging curl options as a block.
+    // Set cURL options as a block.
     curl_setopt_array($this->ch, $options);
     // Add optional user params to preset header.
     if (isset($params['host']) && $params['host']) {
@@ -123,6 +127,8 @@ class CurlRequest {
     };
     // Set any method dependent params.
     switch ($params['method']) {
+      case 'GET':
+      break;
       case 'HEAD':
         @curl_setopt($this->ch, CURLOPT_NOBODY, 1);
       break;
@@ -130,13 +136,63 @@ class CurlRequest {
         @curl_setopt($this->ch, CURLOPT_POST, TRUE);
         @curl_setopt($this->ch, CURLOPT_POSTFIELDS, $params['content']);
       break;
-      case 'GET':
-      break;
     };
     // Set required user params.
-    @curl_setopt($this->ch, CURLOPT_TIMEOUT, $params['timeout']);
+    @curl_setopt($$this->ch, CURLOPT_TIMEOUT, $params['timeout']);
     @curl_setopt($this->ch, CURLOPT_URL, $params['url']);
-  }
+  }// function init
+  /**
+   * Use to get a cURL connection object.
+   *
+   * This method returns a new cURL connection object for each server URL. Only
+   * the scheme, host, port, user, pass of the URL are used, the fragment, path,
+   * and query are ignored.
+   *
+   * @param string $params A cURL compatible connection string.
+   *
+   * @return object Returns cURL connection object.
+   *
+   * @throws InvalidArgumentException if $params is empty or if $params isn't an
+   * array it will throw InvalidArgumentException.
+   * @throws LengthException if 'url', 'method', or 'timeout' are missing from
+   * $params will throw LengthException. Will also throw LengthException if
+   * 'scheme' and 'host' aren't included in $params['url'].
+   */
+  public static function connect($params) {
+    if (!(self::$instance instanceof self)) {
+      self::$instance = new self();
+    };
+    if (empty($params) || !is_array($params)) {
+      throw new InvalidArgumentException('$params was empty or not an array');
+    };
+    $required = array('url', 'method', 'timeout');
+    $missing = array_diff($required, array_keys($params));
+    if (count($missing)) {
+      $mess = 'Missing required params (' . implode(', ', $missing) . ')';
+      throw new LengthException($mess, 1);
+    };
+    $parts = parse_url($params['url']);
+    $keys = array_keys($parts);
+    $required = array('scheme', 'host');
+    $missing = array_diff($required, $keys);
+    if (count($missing)) {
+      $mess = 'Missing required url parts (' . implode(', ', $missing) . ')';
+      throw new LengthException($mess, 2);
+    };
+    $used = array('scheme', 'host', 'port', 'user', 'pass');
+    $available = array_intersect($used, $keys);
+    $server = '';
+    foreach ($available as $k) {
+      $server .= $parts[$k];
+    };
+    $hash = hash('sha1', $server);
+    if (!array_key_exists($hash, self::$connections)) {
+      $ch = curl_init();
+      self::$connections[$hash] = $ch;
+    };
+    self::init(self::$connections[$hash], $params);
+    return self::$connections[$hash];
+  }// function connect
   /**
    * Make curl request.
    *

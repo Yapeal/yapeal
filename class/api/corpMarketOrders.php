@@ -44,61 +44,21 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store corp MarketOrders API.
  *
  * @package Yapeal
- * @subpackage Api_corporation
+ * @subpackage Api_corp
  */
-class corpMarketOrders extends ACorporation {
+class corpMarketOrders extends ACorp {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'MarketOrders';
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to store XML to MarketOrders table.
+   * Constructor
    *
-   * @return Bool Return TRUE if store was successful.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiStore() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $this->xml = $this->xml->xpath($this->xpath);
-      $cnt = count($this->xml);
-      if ($cnt > 0) {
-        try {
-          $extras = array('ownerID' => $this->corporationID);
-          for ($i = 0, $grp = (int)ceil($cnt / YAPEAL_MAX_UPSERT),$pos = 0;
-              $i < $grp;++$i, $pos += YAPEAL_MAX_UPSERT) {
-            $group = array_slice($this->xml, $pos, YAPEAL_MAX_UPSERT, TRUE);
-            YapealDBConnection::multipleUpsertAttributes($group, $tableName,
-              YAPEAL_DSN, $extras);
-          };// for $i = 0...
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $datum ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array( 'tableName' => $tableName,
-          'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
-        );
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
 }
 ?>

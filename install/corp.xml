@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema version="0.3" xmlns="http://yapeal.googlecode.com/files/xmlschema03">
+<schema version="0.3">
 <!--
 /**
  * XML from Yapeal.
@@ -26,7 +26,7 @@
  * @copyright  Copyright (c) 2008-2010, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
- * @subpackage Setup
+ * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eve-online.com/
  */
@@ -50,13 +50,31 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="corpAllianceContactList">
+    <descr>Sub table from /corp/ContactList.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="corpAssetList">
     <descr>Table for /corp/AssetList.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`flag`" type="I1" size="3">
+    <field name="`flag`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -92,6 +110,12 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <index name="`corpAssetList1`">
+      <col>`lft`</col>
+    </index>
+    <index name="`corpAssetList2`">
+      <col>`locationID`</col>
+    </index>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAttackers">
@@ -141,6 +165,24 @@
     <field name="`weaponTypeID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpCalendarEventAttendees">
+    <descr>Table for /corp/CalendarEventAttendees.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`response`" type="C" size="32">
+      <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
@@ -196,7 +238,7 @@
     <field name="`actorName`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <field name="`flag`" type="I2" size="4">
+    <field name="`flag`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -236,6 +278,24 @@
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="corpCorporateContactList">
+    <descr>Sub table from /corp/ContactList.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="corpCorporationSheet">
     <descr>Main table for /corp/CorporationSheet.xml.aspx</descr>
     <field name="`allianceID`" type="I8" size="20">
@@ -265,6 +325,7 @@
     </field>
     <field name="`memberLimit`" type="I2" size="5">
       <NOTNULL/>
+      <DEFAULT value="0"/>
       <UNSIGNED/>
     </field>
     <field name="`shares`" type="I8" size="20">
@@ -341,11 +402,11 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`deployFlags`" type="I2" size="3">
+    <field name="`deployFlags`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`usageFlags`" type="I2" size="3">
+    <field name="`usageFlags`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -409,7 +470,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`installedItemFlag`" type="I1" size="3">
+    <field name="`installedItemFlag`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -443,7 +504,7 @@
       <UNSIGNED/>
     </field>
     <field name="`installTime`" type="T">
-      <KEY/>
+      <NOTNULL/>
     </field>
     <field name="`jobID`" type="I8" size="20">
       <KEY/>
@@ -455,7 +516,7 @@
     <field name="`materialMultiplier`" type="N" size="4.2">
       <NOTNULL/>
     </field>
-    <field name="`outputFlag`" type="I1" size="3">
+    <field name="`outputFlag`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -481,7 +542,7 @@
   </table>
   <table name="corpItems">
     <descr>Sub table from /corp/KillLog.xml.aspx</descr>
-    <field name="`flag`" type="I1" size="3">
+    <field name="`flag`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -620,11 +681,9 @@
       <NOTNULL/>
     </field>
     <field name="`stationID`" type="I8" size="20">
-      <KEY/>
       <UNSIGNED/>
     </field>
     <field name="`typeID`" type="I8" size="20">
-      <KEY/>
       <UNSIGNED/>
     </field>
     <field name="`volEntered`" type="I8" size="20">
@@ -634,6 +693,56 @@
     <field name="`volRemaining`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpMedals">
+    <descr>Table for /corp/Medals.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`created`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`creatorID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`description`" type="X"/>
+    <field name="`medalID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`title`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpMemberMedals">
+    <descr>Table for /corp/MemberMedals.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`medalID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`issued`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`issuerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`reason`" type="X"/>
+    <field name="`status`" type="C" size="32">
+      <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
@@ -689,41 +798,77 @@
     </index>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <table name="corpStandingsAllianceToAlliances">
-    <descr>Sub table from /corp/Standings.xml.aspx that is only available if corporation is in an alliance</descr>
+  <table name="corpOutpostList">
+    <descr>Table for /corp/OutpostList.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`standing`" type="N" size="5.2">
-     <NOTNULL/>
+    <field name="`dockingCostPerShipVolume`" type="N" size="17.2">
+      <NOTNULL/>
     </field>
-    <field name="`toID`" type="I8" size="20">
+    <field name="`officeRentalCost`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`reprocessingEfficiency`" type="N" size="5.4">
+      <NOTNULL/>
+    </field>
+    <field name="`reprocessingStationTake`" type="N" size="5.4">
+      <NOTNULL/>
+    </field>
+    <field name="`solarSystemID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`standingOwnerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stationID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`toName`" type="C" size="255">
+    <field name="`stationName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`stationTypeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="corpOutpostServiceDetail">
+    <descr>Table for /corp/OutpostServiceDetail.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`stationID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`discountPerGoodStanding`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <field name="`minStanding`" type="N" size="5.2">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`serviceName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`surchargePerBadStanding`" type="N" size="5.2">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="corpStandingsAllianceToAlliances">
+    <descr>Replaced by ContactList</descr>
+    <DROP/>
+  </table>
   <table name="corpStandingsAllianceToCorporations">
-    <descr>Sub table from /corp/Standings.xml.aspx that is only available if corporation is in an alliance</descr>
-    <field name="`ownerID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`standing`" type="N" size="5.2">
-      <NOTNULL/>
-    </field>
-    <field name="`toID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`toName`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <descr>Replaced by ContactList</descr>
+    <DROP/>
   </table>
   <table name="corpStandingsFromAgents">
     <descr>Sub table from /corp/Standings.xml.aspx</descr>
@@ -780,58 +925,16 @@
     <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsToAlliances">
-    <descr>Sub table from /corp/Standings.xml.aspx</descr>
-    <field name="`ownerID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`standing`" type="N" size="5.2">
-     <NOTNULL/>
-    </field>
-    <field name="`toID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`toName`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <descr>Replaced by ContactList</descr>
+    <DROP/>
   </table>
   <table name="corpStandingsToCharacters">
-    <descr>Sub table from /corp/Standings.xml.aspx</descr>
-    <field name="`ownerID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`standing`" type="N" size="5.2">
-      <NOTNULL/>
-    </field>
-    <field name="`toID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`toName`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <descr>Replaced by ContactList</descr>
+    <DROP/>
   </table>
   <table name="corpStandingsToCorporations">
-    <descr>Sub table from /corp/Standings.xml.aspx</descr>
-    <field name="`ownerID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`standing`" type="N" size="5.2">
-      <NOTNULL/>
-    </field>
-    <field name="`toID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`toName`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <descr>Replaced by ContactList</descr>
+    <DROP/>
   </table>
   <table name="corpStarbaseDetail">
     <descr>Main table from /corp/StarbaseDetail.xml.aspx</descr>
@@ -968,7 +1071,7 @@
       <NOTNULL/>
     </field>
     <field name="`date`" type="T">
-      <KEY/>
+      <NOTNULL/>
     </field>
     <field name="`ownerID1`" type="I8" size="20">
       <UNSIGNED/>
@@ -983,7 +1086,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`refTypeID`" type="I" size="3">
+    <field name="`refTypeID`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -1019,7 +1122,7 @@
     </field>
     <field name="`stationName`" type="C" size="255"/>
     <field name="`transactionDateTime`" type="T">
-      <KEY/>
+      <NOTNULL/>
     </field>
     <field name="`transactionFor`" type="C" size="255">
       <NOTNULL/>
@@ -1068,12 +1171,12 @@
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP</query>
+    <query platform="mysql">ALTER TABLE `%%PcorpMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`sectionName`)
-      VALUES('AccountBalance AssetList CorporationSheet IndustryJobs KillLog MarketOrders MemberTracking Standings StarbaseList StarbaseDetail WalletJournal WalletTransactions',0,3,'corp')
-      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`sectionName`=VALUES(`sectionName`)
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)
+      VALUES('AccountBalance AssetList ContactList CorporationSheet ContainerLog IndustryJobs KillLog MarketOrders Medals MemberMedals MemberTracking OutpostList Standings StarbaseList StarbaseDetail WalletJournal WalletTransactions',0,3,'corp')
+      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>
 </schema>

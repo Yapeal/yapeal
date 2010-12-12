@@ -25,9 +25,9 @@
  * @copyright  Copyright (c) 2008-2009, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
+ * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eve-online.com/
- * @since      revision ###
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -61,7 +61,7 @@ for ($i = 1; $i < $argc; ++$i) {
 if ($argc == 2) {
   $required = explode(' ', $argv[1]);
 } else {
-  $required = array('curl', 'date', 'mysqli', 'SimpleXML', 'SPL');
+  $required = array('curl', 'date', 'hash', 'mysqli', 'SPL', 'xmlreader');
 };
 $exts = get_loaded_extensions();
 $ret = 'false';

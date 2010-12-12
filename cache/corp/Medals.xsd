@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="created" use="required" type="eveDT"/>
+    <xs:attribute name="creatorID" use="required" type="eveID"/>
+    <xs:attribute name="description" use="required" type="xs:string"/>
+    <xs:attribute name="medalID" use="required" type="eveID"/>
+    <xs:attribute name="title" use="required" type="xs:string"/>
+  </xs:complexType>
+ </xs:schema>

@@ -48,57 +48,39 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class accountCharacters extends AAccount {
   /**
-   * @var string Holds the name of the API.
-   */
-  protected $api = 'Characters';
-  /**
-   * @var SimpleXMLElement Hold the XML return from API.
-   */
-  protected $xml;
-  /**
-   * @var string Xpath used to select data from XML.
-   */
-  private $xpath = '//row';
-  /**
-   * Used to save an item into database.
+   * Constructor
    *
-   * Parent item (object) should call all child(ren)'s apiStore() as appropriate.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
    *
-   * @return boolean Returns TRUE if item was saved to database.
+   * @throws LengthException for any missing required $params.
    */
-  function apiStore() {
-    $ret = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    if ($this->xml instanceof SimpleXMLElement) {
-      $cuntil = (string)$this->xml->cachedUntil[0];
-      $this->xml = $this->xml->xpath($this->xpath);
-      if (count($this->xml) > 0) {
-        try {
-          $extras = array('userID' => $this->userID);
-          YapealDBConnection::multipleUpsertAttributes($this->xml, $tableName,
-            YAPEAL_DSN, $extras);
-        }
-        catch (ADODB_Exception $e) {
-          return FALSE;
-        }
-        $ret = TRUE;
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      $ret = FALSE;
-      };// else count $this->xml ...
-      try {
-        // Update CachedUntil time since we should have a new one.
-        $data = array('tableName' => $tableName, 'ownerID' => $this->userID,
-          'cachedUntil' => $cuntil);
-        YapealDBConnection::upsert($data,
-          YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
-      }
-      catch (ADODB_Exception $e) {
-        // Already logged nothing to do here.
-      }
-    };// if $this->xml ...
-    return $ret;
-  }// function apiStore()
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
+  /**
+   * Method used to prepare database table(s) before parsing API XML data.
+   *
+   * If there is any need to delete records or empty tables before parsing XML
+   * and adding the new data this method should be used to do so.
+   *
+   * @return bool Will return TRUE if table(s) were prepared correctly.
+   */
+  protected function prepareTables() {
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      // Empty out old data then upsert (insert) new.
+      $sql = 'delete from `';
+      $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
+      $sql .= ' where `userID`=' . $this->ownerID;
+      $con->Execute($sql);
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }// function prepareTables
 }
 ?>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="corporationID" use="required" type="eveID"/>
+    <xs:attribute name="corporationName" use="required" type="xs:string"/>
+    <xs:attribute name="solarSystemID" use="required" type="eveID"/>
+    <xs:attribute name="stationID" use="required" type="eveID"/>
+    <xs:attribute name="stationName" use="required" type="xs:string"/>
+    <xs:attribute name="stationTypeID" use="required" type="eveID"/>
+  </xs:complexType>
+</xs:schema>

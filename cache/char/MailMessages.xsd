@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="messageID" use="required" type="eveID"/>
+    <xs:attribute name="senderID" use="required" type="eveID"/>
+    <xs:attribute name="sentDate" type="eveDT"/>
+    <xs:attribute name="title" use="required" type="xs:string"/>
+    <xs:attribute name="toCorpOrAllianceID" use="required" type="xs:string"/>
+    <xs:attribute name="toCharacterIDs" use="required" type="xs:string"/>
+    <xs:attribute name="toListID" use="optional" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

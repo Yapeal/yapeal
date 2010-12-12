@@ -50,38 +50,23 @@ class SectionMap {
   /**
    * @var array Holds the list of APIs for this section.
    */
-  private $apiList = array();
-  /**
-   * @var string Hold proxy string to pass to this section's APIs.
-   */
-  private $proxy = '';
+  private $apiList;
   /**
    * @var string Hold section name.
    */
-  private $section = '';
-  /**
-   * @var string Holds the Eve server name.
-   */
-  private $serverName = '';
+  private $section;
   /**
    * Constructor
    *
-   * @param string $proxy Allows overriding API server for example to use a
-   * different proxy on a per char/corp basis. It should contain a url format
-   * string made to used in sprintf() to replace %1$s with $api and %2$s with
-   * $section as needed to complete the url. For example:
-   * 'http://api.eve-online.com/%2$s/%1$s.xml.aspx' for normal Eve API server.
    * @param array $allowedAPIs An array of admin allowed APIs in this section.
    * Used to limit which APIs out of the list of APIs from this section will be
    * fetched.
    */
-  public function __construct($proxy, $allowedAPIs) {
-    $this->section ='map';
+  public function __construct($allowedAPIs) {
+    $this->section = strtolower(str_replace('Section', '', __CLASS__));
     $path = YAPEAL_CLASS . 'api' . DS;
     $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
     $this->apiList = array_intersect($allowedAPIs, $knownApis);
-    $this->proxy = $proxy;
-    $this->serverName = 'Tranquility';
   }
   /**
    * Function called by Yapeal.php to start section pulling XML from servers.
@@ -91,47 +76,61 @@ class SectionMap {
   public function pullXML() {
     $apiCount = 0;
     $apiSuccess = 0;
+    if (count($this->apiList) == 0) {
+      $mess = 'None of the allowed APIs are currently active for ' . $this->section;
+      trigger_error($mess, E_USER_NOTICE);
+      return FALSE;
+    };
+    // Randomize order in which APIs are tried if there is a list.
+    if (count($this->apiList) > 1) {
+      shuffle($this->apiList);
+    };
     try {
       foreach ($this->apiList as $api) {
-        ++$apiCount;
-        $class = $this->section . $api;
-        $tableName = YAPEAL_TABLE_PREFIX . $class;
-        // Should we wait to get API data
-        if (YapealDBConnection::dontWait($tableName)) {
-          // Set it so we wait a bit before trying again if something goes wrong.
-          $data = array('tableName' => $tableName,
-            'ownerID' => 0, 'cachedUntil' => YAPEAL_START_TIME);
+        // If the cache for this API has expire try to get update.
+        if (CachedUntil::cacheExpired($api) === TRUE) {
+          ++$apiCount;
+          $class = $this->section . $api;
+          $hash = hash('sha1', $class);
+          // These are passed on to the API class instance and used as part of
+          // hash for lock.
+          $params = array();
+          // Use lock to keep from wasting time trying to do API that another
+          // Yapeal is already working on.
           try {
-            YapealDBConnection::upsert($data,
-              YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
+            if ($con->GetOne($sql) != 1) {
+              $mess = 'Failed to get lock for ' . $class . $hash;
+              trigger_error($mess, E_USER_NOTICE);
+              continue;
+            };// if $con->GetOne($sql) ...
           }
-          catch(ADODB_Exception $e) {}
-        } else {
-          continue;
-        };// else dontWait ...
-        $params = array('serverName' => $this->serverName);
-        $instance = new $class($this->proxy, $params);
-        if ($instance->apiFetch()) {
-          ++$apiSuccess;
-        };
-        if ($instance->apiStore()) {
-          ++$apiSuccess;
-        };
-        trigger_error('Current memory used:' . memory_get_usage(TRUE), E_USER_NOTICE);
-        $instance = null;
-        // See if we've taken to long to run and exit if TRUE.
+          catch(ADODB_Exception $e) {
+            continue;
+          }
+          // Give each API 60 seconds to finish. This should never happen but is
+          // here to catch runaways.
+          set_time_limit(60);
+          $instance = new $class($params);
+          if ($instance->apiStore()) {
+            ++$apiSuccess;
+          };
+          $instance = null;
+        };// if CachedUntil::cacheExpired...
+        // See if Yapeal has been running for longer than 'soft' limit.
         if (YAPEAL_MAX_EXECUTE < time()) {
-          $mess = 'Yapeal took to long to execute';
+          $mess = 'Yapeal has been working very hard and needs a break';
           trigger_error($mess, E_USER_NOTICE);
           exit;
-        };// if YAPEAL_START_TIME < $cuntil ...
-     };// foreach $apis ...
+        };// if YYAPEAL_MAX_EXECUTE < time() ...
+      };// foreach $apis ...
     }
     catch (ADODB_Exception $e) {
       // Do nothing use observers to log info
     }
     // Only truly successful if API was fetched and stored.
-    if ($apiCount * 2 == $apiSuccess) {
+    if ($apiCount == $apiSuccess) {
       return TRUE;
     } else {
       return FALSE;

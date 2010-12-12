@@ -3,205 +3,188 @@
   <xsd:element name="schema">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="table" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="sql" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="table" type="table" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element name="sql" type="sql" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="version" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
-  <xsd:element name="table">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="descr" minOccurs="0" maxOccurs="1"/>
-        <xsd:choice>
-          <xsd:element ref="DROP"/>
-          <xsd:element ref="field" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:choice>
-        <xsd:element ref="constraint" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="opt" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="index" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="data" minOccurs="0" maxOccurs="unbounded"/>
-      </xsd:sequence>
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-      <xsd:attribute name="version" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="field">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="descr" minOccurs="0" maxOccurs="1"/>
-        <xsd:choice minOccurs="0" maxOccurs="1">
-          <xsd:element ref="NOTNULL"/>
-          <xsd:element ref="KEY"/>
-          <xsd:element ref="PRIMARY"/>
-        </xsd:choice>
-        <xsd:choice minOccurs="0" maxOccurs="1">
-          <xsd:element ref="AUTO"/>
-          <xsd:element ref="AUTOINCREMENT"/>
-        </xsd:choice>
-        <xsd:choice minOccurs="0" maxOccurs="1">
-          <xsd:element ref="DEFAULT"/>
-          <xsd:element ref="DEFDATE"/>
-          <xsd:element ref="DEFTIMESTAMP"/>
-        </xsd:choice>
-        <xsd:element ref="NOQUOTE" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="UNSIGNED" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="constraint" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="opt" minOccurs="0" maxOccurs="unbounded"/>
-      </xsd:sequence>
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-      <xsd:attribute name="type" use="required">
-        <xsd:simpleType>
-          <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="C"/>
-            <xsd:enumeration value="C2"/>
-            <xsd:enumeration value="X"/>
-            <xsd:enumeration value="X2"/>
-            <xsd:enumeration value="B"/>
-            <xsd:enumeration value="D"/>
-            <xsd:enumeration value="T"/>
-            <xsd:enumeration value="L"/>
-            <xsd:enumeration value="I"/>
-            <xsd:enumeration value="I1"/>
-            <xsd:enumeration value="I2"/>
-            <xsd:enumeration value="I8"/>
-            <xsd:enumeration value="F"/>
-            <xsd:enumeration value="N"/>
-          </xsd:restriction>
-        </xsd:simpleType>
-      </xsd:attribute>
-      <xsd:attribute name="size" type="xsd:string" use="optional"/>
-      <xsd:attribute name="opts" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="data">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="descr" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="row" maxOccurs="unbounded"/>
-      </xsd:sequence>
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="row">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="f" minOccurs="1" maxOccurs="unbounded"/>
-      </xsd:sequence>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="f">
-    <xsd:complexType mixed="true">
-      <xsd:attribute name="name" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="descr" type="xsd:string"/>
-  <xsd:element name="NOTNULL">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="KEY">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="PRIMARY">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="AUTO">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="AUTOINCREMENT">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="DEFAULT">
-    <xsd:complexType>
-      <xsd:attribute name="value" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="DEFDATE">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="DEFTIMESTAMP">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="NOQUOTE">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="UNSIGNED">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="DROP">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="constraint">
-    <xsd:complexType mixed="true">
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="opt">
-    <xsd:complexType mixed="true">
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="index">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:choice>
-          <xsd:element ref="col" minOccurs="1" maxOccurs="unbounded"/>
-          <xsd:element ref="DROP"/>
-        </xsd:choice>
-        <xsd:element ref="CLUSTERED" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="BITMAP" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="UNIQUE" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="FULLTEXT" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="HASH" minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="descr" minOccurs="0" maxOccurs="1"/>
-      </xsd:sequence>
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="col">
-    <xsd:complexType mixed="true">
+  <xsd:complexType name="table">
+    <xsd:sequence>
+      <xsd:element name="descr" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:choice>
+        <xsd:element name="DROP">
+          <xsd:complexType/>
+        </xsd:element>
+        <xsd:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:choice>
+      <xsd:element name="index" type="index" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="constraint" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="opt" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="data" type="data" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+    <xsd:attribute name="version" type="xsd:string" use="optional"/>
   </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="CLUSTERED">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="BITMAP">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="UNIQUE">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="FULLTEXT">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="HASH">
-    <xsd:complexType/>
-  </xsd:element>
-  <xsd:element name="sql">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="query" minOccurs="1" maxOccurs="unbounded"/>
-        <xsd:element ref="descr" minOccurs="0" maxOccurs="1"/>
-      </xsd:sequence>
-      <xsd:attribute name="name" type="xsd:string" use="optional"/>
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-      <xsd:attribute name="key" type="xsd:string" use="optional"/>
-      <xsd:attribute name="prefixmethod" use="optional">
-        <xsd:simpleType>
-          <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="AUTO"/>
-            <xsd:enumeration value="MANUAL"/>
-            <xsd:enumeration value="NONE"/>
-          </xsd:restriction>
-        </xsd:simpleType>
-      </xsd:attribute>
-    </xsd:complexType>
-  </xsd:element>
-  <xsd:element name="query">
-    <xsd:complexType mixed="true">
-      <xsd:attribute name="platform" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
+  <xsd:complexType name="data">
+    <xsd:sequence>
+      <xsd:element name="descr" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="row" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="f" minOccurs="1" maxOccurs="unbounded">
+              <xsd:complexType mixed="true">
+                <xsd:attribute name="name" type="xsd:string" use="optional"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="field">
+    <xsd:sequence>
+      <xsd:element name="descr" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:element name="NOTNULL">
+          <xsd:complexType/>
+        </xsd:element>
+        <xsd:element name="KEY">
+          <xsd:complexType/>
+        </xsd:element>
+        <xsd:element name="PRIMARY">
+          <xsd:complexType/>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:element name="AUTO">
+          <xsd:complexType/>
+        </xsd:element>
+        <xsd:element name="AUTOINCREMENT">
+          <xsd:complexType/>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:element name="DEFAULT">
+          <xsd:complexType>
+            <xsd:attribute name="value" type="xsd:string" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="DEFDATE">
+          <xsd:complexType/>
+        </xsd:element>
+        <xsd:element name="DEFTIMESTAMP">
+          <xsd:complexType/>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="NOQUOTE" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="UNSIGNED" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="constraint" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="opt" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attributeGroup ref="fieldAttrs"/>
+  </xsd:complexType>
+  <xsd:complexType name="index">
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="col" minOccurs="1" maxOccurs="unbounded">
+          <xsd:complexType mixed="true">
+        </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="DROP">
+          <xsd:complexType/>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="CLUSTERED" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="BITMAP" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="UNIQUE" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="FULLTEXT" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="HASH" minOccurs="0" maxOccurs="1">
+        <xsd:complexType/>
+      </xsd:element>
+      <xsd:element name="descr" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:complexType name="sql">
+    <xsd:sequence>
+      <xsd:element name="query" minOccurs="1" maxOccurs="unbounded">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="descr" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="optional"/>
+    <xsd:attribute name="platform" type="xsd:string" use="optional"/>
+    <xsd:attribute name="key" type="xsd:string" use="optional"/>
+    <xsd:attribute name="prefixmethod" use="optional">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="AUTO"/>
+          <xsd:enumeration value="MANUAL"/>
+          <xsd:enumeration value="NONE"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+  <xsd:attributeGroup name="fieldAttrs">
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="type" use="required">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="C"/>
+          <xsd:enumeration value="C2"/>
+          <xsd:enumeration value="X"/>
+          <xsd:enumeration value="X2"/>
+          <xsd:enumeration value="XL"/>
+          <xsd:enumeration value="B"/>
+          <xsd:enumeration value="D"/>
+          <xsd:enumeration value="T"/>
+          <xsd:enumeration value="TS"/>
+          <xsd:enumeration value="L"/>
+          <xsd:enumeration value="I"/>
+          <xsd:enumeration value="I1"/>
+          <xsd:enumeration value="I2"/>
+          <xsd:enumeration value="I4"/>
+          <xsd:enumeration value="I8"/>
+          <xsd:enumeration value="F"/>
+          <xsd:enumeration value="N"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="size" type="xsd:string" use="optional"/>
+    <xsd:attribute name="opts" type="xsd:string" use="optional"/>
+  </xsd:attributeGroup>
 </xsd:schema>

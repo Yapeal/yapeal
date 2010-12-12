@@ -44,319 +44,358 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Class used to fetch and store corp KillLog API.
  *
  * @package Yapeal
- * @subpackage Api_corporation
+ * @subpackage Api_corp
  */
-class corpKillLog extends ACorporation {
+class corpKillLog extends ACorp {
   /**
-   * @var string Holds the name of the API.
+   * @var object QueryBuilder instance for attackers table.
    */
-  protected $api = 'KillLog';
+  protected $attackers;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var string Holds the refID from each row in turn to use when walking.
    */
-  protected $xml = array();
+  private $beforeID;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var string Holds the date from each row in turn to use when walking.
    */
-  protected $killList = array();
+  private $date;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var object QueryBuilder instance for items table.
    */
-  protected $victimList = array();
+  protected $items;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var integer Hold row count used in walking.
    */
-  protected $attackersList = array();
+  private $rowCount;
   /**
-   * @var array Hold an array of the XML return from API.
+   * @var array Holds a stack of parent nodes until after their children are
+   * proccessed.
    */
-  protected $itemsList = array();
+  private $stack = array();
   /**
-   * @var string Xpath used to select data from XML.
+   * @var object QueryBuilder instance for victim table.
    */
-  private $xpath = '//rowset[@name="kills"]/row';
+  protected $victim;
   /**
-   * Used to get an item from Eve API.
+   * Constructor
    *
-   * @return boolean Returns TRUE if item received.
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
    */
-  public function apiFetch() {
-    $ret = 0;
-    $xml = FALSE;
-    $tableName = $this->tablePrefix . $this->api;
-    $oldest = strtotime('7 days ago');
-    $beforeID = 0;
-    do {
-      $postData = array('apiKey' => $this->apiKey, 'beforeKillID' => $beforeID,
-        'characterID' => $this->characterID, 'userID' => $this->userID
-      );
-      $cnt = 0;
-      try {
-        // Build base part of cache file name.
-        $cacheName = $this->serverName . $tableName;
-        $cacheName .= $this->corporationID . $beforeID;
-        // Try to get XML from local cache first if we can.
-        $xml = YapealApiRequests::getCachedXml($cacheName, YAPEAL_API_CORP);
-        if ($xml === FALSE) {
-          $xml = YapealApiRequests::getAPIinfo($this->api, YAPEAL_API_CORP,
-            $postData, $this->proxy);
-          if ($xml instanceof SimpleXMLElement) {
-            YapealApiRequests::cacheXml($xml->asXML(), $cacheName,
-              YAPEAL_API_CORP);
-          };// if $xml ...
-        };// if $xml === FALSE ...
-        if ($xml !== FALSE) {
-          $this->xml[] = $xml;
-          $datum = $xml->xpath($this->xpath);
-          $cnt = count($datum);
-          if ($cnt > 0) {
-            // Get date/time of last record
-            $lastDT = strtotime($datum[$cnt - 1]['killTime'] . ' +0000');
-            // If last record is less than a week old we might be able to
-            // continue walking backwards through records.
-            if ($oldest < $lastDT) {
-              $beforeID = (string)$datum[$cnt - 1]['killID'];
-              // Pause to let CCP figure out we got last group of records before
-              // trying to getting another batch :P
-              sleep(2);
-            } else {
-              // Leave while loop if we can't walk back anymore.
-              break;
-            };// else $oldest<$lastDT
-          } else {
-            $mess = 'No records for ' . $tableName;
-            trigger_error($mess, E_USER_NOTICE);
-            break;
-          }
-        } else {
-          $mess = 'No XML found for ' . $tableName;
-          trigger_error($mess, E_USER_NOTICE);
-          continue;
-        };// else $xml !== FALSE ...
-      }
-      catch (YapealApiErrorException $e) {
-        // Any API errors that need to be handled in some way are handled in this
-        // function.
-        $this->handleApiError($e);
-        return FALSE;
-      }
-      catch (YapealApiFileException $e) {
-        return FALSE;
-      }
-      catch (ADODB_Exception $e) {
-        return FALSE;
-      }
-    } while ($cnt == 100);
-    ++$ret;
-    if ($ret == 1) {
-      return TRUE;
-    };
-    return FALSE;
-  }// function apiFetch
+  public function __construct(array $params) {
+    parent::__construct($params);
+    $this->api = str_replace($this->section, '', __CLASS__);
+  }// function __construct
   /**
-   * Used to store XML to KillLog tables.
+   * Used to store XML to MySQL table(s).
    *
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    $ret = 0;
-    $cuntil = '1970-01-01 00:00:01';
-    $tableName = $this->tablePrefix . $this->api;
-    if (empty($this->xml)) {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      return FALSE;
-    };// if empty $this->xml ...
-    foreach ($this->xml as $xml) {
-      $kills = $xml->xpath('//rowset[@name="kills"]/row');
-      $cnt = count($kills);
-     if ($cnt > 0) {
-        for ($i = 0; $i < $cnt; ++$i) {
-          $kill = $kills[$i];
-          $killID = $kill['killID'];
-          $this->attackers($kill, $killID);
-          $this->killLog($kill, $killID);
-          $this->items($kill, $killID);
-          $this->victim($kill, $killID);
-          // Release memory as we go.
-          unset($kills[$i]);
-        };// for $i = 0...
-        if (!empty($this->attackersList)) {
-          $tableName = $this->tablePrefix . 'Attackers';
-          $extras = array('finalBlow' => 0);
-          try {
-            YapealDBConnection::multipleUpsertAttributes($this->attackersList,
-              $tableName, YAPEAL_DSN);
-            ++$ret;
-          }
-          catch (ADODB_Exception $e) {
-            // Just logging here.
-          }
-        };// if !empty $this->attackersList ...
-        if (!empty($this->itemsList)) {
-          $tableName = $this->tablePrefix . 'Items';
-          try {
-            YapealDBConnection::multipleUpsertAttributes($this->itemsList,
-              $tableName, YAPEAL_DSN);
-            ++$ret;
-          }
-          catch (ADODB_Exception $e) {
-            // Just logging here.
-          }
-        };// if !empty $this->itemsList ...
-        if (!empty($this->killList)) {
-          $tableName = $this->tablePrefix . 'KillLog';
-          try {
-            YapealDBConnection::multipleUpsertAttributes($this->killList,
-              $tableName, YAPEAL_DSN);
-            ++$ret;
-          }
-          catch (ADODB_Exception $e) {
-            // Just logging here.
-          }
-        };// if !empty $this->killList ...
-        if (!empty($this->victimList)) {
-          $tableName = $this->tablePrefix . 'Victim';
-          try {
-            YapealDBConnection::multipleUpsertAttributes($this->victimList,
-              $tableName, YAPEAL_DSN);
-            ++$ret;
-          }
-          catch (ADODB_Exception $e) {
-            // Just logging here.
-          }
-        };// if !empty $this->victimList ...
-      } else {
-      $mess = 'There was no XML data to store for ' . $tableName;
-      trigger_error($mess, E_USER_NOTICE);
-      };// else count $datum ...
-    };// foreach $this->xml ...
+    // This counter is used to insure do ... while can't become infinite loop.
+    $counter = 1000;
+    $this->date = '1970-01-01 00:00:01';
+    $this->beforeID = 0;
     try {
-      $tableName = $this->tablePrefix . $this->api;
-      // Update CachedUntil time since we updated records and have new one.
-      $cuntil = (string)$xml->cachedUntil[0];
-      $data = array( 'tableName' => $tableName,
-        'ownerID' => $this->corporationID, 'cachedUntil' => $cuntil
-      );
-      YapealDBConnection::upsert($data,
-        YAPEAL_TABLE_PREFIX . 'utilCachedUntil', YAPEAL_DSN);
+      do {
+        // Give each API 60 seconds to finish. This should never happen but is
+        // here to catch runaways.
+        set_time_limit(60);
+        /* Not going to assume here that API servers figure oldest allowed
+         * entry based on a saved time from first pull but instead use current
+         * time. The few seconds of difference shouldn't cause any missed data
+         * and is safer than assuming.
+         */
+        $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
+        // Need to add extra stuff to normal parameters to make walking work.
+        $apiParams = $this->params;
+        // This tells API server where to start from when walking.
+        $apiParams['beforeKillID'] = $this->beforeID;
+        // First get a new cache instance.
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        // See if there is a valid cached copy of the API XML.
+        $result = $cache->getCachedApi();
+        // If it's not cached need to try to get it.
+        if (FALSE === $result) {
+          $proxy = $this->getProxy();
+          $con = new YapealNetworkConnection();
+          $result = $con->retrieveXml($proxy, $apiParams);
+          // FALSE means there was an error and it has already been report so just
+          // return to caller.
+          if (FALSE === $result) {
+            return FALSE;
+          };
+          // Cache the received result.
+          $cache->cacheXml($result);
+          // Check if XML is valid.
+          if (FALSE === $cache->isValid()) {
+            // No use going any farther if the XML isn't valid.
+            return FALSE;
+          };
+        };// if FALSE === $result ...
+        // Create XMLReader.
+        $this->xr = new XMLReader();
+        // Pass XML to reader.
+        $this->xr->XML($result);
+        // Outer structure of XML is processed here.
+        while ($this->xr->read()) {
+          if ($this->xr->nodeType == XMLReader::ELEMENT &&
+            $this->xr->localName == 'result') {
+            $result = $this->parserAPI();
+          };// if $this->xr->nodeType ...
+        };// while $this->xr->read() ...
+        $this->xr->close();
+        // Leave loop if already got as many entries as API servers allow.
+        if ($this->rowCount != 100 || $this->date < $oldest) {
+          break;
+        };
+      } while ($counter--);
+    }
+    catch (YapealApiErrorException $e) {
+      // Any API errors that need to be handled in some way are handled in this
+      // function.
+      $this->handleApiError($e);
+      return FALSE;
     }
     catch (ADODB_Exception $e) {
-      // Already logged nothing to do here.
+      return FALSE;
     }
-    // If we stored everything correctly return TRUE.
-    if ($ret == 4) {
-      return TRUE;
-    };
-    return FALSE;
+    return $result;
   }// function apiStore
   /**
-   * Handles the attackers rowset.
+   * Simple <rowset> per API parser for XML.
    *
-   * @param SimpleXMLElement $kill Current kill to extract items from.
-   * @param integer $killID The Id for this kill.
+   * Most common API style is a simple <rowset>. This implementation allows most
+   * API classes to be empty except for a constructor which sets $this->api and
+   * calls their parent constructor.
    *
-   * @return void
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  protected function attackers($kill, $killID) {
-    $tableName = $this->tablePrefix . 'Attackers';
-    $xml = simplexml_load_string($kill->rowset[0]->asXML());
-    $data = $xml->xpath('//row');
-    if (!empty($data)) {
-      foreach ($data as $row) {
-        $row->addAttribute('killID', $killID);
-        $this->attackersList[] = simplexml_load_string($row->asXML());
-      };
-    };
-  }//function attackers
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Get a new query instance for attackers.
+    $this->attackers = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'Attackers', YAPEAL_DSN);
+    // Get a new query instance for items.
+    $this->items = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'Items', YAPEAL_DSN);
+    // Get a new query instance for victim.
+    $this->victim = new YapealQueryBuilder(
+      YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN);
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                $row = array();
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  $row[$this->xr->name] = $this->xr->value;
+                  switch ($this->xr->name) {
+                    case 'killTime':
+                      // Save date for walking.
+                      $this->date = $this->xr->value;
+                      break;
+                    case 'killID':
+                      // Save killID for walking.
+                      $this->beforeID = $this->xr->value;
+                      break;
+                    default:// Nothing to do here.
+                  };// switch $this->xr->name ...
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                break;
+              case 'victim':
+                $row = array('killID' => $this->beforeID);
+               // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  // Save the ship type to use for root node of items table.
+                  if ($this->xr->name == 'shipTypeID') {
+                    $typeID = $this->xr->value;
+                  };
+                  $row[$this->xr->name] = $this->xr->value;
+                };// while $this->xr->moveToNextAttribute() ...
+                $this->victim->addRow($row);
+                break;
+              case 'rowset':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == 1) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab rowset name.
+                $subTable = $this->xr->getAttribute('name');
+                if (empty($subTable)) {
+                  $mess = 'Name of rowset is missing in ' . $this->api;
+                  trigger_error($mess, E_USER_WARNING);
+                  return FALSE;
+                };
+                if ($subTable == 'items') {
+                  $inherit = array('killID' => $this->beforeID, 'index' => 2,
+                    'level' => 1);
+                  $row = array('flag' => 0, 'killID' => $this->beforeID,
+                    'lft' => 0, 'lvl' => 0, 'qtyDestroyed' => 1,
+                    'qtyDropped' => 0, 'typeID' => $typeID
+                  );
+                  $row['rgt'] = $this->nestedSet($inherit);
+                  $this->items->addRow($row);
+                } else if ($subTable == 'attackers') {
+                $this->attack();
+                };// else $subTable ...
+                break;
+              default:// Nothing to do here.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Save row count and store rows.
+              if ($this->rowCount = count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              // Store rows.
+              if (count($this->victim) > 0) {
+                $this->victim->store();
+              };// if count $this->victim ...
+              $this->victim = NULL;
+              // Store rows.
+              if (count($this->attackers) > 0) {
+                $this->attackers->store();
+              };// if count $this->items ...
+              $this->attackers = NULL;
+              // Store rows.
+              if (count($this->items) > 0) {
+                $this->items->store();
+              };// if count $this->items ...
+              $this->items = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+        };// switch $this->xr->nodeType
+      };// while $xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
   /**
-   * Used to store XML to KillLog table.
+   * Navigates XML and build nested sets to be added to table.
    *
-   * @param SimpleXMLElement $kill Current kill to extract items from.
-   * @param integer $killID The Id for this kill.
+   * The function adds addition columns to preserve the parent child
+   * relationships of killID->items, killID->containers, containers->items, etc.
+   * by using the nested set method.
+   * For more information about nested set see these project wiki pages:
+   * {@link http://code.google.com/p/yapeal/wiki/HierarchicalData HierarchicalData}
+   * {@link http://code.google.com/p/yapeal/wiki/HierarchicalData2 HierarchicalData2}
    *
-   * @return void
-   */
-  protected function killLog($kill, $killID) {
-    $tableName = $this->tablePrefix . 'KillLog';
-    $datum = simplexml_load_string($kill->asXML());
-    if (!empty($datum)) {
-      unset($datum->victim[0], $datum->rowset[1], $datum->rowset[0]);
-      $this->killList[] = simplexml_load_string($datum->asXML());
-    };
-  }// function killLog
-  /**
-   * Handles the items rowsets.
-   *
-   * @param SimpleXMLElement $kill Current kill to extract items from.
-   * @param integer $killID The Id for this kill.
-   *
-   * @return void
-   */
-  protected function items($kill, $killID) {
-    $tableName = $this->tablePrefix . 'Items';
-    $typeID = $kill->victim['shipTypeID'];
-    // Walking the items and add nested set stuff.
-    $rgt = $this->editItems($kill->rowset[1], $killID);
-    $data = '<row flag="0" killID="' . $killID . '" lft="1" lvl="0" rgt="';
-    $data .= $rgt . '" qtyDestroyed="1" qtyDropped="0" typeID="' . $typeID . '"/>';
-    $root = new SimpleXMLElement($data);
-    array_unshift($this->itemsList, $root);
-  }// function items
-  /**
-   * Handles the victim element.
-   *
-   * @param SimpleXMLElement $kill Current kill to extract items from.
-   * @param integer $killID The Id for this kill.
-   *
-   * @return void
-   */
-  protected function victim($kill, $killID) {
-    $tableName = $this->tablePrefix . 'Attackers';
-    $xml = simplexml_load_string($kill->asXML());
-    $data = $xml->victim[0];
-    if (!empty($data)) {
-      $data->addAttribute('killID', $killID);
-      $this->victimList[] = simplexml_load_string($data->asXML());
-    };
-  }// function victim
-  /**
-   * Navigates XML and adds lft and rgt attributes.
-   *
-   * Navigates XML using SimpleXML and adds lft and rgt attributes of Nested Set
-   * for insertion into database.
-   *
-   * Original idea for function coded by Stephen.
-   *
-   * @author Stephen <stephenmg12@gmail.com>
    * @author Michael Cummings <mgcummings@yahoo.com>
    *
-   * @param SimpleXMLElement $node Current element from tree.
-   * @param integer $killID Id to be added to nodes.
-   * @param integer $index Current index for lft/rgt counting.
-   * @param integer $level Level of nesting.
+   * @param array $inherit An array of stuff that needs to propagate from parent
+   * to child.
    *
    * @return integer Current index for lft/rgt counting.
    */
-  protected function editItems($node, $killID, $index = 2, $level = 0) {
-    $nodeName = $node->getName();
-    if ($nodeName == 'row') {
-      $node->addAttribute('lft', $index++);
-      $node->addAttribute('lvl', $level);
-      $node->addAttribute('killID', $killID);
-    } elseif ($nodeName == 'rowset') {
-      ++$level;
-    };// elseif $nodeName == 'rowset' ...
-    if ($children = $node->children()) {
-      foreach ($children as $child) {
-        $index = $this->editItems($child, $killID, $index, $level);
-      };// foreach children ...
-    };
-    if ($nodeName == 'row') {
-      $node->addAttribute('rgt', $index++);
-      $this->itemsList[] = simplexml_load_string($node->asXML());
-    };
-    return $index;
-  }// function editItems
+  protected function nestedSet($inherit) {
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Add some of the inherit values to $row and update them as needed.
+              $row = array('lft' => $inherit['index']++,
+                'lvl' => $inherit['level'],
+                'killID' => $inherit['killID']);
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute();
+              // Move back up to element.
+              $this->xr->moveToElement();
+              // Check if parent node.
+              if ($this->xr->isEmptyElement != 1) {
+                // Save parent on stack.
+                $this->stack[] = $row;
+                // Continue on to process children.
+                break;
+              };// if $xr->isEmptyElement ...
+              // Add 'rgt' and increment value.
+              $row['rgt'] =  $inherit['index']++;
+              // The $row is complete and ready to add.
+              $this->items->addRow($row);
+              break;
+            case 'rowset':
+              // Level increases with each parent rowset.
+              ++$inherit['level'];
+              break;
+            default:
+              break;
+          }// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              $row = array_pop($this->stack);
+              // Add 'rgt' and increment value.
+              $row['rgt'] =  $inherit['index']++;
+              // The $row is complete and ready to add.
+              $this->items->addRow($row);
+              break;
+            case 'rowset':
+              // Level decrease with end of each parent rowset.
+              --$inherit['level'];
+              if ($inherit['level'] == 0) {
+                // Return the final index value to parserAPI().
+                return $inherit['index'];
+              };// if $inherit['level'] ...
+              break;
+            default:
+              break;
+          }// switch $this->xr->localName ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return $inherit['index'];
+  }// function nestedSet
+  /**
+   * Used to store XML to attackers table.
+   *
+   * @return Bool Return TRUE if store was successful.
+   */
+  protected function attack() {
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              $row = array('killID' => $this->beforeID);
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              };// while $this->xr->moveToNextAttribute() ...
+              $this->attackers->addRow($row);
+              break;
+          };// switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            return TRUE;
+          };// if $this->xr->localName == 'row' ...
+          break;
+      };// switch $this->xr->nodeType
+    };// while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function rowset
 }
 ?>

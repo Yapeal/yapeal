@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="stationID" use="required" type="eveID"/>
+    <xs:attribute name="ownerID" use="required" type="eveID"/>
+    <xs:attribute name="stationName" use="required" type="xs:normalizedString"/>
+    <xs:attribute name="solarSystemID" use="required" type="eveID"/>
+    <xs:attribute name="dockingCostPerShipVolume" use="required" type="xs:decimal"/>
+    <xs:attribute name="officeRentalCost" use="required" type="xs:decimal"/>
+    <xs:attribute name="stationTypeID" use="required" type="eveID"/>
+    <xs:attribute name="reprocessingEfficiency" use="required" type="xs:decimal"/>
+    <xs:attribute name="reprocessingStationTake" use="required" type="xs:decimal"/>
+    <xs:attribute name="standingOwnerID" use="required" type="eveID"/>
+  </xs:complexType>
+</xs:schema>

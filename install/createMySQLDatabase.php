@@ -25,6 +25,7 @@
  * @copyright Copyright (c) 2008-2009, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
+ * @subpackage Install
  */
 /**
  * @internal Allow viewing of the source code in web browser.

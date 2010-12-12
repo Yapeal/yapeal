@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../resultRowset.xsd"/>
+  <xs:complexType name="rowType">
+    <xs:attribute name="queuePosition" use="required" type="xs:unsignedByte"/>
+    <xs:attribute name="typeID" use="required" type="eveID"/>
+    <xs:attribute name="level" use="required" type="xs:unsignedByte"/>
+    <xs:attribute name="startSP" use="required" type="xs:unsignedInt"/>
+    <xs:attribute name="endSP" use="required" type="xs:unsignedInt"/>
+    <xs:attribute name="startTime" use="required" type="eveDT"/>
+    <xs:attribute name="endTime" use="required" type="eveDT"/>
+  </xs:complexType>
+</xs:schema>

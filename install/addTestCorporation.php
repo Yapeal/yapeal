@@ -91,12 +91,13 @@ try {
       $corp->activeAPI = (string)$section->activeAPI;
       $corp->characterID = (string)$row['characterID'];
       $corp->corporationName = (string)$row['corporationName'];
-      $http = array('timeout' => 15, 'method' => 'GET',
-        'url' => 'http://www.evecorplogo.net/logo.php?id=' . $corporationID);
+      $url = 'http://image.eveonline.com/Corporation/' . $corporationID . '_64.png';
+      $http = array('timeout' => YAPEAL_CURL_TIMEOUT, 'method' => 'GET',
+        'url' => $url);
       $curl = new CurlRequest($http);
       $result = $curl->exec();
       // Now check for errors.
-      if ($result['curl_error'] != ''  ||  200 != $result['http_code'] ||
+      if ($result['curl_error'] != '' || 200 != $result['http_code'] ||
         $result['body'] == '') {
         $picFile = realpath(YAPEAL_PICS . 'blank.png');
         $corp->graphic = '0x' . bin2hex(file_get_contents($picFile));

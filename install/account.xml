@@ -32,6 +32,27 @@
  */
 -->
   <!-- Account Section -->
+  <table name="accountAccountStatus">
+    <field name="`userID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`createDate`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`logonCount`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`logonMinutes`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`paidUntil`" type="T">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="accountCharacters">
     <field name="`characterID`" type="I8" size="20">
       <KEY/>
@@ -55,7 +76,7 @@
   </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)
-      VALUES('Characters',0,1,'account')
+      VALUES('AccountStatus Characters',0,1,'account')
       ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>

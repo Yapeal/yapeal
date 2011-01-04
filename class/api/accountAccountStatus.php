@@ -69,7 +69,47 @@ class accountAccountStatus extends AAccount {
    * @return bool Returns TRUE always.
    */
   protected function parserAPI() {
-    return TRUE;
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $row = array();
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'userID':
+              case 'createDate':
+              case 'logonCount':
+              case 'logonMinutes':
+              case 'paidUntil':
+                // Grab node name.
+                $name = $this->xr->localName;
+                // Move to text node.
+                $this->xr->read();
+                $row[$name] = $this->xr->value;
+                break;
+              default:// Nothing to do.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              $qb->store();
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
   }// function parserAPI
 }
 ?>

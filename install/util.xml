@@ -218,10 +218,11 @@
     <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` CHAR(8) COLLATE ascii_general_ci NOT NULL</query>
     <query platform="mysql">INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
+      ('account', 'AccountStatus', 3600),
       ('account', 'Characters', 900),
       ('char', 'AccountBalance', 900),
       ('char', 'AssetList', 86400),
-      ('char', 'CalenderEventAttandees', 3600),
+      ('char', 'CalendarEventAttandees', 3600),
       ('char', 'CharacterSheet', 3600),
       ('char', 'ContactList', 900),
       ('char', 'ContactNotifications', 21600),
@@ -238,12 +239,12 @@
       ('char', 'SkilInTraining', 300),
       ('char', 'SkillQueue', 900),
       ('char', 'Standings', 3600),
-      ('char', 'UpcomingCalenderEvent', 900),
+      ('char', 'UpcomingCalendarEvent', 900),
       ('char', 'WalletJournal', 3600),
       ('char', 'WalletTransactions', 3600),
       ('corp', 'AccountBalance', 900),
       ('corp', 'AssetList', 86400),
-      ('corp', 'CalenderEventAttandees', 3600),
+      ('corp', 'CalendarEventAttandees', 3600),
       ('corp', 'ContactList', 900),
       ('corp', 'ContainerLog', 3600),
       ('corp', 'CorporationSheet', 21600),

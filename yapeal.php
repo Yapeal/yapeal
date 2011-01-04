@@ -39,6 +39,11 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
+if (PHP_SAPI != 'cli') {
+  $mess = 'Yapeal only works with CLI version of PHP but tried to run it using ';
+  $mess .= PHP_SAPI . ' instead';
+  die($mess);
+};
 // Used to over come path issues caused by how script is ran on server.
 $dir = str_replace('\\', '/', realpath(dirname(__FILE__)));
 chdir($dir);

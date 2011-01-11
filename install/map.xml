@@ -52,7 +52,7 @@
     <field name="`solarSystemName`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="mapJumps">
     <field name="`shipJumps`" type="I8" size="20">
@@ -63,7 +63,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="mapKills">
     <field name="`factionKills`" type="I8" size="20">
@@ -82,7 +82,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="mapSovereignty">
     <field name="`allianceID`" type="I8" size="20">
@@ -104,7 +104,7 @@
     <field name="`solarSystemName`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <!--<table name="mapSovereigntyStatus">
     <field name="`completionTime`" type="T">
@@ -132,7 +132,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>-->
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PmapFacWarSystems` MODIFY `contested` BOOLEAN NOT NULL</query>

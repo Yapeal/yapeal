@@ -101,7 +101,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     // Was $id set?
     if (!empty($id)) {
       // If $id has any characters other than 0-9 it's not a characterID.
-      if (0 == strlen(str_replace(range(0,9), '', $id))) {
+      if (0 == strlen(str_replace(range(0, 9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
           if (TRUE == $create) {
             // If $id is a number and doesn't exist yet set characterID with it.

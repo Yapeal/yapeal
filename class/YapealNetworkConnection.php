@@ -64,7 +64,7 @@ class YapealNetworkConnection {
       'Accept-Charset: utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
       'Keep-Alive: 300'
     );
-    require_once YAPEAL_EAC_HTTPREQUEST . DS . 'eac_httprequest.class.php';
+    require_once YAPEAL_EAC_HTTPREQUEST . 'eac_httprequest.class.php';
     $this->con = Singleton::get('httpRequest');
     if (FALSE === $this->con) {
       $mess = 'Could not get a connection to use for APIs';

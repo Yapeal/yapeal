@@ -1,0 +1,51 @@
+2011-01-10
+
+Added new utilGraphic table and removed graphic and graphicType columns from
+utilRegisteredCharacter and utilRegisteredCorporation tables. New class to
+manage table can be found in class/util/Graphic.php
+
+Removed corporationID and corporationName from utilRegisteredCharacter as it was
+not needed and could cause record mismatches with both utilRegisteredCorporation
+and accountCharacters tables. I'm try to really optimize the util* tables as
+Yapeal spends most of it's time accessing them. I've been considering remove the
+name columns from character and corporation as well but feel that the small
+improvements in speed seen does not seems to warrant make manual table
+management that much more difficult.
+
+Updated all the install/*.xml to use ENGINE = InnoDB in <opt> instead of the
+varies versions with different case and spacing.
+
+Made changes to several of the scripts in install/ to make them more user
+friendly for anyone using them for manual install from archives or SVN.
+
+Updated README and added new INSTALL file with instructions for installing
+Yapeal manually.
+
+2011-01-09
+
+Adding this changelog in hopes that I might actually use it.
+
+Replaced constant YAPEAL_MAX_UPSERT with class constant
+YapealQueryBuilder::MAX_UPSERT.
+
+YapealApiCache::cacheXml() now handles adding some randomness to the cachedUntil
+date/time stored in utilCachedUntil table. This randomness use to be decided in
+CachedUntil::cacheExpired() but it was felt that with new system for coming up
+with cachedUntil using cachedInterval table and ignoring cachedUntil from API
+server the old system of randomly decided to delay getting the API was wasteful
+of database resources. The random delay can now be pre-calculated and added to
+the stored value instead. This should also make designing a service to replace
+running yapeal.php from crontab easier.
+
+Added new static methods getList() and setKeep() to YapealErrorHandler class.
+These new methods will let application developers to turn on an internal logging
+of all errors triggered while Yapeal is running. They can then access the list
+and display or otherwise use it however they choose. Care should be taken when
+using this as the list can become very large quickly in cases where Yapeal is
+misconfigured or API servers return lots of errors.
+
+Fixed mixed line endings in ext/eac_httprequest/ files which caused Yapeal to
+fail without any errors when trying to get XML from APIs for some developers.
+
+Updated usage() in yapeal.php to reflect -d command line optional no longer
+available.

@@ -175,34 +175,14 @@ class CachedUntil extends ALimitedObject implements IGetBy {
     catch (ADODB_Exception $e) {
       return TRUE;
     }
-    //var_dump($result);
     if (empty($result)) {
       return TRUE;
     };
-    $now = time() - 5;// 5 seconds for EVE API server time offset added :P
+    $now = time();
     $cuntil = strtotime($result . ' +0000');
-    // Hard limited to maximum delay of 6 minutes for randomized pulls.
-    // 5 minutes (300) plus a minute from being almost ready last time.
-    if (($now - $cuntil) > 300) {
-      $mess = 'Overdue getting ' . $api . ' for ' . $owner;
-      trigger_error($mess, E_USER_NOTICE);
-      return TRUE;
-    };// if $now ...
-    // Got to wait until API needs updating.
     if ($now < $cuntil) {
       return FALSE;
-    } else {
-      // The later in the day and having already been delayed decreases chance
-      // of being delayed again.
-      // 1 in $mod chance each time with 1 in 2 up to 1 in 29 max
-      // 1 + 0-23 (hours) + Time difference in minutes
-      $mod = 1 + gmdate('G') + floor(($now - $cuntil) / 60);
-      $rand = mt_rand(0, $mod);
-      // Get to wait a while longer.
-      if ($rand == $mod) {
-        return FALSE;
-      };// if $rand==$mod ...
-    };// if $now ...
+    };
     return TRUE;
   }//function cacheExpired
   /**

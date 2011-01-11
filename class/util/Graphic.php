@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Sections class.
+ * Contains Graphic class.
  *
  * PHP version 5
  *
@@ -41,19 +41,18 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Wrapper class for utilSections table.
+ * Wrapper class for utilGraphic table.
  *
  * @package    Yapeal
  * @subpackage Wrappers
  */
-class Sections extends ALimitedObject implements IGetBy {
+class Graphic extends ALimitedObject implements IGetBy {
   /**
    * @var string Holds an instance of the DB connection.
    */
   protected $con;
   /**
-   * Table name
-   * @var string
+   * @var string Holds the table name of the query is being built.
    */
   protected $tableName;
   /**
@@ -67,11 +66,6 @@ class Sections extends ALimitedObject implements IGetBy {
    */
   private $apiList;
   /**
-   * List of all sections
-   * @var array
-   */
-  private $sectionList;
-  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
@@ -79,17 +73,17 @@ class Sections extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param mixed $id Id of Section wanted.
+   * @param integer $id Id of user wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
    * if $id doesn't exist in database.
    *
-   * @throws InvalidArgumentException If $id isn't a number or string throws an
+   * @throws InvalidArgumentException If $id isn't a number throws an
    * InvalidArgumentException.
    * @throws DomainException If $create is FALSE and a database record for $id
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    $this->sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
+    $path = YAPEAL_CLASS . 'api' . DS;
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.
@@ -105,30 +99,19 @@ class Sections extends ALimitedObject implements IGetBy {
     $this->colTypes = $this->qb->getColumnTypes();
     // Was $id set?
     if (!empty($id)) {
-      // If $id has any characters other than 0-9 it's not a sectionID.
+      // If $id has any characters other than 0-9 it's not an ownerID.
       if (0 == strlen(str_replace(range(0, 9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
-          // If $id is a number and doesn't exist yet set sectionID with it.
           if (TRUE == $create) {
-            $this->properties['sectionID'] = $id;
+            // If $id is a number and doesn't exist yet set ownerID with it.
+            $this->properties['ownerID'] = $id;
           } else {
-            $mess = 'Unknown section ' . $id;
-            throw new DomainException($mess, 2);
-          };// else ...
-        };
-        // else if it's a string ...
-      } else if (is_string($id)) {
-        if (FALSE === $this->getItemByName($id)) {
-          // If $id is a string and doesn't exist yet set section with it.
-          if (TRUE == $create) {
-            $this->properties['section'] = $id;
-          } else {
-            $mess = 'Unknown section ' . $id;
+            $mess = 'Unknown owner ' . $id;
             throw new DomainException($mess, 3);
           };// else ...
         };
       } else {
-        $mess = 'Parameter $id must be an integer or a string';
+        $mess = 'Parameter $id must be an integer';
         throw new InvalidArgumentException($mess, 4);
       };// else ...
     };// if !empty $id ...
@@ -141,108 +124,29 @@ class Sections extends ALimitedObject implements IGetBy {
     $this->con = NULL;
   }// function __destruct
   /**
-   * Used to add an API to the list in activeAPI.
+   * Used to get graphic from Graphic table by owner ID.
    *
-   * @param string $name Name of the API to add without 'account' part i.e.
-   * 'accountCharacters' would just be 'Characters'
+   * @param $id Id of graphic owner wanted.
    *
-   * @return bool Returns TRUE if $name already exists else FALSE.
-   *
-   * @throws DomainException If $name not in $this->apiList.
-   */
-  public function addActiveAPI($name) {
-    $this->getApiList();
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 5);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    if (in_array($name, $apis)) {
-      $ret = TRUE;
-    } else {
-      $ret = FALSE;
-      $apis[] = $name;
-    };// if isset...
-    $this->properties['activeAPI'] = implode(' ', $apis);
-    return $ret;
-  }// function addActiveAPI
-  /**
-   * Used to delete an API from the list in activeAPI.
-   *
-   * @param string $name Name of the API to delete without 'char' part i.e.
-   * 'charAccountBalance' would just be 'AccountBalance'
-   *
-   * @return bool Returns TRUE if $name existed else FALSE.
-   *
-   * @throws DomainException If $name not in $this->apiList.
-   */
-  public function deleteActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 6);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $ret = FALSE;
-    foreach ($apis as $k => $v) {
-      if ($name == $v) {
-        $ret = TRUE;
-        unset($apis[$k]);
-        break;
-      };// if $name == $v ...
-    };// foreach $apis ...
-    $this->properties['activeAPI'] = implode(' ', $apis);
-    return $ret;
-  }// function deleteActiveAPI
-  /**
-   * Used to get list of available API classes for a section.
-   *
-   * @return Returns TRUE if $this->apiList is not empty.
-   *
-   * @throws LogicException Throws a LogicException if method is call when
-   * section is unknown.
-   */
-  protected function getApiList() {
-    if (!empty($this->apiList)) {
-      return TRUE;
-    };
-    if (!isset($this->properties['section'])) {
-      $mess = 'Can not add APIs without know which section they belong to';
-      throw new LogicException($mess, 7);
-    };
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $section = $this->properties['section'];
-    $this->apiList = FilterFileFinder::getStrippedFiles($path, $section);
-    if (empty($this->apiList)) {
-      $mess = 'There are no available API classes for ' . $section;
-      trigger_error($mess, E_USER_NOTICE);
-      return FALSE;
-    };
-    return TRUE;
-  }// function getApiList
-  /**
-   * Used to get section from Sections table by section ID.
-   *
-   * @param $id Id of section wanted.
-   *
-   * @return bool TRUE if section was retrieved.
+   * @return bool TRUE if graphic was retrieved.
    */
   public function getItemById($id) {
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
-    $sql .= ' where `sectionID`=' . $id;
+    $sql .= ' where `ownerID`=' . $id;
     try {
       $result = $this->con->GetRow($sql);
-      $this->properties = $result;
-      $this->recordExists = TRUE;
+      if (!empty($result)) {
+        $this->properties = $result;
+        $this->recordExists = TRUE;
+      } else {
+        $this->recordExists = FALSE;
+      };
     }
     catch (ADODB_Exception $e) {
       $this->recordExists = FALSE;
     }
-    // Get list of available APIs for section if possible.
-    if (TRUE === $this->recordExists()) {
-      $this->getApiList();
-    };
-    return $this->recordExists();
+    return $this->recordExists;
   }// function getItemById
   /**
    * Used to get item from table by name.
@@ -251,29 +155,11 @@ class Sections extends ALimitedObject implements IGetBy {
    *
    * @return bool TRUE if item was retrieved else FALSE.
    *
-   * @throws DomainException If $name not in $this->sectionList.
+   * @throws LogicException Throws LogicException because there is no 'name' type
+   * field for this database table.
    */
   public function getItemByName($name) {
-    if (!in_array(ucfirst($name), $this->sectionList)) {
-      $mess = 'Unknown section: ' . $name;
-      throw new DomainException($mess, 8);
-    };// if !in_array...
-    $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
-    $sql .= ' from `' . $this->tableName . '`';
-    try {
-      $sql .= ' where `section`=' . $this->con->qstr($name);
-      $result = $this->con->GetRow($sql);
-      $this->properties = $result;
-      $this->recordExists = TRUE;
-    }
-    catch (ADODB_Exception $e) {
-      $this->recordExists = FALSE;
-    }
-    // Get list of available APIs for section if possible.
-    if (TRUE === $this->recordExists()) {
-      $this->getApiList();
-    };
-    return $this->recordExists();
+    throw new LogicException('Not implimented for ' . __CLASS__ . ' table', 1);
   }// function getItemByName
   /**
    * Function used to check if database record already existed.

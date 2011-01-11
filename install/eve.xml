@@ -46,7 +46,7 @@
     <field name="`name`" type="C" size="255"/>
     <field name="`shortName`" type="C" size="255"/>
     <field name="`startDate`" type="T"/>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveConquerableStationList">
     <field name="`corporationID`" type="I8" size="20">
@@ -64,7 +64,7 @@
     <field name="`stationTypeID`" type="I8" size="20">
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveErrorList">
     <field name="`errorCode`" type="I2" size="3">
@@ -74,7 +74,7 @@
     <field name="`errorText`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveMemberCorporations">
     <field name="`allianceID`" type="I8" size="20">
@@ -86,7 +86,7 @@
       <UNSIGNED/>
     </field>
     <field name="`startDate`" type="T"/>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveRefTypes">
     <field name="`refTypeID`" type="I2" size="5">
@@ -94,7 +94,7 @@
       <UNSIGNED/>
     </field>
     <field name="`refTypeName`" type="C" size="255"/>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)

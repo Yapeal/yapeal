@@ -36,13 +36,10 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
-// Make CGI work like CLI.
+// Only CLI.
 if (PHP_SAPI != 'cli') {
-  ini_set('implicit_flush', '1');
-  ini_set('register_argc_argv', '1');
-  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
-  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
-  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
+  $mess = 'This script will only work with CLI version of PHP';
+  die($mess);
 };
 /**
  * @internal Only let this code be ran directly.
@@ -65,11 +62,12 @@ require_once realpath($path);
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_ADODB . 'adodb-xmlschema03.inc.php';
 if ($argc < 5) {
-  $mess = 'Host, Username, Password, DB are required in ' . $argv[0] . PHP_EOL;
-  $mess .= 'TablePrefix, XMLfile are optional' . PHP_EOL;
+  $mess = 'Hostname Username Password Database are required in ' . $argv[0] . PHP_EOL;
+  $mess .= 'TablePrefix and XMLfile(s) are optional' . PHP_EOL;
+  $mess .= 'If XMLfile(s) is a list it needs to be inside quotes' . PHP_EOL;
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error');
-  exit(1);
+  fwrite(STDOUT, $ret);
+  exit(2);
 };
 // Strip any quotes
 $replace = array("'", '"');

@@ -1,20 +1,18 @@
 Welcome to Yapeal (Yet Another PHP Eve Api Library)
 
-If you're reading this on your server then you seem to have got Yapeal installed
-on it and if you've used the installer everything should be configured already
-for you as well. If you have installed it from a archive (tgz/zip) then you'll
-need to look in config/ for an example file named yapeal-example.ini and make a
-copy of it in the same directory named yapeal.ini and edit it to add your
-information. You'll also need to find a way to add all the database tables
-needed as well. You can try running install/createMySQLDatabase.php and
-install/createMySQLTables.php from a command-line and they should make the same
-database and tables that the installer would have done.
+For manual installation instructions from archives (zip, tar.bz2) or Subversion
+see INSTALL.
 
-In the future I hope to have sections on installing, configuring, setup, and
-troubleshooting but for now best I can do is refer you to the project Wiki at
+For more information on configuring, setup, or troubleshooting Yapeal check out
+the project Wiki at
 http://code.google.com/p/yapeal/
-There you should find information to help you out. Another resource is the forum
-thread for Yapeal at Eve Online which you'll find at
+There you should find information to help you out. Another resource is the
+Yapeal thread on Eve Online forums which you'll find at
 http://myeve.eve-online.com/ingameboard.asp?a=topic&threadID=904182
+
+For additional information about any changes see the commit messages in SVN and
+the CHANGELOG file.
+
+Licensing requirements can be found in COPYING and COPYING-LESSER.
 
 Thanks for using Yapeal, Dragonaire

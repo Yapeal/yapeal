@@ -124,25 +124,24 @@ class YapealApiCache {
       trigger_error($mess, E_USER_WARNING);
       return FALSE;
     };// if empty($xml) ...
-    // Do a default setting for cacheUntil so Yapeal waits a bit before trying
-    // again if something goes wrong. If everything works correctly time will be
-    // set to new cachedUntil time decided by what API XML returns.
+    // Use now + interval + random value for cachedUntil.
+    $until = $this->curTime + $this->cacheInterval;
+    // Add random number of seconds to cache interval. Randomness is larger the
+    // later in the day it is. Between 0 and 1 + 0 .. 23 hours * 15 seconds added.
+    $until += mt_rand(0, ((1 + gmdate("G")) * 15));
     $data = array( 'api' => $this->api, 'ownerID' => $this->ownerID,
       'section' => $this->section
     );
     $cu = new CachedUntil($data);
-    // Use now + interval for cachedUntil.
-    $cu->cachedUntil = gmdate('Y-m-d H:i:s', ($this->curTime + $this->cacheInterval));
+    // Update utilCachedUntil table with new cache date/time. This maybe changed
+    // later if an API error was returned that includes a different cache until
+    // date/time.
+    $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
+    $cu->store();
+    $cu = NULL;
     // check if XML is valid.
     $this->vd->xml = $xml;
     $this->vd->validateXML();
-    // If cachedUntil that API supplied is longer use it.
-    //if ($this->vd->getCachedUntil() > $cu->cachedUntil) {
-    //  // Set cachedUntil to whatever API returned.
-    //  $cu->cachedUntil = $this->vd->getCachedUntil();
-    //};
-    $cu->store();
-    $cu = NULL;
     // Throw exception for any API errors.
     if (TRUE == $this->vd->isApiError()) {
       // Throw exception

@@ -43,7 +43,7 @@
     <field name="`serverOpen`" type="C" size="32">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)

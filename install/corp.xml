@@ -48,7 +48,7 @@
     <field name="`balance`" type="N" size="17.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAllianceContactList">
     <descr>Sub table from /corp/ContactList.xml.aspx</descr>
@@ -66,7 +66,7 @@
     <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAssetList">
     <descr>Table for /corp/AssetList.xml.aspx</descr>
@@ -116,7 +116,7 @@
     <index name="`corpAssetList2`">
       <col>`locationID`</col>
     </index>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpAttackers">
     <descr>Sub table from /corp/KillLog.xml.aspx</descr>
@@ -166,7 +166,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCalendarEventAttendees">
     <descr>Table for /corp/CalendarEventAttendees.xml.aspx</descr>
@@ -184,7 +184,7 @@
     <field name="`response`" type="C" size="32">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCombatSettings">
     <descr>Sub table from /corp/StarbaseDetail.xml.aspx</descr>
@@ -220,7 +220,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpContainerLog">
     <descr>Table for /corp/ContainerLog.xml.aspx</descr>
@@ -276,7 +276,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCorporateContactList">
     <descr>Sub table from /corp/ContactList.xml.aspx</descr>
@@ -294,7 +294,7 @@
     <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpCorporationSheet">
     <descr>Main table for /corp/CorporationSheet.xml.aspx</descr>
@@ -347,7 +347,7 @@
       <NOTNULL/>
     </field>
     <field name="`url`" type="C" size="255"/>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpDivisions">
     <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
@@ -362,7 +362,7 @@
     <field name="`description`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpFuel">
     <descr>Sub table from /corp/StarbaseDetail.xml.aspx</descr>
@@ -382,7 +382,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpGeneralSettings">
     <descr>Sub table from /corp/KillLog.xml.aspx</descr>
@@ -410,7 +410,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpIndustryJobs">
     <descr>Table for /corp/IndustryJobs.xml.aspx</descr>
@@ -538,7 +538,7 @@
     <field name="`timeMultiplier`" type="N" size="4.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpItems">
     <descr>Sub table from /corp/KillLog.xml.aspx</descr>
@@ -574,7 +574,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpKillLog">
     <descr>Main table for /corp/KillLog.xml.aspx</descr>
@@ -593,7 +593,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpLogo">
     <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
@@ -629,7 +629,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMarketOrders">
     <descr>Table for /corp/MarketOrders.xml.aspx</descr>
@@ -694,7 +694,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMedals">
     <descr>Table for /corp/Medals.xml.aspx</descr>
@@ -717,7 +717,7 @@
     <field name="`title`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMemberMedals">
     <descr>Table for /corp/MemberMedals.xml.aspx</descr>
@@ -744,7 +744,7 @@
     <field name="`status`" type="C" size="32">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpMemberTracking">
     <descr>Table for /corp/MemberTracking.xml.aspx</descr>
@@ -796,7 +796,7 @@
     <index name="`corpMemberTrackingindex1`">
       <col>`ownerID`</col>
     </index>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpOutpostList">
     <descr>Table for /corp/OutpostList.xml.aspx</descr>
@@ -835,7 +835,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpOutpostServiceDetail">
     <descr>Table for /corp/OutpostServiceDetail.xml.aspx</descr>
@@ -860,7 +860,7 @@
     <field name="`surchargePerBadStanding`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsAllianceToAlliances">
     <descr>Replaced by ContactList</descr>
@@ -886,7 +886,7 @@
     <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsFromFactions">
     <descr>Sub table from /corp/Standings.xml.aspx</descr>
@@ -904,7 +904,7 @@
     <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsFromNPCCorporations">
     <descr>Sub table from /corp/Standings.xml.aspx</descr>
@@ -922,7 +922,7 @@
     <field name="`standing`" type="N" size="5.2">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStandingsToAlliances">
     <descr>Replaced by ContactList</descr>
@@ -956,7 +956,7 @@
     <field name="`stateTimestamp`" type="T">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpStarbaseList">
     <descr>Table for /corp/StarbaseList.xml.aspx</descr>
@@ -994,7 +994,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpVictim">
     <descr>Sub table from /corp/KillLog.xml.aspx</descr>
@@ -1033,7 +1033,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletDivisions">
     <descr>Sub table from /corp/CorporationSheet.xml.aspx</descr>
@@ -1048,7 +1048,7 @@
     <field name="`description`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletJournal">
     <descr>Table for /corp/WalletJournal.xml.aspx</descr>
@@ -1090,7 +1090,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletTransactions">
     <descr>Table for /corp/WalletTransactions.xml.aspx</descr>
@@ -1143,7 +1143,7 @@
     <field name="`typeName`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE = INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcorpAssetList` MODIFY `singleton` BOOLEAN NOT NULL</query>

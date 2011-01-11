@@ -48,17 +48,25 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class YapealErrorHandler {
   /**
-   * @var string Holds text of error message.
-   */
-  private $message = '';
-  /**
    * @var string Holds file name where error happened.
    */
   private $filename = '';
   /**
+   * @var bool Used to decide if errors are to be logged to an array.
+   */
+  private static $keep = FALSE;
+  /**
    * @var integer Holds line number where error happened.
    */
   private $line = 0;
+  /**
+   * @var array Used to hold list of errors if $keepLog is TRUE.
+   */
+  private static $list = array();
+  /**
+   * @var string Holds text of error message.
+   */
+  private $message = '';
   /**
    * @var array Holds array of all varables.
    */
@@ -91,6 +99,11 @@ class YapealErrorHandler {
     if (error_reporting() == 0) {
       return FALSE;
     };
+    if (self::$keep === TRUE) {
+      self::$list[] = array('type' => $errno, 'message' => $errmsg,
+        'filename' => $filename, 'line' => $line,
+        'time' => gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4));
+    };// if self::$keep === TRUE ...
     $self = new self($errmsg, $filename, $line, $vars);
     if (($errno & YAPEAL_LOG_LEVEL) == $errno) {
       switch ($errno) {
@@ -212,5 +225,29 @@ EOT;
       fwrite(STDERR, $mess);
     };// if PHP_SAPI == 'cli' ...
   }// function print_on_command
+  /**
+   * Retrieves error list.
+   *
+   * @param bool $clear Will clear error list if TRUE.
+   *
+   * @return array Returns a list of errors.
+   */
+  public static function getList($clear = FALSE) {
+    $list = self::$list;
+    if ($clear === TRUE) {
+      self::$list = array();
+    };
+    return $list;
+  }// function getList
+  /**
+   * Used to turn on/off logging errors to an internal list that can be retrieved.
+   *
+   * @param bool $keep When TRUE all errors will be keep in an internal list.
+   */
+  public static function setKeep($keep = FALSE) {
+    if (is_bool($keep)) {
+      self::$keep = $keep;
+    };
+  }// function setKeep
 }
 ?>

@@ -5,7 +5,7 @@
  * @version 	1.0 for PHP version 5
  * @license		http://www.kevinburkholder.com/sw_license.php
  */
- 
+
 /* +------------------------------------------------------------------------+
    | Copyright 2009, Kevin Burkholder				www.KevinBurkholder.com |
    | Some rights reserved.													|
@@ -36,18 +36,18 @@
    |					 EarthAsylum Consulting								|
    |					 KBurkholder@EarthAsylum.com						|
    +------------------------------------------------------------------------+ */
- 
- 
+
+
 /*	----------------------------------------------------------------------------------------------------
-	eac_httprequest is a set of classes that facilitate server-to-server comunications using 
-	various http request methods (GET, POST, PUT, DELETE, etc.). Requests are executed using CURL 
-	(via eac_httprequest.curl.php), STREAMS (via eac_httprequest.stream.php), or SOCKETS (via 
-	eac_httprequest.socket.php) as needed or as allowed in the current environment. Support for basic 
-	and digest authentication for streams and sockets is provided by the eac_httprequest.auth.php class 
+	eac_httprequest is a set of classes that facilitate server-to-server comunications using
+	various http request methods (GET, POST, PUT, DELETE, etc.). Requests are executed using CURL
+	(via eac_httprequest.curl.php), STREAMS (via eac_httprequest.stream.php), or SOCKETS (via
+	eac_httprequest.socket.php) as needed or as allowed in the current environment. Support for basic
+	and digest authentication for streams and sockets is provided by the eac_httprequest.auth.php class
 	and caching for http GET requests is provided by the eac_httprequest.cache.php class.
-	
+
 	eac_httprequest.class.php is a wrapper class used to load one of the curl, stream or socket classes.
-	
+
 	A number of examples are provided in eac_httprequest.test.php.
 	----------------------------------------------------------------------------------------------------	*/
 
@@ -59,7 +59,7 @@
   *
   * This implementation is intended to combine some of the redundancy of the previous two classes by
   * using extended classes for streams and a new sockets class.
-  * The basis is still that of curl and the parent class (eac_httprequest.curl.php) and the option names 
+  * The basis is still that of curl and the parent class (eac_httprequest.curl.php) and the option names
   * are built around curl. Extended classes should interpret/emulate the curl functionality as best as possible.
   *
   * Changes from previous versions:
@@ -76,9 +76,9 @@
   * -	info['request_header'] will be populated with the request headers.
   * -	The stream class includes http_context in the info array (excluding content and headers).
   * -	With a post request, the content-type header is set to "application/x-www-form-urlencoded" only if the form
-  * 	fields are passed as an array. The array is encoded using  http_build_query(). If any other content is 
+  * 	fields are passed as an array. The array is encoded using  http_build_query(). If any other content is
   * 	posted (i.e. xml), the content-type header should be set with $http->header('Content-Type: text/xml').
-  * 	When using the curl class, you can pass the fields array as multi-part by setting the Content-Type to 
+  * 	When using the curl class, you can pass the fields array as multi-part by setting the Content-Type to
   * 	multipart/form-data with $http->header('Content-Type: multipart/form-data')
   * -	URLs are parsed for username, password, and/or port. The username/password is removed from the url.
   * -	COOKIEJAR & COOKIEFILE are no longer set to a default value. They are not supported in streams or sockets.
@@ -86,7 +86,7 @@
   * -	Internally, all options are prefixed with CURLOPT_, externally HTTP_.
   * -	The authentication header is only passed on subsequent calls if HTTP_UNRESTRICTED_AUTH is set.
   * -	Authentication for streams & sockets is handled in a static class loaded when it is needed.
-  * -	Cache support for GET requests via eac_httprequest.cache.php. Set HTTP_CACHE to the full directory path of the 
+  * -	Cache support for GET requests via eac_httprequest.cache.php. Set HTTP_CACHE to the full directory path of the
   * 	cache folder. The folder will be created and chmod'ed if possible, otherwise create and chmod before hand.
   *
   * This class (eac_httprequest.class.php) is a simple wrapper to load the proper child class depending
@@ -99,7 +99,7 @@
   * -	Multiple options may be used to specify a priority preference ('AUTO' == 'CURL;STREAM;SOCKET')
   * 	i.e. 'STREAMS;CURL' will attempt to use streams, if not, then curl.
   */
- 
+
 
 /*	----------------------------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@
 
 		require_once('eac_httprequest.class.php');
 		$http = new httpRequest( [ $options ] );
-		
+
 		As this class is only a wrapper used for selecting and loading one of the other classes, it is
 		not necessary to use this class if only one child class is to be available.
 
@@ -131,13 +131,13 @@
 			See: http://us2.php.net/manual/en/function.curl-setopt.php
 
 		Option names may be prefixed with HTTP_, STREAMS_, SOCKET_, or CURLOPT_. They will be translated
-		and referenced internally as CURLOPT_. 
-		
+		and referenced internally as CURLOPT_.
+
 		To prevent the assumption that cURL is always used, HTTP_ is the preferred prefix and the
 		getOptions() method returns the array with HTTP_* option names.
-		
+
 		* Internally, all options have a prefix of CURLOPT_. Externally, they should have a prefix of HTTP_.
-		
+
 		Three additional values may also be set:
 			HTTP_PLUGIN can be set to one of either 'AUTO', 'CURL', 'STREAM', 'SOCKET'. Auto will use
 				cURL if the cURL module is available, streams if safe mode is off, otherwise sockets.
@@ -145,11 +145,11 @@
 				by setting the time-out to 1 second and not retrieve the resulting body.
 			HTTP_CACHE can be set to the cache directory to enable GET request caching. Only the
 				'If-Modified-Since' method is used in a 'must-revalidate' mode.
-		
+
 		$options can also be a string containing one of either 'AUTO', 'CURL', 'STREAM', or 'SOCKET'.
 		Use when you only need to set the method/class to use (either the default options are okay or
 		you will set additional options with setOptions() or setOption()).
-		
+
 		Default options
 			HTTP_PLUGIN 			= "AUTO";						// AUTO, CURL, STREAM, or SOCKET
 			HTTP_HEADER				= 0;							// no headers in result
@@ -171,24 +171,24 @@
 		HTTP_PLUGIN may be set to any combination of 'CURL', 'STREAM', or 'SOCKET' with each delimited by
 		a semicolon. 'AUTO' (or any other value) is equivelent to 'CURL;STREAM;SOCKET'. Using more than one
 		option is setting a priority preference for which plugin to use.
-		
+
 		The default user agent is set to something like this:
 			Mozilla/5.0 (compatible; curlRequest/1.0.2 +http://www.kevinburkholder.com/)
 		If you want to change this, you must specify a new value using the HTTP_USERAGENT option.
-	
+
 		HTTP_ASYNCRONOUS is intended to allow for the case in which the result of the request is irrelivant
-		and we need the request to go through as quickly as possible. For example, if there is no recourse in the 
+		and we need the request to go through as quickly as possible. For example, if there is no recourse in the
 		event of a POST or PUT failure, there's no point in waiting for a slow connection to give us a timeout.
-	
-		In the stream & socket classes, this option will set the time out to 1 second and set the HTTP_NOBODY 
-		option to true. It will not read the return result from the stream but it will return the opened connection 
+
+		In the stream & socket classes, this option will set the time out to 1 second and set the HTTP_NOBODY
+		option to true. It will not read the return result from the stream but it will return the opened connection
 		so that the result may be retrieved later in your script using getLastResult($connection).
-	
+
 		In the curl class, this option will set the time out to 1 second and set the HTTP_NOBODY option to true.
 		There is no way to then retrieve the result.
-	
+
 		The HTTP_ASYNCRONOUS option is not sticky and must be set for each request.
-		
+
 
 
 	Methods
@@ -196,7 +196,7 @@
 
 		setOptions ( $options_array )
 			Another way of passing the $options array - instead of or in addition to the instantiation.
-		
+
 		setOption ( $option_name , $option_value )
 			Set a single option by passing the curl_setopt option name and the associated value.
 
@@ -208,7 +208,7 @@
 		copyHeaders ( [ $header ] )
 			Copies the current request headers (any $_SERVER['HTTP_*']) to be used for the http request.
 			If $header is set, only that header is copied.
-			'cookie','accept-encoding','user-agent','host','connection', 'referer', and 'cache-control' are 
+			'cookie','accept-encoding','user-agent','host','connection', 'referer', and 'cache-control' are
 			not copied. However, referer will be used to set HTTP_REFERER.
 
 		copyCookies ( [ $cookie ] )
@@ -222,7 +222,7 @@
 
 		get ( $url [, $options ] )
 			Make an http GET request.
-			$url is the requested url. $options can be additional CURLOPT options.  
+			$url is the requested url. $options can be additional CURLOPT options.
 
 		post ( $url [, $fields [,$options ] ] )
 			Make an http POST request.
@@ -234,36 +234,36 @@
 
 		head ( $url [, $options ] )
 			Make an http HEAD request.
-			$url is the requested url. $options can be additional CURLOPT options.  
+			$url is the requested url. $options can be additional CURLOPT options.
 
 		put ( $url, $fn_or_data [, $options ] )
 			Make an http PUT request.
 			$url is the requested url. $fn_or_data can be a file name or a string. In order to use a file,
 			$fn_or_data must be prefixed with "@" and contain a valid file name found on the server making
 			the request (i.e. @/usr/www/docroot/my_file.dat). When the put method looks for the file, it
-			will use the PHP include path as well as the $_SERVER['DOCUMENT_ROOT'] path. 
-			$options can be additional CURLOPT options.  
+			will use the PHP include path as well as the $_SERVER['DOCUMENT_ROOT'] path.
+			$options can be additional CURLOPT options.
 
 		delete ( $url [, $options ] )
 			Make an http DELETE request.
-			$url is the requested url. $options can be additional CURLOPT options.  
+			$url is the requested url. $options can be additional CURLOPT options.
 
 		option ( $url [, $options ] )
 			Make an http OPTION request.
-			$url is the requested url (most often the domain followed by "/*"). 
-			$options can be additional CURLOPT options.  
+			$url is the requested url (most often the domain followed by "/*").
+			$options can be additional CURLOPT options.
 
 		trace ( $url [, $options ] )
 			Make an http TRACE request.
-			$url is the requested url. $options can be additional CURLOPT options.  
+			$url is the requested url. $options can be additional CURLOPT options.
 
 		connect ( $url [, $options ] )
 			Make an http CONNECT request.
-			$url is the requested url. $options can be additional CURLOPT options.  
+			$url is the requested url. $options can be additional CURLOPT options.
 
 		sendLastResult ($to [, $from [, $subject [, $xheaders [, $EOL ] ] ] ])
 			Sends the body of the last request in an email.
-			$to is the recipient's email address. $from is the sender's address (default is either 
+			$to is the recipient's email address. $from is the sender's address (default is either
 			$_SERVER['SERVER_ADMIN'] or 'webmaster@'.$_SERVER['HTTP_HOST']). $subject is the email subject
 			line. $xheaders is an array of additional headers to add to the email. $EOL is the end-of-line
 			character to use (\r\n or \n - \n is the default).
@@ -273,10 +273,10 @@
 
 		getLastResult ( [ $connection ] )
 			Returns the body of the last request.
-			$connection may be a connection resource returned by the stream or socket class when 
+			$connection may be a connection resource returned by the stream or socket class when
 			option HTTP_ASYNCRONOUS is true.
 
-		getInfo ( [ $field ] ) 
+		getInfo ( [ $field ] )
 			Returns the info array or a single value from the array (if $field is set).
 			The info array is an associative array of information returned by the request. The array
 			content will vary depending on the child class used, the type of request, and the result.
@@ -298,18 +298,18 @@
 					[allow_self_signed] => 1	)
 			The curl class will return everything set by curl_getinfo().
 
-		getInfoField ( $field ) 
+		getInfoField ( $field )
 			Returns a single value from the info array (same as getInfo($field)).
 
 		getHeaders ( [ $header ] )
-			Returns an associative array of response headers or a single header from the array (if $header is set). 
+			Returns an associative array of response headers or a single header from the array (if $header is set).
 
 		getRawHeaders ()
 			Returns an indexed array of all response headers. This array will include headers from redirections
-			as well as multiple headers of the same type. 
+			as well as multiple headers of the same type.
 
 		getRequest ( [ $header ] )
-			Returns an indexed array of request headers or a single header from the array (if $header is set). 
+			Returns an indexed array of request headers or a single header from the array (if $header is set).
 
 		getOptions ( [ $option ] )
 			Returns the options array or a single option from the array (if $option is set).
@@ -320,24 +320,24 @@
 	----------------------------------------------------------------------------------------------------
 
 		Type - Set to one of 'CURL', 'STREAM', or 'SOCKET' by the child class being used.
-	
+
 		success - Set to true on successful request, false on failure.
-	
+
 		error - Set to the last error message returned by the request.
 
 
 	CURLOPT options supported by stream & socket class
 	----------------------------------------------------------------------------------------------------
-		HTTP_HEADER			
-		HTTP_NOBODY 			
-		HTTP_USERAGENT		
-		HTTP_FOLLOWLOCATION	
-		HTTP_MAXREDIRS		
-		HTTP_TIMEOUT			
+		HTTP_HEADER
+		HTTP_NOBODY
+		HTTP_USERAGENT
+		HTTP_FOLLOWLOCATION
+		HTTP_MAXREDIRS
+		HTTP_TIMEOUT
 		HTTP_ENCODING			(gzip only)
-		HTTP_RETURNTRANSFER	
+		HTTP_RETURNTRANSFER
 		HTTP_SSL_VERIFYPEER		(stream only)
-		HTTP_REFERER			
+		HTTP_REFERER
 		HTTP_USERPWD			(BASIC or DIGEST authentication)
 		HTTP_FILE
 		HTTP_PORT

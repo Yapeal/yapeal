@@ -34,13 +34,10 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
-// Make CGI work like CLI.
+// Only CLI.
 if (PHP_SAPI != 'cli') {
-  ini_set('implicit_flush', '1');
-  ini_set('register_argc_argv', '1');
-  defined('STDIN') || define('STDIN', fopen('php://stdin', 'r'));
-  defined('STDOUT') || define('STDOUT', fopen('php://stdout', 'w'));
-  defined('STDERR') || define('STDERR', fopen('php://stderr', 'w'));
+  $mess = 'This script will only work with CLI version of PHP';
+  die($mess);
 };
 /**
  * @internal Only let this code be ran directly.
@@ -53,7 +50,7 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 };
 $ret = 'error';
 if ($argc != 5) {
-  $mess = 'Host, Username, Password, DB are required in ' . $argv[0] . PHP_EOL;
+  $mess = 'Hostname Username Password Database are required in ' . $argv[0] . PHP_EOL;
   fwrite(STDERR, $mess);
   fwrite(STDOUT, $ret);
   exit(1);
@@ -63,7 +60,7 @@ $replace = array("'", '"');
 for ($i = 1; $i < $argc; ++$i) {
   $argv[$i] = str_replace($replace, '', $argv[$i]);
 };
-$mysqli = @new mysqli($argv[1], $argv[2], $argv[3], 'information_schema');
+$mysqli = @new mysqli($argv[1], $argv[2], $argv[3]);
 if ($mysqli->connect_error || mysqli_connect_error()) {
   $mess = 'Connection error (' . mysqli_connect_errno() . ') ' .
     mysqli_connect_error() . PHP_EOL;

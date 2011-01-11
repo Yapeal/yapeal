@@ -169,8 +169,6 @@ function usage() {
   $mess .= 'Options:' . PHP_EOL;
   $mess .= '  -c config.ini                        ';
   $mess .= "Read configation from 'config.ini'." . PHP_EOL;
-  $mess .= '  -d logfile.log                       ';
-  $mess .= "Save debugging log to 'logfile.log'." . PHP_EOL;
   $mess .= '  -h                                   ';
   $mess .= 'Show this help.' . PHP_EOL;
   $mess .= '  -V                                   ';

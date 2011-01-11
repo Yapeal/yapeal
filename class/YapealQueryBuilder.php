@@ -92,7 +92,8 @@ class YapealQueryBuilder implements Countable {
    * @throws RuntimeException Throws RuntimeException if can't get ADOdb
    * connection or table column information.
    */
-  public function __construct($tableName, $dsn, $autoStore = YAPEAL_MAX_UPSERT) {
+  public function __construct($tableName, $dsn,
+    $autoStore = YapealQueryBuilder::MAX_UPSERT) {
     if (!is_string($tableName)) {
       $mess = '$tableName must be a string in ' . __CLASS__;
       throw new InvalidArgumentException($mess, 1);
@@ -401,5 +402,10 @@ class YapealQueryBuilder implements Countable {
     }
     return TRUE;
   }// function store
+  /**
+   * Set max SQL insert size. This is a trade off of memory use and number of
+   * inserts needed for larger APIs.
+   */
+  const MAX_UPSERT = 1000;
 }
 ?>

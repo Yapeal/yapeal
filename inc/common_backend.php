@@ -55,11 +55,6 @@ if (!defined('DS')) {
    */
   define('DS', '/');
 };
-// Set max SQL insert size. This is a trade off of memory use and number of
-// inserts needed for larger APIs.
-if (!defined('YAPEAL_MAX_UPSERT')) {
-  define('YAPEAL_MAX_UPSERT', 1000);
-};
 // Set some basic common settings so we know we'll get to see any errors etc.
 error_reporting(E_ALL);
 ini_set('ignore_repeated_errors', 0);

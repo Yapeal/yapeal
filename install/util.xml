@@ -42,7 +42,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = ascii_general_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilCachedUntil">
     <descr>Used to track cache times of the APIs</descr>
@@ -59,19 +59,25 @@
     <field name="`section`" type="C" size="8">
       <NOTNULL/>
     </field>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = ascii_general_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilConfig">
     <DROP/>
   </table>
-  <!--<table name="utilConfig">
-    <descr>Currently unused was formally use in old installer but it being kept around for now</descr>
-    <field name="`Name`" type="C" size="32">
+  <table name="utilGraphic">
+    <descr>Used to maintain a list of graphics for registered chars and corps</descr>
+    <field name="`graphic`" type="B"/>
+    <field name="`graphicType`" type="C" size="4"/>
+    <field name="`ownerID`" type="I8" size="20">
       <KEY/>
+      <UNSIGNED/>
     </field>
-    <field name="`Value`" type="C" size="255"/>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
-  </table>-->
+    <field name="`ownerType`" type="C" size="4"/>
+    <index name="`utilGraphic1`">
+      <col>`OwnerType`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="utilRegisteredCharacter">
     <descr>Used to maintain a list of characters that are registered with Yapeal to have their API gotten</descr>
     <field name="`activeAPI`" type="X"/>
@@ -79,15 +85,6 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`corporationID`" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <field name="`corporationName`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <field name="`graphic`" type="B"/>
-    <field name="`graphicType`" type="C" size="16"/>
     <field name="`isActive`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>
@@ -103,7 +100,7 @@
     <index name="`utilRegisteredCharacter1`">
       <col>`userID`</col>
     </index>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilRegisteredCorporation">
     <descr>Used to maintain a list of corporations that are registered with Yapeal to have their API gotten</descr>
@@ -117,8 +114,6 @@
       <UNSIGNED/>
     </field>
     <field name="`corporationName`" type="C" size="255"/>
-    <field name="`graphic`" type="B"/>
-    <field name="`graphicType`" type="C" size="16"/>
     <field name="`isActive`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>
@@ -127,7 +122,7 @@
     <index name="`utilRegisteredCorporation1`">
       <col>`characterID`</col>
     </index>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilRegisteredUser">
     <descr>Used to maintain a list of users (accounts) that are registered with Yapeal to have their API gotten</descr>
@@ -143,7 +138,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = ascii_general_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilSections">
     <descr>Table used to allow admin control over which API will be available to registered user/char/corp also controls all other API sections</descr>
@@ -161,7 +156,7 @@
     <index name="`utilSection1`">
       <col>`section`</col>
     </index>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = ascii_general_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilXmlCache">
     <descr>Use to cache API XML if database cache is enabled</descr>
@@ -183,40 +178,43 @@
     <index name="`utilXmlCache2`">
       <col>`api`</col>
     </index>
-    <opt platform="mysql"> ENGINE=INNODB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` CHAR(8) COLLATE ascii_general_ci NOT NULL</query>
+    <query>ALTER TABLE `%%PutilCachedUntil` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `graphic` BLOB DEFAULT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') COLLATE ascii_general_ci NOT NULL DEFAULT 'char'</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `isActive` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCorporation` MODIFY `graphic` BLOB DEFAULT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredCorporation` MODIFY `isActive` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `isActive` BOOLEAN NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `fullApiKey` CHAR(64) COLLATE ascii_general_ci</query>
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `limitedApiKey` CHAR(64) COLLATE ascii_general_ci</query>
+    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `fullApiKey` CHAR(64) COLLATE ascii_general_ci</query>
+    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `limitedApiKey` CHAR(64) COLLATE ascii_general_ci</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `isActive` BOOLEAN NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` CHAR(8) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` CHAR(8) COLLATE ascii_general_ci NOT NULL</query>
+    <query>ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query>ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">TRUNCATE `%%PutilCachedInterval`</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` CHAR(8) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+    <query>TRUNCATE `%%PutilCachedInterval`</query>
+    <query>ALTER TABLE `%%PutilCachedInterval` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
       ('account', 'AccountStatus', 3600),
       ('account', 'Characters', 900),

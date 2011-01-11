@@ -1,4 +1,4 @@
-2011-01-10
+2011-01-10 (rev 1136)
 
 Added new utilGraphic table and removed graphic and graphicType columns from
 utilRegisteredCharacter and utilRegisteredCorporation tables. New class to
@@ -21,7 +21,10 @@ friendly for anyone using them for manual install from archives or SVN.
 Updated README and added new INSTALL file with instructions for installing
 Yapeal manually.
 
-2011-01-09
+Changed name of INSTALL to INSTALL.txt because one OS (Windows c$!p) can't
+figure out how to use case differences to tell files apart from directories.
+
+2011-01-09 (rev 1136)
 
 Adding this changelog in hopes that I might actually use it.
 

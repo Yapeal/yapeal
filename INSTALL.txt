@@ -1,0 +1,137 @@
+INSTALLING FROM ARCHIVES
+
+If you are installing from one of the archives (tar.bz2, zip) the following
+instructions should be helpful. For most paths I will use unix standards which
+uses "/" and not "\" like is common in Windows. If you are do an install to
+Windows you may need to change the paths but the general idea is the same.
+
+1) Download archive
+    These instructions are for trunk/ but can also be used for any of the
+    branches by simply using the correct download in the next couple steps.
+    Windows:
+    http://sourceforge.net/projects/yapeal/files/trunk/yapeal-trunk.zip/download
+    Linux:
+    http://sourceforge.net/projects/yapeal/files/trunk/yapeal-trunk.tar.bz2/download
+
+   Which you choose doesn't really matter as both contain the same code and was
+   done to make it more convenient for the user when extracting.
+
+2) Extract archive
+    Windows:
+    Use the built-in zip handling of Vista or Win7's Windows Explorer to extract
+    Yapeal where you want to put it.
+    Linux: cd /where/I/want/to/put/it/
+    tar -jxvf /where/I/downloaded/archive/yapeal-trunk.tar.bz2
+
+3) Copy yapeal-example.ini
+    At this point you'll want to make a copy of config/yapeal-example.ini to
+    config/yapeal.ini
+    Windows cmd.exe:
+    copy config\yapeal-example.ini config\yapeal.ini
+    OR
+    Drag and drop into same folder to make a copy.
+    Linux:
+    cp config/yapeal-example.ini config/yapeal.ini
+
+4) Edit yapeal.ini
+    Now you'll need to edit config/yapeal.ini. In Windows use NotePad or another
+    editor that work well for code editing (Not WordPad or MS Word). In Linux
+    most editors should work but the more basic the better with Vim or Emacs
+    both being good options.
+
+    For most people you'll only need to change the settings in [Database]
+    section like database, username, password. Changing [Cache]
+    cache_output="both" maybe useful as would changing log_level=E_ALL in
+    [Logging] during testing. For more information about the settings read the
+    comments found in the file.
+
+5) Check requirements
+    Now you can check the settings you just did in last step by running the
+    install/checkForRequirements.php script.
+    Windows cmd.exe:
+    php.exe -f install\checkForRequirements.php
+    Linux:
+    php -f install/checkForRequirements.php
+
+    If all is well you should get a new command prompt without any output. If
+    not than correct any problems found and re-run script until no more problems
+    are found. For help on correcting problems found try the Yapeal wiki and the
+    Yapeal thread on eve online forums for help. You can find URLs for them
+    both in the README file.
+
+6) Check MySQL user access
+    For this and the following steps that deal with MySQL the examples will use
+    the defaults from config/yapeal-example.ini for server name, database name,
+    user name, and password (localhost, yapeal, YapealUser, secret). Make sure
+    to use your settings from config/yapeal.ini that you set in last step.
+
+    You should check the database user has the correct access for the database
+    by running the following.
+    Windows cmd.exe:
+    php.exe -f install\testForMySQLDatabasePrivs.php localhost YapealUser secret yapeal
+    Linux:
+    php -f install/testForMySQLDatabasePrivs.php localhost YapealUser secret yapeal
+
+    It should return "true" if not make sure the user exists in MySQL and has
+    the required access to the database you are going to use for Yapeal. The
+    database does not have to exist but the user does need the privileges to
+    create it.
+
+7) Create MySQL database (optional)
+    Next we'll create the database to be used with Yapeal. This is an optional
+    step you can skip if you already have a database ready for Yapeal to use.
+    Windows cmd.exe:
+    php.exe -f install\createMySQLDatabase.php localhost YapealUser secret yapeal
+    Linux:
+    php -f install/createMySQLDatabase.php localhost YapealUser secret yapeal
+
+    Result should be:
+    Database yapeal created successfully
+    true
+    If not re-check the parameters you used and try steps 6 and 7 again.
+
+8) Add tables to database
+    To add all the tables need by Yapeal we'll run install/createMySQLTables.php
+    Windows cmd.exe:
+    php.exe -f install\createMySQLTables.php localhost YapealUser secret yapeal
+    Linux:
+    php -f install/createMySQLTables.php localhost YapealUser secret yapeal
+
+    Result should be:
+    true
+
+After the above steps everything should be in place to run Yapeal. You'll want
+to active more of the APIs as only server/serverStatus is active by default
+you'll also need to add user, character, and corporation information to the
+utilRegistered* tables in the database for any of the account, char, or corp
+APIs to work. More information about adding information and activing APIs can be
+found in the wiki and forum thread.
+
+INSTALLING FROM SVN
+
+To install from the SVN on GoogleCode first setup a working copy. This shouldn't
+be where you plan on run Yapeal from but be a convenant place like your My
+Documents (Documents on Vista/Win7) or some place like it on Linux. The reason to not
+put your working copy where you plan to run Yapeal is it will make upgrading it
+easier without all the extra .svn/ directories, etc. you have with working copy.
+For Linux on command line you can use:
+  cd /directory/just/above/where/I/want/my/wc/
+  svn co http://yapeal.googlecode.com/svn/trunk/ yapeal
+
+Windows users should refer to the documentation for your SVN client. TortoiseSVN
+which you can get from http://tortoisesvn.tigris.org/ is IMHO the best GUI for
+Windows. You can also get command line versions of SVN for Windows. I have used
+the SilkSVN versions (http://www.sliksvn.com/en/download) which seem to work
+well. If you are using one of the command line version of SVN client like from
+SilkSVN you can try these commands from cmd.exe prompt:
+  cd %userprofile%\"My Documents" (%userprofile%\Documents for Vista/Win7)
+  svn co http://yapeal.googlecode.com/svn/trunk/ yapeal
+
+Now that you have a working copy you can export from it to where you plan on
+running Yapeal.
+  svn export --force /path/to/my/wc/ /directory/where/yapeal/should/be/installed/
+
+Now that you have Yapeal in place you can follow the instructions beginning at
+step 3 in INSTALLING FROM ARCHIVES to finish install.
+
+Have fun, Dragonaire

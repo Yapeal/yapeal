@@ -25,7 +25,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2010, Michael Cummings
+ * @copyright  Copyright (c) 2008-2011, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -68,7 +68,7 @@ if (function_exists('getopt')) {
         case 'V':
           $mess = $argv[0] . ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
           $mess .= YAPEAL_DATE . PHP_EOL;
-          $mess .= 'Copyright (C) 2008-2010, Michael Cummings' . PHP_EOL;
+          $mess .= 'Copyright (c) 2008-2011, Michael Cummings' . PHP_EOL;
           $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL;
           $mess .= 'Licensed under the GNU LPGL 3.0 License.' . PHP_EOL;
           $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;

@@ -21,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008-2009, Michael Cummings
+ * @copyright Copyright (c) 2008-2011, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  */

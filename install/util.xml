@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version="0.3">
+<!--
+/**
+ * XML from Yapeal.
+ *
+ * PHP version 5
+ *
+ * LICENSE: This file is part of Yet Another Php Eve Api library also know
+ * as Yapeal which will be used to refer to it in the rest of this license.
+ *
+ *  Yapeal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Yapeal is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Michael Cummings <mgcummings@yahoo.com>
+ * @copyright Copyright (c) 2008-2011, Michael Cummings
+ * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @package Yapeal
+ * @subpackage Install
+ */
+-->
+  <!-- Utility Section -->
+  <table name="utilCachedInterval">
+    <descr>Per API cache interval lengths</descr>
+    <field name="`section`" type="C" size="8">
+      <KEY/>
+    </field>
+    <field name="`api`" type="C" size="32">
+      <KEY/>
+    </field>
+    <field name="`interval`" type="I4">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
+  <table name="utilCachedUntil">
+    <descr>Used to track cache times of the APIs</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`api`" type="C" size="32">
+      <KEY/>
+    </field>
+    <field name="`cachedUntil`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`section`" type="C" size="8">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
+  <table name="utilConfig">
+    <DROP/>
+  </table>
+  <table name="utilGraphic">
+    <descr>Used to maintain a list of graphics for registered chars and corps</descr>
+    <field name="`graphic`" type="B"/>
+    <field name="`graphicType`" type="C" size="4"/>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`ownerType`" type="C" size="4"/>
+    <index name="`utilGraphic1`">
+      <col>`OwnerType`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="utilRegisteredCharacter">
+    <descr>Used to maintain a list of characters that are registered with Yapeal to have their API gotten</descr>
+    <field name="`activeAPI`" type="X"/>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`name`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`proxy`" type="C" size="255"/>
+    <field name="`userID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <index name="`utilRegisteredCharacter1`">
+      <col>`userID`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="utilRegisteredCorporation">
+    <descr>Used to maintain a list of corporations that are registered with Yapeal to have their API gotten</descr>
+    <field name="`activeAPI`" type="X"/>
+    <field name="`characterID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`corporationID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`corporationName`" type="C" size="255"/>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`proxy`" type="C" size="255"/>
+    <index name="`utilRegisteredCorporation1`">
+      <col>`characterID`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="utilRegisteredUser">
+    <descr>Used to maintain a list of users (accounts) that are registered with Yapeal to have their API gotten</descr>
+    <field name="`activeAPI`" type="X"/>
+    <field name="`fullApiKey`" type="C" size="64"/>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`limitedApiKey`" type="C" size="64"/>
+    <field name="`proxy`" type="C" size="255"/>
+    <field name="`userID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
+  <table name="utilSections">
+    <descr>Table used to allow admin control over which API will be available to registered user/char/corp also controls all other API sections</descr>
+    <field name="`activeAPI`" type="X"/>
+    <field name="`isActive`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`proxy`" type="C" size="255"/>
+    <field name="`sectionID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`section`" type="C" size="8"/>
+    <index name="`utilSection1`">
+      <col>`section`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
+  <table name="utilXmlCache">
+    <descr>Use to cache API XML if database cache is enabled</descr>
+    <field name="`hash`" type="C" size="40">
+      <KEY/>
+    </field>
+    <field name="`api`" type="C" size="32">
+      <NOTNULL/>
+    </field>
+    <field name="`section`" type="C" size="8">
+      <NOTNULL/>
+    </field>
+    <field name="`xml`" type="X2">
+      <NOTNULL/>
+    </field>
+    <index name="`utilXmlCache1`">
+      <col>`section`</col>
+    </index>
+    <index name="`utilXmlCache2`">
+      <col>`api`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <sql prefixmethod="MANUAL">
+    <query>ALTER TABLE `%%PutilCachedUntil` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') COLLATE ascii_general_ci NOT NULL DEFAULT 'char'</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `isActive` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCorporation` MODIFY `isActive` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `isActive` BOOLEAN NOT NULL</query>
+    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `fullApiKey` CHAR(64) COLLATE ascii_general_ci</query>
+    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `limitedApiKey` CHAR(64) COLLATE ascii_general_ci</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `isActive` BOOLEAN NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query>ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>TRUNCATE `%%PutilCachedInterval`</query>
+    <query>ALTER TABLE `%%PutilCachedInterval` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
+      ('account', 'AccountStatus', 3600),
+      ('account', 'Characters', 900),
+      ('char', 'AccountBalance', 900),
+      ('char', 'AssetList', 86400),
+      ('char', 'CalendarEventAttendees', 3600),
+      ('char', 'CharacterSheet', 3600),
+      ('char', 'ContactList', 900),
+      ('char', 'ContactNotifications', 21600),
+      ('char', 'FacWarStats', 3600),
+      ('char', 'IndustryJobs', 900),
+      ('char', 'KillLog', 3600),
+      ('char', 'MailBodies', 1800),
+      ('char', 'MailingLists', 21600),
+      ('char', 'MailMessages', 1800),
+      ('char', 'MarketOrders', 3600),
+      ('char', 'Medals', 3600),
+      ('char', 'Notifications', 1800),
+      ('char', 'Research', 900),
+      ('char', 'SkilInTraining', 300),
+      ('char', 'SkillQueue', 900),
+      ('char', 'Standings', 3600),
+      ('char', 'UpcomingCalendarEvent', 900),
+      ('char', 'WalletJournal', 3600),
+      ('char', 'WalletTransactions', 3600),
+      ('corp', 'AccountBalance', 900),
+      ('corp', 'AssetList', 86400),
+      ('corp', 'CalendarEventAttendees', 3600),
+      ('corp', 'ContactList', 900),
+      ('corp', 'ContainerLog', 3600),
+      ('corp', 'CorporationSheet', 21600),
+      ('corp', 'FacWarStats', 3600),
+      ('corp', 'IndustryJobs', 900),
+      ('corp', 'KillLog', 3600),
+      ('corp', 'MarketOrders', 3600),
+      ('corp', 'Medals', 3600),
+      ('corp', 'MemberMedals', 3600),
+      ('corp', 'MemberSecurity', 3600),
+      ('corp', 'MemberSecurityLog', 3600),
+      ('corp', 'MemberTracking', 21600),
+      ('corp', 'OutpostList', 3600),
+      ('corp', 'OutpostServiceDetail', 3600),
+      ('corp', 'Shareholders', 3600),
+      ('corp', 'Standings', 3600),
+      ('corp', 'StarbaseDetail', 3600),
+      ('corp', 'StarbaseList', 3600),
+      ('corp', 'Titles', 3600),
+      ('corp', 'WalletJournal', 3600),
+      ('corp', 'WalletTransactions', 3600),
+      ('eve', 'AllianceList', 3600),
+      ('eve', 'CertificateTree', 86400),
+      ('eve', 'CharacterInfo', 3600),
+      ('eve', 'ConquerableStationList', 3600),
+      ('eve', 'ErrorList', 86400),
+      ('eve', 'FacWarStats', 3600),
+      ('eve', 'FacWarTopStats', 3600),
+      ('eve', 'RefTypes', 86400),
+      ('eve', 'SkillTree', 86400),
+      ('map', 'FacWarSystems', 3600),
+      ('map', 'Jumps', 3600),
+      ('map', 'Kills', 3600),
+      ('map', 'Sovereignty', 3600),
+      ('server', 'ServerStatus', 180)
+    </query>
+  </sql>
+</schema>

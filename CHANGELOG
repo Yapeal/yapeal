@@ -1,3 +1,19 @@
+2011-01-11 (rev 1137)
+
+Did some code cleanup on class/ADODB_Exception.php
+
+Cleared out some old code that was used when trying to make install/*.php
+scripts run in CGI.
+
+Did some updates to DocBlocks to move classes into correct subpackages.
+
+Updated copyright (c) to reflect 2011.
+
+Added check in class/api/AChar.php and ACorp.php to insure that new cacheUntil
+returned during API errors conditions is always in the future. In some cases
+with API errors 101, 103, 115-117, 119 the new cachedUntil date/time can be in
+the past which caused repeated tries to get API before servers are ready.
+
 2011-01-10 (rev 1136)
 
 Added new utilGraphic table and removed graphic and graphicType columns from

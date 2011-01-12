@@ -21,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2010, Michael Cummings
+ * @copyright  Copyright (c) 2008-2011, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @subpackage AApiRequest
@@ -45,7 +45,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * Abstract class to hold common methods for API classes.
  *
  * @package    Yapeal
- * @subpackage AApiRequest
+ * @subpackage Api
  */
 abstract class AApiRequest {
   /**

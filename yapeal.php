@@ -110,12 +110,10 @@ try {
   // Now take the list of sections and call each in turn.
   foreach ($sectionList as $sec) {
     try {
-      // Have to use the following to work around lcfirst() being PHP 5.3 or
-      // above only.
-      $section = new Sections(strtolower(substr($sec, 0, 1)) . substr($sec, 1), FALSE);
+      $section = new Sections(strtolower($sec), FALSE);
     }
     catch (Exception $e) {
-      // Section does not exist in utilSections or other error occurred.
+      // Section does not exist in utilSections table or other error occurred.
       continue;
     }
     if ($section->isActive == 0) {
@@ -127,7 +125,7 @@ try {
     if (count($apis) == 0) {
       continue;
     };
-    $class = 'Section' . ucfirst($sec);
+    $class = 'Section' . $sec;
     try {
       $instance = new $class($apis);
       $instance->pullXML();

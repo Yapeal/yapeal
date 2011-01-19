@@ -66,7 +66,7 @@ if ($argc < 5) {
   $mess .= 'TablePrefix and XMLfile(s) are optional' . PHP_EOL;
   $mess .= 'If XMLfile(s) is a list it needs to be inside quotes' . PHP_EOL;
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, $ret);
+  fwrite(STDOUT, 'error');
   exit(2);
 };
 // Strip any quotes

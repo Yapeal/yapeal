@@ -1,3 +1,7 @@
+2011-01-15
+
+Fixed error message when install/createMySQLTables.php was run without parameters.
+
 2011-01-11 (rev 1137)
 
 Did some code cleanup on class/ADODB_Exception.php

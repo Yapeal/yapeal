@@ -186,28 +186,20 @@ abstract class ACorp extends AApiRequest {
             trigger_error($mess, E_USER_WARNING);
           };// if !$corp->store() ...
           break;
-        //case 114:// Invalid itemID provided. (Bad POS)
-        //  $mess = 'Deleted ' . $this->posID['itemID'];
-        //  $mess .= ' from StarbaseList for ' . $this->ownerID;
-        //  $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList';
-        //  try {
-        //    $con = YapealDBConnection::connect(YAPEAL_DSN);
-        //    $sql = 'delete from ';
-        //    $sql .= '`' . $tableName . '`';
-        //    $sql .= ' where `ownerID`=' . $this->ownerID;
-        //    $sql .= ' and `itemID`=' . $this->posID['itemID'];
-        //    $con->Execute($sql);
-        //  }
-        //  catch (ADODB_Exception $e) {
-        //    $mess = 'Could not delete ' . $this->posID['itemID'];
-        //    $mess .= ' from StarbaseList for ' . $this->ownerID;
-        //    trigger_error($mess, E_USER_WARNING);
-        //    // Something wrong with query return FALSE.
-        //    return FALSE;
-        //  }
-        //  trigger_error($mess, E_USER_WARNING);
-        //  break;
         case 200:// Current security level not high enough. (Wrong API key)
+          $mess = 'Deactivating Eve API: ' . $this->api;
+          $mess .= ' for corporation ' . $this->params['corporationID'];
+          $mess .= ' as character ' .  $this->params['characterID'];
+          $mess .= ' did not give the required full API key';
+          trigger_error($mess, E_USER_WARNING);
+          $char = new RegisteredCharacter($this->params['characterID'], FALSE);
+          $char->deleteActiveAPI($this->api);
+          if (FALSE === $char->store()) {
+            $mess = 'Could not deactivate ' . $this->api;
+            $mess .= ' for ' . $this->params['characterID'];
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$char->store() ...
+          break;
         case 206:// Character must have Accountant or Junior Accountant roles.
         case 207:// Not available for NPC corporations.
         case 208:// Character must have Accountant, Junior Accountant, or Trader roles.
@@ -216,11 +208,7 @@ abstract class ACorp extends AApiRequest {
           $mess = 'Deactivating Eve API: ' . $this->api;
           $mess .= ' for corporation ' . $this->params['corporationID'];
           $mess .= ' as character ' .  $this->params['characterID'];
-          if ($code != 200) {
-            $mess .= ' does not currently have access';
-          } else {
-            $mess .= ' did not give the required full API key';
-          };
+          $mess .= ' does not currently have access';
           trigger_error($mess, E_USER_WARNING);
           $corp = new RegisteredCorporation($this->params['corporationID'], FALSE);
           $corp->deleteActiveAPI($this->api);

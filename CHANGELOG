@@ -1,3 +1,11 @@
+2011-01-22
+
+Actually commited possible fix for (issue 65). Sorry it didn't get put out a
+couple days ago like I thought it had.
+
+Added fix for 'bad behaviour with limited key requesting fullkey apipages'
+(issue 66)
+
 2011-01-15
 
 Fixed error message when install/createMySQLTables.php was run without parameters.

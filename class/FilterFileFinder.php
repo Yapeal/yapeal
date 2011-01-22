@@ -82,11 +82,14 @@ class FilterFileFinder extends FilterIterator {
     $this->type = $type;
     $this->piece = $piece;
     $flat = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-    // Set flags to know working settings.
-    $flags = FilesystemIterator::CURRENT_AS_FILEINFO
-      | FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
-      | FilesystemIterator::UNIX_PATHS;
+    // Fix for issue 65
+    if (defined('FilesystemIterator::UNIX_PATHS')) {
+      // Set flags to know working settings.
+      $flags = FilesystemIterator::CURRENT_AS_FILEINFO
+        | FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
+        | FilesystemIterator::UNIX_PATHS;
       $flat->setFlags($flags);
+    };// if defined...
     parent::__construct($flat);
   }// function constructor
   /**

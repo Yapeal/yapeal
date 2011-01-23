@@ -1,6 +1,6 @@
 2011-01-22
 
-Actually commited possible fix for (issue 65). Sorry it didn't get put out a
+Actually committed possible fix for (issue 65). Sorry it didn't get put out a
 couple days ago like I thought it had.
 
 Added fix for 'bad behaviour with limited key requesting fullkey apipages'

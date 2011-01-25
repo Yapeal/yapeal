@@ -128,7 +128,7 @@ class SectionCorp {
         };
         foreach ($apis as $api) {
           // If the cache for this API has expire try to get update.
-          if (CachedUntil::cacheExpired($api, $charID) === TRUE) {
+          if (CachedUntil::cacheExpired($api, $corpID) === TRUE) {
             ++$apiCount;
             $class = $this->section . $api;
             $tableName = YAPEAL_TABLE_PREFIX . $class;

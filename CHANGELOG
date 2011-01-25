@@ -1,3 +1,9 @@
+2011-01-25
+
+Fixed error where corp APIs were check char cachedUntil times in utilCachedUntil.
+This was a nasty little bug that took a while to spot in class/SectionCorp.php.
+It should cut down on a few API errors plus get corp APIs at correct times again.
+
 2011-01-22
 
 Actually committed possible fix for (issue 65). Sorry it didn't get put out a

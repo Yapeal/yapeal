@@ -26,7 +26,7 @@
  * @package    Yapeal
  * @subpackage AApiRequest
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.

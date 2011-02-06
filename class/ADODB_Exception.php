@@ -30,7 +30,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.

@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -99,7 +99,7 @@ abstract class AAccount extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    $default = 'http://api.eve-online.com/' . $this->section;
+    $default = 'http://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     $sql = 'select proxy from ';
     try {

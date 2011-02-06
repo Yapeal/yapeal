@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -96,7 +96,7 @@ class FilterFileFinder extends FilterIterator {
    * Required method to make filter work.
    *
    * @return mixed Returns a list of files that have a filename with the correct
-   * prefix.
+   * prefix, suffix, or contains the matching string.
    */
   public function accept() {
     $pathinfo = self::pathinfo_utf($this->current(), $this->piece);

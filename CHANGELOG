@@ -1,3 +1,22 @@
+2011-02-05
+
+(trunk/) Changed all references to eve-online.com over to eveonline.com as first
+step in getting ready for https conversion.
+
+(trunk/) Merged in change from branches/incrusion/ for bad hash that was being
+used in class/YapealApiCache.php.
+
+Users should clear thier XML cache(s) file, database, or both depending on which
+they use. Linux users can clear thier file cache by doing the following:
+
+rm -R cache/*.xml
+
+Windows users can select the XML files (not XSDs) on a folder by folder basis
+and delete them from the cache/* folders.
+
+All users will also need to clear the utilXMLCache database table using:
+truncate utilXMLCache;
+
 2011-01-25
 
 Fixed error where corp APIs were check char cachedUntil times in utilCachedUntil.

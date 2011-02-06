@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -69,7 +69,7 @@ class LoggingExceptionObserver implements IYapealObserver {
    * @param object $e The 'object' we're observing.
    */
   public function YapealUpdate(IYapealSubject $e) {
-    $mess = 'EXCEPTION:' . PHP_EOL;
+    $mess = PHP_EOL . 'EXCEPTION:' . PHP_EOL;
     $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
     $mess .= '  Message: ' . $e->getMessage() . PHP_EOL;
     $mess .= '     File: ' . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL;

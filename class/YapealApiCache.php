@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -102,7 +102,7 @@ class YapealApiCache {
       };
     };
     $this->api = $api;
-    $this->hash = hash('sha1', $section . $api . $params);
+    $this->hash = hash('sha1', $section . $api . $owner . $params);
     $this->ownerID = $owner;
     $this->section = $section;
     $this->postParams = $postParams;
@@ -124,21 +124,16 @@ class YapealApiCache {
       trigger_error($mess, E_USER_WARNING);
       return FALSE;
     };// if empty($xml) ...
-    // Use now + interval + random value for cachedUntil.
-    $until = $this->curTime + $this->cacheInterval;
-    // Add random number of seconds to cache interval. Randomness is larger the
-    // later in the day it is. Between 0 and 1 + 0 .. 23 hours * 15 seconds added.
-    $until += mt_rand(0, ((1 + gmdate("G")) * 15));
     $data = array( 'api' => $this->api, 'ownerID' => $this->ownerID,
       'section' => $this->section
     );
     $cu = new CachedUntil($data);
-    // Update utilCachedUntil table with new cache date/time. This maybe changed
-    // later if an API error was returned that includes a different cache until
-    // date/time.
-    $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
+    // Update utilCachedUntil table with default short cache date/time. This
+    // is changed when there is an API error that returns a different one or
+    // normally is set to the new calculated date/time if there aren't any
+    // errors.
+    $cu->cachedUntil = YAPEAL_START_TIME;
     $cu->store();
-    $cu = NULL;
     // check if XML is valid.
     $this->vd->xml = $xml;
     $this->vd->validateXML();
@@ -149,6 +144,14 @@ class YapealApiCache {
       $error = $this->vd->getApiError();
       throw new YapealApiErrorException($error['message'], $error['code']);
     };// if $this->vd->isApiError() ...
+    // Use now + interval + random value for cachedUntil.
+    $until = $this->curTime + $this->cacheInterval;
+    // Add random number of seconds to cache interval. Randomness is larger the
+    // later in the day it is. Between 0 and 1 + 0 .. 23 hours * 15 seconds added.
+    $until += mt_rand(0, ((1 + gmdate("G")) * 15));
+    $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
+    $cu->store();
+    $cu = NULL;
     switch (YAPEAL_CACHE_OUTPUT) {
       case 'both':
         $this->cacheXmlDatabase($xml);

@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -148,11 +148,8 @@ class charMailBodies extends AChar {
     return $result;
   }// function getMissingIds
   /**
-   * Simple <rowset> per API parser for XML.
-   *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
+   * MailBodies API is unusual in that the rows of data use a mix of an
+   * attribute and element content.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
@@ -170,7 +167,6 @@ class charMailBodies extends AChar {
               case 'row':
                 $row = array();
                 $row['messageID'] = $this->xr->getAttribute('messageID');
-                //print 'string = ' . $this->xr->readString() . PHP_EOL;
                 $row['body'] = $this->xr->readString();
                 $qb->addRow($row);
                 break;

@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eve-online.com/
+ * @link       http://www.eveonline.com/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -174,11 +174,10 @@ class corpWalletTransactions extends ACorp {
     return $ret;
   }// function apiStore
   /**
-   * Simple <rowset> per API parser for XML.
+   * Parsers the XML from API.
    *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
+   * Most common API style is a simple <rowset>. Transactions are a little more
+   * complex because of need to do walking back for older records.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */

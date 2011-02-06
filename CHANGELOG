@@ -17,6 +17,8 @@ and delete them from the cache/* folders.
 All users will also need to clear the utilXMLCache database table using:
 truncate utilXMLCache;
 
+Another try at fully fixing issue 65.
+
 2011-01-25
 
 Fixed error where corp APIs were check char cachedUntil times in utilCachedUntil.

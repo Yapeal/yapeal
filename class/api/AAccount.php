@@ -57,8 +57,6 @@ abstract class AAccount extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    // Cut off 'A' and lower case abstract class name to make section name.
-    $this->section = strtolower(substr(__CLASS__, 1));
     $required = array('apiKey' => 'C', 'userID' => 'I');
     foreach ($required as $k => $v) {
       if (!isset($params[$k])) {

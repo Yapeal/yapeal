@@ -57,8 +57,6 @@ abstract class ACorp extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    // Cut off 'A' and lower case abstract class name to make section name.
-    $this->section = strtolower(substr(__CLASS__, 1));
     $required = array('apiKey' => 'C', 'characterID' => 'I',
       'corporationID' => 'I', 'userID' => 'I');
     foreach ($required as $k => $v) {

@@ -57,8 +57,6 @@ abstract class AServer extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    // Cut off 'A' and lower case abstract class name to make section name.
-    $this->section = strtolower(substr(__CLASS__, 1));
     $this->params = $params;
   }// function __construct
   /**

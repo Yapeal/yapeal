@@ -64,8 +64,7 @@ abstract class AApiRequest {
    */
   protected $params;
   /**
-   * @var string Holds the API section name. Normally set in constructor of the
-   * 'section' class that extends this class.
+   * @var string Holds the API section name.
    */
   protected $section;
   /**

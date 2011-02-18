@@ -86,8 +86,11 @@ class corpKillLog extends ACorp {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    parent::__construct($params);
+    // Cut off 'A' and lower case abstract class name to make section name.
+    $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
+    parent::__construct($params);
+
   }// function __construct
   /**
    * Used to store XML to MySQL table(s).

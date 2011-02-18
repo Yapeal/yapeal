@@ -1,211 +1,228 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:include schemaLocation="../eveapi.xsd"/>
-  <xs:element name="result">
+  <xs:element name="eveapi">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="characters"/>
-        <xs:element ref="corporations"/>
-        <xs:element ref="factions"/>
+        <xs:element name="currentTime" type="eveNEDT"/>
+        <xs:choice>
+          <xs:element name="error">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="result">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="characters">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="characterVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="corporations">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="corporationVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="factions">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionKills"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="KillsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="rowset">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="row" minOccurs="0" maxOccurs="100" type="factionVP"/>
+                          </xs:sequence>
+                          <xs:attribute name="columns" use="required" type="eveColumns"/>
+                          <xs:attribute name="key" use="required" type="xs:NCName"/>
+                          <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="cachedUntil" type="eveNEDT"/>
       </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="characters">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsTotal"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="characterVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="corporations">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsTotal"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="corporationVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="factions">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionKills"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="KillsTotal"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsYesterday"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsLastWeek"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="rowset">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="row" minOccurs="0" maxOccurs="unbounded" type="factionVP"/>
-            </xs:sequence>
-            <xs:attribute name="columns" use="required" type="eveColumns"/>
-            <xs:attribute name="key" use="required" type="xs:NCName"/>
-            <xs:attribute name="name" use="required" fixed="VictoryPointsTotal"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
+      <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
     </xs:complexType>
   </xs:element>
   <xs:complexType name="characterKills">

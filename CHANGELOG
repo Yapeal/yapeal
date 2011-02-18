@@ -7,7 +7,18 @@ parent. The error message never are actually used in Yapeal since section file
 always passed correct params but could have tripped up anyone trying to modify
 or replace them.
 
+(branches/incursion/) Merged in branches/https/ changes.
+
 2011-02-05
+
+(branches/https/) Made changes to convert Yapeal to use https. HTTP proxies will
+no longer work with Yapeal but HTTPS proxies should. Future versions will allow
+for per user/char/corp configuring of certificate file to use for now
+self-signed ones need to be either added to config/cacert.pem or replace it if
+using proxy for all conections.
+
+(branches/incursion/) Merged some changes from trunk/ into incrusion branch like
+the fix for issue 65 and issue 66.
 
 (trunk/) Changed all references to eve-online.com over to eveonline.com as first
 step in getting ready for https conversion.
@@ -28,13 +39,60 @@ truncate utilXMLCache;
 
 Another try at fully fixing issue 65.
 
+2011-02-04
+
+(branches/incursion/) Fixed bug in class/YapealApiCache.php where hash being
+used wasn't always unique for all cached XML files because the owner was not
+being included in it.
+
+Users should clear thier XML cache(s) file, database, or both depending on which
+they use. Linux users can clear thier file cache by doing the following:
+
+rm -R cache/*.xml
+
+Windows users can select the XML files (not XSDs) on a folder by folder basis
+and delete them from the cache/* folders.
+
+All users will also need to clear the utilXMLCache database table using:
+truncate utilXMLCache;
+
+2011-01-31
+
+(branches/incursion/) Changed all references to eve-online.com over to
+eveonline.com as first step in getting ready for https conversion.
+
+2011-01-27
+
+(branches/incursion/) Copied over some of the changes from WalletJournal into
+WalletTransactions as well.
+
 2011-01-25
+
+(branches/incursion/) Made several changes to WalletJournal for char and corp to
+work better with new caching. Starting with I pulled in revision 1146 fix from
+trunk/.
 
 Fixed error where corp APIs were check char cachedUntil times in utilCachedUntil.
 This was a nasty little bug that took a while to spot in class/SectionCorp.php.
 It should cut down on a few API errors plus get corp APIs at correct times again.
 
+2011-01-24
+
+(branches/incursion/) Updated corp/, eve/, map/, and /server/ XSDs to do more
+checks on the XML. Can now catch more error cases.
+
+2011-01-23
+
+(branches/incursion/) Updated account/ and char/ XSDs to do more checks on the
+XML. Can now catch more error cases. Work is continuing on doing the same for
+the others.
+
 2011-01-22
+
+Branched trunk/ to work on some additions/fixes for Incursion.
+
+(branches/incursion/) Added option to YapealQueryBuilder::store() to allow pure
+insert instead of just upsert.
 
 Actually committed possible fix for (issue 65). Sorry it didn't get put out a
 couple days ago like I thought it had.

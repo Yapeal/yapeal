@@ -353,13 +353,16 @@ class YapealQueryBuilder implements Countable {
     return $ret;
   }// function setDefaults
   /**
-   * Finishes making upsert, empties out rows, then upserts data to database.
+   * Finishes making insert/upsert, empties out rows, then inserts/upserts data
+   * to database.
+   *
+   * @param bool $upsert When TRUE use upsert else just insert.
    *
    * @return bool Returns TRUE if upsert worked, else FALSE.
    */
-  public function store() {
+  public function store($upsert = TRUE) {
     if ($this->rowCount == 0) {
-      $mess = 'No rows to be upsert for ' . $this->tableName;
+      $mess = 'No rows for ' . $this->tableName;
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };
@@ -372,16 +375,19 @@ class YapealQueryBuilder implements Countable {
     // Keep local copy of row count for transaction check.
     $cnt = $this->rowCount;
     $this->rowCount = 0;
-    // Add update part to upsert.
-    $sql .= ' on duplicate key update ';
-    // Loop thru and build update.
-    $updates = array();
-    foreach (array_keys($this->colTypes) as $k) {
-      $updates[] = '`' . $k . '`=values(`' . $k . '`)';
+    // Default is to use upsert.
+    if ($upsert === TRUE) {
+      // Add update part to make upsert.
+      $sql .= ' on duplicate key update ';
+      // Loop thru and build update.
+      $updates = array();
+      foreach (array_keys($this->colTypes) as $k) {
+        $updates[] = '`' . $k . '`=values(`' . $k . '`)';
+      };
+      $sql .= implode(',', $updates);
     };
-    $sql .= implode(',', $updates);
-    // Use a transaction for larger upserts to make them faster but fall back to
-    // normal upsert if transaction fails.
+    // Use a transaction for larger inserts/upserts to make them faster but fall
+    // back to normal insert/upsert if transaction fails.
     if ($cnt > 10) {
       $this->con->StartTrans();
       $this->con->Execute($sql);
@@ -396,15 +402,20 @@ class YapealQueryBuilder implements Countable {
       $this->con->Execute($sql);
     }
     catch(ADODB_Exception $e) {
-      $mess = 'Upsert failed for ' . $this->tableName;
+      $mess = 'Insert/upsert failed for ' . $this->tableName;
       trigger_error($mess, E_USER_WARNING);
       return FALSE;
     }
     return TRUE;
   }// function store
   /**
-   * Set max SQL insert size. This is a trade off of memory use and number of
-   * inserts needed for larger APIs.
+   * Set max SQL insert/upsert size.
+   *
+   * This is a trade off of memory use and number of inserts needed for larger
+   * APIs. Only a few APIs normal end up using this.
+   * Examples are char/AssetList, corp/AssetList, eve/AllianceList, map/Jumps,
+   * and map/Kills. The reason is they are the only APIs without a set maximum
+   * number of rows and also tend to be very large.
    */
   const MAX_UPSERT = 1000;
 }

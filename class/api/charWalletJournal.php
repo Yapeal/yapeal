@@ -81,11 +81,25 @@ class charWalletJournal extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    // This counter is used to insure do ... while can't become infinite loop.
+    print 'Got here for owner = ' . $this->ownerID . PHP_EOL;
+    /* This counter is used to insure do ... while can't become infinite loop.
+     * Using 1000 means at most last 255794 rows can be retrieved. That works
+     * out to over 355 entries per hour over the maximum 30 days allowed by
+     * the API servers. If you have a corp or char with more than that please
+     * contact me for addition help with Yapeal.
+     */
     $counter = 1000;
-    $this->date = '1970-01-01 00:00:01';
+    $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
     $this->beforeID = 0;
+    // Only try to get a few rows the first time.
+    $rowCount = 16;
+    // SQL use to find actual number of records for this owner and account.
+    $sql = 'select count(1)';
+    $sql .= ' from ' . YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    $sql .= ' where `ownerID`=' . $this->ownerID;
     try {
+        // Need database connection to do some counting.
+        $dbCon = YapealDBConnection::connect(YAPEAL_DSN);
       do {
         // Give each API 60 seconds to finish. This should never happen but is
         // here to catch runaways.
@@ -95,13 +109,15 @@ class charWalletJournal extends AChar {
          * time. The few seconds of difference shouldn't cause any missed data
          * and is safer than assuming.
          */
-        $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
+        $oldest = gmdate('Y-m-d H:i:s', strtotime('30 days ago'));
         // Need to add extra stuff to normal parameters to make walking work.
         $apiParams = $this->params;
         // Added the accountKey to params.
         $apiParams['accountKey'] = 1000;
         // This tells API server where to start from when walking.
-        $apiParams['beforeRefID'] = $this->beforeID;
+        $apiParams['fromID'] = $this->beforeID;
+        // This tells API server how many rows we want.
+        $apiParams['rowCount'] = $rowCount;
         // First get a new cache instance.
         $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
@@ -128,6 +144,9 @@ class charWalletJournal extends AChar {
         $this->xr = new XMLReader();
         // Pass XML to reader.
         $this->xr->XML($result);
+        // Calculate how many records there should be if have no dups in XML.
+        $expectedCount = $dbCon->GetOne($sql) + $rowCount;
+        print 'Expected = ' . $expectedCount . PHP_EOL;
         // Outer structure of XML is processed here.
         while ($this->xr->read()) {
           if ($this->xr->nodeType == XMLReader::ELEMENT &&
@@ -136,9 +155,27 @@ class charWalletJournal extends AChar {
           };// if $this->xr->nodeType ...
         };// while $this->xr->read() ...
         $this->xr->close();
-        // Leave loop if already got as many entries as API servers allow.
-        if ($this->rowCount != 1000 || $this->date < $oldest) {
+        $actual = $dbCon->GetOne($sql) + 0;
+        print 'Actual = ' . $actual . PHP_EOL;
+        /* There are three normal conditions to end walking. They are:
+         * Got less rows than expected because there are no more to get.
+         * The oldest row we got is oldest API allows us to get.
+         * Some of the rows are duplicates of existing records and there is no
+         * reason to waste any time walking back to get more.
+         */
+        if ($this->rowCount != $rowCount || $this->date < $oldest
+          || $actual < $expectedCount) {
+          // Have to break while.
           break;
+        };
+        /* Get less rows at first but keep getting more until we hit maximum.
+         * Wastes some time when doing initial walk for new owners but works
+         * well after that.
+         */
+        if ($rowCount < 129) {
+          $rowCount *= 2;
+        } else {
+          $rowCount = 256;
         };
       } while ($counter--);
     }
@@ -174,18 +211,22 @@ class charWalletJournal extends AChar {
           case XMLReader::ELEMENT:
             switch ($this->xr->localName) {
               case 'row':
+                /* The following assumes the date attribute exists and is not
+                 * empty and the same is true for refID. Since XML would be
+                 * invalid if ether were true they should never return bad
+                 * values.
+                 */
+                $date = $this->xr->getAttribute('date');
+                // If this date is the oldest so far need to save date and refID
+                // to use in walking.
+                if ($date < $this->date) {
+                  $this->date = $date;
+                  $this->beforeID = $this->xr->getAttribute('refID');
+                };// if $date ...
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   $row[$this->xr->name] = $this->xr->value;
                   switch ($this->xr->name) {
-                    case 'date':
-                      // Save date for walking.
-                      $this->date = $this->xr->value;
-                      break;
-                    case 'refID':
-                      // Save refID for walking.
-                      $this->beforeID = $this->xr->value;
-                      break;
                     case 'taxReceiverID':
                     case 'taxAmount':
                       // Fix blank with zero for upsert.

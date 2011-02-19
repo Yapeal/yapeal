@@ -1,3 +1,8 @@
+2011-02-19
+
+(trunk/) Take out some old test messages that had mistakenly been left in
+WalletJournal and WalletTransactions API classes.
+
 2011-02-17
 
 Fixed an interdependency between class/api/A*.php and the per api instance

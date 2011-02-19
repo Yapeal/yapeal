@@ -85,7 +85,6 @@ class corpWalletJournal extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    print 'Got here for owner = ' . $this->ownerID . PHP_EOL;
     $ret = TRUE;
     $accounts = range(1000, 1006);
     shuffle($accounts);
@@ -159,7 +158,6 @@ class corpWalletJournal extends ACorp {
           $this->xr->XML($result);
           // Calculate how many records there should be if have no dups in XML.
           $expectedCount = $dbCon->GetOne($sql) + $rowCount;
-          print 'Expected = ' . $expectedCount . PHP_EOL;
           // Outer structure of XML is processed here.
           while ($this->xr->read()) {
             if ($this->xr->nodeType == XMLReader::ELEMENT &&
@@ -174,7 +172,6 @@ class corpWalletJournal extends ACorp {
           };// while $this->xr->read() ...
           $this->xr->close();
           $actual = $dbCon->GetOne($sql) + 0;
-          print 'Actual = ' . $actual . PHP_EOL;
           /* There are three normal conditions to end walking. They are:
            * Got less rows than expected because there are no more to get.
            * The oldest row we got is oldest API allows us to get.

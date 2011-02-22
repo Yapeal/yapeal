@@ -1,3 +1,7 @@
+2011-02-21
+
+(trunk/) Updated AccountStatus.xsd to allow for GTC offers.
+
 2011-02-19
 
 (trunk/) Take out some old test messages that had mistakenly been left in

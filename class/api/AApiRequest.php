@@ -64,7 +64,8 @@ abstract class AApiRequest {
    */
   protected $params;
   /**
-   * @var string Holds the API section name.
+   * @var string Holds the API section name. Normally set in constructor of the
+   * final derived instance class.
    */
   protected $section;
   /**
@@ -101,7 +102,11 @@ abstract class AApiRequest {
         };
       };// if FALSE === $result ...
       if (in_array('prepareTables', get_class_methods($this->section . $this->api))) {
-        $this->prepareTables();
+        if ($this->prepareTables() !== TRUE) {
+          $mess = 'Could not prepare ' . $this->section . $this->api;
+          $mess .= ' API tables to accept new data for ' . $this->ownerID;
+          trigger_error($mess, E_USER_WARNING);
+        };
       };
       // Create XMLReader.
       $this->xr = new XMLReader();

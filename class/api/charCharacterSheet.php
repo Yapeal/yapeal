@@ -61,7 +61,6 @@ class charCharacterSheet  extends AChar {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Per API parser for XML.
@@ -171,6 +170,8 @@ class charCharacterSheet  extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     $row = array('ownerID' => $this->ownerID);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -209,6 +210,8 @@ class charCharacterSheet  extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -262,6 +265,8 @@ class charCharacterSheet  extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     $qb->setDefault('ownerID', $this->ownerID);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -301,8 +306,10 @@ class charCharacterSheet  extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     $defaults = array('level' => 0, 'ownerID' => $this->ownerID,
-      'unpublished' => 0
+      'published' => 1
     );
     $qb->setDefaults($defaults);
     while ($this->xr->read()) {
@@ -343,8 +350,8 @@ class charCharacterSheet  extends AChar {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    $tables = array('AttributeEnhancers', 'Certificates', 'CorporationRoles',
-      'CorporationRolesAtBase', 'CorporationRolesAtHQ',
+    $tables = array('Attributes', 'AttributeEnhancers', 'Certificates',
+      'CorporationRoles', 'CorporationRolesAtBase', 'CorporationRolesAtHQ',
       'CorporationRolesAtOther', 'CorporationTitles', 'Skills'
     );
     foreach ($tables as $table) {

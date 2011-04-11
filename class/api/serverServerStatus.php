@@ -61,7 +61,6 @@ class serverServerStatus extends AServer {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Simple <rowset> per API parser for XML.

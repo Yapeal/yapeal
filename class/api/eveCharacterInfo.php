@@ -61,7 +61,6 @@ class eveCharacterInfo extends AEve {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Dummy API parser for XML.

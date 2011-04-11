@@ -76,9 +76,13 @@ class YapealQueryBuilder implements Countable {
    */
   private $rowCount = 0;
   /**
-   * @var string Holds the table name of the query is being built.
+   * @var string Holds the table name of the query that is being built.
    */
   protected $tableName;
+  /**
+   * @var bool Used by store() to decided between plain insert or upsert.
+   */
+  protected $upsert = TRUE;
   /**
    * Constructor
    *
@@ -356,15 +360,18 @@ class YapealQueryBuilder implements Countable {
    * Finishes making insert/upsert, empties out rows, then inserts/upserts data
    * to database.
    *
-   * @param bool $upsert When TRUE use upsert else just insert.
+   * @param bool $upsert When TRUE use upsert else just use insert.
    *
    * @return bool Returns TRUE if upsert worked, else FALSE.
    */
-  public function store($upsert = TRUE) {
+  public function store($upsert = NULL) {
     if ($this->rowCount == 0) {
       $mess = 'No rows for ' . $this->tableName;
       trigger_error($mess, E_USER_NOTICE);
       return FALSE;
+    };
+    if (!is_bool($upsert)) {
+      $upsert = $this->upsert;
     };
     // Make insert part of upsert.
     $sql = 'insert into `' . $this->tableName;
@@ -375,7 +382,7 @@ class YapealQueryBuilder implements Countable {
     // Keep local copy of row count for transaction check.
     $cnt = $this->rowCount;
     $this->rowCount = 0;
-    // Default is to use upsert.
+    // Check if upsert is needed.
     if ($upsert === TRUE) {
       // Add update part to make upsert.
       $sql .= ' on duplicate key update ';
@@ -409,13 +416,27 @@ class YapealQueryBuilder implements Countable {
     return TRUE;
   }// function store
   /**
+   * Sets if store() should use plain insert or upsert (insert with duplicate
+   * key update).
+   *
+   * @param bool $is When TRUE store() will use upserts.
+   *
+   * @return bool Returns value of $this->upsert.
+   */
+  public function useUpsert($is = NULL) {
+    if (is_bool($is)) {
+      $this->upsert = $is;
+    };
+    return $this->upsert;
+  }// function useUpsert
+  /**
    * Set max SQL insert/upsert size.
    *
    * This is a trade off of memory use and number of inserts needed for larger
    * APIs. Only a few APIs normal end up using this.
    * Examples are char/AssetList, corp/AssetList, eve/AllianceList, map/Jumps,
    * and map/Kills. The reason is they are the only APIs without a set maximum
-   * number of rows and also tend to be very large.
+   * number of rows that also tend to be very large.
    */
   const MAX_UPSERT = 1000;
 }

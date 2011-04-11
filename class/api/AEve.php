@@ -138,6 +138,10 @@ abstract class AEve extends AApiRequest {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    if (in_array('prepareTables', get_class_methods($this))) {
+      $qb->useUpsert(FALSE);
+    };
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {

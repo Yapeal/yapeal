@@ -62,7 +62,6 @@ class charStandings extends AChar {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Per API parser for XML.
@@ -120,6 +119,8 @@ class charStandings extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $table;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     $qb->setDefault('ownerID', $this->params['characterID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {

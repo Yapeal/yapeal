@@ -70,7 +70,6 @@ class charAssetList extends AChar {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Simple <rowset> per API parser for XML.
@@ -85,6 +84,8 @@ class charAssetList extends AChar {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $this->qb->useUpsert(FALSE);
     // Set any column defaults needed.
     $this->qb->setDefault('ownerID', $this->ownerID);
     // Generate owner node as root for tree. It has to be added after all the

@@ -858,7 +858,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`unpublished`" type="I1" size="1">
+    <field name="`published`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
@@ -1080,7 +1080,7 @@
     <query platform="mysql">ALTER TABLE `%%PcharNotifications` MODIFY `read` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `unpublished` BOOLEAN NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `published` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)

@@ -61,7 +61,6 @@ class charSkillQueue extends AChar {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Method used to prepare database table(s) before parsing API XML data.

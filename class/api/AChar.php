@@ -97,7 +97,7 @@ abstract class AChar extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    $default = 'http://api.eveonline.com/' . $this->section;
+    $default = 'https://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     $sql = 'select proxy from ';
     try {
@@ -239,6 +239,10 @@ abstract class AChar extends AApiRequest {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    if (in_array('prepareTables', get_class_methods($this))) {
+      $qb->useUpsert(FALSE);
+    };
     // Set any column defaults needed.
     $qb->setDefault('ownerID', $this->ownerID);
     try {

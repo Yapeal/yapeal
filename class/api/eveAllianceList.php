@@ -65,7 +65,6 @@ class eveAllianceList extends AEve {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Per API parser for XML.
@@ -76,9 +75,13 @@ class eveAllianceList extends AEve {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     // Get a new query instance.
     $this->corporations = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations', YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $this->corporations->useUpsert(FALSE);
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {

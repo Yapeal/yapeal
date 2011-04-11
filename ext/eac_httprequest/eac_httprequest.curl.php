@@ -139,24 +139,25 @@ class curlRequest {
 		$this->saved_headers = array();
 		$this->options['CURLOPT_HEADER'] = 0;// no headers in result
 		$this->options['CURLOPT_NOBODY'] = 0;// include body in response
-		//$this->options['CURLOPT_USERAGENT']	= $_SERVER['HTTP_USER_AGENT'];// pass user agent
 		$this->options['CURLOPT_USERAGENT']	= YAPEAL_APPLICATION_AGENT;// default user agent
-		$this->options['CURLOPT_FOLLOWLOCATION'] = 0;// allow redirection
+		$this->options['CURLOPT_FOLLOWLOCATION'] = 1;// allow redirection
+		$this->options['CURLOPT_FORBID_REUSE'] = 0;// allow connection re-use
+		$this->options['CURLOPT_LOW_SPEED_LIMIT'] = 10;// min bps to be considered slow
+		$this->options['CURLOPT_LOW_SPEED_TIME'] = ceil(YAPEAL_CURL_TIMEOUT / 4);// how long to wait on slow connection
 		$this->options['CURLOPT_MAXCONNECTS'] = 5;// max number of persistent connections to keep around.
 		$this->options['CURLOPT_MAXREDIRS'] = 5;// max redirects
-		$this->options['CURLOPT_CONNECTTIMEOUT'] = YAPEAL_CURL_TIMEOUT / 4;// max time in seconds to wait for a new connection.
+		$this->options['CURLOPT_CONNECTTIMEOUT'] = YAPEAL_CURL_TIMEOUT / 2;// max time in seconds to wait for a new connection.
 		$this->options['CURLOPT_TIMEOUT'] = YAPEAL_CURL_TIMEOUT;// max time in seconds transfer is allowed to take.
 		$this->options['CURLOPT_ENCODING'] = 'gzip';// allow gzip compression
 		$this->options['CURLOPT_RETURNTRANSFER'] = 1;// return results as string
 		$this->options['CURLOPT_BINARYTRANSFER'] = 0;// no binary transfer
-        $this->options['CURLOPT_SSL_VERIFYPEER'] = 1; //verify ssl certs
-        $this->options['CURLOPT_SSL_VERIFYHOST'] = 2; //verify ssl host
-        $this->options['CURLOPT_CAINFO'] =  YAPEAL_CONFIG . 'cacert.pem';
-		//$this->options['CURLOPT_COOKIEJAR'] = $_SERVER['DOCUMENT_ROOT'] . '/curl_cookies.txt';
-		//$this->options['CURLOPT_COOKIEFILE'] = $_SERVER['DOCUMENT_ROOT'] . '/curl_cookies.txt';
-		//$this->options['CURLOPT_REFERER'] = (($_SERVER['HTTPS']=='on') ? 'https:' : 'http:') . '//' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    $this->options['CURLOPT_SSL_VERIFYPEER'] = 1; // verify ssl certs
+    $this->options['CURLOPT_SSL_VERIFYHOST'] = 1; // verify ssl host
+    $this->options['CURLOPT_SSL_CIPHER_LIST'] = 'AES256-SHA DES-CBC3-SHA AES128-SHA RC4-SHA RC4-MD5'; // use these ciphers only
+    $this->options['CURLOPT_CAINFO'] =  YAPEAL_CONFIG . 'cacert.pem';
+    $this->options['CURLOPT_COOKIEJAR'] = YAPEAL_CACHE . 'curl_cookies.txt';
 		$this->options['CURLOPT_REFERER'] = 'http://code.google.com/p/yapeal/';
-		$this->options['CURLOPT_UNRESTRICTED_AUTH'] = 0;// do not pass authentication to multiple locations
+		$this->options['CURLOPT_UNRESTRICTED_AUTH'] = 1;// do not pass authentication to multiple locations
 		$this->savedOptions = $this->options;
 		if (is_array($options)) {
 			foreach($options as $opt => $val) {

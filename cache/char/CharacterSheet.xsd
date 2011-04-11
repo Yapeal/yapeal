@@ -62,7 +62,7 @@
                           <xs:attribute name="level" type="xs:unsignedByte"/>
                           <xs:attribute name="skillpoints" type="xs:unsignedLong"/>
                           <xs:attribute name="typeID" type="eveID"/>
-                          <xs:attribute name="unpublished" type="eveBoolean" use="optional"/>
+                          <xs:attribute name="published" type="eveBoolean" use="optional"/>
                         </xs:complexType>
                       </xs:element>
                     </xs:sequence>

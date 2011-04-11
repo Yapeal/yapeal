@@ -61,14 +61,12 @@ class charMailMessages extends AChar {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Simple <rowset> per API parser for XML.
    *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
+   * Only reason this isn't just simple rowset is because toCorpOrAllianceID and
+   * toListID need special handling.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */

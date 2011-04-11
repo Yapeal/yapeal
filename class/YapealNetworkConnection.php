@@ -62,6 +62,7 @@ class YapealNetworkConnection {
       'Accept: ' . $accept,
       'Accept-Language: en-us;q=0.9,en;q=0.8,*;q=0.7',
       'Accept-Charset: utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
+      'Connection: Keep-Alive',
       'Keep-Alive: 300'
     );
     require_once YAPEAL_EAC_HTTPREQUEST . 'eac_httprequest.class.php';
@@ -87,7 +88,8 @@ class YapealNetworkConnection {
   public function retrieveXml($url, $postList) {
     $result = $this->con->post($url, $postList);
     if (!$this->con->success) {
-      $mess = 'API connection error: ' . $this->con->error;
+      $mess = 'API connection error: ' . $this->con->error . PHP_EOL;
+      $mess .= 'HTML error for API ' . $url;
       trigger_error($mess, E_USER_WARNING);
       return FALSE;
     };

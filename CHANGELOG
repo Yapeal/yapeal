@@ -1,3 +1,35 @@
+2011-04-11
+
+(trunk/) Updated cache/char/CharacterSheet.xsd to reflect change in skills
+rowset from using 'unpublished' to using 'published'.
+
+(trunk/) Updated install/char.xml to reflect change from 'unpublished' to
+'published'.
+
+(trunk/) Updated class/api/charCharacterSheet.php for change from 'unpublished'
+to 'published'.
+
+(trunk/) Updated many of the class/api/*.php files to take advantage of the new
+insert only functionality of class/YapealQueryBuilder.php.
+
+(trunk/) Add pics/Yapeal-256x80.png contributed by Eonra.
+
+(branches/cloud/) Saving some work done.
+
+2011-02-26
+
+(trunk/) Changed default for proxy in A*::getProxy() to use https.
+
+(trunk/) Relaxed curl timing to allow it the time it needs to fully check certs.
+
+(trunk/) Updated cache/char/Medals.xsd to allow for same medal being rewarded
+more than once.
+
+(trunk/) Updated cache/char/Medals.xsd so second <rowset/> for otherCorporations
+is allowed.
+
+(trunk/) Fixed minor formatting problem in per class constructors.
+
 2011-02-21
 
 (trunk/) Updated AccountStatus.xsd to allow for GTC offers.

@@ -77,7 +77,6 @@ class corpStarbaseDetail extends ACorp {
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
     parent::__construct($params);
-
   }// function __construct
   /**
    * Used to store XML to MySQL table(s).
@@ -184,21 +183,29 @@ class corpStarbaseDetail extends ACorp {
     $defaults = array('ownerID' => $this->ownerID);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
     $qb->setDefaults($defaults);
     // Get a new query instance.
     $this->combat = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
     );
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $this->combat->useUpsert(FALSE);
     $this->combat->setDefaults($defaults);
     // Get a new query instance.
     $this->fuel = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
     );
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $this->fuel->useUpsert(FALSE);
     $this->fuel->setDefaults($defaults);
     // Get a new query instance.
     $this->general = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
     );
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $this->general->useUpsert(FALSE);
     $this->general->setDefaults($defaults);
     try {
       $ret = TRUE;

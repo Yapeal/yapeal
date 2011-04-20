@@ -1,3 +1,9 @@
+2011-04-19
+
+(trunk/) Fixed for issue 71 where transactions involving 2 wallets in the same
+corporation would only show once in DB table when corporation is buying and
+selling stuff to itself etc do to table primary key not including accountKey.
+
 2011-04-11
 
 (trunk/) Updated cache/char/CharacterSheet.xsd to reflect change in skills

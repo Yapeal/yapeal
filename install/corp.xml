@@ -326,7 +326,6 @@
     <field name="`memberLimit`" type="I2" size="5">
       <NOTNULL/>
       <DEFAULT value="0"/>
-      <UNSIGNED/>
     </field>
     <field name="`shares`" type="I8" size="20">
       <NOTNULL/>

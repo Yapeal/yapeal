@@ -31,7 +31,7 @@
                 <xs:element minOccurs="0" name="allianceName" type="xs:string"/>
                 <xs:element name="taxRate" type="xs:decimal"/>
                 <xs:element name="memberCount" type="xs:unsignedLong"/>
-                <xs:element name="memberLimit" type="xs:unsignedLong"/>
+                <xs:element name="memberLimit" type="xs:short"/>
                 <xs:element name="shares" type="xs:unsignedLong"/>
                 <xs:element name="rowset">
                   <xs:complexType>

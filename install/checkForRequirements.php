@@ -34,14 +34,16 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
- * @internal Only let this code be included or required not ran directly.
+ * @internal Only let this code be ran directly.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
-  exit();
+if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
+  $mess = 'Including of ' . $argv[0] . ' is not allowed' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 // Insure minimum version of PHP we need to run.
 if (version_compare(PHP_VERSION, '5.2.4', '<')) {
-  $mess = 'Need minimum of PHP 5.2.4 to use this software!';
+  $mess = 'Need minimum of PHP 5.2.4 to use this software!' . PHP_EOL;
   fwrite(STDERR, $mess);
 };
 // Check for some required extensions
@@ -50,18 +52,19 @@ $exts = get_loaded_extensions();
 $missing = array_diff($required, $exts);
 if (count($missing) > 0) {
   $mess = 'The required PHP extensions: ';
-  $mess .= implode(', ', $missing) . ' are missing!';
+  $mess .= implode(', ', $missing) . ' are missing!' . PHP_EOL;
   fwrite(STDERR, $mess);
 };
 define('DS', '/');
 // Used to over come path issues caused by how script is ran on server.
-$baseDir = str_replace('\\', '/', realpath('..' . DS . dirname(__FILE__)));
+$baseDir = str_replace('\\', '/', realpath(dirname(__FILE__) . DS. '..') . DS);
 // Get path constants so they can be used.
 require_once $baseDir . DS . 'inc' . DS . 'common_paths.php';
 $iniFile = YAPEAL_CONFIG . 'yapeal.ini';
 if (!(is_readable($iniFile) && is_file($iniFile))) {
-  $mess = 'The required ' . $iniFile . ' configuration file is missing';
+  $mess = 'The required ' . $iniFile . ' configuration file is missing!' . PHP_EOL;
   fwrite(STDERR, $mess);
+  exit(2);
 };
 // Grab the info from ini file.
 $iniVars = parse_ini_file($iniFile, TRUE);
@@ -79,29 +82,29 @@ if (!empty($mess)) {
 };
 // Check writable paths
 if (!is_writable(YAPEAL_LOG)) {
-  $mess = YAPEAL_LOG . ' is not writeable';
+  $mess = YAPEAL_LOG . ' is not writeable.' . PHP_EOL;
   fwrite(STDERR, $mess);
 };
 if (!isset($iniVars['Cache']['cache_output'])) {
   $mess = 'Missing required setting "cache_output" in ' . $iniFile;
-  $mess .= ' for section [Cache].';
+  $mess .= ' for section [Cache].' . PHP_EOL;
   fwrite(STDERR, $mess);
 } else {
   // Check if cache directories exist and are writeable.
   if ($iniVars['Cache']['cache_output'] == 'file' ||
     $iniVars['Cache']['cache_output'] == 'both') {
     if (!is_writable(YAPEAL_CACHE)) {
-      $mess = YAPEAL_CACHE . ' is not writeable';
+      $mess = YAPEAL_CACHE . ' is not writeable.' . PHP_EOL;
       fwrite(STDERR, $mess);
     };
     $sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
     foreach ($sections as $section) {
       if (!is_dir(YAPEAL_CACHE . $section)) {
-        $mess = 'Missing required directory ' . YAPEAL_CACHE . $section;
+        $mess = 'Missing required directory ' . YAPEAL_CACHE . $section . PHP_EOL;
         fwrite(STDERR, $mess);
       };
       if (!is_writable(YAPEAL_CACHE . $section)) {
-        $mess = YAPEAL_CACHE . $section . ' is not writeable';
+        $mess = YAPEAL_CACHE . $section . ' is not writeable.' . PHP_EOL;
         fwrite(STDERR, $mess);
       };
     };// foreach $sections ...

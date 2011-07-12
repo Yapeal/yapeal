@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified">
   <xs:include schemaLocation="../eveapi.xsd"/>
   <xs:element name="eveapi">
     <xs:complexType>
@@ -43,26 +43,16 @@
     </xs:complexType>
   </xs:element>
   <xs:complexType name="rowType">
-    <xs:attribute name="transactionDateTime" use="required" type="eveDT"/>
-    <xs:attribute name="transactionID" use="required" type="eveID"/>
-    <xs:attribute name="quantity" use="required" type="xs:unsignedLong"/>
-    <xs:attribute name="typeName" use="required" type="xs:string"/>
-    <xs:attribute name="typeID" use="required" type="eveID"/>
-    <xs:attribute name="price" use="required" type="xs:decimal"/>
-    <xs:attribute name="clientID" use="required" type="eveID"/>
-    <xs:attribute name="clientName" use="required" type="xs:string"/>
     <xs:attribute name="characterID" use="required" type="eveID"/>
     <xs:attribute name="characterName" use="required" type="xs:string"/>
+    <xs:attribute name="clientID" use="required" type="eveID"/>
+    <xs:attribute name="clientName" use="required" type="xs:string"/>
+    <xs:attribute name="journalTransactionID" use="required" type="eveID"/>
+    <xs:attribute name="price" use="required" type="xs:decimal"/>
+    <xs:attribute name="quantity" use="required" type="xs:unsignedLong"/>
     <xs:attribute name="stationID" use="required" type="eveID"/>
     <xs:attribute name="stationName" use="required" type="xs:string"/>
-    <xs:attribute name="transactionType" use="required">
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="buy"/>
-          <xs:enumeration value="sell"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
+    <xs:attribute name="transactionDateTime" use="required" type="eveDT"/>
     <xs:attribute name="transactionFor" use="required">
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -71,5 +61,16 @@
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
+    <xs:attribute name="transactionID" use="required" type="eveID"/>
+    <xs:attribute name="transactionType" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="buy"/>
+          <xs:enumeration value="sell"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="typeID" use="required" type="eveID"/>
+    <xs:attribute name="typeName" use="required" type="xs:string"/>
   </xs:complexType>
 </xs:schema>

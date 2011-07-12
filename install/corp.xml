@@ -1109,6 +1109,10 @@
       <UNSIGNED/>
     </field>
     <field name="`clientName`" type="C" size="255"/>
+    <field name="`journalTransactionID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
     <field name="`price`" type="N" size="17.2">
       <NOTNULL/>
     </field>

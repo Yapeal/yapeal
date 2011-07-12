@@ -1,3 +1,13 @@
+2011-07-11
+
+(trunk/) Updated WalletTransactions for new journalTransactionID field that was
+add. Thanks for the heads up on that CCP :P
+
+(trunk/) Replaced config/cacert.pem with new config/eveonline.crt to see if
+it'll work better for people. The old file had general certs for all CAs vs new
+one has just the chain needed for Eve APIs. Hopefully this will reduce the
+number of errors being seen.
+
 2011-04-19
 
 (trunk/) Fixed for issue 71 where transactions involving 2 wallets in the same

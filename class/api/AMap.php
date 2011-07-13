@@ -70,7 +70,7 @@ abstract class AMap extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    $default = 'http://api.eveonline.com/' . $this->section;
+    $default = 'https://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);

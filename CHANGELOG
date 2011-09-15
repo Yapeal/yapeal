@@ -1,3 +1,160 @@
+2011-09-14
+
+(trunk/) merged branches/keys/ into trunk/
+
+(branches/keys/) Has now been merged with trunk/ and being deleted along with
+some of the other branches from keys.
+
+2011-09-13
+
+(branches/keys/) Fixed errors in contract and notificationTexts XSDs.
+
+2011-09-12
+
+(branches/keys/) Added support for contracts. contractItems and ContractBids still needs to be added.
+
+2011-09-11
+
+(branches/contracts/) Deleted unneeded prepareTables() that was throwing away
+history.
+
+(branches/notification) Deleted branch as it's already fully integrated into
+keys now and unneeded.
+
+(branches/keys/) Refactored the per section parserAPI() methods into a single
+one in class/api/AApiRequest class instead. Had to refactor some things in the
+per account APIs as well but should help make code much clearer.
+
+Added my public CAK to the SQL in install/util.xml for the utilRegisteredKey
+table and changed account section to be active in utilSection.
+
+Did some clean up on some of the SQL in install/util.xml which allows less
+manual SQL to be used.
+
+Started working on several of the install/*.php scripts to convert them for CAK.
+addTestCharacter.php and addTestCorporation.php should now work but the new
+addTestKey.php is still a WIP. addTestUser.php has been deleted.
+
+2011-09-03
+
+(branches/keys/) Updated the utilRegistered* classes to use new AccessMask class.
+
+Finished updating error handling in AAccount, AChar, and ACorp classes to handle
+the new errors added for custom keys. Also update char and corp error handling
+to work with the register mode setting from config/yapeal.ini.
+
+Made some changes to the Section* classes to try making notice log quieter
+again.
+
+2011-08-30
+
+(branches/keys/) Updated class/util/CachedInterval.php to be less buggy and more
+useful.
+
+Added new AccessMask wrapper class to handle new table in util.
+
+Updated YapealAPICache class to use CachedInterval class.
+
+install/util.xml Fixed typo in SkillInTraining row.
+
+2011-08-25
+
+(branches/keys/) Merged branches/notification/ into keys.
+
+(branches/keys/) Updated AccountStatus API files to reflect removal of userID.
+Now uses keyID instead of userID.
+
+Updated SQL in class/api/charMailBodies.php to avoid asking for bodies that are
+already in the database.
+
+(admin/) Updated phing/build.xml with some new test targets and re-structured
+some of the existing ones.
+
+2011-08-24
+
+(branches/notification/) Made updates to some of the SQL to better use primary
+keys.
+
+2011-08-22
+
+(branches/notification/) Added new branch to integrate new notificationTexts API
+from patrick at nospam ch.tario.org into Yapeal. Thanks for the help.
+
+2011-08-20
+
+(branches/keys/) Update util.xml to set assetLists for 6 hours instead of 24.
+
+Dropped non-API legecy column 'changed' from MarketOrder tables.
+
+2011-08-16
+
+(branches/keys/) Did some refactoring on yapeal.php, ASection.php, and
+Section*.php files to make them less interdependent.
+
+2011-08-14
+
+(branches/keys/) Fixed a couple of errors one of my alpha testers found.
+
+install/char.xml added accountKeyBridge table and updated accountCharacters.
+APIKeyInfo table added default to expires.
+
+cache/account/APIKeyInfo.xsd updated type to allow 'Account'.
+
+First try at conversion for corp/ section.
+Fixed missed $crp to $chr conversion in class/SectionCorp.php.
+
+Fixed error in cache/corp/ContainerLog.xsd.
+
+Updated masks in utilSections table to reflect APIs that haven't been
+implemented in Yapeal yet so notice log doesn't fill up with meaningless noise.
+
+2011-08-13
+
+(branches/keys/) Lots of work on getting char section working. It's working
+without problems in testing now.
+
+Added what should be a fix for the error reported in thread with
+charAttributeEnhancers table from install/char.xml. You can read more about the
+error in
+http://www.eveonline.com/ingameboard.asp?a=topic&threadID=904182&page=23#669
+
+Have some bugs with how account APIs work but does get APIs just gets them
+multiple times with each character in the 'account' type keys. With the changes
+to APIKeyInfo to add type="account" to it I'll be having to go back over it
+anyway.
+
+Added new rawQuantity column to AssetList APIs. Found out about that change when
+I got invalid XML errors during testing. CCP had said something about it in
+contracts but didn't know it was being added to assets as well.
+
+2011-08-01
+
+(branches/keys/) Lots of work done on new key stuff after taking first week to
+form ideas and some kind of plan. Things that have been changed in random order:
+utilRegisteredKey table added
+class/util/RegisteredKey.php added
+accountAPIKeyInfo table added
+accountCharacters now sub-table of APIKeyInfo with schema changes.
+cache/account/APIKeyInfo.xsd added and cache/account/Character.xsd removed.
+utilAccessMask table added
+utilCachedInterval table update for API changes.
+utilRegisteredCharacter table updated for custom keys
+utilRegisteredCorporation table updated for custom keys
+utilRegisteredUser table dropped as no longer use with custom keys
+class/util/RegisteredUser.php removed
+class/ASection.php added
+class/Section*.php changed to use ASection class (WIP)
+
+Currently account, eve, map, server sections have been converted to work with
+new custom key and activeAPIMask system. Work is still in progress on char and
+corp stuff. The new APIs that aren't part of custom key changes are being
+ignored for now until everything is working again.
+
+2011-07-23
+
+(branches/keys/) Created new branch from trunk/ to start work on new custom API
+key stuff.
+
 2011-07-11
 
 (trunk/) Updated WalletTransactions for new journalTransactionID field that was

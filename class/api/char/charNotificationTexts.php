@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains MailBodies class.
+ * Contains NotificationTexts class.
  *
  * PHP version 5
  *
@@ -41,12 +41,12 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Class used to fetch and store char MailBodies API.
+ * Class used to fetch and store char NotificationTexts API.
  *
  * @package Yapeal
  * @subpackage Api_char
  */
-class charMailBodies extends AChar {
+class charNotificationTexts extends AChar {
   /**
    * Constructor
    *
@@ -78,6 +78,9 @@ class charMailBodies extends AChar {
         $proxy = $this->getProxy();
         $con = new YapealNetworkConnection();
         $ids = $this->getIds();
+        if (FALSE === $ids) {
+          return FALSE;
+        };
         // Need to add $ids to normal parameters.
         $this->params['ids'] = implode(',', $ids);
         $result = $con->retrieveXml($proxy, $this->params);
@@ -89,7 +92,7 @@ class charMailBodies extends AChar {
         // Cache the received XML.
         $cache->cacheXml($result);
         // Check if XML is valid.
-        if (FALSE === $cache->isValid()) {
+	      if (FALSE === $cache->isValid()) {
           // No use going any farther if the XML isn't valid.
           return FALSE;
         };
@@ -122,27 +125,30 @@ class charMailBodies extends AChar {
     }
   }// function apiStore
   /**
-   * Used to get a list of message IDs.
+   * Used to get a list of notification IDs.
    *
-   * @return array Returns a list of messages IDs.
+   * @return mixed Returns a list of notification IDs or FALSE on error.
    */
   protected function getIds() {
     $con = YapealDBConnection::connect(YAPEAL_DSN);
-    $sql = 'select messageID';
+    $sql = 'select n.`notificationID`';
     $sql .= ' from ';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'charMailMessages`';
+    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'charNotifications` as n';
+    $sql .= ' left join `'. YAPEAL_TABLE_PREFIX . 'charNotificationTexts` as nt';
+		$sql .= ' on (n.`ownerID` = nt.`ownerID` && n.`notificationID` = nt.`notificationID`)';
     $sql .= ' where';
-    $sql .= ' `ownerID`=' . $this->ownerID;
+    $sql .= ' nt.`notificationID` is null';
+    $sql .= ' and n.`ownerID` = ' . $this->ownerID;
     try {
       $result = $con->getCol($sql);
     }
     catch (ADODB_Exception $e) {
-      $result = array('0');
+      return FALSE;
     }
     if (count($result) == 0) {
-      $result = array('0');
+      return FALSE;
     };
-    // Randomize order so no one mail can starve the rest in case of errors,
+    // Randomize order so no one notification can starve the rest in case of errors,
     // etc.
     if (count($result) > 1) {
       shuffle($result);
@@ -150,9 +156,6 @@ class charMailBodies extends AChar {
     return $result;
   }// function getMissingIds
   /**
-   * MailBodies API is unusual in that the rows of data use a mix of an
-   * attribute and element content.
-   *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
@@ -168,9 +171,9 @@ class charMailBodies extends AChar {
             switch ($this->xr->localName) {
               case 'row':
                 $row = array();
-                $row['messageID'] = $this->xr->getAttribute('messageID');
-                $row['body'] = $this->xr->readString();
-                $qb->addRow($row);
+                $row['notificationID'] = $this->xr->getAttribute('notificationID');
+                $row['text'] = $this->xr->readString();
+		            $qb->addRow($row);
                 break;
             };// switch $this->xr->localName ...
             break;

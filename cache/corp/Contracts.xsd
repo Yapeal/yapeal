@@ -30,7 +30,7 @@
                       <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
                     </xs:annotation>
                     <xs:selector xpath=".//row"/>
-                    <xs:field xpath="@orderID"/>
+                    <xs:field xpath="@contractID"/>
                   </xs:key>
                 </xs:element>
               </xs:sequence>
@@ -43,27 +43,27 @@
     </xs:complexType>
   </xs:element>
   <xs:complexType name="rowType">
-    <xs:attribute name="accountKey" use="required">
-      <xs:simpleType>
-        <xs:restriction base="xs:integer">
-          <xs:minInclusive value="1000"/>
-          <xs:maxInclusive value="1006"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
-    <xs:attribute name="bid" use="required" type="eveBoolean"/>
-    <xs:attribute name="charID" use="required" type="eveID"/>
-    <xs:attribute name="duration" use="required" type="xs:unsignedShort"/>
-    <xs:attribute name="escrow" use="required" type="eveISK"/>
-    <xs:attribute name="issued" use="required" type="eveDT"/>
-    <xs:attribute name="minVolume" use="required" type="xs:unsignedLong"/>
-    <xs:attribute name="orderID" use="required" type="eveID"/>
-    <xs:attribute name="orderState" use="required" type="xs:integer"/>
+    <xs:attribute name="contractID" use="required" type="eveID"/>
+    <xs:attribute name="issuerID" use="required" type="eveID"/>
+    <xs:attribute name="issuerCorpID" use="required" type="eveID"/>
+    <xs:attribute name="assigneeID" use="required" type="eveID"/>
+    <xs:attribute name="acceptorID" use="required" type="eveID"/>
+    <xs:attribute name="startStationID" use="required" type="eveID"/>
+    <xs:attribute name="endStationID" use="required" type="eveID"/>
+    <xs:attribute name="type" use="required" type="xs:string"/>
+    <xs:attribute name="status" use="required" type="xs:string"/>
+    <xs:attribute name="title" use="required" type="xs:string"/>
+    <xs:attribute name="forCorp" use="required" type="eveBoolean"/>
+    <xs:attribute name="availability" use="required" type="xs:string"/>
+    <xs:attribute name="dateIssued" use="required" type="eveDT"/>
+    <xs:attribute name="dateExpired" use="required" type="eveDT"/>
+    <xs:attribute name="dateAccepted" use="required" type="eveDT"/>
+    <xs:attribute name="numDays" use="required" type="xs:unsignedShort"/>
+    <xs:attribute name="dateCompleted" use="required" type="eveDT"/>
     <xs:attribute name="price" use="required" type="eveISK"/>
-    <xs:attribute name="range" use="required" type="xs:short"/>
-    <xs:attribute name="stationID" use="required" type="eveID"/>
-    <xs:attribute name="typeID" use="required" type="eveID"/>
-    <xs:attribute name="volEntered" use="required" type="xs:unsignedLong"/>
-    <xs:attribute name="volRemaining" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="reward" use="required" type="eveISK"/>
+    <xs:attribute name="collateral" use="required" type="eveISK"/>
+    <xs:attribute name="buyout" use="required" type="eveISK"/>
+    <xs:attribute name="volume" use="required" type="xs:decimal"/>
   </xs:complexType>
 </xs:schema>

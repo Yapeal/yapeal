@@ -53,8 +53,11 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-// Define shortened name for DIRECTORY_SEPARATOR
-define('DS', DIRECTORY_SEPARATOR);
+/**
+ * Define short name for directory separator which always uses unix '/'.
+ * @ignore
+ */
+define('DS', '/');
 // Pull in Yapeal revision constants.
 $path = $dir . DS . '..' . DS . 'revision.php';
 require_once realpath($path);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Characters class.
+ * Contains AccountStatus class.
  *
  * PHP version 5
  *
@@ -41,12 +41,12 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Class used to fetch and store account Characters API.
+ * Class used to fetch and store eve SkillTree API.
  *
  * @package Yapeal
  * @subpackage Api_account
  */
-class accountCharacters extends AAccount {
+class accountAccountStatus extends AAccount {
   /**
    * Constructor
    *
@@ -63,26 +63,52 @@ class accountCharacters extends AAccount {
     parent::__construct($params);
   }// function __construct
   /**
-   * Method used to prepare database table(s) before parsing API XML data.
+   * Per API parser for XML.
    *
-   * If there is any need to delete records or empty tables before parsing XML
-   * and adding the new data this method should be used to do so.
-   *
-   * @return bool Will return TRUE if table(s) were prepared correctly.
+   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  protected function prepareTables() {
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Set any column defaults needed.
+    $qb->setDefault('keyID', $this->params['keyID']);
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      // Empty out old data then upsert (insert) new.
-      $sql = 'delete from `';
-      $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-      $sql .= ' where `userID`=' . $this->ownerID;
-      $con->Execute($sql);
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'createDate':
+              case 'logonCount':
+              case 'logonMinutes':
+              case 'paidUntil':
+                // Grab node name.
+                $name = $this->xr->localName;
+                // Move to text node.
+                $this->xr->read();
+                $row[$name] = $this->xr->value;
+                break;
+              default:// Nothing to do.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              $qb->store();
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
       return FALSE;
     }
-    return TRUE;
-  }// function prepareTables
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
 }
 ?>

@@ -44,13 +44,6 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-// Define short name for directory separator which always uses unix '/'.
-if (!defined('DS')) {
-  /**
-   * @ignore
-   */
-  define('DS', '/');
-};
 if (!defined('YAPEAL_DATE')) {
   /**
    * Track date of script.

@@ -25,13 +25,6 @@
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                   </xs:complexType>
-                  <xs:key name="rowIdKey">
-                    <xs:annotation>
-                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
-                    </xs:annotation>
-                    <xs:selector xpath=".//row"/>
-                    <xs:field xpath="@logTime"/>
-                  </xs:key>
                 </xs:element>
               </xs:sequence>
             </xs:complexType>

@@ -108,7 +108,8 @@ class YapealApiCache {
     $this->postParams = $postParams;
     $this->vd = new YapealValidateXml($api, $section);
     $this->curTime = time();
-    $this->cacheInterval = $this->getCachedInterval();
+    $ci = new CachedInterval();
+    $this->cacheInterval = $ci->getInterval($api, $section);
   }// function __constructor
   /**
    * Function used to save API XML to cache database table and/or file and
@@ -398,27 +399,6 @@ class YapealApiCache {
     };
     return $result;
   }// function getCachedFile
-  /**
-   * Used to get the cache interval for this API.
-   *
-   * @return int Returns cache interval for this API.
-   */
-  private function getCachedInterval() {
-    $con = YapealDBConnection::connect(YAPEAL_DSN);
-    $sql = 'select `interval`';
-    $sql .= ' from ';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilCachedInterval`';
-    $sql .= ' where';
-    try {
-      $sql .= ' `section`=' . $con->qstr($this->section);
-      $sql .= ' and `api`=' . $con->qstr($this->api);
-      $result = (int)$con->getOne($sql);
-    }
-    catch (ADODB_Exception $e) {
-      $result = 3600;// Use an hour as default.
-    }
-    return $result;
-  }// function getCachedInterval
   /**
    * Returns if current cached XML is valid.
    *

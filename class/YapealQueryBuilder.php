@@ -395,7 +395,7 @@ class YapealQueryBuilder implements Countable {
     };
     // Use a transaction for larger inserts/upserts to make them faster but fall
     // back to normal insert/upsert if transaction fails.
-    if ($cnt > 10) {
+    if ($cnt > 3) {
       $this->con->StartTrans();
       $this->con->Execute($sql);
       if (FALSE === $this->con->CompleteTrans()) {

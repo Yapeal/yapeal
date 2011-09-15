@@ -53,7 +53,10 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-// Define shortened name for DIRECTORY_SEPARATOR
+/**
+ * Define shortened name for DIRECTORY_SEPARATOR
+ * @ignore
+ */
 define('DS', DIRECTORY_SEPARATOR);
 // Pull in Yapeal revision constants.
 $path = $dir . DS . '..' . DS . 'revision.php';
@@ -61,8 +64,8 @@ require_once realpath($path);
 // Move down and over to 'inc' directory to read common_backend.php
 $path = $dir . DS . '..' . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
-if ($argc < 4) {
-  $mess = 'XMLFile, CorporationID, CharacterID are required in ';
+if ($argc < 3) {
+  $mess = 'XMLFile, CorporationID are required in ';
   $mess .= $argv[0] . PHP_EOL;
   fwrite(STDERR, $mess);
   fwrite(STDOUT, 'error');
@@ -75,7 +78,6 @@ for ($i = 1; $i < $argc; ++$i) {
 };
 $xmlFile = $argv[1];
 $corpID = (string)$argv[2];
-$charID = (string)$argv[3];
 try {
   $xml = simplexml_load_file($xmlFile);
   $corps = $xml->xpath('//row');
@@ -85,36 +87,19 @@ try {
     foreach ($corps as $row) {
       $corporationID = (string)$row['corporationID'];
       $corp = new RegisteredCorporation($corporationID);
-      $corp->activeAPI = (string)$section->activeAPI;
-      $corp->characterID = (string)$row['characterID'];
+      $corp->activeAPIMask = (string)$section->activeAPIMask;
       $corp->corporationName = (string)$row['corporationName'];
-      $url = 'http://image.eveonline.com/Corporation/' . $corporationID . '_64.png';
-      $http = array('timeout' => YAPEAL_CURL_TIMEOUT, 'method' => 'GET',
-        'url' => $url);
-      $curl = new CurlRequest($http);
-      $result = $curl->exec();
-      // Now check for errors.
-      if ($result['curl_error'] != '' || 200 != $result['http_code'] ||
-        $result['body'] == '') {
-        $picFile = realpath(YAPEAL_PICS . 'blank.png');
-        $corp->graphic = '0x' . bin2hex(file_get_contents($picFile));
-        $corp->graphicType = 'png';
-      } else {
-        // Have the picture now it can be added to $corp.
-        $corp->graphic = '0x' . bin2hex($result['body']);
-        $corp->graphicType = 'png';
-      };
-      if ($corp->characterID == $charID) {
+      if ($corporationID == $corpID) {
         $corp->isActive = 1;
       } else {
         $corp->isActive = 0;
       };
-      $corp->proxy = '';
+      //$corp->proxy = '';
       // Add the corporation to the database.
       $corp->store();
       $mess = 'Added ' . $corporationID . ' to database';
       fwrite(STDERR, $mess);
-    };// foreach $chars ...
+    };// foreach $corps ...
     fwrite(STDOUT, 'true');
     exit(0);
   };

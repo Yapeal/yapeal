@@ -53,7 +53,10 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-// Define shortened name for DIRECTORY_SEPARATOR
+/**
+ * Define shortened name for DIRECTORY_SEPARATOR
+ * @ignore
+ */
 define('DS', DIRECTORY_SEPARATOR);
 // Pull in Yapeal revision constants.
 $path = $dir . DS . '..' . DS . 'revision.php';
@@ -61,8 +64,8 @@ require_once realpath($path);
 // Move down and over to 'inc' directory to read common_backend.php
 $path = $dir . DS . '..' . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
-if ($argc < 4) {
-  $mess = 'XMLFile, CharacterID, UserID are required in ';
+if ($argc < 3) {
+  $mess = 'XMLFile, CharacterID are required in ';
   $mess .= $argv[0] . PHP_EOL;
   fwrite(STDERR, $mess);
   fwrite(STDOUT, 'error');
@@ -75,7 +78,6 @@ for ($i = 1; $i < $argc; ++$i) {
 };
 $xmlFile = $argv[1];
 $charID = (string)$argv[2];
-$userID = (string)$argv[3];
 try {
   $xml = simplexml_load_file($xmlFile);
   $chars = $xml->xpath('//row');
@@ -85,10 +87,21 @@ try {
     foreach ($chars as $row) {
       $characterID = (string)$row['characterID'];
       $char = new RegisteredCharacter($characterID);
-      $char->activeAPI = (string)$section->activeAPI;
-      $char->corporationID = (string)$row['corporationID'];
-      $char->corporationName = (string)$row['corporationName'];
-      $url = 'http://image.eveonline.com/Character/' . $characterID . '_64.jpg';
+      $char->activeAPIMask = (string)$section->activeAPIMask;
+      if ($characterID == $charID) {
+        $char->isActive = 1;
+      } else {
+        $char->isActive = 0;
+      };
+      $char->characterName = (string)$row['characterName'];
+      //$char->proxy = '';
+      // Add the character to the database.
+      $char->store();
+      $mess = 'Added ' . $characterID . ' to database';
+      fwrite(STDERR, $mess);
+      $pic = new Graphic($characterID);
+      $pic->ownerType = 'char';
+      $url = 'http://image.eveonline.com/Character/' . $characterID . '_256.jpg';
       $http = array('timeout' => YAPEAL_CURL_TIMEOUT, 'method' => 'GET',
         'url' => $url);
       $curl = new CurlRequest($http);
@@ -97,25 +110,13 @@ try {
       if ($result['curl_error'] != '' || 200 != $result['http_code'] ||
         $result['body'] == '') {
         $picFile = realpath(YAPEAL_PICS . 'blank.png');
-        $char->graphic = '0x' . bin2hex(file_get_contents($picFile));
-        $char->graphicType = 'png';
+        $pic->graphic = '0x' . bin2hex(file_get_contents($picFile));
+        $pic->graphicType = 'png';
       } else {
-        // Have the picture now it can be added to $char.
-        $char->graphic = '0x' . bin2hex($result['body']);
-        $char->graphicType = 'jpg';
+        // Have the picture now it can be added to $pic.
+        $pic->graphic = '0x' . bin2hex($result['body']);
+        $pic->graphicType = 'jpg';
       };
-      if ($characterID == $charID) {
-        $char->isActive = 1;
-      } else {
-        $char->isActive = 0;
-      };
-      $char->name = (string)$row['name'];
-      $char->proxy = '';
-      $char->userID = $userID;
-      // Add the character to the database.
-      $char->store();
-      $mess = 'Added ' . $characterID . ' to database';
-      fwrite(STDERR, $mess);
     };// foreach $chars ...
     fwrite(STDOUT, 'true');
     exit(0);

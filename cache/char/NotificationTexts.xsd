@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xml:lang="en-US">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:include schemaLocation="../eveapi.xsd"/>
   <xs:element name="eveapi">
     <xs:complexType>
@@ -21,7 +21,8 @@
                 <xs:element name="rowset">
                   <xs:complexType>
                     <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="3" name="row" type="rowType"/>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
+                      <xs:element minOccurs="0" maxOccurs="1" name="missingIDs" type="xs:string"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                   </xs:complexType>
@@ -30,16 +31,10 @@
                       <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
                     </xs:annotation>
                     <xs:selector xpath=".//row"/>
-                    <xs:field xpath="@characterID"/>
-                  </xs:key>
-                  <xs:key name="rowNameKey">
-                    <xs:annotation>
-                      <xs:documentation>Names must be unique</xs:documentation>
-                    </xs:annotation>
-                    <xs:selector xpath=".//row"/>
-                    <xs:field xpath="@name"/>
+                    <xs:field xpath="@notificationID"/>
                   </xs:key>
                 </xs:element>
+                <xs:element name="missingIDs" minOccurs="0" type="xs:string"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -50,9 +45,10 @@
     </xs:complexType>
   </xs:element>
   <xs:complexType name="rowType">
-    <xs:attribute name="characterID" use="required" type="eveID"/>
-    <xs:attribute name="corporationID" use="required" type="eveID"/>
-    <xs:attribute name="corporationName" use="required" type="xs:string"/>
-    <xs:attribute name="name" use="required" type="xs:string"/>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="notificationID" use="required" type="eveID"/>
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
 </xs:schema>

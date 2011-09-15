@@ -162,6 +162,7 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if it is time to get the API.
    */
   public static function cacheExpired($api, $owner = 0) {
+    $now = time();
     $sql = 'select `cachedUntil`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilCachedUntil`';
     $sql .= ' where';
@@ -178,7 +179,6 @@ class CachedUntil extends ALimitedObject implements IGetBy {
     if (empty($result)) {
       return TRUE;
     };
-    $now = time();
     $cuntil = strtotime($result . ' +0000');
     if ($now < $cuntil) {
       return FALSE;

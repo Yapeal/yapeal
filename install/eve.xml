@@ -97,9 +97,9 @@
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)
-      VALUES('AllianceList ConquerableStationList ErrorList RefTypes',0,4,'eve')
-      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+      VALUES(289,0,4,'eve')
+      ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>
 </schema>

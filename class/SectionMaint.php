@@ -46,27 +46,22 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage maintenance
  */
-class SectionMaint {
+class SectionMaint extends ASection {
   /**
    * @var array Holds the list of maintenance scripts.
    */
-  private $scriptList;
-  /**
-   * @var string Hold section name.
-   */
-  private $section;
+  //private $scriptList;
   /**
    * Constructor
    *
-   * @param array $allowedScripts An array of admin allowed scripts in this
-   * section. Used to limit which scripts out of the list of scripts from this
-   * section will be ran.
    */
-  public function __construct($allowedScripts) {
+  public function __construct() {
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
-    $path = YAPEAL_CLASS . $this->section . DS;
-    $knownScripts = FilterFileFinder::getStrippedFiles($path, $this->section);
-    $this->scriptList = array_intersect($allowedScripts, $knownScripts);
+    parent::__construct();
+    //$this->section = strtolower(str_replace('Section', '', __CLASS__));
+    //$path = YAPEAL_CLASS . $this->section . DS;
+    //$knownScripts = FilterFileFinder::getStrippedFiles($path, $this->section);
+    //$this->scriptList = array_intersect($allowedScripts, $knownScripts);
   }
   /**
    * Function called by Yapeal.php to start section running maintanance scripts.
@@ -74,6 +69,9 @@ class SectionMaint {
    * @return bool Returns TRUE if all scripts ran cleanly else FALSE.
    */
   public function pullXML() {
+    if ($this->abort === TRUE) {
+      return FALSE;
+    };
     $scriptCount = 0;
     $scriptSuccess = 0;
     if (count($this->scriptList) == 0) {

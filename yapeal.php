@@ -44,13 +44,15 @@ if (PHP_SAPI != 'cli') {
   $mess .= PHP_SAPI . ' instead';
   die($mess);
 };
-// Used to over come path issues caused by how script is ran on server.
-$dir = str_replace('\\', '/', realpath(dirname(__FILE__)));
-chdir($dir);
-// Define short name for directory separator which always uses unix '/'.
 if (!defined('DS')) {
+  /**
+   * Define short name for directory separator which always uses unix '/'.
+   */
   define('DS', '/');
 };
+// Used to over come path issues caused by how script is ran on server.
+$dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
+chdir($dir);
 // Pull in Yapeal revision constants.
 require_once $dir . DS . 'revision.php';
 // If function getopts available get any command line parameters.
@@ -60,7 +62,7 @@ if (function_exists('getopt')) {
     foreach ($options as $opt => $value) {
       switch ($opt) {
         case 'c':
-          $iniFile = str_replace('\\', '/', realpath($value));
+          $iniFile = str_replace('\\', DS, realpath($value));
           break;
         case 'h':
           usage();
@@ -83,7 +85,7 @@ if (function_exists('getopt')) {
   };// if !empty $options ...
 };// if function_exists getopt ...
 // Move down to 'inc' directory to read common_backend.php
-$path = str_replace('\\', '/', realpath($dir . DS . 'inc' . DS . 'common_backend.php'));
+$path = str_replace('\\', DS, realpath($dir . DS . 'inc' . DS . 'common_backend.php'));
 require_once $path;
 try {
   /**
@@ -103,31 +105,31 @@ try {
     $mess = 'No section classes were found check path setting';
     trigger_error($mess, E_USER_ERROR);
   };
+  //$sectionList = array_map('strtolower', $sectionList);
   // Randomize order in which API sections are tried if there is a list.
   if (count($sectionList) > 1) {
     shuffle($sectionList);
   };
+  $sql = 'select `section`';
+  $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+  try {
+    $con = YapealDBConnection::connect(YAPEAL_DSN);
+    $result = $con->GetCol($sql);
+  }
+  catch(ADODB_Exception $e) {
+    // Nothing to do here was already report to logs.
+  }
+  $result = array_map('ucfirst', $result);
+  if (count($result) == 0) {
+    $mess = 'No sections were found in utilSections check database';
+    trigger_error($mess, E_USER_ERROR);
+  };
+  $sectionList = array_intersect($sectionList, $result);
   // Now take the list of sections and call each in turn.
   foreach ($sectionList as $sec) {
-    try {
-      $section = new Sections(strtolower($sec), FALSE);
-    }
-    catch (Exception $e) {
-      // Section does not exist in utilSections table or other error occurred.
-      continue;
-    }
-    if ($section->isActive == 0) {
-      // Skip inactive sections.
-      continue;
-    }
-    $apis = explode(' ', $section->activeAPI);
-    // Skip if there's no active APIs for this section.
-    if (count($apis) == 0) {
-      continue;
-    };
     $class = 'Section' . $sec;
     try {
-      $instance = new $class($apis);
+      $instance = new $class();
       $instance->pullXML();
     }
     catch (ADODB_Exception $e) {
@@ -141,6 +143,8 @@ try {
    * ************************************************************************/
   // Release all the ADOdb connections.
   YapealDBConnection::releaseAll();
+  // Reset cache intervals
+  CachedInterval::resetAll();
 }
 catch (Exception $e) {
   require_once YAPEAL_CLASS . 'YapealErrorHandler.php';

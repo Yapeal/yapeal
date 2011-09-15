@@ -46,76 +46,56 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Api_sections
  */
-class SectionChar {
-  /**
-   * @var array Holds the list of APIs for this section.
-   */
-  private $apiList;
-  /**
-   * @var string Hold section name.
-   */
-  private $section;
+class SectionChar extends ASection {
   /**
    * Constructor
-   *
-   * @param array $allowedAPIs An array of admin allowed APIs in this section.
-   * Used to limit which APIs out of the list of APIs from this section will be
-   * fetched.
    */
-  public function __construct($allowedAPIs) {
+  public function __construct() {
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
-    $this->apiList = array_intersect($allowedAPIs, $knownApis);
-  }
+    parent::__construct();
+  }// function __construct
   /**
    * Function called by Yapeal.php to start section pulling XML from servers.
    *
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
+    if ($this->abort === TRUE) {
+      return FALSE;
+    };
     $apiCount = 0;
     $apiSuccess = 0;
     try {
-      $charList = $this->getRegisteredCharacters();
-      if (count($charList) == 0) {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $sql = $this->getSQLQuery();
+      $result = $con->GetAll($sql);
+      if (count($result) == 0) {
+        $mess = 'No characters for char section';
+        trigger_error($mess, E_USER_NOTICE);
+        return FALSE;
+      };// if empty $result ...
+      // Build name of filter based on mode.
+      $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
+      $charList = array_filter($result, $filter);
+      if (empty($charList)) {
         $mess = 'No active characters for char section';
         trigger_error($mess, E_USER_NOTICE);
         return FALSE;
-      };// if empty $userList ...
-      // Ok now that we have a list of chars we can check which APIs need updated.
+      };
+      // Randomize order so no one character can starve the rest in case of
+      // errors, etc.
+      if (count($charList) > 1) {
+        shuffle($charList);
+      };
       foreach ($charList as $chr) {
-        $charID = $chr['characterID'];
-        try {
-          // Grab a character object.
-          // Can't update chars that don't exist or cause errors.
-          $char = new RegisteredCharacter($charID, FALSE);
-          if ($char->isActive == 0) {
-            // Skip inactive chars.
-            continue;
-          };
-          $userID = (string)$char->userID;
-          // Grab a user object.
-          // Can't update if user doesn't exist.
-          $user = new RegisteredUser($userID, FALSE);
-        }
-        catch (Exception $e) {
-          // Can't update if any exception happens while getting info.
-          continue;
-        }
-        if ($user->isActive == 0) {
-          // User has to be active as well to get char APIs.
+        // Skip characters with no APIs.
+        if ($chr['mask'] == 0) {
           continue;
         };
-        if (isset($user->fullApiKey)) {
-          $apiKey = $user->fullApiKey;
-        } else {
-          $apiKey = $user->limitedApiKey;
-        };
-        $apis = array_intersect($this->apiList, explode(' ', $char->activeAPI));
-        if (count($apis) == 0) {
-          $mess = 'None of the allowed APIs are currently active for ' . $charID;
-          trigger_error($mess, E_USER_NOTICE);
+        $apis = $this->am->maskToAPIs($chr['mask'], $this->section);
+        if ($apis === FALSE) {
+          $mess = 'Problem retrieving API list using mask';
+          trigger_error($mess, E_USER_WARNING);
           continue;
         };
         // Randomize order in which APIs are tried if there is a list.
@@ -124,13 +104,13 @@ class SectionChar {
         };
         foreach ($apis as $api) {
           // If the cache for this API has expired try to get update.
-          if (CachedUntil::cacheExpired($api, $charID) === TRUE) {
+          if (CachedUntil::cacheExpired($api, $chr['characterID']) === TRUE) {
             ++$apiCount;
             $class = $this->section . $api;
             // These are passed on to the API class instance and used as part of
             // hash for lock.
-            $params = array('apiKey' => $apiKey, 'characterID' => $charID,
-              'userID' => $userID);
+            $params = array('keyID' => $chr['keyID'], 'vCode' => $chr['vCode'],
+              'characterID' => $chr['characterID']);
             $parameters = '';
             foreach ($params as $k => $v) {
               $parameters .= $k . '=' . $v;
@@ -150,8 +130,8 @@ class SectionChar {
             catch(ADODB_Exception $e) {
               continue;
             }
-            // Give each API 60 seconds to finish. This should never happen but is
-            // here to catch runaways.
+            // Give each API 60 seconds to finish. This should never happen but
+            // is here to catch runaways.
             set_time_limit(60);
             $instance = new $class($params);
             if ($instance->apiStore()) {
@@ -179,25 +159,191 @@ class SectionChar {
     }// else $apiCount == $apiSuccess ...
   }// function pullXML
   /**
-   * Gets a list of characters that are active from RegisteredCharacter.
+   * Used to get the correct SQL for each mode of YAPEAL_REGISTERED_MODE.
    *
-   * @return array Returns the list of active characters.
-   *
-   * @throws ADODB_Exception for any errors.
+   * @return string Returns the SQL query string.
    */
-  function getRegisteredCharacters() {
-    $con = YapealDBConnection::connect(YAPEAL_DSN);
-    /* Generate a list of character(s) we need to do updates for */
-    $sql = 'select `characterID`';
-    $sql .= ' from ';
-    $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`';
-    $result = $con->GetAll($sql);
-    // Randomize order so no one character can starve the rest in case of errors,
-    // etc.
-    if (count($result) > 1) {
-      shuffle($result);
+  protected function getSQLQuery() {
+    switch (YAPEAL_REGISTERED_MODE) {
+      case 'required':
+        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
+        $sql .= 'urc.`isActive` as "RCActive",aaki.`accessMask`,';
+        $sql .= 'urc.`activeAPIMask` as "RCMask"';
+        $sql .= ' from';
+        $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'accountKeyBridge` as akb';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
+        $sql .= ' on (akb.`keyID` = aaki.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
+        $sql .= ' on (akb.`keyID` = urk.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountCharacters` as ac';
+        $sql .= ' on (akb.`characterID` = ac.`characterID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as urc';
+        $sql .= ' on (akb.`characterID` = urc.`characterID`)';
+        $sql .= ' where';
+        $sql .= ' aaki.`type` in ("Account","Character")';
+        break;
+      case 'optional':
+        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
+        $sql .= 'urk.`isActive` as "RKActive",urc.`isActive` as "RCActive",';
+        $sql .= 'aaki.`accessMask`,urk.`activeAPIMask` as "RKMask",';
+        $sql .= 'urc.`activeAPIMask` as "RCMask"';
+        $sql .= ' from';
+        $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'accountKeyBridge` as akb';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
+        $sql .= ' on (akb.`keyID` = aaki.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
+        $sql .= ' on (akb.`keyID` = urk.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountCharacters` as ac';
+        $sql .= ' on (akb.`characterID` = ac.`characterID`)';
+        $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` as urc';
+        $sql .= ' on (akb.`characterID` = urc.`characterID`)';
+        $sql .= ' where';
+        $sql .= ' aaki.`type` in ("Account","Character")';
+        break;
+      case 'ignored':
+        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
+        $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,';
+        $sql .= 'urk.`activeAPIMask` as "RKMask"';
+        $sql .= ' from';
+        $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'accountKeyBridge` as akb';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
+        $sql .= ' on (akb.`keyID` = aaki.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
+        $sql .= ' on (akb.`keyID` = urk.`keyID`)';
+        $sql .= ' join `' . YAPEAL_TABLE_PREFIX . 'accountCharacters` as ac';
+        $sql .= ' on (akb.`characterID` = ac.`characterID`)';
+        $sql .= ' where';
+        $sql .= ' aaki.`type` in ("Account","Character")';
+        break;
     };
-    return $result;
-  }// function getRegisteredCharacters
+    return $sql;
+  }// function getSQLQuery
+  /**
+   * Filter used when YAPEAL_REGISTERED_MODE == 'ignored'.
+   *
+   * This function is used to filter out non-active rows and merge all of the
+   * different masks into one for each row.
+   *
+   * All the settings in utilRegisteredCharacter are ignored and the ones in
+   * utilRegisteredKey used instead. If any of the optional settings in
+   * utilRegisteredKey are null then returns FALSE but no error messages.
+   *
+   * @param array $row The row currently being checked.
+   *
+   * @return bool Returns TRUE if row should exist in result.
+   */
+  protected function ignoredFilter(&$row) {
+    // Filter out if isActive is NULL or FALSE
+    if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
+      return FALSE;
+    };
+    // If expire is not empty but has expired then return FALSE.
+    if (!is_null($row['expires']) && gmdate('Y-m-d H:i:s') > $row['expires']) {
+      return FALSE;
+    };
+    $row['mask'] = $this->mask;
+    if (!is_null($row['RKMask'])) {
+      $row['mask'] &= $row['RKMask'];
+    } else {
+      // Filter out if ActiveAPIMask is NULL
+      return FALSE;
+    };
+    // Use APIKeyInfo mask if available.
+    if (!is_null($row['accessMask'])) {
+      $row['mask'] &= $row['accessMask'];
+    };
+    return TRUE;
+  }// function ignoredFilter
+  /**
+   * Filter used when YAPEAL_REGISTERED_MODE == 'optional'.
+   *
+   * This function is used to filter out non-active rows and merge all of the
+   * different masks into one for each row.
+   *
+   * The best way to view this mode is it allows you to farther restrict the
+   * settings in utilSections using the optional settings from
+   * utilRegisiteredKey and utilRegisteredCharacter if you choose to. Any
+   * non-null optional settings in utilRegisteredCharacter has priority over the
+   * ones in utilRegisteredKey which are ignored in that case.
+   *
+   * @param array $row The row currently being checked.
+   *
+   * @return bool Returns TRUE if row should exist in result.
+   */
+  protected function optionalFilter(&$row) {
+    // If isActive from utilRegisteredCharacter is not empty and set to FALSE
+    // then return FALSE.
+    if (!is_null($row['RCActive']) && $row['RCActive'] == 0) {
+      return FALSE;
+      // Else if isActive from utilRegisteredCharacter is null and isActive from
+      // utilRegisteredKey is not empty and set to FALSE then return FALSE.
+    } elseif (is_null($row['RCActive']) && !is_null($row['RKActive'])
+      && $row['RKActive'] == 0) {
+      return FALSE;
+    };
+    // If expire is not empty but has expired then return FALSE.
+    if (!is_null($row['expires']) && gmdate('Y-m-d H:i:s') > $row['expires']) {
+      return FALSE;
+    };
+    $row['mask'] = $this->mask;
+    // Use Character mask if not empty ...
+    if (!is_null($row['RCMask'])) {
+      $mask &= $row['RCMask'];
+      // else use key mask if not empty.
+    } elseif (!is_null($row['RKMask'])) {
+      $row['mask'] &= $row['RKMask'];
+    };
+    // Use APIKeyInfo mask if available.
+    if (!is_null($row['accessMask'])) {
+      $row['mask'] &= $row['accessMask'];
+    };
+    return TRUE;
+  }// function optionalFilter
+  /**
+   * Filter used when YAPEAL_REGISTERED_MODE == 'required'.
+   *
+   * This function is used to filter out non-active rows and merge all of the
+   * different masks into one for each row.
+   *
+   * The best way to view this mode is it forces you to farther restrict the
+   * settings in utilSections using the optional settings from
+   * utilRegisteredCharacter. The optional settings become required with the
+   * exception of proxy which is still optional so activeAPIMask and isActive
+   * can no longer be null. This mode is much like the old legacy mode of Yapeal.
+   *
+   * @param array $row The row currently being checked.
+   *
+   * @return bool Returns TRUE if row should exist in result.
+   */
+  protected function requiredFilter(&$row) {
+    // isActive is not optional.
+    if (is_null($row['RCActive'])) {
+      $mess = 'IsActive can not be null in utilRegisteredCharacter when';
+      $mess .= ' registered_mode = "required"';
+      trigger_error($mess, E_USER_WARNING);
+      return FALSE;
+    };
+    // Deactivated.
+    if ($row['RCActive'] == 0) {
+      return FALSE;
+    };
+    // If expire is not empty but has expired then return FALSE.
+    if (!is_null($row['expires']) && gmdate('Y-m-d H:i:s') > $row['expires']) {
+      return FALSE;
+    };
+    // activeAPIMask is not optional.
+    if (is_null($row['RCMask'])) {
+      $mess = 'activeAPIMask can not be null in utilRegisteredCharacter when';
+      $mess .= ' registered_mode = "required"';
+      trigger_error($mess, E_USER_WARNING);
+      return FALSE;
+    };
+    $row['mask'] = $this->mask & $row['RCMask'];
+    // Use APIKeyInfo mask if available.
+    if (!is_null($row['accessMask'])) {
+      $row['mask'] &= $row['accessMask'];
+    };
+    return TRUE;
+  }// function requiredFilter
 }
 ?>

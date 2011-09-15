@@ -48,11 +48,18 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  */
 class RegisteredCharacter extends ALimitedObject implements IGetBy {
   /**
-   * @var string Holds an instance of the DB connection.
+   * Hold an instance of the AccessMask class.
+   * @var object
+   */
+  protected $am;
+  /**
+   * Holds an instance of the DB connection.
+   * @var object
    */
   protected $con;
   /**
-   * @var string Holds the table name of the query is being built.
+   * Holds the table name of the query is being built.
+   * @var string
    */
   protected $tableName;
   /**
@@ -60,11 +67,6 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @var object
    */
   protected $qb;
-  /**
-   * List of all section APIs
-   * @var array
-   */
-  private $apiList;
   /**
    * Set to TRUE if a database record exists.
    * @var bool
@@ -83,8 +85,6 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $this->apiList = FilterFileFinder::getStrippedFiles($path, 'char');
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.
@@ -94,6 +94,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
       $mess = 'Failed to get database connection in ' . __CLASS__;
       throw new RuntimeException($mess, 1);
     }
+    // Get a new access mask object.
+    $this->am = new AccessMask();
     // Get a new query builder object.
     $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
     // Get a list of column names and their ADOdb generic types.
@@ -116,7 +118,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
         if (FALSE === $this->getItemByName($id)) {
           if (TRUE == $create) {
             // If $id is a string and doesn't exist yet set name with it.
-            $this->properties['name'] = $id;
+            $this->properties['characterName'] = $id;
           } else {
             $mess = 'Unknown character ' . $id;
             throw new DomainException($mess, 3);
@@ -136,55 +138,43 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     $this->con = NULL;
   }// function __destruct
   /**
-   * Used to add an API to the list in activeAPI.
+   * Used to add an API to the list in activeAPIMask.
    *
    * @param string $name Name of the API to add without 'char' part i.e.
    * 'charAccountBalance' would just be 'AccountBalance'
    *
    * @return bool Returns TRUE if $name already exists else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
    */
   public function addActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 5);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    if (in_array($name, $apis)) {
+    $mask = $this->am->apisToMask($name, 'char');
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
       $ret = TRUE;
     } else {
+      $this->properties['activeAPIMask'] |= $mask;
       $ret = FALSE;
-      $apis[] = $name;
-    };// if isset...
-    $this->properties['activeAPI'] = implode(' ', $apis);
+    };// if $this->properties['activeAPIMask'] ...
     return $ret;
   }// function addActiveAPI
   /**
-   * Used to delete an API from the list in activeAPI.
+   * Used to delete an API from the list in activeAPIMask.
    *
    * @param string $name Name of the API to delete without 'char' part i.e.
    * 'charAccountBalance' would just be 'AccountBalance'
    *
-   * @return bool Returns TRUE if $name existed else FALSE.
+   * @return bool Returns TRUE if $name was already set else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
    */
   public function deleteActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 6);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $ret = FALSE;
-    foreach ($apis as $k => $v) {
-      if ($name == $v) {
-        $ret = TRUE;
-        unset($apis[$k]);
-        break;
-      };// if $name == $v ...
-    };// foreach $apis ...
-    $this->properties['activeAPI'] = implode(' ', $apis);
+    $mask = $this->am->apisToMask($name, 'char');
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
+      $this->properties['activeAPIMask'] ^= $mask;
+      $ret = TRUE;
+    } else {
+      $ret = FALSE;
+    };// if $this->properties['activeAPIMask'] ...
     return $ret;
   }// function deleteActiveAPI
   /**
@@ -202,15 +192,6 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
       $result = $this->con->GetRow($sql);
       if (!empty($result)) {
         $this->properties = $result;
-        $parent = $this->parentTableExists();
-        if (!empty($parent)) {
-          $mess = 'Parent record(s) missing from ';
-          $mess .= implode(', ', array_keys($parent)) . ' for ';
-          $mess .= implode(', ', $parent);
-          $mess .= ' making characterID ' . $this->properties['characterID'];
-          $mess .= ' in utilRegisteredCharacter incomplete.';
-          trigger_error($mess, E_USER_WARNING);
-        };
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
@@ -232,19 +213,10 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
     try {
-      $sql .= ' where `name`=' . $this->con->qstr($name);
+      $sql .= ' where `characterName`=' . $this->con->qstr($name);
       $result = $this->con->GetRow($sql);
       if (!empty($result)) {
         $this->properties = $result;
-        $parent = $this->parentTableExists();
-        if (!empty($parent)) {
-          $mess = 'Parent record(s) missing from ';
-          $mess .= implode(', ', array_keys($parent)) . ' for ';
-          $mess .= implode(', ', $parent);
-          $mess .= ' making characterID ' . $this->properties['characterID'];
-          $mess .= ' in utilRegisteredCharacter incomplete.';
-          trigger_error($mess, E_USER_WARNING);
-        };
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
@@ -255,22 +227,6 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
     }
     return $this->recordExists();
   }// function getItemByName
-  /**
-   * Used to check for required record in parent table(s) that must exist.
-   *
-   * @return array Returns empty array if parent table record(s) exists else an
-   * assoc array of table name and ID of missing record(s).
-   */
-  private function parentTableExists() {
-    $result = array();
-    try {
-      $user = new RegisteredUser($this->properties['userID'], FALSE);
-    }
-    catch (Exception $e) {
-      $result['utilRegisteredUser'] = $this->properties['userID'];
-    }
-    return $result;
-  }// function parentTableExists
   /**
    * Function used to check if database record already existed.
    *
@@ -306,26 +262,29 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $unknowns = array_diff($apis, $this->apiList);
-    if (!empty($unknowns)) {
-      $mess = 'activeAPI contains the following unknown APIs: ';
-      $mess .= implode(', ', $unknowns);
+    $mask = array_reduce($this->maskList, array($this, 'reduceOR'), 0);
+    // Find any unknown APIs in mask.
+    $unknowns = $this->properties['activeAPIMask'] & $mask;
+    if ($unknowns != 0) {
+      $mess = 'activeAPIMask contains the following unknown mask values: %b';
+      $mess = sprintf($mess, $unknowns);
       trigger_error($mess, E_USER_WARNING);
-    };
-    $parent = $this->parentTableExists();
-    if (!empty($parent)) {
-      $mess = 'Parent record(s) missing from ';
-      $mess .= implode(', ', array_keys($parent)) . ' for ';
-      $mess .= implode(', ', $parent);
-      $mess .= ' making characterID ' . $this->properties['characterID'];
-      $mess .= ' in utilRegisteredCharacter incomplete and could not store.';
-      throw new LogicException($mess, 7);
-    };
+    };// if $mask ...
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...
     return $this->qb->store();
   }// function store
+  /**
+   * Used by store() to 'or' together masks for array_reduce().
+   *
+   * @param int $x First value to be ORed together.
+   * @param int $y Second value to be ORed together.
+   *
+   * @return int Returns $x | $y
+   */
+  protected function reduceOR($x, $y) {
+    return $x | $y;
+  }// function reduceOR
 }
 ?>

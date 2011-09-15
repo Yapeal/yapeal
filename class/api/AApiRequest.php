@@ -151,11 +151,59 @@ abstract class AApiRequest {
    */
   abstract protected function handleApiError($e);
   /**
-   * Abstract per API parser for XML.
+   * Simple <rowset> per API parser for XML.
+   *
+   * Most common API style is a simple <rowset>. This implementation allows most
+   * API classes to be empty except for a constructor which sets $this->api and
+   * calls their parent constructor.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
-  abstract protected function parserAPI();
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    if (in_array('prepareTables', get_class_methods($this))) {
+      $qb->useUpsert(FALSE);
+    };
+    if ($this->ownerID != 0) {
+      $qb->setDefault('ownerID', $this->ownerID);
+    };
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'row':
+                // Walk through attributes and add them to row.
+                while ($this->xr->moveToNextAttribute()) {
+                  $row[$this->xr->name] = $this->xr->value;
+                };// while $this->xr->moveToNextAttribute() ...
+                $qb->addRow($row);
+                break;
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              // Insert any leftovers.
+              if (count($qb) > 0) {
+                $qb->store();
+              };// if count $rows ...
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+        };// switch $this->xr->nodeType
+      };// while $xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    trigger_error($mess, E_USER_WARNING);
+    return FALSE;
+  }// function parserAPI
   /**
    * Version of sprintf for cases where named arguments are desired (php syntax)
    *

@@ -33,7 +33,7 @@
 -->
   <!-- Account Section -->
   <table name="accountAccountStatus">
-    <field name="`userID`" type="I8" size="20">
+    <field name="`keyID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
@@ -53,31 +53,70 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="accountAPIKeyInfo">
+    <field name="`keyID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`accessMask`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`expires`" type="T">
+      <NOTNULL/>
+      <DEFAULT value="2038-01-19 03:14:07"/>
+    </field>
+    <field name="`type`" type="C" size="11">
+      <NOTNULL/>
+    </field>
+    <index name="`accountAPIKeyInfo1`">
+      <col>`type`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="accountCharacters">
     <field name="`characterID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`characterName`" type="C" size="100">
+      <NOTNULL/>
+    </field>
     <field name="`corporationID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`corporationName`" type="C" size="255">
+    <field name="`corporationName`" type="C" size="150">
       <NOTNULL/>
     </field>
-    <field name="`name`" type="C" size="255">
-      <NOTNULL/>
-    </field>
-    <field name="`userID`" type="I8" size="20">
-      <NOTNULL/>
+    <index name="`accountCharacters1`">
+      <col>`corporationID`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="accountKeyBridge">
+    <field name="`keyID`" type="I8" size="20">
+      <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <index name="`accountKeyBridge1`">
+      <col>`characterID`</col>
+      <col>`keyID`</col>
+      <UNIQUE/>
+    </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)
-      VALUES('AccountStatus Characters',0,1,'account')
-      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+    <query platform="mysql">ALTER TABLE `%%PaccountAPIKeyInfo` MODIFY `type` ENUM('Account','Character','Corporation') COLLATE ascii_general_ci NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+      VALUES(33554433,1,1,'account')
+      ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>
 </schema>

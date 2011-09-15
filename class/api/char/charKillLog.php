@@ -125,8 +125,8 @@ class charKillLog extends AChar {
           $proxy = $this->getProxy();
           $con = new YapealNetworkConnection();
           $result = $con->retrieveXml($proxy, $apiParams);
-          // FALSE means there was an error and it has already been report so just
-          // return to caller.
+          // FALSE means there was an error and it has already been report so
+          // just return to caller.
           if (FALSE === $result) {
             return FALSE;
           };
@@ -168,11 +168,7 @@ class charKillLog extends AChar {
     return $result;
   }// function apiStore
   /**
-   * Simple <rowset> per API parser for XML.
-   *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
+   * Full implementation of multiple tables and nested sets from XML.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */

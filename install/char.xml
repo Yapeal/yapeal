@@ -80,6 +80,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`rawQuantity`" type="I8" size="20"/>
     <field name="`rgt`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -154,14 +155,14 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`augmentatorName`" type="C" size="255">
+    <field name="`augmentatorName`" type="C" size="100">
       <NOTNULL/>
     </field>
     <field name="`augmentatorValue`" type="I1" size="2">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`bonusName`" type="C" size="255">
+    <field name="`bonusName`" type="C" size="100">
       <KEY/>
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
@@ -317,6 +318,88 @@
       <NOTNULL/>
     </field>
     <field name="`messageData`" type="X"/>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charContracts">
+    <descr>Table for /char/Contracts.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contractID`" type="I8" size="20">
+      <NOTNULL/>
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`issuerID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`issuerCorpID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`assigneeID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`acceptorID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`startStationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`endStationID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`type`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`status`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`title`" type="C" size="255">
+    </field>
+    <field name="`forCorp`" type="I1" size="1">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+	<field name="`availability`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`dateIssued`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`dateExpired`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`dateAccepted`" type="T">
+    </field>
+    <field name="`numDays`" type="I2" size="3">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`dateCompleted`" type="T">
+    </field>
+    <field name="`price`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`reward`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`collateral`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`buyout`" type="N" size="17.2">
+      <NOTNULL/>
+    </field>
+    <field name="`volume`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charCorporationRoles">
@@ -647,9 +730,6 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`changed`" type="T">
-      <NOTNULL/>
-    </field>
     <field name="`charID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -745,6 +825,22 @@
     <field name="`typeID`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charNotificationTexts">
+    <descr>Table for /char/NotificationTexts.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`notificationID`" type="I8" size="20">
+      <KEY/>
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`text`" type="X">
+      <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
@@ -1074,10 +1170,12 @@
     <query platform="mysql">ALTER TABLE `%%PcharContactList` MODIFY `inWatchlist` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
+    <query platform="mysql">ALTER TABLE `%%PcharContracts` MODIFY `forCorp` BOOLEAN NOT NULL</query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PcharIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
     <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
@@ -1087,9 +1185,9 @@
     <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `published` BOOLEAN NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPI`,`isActive`,`sectionID`,`section`)
-      VALUES('AccountBalance AssetList CharacterSheet ContactList ContactNotifications IndustryJobs KillLog MailingLists MailMessages MarketOrders Notifications Research SkillInTraining SkillQueue Standings WalletJournal WalletTransactions',0,2,'char')
-      ON DUPLICATE KEY UPDATE `activeAPI`=VALUES(`activeAPI`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+      VALUES(107970491,0,2,'char')
+      ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>
 </schema>

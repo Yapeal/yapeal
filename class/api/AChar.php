@@ -57,7 +57,7 @@ abstract class AChar extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    $required = array('apiKey' => 'C', 'characterID' => 'I', 'userID' => 'I');
+    $required = array('characterID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
     foreach ($required as $k => $v) {
       if (!isset($params[$k])) {
         $mess = 'Missing required parameter $params["' . $k . '"]';
@@ -102,18 +102,23 @@ abstract class AChar extends AApiRequest {
     $sql = 'select proxy from ';
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
-      $tables = array(
-        '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter` where `characterID`=' .
-        $this->params['characterID'],
-        '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredUser` where `userID`=' .
-        $this->params['userID'],
-        '`' . YAPEAL_TABLE_PREFIX . 'utilSections` where `section`=' .
-        $con->qstr($this->section)
-      );
+      $tables = array();
+      // Only use utilRegisteredCharacter when YAPEAL_REGISTERED_MODE is
+      // required or optional.
+      if (YAPEAL_REGISTERED_MODE == 'required'
+        || YAPEAL_REGISTERED_MODE == 'optional') {
+        $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`'
+          . ' where `characterID`=' . $this->params['characterID'];
+      };
+      $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey`'
+        . ' where `keyID`=' . $this->params['keyID'];
+      $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilSections`'
+        . ' where `section`=' . $con->qstr($this->section);
       // Look for a set proxy in each table.
       foreach ($tables as $table) {
         $result = $con->GetOne($sql . $table);
-        // 4 is random and not magic. It just sounded good.
+        // 4 is random and not magic. It just sounded good and is shorter than
+        // any legal URL.
         if (strlen($result) > 4) {
           break;
         };
@@ -171,39 +176,97 @@ abstract class AChar extends AApiRequest {
         case 205:// Authentication failure (final pass).
         case 210:// Authentication failure.
         case 212:// Authentication failure (final pass).
-          $mess = 'Deactivating characterID: ' . $this->params['characterID'];
-          $mess .= ' as their Eve API information is incorrect';
-          trigger_error($mess, E_USER_WARNING);
-          $char = new RegisteredCharacter($this->params['characterID'], FALSE);
-          $char->isActive = 0;
-          if (!$char->store()) {
-            $mess = 'Could not deactivate characterID: ';
-            $mess .= $this->params['characterID'];
+          if (YAPEAL_REGISTERED_MODE != 'ignored') {
+            $mess = 'Deactivating characterID: ' . $this->params['characterID'];
+            $mess .= ' as their Eve API information is incorrect';
             trigger_error($mess, E_USER_WARNING);
-          };// if !$char->store() ...
-          break;
-        case 200:// Current security level not high enough. (Wrong API key)
-          $mess = 'Deactivating Eve API: ' . $this->api;
-          $mess .= ' for ' . $this->params['characterID'];
-          $mess .= ' as did not give the required full API key';
+            // A new row for character will be created if needed. This allows
+            // the 'optional' registered mode to work correctly.
+            $char = new RegisteredCharacter($this->params['characterID']);
+            $char->isActive = 0;
+            // If new character need to set required columns.
+            if (FALSE === $char->recordExists()) {
+              $char->activeAPIMask = 0;
+            };// if $char->recordExists() ...
+            if (FALSE === $char->store()) {
+              $mess = 'Could not deactivate characterID: ';
+              $mess .= $this->params['characterID'];
+              trigger_error($mess, E_USER_WARNING);
+            };// if $user->store() ...
+          };// if YAPEAL_REGISTERED_MODE ...
+          // Always deactive key no matter the registered mode.
+          $mess = 'Deactivating keyID: ' . $this->params['keyID'];
+          $mess .= ' as the Eve API information is incorrect';
           trigger_error($mess, E_USER_WARNING);
-          $char = new RegisteredCharacter($this->params['characterID'], FALSE);
-          $char->deleteActiveAPI($this->api);
-          if (FALSE === $char->store()) {
-            $mess = 'Could not deactivate ' . $this->api;
-            $mess .= ' for ' . $this->params['characterID'];
+          $key = new RegisteredKey($this->params['keyID'], FALSE);
+          $key->isActive = 0;
+          if (FALSE === $key->store()) {
+            $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$char->store() ...
+          };// if !$user->store() ...
           break;
         case 211:// Login denied by account status.
-          // The user's account isn't active deactivate it.
-          $mess = 'Deactivating userID: ' . $this->params['userID'];
-          $mess .= ' as their Eve account is currently suspended';
+          // The account is not active deactivate key and character too if
+          // registered mode is not 'ignored'.
+          if (YAPEAL_REGISTERED_MODE != 'ignored') {
+            $mess = 'Deactivating characterID: ' . $this->params['characterID'];
+            $mess .= ' as their Eve account is currently suspended';
+            trigger_error($mess, E_USER_WARNING);
+            // A new row for character will be created if needed. This allows
+            // the 'optional' registered mode to work correctly.
+            $char = new RegisteredCharacter($this->params['characterID']);
+            $char->isActive = 0;
+            // If new character need to set required columns.
+            if (FALSE === $char->recordExists()) {
+              $char->activeAPIMask = 0;
+            };// if $char->recordExists() ...
+            if (FALSE === $char->store()) {
+              $mess = 'Could not deactivate characterID: ';
+              $mess .= $this->params['characterID'];
+              trigger_error($mess, E_USER_WARNING);
+            };// if $user->store() ...
+          };// if YAPEAL_REGISTERED_MODE ...
+          // Always deactive key no matter the registered mode.
+          $mess = 'Deactivating keyID: ' . $this->params['keyID'];
+          $mess .= ' as the Eve account is currently suspended';
           trigger_error($mess, E_USER_WARNING);
-          $user = new RegisteredUser($this->params['userID'], FALSE);
-          $user->isActive = 0;
-          if (!$user->store()) {
-            $mess = 'Could not deactivate userID: ' . $this->params['userID'];
+          $key = new RegisteredKey($this->params['keyID'], FALSE);
+          $key->isActive = 0;
+          if (FALSE === $key->store()) {
+            $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$user->store() ...
+          break;
+        case 221:// Illegal page request! (Key accessMask outdated)
+          // The key access has changed deactivate API for key.
+          $mess = 'Deactivating Eve API: ' . $this->api;
+          $mess .= ' for keyID: ' . $this->params['keyID'];
+          $mess .= ' as this API is no longer allowed by owner with this key';
+          trigger_error($mess, E_USER_WARNING);
+          $key = new RegisteredKey($this->params['keyID'], FALSE);
+          $key->deleteActiveAPI($this->api, $this->section);
+          if (FALSE === $key->store()) {
+            $mess = 'Could not deactivate ' . $this->api;
+            $mess .= ' for ' . $this->params['keyID'];
+            trigger_error($mess, E_USER_WARNING);
+          };// if !$char->store() ...
+          break;
+        case 222://Key has expired. Contact key owner for access renewal.
+          $mess = 'Deactivating keyID: ' . $this->params['keyID'];
+          $mess .= ' as it needs to be renewed by owner';
+          trigger_error($mess, E_USER_WARNING);
+          // Deactivate for char and corp sections by expiring the key.
+          $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
+          $sql .= ' set `expires` = "' . gmdate('Y-m-d H:i:s') . '"';
+          $sql .= ' where `keyID` = ' . $this->params['keyID'];
+          // Get a database connection.
+          $con = YapealDBConnection::connect(YAPEAL_DSN);
+          $con->Execute($sql);
+          // Deactivate for account section.
+          $key = new RegisteredKey($this->params['keyID'], FALSE);
+          $key->isActive = 0;
+          if (FALSE === $key->store()) {
+            $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
@@ -226,59 +289,5 @@ abstract class AChar extends AApiRequest {
     }
     return TRUE;
   }// function handleApiError
-  /**
-   * Simple <rowset> per API parser for XML.
-   *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
-   *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
-   */
-  protected function parserAPI() {
-    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-    // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
-    // Save some overhead for tables that are truncated or in some way emptied.
-    if (in_array('prepareTables', get_class_methods($this))) {
-      $qb->useUpsert(FALSE);
-    };
-    // Set any column defaults needed.
-    $qb->setDefault('ownerID', $this->ownerID);
-    try {
-      while ($this->xr->read()) {
-        switch ($this->xr->nodeType) {
-          case XMLReader::ELEMENT:
-            switch ($this->xr->localName) {
-              case 'row':
-                $row = array();
-                // Walk through attributes and add them to row.
-                while ($this->xr->moveToNextAttribute()) {
-                  $row[$this->xr->name] = $this->xr->value;
-                };// while $this->xr->moveToNextAttribute() ...
-                $qb->addRow($row);
-                break;
-            };// switch $this->xr->localName ...
-            break;
-          case XMLReader::END_ELEMENT:
-            if ($this->xr->localName == 'result') {
-              // Insert any leftovers.
-              if (count($qb) > 0) {
-                $qb->store();
-              };// if count $rows ...
-              $qb = NULL;
-              return TRUE;
-            };// if $this->xr->localName == 'row' ...
-            break;
-        };// switch $this->xr->nodeType
-      };// while $xr->read() ...
-    }
-    catch (ADODB_Exception $e) {
-      return FALSE;
-    }
-    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
-    return FALSE;
-  }// function parserAPI
 }
 ?>

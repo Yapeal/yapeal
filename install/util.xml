@@ -30,6 +30,21 @@
  */
 -->
   <!-- Utility Section -->
+  <table name="utilAccessMask">
+    <descr>Used to convert from people friendly mask names to values</descr>
+    <field name="`section`" type="C" size="8">
+      <KEY/>
+    </field>
+    <field name="`api`" type="C" size="32">
+      <KEY/>
+    </field>
+    <field name="`description`" type="C" size="255"/>
+    <field name="`mask`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
   <table name="utilCachedInterval">
     <descr>Per API cache interval lengths</descr>
     <field name="`section`" type="C" size="8">
@@ -76,76 +91,64 @@
     <index name="`utilGraphic1`">
       <col>`OwnerType`</col>
     </index>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilRegisteredCharacter">
-    <descr>Used to maintain a list of characters that are registered with Yapeal to have their API gotten</descr>
-    <field name="`activeAPI`" type="X"/>
+    <descr>Used to maintain a list of characters that are registered with Yapeal to have their APIs gotten</descr>
+    <field name="`activeAPIMask`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`characterID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`isActive`" type="I1" size="1">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <field name="`name`" type="C" size="255">
-      <NOTNULL/>
-    </field>
+    <field name="`isActive`" type="L" size="1"/>
+    <field name="`characterName`" type="C" size="100"/>
     <field name="`proxy`" type="C" size="255"/>
-    <field name="`userID`" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <index name="`utilRegisteredCharacter1`">
-      <col>`userID`</col>
-    </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="utilRegisteredCorporation">
-    <descr>Used to maintain a list of corporations that are registered with Yapeal to have their API gotten</descr>
-    <field name="`activeAPI`" type="X"/>
-    <field name="`characterID`" type="I8" size="20">
-      <NOTNULL/>
+    <descr>Used to maintain a list of corporations that are registered with Yapeal to have their APIs gotten</descr>
+    <field name="`activeAPIMask`" type="I8" size="20">
       <UNSIGNED/>
     </field>
     <field name="`corporationID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`corporationName`" type="C" size="255"/>
-    <field name="`isActive`" type="I1" size="1">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
+    <field name="`corporationName`" type="C" size="150"/>
+    <field name="`isActive`" type="L" size="1"/>
     <field name="`proxy`" type="C" size="255"/>
-    <index name="`utilRegisteredCorporation1`">
-      <col>`characterID`</col>
-    </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <table name="utilRegisteredUser">
-    <descr>Used to maintain a list of users (accounts) that are registered with Yapeal to have their API gotten</descr>
-    <field name="`activeAPI`" type="X"/>
-    <field name="`fullApiKey`" type="C" size="64"/>
-    <field name="`isActive`" type="I1" size="1">
-      <NOTNULL/>
+  <table name="utilRegisteredKey">
+    <descr>Used to maintain a list of registered key IDs and secret code used with new custom API system</descr>
+    <field name="`activeAPIMask`" type="I8" size="20">
       <UNSIGNED/>
     </field>
-    <field name="`limitedApiKey`" type="C" size="64"/>
-    <field name="`proxy`" type="C" size="255"/>
-    <field name="`userID`" type="I8" size="20">
+    <field name="`isActive`" type="L" size="1"/>
+    <field name="`keyID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`proxy`" type="C" size="255"/>
+    <field name="`vCode`" type="C" size="64">
+      <NOTNULL/>
+    </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+  </table>
+  <table name="utilRegisteredUser">
+    <descr>Table used in old two key API system. New custom key system has totally move away from having users.</descr>
+    <DROP/>
   </table>
   <table name="utilSections">
     <descr>Table used to allow admin control over which API will be available to registered user/char/corp also controls all other API sections</descr>
-    <field name="`activeAPI`" type="X"/>
-    <field name="`isActive`" type="I1" size="1">
+    <field name="`activeAPIMask`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
+    </field>
+    <field name="`isActive`" type="L" size="1">
+      <NOTNULL/>
     </field>
     <field name="`proxy`" type="C" size="255"/>
     <field name="`sectionID`" type="I8" size="20">
@@ -166,6 +169,9 @@
     <field name="`api`" type="C" size="32">
       <NOTNULL/>
     </field>
+    <field name="`modified`" type="T">
+      <NOTNULL/>
+    </field>
     <field name="`section`" type="C" size="8">
       <NOTNULL/>
     </field>
@@ -181,49 +187,114 @@
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <sql prefixmethod="MANUAL">
-    <query>ALTER TABLE `%%PutilCachedUntil` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') COLLATE ascii_general_ci NOT NULL DEFAULT 'char'</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') NOT NULL DEFAULT 'char'</query>
   </sql>
   <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCharacter` MODIFY `isActive` BOOLEAN NOT NULL</query>
-  </sql>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredCorporation` MODIFY `isActive` BOOLEAN NOT NULL</query>
-  </sql>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilRegisteredUser` MODIFY `isActive` BOOLEAN NOT NULL</query>
-    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `fullApiKey` CHAR(64) COLLATE ascii_general_ci</query>
-    <query>ALTER TABLE `%%PutilRegisteredUser` MODIFY `limitedApiKey` CHAR(64) COLLATE ascii_general_ci</query>
-  </sql>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `isActive` BOOLEAN NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT NOT NULL</query>
   </sql>
   <sql prefixmethod="MANUAL">
+    <query>TRUNCATE `%%PutilAccessMask`</query>
+    <query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
+    <query>INSERT INTO `utilAccessMask` (`mask`, `section`, `api`, `description`)
+      VALUES
+      (1, 'account', 'APIKeyInfo', 'Used to get information about a keyID'),
+      (33554432, 'account', 'AccountStatus', 'EVE player account status.'),
+      (1, 'char', 'AccountBalance', 'Current balance of characters wallet.'),
+      (2, 'char', 'AssetList', 'Entire asset list of character.'),
+      (4, 'char', 'CalendarEventAttendees', 'Event attendee responses. Requires UpcomingCalendarEvents to function.'),
+      (8, 'char', 'CharacterSheet', 'Character Sheet information. Contains basic''Show Info''information along with clones, account balance, implants, attributes, skills, certificates and corporation roles.'),
+      (16, 'char', 'ContactList', 'List of character contacts and relationship levels.'),
+      (32, 'char', 'ContactNotifications', 'Most recent contact notifications for the character.'),
+      (64, 'char', 'FacWarStats', 'Characters Factional Warfare Statistics.'),
+      (128, 'char', 'IndustryJobs', 'Character jobs, completed and active.'),
+      (256, 'char', 'KillLog', 'Characters kill log.'),
+      (512, 'char', 'MailBodies', 'EVE Mail bodies. Requires MailMessages as well to function.'),
+      (1024, 'char', 'MailingLists', 'List of all Mailing Lists the character subscribes to.'),
+      (2048, 'char', 'MailMessages', 'List of all messages in the characters EVE Mail Inbox.'),
+      (4096, 'char', 'MarketOrders', 'List of all Market Orders the character has made.'),
+      (8192, 'char', 'Medals', 'Medals awarded to the character.'),
+      (16384, 'char', 'Notifications', 'List of recent notifications sent to the character.'),
+      (32768, 'char', 'NotificationTexts', 'Actual body of notifications sent to the character. Requires Notification access to function.'),
+      (65536, 'char', 'Research', 'List of all Research agents working for the character and the progress of the research.'),
+      (131072, 'char', 'SkillInTraining', 'Skill currently in training on the character. Subset of entire Skill Queue.'),
+      (262144, 'char', 'SkillQueue', 'Entire skill queue of character.'),
+      (524288, 'char', 'Standings', 'NPC Standings towards the character.'),
+      (1048576, 'char', 'UpcomingCalendarEvents', 'Upcoming events on characters calendar.'),
+      (2097152, 'char', 'WalletJournal', 'Wallet journal of character.'),
+      (4194304, 'char', 'WalletTransactions', 'Market transaction journal of character.'),
+      (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.'),
+      (1, 'corp', 'AccountBalance', 'Current balance of all corporation accounts.'),
+      (2, 'corp', 'AssetList', 'List of all corporation assets.'),
+      (4, 'corp', 'MemberMedals', 'List of medals awarded to corporation members.'),
+      (8, 'corp', 'CorporationSheet', 'Exposes basic''Show Info''information as well as Member Limit and basic division and wallet info.'),
+      (16, 'corp', 'ContactList', 'Corporate contact list and relationships.'),
+      (32, 'corp', 'ContainerLog', 'Corporate secure container acess log.'),
+      (64, 'corp', 'FacWarStats', 'Corporations Factional Warfare Statistics.'),
+      (128, 'corp', 'IndustryJobs', 'Corporation jobs, completed and active.'),
+      (256, 'corp', 'KillLog', 'Corporation kill log.'),
+      (512, 'corp', 'MemberSecurity', 'Member roles and titles.'),
+      (1024, 'corp', 'MemberSecurityLog', 'Member role and title change log.'),
+      (2048, 'corp', 'MemberTracking', 'Extensive Member information. Time of last logoff, last known location and ship.'),
+      (4096, 'corp', 'MarketOrders', 'List of all corporate market orders.'),
+      (8192, 'corp', 'Medals', 'List of all medals created by the corporation.'),
+      (16384, 'corp', 'OutpostList', 'List of all outposts controlled by the corporation.'),
+      (32768, 'corp', 'OutpostServiceDetail', 'List of all service settings of corporate outposts.'),
+      (65536, 'corp', 'Shareholders', 'Shareholders of the corporation.'),
+      (131072, 'corp', 'StarbaseDetail', 'List of all settings of corporate starbases.'),
+      (262144, 'corp', 'Standings', 'NPC Standings towards corporation.'),
+      (524288, 'corp', 'StarbaseList', 'List of all corporate starbases.'),
+      (1048576, 'corp', 'WalletJournal', 'Wallet journal for all corporate accounts.'),
+      (2097152, 'corp', 'WalletTransactions', 'Market transactions of all corporate accounts.'),
+      (4194304, 'corp', 'Titles', 'Titles of corporation and the roles they grant.'),
+      (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.'),
+      (0, 'corp', 'CalendarEventAttendees', ''),
+      (1, 'eve', 'AllianceList', 'Returns a list of alliances in eve.'),
+      (2, 'eve', 'CertificateTree', 'Returns a list of certificates in eve.'),
+      (4, 'eve', 'CharacterID', 'Returns the ownerID for a given character, faction, alliance or corporation name, or the typeID for other objects such as stations, solar systems, planets, etc. '),
+      (8, 'eve', 'CharacterName', 'Returns the name associated with an ownerID or a typeID.'),
+      (16, 'eve', 'ConquerableStationList', 'Conquerable Station List including Outpost.'),
+      (32, 'eve', 'ErrorList', 'Returns a list of error codes that can be returned by the EVE API servers.'),
+      (64, 'eve', 'FacWarStats', 'Returns global stats on the factions in factional warfare including the number of pilots in each faction, the number of systems they control, and how many kills and victory points each and all factions obtained yesterday, in the last week, and total.'),
+      (128, 'eve', 'FacWarTopStats', 'Returns Factional Warfare Top 100 Stats.'),
+      (256, 'eve', 'RefTypes', 'Returns a list of transaction types used in the Journal Entries.'),
+      (512, 'eve', 'SkillTree', 'XML of currently in-game skills (including unpublished skills).'),
+      (0, 'eve', 'CharacterInfo', 'Character information, exposes skill points and current ship information on top of''Show Info''information.'),
+      (8388608, 'eve', 'CharacterInfoPublic', 'Character information, exposes skill points and current ship information on top of''Show Info''information.'),
+      (16777216, 'eve', 'CharacterInfoPrivate', 'Sensitive Character Information, exposes account balance and last known location on top of the other Character Information call.'),
+      (1, 'map', 'FacWarSystems', 'Returns a list of contestable solarsystems and the NPC faction currently occupying them. It should be noted that this file only returns a non-zero ID if the occupying faction is not the sovereign faction.'),
+      (2, 'map', 'Jumps', 'Returns a list of systems where any jumps have happenned.'),
+      (4, 'map', 'Kills', 'Returns the number of kills in solarsystems within the last hour. Only solar system where kills have been made are listed, so assume zero in case the system is not listed. '),
+      (8, 'map', 'Sovereignty', 'Returns a list of solarsystems and what faction or alliance controls them. '),
+      (16, 'map', 'SovereigntyStatus', 'Returns a list of all sovereignty structures in EVE. This API has been disabled and is not expected to return but was included for completeness.'),
+      (1, 'server', 'ServerStatus', 'Returns current Eve server status and number of players online.');
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilCachedInterval`</query>
-    <query>ALTER TABLE `%%PutilCachedInterval` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
     <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
       ('account', 'AccountStatus', 3600),
-      ('account', 'Characters', 900),
+      ('account', 'APIKeyInfo', 300),
       ('char', 'AccountBalance', 900),
-      ('char', 'AssetList', 86400),
+      ('char', 'AssetList', 21600),
       ('char', 'CalendarEventAttendees', 3600),
       ('char', 'CharacterSheet', 3600),
       ('char', 'ContactList', 900),
       ('char', 'ContactNotifications', 21600),
+      ('char', 'Contracts', 3600),
       ('char', 'FacWarStats', 3600),
       ('char', 'IndustryJobs', 900),
       ('char', 'KillLog', 3600),
@@ -233,18 +304,20 @@
       ('char', 'MarketOrders', 3600),
       ('char', 'Medals', 3600),
       ('char', 'Notifications', 1800),
+      ('char', 'NotificationTexts', 1800),
       ('char', 'Research', 900),
-      ('char', 'SkilInTraining', 300),
+      ('char', 'SkillInTraining', 300),
       ('char', 'SkillQueue', 900),
       ('char', 'Standings', 3600),
       ('char', 'UpcomingCalendarEvent', 900),
       ('char', 'WalletJournal', 1620),
       ('char', 'WalletTransactions', 3600),
       ('corp', 'AccountBalance', 900),
-      ('corp', 'AssetList', 86400),
+      ('corp', 'AssetList', 21600),
       ('corp', 'CalendarEventAttendees', 3600),
       ('corp', 'ContactList', 900),
       ('corp', 'ContainerLog', 3600),
+      ('corp', 'Contracts', 3600),
       ('corp', 'CorporationSheet', 21600),
       ('corp', 'FacWarStats', 3600),
       ('corp', 'IndustryJobs', 900),
@@ -278,6 +351,12 @@
       ('map', 'Kills', 3600),
       ('map', 'Sovereignty', 3600),
       ('server', 'ServerStatus', 180)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query platform="mysql">INSERT INTO `%%PutilRegisteredKey` (`activeAPIMask`,`isActive`,`keyID`,`vCode`)
+      VALUES(8388608,1,1156,'abc123')
+      ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`isActive`=VALUES(`isActive`),`keyID`=VALUES(`keyID`),`vCode`=VALUES(`vCode`)
     </query>
   </sql>
 </schema>

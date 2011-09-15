@@ -79,7 +79,18 @@ class maintCleanCache {
             };// if $result...
           };// if $item->isFile() ...
         };// foreach $files ...
-      };// foreach $sections ...
+      };// foreach $this->sections ...
+      $sql = ' delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
+      $sql .= ' where';
+      $sql .= ' `modified` = ';
+      try {
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        $sql .= $con->qstr(gmdate('Y-m-d H:i:s', $limit));
+        $con->Execute($sql);
+      }
+      catch(ADODB_Exception $e) {
+        // Nothing to do here was already report to logs.
+      }
       return TRUE;
     }// function doWork()
 }

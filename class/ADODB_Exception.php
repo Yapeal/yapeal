@@ -2,10 +2,12 @@
 /**
  * Contains Custom ADOdb exception class.
  *
- * The original code for this was lifted from the original adodb-exception.inc.php.
- * @version V5.07 18 Dec 2008   (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.
- * I added the observer pattern code to it to make it integrate better with Yapeal's
- * logging and exception handling.
+ * The original code for this was lifted from the original
+ * adodb-exception.inc.php by John Lim. I added the observer pattern code to it
+ * to make it integrate better with Yapeal's logging and exception handling.
+ * @version V5.07 18 Dec 2008
+ * @author     John Lim <jlim#natsoft.com>
+ * @copyright  Copyright (c) 2000-2008, John Lim All rights reserved.
  *
  * PHP version 5
  *

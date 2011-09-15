@@ -55,6 +55,10 @@ if (count($missing) > 0) {
   $mess .= implode(', ', $missing) . ' are missing!' . PHP_EOL;
   fwrite(STDERR, $mess);
 };
+/**
+ * Define short name for directory separator which always uses unix '/'.
+ * @ignore
+ */
 define('DS', '/');
 // Used to over come path issues caused by how script is ran on server.
 $baseDir = str_replace('\\', '/', realpath(dirname(__FILE__) . DS. '..') . DS);

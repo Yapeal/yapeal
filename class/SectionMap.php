@@ -46,27 +46,13 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
  * @package Yapeal
  * @subpackage Api_sections
  */
-class SectionMap {
-  /**
-   * @var array Holds the list of APIs for this section.
-   */
-  private $apiList;
-  /**
-   * @var string Hold section name.
-   */
-  private $section;
+class SectionMap extends ASection {
   /**
    * Constructor
-   *
-   * @param array $allowedAPIs An array of admin allowed APIs in this section.
-   * Used to limit which APIs out of the list of APIs from this section will be
-   * fetched.
    */
-  public function __construct($allowedAPIs) {
+  public function __construct() {
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $knownApis = FilterFileFinder::getStrippedFiles($path, $this->section);
-    $this->apiList = array_intersect($allowedAPIs, $knownApis);
+    parent::__construct();
   }
   /**
    * Function called by Yapeal.php to start section pulling XML from servers.
@@ -74,19 +60,21 @@ class SectionMap {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
+    if ($this->abort === TRUE) {
+      return FALSE;
+    };
     $apiCount = 0;
     $apiSuccess = 0;
-    if (count($this->apiList) == 0) {
-      $mess = 'None of the allowed APIs are currently active for ' . $this->section;
-      trigger_error($mess, E_USER_NOTICE);
+    $apis = $this->am->maskToAPIs($this->mask, $this->section);
+    if (count($apis) == 0) {
       return FALSE;
     };
     // Randomize order in which APIs are tried if there is a list.
-    if (count($this->apiList) > 1) {
-      shuffle($this->apiList);
+    if (count($apis) > 1) {
+      shuffle($apis);
     };
     try {
-      foreach ($this->apiList as $api) {
+      foreach ($apis as $api) {
         // If the cache for this API has expire try to get update.
         if (CachedUntil::cacheExpired($api) === TRUE) {
           ++$apiCount;

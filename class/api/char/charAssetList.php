@@ -41,12 +41,12 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Class used to fetch and store corp AssetList API.
+ * Class used to fetch and store char AssetList API.
  *
  * @package Yapeal
- * @subpackage Api_corp
+ * @subpackage Api_char
  */
-class corpAssetList extends ACorp {
+class charAssetList extends AChar {
   /**
    * @var object Holds queryBuilder instance.
    */
@@ -88,11 +88,12 @@ class corpAssetList extends ACorp {
     $this->qb->useUpsert(FALSE);
     // Set any column defaults needed.
     $this->qb->setDefault('ownerID', $this->ownerID);
+    $this->qb->setDefault('rawQuantity', 0);
     // Generate owner node as root for tree. It has to be added after all the
     // others to have corrected 'rgt'.
     $row = array('flag' => '0', 'itemID' => $this->ownerID, 'lft' => '0',
       'locationID' => '0', 'lvl' => '0', 'ownerID' => $this->ownerID,
-      'quantity' => '1', 'singleton' => '0', 'typeID' => '2'
+      'quantity' => '1', 'singleton' => '0', 'typeID' => '25'
     );
     $inherit = array('locationID' => '0', 'index' => 2, 'level' => 0);
     try {
@@ -164,7 +165,7 @@ class corpAssetList extends ACorp {
               break;
             default:
               break;
-          }// switch $this->xr->localName ...
+          };// switch $this->xr->localName ...
           break;
         case XMLReader::END_ELEMENT:
           switch ($this->xr->localName) {
@@ -176,7 +177,7 @@ class corpAssetList extends ACorp {
               $row = array_pop($this->stack);
               // Add 'rgt' and increment value.
               $row['rgt'] =  $inherit['index']++;
-              // The $row is complete and ready to add.
+              // The $row is complete and ready to be added.
               $this->qb->addRow($row);
               break;
             case 'rowset':
@@ -185,7 +186,7 @@ class corpAssetList extends ACorp {
               break;
             default:
               break;
-          }// switch $this->xr->localName ...
+          };// switch $this->xr->localName ...
           break;
       };// switch $this->xr->nodeType
     };// while $xr->read() ...

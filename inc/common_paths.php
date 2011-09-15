@@ -40,12 +40,16 @@ if (isset($_REQUEST['viewSource'])) {
 if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
-// Used to over come path issues caused by how script is ran on server.
-$incDir = str_replace('\\', '/', realpath(dirname(__FILE__)));
 // Define short name for directory separator which always uses '/'.
 if (!defined('DS')) {
+  /**
+   * Define short name for directory separator which always uses unix '/'.
+   * @ignore
+   */
   define('DS', '/');
 };
+// Used to over come path issues caused by how script is ran on server.
+$incDir = str_replace('\\', DS, realpath(dirname(__FILE__)));
 /**
  * Since this file has to be in the 'inc' directory we can set that path now.
  */
@@ -56,7 +60,7 @@ if (!defined('YAPEAL_INC')) {
  * We know the 'base' directory has to be just above 'inc'.
  */
 if (!defined('YAPEAL_BASE')) {
-  $dir = str_replace('\\', '/', realpath(YAPEAL_INC . '..'));
+  $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
   define('YAPEAL_BASE', $dir . DS);
 };
 /**
@@ -113,7 +117,7 @@ foreach ($exts as $ext) {
   if ($ext->isDir()) {
     $constant = 'YAPEAL_' . strtoupper($ext);
     if (!defined($constant)) {
-      $path = str_replace('\\', '/', realpath($ext->getPathname()));
+      $path = str_replace('\\', DS, realpath($ext->getPathname()));
      define($constant, $path . DS);
     };// if !defined...
   };// if $ext->isDir() ...

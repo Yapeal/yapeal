@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema version="0.3">
-<!--
+<?php
 /**
- * XML from Yapeal.
+ * Contains Contracts class.
  *
  * PHP version 5
  *
@@ -26,29 +24,43 @@
  * @copyright  Copyright (c) 2008-2011, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
- * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
--->
-  <!-- Server Section -->
-  <table name="serverServerStatus">
-    <field name="`onlinePlayers`" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <field name="`serverName`" type="C" size="32">
-      <KEY/>
-    </field>
-    <field name="`serverOpen`" type="C" size="32">
-      <NOTNULL/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <sql prefixmethod="MANUAL">
-    <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
-      VALUES(1,1,6,'server')
-      ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
-    </query>
-  </sql>
-</schema>
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
+/**
+ * @internal Only let this code be included or required not ran directly.
+ */
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
+  exit();
+};
+/**
+ * Class used to fetch and store corp StarbaseList API.
+ *
+ * @package Yapeal
+ * @subpackage Api_corp
+ */
+class corpContracts extends ACorp {
+  /**
+   * Constructor
+   *
+   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
+   */
+  public function __construct(array $params) {
+    // Cut off 'A' and lower case abstract class name to make section name.
+    $this->section = strtolower(substr(get_parent_class($this), 1));
+    $this->api = str_replace($this->section, '', __CLASS__);
+    parent::__construct($params);
+  }// function __construct
+}
+?>

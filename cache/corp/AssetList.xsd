@@ -49,6 +49,7 @@
     <xs:attribute name="itemID" use="required" type="eveID"/>
     <xs:attribute name="locationID" type="eveID"/>
     <xs:attribute name="quantity" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="rawQuantity" use="optional" type="xs:integer"/>
     <xs:attribute name="singleton" use="required" type="eveBoolean"/>
     <xs:attribute name="typeID" use="required" type="eveID"/>
   </xs:complexType>

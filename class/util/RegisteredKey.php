@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains RegisteredUser class.
+ * Contains RegisteredKey class.
  *
  * PHP version 5
  *
@@ -41,18 +41,25 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
   exit();
 };
 /**
- * Wrapper class for utilRegisteredUser table.
+ * Wrapper class for utilRegisteredKey table.
  *
  * @package    Yapeal
  * @subpackage Wrappers
  */
-class RegisteredUser extends ALimitedObject implements IGetBy {
+class RegisteredKey extends ALimitedObject implements IGetBy {
   /**
-   * @var string Holds an instance of the DB connection.
+   * Hold an instance of the AccessMask class.
+   * @var object
+   */
+  protected $am;
+  /**
+   * Holds an instance of the DB connection.
+   * @var object
    */
   protected $con;
   /**
-   * @var string Holds the table name of the query is being built.
+   * Holds the table name of the query that is being built.
+   * @var string
    */
   protected $tableName;
   /**
@@ -61,19 +68,19 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    */
   protected $qb;
   /**
-   * List of all section APIs
-   * @var array
-   */
-  private $apiList;
-  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
   private $recordExists;
   /**
+   * Holds the type returned when querying accountAPIKeyInfo.
+   * $var string
+   */
+  private $type;
+  /**
    * Constructor
    *
-   * @param integer $id Id of user wanted.
+   * @param integer $id Id of key wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
    * if $id doesn't exist in database.
    *
@@ -83,8 +90,6 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $this->apiList = FilterFileFinder::getStrippedFiles($path, 'account');
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.
@@ -94,20 +99,22 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
       $mess = 'Failed to get database connection in ' . __CLASS__;
       throw new RuntimeException($mess, 1);
     }
+    // Get a new access mask object.
+    $this->am = new AccessMask();
     // Get a new query builder object.
     $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
     // Get a list of column names and their ADOdb generic types.
     $this->colTypes = $this->qb->getColumnTypes();
     // Was $id set?
     if (!empty($id)) {
-      // If $id has any characters other than 0-9 it's not an userID.
+      // If $id has any characters other than 0-9 it's not an keyID.
       if (0 == strlen(str_replace(range(0, 9), '', $id))) {
         if (FALSE === $this->getItemById($id)) {
           if (TRUE == $create) {
-            // If $id is a number and doesn't exist yet set userID with it.
-            $this->properties['userID'] = $id;
+            // If $id is a number and doesn't exist yet set keyID with it.
+            $this->properties['keyID'] = $id;
           } else {
-            $mess = 'Unknown user ' . $id;
+            $mess = 'Unknown key ' . $id;
             throw new DomainException($mess, 3);
           };// else ...
         };
@@ -125,71 +132,97 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
     $this->con = NULL;
   }// function __destruct
   /**
-   * Used to add an API to the list in activeAPI.
+   * Used to add an API to the list in activeAPIMask.
    *
-   * @param string $name Name of the API to add without 'account' part i.e.
-   * 'accountCharacters' would just be 'Characters'
+   * @param string $name Name of the API to add without 'char','corp', etc i.e.
+   * 'corpAccountBalance' would just be 'AccountBalance'.
+   * @param string $section Name of the section the API belongs to.
    *
    * @return bool Returns TRUE if $name already exists else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
    */
-  public function addActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 1);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    if (in_array($name, $apis)) {
+  public function addActiveAPI($name, $section = NULL) {
+    // APIKeyInfo is always on and does not have a mask value.
+    if ($name == 'APIKeyInfo') {
+      return TRUE;
+    };
+    // If no section parameter see if key type is known from accountAPIKeyInfo.
+    if (empty($section) && !empty($this->type)) {
+      if ($this->type == 'Character') {
+        $section = 'char';
+      } elseif ($this->type == 'Corporation') {
+        $section = 'corp';
+      } else {
+        // Else Account
+        $section = strtolower($this->type);
+      };
+    };// if empty($section) ...
+    $mask = $this->am->apisToMask($name, $section);
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
       $ret = TRUE;
     } else {
+      $this->properties['activeAPIMask'] |= $mask;
       $ret = FALSE;
-      $apis[] = $name;
-    };// if isset...
-    $this->properties['activeAPI'] = implode(' ', $apis);
+    };// if $this->properties['activeAPIMask'] ...
     return $ret;
   }// function addActiveAPI
   /**
    * Used to delete an API from the list in activeAPI.
    *
-   * @param string $name Name of the API to delete without 'char' part i.e.
-   * 'charAccountBalance' would just be 'AccountBalance'
+   * @param string $name Name of the API to delete without 'char','corp', etc
+   * i.e. 'corpAccountBalance' would just be 'AccountBalance'.
+   * @param string $section Name of the section the API belongs to.
    *
    * @return bool Returns TRUE if $name existed else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
    */
-  public function deleteActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 1);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $ret = FALSE;
-    foreach ($apis as $k => $v) {
-      if ($name == $v) {
-        $ret = TRUE;
-        unset($apis[$k]);
-        break;
-      };// if $name == $v ...
-    };// foreach $apis ...
-    $this->properties['activeAPI'] = implode(' ', $apis);
+  public function deleteActiveAPI($name, $section = NULL) {
+    // APIKeyInfo is always on and does not have a mask value.
+    if ($name == 'APIKeyInfo') {
+      return FALSE;
+    };
+    // If no section parameter see if key type is known from accountAPIKeyInfo.
+    if (empty($section) && !empty($this->type)) {
+      if ($this->type == 'Character') {
+        $section = 'char';
+      } elseif ($this->type == 'Corporation') {
+        $section = 'corp';
+      } else {
+        // Else Account
+        $section = strtolower($this->type);
+      };
+    };// if empty($section) ...
+    $mask = $this->am->apisToMask($name, $section);
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
+      $this->properties['activeAPIMask'] ^= $mask;
+      $ret = TRUE;
+    } else {
+      $ret = FALSE;
+    };// if $this->properties['activeAPIMask'] ...
     return $ret;
   }// function deleteActiveAPI
   /**
-   * Used to get user from RegisteredUser table by user ID.
+   * Used to get key from RegisteredKey table by key ID.
    *
-   * @param $id Id of user wanted.
+   * @param $id Id of key wanted.
    *
-   * @return bool TRUE if user was retrieved.
+   * @return bool TRUE if key was retrieved.
    */
   public function getItemById($id) {
-    $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
-    $sql .= ' from `' . $this->tableName . '`';
-    $sql .= ' where `userID`=' . $id;
+    $sql = 'select urk.`' . implode('`,urk.`', array_keys($this->colTypes));
+    $sql .= '`,aaki.`type`';
+    $sql .= ' from `' . $this->tableName . '` as urk';
+    $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
+    $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
+    $sql .= ' where `keyID`=' . $id;
     try {
       $result = $this->con->GetRow($sql);
       if (!empty($result)) {
+        // Split out type for existing keys or NULL.
+        $this->type = $result['type'];
+        unset($result['type']);
         $this->properties = $result;
         $this->recordExists = TRUE;
       } else {
@@ -249,13 +282,6 @@ class RegisteredUser extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $unknowns = array_diff($apis, $this->apiList);
-    if (!empty($unknowns)) {
-      $mess = 'activeAPI contains the following unknown APIs: ';
-      $mess .= implode(', ', $unknowns);
-      trigger_error($mess, E_USER_WARNING);
-    };
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...

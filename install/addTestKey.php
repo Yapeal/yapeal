@@ -1,7 +1,7 @@
 #!/usr/bin/php -Cq
 <?php
 /**
- * Used to add test user to utilRegisteredUser table.
+ * Used to add test key to utilRegisteredKey table.
  *
  * PHP version 5
  *
@@ -53,8 +53,11 @@ if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
 // Used to over come path issues caused by how script is ran on server.
 $dir = realpath(dirname(__FILE__));
 chdir($dir);
-// Define shortened name for DIRECTORY_SEPARATOR
-define('DS', DIRECTORY_SEPARATOR);
+/**
+ * Define short name for directory separator which always uses unix '/'.
+ * @ignore
+ */
+define('DS', '/');
 // Pull in Yapeal revision constants.
 $path = $dir . DS . '..' . DS . 'revision.php';
 require_once realpath($path);
@@ -62,7 +65,7 @@ require_once realpath($path);
 $path = $dir . DS . '..' . DS . 'inc' . DS . 'common_backend.php';
 require_once realpath($path);
 if ($argc < 5) {
-  $mess = 'userID, fullAPIKey, limitedAPIKey, isActive are required in ';
+  $mess = 'keyID, vCode, type, isActive are required in ';
   $mess .= $argv[0] . PHP_EOL;
   fwrite(STDERR, $mess);
   fwrite(STDOUT, 'error');
@@ -73,15 +76,15 @@ $replace = array("'", '"');
 for ($i = 1; $i < $argc; ++$i) {
   $argv[$i] = str_replace($replace, '', $argv[$i]);
 };
-$userID = (int)$argv[1];
-$fullAPIKey = $argv[2];
-$limitedAPIKey = $argv[3];
+$keyID = (int)$argv[1];
+$vCode = $argv[2];
+$type = $argv[3];
 $isActive = $argv[4];
 try {
   // Need list of allowed APIs
   $section = new Sections('account', FALSE);
-  $user = new RegisteredUser($userID);
-  $user->activeAPI = (string)$section->activeAPI;
+  $key = new RegisteredKey($keyID);
+  $user->activeAPIMask = (string)$section->activeAPI;
   $user->fullApiKey = $fullAPIKey;
   $user->limitedApiKey = $limitedAPIKey;
   $user->isActive = $isActive;

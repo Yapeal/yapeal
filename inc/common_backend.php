@@ -51,6 +51,7 @@ date_default_timezone_set('GMT');
 // Define short name for directory separator which always uses '/'.
 if (!defined('DS')) {
   /**
+   * Define short name for directory separator which always uses unix '/'.
    * @ignore
    */
   define('DS', '/');
@@ -91,6 +92,7 @@ foreach ($sections as $section) {
     $mess .= '] is missing from ' . $iniFile . PHP_EOL;
   }; // if isset ...
 };
+unset($sections);
 if (!empty($mess)) {
   trigger_error($mess, E_USER_WARNING);
   exit(3);
@@ -107,7 +109,7 @@ require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
  * Logging section
  * **************************************************************************/
 // Grab the info from ini file again now that our constants are defined.
-$iniVars = parse_ini_file($iniFile, TRUE);
+//$iniVars = parse_ini_file($iniFile, TRUE);
 $settings = array('error_log', 'log_level', 'notice_log', 'strict_log',
   'warning_log');
 foreach ($settings as $setting) {
@@ -191,6 +193,7 @@ if (!defined('YAPEAL_DSN')) {
    * Defines the DSN used for ADOdb connection.
    */
   define('YAPEAL_DSN', $dsn);
+  unset($dsn);
 };
 if (!defined('YAPEAL_TABLE_PREFIX')) {
   /**
@@ -217,5 +220,29 @@ if (!defined('YAPEAL_APPLICATION_AGENT')) {
    * Used as default user agent in network connections.
    */
   define('YAPEAL_APPLICATION_AGENT', $user_agent);
+  unset($curl, $user_agent);
 };
+if (isset($iniVars['registered_mode'])) {
+  $mode = $iniVars['registered_mode'];
+} else {
+  $mess = $iniFile . ' is outdated and "registered_mode" is not set.';
+  $mess = ' "registered_mode" will be set to "required" as legacy mode';
+  trigger_error($mess, E_USER_NOTICE);
+  $mode = 'required';
+};
+if (!in_array($mode, array('ignored','optional','required'))) {
+  $mess = $iniFile . ' had unknown value ' . $mode;
+  $mess .= ' for "registered_mode" using mode "optional" instead';
+  trigger_error($mess, E_USER_WARNING);
+  $mode = 'optional';
+};
+if (!defined('YAPEAL_REGISTERED_MODE')) {
+  /**
+   * Determines whether utilRegisteredCharacter and utilRegisteredCorporation
+   * tables are used or not, it also allows some columns in utilRegisteredKey,
+   * utilRegisteredCharacter, and utilRegisteredCorporation to be optional.
+   */
+  define('YAPEAL_REGISTERED_MODE', $mode);
+};
+unset($mode);
 ?>

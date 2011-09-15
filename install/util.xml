@@ -207,7 +207,7 @@
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilAccessMask`</query>
     <query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
-    <query>INSERT INTO `utilAccessMask` (`mask`, `section`, `api`, `description`)
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`)
       VALUES
       (1, 'account', 'APIKeyInfo', 'Used to get information about a keyID'),
       (33554432, 'account', 'AccountStatus', 'EVE player account status.'),

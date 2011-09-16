@@ -288,7 +288,7 @@ class SectionChar extends ASection {
     $row['mask'] = $this->mask;
     // Use Character mask if not empty ...
     if (!is_null($row['RCMask'])) {
-      $mask &= $row['RCMask'];
+      $row['mask'] &= $row['RCMask'];
       // else use key mask if not empty.
     } elseif (!is_null($row['RKMask'])) {
       $row['mask'] &= $row['RKMask'];

@@ -1,3 +1,8 @@
+2011-09-16
+
+(trunk/) Fixed notice in SectionCorp.php and SectionChar.php about undefined
+$mask variable.
+
 2011-09-15
 
 (trunk/) Fixed issue 81 in install/util.xml.

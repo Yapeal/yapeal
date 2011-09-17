@@ -36,18 +36,23 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
-// Only CLI.
+/**
+ * @internal Only let this code be ran in CLI.
+ */
 if (PHP_SAPI != 'cli') {
-  $mess = 'This script will only work with CLI version of PHP';
+  header('HTTP/1.0 403 Forbidden', TRUE, 403);
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
+  $mess = ' to run it using ' . PHP_SAPI . ' instead';
   die($mess);
 };
 /**
  * @internal Only let this code be ran directly.
  */
-if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
-  $mess = 'Including of ' . $argv[0] . ' is not allowed' . PHP_EOL;
+$included = get_included_files();
+if (count($included) > 1 || $included[0] != __FILE__) {
+  $mess = basename(__FILE__) . ' must be called directly and can not be included';
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error');
+  fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
 // Used to over come path issues caused by how script is ran on server.

@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="schema">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="table" type="table" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="sql" type="sql" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:enumeration value="0.1"/>
+            <xs:enumeration value="0.2"/>
+            <xs:enumeration value="0.3"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="table">
+    <xs:sequence>
+      <xs:element name="descr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:choice>
+        <xs:element name="DROP">
+          <xs:complexType/>
+        </xs:element>
+        <xs:sequence>
+          <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="index" type="index" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="constraint" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType mixed="true">
+              <xs:attribute name="platform" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="opt" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType mixed="true">
+              <xs:attribute name="platform" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data" type="data" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="platform" type="xs:string" use="optional"/>
+    <xs:attribute name="version" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="data">
+    <xs:sequence>
+      <xs:element name="descr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="row" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="f" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType mixed="true">
+                <xs:attribute name="name" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="platform" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="field">
+    <xs:sequence>
+      <xs:element name="descr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:element name="NOTNULL">
+          <xs:complexType/>
+        </xs:element>
+        <xs:element name="KEY">
+          <xs:complexType/>
+        </xs:element>
+        <xs:element name="PRIMARY">
+          <xs:complexType/>
+        </xs:element>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:element name="AUTO">
+          <xs:complexType/>
+        </xs:element>
+        <xs:element name="AUTOINCREMENT">
+          <xs:complexType/>
+        </xs:element>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:element name="DEFAULT">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DEFDATE">
+          <xs:complexType/>
+        </xs:element>
+        <xs:element name="DEFTIMESTAMP">
+          <xs:complexType/>
+        </xs:element>
+      </xs:choice>
+      <xs:element name="NOQUOTE" minOccurs="0" maxOccurs="1">
+        <xs:complexType/>
+      </xs:element>
+      <xs:element name="UNSIGNED" minOccurs="0" maxOccurs="1">
+        <xs:complexType/>
+      </xs:element>
+      <xs:element name="constraint" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="platform" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="opt" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="platform" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="fieldAttrs"/>
+  </xs:complexType>
+  <xs:complexType name="index">
+    <xs:sequence>
+      <xs:element name="descr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:choice>
+        <xs:element name="DROP">
+          <xs:complexType/>
+        </xs:element>
+        <xs:sequence>
+          <xs:element name="col" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType mixed="true">
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CLUSTERED" minOccurs="0" maxOccurs="1">
+            <xs:complexType/>
+          </xs:element>
+          <xs:element name="BITMAP" minOccurs="0" maxOccurs="1">
+            <xs:complexType/>
+          </xs:element>
+          <xs:element name="UNIQUE" minOccurs="0" maxOccurs="1">
+            <xs:complexType/>
+          </xs:element>
+          <xs:element name="FULLTEXT" minOccurs="0" maxOccurs="1">
+            <xs:complexType/>
+          </xs:element>
+          <xs:element name="HASH" minOccurs="0" maxOccurs="1">
+            <xs:complexType/>
+          </xs:element>
+        </xs:sequence>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="platform" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="sql">
+    <xs:sequence>
+      <xs:element name="descr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="query" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="platform" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="platform" type="xs:string" use="optional"/>
+    <xs:attribute name="key" type="xs:string" use="optional"/>
+    <xs:attribute name="prefixmethod" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="AUTO"/>
+          <xs:enumeration value="MANUAL"/>
+          <xs:enumeration value="NONE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:attributeGroup name="fieldAttrs">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="B"/>
+          <xs:enumeration value="C"/>
+          <xs:enumeration value="C2"/>
+          <xs:enumeration value="D"/>
+          <xs:enumeration value="F"/>
+          <xs:enumeration value="I"/>
+          <xs:enumeration value="I1"/>
+          <xs:enumeration value="I2"/>
+          <xs:enumeration value="I4"/>
+          <xs:enumeration value="I8"/>
+          <xs:enumeration value="L"/>
+          <xs:enumeration value="N"/>
+          <xs:enumeration value="T"/>
+          <xs:enumeration value="TS"/>
+          <xs:enumeration value="X"/>
+          <xs:enumeration value="X2"/>
+          <xs:enumeration value="XL"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="size" type="xs:string" use="optional"/>
+    <xs:attribute name="opts" type="xs:string" use="optional"/>
+  </xs:attributeGroup>
+</xs:schema>

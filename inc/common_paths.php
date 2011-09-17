@@ -35,10 +35,18 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
- * @internal Only let this code be included or required not ran directly.
+ * @internal Only let this code be included.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
-  exit();
+if (count(get_included_files()) < 2) {
+  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  if (PHP_SAPI != 'cli') {
+    header('HTTP/1.0 403 Forbidden', TRUE, 403);
+    die($mess);
+  } else {
+    fwrite(STDERR, $mess . PHP_EOL);
+    fwrite(STDOUT, 'error' . PHP_EOL);
+    exit(1);
+  };
 };
 // Define short name for directory separator which always uses '/'.
 if (!defined('DS')) {
@@ -48,24 +56,30 @@ if (!defined('DS')) {
    */
   define('DS', '/');
 };
-// Used to over come path issues caused by how script is ran on server.
-$incDir = str_replace('\\', DS, realpath(dirname(__FILE__)));
 /**
  * Since this file has to be in the 'inc' directory we can set that path now.
  */
 if (!defined('YAPEAL_INC')) {
-  define('YAPEAL_INC', $incDir . DS);
+  // Used to over come path issues caused by how script is ran on server.
+  $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
+  /**
+   * @ignore
+   */
+  define('YAPEAL_INC', $dir . DS);
 };
 /**
- * We know the 'base' directory has to be just above 'inc'.
+ * We know the 'base' directory has to be just above 'inc' by default.
  */
 if (!defined('YAPEAL_BASE')) {
   $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
+  /**
+   * @ignore
+   */
   define('YAPEAL_BASE', $dir . DS);
 };
 /**
- * The 'cache' directory is normally a neighbor to 'inc' but can be moved in some
- * configurations.
+ * The 'cache' directory is normally a neighbor to 'inc' but can be moved in
+ * some configurations.
  */
 if (!defined('YAPEAL_CACHE')) {
   define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
@@ -77,8 +91,8 @@ if (!defined('YAPEAL_CLASS')) {
   define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
 };
 /**
- * The 'config' directory is normally a neighbor to 'inc' but can be moved in some
- * configurations.
+ * The 'config' directory is normally a neighbor to 'inc' but can be moved in
+ * some configurations.
  */
 if (!defined('YAPEAL_CONFIG')) {
   define('YAPEAL_CONFIG', YAPEAL_BASE . 'config' . DS);

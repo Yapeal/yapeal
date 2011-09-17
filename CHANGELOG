@@ -3,6 +3,20 @@
 (trunk/) Fixed missing columns from query in SectionAccount::getAPIQuery() for
 the ignored mode.
 
+Updated all the *.php with improved include guard which works for all PHP_SAPI
+types.
+
+Updated yapeal.php to use new don't include guard and better PHP_SAPI detection.
+
+Did some refactoring on yapeal.php inc/common_*.php to simpify things and move
+many of the tests done in inc/common_backend.php over to
+install/checkForRequirements.php instead. These changes will be needed for some
+planned future changes to Yapeal but were also just some long overdue code
+cleanups.
+
+Fixed several errors in the install/*.xml files mostly having to do with the new
+APIs.
+
 2011-09-16
 
 (trunk/) Fixed notice in SectionCorp.php and SectionChar.php about undefined

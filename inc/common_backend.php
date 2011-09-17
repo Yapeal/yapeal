@@ -34,28 +34,26 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
- * @internal Only let this code be included or required not ran directly.
+ * @internal Only let this code be included.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
-  exit();
+if (count(get_included_files()) < 2) {
+  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  if (PHP_SAPI != 'cli') {
+    header('HTTP/1.0 403 Forbidden', TRUE, 403);
+    die($mess);
+  } else {
+    fwrite(STDERR, $mess . PHP_EOL);
+    fwrite(STDOUT, 'error' . PHP_EOL);
+    exit(1);
+  };
 };
-/** Any errors that are trigger in this file are reported to the system default
+// Set the default timezone to GMT.
+date_default_timezone_set('GMT');
+/**
+ * Any errors that are trigger in this file are reported to the system default
  * logging location until we're done setting up some of the required vars and
  * we can start our own logging.
  */
-// Used to over come path issues caused by how script is ran.
-$incDir = str_replace('\\', '/', realpath(dirname(__FILE__)));
-chdir($incDir);
-// Set the default timezone to GMT.
-date_default_timezone_set('GMT');
-// Define short name for directory separator which always uses '/'.
-if (!defined('DS')) {
-  /**
-   * Define short name for directory separator which always uses unix '/'.
-   * @ignore
-   */
-  define('DS', '/');
-};
 // Set some basic common settings so we know we'll get to see any errors etc.
 error_reporting(E_ALL);
 ini_set('ignore_repeated_errors', 0);
@@ -65,11 +63,26 @@ ini_set('display_errors', 1);
 ini_set('error_log', NULL);
 ini_set('log_errors', 0);
 ini_set('track_errors', 0);
+if (!defined('DS')) {
+  /**
+   * Define short name for directory separator which always uses unix '/'.
+   * @ignore
+   */
+  define('DS', '/');
+};
+if (!defined('YAPEAL_INC')) {
+  // Used to over come path issues caused by how script is ran.
+  $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
+  // Get path constants so they can be used.
+  require_once $dir . DS . 'common_paths.php';
+} else {
+  require_once YAPEAL_INC . 'common_paths.php';
+};
+chdir(YAPEAL_INC);
 // Grab revision settings
-$path = str_replace('\\', '/', realpath($incDir . DS . '..' . DS . 'revision.php'));
-require_once $path;
-// Get path constants so they can be used.
-require_once $incDir . DS . 'common_paths.php';
+require_once YAPEAL_BASE . 'revision.php';
+// Start auto loader.
+require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 // Set a constant for location of configuration file.
 if (!isset($iniFile)) {
   // Default assumes that this file and yapeal.ini file are in 'neighboring'
@@ -83,107 +96,24 @@ if (!($iniFile && is_readable($iniFile) && is_file($iniFile))) {
 };
 // Grab the info from ini file.
 $iniVars = parse_ini_file($iniFile, TRUE);
-// Abort if required sections aren't defined
-$sections = array('Cache', 'Database', 'Logging');
-$mess = '';
-foreach ($sections as $section) {
-  if (!isset($iniVars[$section])) {
-    $mess .= 'Required section [' . $section;
-    $mess .= '] is missing from ' . $iniFile . PHP_EOL;
-  }; // if isset ...
-};
-unset($sections);
-if (!empty($mess)) {
-  trigger_error($mess, E_USER_WARNING);
-  exit(3);
-};
-// Set vars use in error messages.
-$req1 = 'Missing required setting ';
-$req2 = ' in ' . $iniFile;
-$nonexist = 'Nonexistent directory defined for ';
-/* **************************************************************************
- * Class autoloader section
- * **************************************************************************/
-require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
-/* **************************************************************************
- * Logging section
- * **************************************************************************/
-// Grab the info from ini file again now that our constants are defined.
-//$iniVars = parse_ini_file($iniFile, TRUE);
-$settings = array('error_log', 'log_level', 'notice_log', 'strict_log',
-  'warning_log');
-foreach ($settings as $setting) {
-  if (!isset($iniVars['Logging'][$setting])) {
-    trigger_error($req1 . $setting . $req2, E_USER_ERROR);
-  };// else isset $iniVars...
-};// foreach $settings ...
-if (!defined('YAPEAL_LOG_LEVEL')) {
-  define('YAPEAL_LOG_LEVEL', $iniVars['Logging']['log_level']);
-};
-if (!defined('YAPEAL_ERROR_LOG')) {
-  define('YAPEAL_ERROR_LOG', YAPEAL_LOG . $iniVars['Logging']['error_log']);
-};
-if (!defined('YAPEAL_NOTICE_LOG')) {
-  define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . $iniVars['Logging']['notice_log']);
-};
-if (!defined('YAPEAL_STRICT_LOG')) {
-  define('YAPEAL_STRICT_LOG', YAPEAL_LOG . $iniVars['Logging']['strict_log']);
-};
-if (!defined('YAPEAL_WARNING_LOG')) {
-  define('YAPEAL_WARNING_LOG', YAPEAL_LOG . $iniVars['Logging']['warning_log']);
-};
-/* **************************************************************************
- * Change over to our custom error and exception code
- * **************************************************************************/
-// Change some error logging settings.
-ini_set('error_log', YAPEAL_ERROR_LOG);
-ini_set('log_errors', 1);
-// Start using custom error handler.
-set_error_handler(array('YapealErrorHandler', 'handle'));
-error_reporting(YAPEAL_LOG_LEVEL);
-// Setup exception observers.
-$logObserver = new LoggingExceptionObserver(YAPEAL_WARNING_LOG);
-$printObserver = new PrintingExceptionObserver();
-// Attach (start) our custom printing and logging of exceptions.
-YapealApiException::attach($logObserver);
-YapealApiException::attach($printObserver);
-ADODB_Exception::attach($logObserver);
-ADODB_Exception::attach($printObserver);
-unset($logObserver, $printObserver);
-/* **************************************************************************
- * Cache section
- * **************************************************************************/
-$settings = array('cache_output');
-foreach ($settings as $setting) {
-  if (!isset($iniVars['Cache'][$setting])) {
-    $mess = $req1 . $setting . $req2 . ' section [Cache].';
-    trigger_error($mess, E_USER_ERROR);
-  };
-};// foreach $settings ...
+/**
+ * Define constants from settings in INI file.
+ */
+// Cache settings.
 if (!defined('YAPEAL_CACHE_OUTPUT')) {
   /**
    * Used to decide how API XML should be cached.
    */
   define('YAPEAL_CACHE_OUTPUT', $iniVars['Cache']['cache_output']);
 };
-/* **************************************************************************
- * Curl section
- * **************************************************************************/
+// Curl settings
 if (!defined('YAPEAL_CURL_TIMEOUT')) {
+  /**
+   * Set a max time out for cURL.
+   */
   define('YAPEAL_CURL_TIMEOUT', 45);
 };
-/* **************************************************************************
- * Database section
- * **************************************************************************/
-$settings = array('database', 'driver', 'host', 'suffix', 'table_prefix',
-  'username', 'password');
-$data = array();
-foreach ($settings as $setting) {
-  if (!isset($iniVars['Database'][$setting])) {
-    $mess = $req1 . $setting . $req2 . ' section [Database].';
-    trigger_error($mess, E_USER_ERROR);
-  };
-};// foreach $settings ...
+// Database settings.
 if (!defined('YAPEAL_DSN')) {
   // Put all the pieces of the ADOdb DSN together.
   $dsn = $iniVars['Database']['driver'] . $iniVars['Database']['username'] . ':';
@@ -201,14 +131,7 @@ if (!defined('YAPEAL_TABLE_PREFIX')) {
    */
   define('YAPEAL_TABLE_PREFIX', $iniVars['Database']['table_prefix']);
 };
-/* **************************************************************************
- * General section
- * **************************************************************************/
-if (!isset($iniVars['application_agent'])) {
-  $mess = $iniFile . ' is outdated and "application_agent" is not set';
-  trigger_error($mess, E_USER_NOTICE);
-  $iniVars['application_agent'] = '';
-};// if isset $iniVars['application_agent'] ...
+// General settings.
 if (!defined('YAPEAL_APPLICATION_AGENT')) {
   $curl = curl_version();
   $user_agent = $iniVars['application_agent'];
@@ -222,27 +145,46 @@ if (!defined('YAPEAL_APPLICATION_AGENT')) {
   define('YAPEAL_APPLICATION_AGENT', $user_agent);
   unset($curl, $user_agent);
 };
-if (isset($iniVars['registered_mode'])) {
-  $mode = $iniVars['registered_mode'];
-} else {
-  $mess = $iniFile . ' is outdated and "registered_mode" is not set.';
-  $mess = ' "registered_mode" will be set to "required" as legacy mode';
-  trigger_error($mess, E_USER_NOTICE);
-  $mode = 'required';
-};
-if (!in_array($mode, array('ignored','optional','required'))) {
-  $mess = $iniFile . ' had unknown value ' . $mode;
-  $mess .= ' for "registered_mode" using mode "optional" instead';
-  trigger_error($mess, E_USER_WARNING);
-  $mode = 'optional';
-};
 if (!defined('YAPEAL_REGISTERED_MODE')) {
   /**
-   * Determines whether utilRegisteredCharacter and utilRegisteredCorporation
-   * tables are used or not, it also allows some columns in utilRegisteredKey,
-   * utilRegisteredCharacter, and utilRegisteredCorporation to be optional.
+   * Determines how utilRegisteredKey, utilRegisteredCharacter, and
+   * utilRegisteredCorporation tables are used, it also allows some columns in
+   * this tables to be optional depending on value.
    */
-  define('YAPEAL_REGISTERED_MODE', $mode);
+  define('YAPEAL_REGISTERED_MODE', $iniVars['registered_mode']);
 };
-unset($mode);
+// Log settings
+if (!defined('YAPEAL_LOG_LEVEL')) {
+  define('YAPEAL_LOG_LEVEL', $iniVars['Logging']['log_level']);
+};
+if (!defined('YAPEAL_ERROR_LOG')) {
+  define('YAPEAL_ERROR_LOG', YAPEAL_LOG . $iniVars['Logging']['error_log']);
+};
+if (!defined('YAPEAL_NOTICE_LOG')) {
+  define('YAPEAL_NOTICE_LOG', YAPEAL_LOG . $iniVars['Logging']['notice_log']);
+};
+if (!defined('YAPEAL_STRICT_LOG')) {
+  define('YAPEAL_STRICT_LOG', YAPEAL_LOG . $iniVars['Logging']['strict_log']);
+};
+if (!defined('YAPEAL_WARNING_LOG')) {
+  define('YAPEAL_WARNING_LOG', YAPEAL_LOG . $iniVars['Logging']['warning_log']);
+};
+/**
+ * Change over to our custom error and exception code.
+ */
+ini_set('error_log', YAPEAL_ERROR_LOG);
+ini_set('log_errors', 1);
+// Start using custom error handler.
+set_error_handler(array('YapealErrorHandler', 'handle'));
+error_reporting(YAPEAL_LOG_LEVEL);
+// Setup exception observers.
+$logObserver = new LoggingExceptionObserver(YAPEAL_WARNING_LOG);
+$printObserver = new PrintingExceptionObserver();
+// Attach (start) our custom printing and logging of exceptions.
+YapealApiException::attach($logObserver);
+YapealApiException::attach($printObserver);
+ADODB_Exception::attach($logObserver);
+ADODB_Exception::attach($printObserver);
+unset($logObserver, $printObserver);
+unset($iniFile, $iniVars);
 ?>

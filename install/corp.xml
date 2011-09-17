@@ -286,7 +286,6 @@
       <UNSIGNED/>
     </field>
     <field name="`contractID`" type="I8" size="20">
-      <NOTNULL/>
       <KEY/>
       <UNSIGNED/>
     </field>
@@ -320,9 +319,7 @@
     <field name="`status`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <field name="`title`" type="C" size="255">
-      <NULL/>
-    </field>
+    <field name="`title`" type="C" size="255"/>
     <field name="`forCorp`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>

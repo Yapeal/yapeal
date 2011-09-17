@@ -39,22 +39,45 @@ if (isset($_REQUEST['viewSource'])) {
   highlight_file(__FILE__);
   exit();
 };
+/**
+ * @internal Only let this code be ran in CLI.
+ */
 if (PHP_SAPI != 'cli') {
-  $mess = 'Yapeal only works with CLI version of PHP but tried to run it using ';
-  $mess .= PHP_SAPI . ' instead';
+  header('HTTP/1.0 403 Forbidden', TRUE, 403);
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
+  $mess = ' to run it using ' . PHP_SAPI . ' instead';
   die($mess);
 };
-if (!defined('DS')) {
-  /**
-   * Define short name for directory separator which always uses unix '/'.
-   */
-  define('DS', '/');
+/**
+ * @internal Only let this code be ran directly.
+ */
+$included = get_included_files();
+if (count($included) > 1 || $included[0] != __FILE__) {
+  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  fwrite(STDERR, $mess . PHP_EOL);
+  fwrite(STDOUT, 'error' . PHP_EOL);
+  exit(1);
 };
+/**
+ * Define short name for directory separator which always uses unix '/'.
+ */
+define('DS', '/');
+/**
+ * We know we are in the 'base' directory might as well set constant.
+ */
 // Used to over come path issues caused by how script is ran on server.
 $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
-chdir($dir);
+define('YAPEAL_BASE', $dir . DS);
+chdir(YAPEAL_BASE);
 // Pull in Yapeal revision constants.
-require_once $dir . DS . 'revision.php';
+require_once YAPEAL_BASE . 'revision.php';
+/**
+ * Since we know that we are at 'base' directory we know where 'inc' should be
+ * by default.
+ */
+define('YAPEAL_INC', YAPEAL_BASE . DS . 'inc' . DS);
+// Pull in path constants.
+require_once YAPEAL_INC . 'common_paths.php';
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
   $options = getopt('hVc:');
@@ -84,9 +107,7 @@ if (function_exists('getopt')) {
     };// foreach $options...
   };// if !empty $options ...
 };// if function_exists getopt ...
-// Move down to 'inc' directory to read common_backend.php
-$path = str_replace('\\', DS, realpath($dir . DS . 'inc' . DS . 'common_backend.php'));
-require_once $path;
+require_once YAPEAL_INC . DS . 'common_backend.php';
 try {
   /**
    * Give ourself a 'soft' limit of 10 minutes to finish.

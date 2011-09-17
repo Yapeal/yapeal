@@ -34,11 +34,22 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
+ * @internal Only let this code be ran in CLI.
+ */
+if (PHP_SAPI != 'cli') {
+  header('HTTP/1.0 403 Forbidden', TRUE, 403);
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
+  $mess = ' to run it using ' . PHP_SAPI . ' instead';
+  die($mess);
+};
+/**
  * @internal Only let this code be ran directly.
  */
-if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
-  $mess = 'Including of ' . $argv[0] . ' is not allowed' . PHP_EOL;
-  fwrite(STDERR, $mess);
+$included = get_included_files();
+if (count($included) > 1 || $included[0] != __FILE__) {
+  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  fwrite(STDERR, $mess . PHP_EOL);
+  fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
 // Insure minimum version of PHP we need to run.
@@ -55,13 +66,28 @@ if (count($missing) > 0) {
   $mess .= implode(', ', $missing) . ' are missing!' . PHP_EOL;
   fwrite(STDERR, $mess);
 };
+// Check on cURL version and features.
+$cv = curl_version();
+if (version_compare($cv['version'], '7.15.0', '<')) {
+  $mess = 'Need minimum of cURL 7.15.0 to use this software!' . PHP_EOL;
+  fwrite(STDERR, $mess);
+};
+if (($cv['features'] & CURL_VERSION_SSL) != CURL_VERSION_SSL) {
+  $mess = 'cURL was built without SSL please check it.';
+  fwrite(STDERR, $mess);
+};
+// Check for minimum MySQL client.
+if (mysqli_get_client_version() < 50000) {
+  $mess = 'MySQL client version is older than 5.0.' . PHP_EOL;
+  fwrite(STDERR, $mess);
+};
 /**
  * Define short name for directory separator which always uses unix '/'.
  * @ignore
  */
 define('DS', '/');
 // Used to over come path issues caused by how script is ran on server.
-$baseDir = str_replace('\\', '/', realpath(dirname(__FILE__) . DS. '..') . DS);
+$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..') . DS);
 // Get path constants so they can be used.
 require_once $baseDir . DS . 'inc' . DS . 'common_paths.php';
 $iniFile = YAPEAL_CONFIG . 'yapeal.ini';
@@ -81,6 +107,18 @@ foreach ($sections as $section) {
     $mess .= '] is missing from ' . $iniFile . PHP_EOL;
   }; // if isset ...
 };
+if (!empty($mess)) {
+  fwrite(STDERR, $mess);
+};
+// Check for required error logging settings.
+$settings = array('error_log', 'log_level', 'notice_log', 'strict_log',
+  'warning_log');
+$mess = '';
+foreach ($settings as $setting) {
+  if (!isset($iniVars['Logging'][$setting])) {
+    $mess .= 'Missing required setting ' . $setting . ' in ' . $iniFile . PHP_EOL;
+  };// if isset $iniVars...
+};// foreach $settings ...
 if (!empty($mess)) {
   fwrite(STDERR, $mess);
 };
@@ -114,4 +152,30 @@ if (!isset($iniVars['Cache']['cache_output'])) {
     };// foreach $sections ...
   };// if $iniVars['Cache']['cache_output'] == 'file' || ...
 };// else !isset $iniVars['Cache']['cache_output'] ...
+// Check for required database settings.
+$settings = array('database', 'driver', 'host', 'suffix', 'table_prefix',
+  'username', 'password');
+$mess = '';
+foreach ($settings as $setting) {
+  if (!isset($iniVars['Database'][$setting])) {
+    $mess .= 'Missing required setting ' . $setting . ' in ' . $iniFile . PHP_EOL;
+  };
+};// foreach $settings ...
+if (!empty($mess)) {
+  fwrite(STDERR, $mess);
+};
+if (!isset($iniVars['application_agent'])) {
+  $mess = $iniFile . ' is outdated and "application_agent" is not set';
+  fwrite(STDERR, $mess);
+};// if isset $iniVars['application_agent'] ...
+if (isset($iniVars['registered_mode'])) {
+  $mode = $iniVars['registered_mode'];
+  if (!in_array($mode, array('ignored','optional','required'))) {
+    $mess = $iniFile . ' had unknown value ' . $mode . ' for "registered_mode"';
+    fwrite(STDERR, $mess);
+  };
+} else {
+  $mess = $iniFile . ' is outdated and "registered_mode" is not set';
+  fwrite(STDERR, $mess);
+};
 ?>

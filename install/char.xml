@@ -327,7 +327,6 @@
       <UNSIGNED/>
     </field>
     <field name="`contractID`" type="I8" size="20">
-      <NOTNULL/>
       <KEY/>
       <UNSIGNED/>
     </field>
@@ -361,8 +360,7 @@
     <field name="`status`" type="C" size="255">
       <NOTNULL/>
     </field>
-    <field name="`title`" type="C" size="255">
-    </field>
+    <field name="`title`" type="C" size="255"/>
     <field name="`forCorp`" type="I1" size="1">
       <NOTNULL/>
       <UNSIGNED/>
@@ -376,14 +374,12 @@
     <field name="`dateExpired`" type="T">
       <NOTNULL/>
     </field>
-    <field name="`dateAccepted`" type="T">
-    </field>
+    <field name="`dateAccepted`" type="T"/>
     <field name="`numDays`" type="I2" size="3">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`dateCompleted`" type="T">
-    </field>
+    <field name="`dateCompleted`" type="T"/>
     <field name="`price`" type="N" size="17.2">
       <NOTNULL/>
     </field>
@@ -836,7 +832,6 @@
     </field>
     <field name="`notificationID`" type="I8" size="20">
       <KEY/>
-      <NOTNULL/>
       <UNSIGNED/>
     </field>
     <field name="`text`" type="X">

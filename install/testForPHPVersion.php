@@ -38,10 +38,23 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
- * @internal Don't let this code be ran directly.
+ * @internal Only let this code be ran in CLI.
  */
-if (basename(__FILE__) != basename($_SERVER['PHP_SELF'])) {
-  exit();
+if (PHP_SAPI != 'cli') {
+  header('HTTP/1.0 403 Forbidden', TRUE, 403);
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
+  $mess = ' to run it using ' . PHP_SAPI . ' instead';
+  die($mess);
+};
+/**
+ * @internal Only let this code be ran directly.
+ */
+$included = get_included_files();
+if (count($included) > 1 || $included[0] != __FILE__) {
+  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  fwrite(STDERR, $mess);
+  fwrite(STDOUT, 'error' . PHP_EOL);
+  exit(1);
 };
 if (version_compare(PHP_VERSION,"5.2.1","<")) {
   fwrite(STDOUT, "old");

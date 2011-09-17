@@ -35,10 +35,18 @@ if (isset($_REQUEST['viewSource'])) {
   exit();
 };
 /**
- * @internal Only let this code be included or required not ran directly.
+ * @internal Only let this code be included.
  */
-if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
-  exit();
+if (count(get_included_files()) < 2) {
+  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  if (PHP_SAPI != 'cli') {
+    header('HTTP/1.0 403 Forbidden', TRUE, 403);
+    die($mess);
+  } else {
+    fwrite(STDERR, $mess . PHP_EOL);
+    fwrite(STDOUT, 'error' . PHP_EOL);
+    exit(1);
+  };
 };
 /**
  * Class used to fetch and store char ContactNotifications API.

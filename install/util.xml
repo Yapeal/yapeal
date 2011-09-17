@@ -38,7 +38,7 @@
     <field name="`api`" type="C" size="32">
       <KEY/>
     </field>
-    <field name="`description`" type="C" size="255"/>
+    <field name="`description`" type="X" size="512"/>
     <field name="`mask`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -175,9 +175,7 @@
     <field name="`section`" type="C" size="8">
       <NOTNULL/>
     </field>
-    <field name="`xml`" type="X2">
-      <NOTNULL/>
-    </field>
+    <field name="`xml`" type="X2"/>
     <index name="`utilXmlCache1`">
       <col>`section`</col>
     </index>
@@ -186,27 +184,27 @@
     </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <sql prefixmethod="MANUAL">
+  <!--<sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
-  </sql>
+  </sql>-->
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') NOT NULL DEFAULT 'char'</query>
+    <!--<query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') NOT NULL</query>
+    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') NOT NULL DEFAULT 'char'</query>-->
   </sql>
-  <sql prefixmethod="MANUAL">
+  <!--<sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
-  </sql>
+  </sql>-->
   <sql prefixmethod="MANUAL">
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
     <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT NOT NULL</query>
+    <!--<query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>-->
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT</query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilAccessMask`</query>
-    <query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
+    <!--<query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
     <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`)
       VALUES
       (1, 'account', 'APIKeyInfo', 'Used to get information about a keyID'),
@@ -214,7 +212,7 @@
       (1, 'char', 'AccountBalance', 'Current balance of characters wallet.'),
       (2, 'char', 'AssetList', 'Entire asset list of character.'),
       (4, 'char', 'CalendarEventAttendees', 'Event attendee responses. Requires UpcomingCalendarEvents to function.'),
-      (8, 'char', 'CharacterSheet', 'Character Sheet information. Contains basic''Show Info''information along with clones, account balance, implants, attributes, skills, certificates and corporation roles.'),
+      (8, 'char', 'CharacterSheet', 'Character Sheet information. Contains basic "Show Info" information along with clones, account balance, implants, attributes, skills, certificates and corporation roles.'),
       (16, 'char', 'ContactList', 'List of character contacts and relationship levels.'),
       (32, 'char', 'ContactNotifications', 'Most recent contact notifications for the character.'),
       (64, 'char', 'FacWarStats', 'Characters Factional Warfare Statistics.'),
@@ -238,7 +236,7 @@
       (1, 'corp', 'AccountBalance', 'Current balance of all corporation accounts.'),
       (2, 'corp', 'AssetList', 'List of all corporation assets.'),
       (4, 'corp', 'MemberMedals', 'List of medals awarded to corporation members.'),
-      (8, 'corp', 'CorporationSheet', 'Exposes basic''Show Info''information as well as Member Limit and basic division and wallet info.'),
+      (8, 'corp', 'CorporationSheet', 'Exposes basic "Show Info" information as well as Member Limit and basic division and wallet info.'),
       (16, 'corp', 'ContactList', 'Corporate contact list and relationships.'),
       (32, 'corp', 'ContainerLog', 'Corporate secure container acess log.'),
       (64, 'corp', 'FacWarStats', 'Corporations Factional Warfare Statistics.'),
@@ -262,7 +260,7 @@
       (0, 'corp', 'CalendarEventAttendees', ''),
       (1, 'eve', 'AllianceList', 'Returns a list of alliances in eve.'),
       (2, 'eve', 'CertificateTree', 'Returns a list of certificates in eve.'),
-      (4, 'eve', 'CharacterID', 'Returns the ownerID for a given character, faction, alliance or corporation name, or the typeID for other objects such as stations, solar systems, planets, etc. '),
+      (4, 'eve', 'CharacterID', 'Returns the ownerID for a given character, faction, alliance or corporation name, or the typeID for other objects such as stations, solar systems, planets, etc.'),
       (8, 'eve', 'CharacterName', 'Returns the name associated with an ownerID or a typeID.'),
       (16, 'eve', 'ConquerableStationList', 'Conquerable Station List including Outpost.'),
       (32, 'eve', 'ErrorList', 'Returns a list of error codes that can be returned by the EVE API servers.'),
@@ -270,20 +268,20 @@
       (128, 'eve', 'FacWarTopStats', 'Returns Factional Warfare Top 100 Stats.'),
       (256, 'eve', 'RefTypes', 'Returns a list of transaction types used in the Journal Entries.'),
       (512, 'eve', 'SkillTree', 'XML of currently in-game skills (including unpublished skills).'),
-      (0, 'eve', 'CharacterInfo', 'Character information, exposes skill points and current ship information on top of''Show Info''information.'),
-      (8388608, 'eve', 'CharacterInfoPublic', 'Character information, exposes skill points and current ship information on top of''Show Info''information.'),
+      (0, 'eve', 'CharacterInfo', 'Character information, exposes skill points and current ship information on top of "Show Info" information.'),
+      (8388608, 'eve', 'CharacterInfoPublic', 'Character information, exposes skill points and current ship information on top of "Show Info" information.'),
       (16777216, 'eve', 'CharacterInfoPrivate', 'Sensitive Character Information, exposes account balance and last known location on top of the other Character Information call.'),
       (1, 'map', 'FacWarSystems', 'Returns a list of contestable solarsystems and the NPC faction currently occupying them. It should be noted that this file only returns a non-zero ID if the occupying faction is not the sovereign faction.'),
       (2, 'map', 'Jumps', 'Returns a list of systems where any jumps have happenned.'),
-      (4, 'map', 'Kills', 'Returns the number of kills in solarsystems within the last hour. Only solar system where kills have been made are listed, so assume zero in case the system is not listed. '),
+      (4, 'map', 'Kills', 'Returns the number of kills in solarsystems within the last hour. Only solar system where kills have been made are listed, so assume zero in case the system is not listed.'),
       (8, 'map', 'Sovereignty', 'Returns a list of solarsystems and what faction or alliance controls them. '),
       (16, 'map', 'SovereigntyStatus', 'Returns a list of all sovereignty structures in EVE. This API has been disabled and is not expected to return but was included for completeness.'),
-      (1, 'server', 'ServerStatus', 'Returns current Eve server status and number of players online.');
+      (1, 'server', 'ServerStatus', 'Returns current Eve server status and number of players online.')
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilCachedInterval`</query>
-    <query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
+    <!--<query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
     <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
       ('account', 'AccountStatus', 3600),

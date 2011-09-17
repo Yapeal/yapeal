@@ -17,6 +17,12 @@ cleanups.
 Fixed several errors in the install/*.xml files mostly having to do with the new
 APIs.
 
+Fixed util* tables so they no longer try to use ENUMs to fix fails during
+database updates with install/createMySQLTables.php. Will try to add them back
+once xmlschema project can be finished and used in Yapeal. May need to drop all
+util* tables except for the utilRegistered* tables to get tables to update
+correctly the first time.
+
 2011-09-16
 
 (trunk/) Fixed notice in SectionCorp.php and SectionChar.php about undefined

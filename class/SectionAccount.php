@@ -164,24 +164,12 @@ class SectionAccount extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
-    switch (YAPEAL_REGISTERED_MODE) {
-      case 'required':
-      case 'optional':
-        $sql = 'select urk.`keyID`,urk.`vCode`,urk.`activeAPIMask` as "RKMask",';
-        $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,aaki.`type`';
-        $sql .= ' from';
-        $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
-        $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
-        $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
-        break;
-      case 'ignored':
-        $sql = 'select urk.`keyID`,urk.`vCode`,aaki.`accessMask`,aaki.`type`';
-        $sql .= ' from';
-        $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
-        $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
-        $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
-        break;
-    };
+    $sql = 'select urk.`keyID`,urk.`vCode`,urk.`activeAPIMask` as "RKMask",';
+    $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,aaki.`type`';
+    $sql .= ' from';
+    $sql .= ' `' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey` as urk';
+    $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
+    $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
     return $sql;
   }// function getSQLQuery
   /**

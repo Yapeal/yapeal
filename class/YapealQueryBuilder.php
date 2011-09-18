@@ -76,6 +76,10 @@ class YapealQueryBuilder implements Countable {
    */
   protected $defaults = array();
   /**
+   * @var array Holds a list of null-able columns.
+   */
+  protected $nullables = array();
+  /**
    * @var array Holds the built rows of data to be inserted.
    */
   protected $rows = array();
@@ -139,6 +143,10 @@ class YapealQueryBuilder implements Countable {
       if (isset($col->has_default) && $col->has_default === TRUE) {
         $this->defaults[$col->name] = $col->default_value;
       };// if isset $col->has_default ...
+      // Add any null-able columns to null list.
+      if (isset($col->not_null) && $col->not_null === FALSE) {
+        $this->nullables[] = $col->name;
+      };// if isset $col->has_default ...
       // Make list of column names and their ADOdb generic types.
       $this->colTypes[$col->name] = $this->metaType($col);
     };// foreach $this->columns ...
@@ -183,7 +191,7 @@ class YapealQueryBuilder implements Countable {
   public function addRow($row) {
     // Merging defaults with API row should make a complete database record.
     $data = array_merge($this->defaults, $row);
-    $diff = array_diff(array_keys($this->colTypes), array_keys($data));
+    $diff = array_diff(array_keys($this->colTypes), array_keys($data), $this->nullables);
     if (count($diff)) {
       $mess = 'Row was missing required fields (' . implode(', ', $diff);
       $mess .= ') that are needed for ' . $this->tableName;
@@ -199,9 +207,14 @@ class YapealQueryBuilder implements Countable {
       trigger_error($mess, E_USER_WARNING);
     };
     // Make a new array where database fields and API data fields overlap.
-    $fields = array_intersect(array_keys($this->colTypes), array_keys($data));
+    //$fields = array_intersect(array_keys($this->colTypes), array_keys($data), $this->nullables);
     $set = array();
-    foreach ($fields as $field) {
+    foreach (array_keys($this->colTypes) as $field) {
+      // Set any missing null-able column to NULL.
+      if (!isset($data[$field]) && in_array($field, $this->nullables)) {
+        $set[] = 'NULL';
+        continue;
+      };
       switch ($this->colTypes[$field]) {
         case 'C':
         case 'D':

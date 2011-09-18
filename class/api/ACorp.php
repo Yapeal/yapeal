@@ -58,7 +58,7 @@ abstract class ACorp extends AApiRequest {
   /**
    * Constructor
    *
-   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * @param array $params Holds the required parameters like keyID, vCode, etc
    * used in HTML POST parameters to API servers which varies depending on API
    * 'section' being requested.
    *
@@ -213,23 +213,44 @@ abstract class ACorp extends AApiRequest {
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
+        case 125:// Corporation not enlisted in Factional Warfare. (Key accessMask outdated)
+          // The key access has changed deactivate API for corporation if
+          // registered mode is not 'ignored'.
+          if (YAPEAL_REGISTERED_MODE != 'ignored') {
+            $mess = 'Deactivating Eve API: ' . $this->api;
+            $mess .= ' for corporation ' . $this->params['corporationID'];
+            $mess .= ' as they are not enlisted in factional warfare';
+            trigger_error($mess, E_USER_NOTICE);
+            // A new row for corporation will be created if needed. This allows
+            // the 'optional' registered mode to work correctly.
+            $corp = new RegisteredCorporation($this->params['corporationID']);
+            // If new corporation need to set some required columns.
+            if (FALSE === $corp->recordExists()) {
+              $corp->isActive = 1;
+            };// if $char->recordExists() ...
+            $corp->deleteActiveAPI($this->api);
+            if (FALSE === $corp->store()) {
+              $mess = 'Could not deactivate ' . $this->api;
+              $mess .= ' for ' . $this->params['corporationID'];
+              trigger_error($mess, E_USER_WARNING);
+            };// if $char->store() ...
+          };// if YAPEAL_REGISTERED_MODE ...
+          break;
         case 206:// Character must have Accountant or Junior Accountant roles.
         case 207:// Not available for NPC corporations.
         case 208:// Character must have Accountant, Junior Accountant, or Trader roles.
         case 209:// Character must be a Director or CEO.
         case 213:// Character must have Factory Manager role.
-          $mess = 'Deactivating Eve API: ' . $this->api;
-          $mess .= ' for corporation ' . $this->params['corporationID'];
-          $mess .= ' as character ' .  $this->params['characterID'];
-          $mess .= ' does not currently have access';
+        case 220:// Invalid Corporation Key. (Owner no longer CEO or director)
+          $mess = 'Deactivating keyID: ' . $this->params['keyID'];
+            $mess .= ' as account owner no long has corporation access';
           trigger_error($mess, E_USER_WARNING);
-          $corp = new RegisteredCorporation($this->params['corporationID'], FALSE);
-          $corp->deleteActiveAPI($this->api);
-          if (FALSE === $corp->store()) {
-            $mess = 'Could not deactivate ' . $this->api;
-            $mess .= ' for ' . $this->params['corporationID'];
+          $key = new RegisteredKey($this->params['keyID'], FALSE);
+          $key->isActive = 0;
+          if (FALSE === $key->store()) {
+            $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$corp->store() ...
+          };// if $key->store() ...
           break;
         case 211:// Login denied by account status.
           // The account is not active deactivate key and corporation too if
@@ -242,15 +263,11 @@ abstract class ACorp extends AApiRequest {
             // the 'optional' registered mode to work correctly.
             $corp = new RegisteredCorporation($this->params['corporationID']);
             $corp->isActive = 0;
-            // If new corporation need to set required columns.
-            if (FALSE === $corp->recordExists()) {
-              $corp->activeAPIMask = 0;
-            };// if $char->recordExists() ...
             if (FALSE === $corp->store()) {
               $mess = 'Could not deactivate corporationID: ';
               $mess .= $this->params['corporationID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $user->store() ...
+            };// if $corp->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
           // Always deactive key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -261,39 +278,30 @@ abstract class ACorp extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
-        case 220://Invalid Corporation Key. (Owner no longer CEO or director)
+        case 221:// Illegal page request! (Key accessMask outdated)
+          // The key access has changed deactivate API for corporation if
+          // registered mode is not 'ignored'.
           if (YAPEAL_REGISTERED_MODE != 'ignored') {
-            $mess = 'Deactivating corporationID: ' . $this->params['corporationID'];
-            $mess .= ' as account owner no long have corporation access';
-            trigger_error($mess, E_USER_WARNING);
+            $mess = 'Deactivating Eve API: ' . $this->api;
+            $mess .= ' for corporation ' . $this->params['corporationID'];
+            $mess .= ' as this API is no longer allowed by owner with this key';
+            trigger_error($mess, E_USER_NOTICE);
             // A new row for corporation will be created if needed. This allows
             // the 'optional' registered mode to work correctly.
             $corp = new RegisteredCorporation($this->params['corporationID']);
-            $corp->isActive = 0;
-            // If new corporation need to set required columns.
+            // If new corporation need to set some required columns.
             if (FALSE === $corp->recordExists()) {
-              $corp->activeAPIMask = 0;
-            };// if $char->recordExists() ...
+              $corp->isActive = 1;
+            };// if $corp->recordExists() ...
+            $corp->deleteActiveAPI($this->api);
             if (FALSE === $corp->store()) {
-              $mess = 'Could not deactivate corporationID: ';
-              $mess .= $this->params['corporationID'];
+              $mess = 'Could not deactivate ' . $this->api;
+              $mess .= ' for ' . $this->params['corporationID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $user->store() ...
+            };// if $corp->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
-          // Always deactive key no matter the registered mode.
-          $mess = 'Deactivating keyID: ' . $this->params['keyID'];
-            $mess .= ' as account owner no long have corporation access';
-          trigger_error($mess, E_USER_WARNING);
-          $key = new RegisteredKey($this->params['keyID'], FALSE);
-          $key->isActive = 0;
-          if (FALSE === $key->store()) {
-            $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
-            trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
-          break;
-        case 221:// Illegal page request! (Key accessMask outdated)
           // The key access has changed deactivate API for key.
           $mess = 'Deactivating Eve API: ' . $this->api;
           $mess .= ' for keyID: ' . $this->params['keyID'];
@@ -305,7 +313,7 @@ abstract class ACorp extends AApiRequest {
             $mess = 'Could not deactivate ' . $this->api;
             $mess .= ' for ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$char->store() ...
+          };// if !$key->store() ...
           break;
         case 222://Key has expired. Contact key owner for access renewal.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -324,7 +332,7 @@ abstract class ACorp extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
         case 901:// Web site database temporarily disabled.
         case 902:// EVE backend database temporarily disabled.

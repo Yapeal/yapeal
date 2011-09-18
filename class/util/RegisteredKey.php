@@ -224,7 +224,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
     $sql .= ' from `' . $this->tableName . '` as urk';
     $sql .= ' left join `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo` as aaki';
     $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
-    $sql .= ' where `keyID`=' . $id;
+    $sql .= ' where urk.`keyID`=' . $id;
     try {
       $result = $this->con->GetRow($sql);
       if (!empty($result)) {
@@ -235,6 +235,14 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
+        // Get accessMask from accountAPIKeyInfo if available.
+        $sql = 'select `accessMask`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
+        $sql .= ' where `keyID`=' . $id;
+        $result = $this->con->GetOne($sql);
+        if (!empty($result)) {
+          $this->properties['activeAPIMask'] = (string)$result;
+        };
       };
     }
     catch (ADODB_Exception $e) {

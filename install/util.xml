@@ -307,7 +307,7 @@
       ('char', 'SkillInTraining', 300),
       ('char', 'SkillQueue', 900),
       ('char', 'Standings', 3600),
-      ('char', 'UpcomingCalendarEvent', 900),
+      ('char', 'UpcomingCalendarEvents', 900),
       ('char', 'WalletJournal', 1620),
       ('char', 'WalletTransactions', 3600),
       ('corp', 'AccountBalance', 900),

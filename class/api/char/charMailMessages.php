@@ -58,7 +58,7 @@ class charMailMessages extends AChar {
   /**
    * Constructor
    *
-   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * @param array $params Holds the required parameters like keyID, vCode, etc
    * used in HTML POST parameters to API servers which varies depending on API
    * 'section' being requested.
    *

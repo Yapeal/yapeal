@@ -76,11 +76,6 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    */
   protected $qb;
   /**
-   * List of all masks for this section.
-   * @var array
-   */
-  private $maskList;
-  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
@@ -208,6 +203,20 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
+        // Get new mask from section.
+        $sql = 'select `activeAPIMask`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+        $sql .= ' where `section` = "corp"';
+        $result = $this->con->GetOne($sql);
+        $this->properties['activeAPIMask'] = (string)$result;
+        // Get corporationName from accountCharacter if available.
+        $sql = 'select `corporationName`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'accountCharacters`';
+        $sql .= ' where `corporationID`=' . $id;
+        $result = $this->con->GetOne($sql);
+        if (!empty($result)) {
+          $this->properties['corporationName'] = (string)$result;
+        };
       };
     }
     catch (ADODB_Exception $e) {
@@ -233,6 +242,20 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
+        // Get new mask from section.
+        $sql = 'select `activeAPIMask`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+        $sql .= ' where `section` = "corp"';
+        $result = $this->con->GetOne($sql);
+        $this->properties['activeAPIMask'] = (string)$result;
+        // Get corporationID from accountCharacter if available.
+        $sql = 'select `corporationID`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'accountCharacters`';
+        $sql .= ' where `corporationName`=' . $name;
+        $result = $this->con->GetOne($sql);
+        if (!empty($result)) {
+          $this->properties['corporationID'] = (string)$result;
+        };
       };
     }
     catch (ADODB_Exception $e) {
@@ -275,29 +298,10 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    $mask = array_reduce($this->maskList, array($this, 'reduceOR'), 0);
-    // Find any unknown APIs in mask.
-    $unknowns = $this->properties['activeAPIMask'] & $mask;
-    if ($unknowns != 0) {
-      $mess = 'activeAPIMask contains the following unknown mask values: %b';
-      $mess = sprintf($mess, $unknowns);
-      trigger_error($mess, E_USER_WARNING);
-    };// if $mask ...
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...
     return $this->qb->store();
   }// function store
-  /**
-   * Used by store() to 'or' together masks for array_reduce().
-   *
-   * @param int $x First value to be ORed together.
-   * @param int $y Second value to be ORed together.
-   *
-   * @return int Returns $x | $y
-   */
-  protected function reduceOR($x, $y) {
-    return $x | $y;
-  }// function reduceOR
 }
 ?>

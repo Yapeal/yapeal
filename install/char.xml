@@ -1017,6 +1017,32 @@
     <descr>Replaced by ContactList</descr>
     <DROP/>
   </table>
+  <!--<table name="charUpcomingCalendarEvents">
+    <descr>Table for /char/UpcomingCalendarEvents.xml.aspx</descr>
+    <xs:attribute name="duration" use="required" type="xs:short"/>
+    <xs:attribute name="eventDate" use="required" type="eveDT"/>
+    <xs:attribute name="eventID" use="required" type="eveID"/>
+    <xs:attribute name="eventText" use="required" type="xs:string"/>
+    <xs:attribute name="eventTitle" use="required" type="xs:string"/>
+    <xs:attribute name="importance" use="required" type="eveBoolean"/>
+    <xs:attribute name="ownerID" use="required" type="eveID"/>
+    <xs:attribute name="ownerName" use="required" type="xs:string"/>
+    <field name="`characterID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`eventID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`characterName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`response`" type="C" size="32">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>-->
   <table name="charVictim">
     <descr>Sub table from /char/KillLog.xml.aspx</descr>
     <field name="`killID`" type="I8" size="20">

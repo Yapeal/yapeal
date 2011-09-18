@@ -58,7 +58,7 @@ abstract class AChar extends AApiRequest {
   /**
    * Constructor
    *
-   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * @param array $params Holds the required parameters like keyID, vCode, etc
    * used in HTML POST parameters to API servers which varies depending on API
    * 'section' being requested.
    *
@@ -213,6 +213,29 @@ abstract class AChar extends AApiRequest {
             trigger_error($mess, E_USER_WARNING);
           };// if !$user->store() ...
           break;
+        case 124:// Character not enlisted in Factional Warfare. (Key accessMask outdated)
+          // The key access has changed deactivate API for character if
+          // registered mode is not 'ignored'.
+          if (YAPEAL_REGISTERED_MODE != 'ignored') {
+            $mess = 'Deactivating Eve API: ' . $this->api;
+            $mess .= ' for characterID: ' . $this->params['characterID'];
+            $mess .= ' as they are not enlisted in factional warfare';
+            trigger_error($mess, E_USER_NOTICE);
+            // A new row for character will be created if needed. This allows
+            // the 'optional' registered mode to work correctly.
+            $char = new RegisteredCharacter($this->params['characterID']);
+            // If new character need to set required columns.
+            if (FALSE === $char->recordExists()) {
+              $char->isActive = 1;
+            };// if $char->recordExists() ...
+            $char->deleteActiveAPI($this->api);
+            if (FALSE === $char->store()) {
+              $mess = 'Could not deactivate ' . $this->api;
+              $mess .= ' for ' . $this->params['characterID'];
+              trigger_error($mess, E_USER_WARNING);
+            };// if $char->store() ...
+          };// if YAPEAL_REGISTERED_MODE ...
+          break;
         case 211:// Login denied by account status.
           // The account is not active deactivate key and character too if
           // registered mode is not 'ignored'.
@@ -224,15 +247,11 @@ abstract class AChar extends AApiRequest {
             // the 'optional' registered mode to work correctly.
             $char = new RegisteredCharacter($this->params['characterID']);
             $char->isActive = 0;
-            // If new character need to set required columns.
-            if (FALSE === $char->recordExists()) {
-              $char->activeAPIMask = 0;
-            };// if $char->recordExists() ...
             if (FALSE === $char->store()) {
               $mess = 'Could not deactivate characterID: ';
               $mess .= $this->params['characterID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $user->store() ...
+            };// if $char->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
           // Always deactive key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -246,6 +265,27 @@ abstract class AChar extends AApiRequest {
           };// if !$user->store() ...
           break;
         case 221:// Illegal page request! (Key accessMask outdated)
+          // The key access has changed deactivate API for character if
+          // registered mode is not 'ignored'.
+          if (YAPEAL_REGISTERED_MODE != 'ignored') {
+            $mess = 'Deactivating Eve API: ' . $this->api;
+            $mess .= ' for characterID: ' . $this->params['characterID'];
+            $mess .= ' as this API is no longer allowed by owner with this key';
+            trigger_error($mess, E_USER_WARNING);
+            // A new row for character will be created if needed. This allows
+            // the 'optional' registered mode to work correctly.
+            $char = new RegisteredCharacter($this->params['characterID']);
+            // If new character need to set some required columns.
+            if (FALSE === $char->recordExists()) {
+              $char->isActive = 1;
+            };// if $char->recordExists() ...
+            $char->deleteActiveAPI($this->api);
+            if (FALSE === $char->store()) {
+              $mess = 'Could not deactivate ' . $this->api;
+              $mess .= ' for ' . $this->params['characterID'];
+              trigger_error($mess, E_USER_WARNING);
+            };// if $char->store() ...
+          };// if YAPEAL_REGISTERED_MODE ...
           // The key access has changed deactivate API for key.
           $mess = 'Deactivating Eve API: ' . $this->api;
           $mess .= ' for keyID: ' . $this->params['keyID'];

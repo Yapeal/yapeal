@@ -1,3 +1,12 @@
+2011-09-18
+
+(trunk/) Fixed many bugs in the class/util/Registered* classes. They have also
+been made a little smarter and will try to fill in columns from other database
+tables when making a new row if the info is available in the API tables etc.
+
+Fixed typo in install/util.xml which caused unknown API in char for
+UpcomingCalendarEvents in cache code.
+
 2011-09-17
 
 (trunk/) Fixed missing columns from query in SectionAccount::getAPIQuery() for

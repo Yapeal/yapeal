@@ -203,6 +203,20 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
+        // Get new mask from section.
+        $sql = 'select `activeAPIMask`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+        $sql .= ' where `section` = "char"';
+        $result = $this->con->GetOne($sql);
+        $this->properties['activeAPIMask'] = (string)$result;
+        // Get characterName from accountCharacter if available.
+        $sql = 'select `characterName`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'accountCharacters`';
+        $sql .= ' where `characterID`=' . $id;
+        $result = $this->con->GetOne($sql);
+        if (!empty($result)) {
+          $this->properties['characterName'] = (string)$result;
+        };
       };
     }
     catch (ADODB_Exception $e) {
@@ -228,6 +242,20 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
         $this->recordExists = TRUE;
       } else {
         $this->recordExists = FALSE;
+        // Get new mask from section.
+        $sql = 'select `activeAPIMask`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+        $sql .= ' where `section` = "char"';
+        $result = $this->con->GetOne($sql);
+        $this->properties['activeAPIMask'] = (string)$result;
+        // Get characterID from accountCharacter if available.
+        $sql = 'select `characterID`';
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'accountCharacters`';
+        $sql .= ' where `characterName`=' . $name;
+        $result = $this->con->GetOne($sql);
+        if (!empty($result)) {
+          $this->properties['characterID'] = (string)$result;
+        };
       };
     }
     catch (ADODB_Exception $e) {
@@ -270,29 +298,10 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    $mask = array_reduce($this->maskList, array($this, 'reduceOR'), 0);
-    // Find any unknown APIs in mask.
-    $unknowns = $this->properties['activeAPIMask'] & $mask;
-    if ($unknowns != 0) {
-      $mess = 'activeAPIMask contains the following unknown mask values: %b';
-      $mess = sprintf($mess, $unknowns);
-      trigger_error($mess, E_USER_WARNING);
-    };// if $mask ...
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...
     return $this->qb->store();
   }// function store
-  /**
-   * Used by store() to 'or' together masks for array_reduce().
-   *
-   * @param int $x First value to be ORed together.
-   * @param int $y Second value to be ORed together.
-   *
-   * @return int Returns $x | $y
-   */
-  protected function reduceOR($x, $y) {
-    return $x | $y;
-  }// function reduceOR
 }
 ?>

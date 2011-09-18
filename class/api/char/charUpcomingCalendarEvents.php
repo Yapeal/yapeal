@@ -58,7 +58,7 @@ class charUpcomingCalendarEvents extends AChar {
   /**
    * Constructor
    *
-   * @param array $params Holds the required parameters like userID, apiKey, etc
+   * @param array $params Holds the required parameters like keyID, vCode, etc
    * used in HTML POST parameters to API servers which varies depending on API
    * 'section' being requested.
    *
@@ -79,7 +79,7 @@ class charUpcomingCalendarEvents extends AChar {
    * @return bool Returns TRUE always.
    */
   protected function parserAPI() {
-    return TRUE;
+    return FALSE;
   }// function parserAPI
 }
 ?>

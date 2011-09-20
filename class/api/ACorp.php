@@ -200,7 +200,7 @@ abstract class ACorp extends AApiRequest {
               $mess = 'Could not deactivate corporationID: ';
               $mess .= $this->params['corporationID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $user->store() ...
+            };// if $corp->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
           // Always deactive key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -211,7 +211,7 @@ abstract class ACorp extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
         case 125:// Corporation not enlisted in Factional Warfare. (Key accessMask outdated)
           // The key access has changed deactivate API for corporation if
@@ -227,13 +227,13 @@ abstract class ACorp extends AApiRequest {
             // If new corporation need to set some required columns.
             if (FALSE === $corp->recordExists()) {
               $corp->isActive = 1;
-            };// if $char->recordExists() ...
+            };// if $corp->recordExists() ...
             $corp->deleteActiveAPI($this->api);
             if (FALSE === $corp->store()) {
               $mess = 'Could not deactivate ' . $this->api;
               $mess .= ' for ' . $this->params['corporationID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $char->store() ...
+            };// if $corp->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
           break;
         case 206:// Character must have Accountant or Junior Accountant roles.

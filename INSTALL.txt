@@ -100,9 +100,9 @@ Windows you may need to change the paths but the general idea is the same.
     Result should be:
     true
 
-After the above steps everything should be in place to run Yapeal. You'll want
-to active more of the APIs as only server/serverStatus is active by default
-you'll also need to add user, character, and corporation information to the
+After the above steps everything should be in place to run Yapeal. You'll
+probably want to active more of the APIs as only a few are active by default
+you'll also need to add key, character, and corporation information to the
 utilRegistered* tables in the database for any of the account, char, or corp
 APIs to work. More information about adding information and activing APIs can be
 found in the wiki and forum thread.
@@ -111,10 +111,10 @@ INSTALLING FROM SVN
 
 To install from the SVN on GoogleCode first setup a working copy. This shouldn't
 be where you plan on run Yapeal from but be a convenant place like your My
-Documents (Documents on Vista/Win7) or some place like it on Linux. The reason to not
-put your working copy where you plan to run Yapeal is it will make upgrading it
-easier without all the extra .svn/ directories, etc. you have with working copy.
-For Linux on command line you can use:
+Documents (Documents on Vista/Win7) or some place like it on Linux. The reason
+to not put your working copy where you plan to run Yapeal is it will make
+upgrading it easier without all the extra .svn/ directories, etc. you have with
+working copy. For Linux on command line you can use:
   cd /directory/just/above/where/I/want/my/wc/
   svn co http://yapeal.googlecode.com/svn/trunk/ yapeal
 
@@ -122,8 +122,8 @@ Windows users should refer to the documentation for your SVN client. TortoiseSVN
 which you can get from http://tortoisesvn.tigris.org/ is IMHO the best GUI for
 Windows. You can also get command line versions of SVN for Windows. I have used
 the SilkSVN versions (http://www.sliksvn.com/en/download) which seem to work
-well. If you are using one of the command line version of SVN client like from
-SilkSVN you can try these commands from cmd.exe prompt:
+well. If you are using one of the command line version of the SVN client like
+from SilkSVN you can try these commands from cmd.exe prompt:
   cd %userprofile%\"My Documents" (%userprofile%\Documents for Vista/Win7)
   svn co http://yapeal.googlecode.com/svn/trunk/ yapeal
 

@@ -200,7 +200,7 @@ abstract class AChar extends AApiRequest {
               $mess = 'Could not deactivate characterID: ';
               $mess .= $this->params['characterID'];
               trigger_error($mess, E_USER_WARNING);
-            };// if $user->store() ...
+            };// if $char->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
           // Always deactive key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -211,7 +211,7 @@ abstract class AChar extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
         case 124:// Character not enlisted in Factional Warfare. (Key accessMask outdated)
           // The key access has changed deactivate API for character if
@@ -262,7 +262,7 @@ abstract class AChar extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
         case 221:// Illegal page request! (Key accessMask outdated)
           // The key access has changed deactivate API for character if
@@ -297,7 +297,7 @@ abstract class AChar extends AApiRequest {
             $mess = 'Could not deactivate ' . $this->api;
             $mess .= ' for ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$char->store() ...
+          };// if !$key->store() ...
           break;
         case 222://Key has expired. Contact key owner for access renewal.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -316,7 +316,7 @@ abstract class AChar extends AApiRequest {
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
             trigger_error($mess, E_USER_WARNING);
-          };// if !$user->store() ...
+          };// if $key->store() ...
           break;
         case 901:// Web site database temporarily disabled.
         case 902:// EVE backend database temporarily disabled.

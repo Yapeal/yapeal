@@ -107,6 +107,8 @@ class Sections extends ALimitedObject implements IGetBy {
       $mess = 'Failed to get database connection in ' . __CLASS__;
       throw new RuntimeException($mess, 1);
     }
+    // Get a new access mask object.
+    $this->am = new AccessMask();
     // Get a new query builder object.
     $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
     // Get a list of column names and their ADOdb generic types.
@@ -156,23 +158,22 @@ class Sections extends ALimitedObject implements IGetBy {
    *
    * @return bool Returns TRUE if $name already exists else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
+   * @throws RuntimeException Throws RuntimeException if
+   * $this->properties['section'] is not set.
    */
   public function addActiveAPI($name) {
-    $this->getApiList();
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 5);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    if (in_array($name, $apis)) {
-      $ret = TRUE;
+    if(!isset($this->properties['section'])) {
+      $mess = 'Can not add API when section is unknown';
+      throw new RuntimeException($mess, 5);
+    };
+    $mask = $this->am->apisToMask($name, $this->properties['section']);
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
+      return TRUE;
     } else {
-      $ret = FALSE;
-      $apis[] = $name;
-    };// if isset...
-    $this->properties['activeAPI'] = implode(' ', $apis);
-    return $ret;
+      $this->properties['activeAPIMask'] |= $mask;
+      return FALSE;
+    };// if $this->properties['activeAPIMask'] ...
   }// function addActiveAPI
   /**
    * Used to delete an API from the list in activeAPI.
@@ -182,51 +183,23 @@ class Sections extends ALimitedObject implements IGetBy {
    *
    * @return bool Returns TRUE if $name existed else FALSE.
    *
-   * @throws DomainException If $name not in $this->apiList.
+   * @throws DomainException Throws DomainException if $name could not be found.
+   * @throws RuntimeException Throws RuntimeException if
+   * $this->properties['section'] is not set.
    */
   public function deleteActiveAPI($name) {
-    if (!in_array($name, $this->apiList)) {
-      $mess = 'Unknown API: ' . $name;
-      throw new DomainException($mess, 6);
-    };// if !in_array...
-    $apis = explode(' ', $this->properties['activeAPI']);
-    $ret = FALSE;
-    foreach ($apis as $k => $v) {
-      if ($name == $v) {
-        $ret = TRUE;
-        unset($apis[$k]);
-        break;
-      };// if $name == $v ...
-    };// foreach $apis ...
-    $this->properties['activeAPI'] = implode(' ', $apis);
-    return $ret;
-  }// function deleteActiveAPI
-  /**
-   * Used to get list of available API classes for a section.
-   *
-   * @return Returns TRUE if $this->apiList is not empty.
-   *
-   * @throws LogicException Throws a LogicException if method is call when
-   * section is unknown.
-   */
-  protected function getApiList() {
-    if (!empty($this->apiList)) {
+    if(!isset($this->properties['section'])) {
+      $mess = 'Can not remove API when section is unknown';
+      throw new RuntimeException($mess, 6);
+    };
+    $mask = $this->am->apisToMask($name, $this->properties['section']);
+    if (($this->properties['activeAPIMask'] & $mask) > 0) {
+      $this->properties['activeAPIMask'] ^= $mask;
       return TRUE;
-    };
-    if (!isset($this->properties['section'])) {
-      $mess = 'Can not add APIs without know which section they belong to';
-      throw new LogicException($mess, 7);
-    };
-    $path = YAPEAL_CLASS . 'api' . DS;
-    $section = $this->properties['section'];
-    $this->apiList = FilterFileFinder::getStrippedFiles($path, $section);
-    if (empty($this->apiList)) {
-      $mess = 'There are no available API classes for ' . $section;
-      trigger_error($mess, E_USER_NOTICE);
+    } else {
       return FALSE;
-    };
-    return TRUE;
-  }// function getApiList
+    };// if $this->properties['activeAPIMask'] ...
+  }// function deleteActiveAPI
   /**
    * Used to get section from Sections table by section ID.
    *
@@ -240,16 +213,16 @@ class Sections extends ALimitedObject implements IGetBy {
     $sql .= ' where `sectionID`=' . $id;
     try {
       $result = $this->con->GetRow($sql);
-      $this->properties = $result;
-      $this->recordExists = TRUE;
+      if (!empty($result)) {
+        $this->properties = $result;
+        $this->recordExists = TRUE;
+      } else {
+        $this->recordExists = FALSE;
+      };
     }
     catch (ADODB_Exception $e) {
       $this->recordExists = FALSE;
     }
-    // Get list of available APIs for section if possible.
-    if (TRUE === $this->recordExists()) {
-      $this->getApiList();
-    };
     return $this->recordExists();
   }// function getItemById
   /**
@@ -264,23 +237,23 @@ class Sections extends ALimitedObject implements IGetBy {
   public function getItemByName($name) {
     if (!in_array(ucfirst($name), $this->sectionList)) {
       $mess = 'Unknown section: ' . $name;
-      throw new DomainException($mess, 8);
+      throw new DomainException($mess, 7);
     };// if !in_array...
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
     try {
       $sql .= ' where `section`=' . $this->con->qstr($name);
       $result = $this->con->GetRow($sql);
-      $this->properties = $result;
-      $this->recordExists = TRUE;
+      if (!empty($result)) {
+        $this->properties = $result;
+        $this->recordExists = TRUE;
+      } else {
+        $this->recordExists = FALSE;
+      };
     }
     catch (ADODB_Exception $e) {
       $this->recordExists = FALSE;
     }
-    // Get list of available APIs for section if possible.
-    if (TRUE === $this->recordExists()) {
-      $this->getApiList();
-    };
     return $this->recordExists();
   }// function getItemByName
   /**

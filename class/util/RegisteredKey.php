@@ -168,12 +168,11 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
     };// if empty($section) ...
     $mask = $this->am->apisToMask($name, $section);
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
-      $ret = TRUE;
+      return TRUE;
     } else {
       $this->properties['activeAPIMask'] |= $mask;
-      $ret = FALSE;
+      return FALSE;
     };// if $this->properties['activeAPIMask'] ...
-    return $ret;
   }// function addActiveAPI
   /**
    * Used to delete an API from the list in activeAPI.

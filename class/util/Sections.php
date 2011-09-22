@@ -56,6 +56,11 @@ if (count(get_included_files()) < 2) {
  */
 class Sections extends ALimitedObject implements IGetBy {
   /**
+   * Hold an instance of the AccessMask class.
+   * @var object
+   */
+  protected $am;
+  /**
    * @var string Holds an instance of the DB connection.
    */
   protected $con;
@@ -69,11 +74,6 @@ class Sections extends ALimitedObject implements IGetBy {
    * @var object
    */
   protected $qb;
-  /**
-   * List of all section APIs
-   * @var array
-   */
-  private $apiList;
   /**
    * List of all sections
    * @var array

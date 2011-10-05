@@ -163,11 +163,9 @@ class FilterFileFinder extends FilterIterator {
    * are returned as an associative array.
    */
   static public function pathinfo_utf($path, $options = 0) {
+    $path = str_replace(array("\\","\\\\"), DS, $path);
     if (strpos($path, '/') !== FALSE) {
       $pieces = explode('/', $path);
-      $basename = end($pieces);
-    } elseif (strpos($path, '\\') !== FALSE) {
-      $pieces = explode('\\', $path);
       $basename = end($pieces);
     } else {
       return FALSE;

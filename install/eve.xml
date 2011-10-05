@@ -71,7 +71,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`errorText`" type="C" size="255">
+    <field name="`errorText`" type="X">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>

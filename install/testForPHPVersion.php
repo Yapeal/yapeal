@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/php -Cq
 <?php
 /**
  * Contains code that test version of PHP run script.

@@ -107,47 +107,51 @@ class YapealErrorHandler {
     if (error_reporting() == 0) {
       return FALSE;
     };
+    // Let PHP handle any errors Yapeal is not set to handle.
+    if (($errno & YAPEAL_LOG_LEVEL) != $errno) {
+      return FALSE;
+    };
     if (self::$keep === TRUE) {
       self::$list[] = array('type' => $errno, 'message' => $errmsg,
         'filename' => $filename, 'line' => $line,
         'time' => gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4));
     };// if self::$keep === TRUE ...
     $self = new self($errmsg, $filename, $line, $vars);
-    if (($errno & YAPEAL_LOG_LEVEL) == $errno) {
-      switch ($errno) {
-        case E_USER_ERROR:
-        case E_ERROR:
-          return $self->handleError();
-        case E_USER_NOTICE:
-        case E_NOTICE:
-          return $self->handleNotice();
-        case E_STRICT:
-          return $self->handleStrict();
-        case E_USER_WARNING:
-        case E_WARNING:
-          return $self->handleWarning();
-      };// switch $errno ...
-    };// if $errno & ...
-    return FALSE;
+    switch ($errno) {
+      case E_USER_ERROR:
+      case E_ERROR:
+        $self->handleError();
+        break;
+      case E_USER_NOTICE:
+      case E_NOTICE:
+        $self->handleNotice();
+        break;
+      case E_STRICT:
+        $self->handleStrict();
+        break;
+      case E_USER_WARNING:
+      case E_WARNING:
+        $self->handleWarning();
+        break;
+    };// switch $errno ...
+    return TRUE;
   }
   /**
    * Called to handle error type messages.
    */
   private function handleError() {
+    $body =  '  ERROR: ' . $this->message . PHP_EOL;
+    $body .= '   File: ' . $this->filename;
+    if ($this->line) {
+      $body .= '(' . $this->line . ')';
+    };// if $this->line ...
+    $body .= PHP_EOL;
+    $body .= '  Trace:' . PHP_EOL;
     ob_start();
     debug_print_backtrace();
     $backtrace = ob_get_flush();
-    $body = PHP_EOL;
-    $file = $this->filename;
-    if ($this->line) {
-      $file .= '(' . $this->line . ')';
-    };// if $this->line ...
-    $body .= <<<EOT
-ERROR: {$this->message}
-     File: {$file}
-Backtrace:
-{$backtrace}
-EOT;
+    $body .= $backtrace . PHP_EOL;
+    $body .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
     self::print_on_command($body);
     self::elog($body, YAPEAL_ERROR_LOG);
     exit(1);
@@ -156,15 +160,11 @@ EOT;
    * Called to handle notice type messages.
    */
   private function handleNotice() {
-    $body = PHP_EOL;
-    $file = $this->filename;
+    $body =  ' NOTICE: ' . $this->message . PHP_EOL;
+    $body .= '   File: ' . $this->filename;
     if ($this->line) {
-      $file .= '(' . $this->line . ')';
+      $body .= '(' . $this->line . ')';
     };// if $this->line ...
-    $body .= <<<EOT
-NOTICE: {$this->message}
-  File: {$file}
-EOT;
     self::print_on_command($body);
     return self::elog($body, YAPEAL_NOTICE_LOG);
   }// function handleNotice
@@ -172,15 +172,11 @@ EOT;
    * Called to handle strict type messages.
    */
   private function handleStrict() {
-    $body = PHP_EOL;
-    $file = $this->filename;
+    $body =  ' STRICT: ' . $this->message . PHP_EOL;
+    $body .= '   File: ' . $this->filename;
     if ($this->line) {
-      $file .= '(' . $this->line . ')';
+      $body .= '(' . $this->line . ')';
     };// if $this->line ...
-    $body .= <<<EOT
-STRICT: {$this->message}
-  File: {$file}
-EOT;
     self::print_on_command($body);
     return self::elog($body, YAPEAL_STRICT_LOG);
   }// function handleStrict
@@ -188,15 +184,11 @@ EOT;
    * Called to handle warning type messages.
    */
   private function handleWarning() {
-    $body = PHP_EOL;
-    $file = $this->filename;
+    $body =  'WARNING: ' . $this->message . PHP_EOL;
+    $body .= '   File: ' . $this->filename;
     if ($this->line) {
-      $file .= '(' . $this->line . ')';
+      $body .= '(' . $this->line . ')';
     };// if $this->line ...
-    $body .= <<<EOT
-WARNING: {$this->message}
-   File: {$file}
-EOT;
     self::print_on_command($body);
     return self::elog($body, YAPEAL_WARNING_LOG);
   }// function handleWarning
@@ -208,30 +200,21 @@ EOT;
    */
   static function elog($str, $filename = YAPEAL_ERROR_LOG) {
     $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4) . '] ';
-    $mess .= $str . PHP_EOL;
+    $mess .= PHP_EOL . $str . PHP_EOL;
     error_log($mess, 3, $filename);
   }// function elog
   /**
    * Only prints message if in command line mode.
    *
    * @param string $str Message to be printed.
-   * @param bool $newline PHP_EOL will be added to end of $str
-   * @param bool $timestamp Add Timestamp in front of $str
-   *
-   * @return void
    */
-  static function print_on_command($str, $newline = TRUE, $timestamp = TRUE) {
-    if (PHP_SAPI == 'cli') {
-      $mess = '';
-      if ($timestamp) {
-        $mess .= '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4) . '] ';
-      };
-      $mess .= $str;
-      if ($newline) {
-        $mess .= PHP_EOL;
-      };
-      fwrite(STDERR, $mess);
-    };// if PHP_SAPI == 'cli' ...
+  static function print_on_command($str) {
+    if (PHP_SAPI !== 'cli') {
+      return;
+    };
+    $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4) . '] ';
+    $mess .= PHP_EOL . $str . PHP_EOL;
+    fwrite(STDERR, $mess);
   }// function print_on_command
   /**
    * Retrieves error list.

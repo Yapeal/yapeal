@@ -96,9 +96,8 @@ class YapealNetworkConnection {
   public function retrieveXml($url, $postList) {
     $result = $this->con->post($url, $postList);
     if (!$this->con->success) {
-      $mess = 'API connection error: ' . $this->con->error . PHP_EOL;
-      $mess .= 'HTML error for API ' . $url;
-      trigger_error($mess, E_USER_WARNING);
+      $mess = $this->con->error. ' for API ' . $url;
+      trigger_error($mess, E_USER_NOTICE);
       return FALSE;
     };
     return $result;

@@ -77,11 +77,12 @@ class LoggingExceptionObserver implements IYapealObserver {
    * @param object $e The 'object' we're observing.
    */
   public function YapealUpdate(IYapealSubject $e) {
-    $mess = PHP_EOL . 'EXCEPTION:' . PHP_EOL;
-    $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
-    $mess .= '  Message: ' . $e->getMessage() . PHP_EOL;
+    $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
+    if ($e->getCode()) {
+      $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
+    };
     $mess .= '     File: ' . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL;
-    $mess .= 'Backtrace:' . PHP_EOL;
+    $mess .= '    Trace:' . PHP_EOL;
     $mess .= $e->getTraceAsString() . PHP_EOL;
     $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
     YapealErrorHandler::elog($mess, $this->file);

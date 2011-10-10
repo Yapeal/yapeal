@@ -143,11 +143,11 @@ class curlRequest {
 		$this->options['CURLOPT_FOLLOWLOCATION'] = 1;// allow redirection
 		$this->options['CURLOPT_FORBID_REUSE'] = 0;// allow connection re-use
 		$this->options['CURLOPT_LOW_SPEED_LIMIT'] = 10;// min bps to be considered slow
-		$this->options['CURLOPT_LOW_SPEED_TIME'] = ceil(YAPEAL_CURL_TIMEOUT / 4);// how long to wait on slow connection
+		$this->options['CURLOPT_LOW_SPEED_TIME'] = ceil(curlRequest::TIMEOUT / 4);// how long to wait on slow connection
 		$this->options['CURLOPT_MAXCONNECTS'] = 5;// max number of persistent connections to keep around.
 		$this->options['CURLOPT_MAXREDIRS'] = 5;// max redirects
-		$this->options['CURLOPT_CONNECTTIMEOUT'] = YAPEAL_CURL_TIMEOUT / 2;// max time in seconds to wait for a new connection.
-		$this->options['CURLOPT_TIMEOUT'] = YAPEAL_CURL_TIMEOUT;// max time in seconds transfer is allowed to take.
+		$this->options['CURLOPT_CONNECTTIMEOUT'] = curlRequest::TIMEOUT / 2;// max time in seconds to wait for a new connection.
+		$this->options['CURLOPT_TIMEOUT'] = curlRequest::TIMEOUT;// max time in seconds transfer is allowed to take.
 		$this->options['CURLOPT_ENCODING'] = 'gzip';// allow gzip compression
 		$this->options['CURLOPT_RETURNTRANSFER'] = 1;// return results as string
 		$this->options['CURLOPT_BINARYTRANSFER'] = 0;// no binary transfer
@@ -822,5 +822,9 @@ class curlRequest {
 		$this->info['decoded_content_length'] = strlen($unpacked);
 		return $unpacked;
 	}
+	/**
+	 * Constant used in several of the connection timeout values.
+	 */
+	const TIMEOUT = 45;
 }
 ?>

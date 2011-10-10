@@ -107,7 +107,7 @@ try {
       $pic = new Graphic($characterID);
       $pic->ownerType = 'char';
       $url = 'http://image.eveonline.com/Character/' . $characterID . '_256.jpg';
-      $http = array('timeout' => YAPEAL_CURL_TIMEOUT, 'method' => 'GET',
+      $http = array('timeout' => 45, 'method' => 'GET',
         'url' => $url);
       $curl = new CurlRequest($http);
       $result = $curl->exec();

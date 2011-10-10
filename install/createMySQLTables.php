@@ -55,68 +55,97 @@ if (count($included) > 1 || $included[0] != __FILE__) {
   fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
-// Used to over come path issues caused by how script is ran on server.
-$dir = realpath(dirname(__FILE__));
-chdir($dir);
 /**
  * Define short name for directory separator which always uses unix '/'.
  * @ignore
  */
 define('DS', '/');
-// Move down and over to 'inc' directory to read common_paths.php
-$path = $dir . DS . '..' . DS . 'inc' . DS . 'common_paths.php';
-require_once realpath($path);
+// Used to over come path issues caused by how script is ran on server.
+$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
+// Pull in Yapeal revision constants.
+require_once $baseDir . 'revision.php';
+// Get path constants so they can be used.
+require_once $baseDir . 'inc' . DS . 'common_paths.php';
 // Load ADO classes that are needed.
+//require_once YAPEAL_ADODB . 'adodb-exceptions.inc.php';
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_ADODB . 'adodb-xmlschema03.inc.php';
-if ($argc < 5) {
-  $mess = 'Hostname Username Password Database are required in ' . $argv[0] . PHP_EOL;
-  $mess .= 'TablePrefix and XMLfile(s) are optional' . PHP_EOL;
-  $mess .= 'If XMLfile(s) is a list it needs to be inside quotes' . PHP_EOL;
-  fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error');
-  exit(2);
+// If function getopts available get any command line parameters.
+if (function_exists('getopt')) {
+  $options = parseCommandLineOptions($argv);
+};// if function_exists getopt ...
+if (!empty($options['config'])) {
+  $section = getSettingsFromIniFileForDatabaseSection($options['config']);
+  unset($options['config']);
+} else {
+  $section = getSettingsFromIniFileForDatabaseSection();
 };
-// Strip any quotes
-$replace = array("'", '"');
-for ($i = 1; $i < $argc; ++$i) {
-  $argv[$i] = str_replace($replace, '', $argv[$i]);
-};
-$dsn = 'mysql://' . $argv[2] . ':' . $argv[3] . '@' . $argv[1] . '/' . $argv[4];
-if ($argc > 6) {
-  $sections = explode(' ', $argv[6]);
+if (isset($options['xml'])) {
+  $sections = explode(' ', $options['xml']);
+  unset($options['xml']);
 } else {
   $sections = array('util', 'account', 'char', 'corp', 'eve', 'map', 'server');
+};
+// Merge the configuration file settings with ones from command line.
+// Settings from command line will override any from file.
+$options = array_merge($section, $options);
+$required = array('database', 'host', 'password', 'username');
+$mess = '';
+foreach ($required as $setting) {
+  if (empty($options[$setting])) {
+    $mess .= 'Missing required setting ' . $setting;
+    $mess .= ' in section [Database].' . PHP_EOL;
+  };
+};// foreach $required ...
+if (!empty($mess)) {
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+if (isset($options['driver'])) {
+  $dsn = $options['driver'];
+} else {
+  $dsn = 'mysql://';
+};
+$dsn .= $options['username'] . ':' . $options['password'] . '@';
+$dsn .= $options['host'] . '/' . $options['database'];
+if (isset($options['suffix'])) {
+  $dsn .= $options['suffix'];
+} else {
+  $dsn .= '?new';
 };
 $ret = 0;
 try {
   // Get connection to DB.
   $db = ADONewConnection($dsn);
-  $missing = array();
   foreach ($sections as $section) {
     $file = realpath(YAPEAL_INSTALL . $section . '.xml');
+    if (!is_file($file)) {
+      $mess = 'Could not find XML file ' . $file;
+      fwrite(STDERR, $mess);
+      continue;
+    };
+    $xml = file_get_contents($file);
+    if (FALSE === $xml) {
+      $mess = 'Could not get contents of XML file ' . $file;
+      fwrite(STDERR, $mess);
+      continue;
+    };
     // Get new Schema.
     $schema = new adoSchema($db);
     // Some settings for Schema.
     $schema->ExecuteInline(FALSE);
     $schema->ContinueOnError(FALSE);
     $schema->SetUpgradeMethod('ALTER');
-    if ($argc > 5 && !empty($argv[5])) {
-      $schema->SetPrefix($argv[5], FALSE);
-    };
-    if (!is_file($file)) {
-      $missing[] = $file;
-      continue;
-    };
-    $xml = file_get_contents(realpath(YAPEAL_INSTALL . $section . '.xml'));
-    if (FALSE === $xml) {
-      $mess = 'Could not read ' . $section . '.xml in ' . YAPEAL_INSTALL;
-      fwrite(STDERR, $mess);
-      fwrite(STDOUT, 'error');
-      exit(2);
+    if (isset($options['table_prefix'])) {
+      $schema->SetPrefix($options['table_prefix'], FALSE);
     };
     $sql = $schema->ParseSchemaString($xml);
     $result = $schema->ExecuteSchema($sql);
+    $save = $schema->SaveSQL(YAPEAL_CACHE . 'ADOdb' . DS . $section . '.sql');
+    if (FALSE === $save) {
+      $mess = 'Could not save ' . YAPEAL_CACHE . 'ADOdb' . DS . $section . '.sql' . PHP_EOL;
+      fwrite(STDERR, $mess);
+    };
     if ($result == 2) {
       ++$ret;
     } else if ($result == 1) {
@@ -126,38 +155,268 @@ try {
       $mess = 'Failed to execute schema for ' . $section . PHP_EOL;
       fwrite(STDERR, $mess);
     };
-    $result = $schema->SaveSQL(YAPEAL_CACHE . $section . '.sql');
-    if (FALSE === $result) {
-      $mess = 'Could not save ' . $section . '.sql to ' . YAPEAL_CACHE . PHP_EOL;
-      fwrite(STDERR, $mess);
-    };
     $schema = NULL;
   };// foreach $sections as $section ...
-  if (!empty($missing)) {
-    $mess = 'Could not find the following files: ';
-    $mess .= implode('.xml, ', $missing) . PHP_EOL;
+  if (count($sections) != $ret) {
+    $mess .= 'There were problems during processing please check any error';
+    $mess .= ' messages from above and correct.' . PHP_EOL;
     fwrite(STDERR, $mess);
+    exit(2);
   };
-  if ($ret != count($sections)) {
-    $mess = 'Not all files processed correctly' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    fwrite(STDOUT, 'false');
-  }else {
-    fwrite(STDOUT , 'true');
-  };
-  exit(0);
 } catch (Exception $e) {
-  $mess = <<<MESS
-EXCEPTION:
-     Code: {$e->getCode()}
-  Message: {$e->getMessage()}
-     File: {$e->getFile()}
-     Line: {$e->getLine()}
-Backtrace:
-{$e->getTraceAsString()}
-MESS;
+  $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
+  if ($e->getCode()) {
+    $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
+  };
+  $mess .= '     File: ' . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL;
+  $mess .= '    Trace:' . PHP_EOL;
+  $mess .= $e->getTraceAsString() . PHP_EOL;
+  $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'false');
-  exit(4);
+  exit(2);
 }
+$mess = 'All database tables have been installed or updated as needed.' . PHP_EOL;
+fwrite(STDOUT, $mess);
+exit(0);
+/**
+ * Function used to get 'ini' configuration file.
+ *
+ * @param string $file Path and name of the ini file to get.
+ *
+ * @return array Returns list of settings from file.
+ */
+function getSettingsFromIniFileForDatabaseSection($file = NULL) {
+  // Check if given custom configuration file.
+  if (empty($file) || !is_string($file)) {
+    // Default assumes that this file and yapeal.ini file are in 'neighboring'
+    // directories.
+    $file = YAPEAL_CONFIG . 'yapeal.ini';
+  } else {
+    $mess = 'Using custom configuration file ' . $file . PHP_EOL;
+    fwrite(STDOUT, $mess);
+  };
+  if (!(is_readable($file) && is_file($file))) {
+    $mess = 'The ' . $file . ' configuration file is missing!' . PHP_EOL;
+    fwrite(STDERR, $mess);
+    return array();
+  };
+  // Grab the info from ini file.
+  $settings = parse_ini_file($file, TRUE);
+  if (empty($settings)) {
+    $mess = 'The ' . $file . ' configuration file contains no settings!' . PHP_EOL;
+    fwrite(STDERR, $mess);
+    return array();
+  };
+  if (empty($settings['Database'])) {
+    $mess = 'No settings for [Database] section found in configuration file!' . PHP_EOL;
+    fwrite(STDERR, $mess);
+    return array();
+  };
+  // Can't use default from configuration file for this or adodb-xmlschema has a
+  // fit and refuses to work.
+  unset($settings['Database']['driver']);
+  return $settings['Database'];
+}// function getSettingsFromIniFileForDatabaseSection
+/**
+ * Function used to parser command line options.
+ *
+ * @param array $argv Array of arguments passed to script.
+ *
+ * @return mixed Returns settings list.
+ */
+function parseCommandLineOptions($argv) {
+  $shortOpts = 'c:d:hp:s:t:u:Vx:';
+  if (version_compare(PHP_VERSION, '5.3.0', '>=')
+    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
+    $longOpts = array('config:', 'database:', 'driver:', 'help', 'password:',
+      'server:', 'suffix:', 'table-prefix:', 'username:', 'version', 'xml:');
+    $options = getopt($shortOpts, $longOpts);
+  } else {
+    $options = getopt($shortOpts);
+  };
+  $settings = array('config' => NULL, 'xml' =>
+    'util account char corp eve map server');
+  if (empty($options)) {
+    return $settings;
+  };
+  $exit = FALSE;
+  foreach ($options as $opt => $value) {
+    switch ($opt) {
+      case 'c':
+      case 'config':
+        if (is_array($value)) {
+          // If option is used multiple times use the last value.
+          $value = $value[count($value) - 1];
+        };
+        $settings['config'] = (string)$value;
+        break;
+      case 'd':
+      case 'database':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['database'] = (string)$value;
+        break;
+      case 'driver':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['driver'] = (string)$value;
+        break;
+      case 'p':
+      case 'password':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['password'] = (string)$value;
+        break;
+      case 's':
+      case 'server':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['host'] = (string)$value;
+        break;
+      case 'suffix':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['suffix'] = (string)$value;
+        break;
+      case 't':
+      case 'table-prefix':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['table_prefix'] = (string)$value;
+        break;
+      case 'u':
+      case 'username':
+        if (is_array($value)) {
+          $value = $value[count($value) - 1];
+        };
+        $settings['username'] = (string)$value;
+        break;
+      case 'x':
+      case 'xml':
+        if (is_array($value)) {
+          // If option is used multiple times combined them.
+          $value = implode(' ', $value);
+        };
+        $settings['xml'] = (string)$value;
+        break;
+      case 'h':
+      case 'help':
+        usage($argv);
+        // Fall through is intentional.
+      case 'V':
+      case 'version':
+        $mess = basename($argv[0]);
+        if (YAPEAL_VERSION != 'svnversion') {
+          $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+          $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
+        } else {
+          $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
+          $date = str_replace(array('$', 'Date:'), '', '$Date$');
+          $mess .= $rev . '(svn)' . $date . PHP_EOL;
+        };
+        $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
+        $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
+        $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
+        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+        $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
+        fwrite(STDOUT, $mess);
+        $exit = TRUE;
+        break;
+    };// switch $opt
+  };// foreach $options...
+  if ($exit == TRUE) {
+    exit;
+  };
+  return $settings;
+};// function parseCommandLineOptions
+/**
+ * Function use to show the usage message on command line.
+ *
+ * @param array $argv Array of arguments passed to script.
+ */
+function usage($argv) {
+  $ragLine = 76;
+  $cutLine = 80;
+  $mess = PHP_EOL . 'Usage: ' . basename($argv[0]);
+  $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
+  $desc = 'The script reads database settings from [Database] section of the';
+  $desc .= ' configuration file, either the default one in';
+  $desc .= ' /Where/Installed/Yapeal/config/yapeal.ini or the custom one from';
+  $desc .= ' -c OPTION. The other OPTIONs -d, -p, -s, -t, -u can be used to';
+  $desc .= ' override any settings found in the configuration file. If no';
+  $desc .= ' configuration file is found, either default or custom, or some';
+  $desc .= ' of the settings are missing from it the OPTIONs -d, -p, -s, -t, -u';
+  $desc .= ' become required. For example the configuration file has all but';
+  $desc .= ' the "password" setting. The -p option will be required on the';
+  $desc .= ' command line.';
+  // Make text ragged right with forced word wrap at 80 characters.
+  $desc = wordwrap($desc, $ragLine, PHP_EOL);
+  $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
+  $mess .= $desc . PHP_EOL . PHP_EOL;
+  $desc = 'Short version of OPTIONs have the same value requirements of the';
+  $desc .= ' corresponding long ones. For all OPTIONs except -x if they are';
+  $desc .= ' used more than once only the last value will be used.';
+  $desc = wordwrap($desc, $ragLine, PHP_EOL);
+  $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
+  $mess .= $desc . PHP_EOL . PHP_EOL;
+  $mess .= 'OPTIONs:' . PHP_EOL;
+  $options = array();
+  $options[] = array('pp' => '-c, --config=FILE', 'desc' =>
+    'Read configuration from FILE. This is an optional setting to allow using a'
+    . ' custom configuration file. File must be in "ini" format. Defaults to'
+    . ' /Where/Installed/Yapeal/config/yapeal.ini.');
+  $options[] = array('pp' => '-d, --database', 'desc' =>
+    'The database name the table(s) will be added to.');
+  $options[] = array('pp' => '--driver=DRIVER', 'desc' =>
+    'DRIVER is only use during testing and should only be used if directed to'
+    . ' by a developer. Optional setting that defaults to mysql://.');
+  $options[] = array('pp' => '-h, --help', 'desc' => 'Show this help.');
+  $options[] = array('pp' => '-p, password=SECRET', 'desc' =>
+    'Use SECRET as the password for the database.');
+  $options[] = array('pp' => '-s, --server=LOCALHOST', 'desc' =>
+    'LOCALHOST is the database server name to use.');
+  $options[] = array('pp' => '--suffix=SUFFIX', 'desc' =>
+    'SUFFIX is another optional setting only used during testing. Only use if'
+    . ' directed to by developer. Defaults to ?new.');
+  $options[] = array('pp' => '-t, --table-prefix=PREFIX', 'desc' =>
+    'Append PREFIX to all the table names. This is an optional setting that is'
+    . ' mostly useful when combining Yapeal tables with the tables from an'
+    . ' application in the same database. Dafaults to empty string.');
+  $options[] = array('pp' => '-u, --username=USER', 'desc' =>
+    'Use USER as the user name for the database.');
+  $options[] = array('pp' => '-V, --version', 'desc' =>
+    'Show version and licensing information.');
+  $options[] = array('pp' => '-x, --xml=XML', 'desc' =>
+    'Optional XML file list. It is either a quoted space separated list of xml'
+    . ' file names to use or can be used multiple times and the values from'
+    . ' each one will be appended to the list. For example you can either do'
+    . ' createMySQLTables.php -x "util account" or'
+    . ' createMySQLTables.php -x "util" -x "account". This option should rarely'
+    . ' be needed as Yapeal uses the default list "util account char corp eve'
+    . ' map server" which includes all the files normally needed.');
+  $width = 0;
+  foreach ($options as $option) {
+    // find widest parameter in list.
+    if (strlen($option['pp']) > $width) {
+      $width = strlen($option['pp']);
+    };
+  };// foreach $options ...
+  // Give another six spaces for padding.
+  $width += 6;
+  foreach ($options as $option) {
+    $desc = str_pad('  ' . $option['pp'], $width);
+    $desc .= $option['desc'];
+    // Make text ragged right with forced word wrap at 80 characters.
+    $desc = wordwrap($desc, $ragLine, PHP_EOL);
+    $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
+    $mess .= $desc . PHP_EOL . PHP_EOL;
+  };// foreach $options ...
+  fwrite(STDOUT, $mess);
+};// function usage
 ?>

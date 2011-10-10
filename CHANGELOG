@@ -1,6 +1,52 @@
+2011 -10-09
+
+(trunk/) An addition refinement on issue 76 to take care of double '/'s.
+
+Changed install/createMySQLTables.php to be an actually designed for human use
+script and not just a quick background hack to work with the old GUI frontend
+installer. You can find out more about using it with createMySQLTables.php -h.
+
+2011-10-08
+
+(trunk/) Added new parserOptions() function to yapeal.php and updated usage().
+Yapeal now should be better at handling command line options add give version
+information even when exported from SVN. Yapeal.php now accepts long options on
+most OSes if running newer versions of PHP.
+
+Updated class/LoggingExceptionObserver.php, class/PrintingExceptionObserver.php,
+and yapeal.php to make 'Code:' part of exception message optional.
+
+Updated class/YapealNetworkConnection.php to make error messages for timeouts
+etc go to notice log instead.
+
+Replaced YAPEAL_CURL_TIMEOUT with class constant in
+ext/eac_httprequest/eac_httprequest.curl.php.
+
+Function-alized inc/common_backend.php to make code clearer and to aid in any
+future moves to making into class.
+
+2011-10-06
+
+(trunk/) Did some clean up on error message formatting in
+class/YapealErrorHandler.php.
+
+Updated YapealErrorHandler::print_on_command() to work with new formatting and
+dropping extra parameters since always used defaults anyway.
+
+Updated YapealErrorHandler::elog() to work with new formatting.
+
+Updated yapeal.php for new error message formatting.
+
+Updated class/LoggingExceptionObserver.php for new error message formatting.
+
+Updated class/PrintingExceptionObserver.php for new error message formatting.
+
+Added new is_callable() guard to attach() and detach() in
+class/YapealApiException.php and class/ADODB_Exception.php.
+
 2011-10-05
 
-(trunk/) Fix for issue 86. changed to text column instead.
+(trunk/) Fix for issue 86. Changed to text column instead.
 
 Another try at fixing issue 76.
 

@@ -142,8 +142,10 @@ class ADODB_Exception extends Exception implements IYapealSubject {
    * @param IYapealObserver $observer The observer being added.
    */
   public static function attach(IYapealObserver $observer) {
-    $idx = spl_object_hash($observer);
-    self::$observers[$idx] = $observer;
+    if (is_callable($observer)) {
+      $idx = spl_object_hash($observer);
+      self::$observers[$idx] = $observer;
+    };
   }// function attach
   /**
    * Used by observers to unregister from being notified.
@@ -151,9 +153,11 @@ class ADODB_Exception extends Exception implements IYapealSubject {
    * @param IYapealObserver $observer The observer being removed.
    */
   public static function detach(IYapealObserver $observer) {
-    $idx = spl_object_hash($observer);
-    if (array_key_exists($idx, self::$observers)) {
-      unset(self::$observers[$idx]);
+    if (is_callable($observer)) {
+      $idx = spl_object_hash($observer);
+      if (array_key_exists($idx, self::$observers)) {
+        unset(self::$observers[$idx]);
+      };
     };
   }// function detach
   /**

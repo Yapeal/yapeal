@@ -67,7 +67,6 @@ require_once $baseDir . 'revision.php';
 // Get path constants so they can be used.
 require_once $baseDir . 'inc' . DS . 'common_paths.php';
 // Load ADO classes that are needed.
-//require_once YAPEAL_ADODB . 'adodb-exceptions.inc.php';
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_ADODB . 'adodb-xmlschema03.inc.php';
 // If function getopts available get any command line parameters.
@@ -234,8 +233,7 @@ function parseCommandLineOptions($argv) {
   } else {
     $options = getopt($shortOpts);
   };
-  $settings = array('config' => NULL, 'xml' =>
-    'util account char corp eve map server');
+  $settings = array();
   if (empty($options)) {
     return $settings;
   };
@@ -371,14 +369,14 @@ function usage($argv) {
     'Read configuration from FILE. This is an optional setting to allow using a'
     . ' custom configuration file. File must be in "ini" format. Defaults to'
     . ' /Where/Installed/Yapeal/config/yapeal.ini.');
-  $options[] = array('pp' => '-d, --database', 'desc' =>
-    'The database name the table(s) will be added to.');
+  $options[] = array('pp' => '-d, --database=DB', 'desc' =>
+    'DB is the database name all the new table(s) will be added to.');
   $options[] = array('pp' => '--driver=DRIVER', 'desc' =>
     'DRIVER is only use during testing and should only be used if directed to'
     . ' by a developer. Optional setting that defaults to mysql://.');
   $options[] = array('pp' => '-h, --help', 'desc' => 'Show this help.');
   $options[] = array('pp' => '-p, password=SECRET', 'desc' =>
-    'Use SECRET as the password for the database.');
+    'SECRET is the password for the database server.');
   $options[] = array('pp' => '-s, --server=LOCALHOST', 'desc' =>
     'LOCALHOST is the database server name to use.');
   $options[] = array('pp' => '--suffix=SUFFIX', 'desc' =>
@@ -389,14 +387,14 @@ function usage($argv) {
     . ' mostly useful when combining Yapeal tables with the tables from an'
     . ' application in the same database. Dafaults to empty string.');
   $options[] = array('pp' => '-u, --username=USER', 'desc' =>
-    'Use USER as the user name for the database.');
+    'USER is the user name for the database server.');
   $options[] = array('pp' => '-V, --version', 'desc' =>
     'Show version and licensing information.');
   $options[] = array('pp' => '-x, --xml=XML', 'desc' =>
     'Optional XML file list. It is either a quoted space separated list of xml'
     . ' file names to use or can be used multiple times and the values from'
     . ' each one will be appended to the list. For example you can either do'
-    . ' createMySQLTables.php -x "util account" or'
+    . ' createMySQLTables.php -x "util account" OR'
     . ' createMySQLTables.php -x "util" -x "account". This option should rarely'
     . ' be needed as Yapeal uses the default list "util account char corp eve'
     . ' map server" which includes all the files normally needed.');

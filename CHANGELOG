@@ -1,10 +1,20 @@
-2011 -10-09
+2011-10-10
+
+(trunk/) Updated INSTALL.txt to reflect changes to the scripts in install/
+
+2011-10-09
 
 (trunk/) An addition refinement on issue 76 to take care of double '/'s.
 
-Changed install/createMySQLTables.php to be an actually designed for human use
-script and not just a quick background hack to work with the old GUI frontend
-installer. You can find out more about using it with createMySQLTables.php -h.
+Changed install/createMySQLTables.php to be human friendly script and not
+just a quick background hack to work with the old GUI frontend installer. You
+can find out more about using it with createMySQLTables.php -h.
+
+createMySQLTables.php also now saves the SQL files to cache/ADOdb/ instead of
+directly in cache/
+
+Updated install/createMySQLDatabase.php, install/testForMySQLDatabasePrivs.php
+like the other scripts. WIP on the other ones not used in install instructions.
 
 2011-10-08
 
@@ -12,6 +22,10 @@ installer. You can find out more about using it with createMySQLTables.php -h.
 Yapeal now should be better at handling command line options add give version
 information even when exported from SVN. Yapeal.php now accepts long options on
 most OSes if running newer versions of PHP.
+
+Changed install/checkForRequirements.php to be human friendly script and not
+just a quick background hack to work with the old GUI frontend installer. You
+can find out more about using it with checkForRequirements.php -h.
 
 Updated class/LoggingExceptionObserver.php, class/PrintingExceptionObserver.php,
 and yapeal.php to make 'Code:' part of exception message optional.

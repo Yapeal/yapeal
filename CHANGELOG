@@ -1,3 +1,13 @@
+2011-10-12
+
+(trunk/) Moved getSettingsFromIniFile() into own file in install and refactored
+the other scripts to start using it.
+
+Moved parseCommandLineOptions() into own file in install and refactored
+the other scripts to start using it.
+
+changed inc/common_backend.php to use new install/getSettingsFromIniFile.php
+
 2011-10-10
 
 (trunk/) Updated INSTALL.txt to reflect changes to the scripts in install/

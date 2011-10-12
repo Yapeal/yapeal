@@ -69,15 +69,46 @@ require_once $baseDir . 'inc' . DS . 'common_paths.php';
 // Load ADO classes that are needed.
 require_once YAPEAL_ADODB . 'adodb.inc.php';
 require_once YAPEAL_ADODB . 'adodb-xmlschema03.inc.php';
+require_once YAPEAL_INSTALL . 'parseCommandLineOptions.php';
+require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
-  $options = parseCommandLineOptions($argv);
+  $shortOpts = array('c:', 'd:', 'p:', 's:', 't:', 'u:');
+  $longOpts = array('config:', 'database:', 'driver:', 'password:', 'server:',
+    'suffix:', 'table-prefix:', 'username:', 'xml:');
+  $options = parseCommandLineOptions($shortOpts, $longOpts);
+  $exit = FALSE;
+  if (isset($options['help'])) {
+    usage();
+    $exit = TRUE;
+  };
+  if (isset($options['version'])) {
+    $mess = basename(__FILE__);
+    if (YAPEAL_VERSION != 'svnversion') {
+      $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+      $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
+    } else {
+      $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
+      $date = str_replace(array('$', 'Date:'), '', '$Date$');
+      $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
+    };
+    $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
+    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
+    $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
+    $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+    $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
+    fwrite(STDOUT, $mess);
+    $exit = TRUE;
+  };
+  if ($exit == TRUE) {
+    exit(0);
+  };
 };// if function_exists getopt ...
 if (!empty($options['config'])) {
-  $section = getSettingsFromIniFileForDatabaseSection($options['config']);
+  $section = getSettingsFromIniFile($options['config'], 'Database');
   unset($options['config']);
 } else {
-  $section = getSettingsFromIniFileForDatabaseSection();
+  $section = getSettingsFromIniFile(NULL, 'Database');
 };
 if (isset($options['xml'])) {
   $sections = explode(' ', $options['xml']);
@@ -100,12 +131,7 @@ if (!empty($mess)) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-if (isset($options['driver'])) {
-  $dsn = $options['driver'];
-} else {
-  $dsn = 'mysql://';
-};
-$dsn .= $options['username'] . ':' . $options['password'] . '@';
+$dsn = 'mysql://' . $options['username'] . ':' . $options['password'] . '@';
 $dsn .= $options['host'] . '/' . $options['database'];
 if (isset($options['suffix'])) {
   $dsn .= $options['suffix'];
@@ -177,162 +203,6 @@ try {
 $mess = 'All database tables have been installed or updated as needed.' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-/**
- * Function used to get 'ini' configuration file.
- *
- * @param string $file Path and name of the ini file to get.
- *
- * @return array Returns list of settings from file.
- */
-function getSettingsFromIniFileForDatabaseSection($file = NULL) {
-  // Check if given custom configuration file.
-  if (empty($file) || !is_string($file)) {
-    // Default assumes that this file and yapeal.ini file are in 'neighboring'
-    // directories.
-    $file = YAPEAL_CONFIG . 'yapeal.ini';
-  } else {
-    $mess = 'Using custom configuration file ' . $file . PHP_EOL;
-    fwrite(STDOUT, $mess);
-  };
-  if (!(is_readable($file) && is_file($file))) {
-    $mess = 'The ' . $file . ' configuration file is missing!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    return array();
-  };
-  // Grab the info from ini file.
-  $settings = parse_ini_file($file, TRUE);
-  if (empty($settings)) {
-    $mess = 'The ' . $file . ' configuration file contains no settings!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    return array();
-  };
-  if (empty($settings['Database'])) {
-    $mess = 'No settings for [Database] section found in configuration file!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    return array();
-  };
-  // Can't use default from configuration file for this or adodb-xmlschema has a
-  // fit and refuses to work.
-  unset($settings['Database']['driver']);
-  return $settings['Database'];
-}// function getSettingsFromIniFileForDatabaseSection
-/**
- * Function used to parser command line options.
- *
- * @param array $argv Array of arguments passed to script.
- *
- * @return mixed Returns settings list.
- */
-function parseCommandLineOptions($argv) {
-  $shortOpts = 'c:d:hp:s:t:u:Vx:';
-  if (version_compare(PHP_VERSION, '5.3.0', '>=')
-    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-    $longOpts = array('config:', 'database:', 'driver:', 'help', 'password:',
-      'server:', 'suffix:', 'table-prefix:', 'username:', 'version', 'xml:');
-    $options = getopt($shortOpts, $longOpts);
-  } else {
-    $options = getopt($shortOpts);
-  };
-  $settings = array();
-  if (empty($options)) {
-    return $settings;
-  };
-  $exit = FALSE;
-  foreach ($options as $opt => $value) {
-    switch ($opt) {
-      case 'c':
-      case 'config':
-        if (is_array($value)) {
-          // If option is used multiple times use the last value.
-          $value = $value[count($value) - 1];
-        };
-        $settings['config'] = (string)$value;
-        break;
-      case 'd':
-      case 'database':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['database'] = (string)$value;
-        break;
-      case 'driver':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['driver'] = (string)$value;
-        break;
-      case 'p':
-      case 'password':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['password'] = (string)$value;
-        break;
-      case 's':
-      case 'server':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['host'] = (string)$value;
-        break;
-      case 'suffix':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['suffix'] = (string)$value;
-        break;
-      case 't':
-      case 'table-prefix':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['table_prefix'] = (string)$value;
-        break;
-      case 'u':
-      case 'username':
-        if (is_array($value)) {
-          $value = $value[count($value) - 1];
-        };
-        $settings['username'] = (string)$value;
-        break;
-      case 'x':
-      case 'xml':
-        if (is_array($value)) {
-          // If option is used multiple times combined them.
-          $value = implode(' ', $value);
-        };
-        $settings['xml'] = (string)$value;
-        break;
-      case 'h':
-      case 'help':
-        usage($argv);
-        // Fall through is intentional.
-      case 'V':
-      case 'version':
-        $mess = basename($argv[0]);
-        if (YAPEAL_VERSION != 'svnversion') {
-          $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-          $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
-        } else {
-          $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-          $date = str_replace(array('$', 'Date:'), '', '$Date$');
-          $mess .= $rev . '(svn)' . $date . PHP_EOL;
-        };
-        $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-        $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
-        $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-        $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-        fwrite(STDOUT, $mess);
-        $exit = TRUE;
-        break;
-    };// switch $opt
-  };// foreach $options...
-  if ($exit == TRUE) {
-    exit;
-  };
-  return $settings;
-};// function parseCommandLineOptions
 /**
  * Function use to show the usage message on command line.
  *

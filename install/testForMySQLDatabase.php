@@ -65,7 +65,7 @@ $replace = array("'", '"');
 for ($i = 1; $i < $argc; ++$i) {
   $argv[$i] = str_replace($replace, '', $argv[$i]);
 };
-$mysqli = @new mysqli($argv[1], $argv[2], $argv[3], 'information_schema');
+$mysqli = @new mysqli($argv[1], $argv[2], $argv[3]);
 if ($mysqli->connect_error || mysqli_connect_error()) {
   $mess = 'Connection error (' . mysqli_connect_errno() . ') ' .
     mysqli_connect_error() . PHP_EOL;

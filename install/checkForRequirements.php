@@ -53,6 +53,55 @@ if (count($included) > 1 || $included[0] != __FILE__) {
   fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
+/**
+ * Define short name for directory separator which always uses unix '/'.
+ * @ignore
+ */
+define('DS', '/');
+// Used to over come path issues caused by how script is ran on server.
+$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
+// Pull in Yapeal revision constants.
+require_once $baseDir . 'revision.php';
+// Get path constants so they can be used.
+require_once $baseDir . 'inc' . DS . 'common_paths.php';
+require_once YAPEAL_INSTALL . 'parseCommandLineOptions.php';
+require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
+// Must have getopt() to get command line parameters.
+if (!function_exists('getopt')) {
+  $mess = 'getopt() not available can not perform checks!' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+$shortOpts = array('c:');
+$longOpts = array('config:');
+// Parser command line options first in case user just wanted to see help.
+$options = parseCommandLineOptions($shortOpts, $longOpts);
+$exit = FALSE;
+if (isset($options['help'])) {
+  usage();
+  $exit = TRUE;
+};
+if (isset($options['version'])) {
+  $mess = basename(__FILE__);
+  if (YAPEAL_VERSION != 'svnversion') {
+    $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+    $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
+  } else {
+    $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
+    $date = str_replace(array('$', 'Date:'), '', '$Date$');
+    $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
+  };
+  $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
+  $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
+  $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
+  $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+  $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
+  fwrite(STDOUT, $mess);
+  $exit = TRUE;
+};
+if ($exit == TRUE) {
+  exit(0);
+};
 // Insure minimum version of PHP we need to run.
 if (version_compare(PHP_VERSION, '5.2.4', '<')) {
   $mess = 'Need minimum of PHP 5.2.4 to use this software!' . PHP_EOL;
@@ -87,215 +136,121 @@ if (mysqli_get_client_version() < 50000) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-/**
- * Define short name for directory separator which always uses unix '/'.
- * @ignore
- */
-define('DS', '/');
-// Used to over come path issues caused by how script is ran on server.
-$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
-// Pull in Yapeal revision constants.
-require_once $baseDir . 'revision.php';
-// Get path constants so they can be used.
-require_once $baseDir . 'inc' . DS . 'common_paths.php';
-// If function getopts available get any command line parameters.
-if (function_exists('getopt')) {
-  $iniFile = parseCommandLineOptions($argv);
-};// if function_exists getopt ...
-// Get array used to set constants.
-$iniVars = getSettingsFromIniFile($iniFile);
-// Abort if required sections aren't defined
-$sections = array('Cache', 'Database', 'Logging');
+// Check the custom settings file if it can be found else check the default.
+if (!empty($options['config'])) {
+  $iniVars = getSettingsFromIniFile($options['config']);
+} else {
+  $iniVars = getSettingsFromIniFile();
+};
+if (empty($iniVars)) {
+  $mess = 'Had one or more problems accessing configuration file.';
+  $mess .= ' See any other error messages above for more help.' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+// Check for required sections.
+$required = array('Cache', 'Database', 'Logging');
 $mess = '';
-foreach ($sections as $section) {
+foreach ($required as $section) {
   if (!isset($iniVars[$section])) {
     $mess .= 'Required section [' . $section;
-    $mess .= '] is missing' . PHP_EOL;
+    $mess .= '] is missing.' . PHP_EOL;
   }; // if isset ...
-};
+};// foreach $required ...
 if (!empty($mess)) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-// Check for required error logging settings.
-$settings = array('error_log', 'log_level', 'notice_log', 'strict_log',
-  'warning_log');
-$mess = '';
-foreach ($settings as $setting) {
-  if (!isset($iniVars['Logging'][$setting])) {
-    $mess .= 'Missing required setting ' . $setting;
-    $mess .= ' in section [Logging].' . PHP_EOL;
-  };// if isset $iniVars...
-};// foreach $settings ...
-if (!empty($mess)) {
-  fwrite(STDERR, $mess);
-  exit(2);
-};
-// Check writable paths
+// Check if log directory is writable.
 if (!is_writable(YAPEAL_LOG)) {
   $mess = YAPEAL_LOG . ' is not writeable.' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };
+// Check for required Logging section settings.
+$required = array('error_log', 'log_level', 'notice_log', 'strict_log',
+  'warning_log');
+$mess = '';
+foreach ($required as $setting) {
+  if (!isset($iniVars['Logging'][$setting])) {
+    $mess .= 'Missing required setting ' . $setting;
+    $mess .= ' in section [Logging].' . PHP_EOL;
+  };// if isset $iniVars...
+};// foreach $required ...
+if (!empty($mess)) {
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+// Check if cache directory is writable.
+if (!is_writable(YAPEAL_CACHE)) {
+  $mess = YAPEAL_CACHE . ' is not writeable.' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+// Check for required Cache section setting.
 if (!isset($iniVars['Cache']['cache_output'])) {
   $mess = 'Missing required setting "cache_output"';
   $mess .= ' in section [Cache].' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
-} else {
-  // Check if cache directories exist and are writeable.
-  if ($iniVars['Cache']['cache_output'] == 'file' ||
-    $iniVars['Cache']['cache_output'] == 'both') {
-    if (!is_writable(YAPEAL_CACHE)) {
-      $mess = YAPEAL_CACHE . ' is not writeable.' . PHP_EOL;
+};
+// Check if required cache directories exist and are writeable.
+if ($iniVars['Cache']['cache_output'] == 'file' ||
+  $iniVars['Cache']['cache_output'] == 'both') {
+  $required = array('account', 'ADOdb', 'char', 'corp', 'eve', 'map', 'server');
+  foreach ($required as $section) {
+    if (!is_dir(YAPEAL_CACHE . $section)) {
+      $mess = 'Missing required directory ' . YAPEAL_CACHE . $section . PHP_EOL;
       fwrite(STDERR, $mess);
       exit(2);
     };
-    $sections = array('account', 'ADOdb', 'char', 'corp', 'eve', 'map', 'server');
-    foreach ($sections as $section) {
-      if (!is_dir(YAPEAL_CACHE . $section)) {
-        $mess = 'Missing required directory ' . YAPEAL_CACHE . $section . PHP_EOL;
-        fwrite(STDERR, $mess);
-        exit(2);
-      };
-      if (!is_writable(YAPEAL_CACHE . $section)) {
-        $mess = YAPEAL_CACHE . $section . ' is not writeable.' . PHP_EOL;
-        fwrite(STDERR, $mess);
-        exit(2);
-      };
-    };// foreach $sections ...
-  };// if $iniVars['Cache']['cache_output'] == 'file' || ...
-};// else !isset $iniVars['Cache']['cache_output'] ...
-// Check for required database settings.
-$settings = array('database', 'driver', 'host', 'suffix', 'table_prefix',
+    if (!is_writable(YAPEAL_CACHE . $section)) {
+      $mess = YAPEAL_CACHE . $section . ' is not writeable.' . PHP_EOL;
+      fwrite(STDERR, $mess);
+      exit(2);
+    };
+  };// foreach $required ...
+};// if $iniVars['Cache']['cache_output'] == 'file' || ...
+// Check for required Database section settings.
+$required = array('database', 'driver', 'host', 'suffix', 'table_prefix',
   'username', 'password');
 $mess = '';
-foreach ($settings as $setting) {
+foreach ($required as $setting) {
   if (!isset($iniVars['Database'][$setting])) {
     $mess .= 'Missing required setting ' . $setting;
     $mess .= ' in section [Database].' . PHP_EOL;
   };
-};// foreach $settings ...
+};// foreach $required ...
 if (!empty($mess)) {
   fwrite(STDERR, $mess);
   exit(2);
 };
+// Check for the required non-section general settings.
 if (!isset($iniVars['application_agent'])) {
   $mess = 'Configuration file is outdated and "application_agent" is not set.' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };// if isset $iniVars['application_agent'] ...
-if (isset($iniVars['registered_mode'])) {
-  $mode = $iniVars['registered_mode'];
-  if (!in_array($mode, array('ignored','optional','required'))) {
-    $mess = 'Unknown value ' . $mode;
-    $mess .=  ' for "registered_mode" in configuration file.' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(2);
-  };
-} else {
+if (!isset($iniVars['registered_mode'])) {
   $mess = 'Configuration file is outdated and "registered_mode" is not set.' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+$required = array('ignored','optional','required');
+if (!in_array($iniVars['registered_mode'], $required)) {
+  $mess = 'Unknown value ' . $iniVars['registered_mode'];
+  $mess .=  ' for "registered_mode" in configuration file.' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };
 $mess = 'All tests passed!!!' . PHP_EOL;
 fwrite(STDOUT, $mess);
-exit;
-/**
- * Function used to get 'ini' configuration file.
- *
- * @param string $file Path and name of the ini file to get.
- *
- * @return array Returns list of settings from file.
- */
-function getSettingsFromIniFile($file = NULL) {
-  // Check if given custom configuration file.
-  if (empty($file) || !is_string($file)) {
-    // Default assumes that this file and yapeal.ini file are in 'neighboring'
-    // directories.
-    $file = YAPEAL_CONFIG . 'yapeal.ini';
-  } else {
-    $mess = 'Using custom configuration file ' . $file . PHP_EOL;
-    fwrite(STDOUT, $mess);
-  };
-  if (!(is_readable($file) && is_file($file))) {
-    $mess = 'The required ' . $file . ' configuration file is missing!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(2);
-  };
-  // Grab the info from ini file.
-  $settings = parse_ini_file($file, TRUE);
-  if (empty($settings)) {
-    $mess = 'The ' . $file . ' configuration file contains no settings!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(2);
-  };
-  return $settings;
-}// function getSettingsFromIniFile
-/**
- * Function used to parser command line options.
- *
- * @param array $argv Array of arguments passed to script.
- *
- * @return mixed Returns path and name of configuration file if set.
- */
-function parseCommandLineOptions($argv) {
-  $shortOpts = 'c:hV';
-  if (version_compare(PHP_VERSION, '5.3.0', '>=')
-    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-    $longOpts = array('config:', 'help', 'version');
-    $options = getopt($shortOpts, $longOpts);
-  } else {
-    $options = getopt($shortOpts);
-  };
-  $file = NULL;
-  if (empty($options)) {
-    return $file;
-  };
-  $exit = FALSE;
-  foreach ($options as $opt => $value) {
-    switch ($opt) {
-      case 'c':
-      case 'config':
-        $file = $value;
-        break;
-      case 'h':
-      case 'help':
-        usage($argv);
-        // Fall through is intentional.
-      case 'V':
-      case 'version':
-        $mess = basename($argv[0]);
-        if (YAPEAL_VERSION != 'svnversion') {
-          $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-          $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
-        } else {
-          $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-          $date = str_replace(array('$', 'Date:'), '', '$Date$');
-          $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
-        };
-        $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-        $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
-        $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-        $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-        fwrite(STDOUT, $mess);
-        $exit = TRUE;
-        break;
-    };// switch $opt
-  };// foreach $options...
-  if ($exit == TRUE) {
-    exit;
-  };
-  return $file;
-};// function parseCommandLineOptions
+exit(0);
 /**
  * Function use to show the usage message on command line.
- *
- * @param array $argv Array of arguments passed to script.
  */
-function usage($argv) {
-  $mess = PHP_EOL . 'Usage: ' . basename($argv[0]);
+function usage() {
+  $mess = PHP_EOL . 'Usage: ' . basename(__FILE__);
   $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
   $mess .= 'OPTIONs:' . PHP_EOL;
   $mess .= str_pad('  -c, --config=FILE', 25);

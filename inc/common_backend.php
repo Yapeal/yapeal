@@ -70,6 +70,7 @@ if (!defined('YAPEAL_INC')) {
 require_once YAPEAL_BASE . 'revision.php';
 // Start auto loader.
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
+require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
 // Get array used to set constants.
 $iniVars = getSettingsFromIniFile($iniFile);
 /**
@@ -84,34 +85,6 @@ setGeneralSectionConstants($iniVars);
 // Logging settings.
 setLoggingSectionConstants($iniVars['Logging']);
 setupCustomErrorAndExceptionSettings();
-/**
- * Function used to get 'ini' configuration file.
- *
- * @param string $file Path and name of the ini file to get.
- *
- * @return array Returns list of settings from file.
- */
-function getSettingsFromIniFile($file = NULL) {
-  // Check if given custom configuration file.
-  if (empty($file) || !is_string($file)) {
-    // Default assumes that this file and yapeal.ini file are in 'neighboring'
-    // directories.
-    $file = YAPEAL_CONFIG . 'yapeal.ini';
-  };
-  if (!(is_readable($file) && is_file($file))) {
-    $mess = 'The required ' . $file . ' configuration file is missing!';
-    trigger_error($mess, E_USER_ERROR);
-    exit(2);
-  };
-  // Grab the info from ini file.
-  $settings = parse_ini_file($file, TRUE);
-  if (empty($settings)) {
-    $mess = 'The ' . $file . ' configuration file contains no settings!';
-    trigger_error($mess, E_USER_ERROR);
-    exit(2);
-  };
-  return $settings;
-}// function getSettingsFromIniFile
 /**
  * Function used to preset error handling to some sensible defaults.
  *

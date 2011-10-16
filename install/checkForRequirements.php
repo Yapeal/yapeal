@@ -64,8 +64,9 @@ $baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
 require_once $baseDir . 'revision.php';
 // Get path constants so they can be used.
 require_once $baseDir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_INSTALL . 'parseCommandLineOptions.php';
-require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'parseCommandLineOptions.php';
+require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'usage.php';
 // Must have getopt() to get command line parameters.
 if (!function_exists('getopt')) {
   $mess = 'getopt() not available can not perform checks!' . PHP_EOL;
@@ -78,7 +79,8 @@ $longOpts = array('config:');
 $options = parseCommandLineOptions($shortOpts, $longOpts);
 $exit = FALSE;
 if (isset($options['help'])) {
-  usage();
+  $file = basename(__FILE__);
+  usage($file, $shortOpts, $longOpts);
   $exit = TRUE;
 };
 if (isset($options['version'])) {
@@ -246,20 +248,4 @@ if (!in_array($iniVars['registered_mode'], $required)) {
 $mess = 'All tests passed!!!' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-/**
- * Function use to show the usage message on command line.
- */
-function usage() {
-  $mess = PHP_EOL . 'Usage: ' . basename(__FILE__);
-  $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
-  $mess .= 'OPTIONs:' . PHP_EOL;
-  $mess .= str_pad('  -c, --config=FILE', 25);
-  $mess .= 'Read custom configuration from FILE.';
-  $mess .= " File must be in 'ini' format." . PHP_EOL;
-  $mess .= str_pad('  -h, --help', 25);
-  $mess .= 'Show this help.' . PHP_EOL;
-  $mess .= str_pad('  -V, --version', 25);
-  $mess .= 'Show version and licensing information.' . PHP_EOL . PHP_EOL;
-  fwrite(STDOUT, $mess);
-};// function usage
 ?>

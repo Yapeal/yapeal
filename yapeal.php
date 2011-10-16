@@ -77,15 +77,48 @@ require_once YAPEAL_BASE . 'revision.php';
 define('YAPEAL_INC', YAPEAL_BASE . DS . 'inc' . DS);
 // Pull in path constants.
 require_once YAPEAL_INC . 'common_paths.php';
+require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
-  $iniFile = parseCommandLineOptions($argv);
-} else {
+  $shortOpts = array('c:');
+  $longOpts = array('config:');
+  // Parser command line options first in case user just wanted to see help.
+  $options = parseCommandLineOptions($shortOpts, $longOpts);
+  $exit = FALSE;
+  if (isset($options['help'])) {
+    usage();
+    $exit = TRUE;
+  };
+  if (isset($options['version'])) {
+    $mess = basename(__FILE__);
+    if (YAPEAL_VERSION != 'svnversion') {
+      $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
+      $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
+    } else {
+      $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
+      $date = str_replace(array('$', 'Date:'), '', '$Date$');
+      $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
+    };
+    $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
+    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
+    $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
+    $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+    $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
+    fwrite(STDOUT, $mess);
+    $exit = TRUE;
+  };
+  if ($exit == TRUE) {
+    exit(0);
+  };
+};// if function_exists('getopt') ...
+if (!empty($options['config'])) {
   /**
    * @var mixed Holds path and name of ini configuration file when set.
    */
+  $iniFile = $options['config'];
+} else {
   $iniFile = NULL;
-};// if function_exists getopt ...
+};
 require_once YAPEAL_INC . DS . 'common_backend.php';
 try {
   /**
@@ -164,78 +197,42 @@ catch (Exception $e) {
 }
 exit;
 /**
- * Function used to parser command line options.
- *
- * @param array $argv Array of arguments passed to script.
- *
- * @return mixed Returns path and name of configuration file if set.
- */
-function parseCommandLineOptions($argv) {
-  $shortOpts = 'c:hV';
-  if (version_compare(PHP_VERSION, '5.3.0', '>=')
-    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-    $longOpts = array('config:', 'help', 'version');
-    $options = getopt($shortOpts, $longOpts);
-  } else {
-    $options = getopt($shortOpts);
-  };
-  if (empty($options)) {
-    return NULL;
-  };
-  $file = NULL;
-  $exit = FALSE;
-  foreach ($options as $opt => $value) {
-    switch ($opt) {
-      case 'c':
-      case 'config':
-        $file = $value;
-        break;
-      case 'h':
-      case 'help':
-        usage($argv);
-        // Fall through is intentional.
-      case 'V':
-      case 'version':
-        $mess = basename($argv[0]);
-        if (YAPEAL_VERSION != 'svnversion') {
-          $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-          $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
-        } else {
-          $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-          $date = str_replace(array('$', 'Date:'), '', '$Date$');
-          $mess .= $rev . '(export)' . $date . PHP_EOL . PHP_EOL;
-        };
-        $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-        $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
-        $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-        $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-        $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-        fwrite(STDOUT, $mess);
-        $exit = TRUE;
-        break;
-    };// switch $opt
-  };// foreach $options...
-  if ($exit == TRUE) {
-    exit;
-  };
-  return $file;
-};// function parseCommandLineOptions
-/**
  * Function use to show the usage message on command line.
  *
- * @param array $argv Array of arguments passed to script.
+ * @ignore
  */
-function usage($argv) {
-  $mess = PHP_EOL . 'Usage: ' . basename($argv[0]);
+function usage() {
+  $cutLine = 78;
+  $ragLine = $cutLine - 5;
+  $mess = PHP_EOL . 'Usage: ' . basename(__FILE__);
   $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
   $mess .= 'OPTIONs:' . PHP_EOL;
-  $mess .= str_pad('  -c, --config=FILE', 25);
-  $mess .= 'Read custom configuration from FILE.';
-  $mess .= " File must be in 'ini' format." . PHP_EOL;
-  $mess .= str_pad('  -h, --help', 25);
-  $mess .= 'Show this help.' . PHP_EOL;
-  $mess .= str_pad('  -V, --version', 25);
-  $mess .= 'Show version and licensing information.' . PHP_EOL . PHP_EOL;
+  $options = array();
+  $options['c:'] = array('op' => '  -c, --config=FILE', 'desc' =>
+    'Read configuration from FILE. This is an optional setting to allow the use'
+    . ' of a custom configuration file. FILE must be in "ini" format. Defaults'
+    . ' to <yapeal_base>/config/yapeal.ini.');
+  $options['h'] = array('op' => '  -h, --help', 'desc' => 'Show this help.');
+  $options['V'] = array('op' => '  -V, --version', 'desc' =>
+    'Show version and licensing information.');
+  $width = 0;
+  foreach ($options as $k => $v) {
+    if (strlen($v['op']) > $width) {
+      $width = strlen($v['op']);
+    };
+  };// foreach $options ...
+  $width += 4;
+  $break = PHP_EOL . str_pad('', $width);
+  $descCut = $cutLine - $width;
+  $descRag = $descCut - 5;
+  foreach ($options as $k => $v) {
+    $option = str_pad($v['op'], $width);
+    // Make description text ragged right with forced word wrap at full width.
+    $desc = wordwrap($v['desc'], $descRag, PHP_EOL);
+    $desc = wordwrap($v['desc'], $descCut, PHP_EOL, TRUE);
+    $option .= str_replace(PHP_EOL, $break, $desc);
+    $mess .= $option . PHP_EOL . PHP_EOL;
+  };// foreach $options ...
   fwrite(STDOUT, $mess);
 };// function usage
 ?>

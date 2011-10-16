@@ -70,7 +70,7 @@ if (!defined('YAPEAL_INC')) {
 require_once YAPEAL_BASE . 'revision.php';
 // Start auto loader.
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
-require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 // Get array used to set constants.
 $iniVars = getSettingsFromIniFile($iniFile);
 /**

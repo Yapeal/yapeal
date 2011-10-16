@@ -64,8 +64,9 @@ $baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
 require_once $baseDir . 'revision.php';
 // Get path constants so they can be used.
 require_once $baseDir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_INSTALL . 'parseCommandLineOptions.php';
-require_once YAPEAL_INSTALL . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'parseCommandLineOptions.php';
+require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'usage.php';
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
   $shortOpts = array('c:', 'd:', 'p:', 's:', 'u:');
@@ -74,7 +75,8 @@ if (function_exists('getopt')) {
   $options = parseCommandLineOptions($shortOpts, $longOpts);
   $exit = FALSE;
   if (isset($options['help'])) {
-    usage();
+    $file = basename(__FILE__);
+    usage($file, $shortOpts, $longOpts);
     $exit = TRUE;
   };
   if (isset($options['version'])) {
@@ -170,81 +172,4 @@ $mess = $options['username'] . ' has the needed privileges on the ';
 $mess .= $options['database'] . ' database.' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-/**
- * Function use to show the usage message on command line.
- */
-function usage() {
-  $ragLine = 76;
-  $cutLine = 80;
-  $mess = PHP_EOL . 'Usage: ' . basename(__FILE__);
-  $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
-  $desc = 'The script reads database settings from [Database] section of the';
-  $desc .= ' configuration file, either the default one in';
-  $desc .= ' /Where/Installed/Yapeal/config/yapeal.ini or the custom one from';
-  $desc .= ' -c OPTION. The other OPTIONs -d, -p, -s, -u can be used to';
-  $desc .= ' override any settings found in the configuration file. If no';
-  $desc .= ' configuration file is found, either default or custom, or some';
-  $desc .= ' of the settings are missing from it the OPTIONs -d, -p, -s, -u';
-  $desc .= ' become required. For example the configuration file has all but';
-  $desc .= ' the "password" setting. The -p option will be required on the';
-  $desc .= ' command line.';
-  // Make text ragged right with forced word wrap at 80 characters.
-  $desc = wordwrap($desc, $ragLine, PHP_EOL);
-  $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
-  $mess .= $desc . PHP_EOL . PHP_EOL;
-  $desc = 'Short version of OPTIONs have the same value requirements of the';
-  $desc .= ' corresponding long ones. For all OPTIONs if they are';
-  $desc .= ' used more than once only the last value will be used.';
-  $desc = 'Short version of OPTIONs have the same value requirements of the';
-  $desc .= ' corresponding long ones. For all OPTIONs except --privileges if';
-  $desc .= ' they are used more than once only the last value will be used.';
-  $desc = wordwrap($desc, $ragLine, PHP_EOL);
-  $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
-  $mess .= $desc . PHP_EOL . PHP_EOL;
-  $mess .= 'OPTIONs:' . PHP_EOL;
-  $options = array();
-  $options[] = array('pp' => '-c, --config=FILE', 'desc' =>
-    'Read configuration from FILE. This is an optional setting to allow using a'
-    . ' custom configuration file. File must be in "ini" format. Defaults to'
-    . ' /Where/Installed/Yapeal/config/yapeal.ini.');
-  $options[] = array('pp' => '-d, --database=DB', 'desc' =>
-    'DB is the name of the database to check privileges on.');
-  $options[] = array('pp' => '-h, --help', 'desc' => 'Show this help.');
-  $options[] = array('pp' => '-p, password=SECRET', 'desc' =>
-    'SECRET is the password for the database server.');
-  $options[] = array('pp' => '--privileges=PRIVS', 'desc' =>
-    'Optional PRIVS list. It is either a quoted space separated list of'
-    . ' privileges names to use or can be used multiple times and the values'
-    . ' from each one will be appended to the list. For example you can either'
-    . ' do testForMySQLDatabasePrivs.php --privileges="alter create" OR'
-    . ' testForMySQLDatabasePrivs.php --privileges="alter"'
-    . ' --privileges="create". This option should rarely be needed as Yapeal'
-    . ' uses the default list "alter create delete drop index insert select"'
-    . ' which includes all the privileges normally needed.');
-  $options[] = array('pp' => '-s, --server=LOCALHOST', 'desc' =>
-    'LOCALHOST is the database server name to use.');
-  $options[] = array('pp' => '-u, --username=USER', 'desc' =>
-    'USER is the user name who\'s privileges are being checked for on the'
-    . ' database server.');
-  $options[] = array('pp' => '-V, --version', 'desc' =>
-    'Show version and licensing information.');
-  $width = 0;
-  foreach ($options as $option) {
-    // find widest parameter in list.
-    if (strlen($option['pp']) > $width) {
-      $width = strlen($option['pp']);
-    };
-  };// foreach $options ...
-  // Give another six spaces for padding.
-  $width += 6;
-  foreach ($options as $option) {
-    $desc = str_pad('  ' . $option['pp'], $width);
-    $desc .= $option['desc'];
-    // Make text ragged right with forced word wrap at 80 characters.
-    $desc = wordwrap($desc, $ragLine, PHP_EOL);
-    $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
-    $mess .= $desc . PHP_EOL . PHP_EOL;
-  };// foreach $options ...
-  fwrite(STDOUT, $mess);
-};// function usage
 ?>

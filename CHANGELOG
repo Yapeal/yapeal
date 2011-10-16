@@ -1,3 +1,13 @@
+2011-10-16
+
+(trunk/) Added inc/usage.php to replace the per script functions in the install/
+scripts.
+
+Cleaned up install/ by deleting all the old scripts used only by the old GUI
+installer.
+
+Fixed name on pic/yapeagreen.png to yapealgreen.png.
+
 2011-10-12
 
 (trunk/) Moved getSettingsFromIniFile() into own file in install and refactored
@@ -7,6 +17,9 @@ Moved parseCommandLineOptions() into own file in install and refactored
 the other scripts to start using it.
 
 changed inc/common_backend.php to use new install/getSettingsFromIniFile.php
+
+moved new function scripts into inc/ and updated everything to use at new
+location.
 
 2011-10-10
 

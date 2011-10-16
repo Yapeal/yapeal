@@ -56,9 +56,6 @@ if (count(get_included_files()) < 2) {
  *
  * @return array Returns list of settings from file.
  *
- * @package    Yapeal
- * @subpackage Install
- *
  * @todo Look at making this into a full class instead of just a function.
  */
 function getSettingsFromIniFile($file = NULL, $section =NULL) {

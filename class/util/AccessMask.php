@@ -38,13 +38,13 @@ if (isset($_REQUEST['viewSource'])) {
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
   } else {
-    fwrite(STDERR, $mess . PHP_EOL);
-    fwrite(STDOUT, 'error' . PHP_EOL);
+    fwrite(STDERR, $mess);
     exit(1);
   };
 };
@@ -171,6 +171,51 @@ class AccessMask {
     };// else ...
   }// function apisToMask
   /**
+   * Returns the whole access mask list for all the known APIs.
+   *
+   * @return array Returns the access mask list.
+   */
+  public function getMaskList() {
+    return self::$maskList;
+  }// function getMaskList
+  /**
+   * Returns the access mask list for a single section of known APIs.
+   *
+   * @param string $section The section the access mask list is wanted for.
+   * @param int $status The Yapeal supported status each API must be to be
+   * included. It should be one or more of AccessMask::NOT_WORKING,
+   * AccessMask::XSD_ONLY, AccessMask::WIP, AccessMask::TESTING,
+   * AccessMask::COMPLETE.
+   *
+   * @return array Returns the access mask list for a section.
+   */
+  public function getSectionMaskList($section, $status = AccessMask::COMPLETE) {
+    $mask = $this->getSectionToMask($section, $status);
+    return $this->maskToAPIs($mask, $section);
+  }// function getSectionMaskList
+  /**
+   * Converts section name to an API mask value.
+   *
+   * @param string $section The section access mask is wanted for.
+   * @param int $status The Yapeal supported status each API must be to be
+   * included. It should be one or more of AccessMask::NOT_WORKING,
+   * AccessMask::XSD_ONLY, AccessMask::WIP, AccessMask::TESTING,
+   * AccessMask::COMPLETE.
+   *
+   * @return array Returns the access mask for section.
+   */
+  public function getSectionToMask($section, $status = AccessMask::COMPLETE) {
+    $mask = 0;
+    foreach (self::$maskList as $row) {
+      if ($row['section'] == $section) {
+        if (($row['status'] & $status) > 0) {
+          $mask |= $row['mask'];
+        };
+      };
+    };// foreach self::$maskList ...
+    return $mask;
+  }// function getSectionToMask
+  /**
    * Converts a mask to list of API names.
    *
    * @param mixed $mask A integer mask or an array of mask values to convert to
@@ -208,5 +253,13 @@ class AccessMask {
   protected function reduceOR($x, $y) {
     return $x | $y;
   }// function reduceOR
+  /**
+   * Constants used with status.
+   */
+  const NOT_WORKING = 1;
+  const XSD_ONLY = 2;
+  const WIP = 4;
+  const TESTING = 8;
+  const COMPLETE = 16;
 }
 ?>

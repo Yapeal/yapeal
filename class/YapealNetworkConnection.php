@@ -39,13 +39,13 @@ if (isset($_REQUEST['viewSource'])) {
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
   } else {
-    fwrite(STDERR, $mess . PHP_EOL);
-    fwrite(STDOUT, 'error' . PHP_EOL);
+    fwrite(STDERR, $mess);
     exit(1);
   };
 };
@@ -73,7 +73,7 @@ class YapealNetworkConnection {
       'Connection: Keep-Alive',
       'Keep-Alive: 300'
     );
-    require_once YAPEAL_EAC_HTTPREQUEST . 'eac_httprequest.class.php';
+    require_once YAPEAL_EXT . 'eac_httprequest' . DS . 'eac_httprequest.class.php';
     $this->con = Singleton::get('httpRequest');
     if (FALSE === $this->con) {
       $mess = 'Could not get a connection to use for APIs';

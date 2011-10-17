@@ -44,8 +44,8 @@ if (isset($_REQUEST['viewSource'])) {
  */
 if (PHP_SAPI != 'cli') {
   header('HTTP/1.0 403 Forbidden', TRUE, 403);
-  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
-  $mess = ' to run it using ' . PHP_SAPI . ' instead';
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
+    . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
   die($mess);
 };
 /**
@@ -53,9 +53,9 @@ if (PHP_SAPI != 'cli') {
  */
 $included = get_included_files();
 if (count($included) > 1 || $included[0] != __FILE__) {
-  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  $mess = basename(__FILE__)
+    . ' must be called directly and can not be included.' . PHP_EOL;
   fwrite(STDERR, $mess . PHP_EOL);
-  fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
 // Set the default timezone to GMT.
@@ -69,32 +69,14 @@ define('DS', '/');
 // Check if the base path for Yapeal has been set in the environment.
 $dir = @getenv('YAPEAL_BASE');
 if ($dir === FALSE) {
-  // Used to overcome path issues caused by how script is ran on server.
-  $dir = str_replace('\\', DS, dirname(__FILE__));
+  // Used to overcome path issues caused by how script is ran.
+  $dir = str_replace('\\', DS, dirname(__FILE__)) . DS;
 };
-/**
- * We know we are in the 'base' directory might as well set constant.
- *
- * @ignore
- */
-define('YAPEAL_BASE', $dir . DS);
-// Pull in Yapeal revision constants.
+// Get path constants so they can be used.
+require_once $dir . 'inc' . DS . 'common_paths.php';
 require_once YAPEAL_BASE . 'revision.php';
-/**
- * Since we know that we are at 'base' directory we know where 'inc' should be
- * as well.
- *
- * @ignore
- */
-define('YAPEAL_INC', YAPEAL_BASE . DS . 'inc' . DS);
-// Pull in path constants.
-require_once YAPEAL_INC . 'common_paths.php';
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 YapealAutoLoad::activateAutoLoad();
-/**
- * @var mixed Holds path and name of ini configuration file when set.
- */
-$iniFile = NULL;
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
   require_once YAPEAL_INC . 'parseCommandLineOptions.php';
@@ -114,7 +96,7 @@ if (function_exists('getopt')) {
       $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
     } else {
       $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-      $date = str_replace(array('$', 'Date::'), '', '$Date: 2011-10-16 08:04:49 -0700$');
+      $date = str_replace(array('$', 'Date::'), '', '$Date:: 2011-10-16 08:04:49 -0700$');
       $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
     };
     $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;

@@ -39,8 +39,8 @@ if (isset($_REQUEST['viewSource'])) {
  */
 if (PHP_SAPI != 'cli') {
   header('HTTP/1.0 403 Forbidden', TRUE, 403);
-  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
-  $mess = ' to run it using ' . PHP_SAPI . ' instead';
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
+    . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
   die($mess);
 };
 /**
@@ -48,9 +48,9 @@ if (PHP_SAPI != 'cli') {
  */
 $included = get_included_files();
 if (count($included) > 1 || $included[0] != __FILE__) {
-  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  $mess = basename(__FILE__)
+    . ' must be called directly and can not be included.' . PHP_EOL;
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
 /**
@@ -58,12 +58,15 @@ if (count($included) > 1 || $included[0] != __FILE__) {
  * @ignore
  */
 define('DS', '/');
-// Used to over come path issues caused by how script is ran on server.
-$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
-// Pull in Yapeal revision constants.
-require_once $baseDir . 'revision.php';
+// Check if the base path for Yapeal has been set in the environment.
+$dir = @getenv('YAPEAL_BASE');
+if ($dir === FALSE) {
+  // Used to overcome path issues caused by how script is ran.
+  $dir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
+};
 // Get path constants so they can be used.
-require_once $baseDir . 'inc' . DS . 'common_paths.php';
+require_once $dir . 'inc' . DS . 'common_paths.php';
+require_once YAPEAL_BASE . 'revision.php';
 require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
@@ -128,7 +131,8 @@ if ($mysqli->connect_error || mysqli_connect_error()) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-$sql = 'create database `' . $mysqli->real_escape_string($options['database']);
+$sql = 'create database if not exists `';
+$sql .= $mysqli->real_escape_string($options['database']);
 $sql .= '` collate = utf8_unicode_ci';
 if ($mysqli->query($sql) === FALSE) {
   $mess = 'Database ' . $options['database'] . ' could not be created.' . PHP_EOL;

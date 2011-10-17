@@ -1,3 +1,31 @@
+2011-10-17
+
+(trunk/) Added new 'status' column to utilAccessMask table. This column can be
+used to filter APIs by how well they are supported by Yapeal. This column is a
+bitmap with the following defined values:
+NOT_WORKING = 1, XSD_ONLY = 2, WIP = 4, TESTING = 8, COMPLETE = 16
+
+NOT_WORKING - Means the API is know but nothing works in Yapeal yet.
+
+XSD_ONLY - The XSD has been done but nothing else works yet. Yapeal will cache
+the XML but does nothing with it and you may still receive some error messages.
+
+WIP - Someone is actively working on the API but the code is incomplete and lots
+of errors are to be expected and data may or may not make it into the database.
+
+TESTING - Whomever has been working on the code for this API believes it is
+working but it needs more testing to track down any remaining bugs. Data will be
+in database but it is possible some edge cases may still cause errors and
+missing data.
+
+COMPLETE - This API should be working fully and no errors are expected.
+
+Added new methods to class/util/AccessMask.php to allow getting list of section
+APIs or a section mask. The new methods use the new Yapeal support status column
+that has been added to table.
+
+Updated ActiveAPIMask in install/*.xml to include APIs with status of COMPLETE.
+
 2011-10-16
 
 (trunk/) Added inc/usage.php to replace the per script functions in the install/
@@ -10,8 +38,26 @@ Fixed name on pic/yapeagreen.png to yapealgreen.png.
 
 Moved many of the functions from inc/common_backend.php into the other assocated
 classes as static functions and the last couple to yapeal.php. Deleting
-inc/common_backend.php as its out lived it's time. Its one of the last old
+inc/common_backend.php as it has out lived it's time. Its one of the last old
 timers.
+
+Added 'deny from all' .htaccess files to everything but root directory and
+pics/. Yapeal still isn't meant to be installed in a web server accessible
+location but reality is that's where many people try to put it or have to.
+
+Yapeal now understands two environmental settings: YAPEAL_BASE and YAPEAL_INI.
+
+YAPEAL_BASE can be used to set the base directory where yapeal can be found. If
+it isn't set Yapeal will do it's best to find the base directory on it's own.
+
+YAPEAL_INI can be used to set the location and name of yapeal.ini. The command
+line options -c, --config can be used to override it and if it isn't set Yapeal
+tries to use inc/yapeal.ini just below yapeal base.
+
+Noticed many of the path constants were not use or only used once or twice so
+refactored everything and dropped many of them from inc/common_paths.php.
+
+Deleted unused class/CurlRequest.php.
 
 2011-10-12
 

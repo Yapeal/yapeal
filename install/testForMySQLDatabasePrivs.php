@@ -39,8 +39,8 @@ if (isset($_REQUEST['viewSource'])) {
  */
 if (PHP_SAPI != 'cli') {
   header('HTTP/1.0 403 Forbidden', TRUE, 403);
-  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried';
-  $mess = ' to run it using ' . PHP_SAPI . ' instead';
+  $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
+    . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
   die($mess);
 };
 /**
@@ -48,9 +48,9 @@ if (PHP_SAPI != 'cli') {
  */
 $included = get_included_files();
 if (count($included) > 1 || $included[0] != __FILE__) {
-  $mess = basename(__FILE__) . ' must be called directly and can not be included';
+  $mess = basename(__FILE__)
+    . ' must be called directly and can not be included.' . PHP_EOL;
   fwrite(STDERR, $mess);
-  fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
 /**
@@ -58,12 +58,15 @@ if (count($included) > 1 || $included[0] != __FILE__) {
  * @ignore
  */
 define('DS', '/');
-// Used to over come path issues caused by how script is ran on server.
-$baseDir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
-// Pull in Yapeal revision constants.
-require_once $baseDir . 'revision.php';
+// Check if the base path for Yapeal has been set in the environment.
+$dir = @getenv('YAPEAL_BASE');
+if ($dir === FALSE) {
+  // Used to overcome path issues caused by how script is ran.
+  $dir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS. '..')) . DS;
+};
 // Get path constants so they can be used.
-require_once $baseDir . 'inc' . DS . 'common_paths.php';
+require_once $dir . 'inc' . DS . 'common_paths.php';
+require_once YAPEAL_BASE . 'revision.php';
 require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
@@ -86,7 +89,7 @@ if (function_exists('getopt')) {
       $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
     } else {
       $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-      $date = str_replace(array('$', 'Date:'), '', '$Date$');
+      $date = str_replace(array('$', 'Date::'), '', '$Date:: 2011-10-16 08:04:49 -0700$');
       $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
     };
     $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
@@ -136,10 +139,12 @@ if (empty($options['privileges'])) {
   $privs = explode(' ', $options['privileges']);
 };
 $split = array();
+// May need to do a little escaping on database name.
+$database = str_replace('_', '\\_', $options['database']);
 $sql = 'show grants';
 if ($result = $mysqli->query($sql)) {
   while ($row = $result->fetch_row()) {
-    $dbPos = strpos($row[0], '`' . $options['database'] . '`');
+    $dbPos = strpos($row[0], '`' . $database . '`');
     // If not the right table continue.
     if (FALSE !== $dbPos) {
       // Trim grant off the front.

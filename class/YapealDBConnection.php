@@ -32,13 +32,13 @@
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
   } else {
-    fwrite(STDERR, $mess . PHP_EOL);
-    fwrite(STDOUT, 'error' . PHP_EOL);
+    fwrite(STDERR, $mess);
     exit(1);
   };
 };
@@ -93,7 +93,7 @@ class YapealDBConnection {
     $ADODB_CACHE_DIR = YAPEAL_CACHE . 'ADOdb';
     if (empty(self::$connections)) {
       require_once YAPEAL_CLASS . 'ADODB_Exception.php';
-      require_once YAPEAL_ADODB . 'adodb.inc.php';
+      require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb.inc.php';
     };
     $hash = hash('sha1', $dsn);
     if (!array_key_exists($hash, self::$connections)) {

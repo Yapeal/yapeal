@@ -38,13 +38,13 @@ if (isset($_REQUEST['viewSource'])) {
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
   } else {
-    fwrite(STDERR, $mess . PHP_EOL);
-    fwrite(STDOUT, 'error' . PHP_EOL);
+    fwrite(STDERR, $mess);
     exit(1);
   };
 };
@@ -56,14 +56,11 @@ if (!defined('DS')) {
    */
   define('DS', '/');
 };
-/**
- * Since this file has to be in the 'inc' directory we can set that path now.
- */
 if (!defined('YAPEAL_INC')) {
   // Used to over come path issues caused by how script is ran on server.
   $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
   /**
-   * @ignore
+   * Since this file has to be in the 'inc' directory we can set that path now.
    */
   define('YAPEAL_INC', $dir . DS);
 };
@@ -106,13 +103,6 @@ if (!defined('YAPEAL_EXT')) {
    */
   define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
 };
-if (!defined('YAPEAL_INSTALL')) {
-  /**
-   * The 'install' directory is normally just above base but can be moved in
-   * some configurations.
-   */
-  define('YAPEAL_INSTALL', YAPEAL_BASE . 'install' . DS);
-};
 if (!defined('YAPEAL_LOG')) {
   /**
    * The 'log' directory is normally just above base but can be moved in some
@@ -120,24 +110,4 @@ if (!defined('YAPEAL_LOG')) {
    */
   define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
 };
-if (!defined('YAPEAL_PICS')) {
-  /**
-   * The 'pics' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_PICS', YAPEAL_BASE . 'pics' . DS);
-};
-/* **************************************************************************
- * Specific Extension Library Paths
- * **************************************************************************/
-$exts = new DirectoryIterator(YAPEAL_EXT);
-foreach ($exts as $ext) {
-  if ($ext->isDir()) {
-    $constant = 'YAPEAL_' . strtoupper($ext);
-    if (!defined($constant)) {
-      $path = str_replace('\\', DS, realpath($ext->getPathname()));
-     define($constant, $path . DS);
-    };// if !defined...
-  };// if $ext->isDir() ...
-};// foreach $exts ...
 ?>

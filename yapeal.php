@@ -58,28 +58,46 @@ if (count($included) > 1 || $included[0] != __FILE__) {
   fwrite(STDOUT, 'error' . PHP_EOL);
   exit(1);
 };
+// Set the default timezone to GMT.
+date_default_timezone_set('GMT');
+// Set some minimal error settings for now.
+presetErrorHandling();
 /**
  * Define short name for directory separator which always uses unix '/'.
  */
 define('DS', '/');
+// Check if the base path for Yapeal has been set in the environment.
+$dir = @getenv('YAPEAL_BASE');
+if ($dir === FALSE) {
+  // Used to overcome path issues caused by how script is ran on server.
+  $dir = str_replace('\\', DS, dirname(__FILE__));
+};
 /**
  * We know we are in the 'base' directory might as well set constant.
+ *
+ * @ignore
  */
-// Used to overcome path issues caused by how script is ran on server.
-$dir = str_replace('\\', DS, dirname(__FILE__));
 define('YAPEAL_BASE', $dir . DS);
 // Pull in Yapeal revision constants.
 require_once YAPEAL_BASE . 'revision.php';
 /**
  * Since we know that we are at 'base' directory we know where 'inc' should be
  * as well.
+ *
+ * @ignore
  */
 define('YAPEAL_INC', YAPEAL_BASE . DS . 'inc' . DS);
 // Pull in path constants.
 require_once YAPEAL_INC . 'common_paths.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
+require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
+YapealAutoLoad::activateAutoLoad();
+/**
+ * @var mixed Holds path and name of ini configuration file when set.
+ */
+$iniFile = NULL;
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
+  require_once YAPEAL_INC . 'parseCommandLineOptions.php';
   $shortOpts = array('c:');
   $longOpts = array('config:');
   // Parser command line options first in case user just wanted to see help.
@@ -96,11 +114,11 @@ if (function_exists('getopt')) {
       $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
     } else {
       $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-      $date = str_replace(array('$', 'Date:'), '', '$Date$');
+      $date = str_replace(array('$', 'Date::'), '', '$Date: 2011-10-16 08:04:49 -0700$');
       $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
     };
     $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
+    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
     $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
     $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
     $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
@@ -111,15 +129,22 @@ if (function_exists('getopt')) {
     exit(0);
   };
 };// if function_exists('getopt') ...
+// Autoload does not work for functions.
+require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 if (!empty($options['config'])) {
-  /**
-   * @var mixed Holds path and name of ini configuration file when set.
-   */
-  $iniFile = $options['config'];
+  $iniVars = getSettingsFromIniFile($options['config']);
 } else {
-  $iniFile = NULL;
+  $iniVars = getSettingsFromIniFile();
 };
-require_once YAPEAL_INC . DS . 'common_backend.php';
+/**
+ * Define constants and properties from settings in configuration.
+ */
+YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
+YapealErrorHandler::setupCustomErrorAndExceptionSettings();
+YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
+YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
+setGeneralSectionConstants($iniVars);
+unset($iniVars);
 try {
   /**
    * Give ourself a 'soft' limit of 10 minutes to finish.
@@ -183,7 +208,7 @@ catch (Exception $e) {
   require_once YAPEAL_CLASS . 'YapealErrorHandler.php';
   $mess = 'Uncaught exception in ' . basename(__FILE__);
   YapealErrorHandler::print_on_command($mess);
-  YapealErrorHandler::elog($mess, YAPEAL_ERROR_LOG);
+  YapealErrorHandler::elog($mess);
   $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
   if ($e->getCode()) {
     $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
@@ -193,9 +218,55 @@ catch (Exception $e) {
   $mess .= $e->getTraceAsString() . PHP_EOL;
   $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
   YapealErrorHandler::print_on_command($mess);
-  YapealErrorHandler::elog($mess, YAPEAL_ERROR_LOG);
+  YapealErrorHandler::elog($mess);
 }
-exit;
+exit(0);
+/**
+ * Function used to preset error handling to some sensible defaults.
+ *
+ * Any errors that are triggered now are reported to the system default
+ * logging location until we're done setting up some of the required vars and
+ * we can start our own logging.
+ */
+function presetErrorHandling() {
+  // Set some basic common settings so we know we'll get to see any errors etc.
+  error_reporting(E_ALL);
+  ini_set('ignore_repeated_errors', 0);
+  ini_set('ignore_repeated_source', 0);
+  ini_set('html_errors', 0);
+  ini_set('display_errors', 1);
+  ini_set('error_log', NULL);
+  ini_set('log_errors', 0);
+  ini_set('track_errors', 0);
+}// function presetErrorHandling
+/**
+ * Function used to set constants from general area (not in a section) of the
+ * configuration file.
+ *
+ * @param array $section A list of settings for this section of configuration.
+ */
+function setGeneralSectionConstants(array $section) {
+  if (!defined('YAPEAL_APPLICATION_AGENT')) {
+    $curl = curl_version();
+    $user_agent = $section['application_agent'];
+    $user_agent .= ' Yapeal/'. YAPEAL_VERSION . ' ' . YAPEAL_STABILITY;
+    $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
+    $user_agent .= ' libcurl/' . $curl['version'];
+    $user_agent = trim($user_agent);
+    /**
+     * Used as default user agent in network connections.
+     */
+    define('YAPEAL_APPLICATION_AGENT', $user_agent);
+  };
+  if (!defined('YAPEAL_REGISTERED_MODE')) {
+    /**
+     * Determines how utilRegisteredKey, utilRegisteredCharacter, and
+     * utilRegisteredCorporation tables are used, it also allows some columns in
+     * this tables to be optional depending on value.
+     */
+    define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
+  };
+}// function setGeneralSectionConstants
 /**
  * Function use to show the usage message on command line.
  *

@@ -3,10 +3,15 @@
 (trunk/) Added inc/usage.php to replace the per script functions in the install/
 scripts.
 
-Cleaned up install/ by deleting all the old scripts used only by the old GUI
-installer.
+Cleaned up install/ by deleting all the old scripts that were only used by the
+old GUI installer.
 
 Fixed name on pic/yapeagreen.png to yapealgreen.png.
+
+Moved many of the functions from inc/common_backend.php into the other assocated
+classes as static functions and the last couple to yapeal.php. Deleting
+inc/common_backend.php as its out lived it's time. Its one of the last old
+timers.
 
 2011-10-12
 

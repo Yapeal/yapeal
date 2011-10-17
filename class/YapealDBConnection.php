@@ -121,5 +121,29 @@ class YapealDBConnection {
       };// foreach self::$connections ....
     };// if !empty...
   }// function releaseAll
+  /**
+   * Function used to set constants from [Database] section of the configuration
+   * file.
+   *
+   * @param array $section A list of settings for this section of configuration.
+   */
+  public static function setDatabaseSectionConstants(array $section) {
+    if (!defined('YAPEAL_DSN')) {
+      // Put all the pieces of the ADOdb DSN together.
+      $dsn = $section['driver'] . $section['username'] . ':';
+      $dsn .= $section['password'] . '@' . $section['host'];
+      $dsn .= '/' . $section['database'] . $section['suffix'];
+      /**
+       * Defines the DSN used for ADOdb connection.
+       */
+      define('YAPEAL_DSN', $dsn);
+    };
+    if (!defined('YAPEAL_TABLE_PREFIX')) {
+      /**
+       * Defines the table prefix used for all Yapeal tables.
+       */
+      define('YAPEAL_TABLE_PREFIX', $section['table_prefix']);
+    };
+  }// function setDatabaseSectionConstants
 }
 ?>

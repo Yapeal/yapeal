@@ -56,6 +56,10 @@ if (count(get_included_files()) < 2) {
  */
 class YapealErrorHandler {
   /**
+   * @var string Holds name of error log file.
+   */
+  private static $errorLog = NULL;
+  /**
    * @var string Holds file name where error happened.
    */
   private $filename = '';
@@ -68,6 +72,10 @@ class YapealErrorHandler {
    */
   private $line = 0;
   /**
+   * @var int Holds logging level.
+   */
+  private static $logLevel = 0;
+  /**
    * @var array Used to hold list of errors if $keepLog is TRUE.
    */
   private static $list = array();
@@ -76,9 +84,21 @@ class YapealErrorHandler {
    */
   private $message = '';
   /**
+   * @var string Holds name of notice log file.
+   */
+  private static $noticeLog = NULL;
+  /**
+   * @var string Holds name of strict log file.
+   */
+  private static $strictLog = NULL;
+  /**
    * @var array Holds array of all varables.
    */
   private $vars = array();
+  /**
+   * @var string Holds name of warning log file.
+   */
+  private static $warningLog = NULL;
   /**
    * Constructor
    *
@@ -92,7 +112,7 @@ class YapealErrorHandler {
     $this->filename = $filename;
     $this->line = $linenum;
     $this->vars = $vars;
-  }
+  }// function __construct
   /**
    * Method that PHP will call to handle errors.
    *
@@ -108,7 +128,7 @@ class YapealErrorHandler {
       return FALSE;
     };
     // Let PHP handle any errors Yapeal is not set to handle.
-    if (($errno & YAPEAL_LOG_LEVEL) != $errno) {
+    if (($errno & self::$logLevel) != $errno) {
       return FALSE;
     };
     if (self::$keep === TRUE) {
@@ -153,7 +173,7 @@ class YapealErrorHandler {
     $body .= $backtrace . PHP_EOL;
     $body .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
     self::print_on_command($body);
-    self::elog($body, YAPEAL_ERROR_LOG);
+    self::elog($body, self::$errorLog);
     exit(1);
   }// function handleError
   /**
@@ -166,7 +186,7 @@ class YapealErrorHandler {
       $body .= '(' . $this->line . ')';
     };// if $this->line ...
     self::print_on_command($body);
-    return self::elog($body, YAPEAL_NOTICE_LOG);
+    return self::elog($body, self::$noticeLog);
   }// function handleNotice
   /**
    * Called to handle strict type messages.
@@ -178,7 +198,7 @@ class YapealErrorHandler {
       $body .= '(' . $this->line . ')';
     };// if $this->line ...
     self::print_on_command($body);
-    return self::elog($body, YAPEAL_STRICT_LOG);
+    return self::elog($body, self::$strictLog);
   }// function handleStrict
   /**
    * Called to handle warning type messages.
@@ -190,7 +210,7 @@ class YapealErrorHandler {
       $body .= '(' . $this->line . ')';
     };// if $this->line ...
     self::print_on_command($body);
-    return self::elog($body, YAPEAL_WARNING_LOG);
+    return self::elog($body, self::$warningLog);
   }// function handleWarning
   /**
    * Used to send message to a log file.
@@ -198,9 +218,12 @@ class YapealErrorHandler {
    * @param string $str Message to be sent to log file.
    * @param string $filename File to use for logging message.
    */
-  static function elog($str, $filename = YAPEAL_ERROR_LOG) {
+  static function elog($str, $filename = NULL) {
     $mess = '[' . gmdate('Y-m-d H:i:s') . substr(microtime(FALSE), 1, 4) . '] ';
     $mess .= PHP_EOL . $str . PHP_EOL;
+    if (is_null($filename)) {
+      $filename = YAPEAL_LOG . 'yapeal_error.log';
+    };
     error_log($mess, 3, $filename);
   }// function elog
   /**
@@ -240,5 +263,36 @@ class YapealErrorHandler {
       self::$keep = $keep;
     };
   }// function setKeep
+  /**
+   * Function used to set constants from [Logging] section of the configuration
+   * file.
+   *
+   * @param array $section A list of settings for this section of configuration.
+   */
+  public static function setLoggingSectionProperties(array $section) {
+    self::$logLevel = $section['log_level'];
+    self::$errorLog = YAPEAL_LOG . $section['error_log'];
+    self::$noticeLog = YAPEAL_LOG . $section['notice_log'];
+    self::$strictLog = YAPEAL_LOG . $section['strict_log'];
+    self::$warningLog = YAPEAL_LOG . $section['warning_log'];
+  }// function setLoggingSectionProperties
+  /**
+   * Function used to setup error and exception logging.
+   */
+  public static function setupCustomErrorAndExceptionSettings() {
+    ini_set('error_log', self::$errorLog);
+    ini_set('log_errors', 1);
+    // Start using custom error handler.
+    set_error_handler(array('YapealErrorHandler', 'handle'));
+    error_reporting(self::$logLevel);
+    // Setup exception observers.
+    $logObserver = new LoggingExceptionObserver(self::$warningLog);
+    $printObserver = new PrintingExceptionObserver();
+    // Attach (start) our custom printing and logging of exceptions.
+    YapealApiException::attach($logObserver);
+    YapealApiException::attach($printObserver);
+    ADODB_Exception::attach($logObserver);
+    ADODB_Exception::attach($printObserver);
+  }// function setupCustomErrorAndExceptionSettings
 }
 ?>

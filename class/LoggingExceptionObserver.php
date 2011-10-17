@@ -58,20 +58,6 @@ if (count(get_included_files()) < 2) {
  */
 class LoggingExceptionObserver implements IYapealObserver {
   /**
-   * @var string Holds the name of the log file to use.
-   */
-  private $file;
-  /**
-   * Constructor
-   *
-   * @param string $filename Optional filename to log messages to.
-   */
-  public function __construct($filename = YAPEAL_ERROR_LOG) {
-    if (!empty($filename) && is_string($filename)) {
-      $this->file = $filename;
-    };
-  }// function __construct
-  /**
    * Method the 'object' calls to let us know something has happened.
    *
    * @param object $e The 'object' we're observing.
@@ -85,7 +71,7 @@ class LoggingExceptionObserver implements IYapealObserver {
     $mess .= '    Trace:' . PHP_EOL;
     $mess .= $e->getTraceAsString() . PHP_EOL;
     $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
-    YapealErrorHandler::elog($mess, $this->file);
+    YapealErrorHandler::elog($mess);
   }// function YapealUpdate
 }
 ?>

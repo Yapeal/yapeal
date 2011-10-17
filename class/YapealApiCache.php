@@ -64,6 +64,10 @@ class YapealApiCache {
    */
   private $cacheInterval;
   /**
+   * @var string Value from [Cache] section for cache_output.
+   */
+  private static $cacheOutput = 'file';
+  /**
    * @var integer Holds current Unix time to have consistant caching time.
    */
   private $curTime;
@@ -161,7 +165,7 @@ class YapealApiCache {
     $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
     $cu->store();
     $cu = NULL;
-    switch (YAPEAL_CACHE_OUTPUT) {
+    switch (self::$cacheOutput) {
       case 'both':
         $this->cacheXmlDatabase($xml);
         $this->cacheXmlFile($xml);
@@ -241,7 +245,7 @@ class YapealApiCache {
    * Used to delete any cached XML.
    */
   public function delCachedApi() {
-    switch (YAPEAL_CACHE_OUTPUT) {
+    switch (self::$cacheOutput) {
       case 'both':
         $this->delCachedDatabase($xml);
         $this->delCachedFile($xml);
@@ -308,7 +312,7 @@ class YapealApiCache {
    * returns FALSE.
    */
   public function getCachedApi() {
-    switch (YAPEAL_CACHE_OUTPUT) {
+    switch (self::$cacheOutput) {
       case 'both':
         $xml = $this->getCachedDatabase();
         // If not cached in DB try file.
@@ -415,5 +419,13 @@ class YapealApiCache {
   public function isValid() {
     return $this->vd->isValid();
   }// function isValid
+  /**
+   * function used to set constants from [Cache] section of the configuration file.
+   *
+   * @param array $section A list of settings for this section of configuration.
+   */
+  public static function setCacheSectionProperties(array $section) {
+    self::$cacheOutput = $section['cache_output'];
+  }// function setCacheSectionProperties
 }
 ?>

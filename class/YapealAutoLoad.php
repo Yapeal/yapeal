@@ -80,6 +80,48 @@ class YapealAutoLoad {
    */
   private function __clone() {}
   /**
+   * Used to activate autoloading.
+   */
+  public static function activateAutoLoad() {
+    if (FALSE == spl_autoload_functions()) {
+      spl_autoload_register(array('YapealAutoLoad', 'autoLoad'));
+      if (function_exists('__autoload')) {
+        spl_autoload_register('__autoload', FALSE);
+      };
+    } else {
+      // Prepend if other autoloaders already exist.
+      spl_autoload_register(array('YapealAutoLoad', 'autoLoad'), FALSE, TRUE);
+    };// else FALSE == spl_autoload_functions() ...
+  }// function activateAutoLoad
+  /**
+   * Add an extension to the list used for class/interface names.
+   *
+   * @param string $ext The extension to be added to list.
+   *
+   * @return bool TRUE if extension was already in the list.
+   */
+  public static function addExtension($ext) {
+    if (!in_array($ext, self::$suffixList)) {
+      self::$suffixList[] = $ext;
+      return FALSE;
+    };
+    return TRUE;
+  }
+  /**
+   * Add a directory to the list to be searched in for class/interface files.
+   *
+   * @param string $dir The directory to be added to list.
+   *
+   * @return bool TRUE if directory was already in the list.
+   */
+  public static function addPath($dir) {
+    if (!in_array($dir, self::$dirList)) {
+      self::$dirList[] = $dir;
+      return FALSE;
+    };
+    return TRUE;
+  }
+  /**
    * Searches through the common class directory locations for the file
    * containing the class/interface we need.
    *
@@ -110,43 +152,5 @@ class YapealAutoLoad {
     };// foreach self::$dirList ...
     return FALSE;
   }
-  /**
-   * Add an extension to the list used for class/interface names.
-   *
-   * @param string $ext The extension to be added to list.
-   *
-   * @return bool TRUE if extension was already in the list.
-   */
-  static public function addExtension($ext) {
-    if (!in_array($ext, self::$suffixList)) {
-      self::$suffixList[] = $ext;
-      return FALSE;
-    };
-    return TRUE;
-  }
-  /**
-   * Add a directory to the list to be searched in for class/interface files.
-   *
-   * @param string $dir The directory to be added to list.
-   *
-   * @return bool TRUE if directory was already in the list.
-   */
-  static public function addPath($dir) {
-    if (!in_array($dir, self::$dirList)) {
-      self::$dirList[] = $dir;
-      return FALSE;
-    };
-    return TRUE;
-  }
 }
-// Now activate the YapealAutoLoad autoloader.
-if (FALSE == spl_autoload_functions()) {
-  spl_autoload_register(array('YapealAutoLoad', 'autoLoad'));
-  if (function_exists('__autoload')) {
-    spl_autoload_register('__autoload', FALSE);
-  };
-} else {
-  // Prepend if other autoloaders already exist.
-  spl_autoload_register(array('YapealAutoLoad', 'autoLoad'), FALSE, TRUE);
-};// else FALSE == spl_autoload_functions() ...
 ?>

@@ -67,60 +67,64 @@ if (!defined('YAPEAL_INC')) {
    */
   define('YAPEAL_INC', $dir . DS);
 };
-/**
- * We know the 'base' directory has to be just above 'inc' by default.
- */
 if (!defined('YAPEAL_BASE')) {
-  $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
+  // Check if the base path for Yapeal has been set in the environment.
+  $dir = @getenv('YAPEAL_BASE');
+  if ($dir === FALSE) {
+    $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
+  };
   /**
-   * @ignore
+   * We know the 'base' directory should be just above 'inc' by default.
    */
   define('YAPEAL_BASE', $dir . DS);
 };
-/**
- * The 'cache' directory is normally a neighbor to 'inc' but can be moved in
- * some configurations.
- */
 if (!defined('YAPEAL_CACHE')) {
+  /**
+   * The 'cache' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
 };
-/**
- * The 'class' directory is a neighbor to us.
- */
 if (!defined('YAPEAL_CLASS')) {
+  /**
+   * The 'class' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
 };
-/**
- * The 'config' directory is normally a neighbor to 'inc' but can be moved in
- * some configurations.
- */
 if (!defined('YAPEAL_CONFIG')) {
+  /**
+   * The 'config' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_CONFIG', YAPEAL_BASE . 'config' . DS);
 };
-/**
- * The 'ext' directory is normally a neighbor to 'inc' but can be moved in some
- * configurations.
- */
 if (!defined('YAPEAL_EXT')) {
+  /**
+   * The 'ext' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
 };
-/**
- * The 'install' directory is a neighbor to 'inc'.
- */
 if (!defined('YAPEAL_INSTALL')) {
+  /**
+   * The 'install' directory is normally just above base but can be moved in
+   * some configurations.
+   */
   define('YAPEAL_INSTALL', YAPEAL_BASE . 'install' . DS);
 };
-/**
- * The 'log' directory is normally a neighbor to 'inc' but can be moved in
- * some configurations.
- */
 if (!defined('YAPEAL_LOG')) {
+  /**
+   * The 'log' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
 };
-/**
- * The 'pics' directory is normally a neighbor to 'inc'.
- */
 if (!defined('YAPEAL_PICS')) {
+  /**
+   * The 'pics' directory is normally just above base but can be moved in some
+   * configurations.
+   */
   define('YAPEAL_PICS', YAPEAL_BASE . 'pics' . DS);
 };
 /* **************************************************************************

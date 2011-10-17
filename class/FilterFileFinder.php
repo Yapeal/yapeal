@@ -92,7 +92,7 @@ class FilterFileFinder extends FilterIterator {
     $flat = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
     // Fix for issue 65 try 2
     if (class_exists('FilesystemIterator')) {
-      // Set flags to know working settings.
+      // Set flags to known working settings.
       $flags = FilesystemIterator::CURRENT_AS_FILEINFO
         | FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
         | FilesystemIterator::UNIX_PATHS;

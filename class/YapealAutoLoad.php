@@ -1,8 +1,6 @@
 <?php
 /**
- * Yet Another Php Eve Api library
- *
- * YapealAutoLoad.php - Contents YapealAutoLoad class.
+ * Contains YapealAutoLoad class.
  *
  * PHP version 5
  *

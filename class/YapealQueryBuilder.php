@@ -113,7 +113,7 @@ class YapealQueryBuilder implements Countable {
     if (!is_string($tableName)) {
       $mess = '$tableName must be a string in ' . __CLASS__;
       throw new InvalidArgumentException($mess, 1);
-    };// if !is_string $params[$k] ...
+    };// if !is_string $tableName ...
     // Keep table name for later.
     $this->tableName = $tableName;
     if (!is_string($dsn)) {

@@ -118,6 +118,9 @@ if (!empty($options['config'])) {
 } else {
   $iniVars = getSettingsFromIniFile();
 };
+if (empty($iniVars)) {
+  exit(1);
+};
 /**
  * Define constants and properties from settings in configuration.
  */

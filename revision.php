@@ -62,12 +62,17 @@ if (!defined('YAPEAL_STABILITY')) {
   /**
    * Track stability of script.
    */
-  define('YAPEAL_STABILITY', str_replace('@', '', '@svnstability@'));
+  define('YAPEAL_STABILITY', 'Beta');
 };
 if (!defined('YAPEAL_VERSION')) {
+  $path = dirname(__FILE__);
+  $version = file_get_contents($path . DS . '.yapeal_version', FALSE);
+  if (empty($version)) {
+    $version = 'Unknown';
+  };
   /**
    * Track version of script.
    */
-  define('YAPEAL_VERSION', str_replace('@', '', '@svnversion@'));
+  define('YAPEAL_VERSION', $version);
 };
 ?>

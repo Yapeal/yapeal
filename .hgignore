@@ -1,3 +1,6 @@
 syntax: glob
 .hgsub
 *.komodoproject
+export/
+upload/
+docs/

@@ -52,27 +52,24 @@ if (count(get_included_files()) < 2) {
     exit(1);
   };
 };
-if (!defined('YAPEAL_DATE')) {
+if (!defined('YAPEAL_VERSION')) {
+  $version = str_replace('@', '', '@buildversion@');
+  if ($version == 'buildversion') {
+    $version = strftime("%y.%j.%H%M");
+    /**
+     * @ignore
+     */
+    define('YAPEAL_STABILITY', 'Local');
+  };
   /**
-   * Track date of script.
+   * Track version of script.
    */
-  define('YAPEAL_DATE', str_replace('@', '', '@builddate@'));
+  define('YAPEAL_VERSION', $version);
 };
 if (!defined('YAPEAL_STABILITY')) {
   /**
    * Track stability of script.
    */
   define('YAPEAL_STABILITY', 'Beta');
-};
-if (!defined('YAPEAL_VERSION')) {
-  $path = dirname(__FILE__);
-  $version = file_get_contents($path . DS . '.yapeal_version', FALSE);
-  if (empty($version)) {
-    $version = 'Unknown';
-  };
-  /**
-   * Track version of script.
-   */
-  define('YAPEAL_VERSION', $version);
 };
 ?>

@@ -84,16 +84,9 @@ if (function_exists('getopt')) {
   };
   if (isset($options['version'])) {
     $mess = basename(__FILE__);
-    if (YAPEAL_VERSION != 'svnversion') {
-      $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ') ';
-      $mess .= YAPEAL_DATE . PHP_EOL . PHP_EOL;
-    } else {
-      $rev = str_replace(array('$', 'Rev:'), '', '$Rev$');
-      $date = str_replace(array('$', 'Date::'), '', '$Date:: 2011-10-16 08:04:49 -0700$');
-      $mess .= $rev . '(svn)' . $date . PHP_EOL . PHP_EOL;
-    };
+    $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ')' . PHP_EOL . PHP_EOL;
     $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later';
+    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
     $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
     $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
     $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;

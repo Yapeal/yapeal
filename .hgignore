@@ -1,6 +1,7 @@
 syntax: glob
 .hgsub
 *.komodoproject
+config/yapeal.ini
 export/
 upload/
 docs/

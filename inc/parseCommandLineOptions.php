@@ -87,14 +87,25 @@ function parseCommandLineOptions(array $shortOptions = NULL,
   if (empty($options)) {
     return $settings;
   };
-  $optionsOnlyMap = array('h' => 'help', 'help' => 'help', 'V' => 'version',
-    'version' => 'version');
-  $optionsWithValuesMap = array('c' => 'config', 'config' => 'config',
-    'd' => 'database', 'database' => 'database','driver' => 'driver',
-    'p' => 'password', 'password' => 'password', 's' => 'host',
-    'server' =>'host', 'suffix' => 'suffix', 'table-prefix' => 'table_prefix',
-    'u' => 'username', 'username' => 'username');
-  $optionsWithListMap = array('priviledges' => 'priviledges', 'xml' => 'xml');
+  $optionsOnlyMap = array(
+    'h' => 'help', 'help' => 'help',
+    'V' => 'version', 'version' => 'version'
+  );
+  $optionsWithValuesMap = array(
+    'c' => 'config', 'config' => 'config',
+    'd' => 'database', 'database' => 'database',
+    'driver' => 'driver',
+    'l' => 'log', 'log' => 'log',
+    'p' => 'password', 'password' => 'password',
+    's' => 'host', 'server' =>'host',
+    'suffix' => 'suffix',
+    'table-prefix' => 'table_prefix',
+    'u' => 'username', 'username' => 'username'
+  );
+  $optionsWithListMap = array(
+    'priviledges' => 'priviledges',
+    'xml' => 'xml'
+  );
   foreach ($options as $opt => $value) {
     if (array_key_exists($opt, $optionsOnlyMap)) {
       $settings[$optionsOnlyMap[$opt]] = TRUE;

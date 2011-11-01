@@ -107,6 +107,10 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
     'DRIVER is only use during testing and should only be used if directed to'
     . ' do so by a developer. Optional setting that defaults to mysql://.');
   $options['h'] = array('op' => '  -h, --help', 'desc' => 'Show this help.');
+  $options['l:'] = array('op' => '  -l, --log=LOG', 'desc' =>
+    'LOG should be the path and name of a file that holds logging configuration'
+    . ' settings. The file can be in either INI or XML format. Optional setting'
+    . ' that defaults to config/log4php.xml');
   $options['p:'] = array('op' => '  -p, password=PASS', 'desc' =>
     'PASS is the password for the database server.');
   $options['privileges:'] = array('op' => '  --privileges=PRIVS', 'desc' =>

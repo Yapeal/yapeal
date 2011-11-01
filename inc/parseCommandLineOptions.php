@@ -77,8 +77,7 @@ function parseCommandLineOptions(array $shortOptions = NULL,
   $shortOptions = array_merge($shortOptions, array('h', 'V'));
   $shortOptions = implode('', $shortOptions);
   $longOptions = array_merge($longOptions, array('help', 'version'));
-  if (version_compare(PHP_VERSION, '5.3.0', '>=')
-    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
+  if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
     $options = getopt($shortOptions, $longOptions);
   } else {
     $options = getopt($shortOptions);

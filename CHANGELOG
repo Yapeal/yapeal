@@ -1,3 +1,13 @@
+2011-11-01
+
+(default) Fixing WARNING error many people are having with long options in
+yapeal.php since it seems even in Linux it was uncommon to be able to use them
+before PHP 5.3.
+
+2011-10-31
+
+(/) Switch to Mercurial is done and all development will continue in it.
+
 2011-10-17
 
 (trunk/) Added new 'status' column to utilAccessMask table. This column can be

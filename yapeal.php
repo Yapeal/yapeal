@@ -80,8 +80,8 @@ YapealAutoLoad::activateAutoLoad();
 // If function getopts available get any command line parameters.
 if (function_exists('getopt')) {
   require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-  $shortOpts = array('c:');
-  $longOpts = array('config:');
+  $shortOpts = array('c:', 'l:');
+  $longOpts = array('config:', 'log:');
   // Parser command line options first in case user just wanted to see help.
   $options = parseCommandLineOptions($shortOpts, $longOpts);
   $exit = FALSE;
@@ -262,6 +262,10 @@ function usage() {
     . ' of a custom configuration file. FILE must be in "ini" format. Defaults'
     . ' to <yapeal_base>/config/yapeal.ini.');
   $options['h'] = array('op' => '  -h, --help', 'desc' => 'Show this help.');
+  $options['l:'] = array('op' => '  -l, --log=LOG', 'desc' =>
+    'LOG should be the path and name of a file that holds logging configuration'
+    . ' settings. The file can be in either INI or XML format. Optional setting'
+    . ' that defaults to config/log4php.xml');
   $options['V'] = array('op' => '  -V, --version', 'desc' =>
     'Show version and licensing information.');
   $width = 0;

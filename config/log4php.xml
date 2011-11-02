@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <log4php:configuration xmlns:log4php="http://logging.apache.org/log4php/">
-  <appender name="combinedLog" class="LoggerAppenderFile">
-    <param name="file" value="myLog.log" />
+  <appender name="errorLog" class="LoggerAppenderRollingFile" threshold="ERROR">
+    <param name="file" value="log/yapeal_error.log"/>
+    <param name="maxFileSize" value="100KB"/>
+    <filter class="LoggerFilterLevelMatch">
+      <param name="levelToMatch" value="error" />
+    </filter>
+  </appender>
+  <appender name="warningLog" class="LoggerAppenderRollingFile" threshold="WARN">
+    <param name="file" value="log/yapeal_warning.log"/>
+    <param name="maxFileSize" value="100KB"/>
+    <filter class="LoggerFilterLevelMatch">
+      <param name="levelToMatch" value="warn" />
+    </filter>
+  </appender>
+  <appender name="noticeLog" class="LoggerAppenderRollingFile" threshold="NOTICE">
+    <param name="file" value="log/yapeal_notice.log"/>
+    <param name="maxFileSize" value="100KB"/>
+    <filter class="LoggerFilterLevelMatch">
+      <param name="levelToMatch" value="notice" />
+    </filter>
+  </appender>
+  <appender name="cli" class="LoggerAppenderConsole">
+    <param name="target" value="STDERR"/>
   </appender>
   <root>
-    <level value="WARN" />
-    <appender_ref ref="myAppender" />
+    <appender_ref ref="cli"/>
   </root>
+  <logger name="legacy">
+    <appender_ref ref="errorLog"/>
+    <appender_ref ref="warningLog"/>
+    <appender_ref ref="noticeLog"/>
+  </logger>
 </log4php:configuration>

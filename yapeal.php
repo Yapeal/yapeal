@@ -157,7 +157,7 @@ try {
   }
   $result = array_map('ucfirst', $result);
   if (count($result) == 0) {
-    $mess = 'No sections were found in utilSections check database';
+    $mess = 'No sections were found in utilSections check database.';
     trigger_error($mess, E_USER_ERROR);
   };
   $sectionList = array_intersect($sectionList, $result);

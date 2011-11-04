@@ -433,6 +433,8 @@ class YapealQueryBuilder implements Countable {
    * @return bool Returns TRUE if upsert worked, else FALSE.
    */
   public function store($upsert = NULL) {
+    print $this->rowCount . PHP_EOL;
+    print $this->rowSize . PHP_EOL;
     if ($this->rowCount == 0) {
       $mess = 'No rows for ' . $this->tableName;
       trigger_error($mess, E_USER_NOTICE);
@@ -450,6 +452,7 @@ class YapealQueryBuilder implements Countable {
     // Keep local copy of row count for transaction check.
     $cnt = $this->rowCount;
     $this->rowCount = 0;
+    $this->rowSize = 0;
     // Check if upsert is needed.
     if ($upsert === TRUE) {
       // Add update part to make upsert.

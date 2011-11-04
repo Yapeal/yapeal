@@ -201,7 +201,8 @@ class YapealApiCache {
   private function cacheXmlDatabase($xml) {
     try {
       // Get a new query instance.
-      $qb = new YapealQueryBuilder(YAPEAL_TABLE_PREFIX . 'utilXmlCache', YAPEAL_DSN);
+      $qb = new YapealQueryBuilder(YAPEAL_TABLE_PREFIX . 'utilXmlCache',
+        YAPEAL_DSN, FALSE);
       $row = array('api' => $this->api, 'hash' => $this->hash,
         'section' => $this->section, 'xml' => $xml);
       $qb->addRow($row);

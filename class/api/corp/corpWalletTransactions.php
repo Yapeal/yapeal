@@ -104,6 +104,7 @@ class corpWalletTransactions extends ACorp {
       $this->date = $future;
       $this->beforeID = '0';
       $rowCount = 1000;
+      $first = TRUE;
       try {
         do {
           // Give each wallet 60 seconds to finish. This should never happen but
@@ -168,13 +169,14 @@ class corpWalletTransactions extends ACorp {
            * walking backwards.
            * The oldest row we got is oldest API allows us to get.
            */
-          if (($this->beforeID > 0 && $this->rowCount != $rowCount)
+          if (($first === FALSE && $this->rowCount != $rowCount)
             || $this->date < $oldest) {
             // Have to continue with next account not just break while.
             continue 2;
           };
           // This tells API server where to start from when walking backwards.
           $apiParams['fromID'] = $this->beforeID;
+          $first = FALSE;
         } while ($counter--);
       }
       catch (YapealApiErrorException $e) {

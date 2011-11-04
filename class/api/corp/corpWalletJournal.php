@@ -108,8 +108,7 @@ class corpWalletJournal extends ACorp {
       // oldest available date from the XML.
       $this->date = $future;
       $this->beforeID = 0;
-      // Only try to get a few rows the first time.
-      $rowCount = 32;
+      $rowCount = 1000;
       // SQL use to find actual number of records for this owner and account.
       $sql = 'select sum(if(`ownerID`=' . $this->ownerID . ',1,0))';
       $sql .= ' from ' . YAPEAL_TABLE_PREFIX . $this->section . $this->api;
@@ -131,8 +130,6 @@ class corpWalletJournal extends ACorp {
           $apiParams = $this->params;
           // Added the accountKey to params.
           $apiParams['accountKey'] = $this->account;
-          // This tells API server where to start from when walking.
-          $apiParams['fromID'] = $this->beforeID;
           // This tells API server how many rows we want.
           $apiParams['rowCount'] = $rowCount;
           // First get a new cache instance.
@@ -144,8 +141,8 @@ class corpWalletJournal extends ACorp {
             $proxy = $this->getProxy();
             $con = new YapealNetworkConnection();
             $result = $con->retrieveXml($proxy, $apiParams);
-            // FALSE means there was an error and it has already been report so just
-            // return to caller.
+            // FALSE means there was an error and it has already been report so
+            // just return to caller.
             if (FALSE === $result) {
               return FALSE;
             };
@@ -190,15 +187,8 @@ class corpWalletJournal extends ACorp {
             // Have to continue with next account not just break while.
             continue 2;
           };
-          /* Get less rows at first but keep getting more until we hit maximum.
-           * Wastes some time when doing initial walk for new owners but works
-           * well after that.
-           */
-          if ($rowCount < 129) {
-            $rowCount *= 2;
-          } else {
-            $rowCount = 256;
-          };
+          // This tells API server where to start from when walking.
+          $apiParams['fromID'] = $this->beforeID;
           // Give API servers time to figure out we got last one before trying
           // to walk back for more.
           sleep(2);
@@ -230,7 +220,7 @@ class corpWalletJournal extends ACorp {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
     // Set any column defaults needed.
     $defaults = array('accountKey' => $this->account,
       'ownerID' => $this->ownerID
@@ -265,9 +255,10 @@ class corpWalletJournal extends ACorp {
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
               // Save row count and store rows.
-              if ($this->rowCount = count($qb) > 0) {
+              $this->rowCount = count($qb);
+              if ($this->rowCount > 0) {
                 $qb->store();
-              };// if count $rows ...
+              };// if $this->rowCount ...
               $qb = NULL;
               return TRUE;
             };// if $this->xr->localName == 'row' ...

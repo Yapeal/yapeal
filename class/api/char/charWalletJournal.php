@@ -97,12 +97,10 @@ class charWalletJournal extends AChar {
     $counter = 1000;
     $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
     $this->beforeID = 0;
-    // Only try to get a few rows the first time.
-    $rowCount = 16;
+    $rowCount = 250;
     // SQL use to find actual number of records for this owner and account.
-    $sql = 'select count(1)';
+    $sql = 'select sum(if(`ownerID`=' . $this->ownerID . ',1,0))';
     $sql .= ' from ' . YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-    $sql .= ' where `ownerID`=' . $this->ownerID;
     try {
         // Need database connection to do some counting.
         $dbCon = YapealDBConnection::connect(YAPEAL_DSN);
@@ -120,8 +118,6 @@ class charWalletJournal extends AChar {
         $apiParams = $this->params;
         // Added the accountKey to params.
         $apiParams['accountKey'] = 1000;
-        // This tells API server where to start from when walking.
-        $apiParams['fromID'] = $this->beforeID;
         // This tells API server how many rows we want.
         $apiParams['rowCount'] = $rowCount;
         // First get a new cache instance.
@@ -133,8 +129,8 @@ class charWalletJournal extends AChar {
           $proxy = $this->getProxy();
           $con = new YapealNetworkConnection();
           $result = $con->retrieveXml($proxy, $apiParams);
-          // FALSE means there was an error and it has already been report so just
-          // return to caller.
+          // FALSE means there was an error and it has already been report so
+          // just return to caller.
           if (FALSE === $result) {
             return FALSE;
           };
@@ -172,15 +168,8 @@ class charWalletJournal extends AChar {
           // Have to break while.
           break;
         };
-        /* Get less rows at first but keep getting more until we hit maximum.
-         * Wastes some time when doing initial walk for new owners but works
-         * well after that.
-         */
-        if ($rowCount < 129) {
-          $rowCount *= 2;
-        } else {
-          $rowCount = 256;
-        };
+        // This tells API server where to start from when walking.
+        $apiParams['fromID'] = $this->beforeID;
       } while ($counter--);
     }
     catch (YapealApiErrorException $e) {
@@ -204,8 +193,8 @@ class charWalletJournal extends AChar {
    */
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-    // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Get a new query instance with autoStore off.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
     // Set any column defaults needed.
     $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
     $qb->setDefaults($defaults);
@@ -248,9 +237,10 @@ class charWalletJournal extends AChar {
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
               // Save row count and store rows.
-              if ($this->rowCount = count($qb) > 0) {
+              $this->rowCount = count($qb);
+              if ($this->rowCount > 0) {
                 $qb->store();
-              };// if count $rows ...
+              };// if $this->rowCount ...
               $qb = NULL;
               return TRUE;
             };// if $this->xr->localName == 'row' ...

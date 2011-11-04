@@ -1,3 +1,9 @@
+2011-11-03
+
+(default) Changed class/YapealQueryBuilder.php to not just track number of rows
+in inserts/upserts but also size in bytes so it limits packet size when sending
+them to MySQL to help people work around the default low level server is set to.
+
 2011-11-01
 
 (default) Fixing WARNING error many people are having with long options in

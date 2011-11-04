@@ -56,9 +56,17 @@ if (count(get_included_files()) < 2) {
  */
 class YapealQueryBuilder implements Countable {
   /**
-   * @var mixed Holds count for auto store.
+   * @var bool Use to determine if autoStore mode is active or not.
    */
-  protected $autoStore;
+  protected $autoStore = TRUE;
+  /**
+   * @var mixed Holds max row count for autoStore mode.
+   */
+  protected $autoStoreRows = self::MAX_UPSERT_ROWS;
+  /**
+   * @var mixed Holds max byte size of data rows for autoStore mode.
+   */
+  protected static $autoStoreSize = self::MAX_UPSERT_SIZE;
   /**
    * @var string List of column ADOFieldObjects for table.
    */
@@ -88,6 +96,10 @@ class YapealQueryBuilder implements Countable {
    */
   private $rowCount = 0;
   /**
+   * @var integer Holds current byte size of rows.
+   */
+  private $rowSize = 0;
+  /**
    * @var string Holds the table name of the query that is being built.
    */
   protected $tableName;
@@ -100,16 +112,14 @@ class YapealQueryBuilder implements Countable {
    *
    * @param string $tableName Name of the table this query is for.
    * @param string $dsn ADOdb DSN for database connection.
-   * @param mixed $autoStore Sets how many rows can be added before they are
-   * automatically stored. Set to FALSE to turn off.
+   * @param bool $autoStoreMode Used to turn autostore on or off.
    *
    * @throws InvalidArgumentException Throws InvalidArgumentException if
    * $tableName or $dsn aren't strings.
    * @throws RuntimeException Throws RuntimeException if can't get ADOdb
    * connection or table column information.
    */
-  public function __construct($tableName, $dsn,
-    $autoStore = YapealQueryBuilder::MAX_UPSERT) {
+  public function __construct($tableName, $dsn, $autoStoreMode = TRUE) {
     if (!is_string($tableName)) {
       $mess = '$tableName must be a string in ' . __CLASS__;
       throw new InvalidArgumentException($mess, 1);
@@ -150,7 +160,7 @@ class YapealQueryBuilder implements Countable {
       // Make list of column names and their ADOdb generic types.
       $this->colTypes[$col->name] = $this->metaType($col);
     };// foreach $this->columns ...
-    $this->autoStore = $autoStore;
+    $this->autoStore = (bool)$autoStoreMode;
   }// function __construct
   /**
    * Destructor used to make sure to release ADOdb resource correctly more for
@@ -239,14 +249,17 @@ class YapealQueryBuilder implements Countable {
         $set[] = (string)$data[$field];
       };// switch $types($field) ...
     };// foreach $fields ...
+    $newRow = '(' . implode(',', $set) . ')';
     // Put completed row in with the rest.
-    $this->rows[] = '(' . implode(',', $set) . ')';
-    // Add row to the row count.
+    $this->rows[] = $newRow;
+    // Add row to the row count and size.
     ++$this->rowCount;
-    // Check if doing auto stores and if there are enough rows do so.
-    if ($this->autoStore !== FALSE && $this->autoStore == $this->rowCount) {
+    $this->rowSize += strlen($newRow);
+    // Check if doing auto stores and ready to do so.
+    if ($this->autoStore === TRUE && ($this->autoStoreRows == $this->rowCount
+      || self::$autoStoreSize <= $this->rowSize)) {
       $this->store();
-    };// if $this->autoStore !== FALSE ...
+    };// if $this->autoStore === TRUE ...
     return TRUE;
   }// function addRow
   /**
@@ -378,6 +391,40 @@ class YapealQueryBuilder implements Countable {
     return $ret;
   }// function setDefaults
   /**
+   * Turns autoStore mode on if parameter is TRUE else mode is off for FALSE.
+   *
+   * @param bool $mode Setting for autoStore mode.
+   */
+  public function setAutoStoreMode($mode) {
+    $this->autoStore = (bool)$mode;
+  }// function setAutoStoreMode
+  /**
+   * Set the max number of rows to use in a single insert/upsert when using
+   * autostore.
+   *
+   * @param mixed $autoStoreRows Sets how many rows can be added before they are
+   * automatically stored.
+   */
+  public function setAutoStoreRows($autoStoreRows) {
+    $this->autoStoreRows = $autoStoreRows;
+  }// function setAutoStoreRows
+  /**
+   * Set the max (soft) size in bytes of the data rows for a single
+   * insert/upsert when using autostore.
+   *
+   * This method sets a soft limit on how many bytes the data rows will be. When
+   * adding a row to the query if the total byte size goes over this limit it
+   * will force an autostore to happen. This is ignored if autoStore mode is off.
+   * The size should be a few percent below the MySQL server's max_packet_size.
+   * This is made available mostly for people to use when they don't have an
+   * option to increase the setting in my.cnf.
+   *
+   * @param mixed $autoStoreSize Sets max (soft) byte size.
+   */
+  public static function setAutoStoreSize($autoStoreSize) {
+    self::$autoStoreSize = $autoStoreSize;
+  }// function setAutoStoreSize
+  /**
    * Finishes making insert/upsert, empties out rows, then inserts/upserts data
    * to database.
    *
@@ -459,6 +506,19 @@ class YapealQueryBuilder implements Countable {
    * and map/Kills. The reason is they are the only APIs without a set maximum
    * number of rows that also tend to be very large.
    */
-  const MAX_UPSERT = 1000;
+  const MAX_UPSERT_ROWS = 1000;
+  /**
+   * Set max SQL insert/upsert size in bytes.
+   *
+   * This is a trade off of packet size used with MySQL and the number of
+   * inserts needed for larger APIs. Only a few APIs normal end up exceeding
+   * this size.
+   * Examples are char/AssetList, corp/AssetList, eve/AllianceList, map/Jumps,
+   * and map/Kills. The reason is they are the only APIs without a set maximum
+   * number of rows that also tend to be very large.
+   * The value here should be about right for MySQL server's default
+   * max_packet_size setting.
+   */
+  const MAX_UPSERT_SIZE = 990000;
 }
 ?>

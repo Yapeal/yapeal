@@ -56,10 +56,6 @@ if (count(get_included_files()) < 2) {
  */
 class YapealErrorHandler {
   /**
-   * @var int Holds logging level.
-   */
-  private static $logLevel = 0;
-  /**
    * @var int Holds path and name of the config file to use with log4php.
    */
   private static $logConfig = '';
@@ -81,12 +77,9 @@ class YapealErrorHandler {
     if (error_reporting() == 0) {
       return FALSE;
     };
-    // Let PHP handle any errors Yapeal is not set to log.
-    if (($errno & self::$logLevel) != $errno) {
-      return FALSE;
-    };
     switch ($errno) {
       case E_ERROR:
+      case E_RECOVERABLE_ERROR:
         $body = $errmsg . PHP_EOL;
         $body .= '   Trace:' . PHP_EOL;
         ob_start();
@@ -95,14 +88,17 @@ class YapealErrorHandler {
         $body .= $backtrace . PHP_EOL;
         $body .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
         Logger::getLogger('yapeal_capture')->error($body);
-        break;
+        return TRUE;
       case E_NOTICE:
       case E_STRICT:
         Logger::getLogger('yapeal_capture')->info($errmsg);
-        break;
+        return TRUE;
       case E_WARNING:
         Logger::getLogger('yapeal_capture')->warn($errmsg);
-        break;
+        return TRUE;
+      case E_DEPRECATED:
+        Logger::getLogger('yapeal_capture')->info($errmsg);
+        return TRUE;
     };// switch $errno ...
     return FALSE;
   }
@@ -138,7 +134,6 @@ class YapealErrorHandler {
    *
    */
   public static function setupCustomErrorAndExceptionSettings() {
-    self::$logLevel = E_ERROR | E_WARNING | E_NOTICE | E_STRICT;
     Logger::configure(self::$logConfig);
     // Start using custom error handler.
     set_error_handler(array('YapealErrorHandler', 'handle'));

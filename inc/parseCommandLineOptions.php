@@ -97,7 +97,7 @@ function parseCommandLineOptions(array $shortOptions = NULL,
     'c' => 'config', 'config' => 'config',
     'd' => 'database', 'database' => 'database',
     'driver' => 'driver',
-    'l' => 'log', 'log' => 'log',
+    'l' => 'log-config', 'log' => 'log-config',
     'p' => 'password', 'password' => 'password',
     's' => 'host', 'server' =>'host',
     'suffix' => 'suffix',
@@ -105,7 +105,7 @@ function parseCommandLineOptions(array $shortOptions = NULL,
     'u' => 'username', 'username' => 'username'
   );
   $optionsWithListMap = array(
-    'priviledges' => 'priviledges',
+    'privileges' => 'privileges',
     'xml' => 'xml'
   );
   foreach ($options as $opt => $value) {

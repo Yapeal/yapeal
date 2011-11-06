@@ -60,6 +60,10 @@ class YapealErrorHandler {
    */
   private static $logLevel = 0;
   /**
+   * @var int Holds path and name of the config file to use with log4php.
+   */
+  private static $logConfig = '';
+  /**
    * Constructor
    */
   private function __construct() {}// function __construct
@@ -77,7 +81,7 @@ class YapealErrorHandler {
     if (error_reporting() == 0) {
       return FALSE;
     };
-    // Let PHP handle any errors Yapeal is not set to handle.
+    // Let PHP handle any errors Yapeal is not set to log.
     if (($errno & self::$logLevel) != $errno) {
       return FALSE;
     };
@@ -107,19 +111,36 @@ class YapealErrorHandler {
    * file.
    *
    * @param array $section A list of settings for this section of configuration.
+   * @param string $file Path and name of the config file to use with log4php.
    */
-  public static function setLoggingSectionProperties(array $section) {
-    self::$logLevel = $section['log_level'];
+  public static function setLoggingSectionProperties(array $section,
+    $file = NULL) {
+    // Check if given custom configuration file.
+    if (empty($file) || !is_string($file)) {
+      if (!empty($section['log_config'])) {
+        $file = $section['log_config'];
+      } else {
+        $file = @getenv('YAPEAL_LOGGER');
+        if ($file === FALSE) {
+          $file = YAPEAL_CONFIG . 'logger.xml';
+        };
+      };
+    };
+    if (!(is_readable($file) && is_file($file))) {
+      $mess = 'The ' . $file . ' configuration file is missing!' . PHP_EOL;
+      fwrite(STDERR, $mess);
+      exit(1);
+    };
   }// function setLoggingSectionProperties
   /**
    * Function used to setup error and exception logging.
+   *
    */
   public static function setupCustomErrorAndExceptionSettings() {
-    ini_set('error_log', self::$errorLog);
-    ini_set('log_errors', 1);
+    self::$logLevel = E_ERROR | E_WARNING | E_NOTICE | E_STRICT;
+    Logger::configure(self::$logConfig);
     // Start using custom error handler.
     set_error_handler(array('YapealErrorHandler', 'handle'));
-    error_reporting(self::$logLevel);
   }// function setupCustomErrorAndExceptionSettings
 }
 ?>

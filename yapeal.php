@@ -77,8 +77,7 @@ require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
 require_once YAPEAL_INC . 'showVersion.php';
-require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
-YapealAutoLoad::activateAutoLoad();
+require_once YAPEAL_INC . 'setGeneralSectionConstants.php';
 $shortOpts = array('c:', 'l:');
 $longOpts = array('config:', 'log:');
 // Parser command line options first in case user just wanted to see help.
@@ -100,15 +99,23 @@ if (!empty($options['config'])) {
 if (empty($iniVars)) {
   exit(1);
 };
+require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
+YapealAutoLoad::activateAutoLoad();
 /**
  * Define constants and properties from settings in configuration.
  */
-YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
-YapealErrorHandler::setupCustomErrorAndExceptionSettings();
+if (!empty($options['log-config'])) {
+  YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging'],
+    $options['log-config']);
+  unset($options['config']);
+} else {
+  YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
+};
 YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
 YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
 setGeneralSectionConstants($iniVars);
 unset($iniVars);
+YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 try {
   /**
    * Give ourself a 'soft' limit of 10 minutes to finish.
@@ -177,32 +184,4 @@ catch (Exception $e) {
   exit(1);
 }
 exit(0);
-/**
- * Function used to set constants from general area (not in a section) of the
- * configuration file.
- *
- * @param array $section A list of settings for this section of configuration.
- */
-function setGeneralSectionConstants(array $section) {
-  if (!defined('YAPEAL_APPLICATION_AGENT')) {
-    $curl = curl_version();
-    $user_agent = $section['application_agent'];
-    $user_agent .= ' Yapeal/'. YAPEAL_VERSION . ' ' . YAPEAL_STABILITY;
-    $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
-    $user_agent .= ' libcurl/' . $curl['version'];
-    $user_agent = trim($user_agent);
-    /**
-     * Used as default user agent in network connections.
-     */
-    define('YAPEAL_APPLICATION_AGENT', $user_agent);
-  };
-  if (!defined('YAPEAL_REGISTERED_MODE')) {
-    /**
-     * Determines how utilRegisteredKey, utilRegisteredCharacter, and
-     * utilRegisteredCorporation tables are used, it also allows some columns in
-     * this tables to be optional depending on value.
-     */
-    define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
-  };
-}// function setGeneralSectionConstants
 ?>

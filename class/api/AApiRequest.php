@@ -113,7 +113,7 @@ abstract class AApiRequest {
         if ($this->prepareTables() !== TRUE) {
           $mess = 'Could not prepare ' . $this->section . $this->api;
           $mess .= ' API tables to accept new data for ' . $this->ownerID;
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
         };
       };
       // Create XMLReader.
@@ -136,9 +136,9 @@ abstract class AApiRequest {
       return FALSE;
     }
     catch (ADODB_Exception $e) {
-      $mess = 'Uncaught ADOdb exception' . PHP_EOL;
-      trigger_error($mess, E_USER_WARNING);
       // Catch any uncaught ADOdb exceptions here.
+      $mess = 'Uncaught ADOdb exception' . PHP_EOL;
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     }
   }// function apiStore
@@ -206,10 +206,11 @@ abstract class AApiRequest {
       };// while $xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -249,7 +250,7 @@ abstract class AApiRequest {
       // format string.
       if (!array_key_exists($arg_key, $arg_nums)) {
         $mess = 'Missing argument "' . $arg_key . '"' . PHP_EOL;
-        trigger_error($mess, E_USER_WARNING);
+        Logger::getLogger('yapeal')->warn($mess);
         return FALSE;
       };// if ! array_key_exists(...
       // Replace the named argument with the corresponding numeric one.

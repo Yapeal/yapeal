@@ -100,7 +100,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get database connection in ' . __CLASS__;
-      throw new RuntimeException($mess, 1);
+      throw new RuntimeException($mess);
     }
     // Get a new access mask object.
     $this->am = new AccessMask();
@@ -118,7 +118,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
             $this->properties['corporationID'] = $id;
           } else {
             $mess = 'Unknown corporation ' . $id;
-            throw new DomainException($mess, 2);
+            throw new DomainException($mess);
           };// else ...
         };
         // else if it's a string ...
@@ -129,12 +129,12 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
             $this->properties['corporationName'] = $id;
           } else {
             $mess = 'Unknown corporation ' . $id;
-            throw new DomainException($mess, 3);
+            throw new DomainException($mess);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer or a string';
-        throw new InvalidArgumentException($mess, 4);
+        throw new InvalidArgumentException($mess);
       };// else ...
     };// if !empty $id ...
   }// function __construct
@@ -220,6 +220,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists;
@@ -259,6 +260,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists;

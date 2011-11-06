@@ -129,6 +129,7 @@ abstract class AMap extends AApiRequest {
       };// switch $code ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     return TRUE;
@@ -150,6 +151,7 @@ abstract class AMap extends AApiRequest {
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

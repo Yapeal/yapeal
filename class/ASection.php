@@ -79,6 +79,7 @@ abstract class ASection {
       $section = new Sections(strtolower($this->section), FALSE);
     }
     catch (Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       // Section does not exist in utilSections table or other error occurred.
       $this->abort = TRUE;
       return;
@@ -103,7 +104,8 @@ abstract class ASection {
     } else {
       $this->abort = TRUE;
       $mess = 'No known APIs found for section ' . $this->section;
-      trigger_error($mess, E_USER_ERROR);
+      Logger::getLogger('yapeal')->error($mess);
+      return;
     };// else $foundAPIs ...
   }// function __construct
   /**

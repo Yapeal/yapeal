@@ -79,7 +79,7 @@ class SectionChar extends ASection {
       $result = $con->GetAll($sql);
       if (count($result) == 0) {
         $mess = 'No characters for char section';
-        trigger_error($mess, E_USER_NOTICE);
+        Logger::getLogger('yapeal')->info($mess);
         return FALSE;
       };// if empty $result ...
       // Build name of filter based on mode.
@@ -87,7 +87,7 @@ class SectionChar extends ASection {
       $charList = array_filter($result, $filter);
       if (empty($charList)) {
         $mess = 'No active characters for char section';
-        trigger_error($mess, E_USER_NOTICE);
+        Logger::getLogger('yapeal')->info($mess);
         return FALSE;
       };
       // Randomize order so no one character can starve the rest in case of
@@ -103,7 +103,7 @@ class SectionChar extends ASection {
         $apis = $this->am->maskToAPIs($chr['mask'], $this->section);
         if ($apis === FALSE) {
           $mess = 'Problem retrieving API list using mask';
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
           continue;
         };
         // Randomize order in which APIs are tried if there is a list.
@@ -131,7 +131,7 @@ class SectionChar extends ASection {
               $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
               if ($con->GetOne($sql) != 1) {
                 $mess = 'Failed to get lock for ' . $class . $hash;
-                trigger_error($mess, E_USER_NOTICE);
+                Logger::getLogger('yapeal')->info($mess);
                 continue;
               };// if $con->GetOne($sql) ...
             }
@@ -150,14 +150,14 @@ class SectionChar extends ASection {
           // See if Yapeal has been running for longer than 'soft' limit.
           if (YAPEAL_MAX_EXECUTE < time()) {
             $mess = 'Yapeal has been working very hard and needs a break';
-            trigger_error($mess, E_USER_NOTICE);
+            Logger::getLogger('yapeal')->info($mess);
             exit;
           };// if YAPEAL_MAX_EXECUTE < time() ...
         };// foreach $apis ...
       };// foreach $charList
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      Logger::getLogger('yapeal')->warn($e);
     }
     // Only truly successful if API was fetched and stored.
     if ($apiCount == $apiSuccess) {
@@ -328,7 +328,7 @@ class SectionChar extends ASection {
     if (is_null($row['RCActive'])) {
       $mess = 'IsActive can not be null in utilRegisteredCharacter when';
       $mess .= ' registered_mode = "required"';
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     };
     // Deactivated.
@@ -343,7 +343,7 @@ class SectionChar extends ASection {
     if (is_null($row['RCMask'])) {
       $mess = 'activeAPIMask can not be null in utilRegisteredCharacter when';
       $mess .= ' registered_mode = "required"';
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     };
     $row['mask'] = $this->mask & $row['RCMask'];

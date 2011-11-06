@@ -143,7 +143,8 @@ class httpRequest {
 		require_once $plugin_file;
 		if (!class_exists($plugin_class)) {
 			$mess = 'Plugin class ' . $plugin_class . ' does not exist';
-			trigger_error($mess, E_USER_ERROR);
+			Logger::getLogger('yapeal')->error($mess);
+      exit(2);
 		};
 		$this->plugin = new $plugin_class($this->options);
 	}

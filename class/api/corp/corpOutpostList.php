@@ -88,6 +88,7 @@ class corpOutpostList extends ACorp {
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

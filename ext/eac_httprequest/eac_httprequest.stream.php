@@ -51,7 +51,6 @@ class streamRequest extends curlRequest {
 	 * @return mixed result of request
 	 */
 	protected function request($url) {
-		trigger_error('Stream connection', E_USER_NOTICE);
 		$streamParams = array(
 			'http' => array('method' => $this->options['CURLOPT_CUSTOMREQUEST'])
 		);

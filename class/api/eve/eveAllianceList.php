@@ -131,10 +131,11 @@ class eveAllianceList extends AEve {
       };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -167,7 +168,7 @@ class eveAllianceList extends AEve {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -191,6 +192,7 @@ class eveAllianceList extends AEve {
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

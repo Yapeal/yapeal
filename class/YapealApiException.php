@@ -53,54 +53,6 @@ if (count(get_included_files()) < 2) {
  *
  * @package Yapeal
  * @subpackage Exceptions
- * @uses IYapealSubject
  */
-class YapealApiException extends Exception implements IYapealSubject {
-  /**
-   * @var array Hold the references to our observers.
-   */
-  protected static $observers = array();
-  /**
-   * Constructor
-   *
-   * @param string $message Optional text message of the exception.
-   * @param integer $code Optional code for exception.
-   */
-  public function __construct($message = NULL, $code = 0) {
-    parent::__construct($message, $code);
-    $this->notify();
-  }
-  /**
-   * Used by observers to register so they can be notified.
-   *
-   * @param IYapealObserver $observer The observer being added.
-   */
-  public static function attach(IYapealObserver $observer) {
-    if (is_callable($observer)) {
-      $idx = spl_object_hash($observer);
-      self::$observers[$idx] = $observer;
-    };
-  }
-  /**
-   * Used by observers to unregister from being notified.
-   *
-   * @param IYapealObserver $observer The observer being removed.
-   */
-  public static function detach(IYapealObserver $observer) {
-    if (is_callable($observer)) {
-      $idx = spl_object_hash($observer);
-      if (array_key_exists($idx, self::$observers)) {
-        unset(self::$observers[$idx]);
-      };
-    };
-  }
-  /**
-   * Used to notify all the observers.
-   */
-  public function notify() {
-    foreach (self::$observers as $observer) {
-      $observer->YapealUpdate($this);
-    };
-  }
-}
+class YapealApiException extends Exception {}
 ?>

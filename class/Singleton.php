@@ -93,14 +93,14 @@ class Singleton {
 		if (isset(self::$instance[$name])) {
       if (!empty($args)) {
         $mess = '$args ignored as an instance of ' . $name . ' already exists';
-        trigger_error($mess, E_USER_NOTICE);
+        Logger::getLogger('yapeal')->info($mess);
       };
       return self::$instance[$name];
     };
     $reflectionClass = new ReflectionClass($name);
     if (FALSE === $reflectionClass->isInstantiable()) {
       $mess = $name . ' class is not instantiable';
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     };
     if (TRUE === $reflectionClass->hasMethod('__construct')) {
@@ -110,7 +110,7 @@ class Singleton {
         if (!empty($args)) {
           $mess = $name . '::__construct() does not accept any parameters.';
           $mess .= ' $args will be ignored.';
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
         };
         self::$instance[$name] = $reflectionClass->newInstance();
       } else {
@@ -134,7 +134,7 @@ class Singleton {
           $mess = 'The following required parameters for constructor were missing: ';
           $mess .= implode(', ', $missing);
           $mess .= ' when calling instance of ' . $name;
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
           return FALSE;
         };
         self::$instance[$name] = $reflectionClass->newInstanceArgs((array)$re_args);

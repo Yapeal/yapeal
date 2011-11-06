@@ -156,13 +156,13 @@ class YapealValidateXml {
       $mess .= ' Check to make sure API ';
       $mess .= $this->section . DS . $this->api;
       $mess .= ' is a valid API.';
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     };// if FALSE !== strpos <!DOCTYPE html ...
     // Check for XML header.
     //if (FALSE === strpos($xml, "?xml version='1.0'")) {
     //  $mess = 'API server returned unknown type of data.';
-    //  trigger_error($mess, E_USER_WARNING);
+    //  Logger::getLogger('yapeal')->warn($mess);
     //  $this->validXML = FALSE;
     //  return FALSE;
     //};// if strpos $xml...
@@ -177,18 +177,18 @@ class YapealValidateXml {
       // Can not use schema if it is missing.
       if (!is_file($cacheFile)) {
         $mess = 'Missing schema file ' . $cacheFile;
-        trigger_error($mess, E_USER_NOTICE);
+        Logger::getLogger('yapeal')->info($mess);
         $cacheFile = realpath(YAPEAL_CACHE . 'unknown.xsd');
       };// if !is_file ...
       // Have to have a good schema.
       if (!$xr->setSchema($cacheFile)) {
         $mess = 'Could not load schema file ' . $cacheFile;
-        trigger_error($mess, E_USER_NOTICE);
+        Logger::getLogger('yapeal')->info($mess);
         return FALSE;
       };// if !$xr->setSchema ...
     } else {
       $mess = 'Could not access cache directory to get XSD file';
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     };// else is_dir ...
     // Now ready to start going through API XML.

@@ -84,7 +84,7 @@ class SectionMaint extends ASection {
     $scriptSuccess = 0;
     if (count($this->scriptList) == 0) {
       $mess = 'None of the allowed scripts are currently active for ' . $this->section;
-      trigger_error($mess, E_USER_NOTICE);
+      Logger::getLogger('yapeal')->info($mess);
       return FALSE;
     };
     // Randomize order in which scripts are tried if there is a list.
@@ -108,7 +108,7 @@ class SectionMaint extends ASection {
             $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
             if ($con->GetOne($sql) != 1) {
               $mess = 'Failed to get lock for ' . $class . $hash;
-              trigger_error($mess, E_USER_NOTICE);
+              Logger::getLogger('yapeal')->info($mess);
               continue;
             };// if $con->GetOne($sql) ...
           }
@@ -127,13 +127,13 @@ class SectionMaint extends ASection {
         // See if Yapeal has been running for longer than 'soft' limit.
         if (YAPEAL_MAX_EXECUTE < time()) {
           $mess = 'Yapeal has been working very hard and needs a break';
-          trigger_error($mess, E_USER_NOTICE);
+          Logger::getLogger('yapeal')->info($mess);
           exit;
         };// if YAPEAL_MAX_EXECUTE < time() ...
       };// foreach $scripts ...
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      Logger::getLogger('yapeal')->warn($e);
     }
     // Only truly successful if all scripts ran successfully.
     if ($scriptCount == $scriptSuccess) {

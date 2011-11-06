@@ -138,6 +138,7 @@ class corpOutpostServiceDetail extends ACorp {
         continue;
       }
       catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -161,7 +162,7 @@ class corpOutpostServiceDetail extends ACorp {
       $list = $con->GetAll($sql);
     }
     catch (ADODB_Exception $e) {
-      // Something wrong with query return FALSE.
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     if (count($list) == 0) {
@@ -192,6 +193,7 @@ class corpOutpostServiceDetail extends ACorp {
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

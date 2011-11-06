@@ -139,7 +139,8 @@ try {
   $sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
   if (count($sectionList) == 0) {
     $mess = 'No section classes were found check path setting';
-    trigger_error($mess, E_USER_ERROR);
+    Logger::getLogger('yapeal')->error($mess);
+    exit(2);
   };
   //$sectionList = array_map('strtolower', $sectionList);
   // Randomize order in which API sections are tried if there is a list.
@@ -158,7 +159,8 @@ try {
   $result = array_map('ucfirst', $result);
   if (count($result) == 0) {
     $mess = 'No sections were found in utilSections check database.';
-    trigger_error($mess, E_USER_ERROR);
+    Logger::getLogger('yapeal')->error($mess);
+    exit(2);
   };
   $sectionList = array_intersect($sectionList, $result);
   // Now take the list of sections and call each in turn.
@@ -169,7 +171,7 @@ try {
       $instance->pullXML();
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      Logger::getLogger('yapeal')->fatal($e);
     }
     // Going to sleep for a second to let DB time to flush etc between sections.
     sleep(1);
@@ -183,20 +185,10 @@ try {
   CachedInterval::resetAll();
 }
 catch (Exception $e) {
-  require_once YAPEAL_CLASS . 'YapealErrorHandler.php';
   $mess = 'Uncaught exception in ' . basename(__FILE__);
-  YapealErrorHandler::print_on_command($mess);
-  YapealErrorHandler::elog($mess);
-  $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
-  if ($e->getCode()) {
-    $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
-  };
-  $mess .= '     File: ' . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL;
-  $mess .= '    Trace:' . PHP_EOL;
-  $mess .= $e->getTraceAsString() . PHP_EOL;
-  $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
-  YapealErrorHandler::print_on_command($mess);
-  YapealErrorHandler::elog($mess);
+  Logger::getLogger('yapeal')->fatal($mess);
+  Logger::getLogger('yapeal')->fatal($e);
+  exit(1);
 }
 exit(0);
 /**

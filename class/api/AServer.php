@@ -129,6 +129,7 @@ abstract class AServer extends AApiRequest {
       };// switch $code ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     return TRUE;

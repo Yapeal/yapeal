@@ -122,7 +122,7 @@ class charCharacterSheet  extends AChar {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->$subTable();
@@ -136,7 +136,7 @@ class charCharacterSheet  extends AChar {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 if ($subTable == 'skills') {
@@ -163,10 +163,11 @@ class charCharacterSheet  extends AChar {
       };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -206,7 +207,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function attributes
   /**
@@ -259,7 +260,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function attributeEnhancers
   /**
@@ -302,7 +303,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -346,7 +347,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function skills
   /**
@@ -372,6 +373,7 @@ class charCharacterSheet  extends AChar {
         $con->Execute($sql);
       }
       catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

@@ -145,7 +145,7 @@ class corpCorporationSheet  extends ACorp {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Uncaught ADOdb exception' . PHP_EOL;
-      trigger_error($mess, E_USER_WARNING);
+      Logger::getLogger('yapeal')->warn($mess);
       // Catch any uncaught ADOdb exceptions here.
       return FALSE;
     }
@@ -197,7 +197,7 @@ class corpCorporationSheet  extends ACorp {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->$subTable();
@@ -211,7 +211,7 @@ class corpCorporationSheet  extends ACorp {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->rowset($subTable);
@@ -234,10 +234,11 @@ class corpCorporationSheet  extends ACorp {
       };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -277,7 +278,7 @@ class corpCorporationSheet  extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function logo
   /**
@@ -318,7 +319,7 @@ class corpCorporationSheet  extends ACorp {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
 }

@@ -787,7 +787,6 @@ class curlRequest {
 	 * @return string decoded data
 	 */
 	protected function _gzdecode($data = null) {
-		trigger_error('Was gzipped', E_USER_NOTICE);
 		if (!$data) {
 			return '';
 		};

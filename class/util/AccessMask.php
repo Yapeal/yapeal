@@ -77,7 +77,7 @@ class AccessMask {
       }
       catch (ADODB_Exception $e) {
         $mess = 'Failed to get database connection in ' . __CLASS__;
-        throw new RuntimeException($mess, 1);
+        throw new RuntimeException($mess);
       }
       $sql = 'select `api`,`description`,`mask`,`section`';
       $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'util' . __CLASS__ . '`';
@@ -86,7 +86,7 @@ class AccessMask {
       }
       catch (ADODB_Exception $e) {
         $mess = 'Failed to get data from table in ' . __CLASS__;
-        throw new RuntimeException($mess, 2);
+        throw new RuntimeException($mess);
       }
       // If the table is empty add a default for APIKeyInfo mask only.
       if (empty(self::$maskList)) {

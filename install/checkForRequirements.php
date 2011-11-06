@@ -155,8 +155,7 @@ if (!is_writable(YAPEAL_LOG)) {
   exit(2);
 };
 // Check for required Logging section settings.
-$required = array('error_log', 'log_level', 'notice_log', 'strict_log',
-  'warning_log');
+$required = array('log_config');
 $mess = '';
 foreach ($required as $setting) {
   if (!isset($iniVars['Logging'][$setting])) {

@@ -60,8 +60,6 @@ if (count($included) > 1 || $included[0] != __FILE__) {
 };
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
-// Set some minimal error settings for now.
-presetErrorHandling();
 /**
  * Define short name for directory separator which always uses unix '/'.
  */
@@ -75,37 +73,25 @@ if ($dir === FALSE) {
 // Get path constants so they can be used.
 require_once $dir . 'inc' . DS . 'common_paths.php';
 require_once YAPEAL_BASE . 'revision.php';
+require_once YAPEAL_INC . 'parseCommandLineOptions.php';
+require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
+require_once YAPEAL_INC . 'usage.php';
+require_once YAPEAL_INC . 'showVersion.php';
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 YapealAutoLoad::activateAutoLoad();
-// If function getopts available get any command line parameters.
-if (function_exists('getopt')) {
-  require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-  $shortOpts = array('c:', 'l:');
-  $longOpts = array('config:', 'log:');
-  // Parser command line options first in case user just wanted to see help.
-  $options = parseCommandLineOptions($shortOpts, $longOpts);
-  $exit = FALSE;
-  if (isset($options['help'])) {
-    usage();
-    $exit = TRUE;
-  };
-  if (isset($options['version'])) {
-    $mess = basename(__FILE__);
-    $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ')' . PHP_EOL . PHP_EOL;
-    $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
-    $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-    $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-    $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-    fwrite(STDOUT, $mess);
-    $exit = TRUE;
-  };
-  if ($exit == TRUE) {
-    exit(0);
-  };
-};// if function_exists('getopt') ...
-// Autoload does not work for functions.
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
+$shortOpts = array('c:', 'l:');
+$longOpts = array('config:', 'log:');
+// Parser command line options first in case user just wanted to see help.
+$options = parseCommandLineOptions($shortOpts, $longOpts);
+$exit = FALSE;
+if (isset($options['help'])) {
+  usage(__FILE__, $shortOpts, $longOpts);
+  exit(0);
+};
+if (isset($options['version'])) {
+  showVersion(__FILE__);
+  exit(0);
+};
 if (!empty($options['config'])) {
   $iniVars = getSettingsFromIniFile($options['config']);
 } else {
@@ -192,24 +178,6 @@ catch (Exception $e) {
 }
 exit(0);
 /**
- * Function used to preset error handling to some sensible defaults.
- *
- * Any errors that are triggered now are reported to the system default
- * logging location until we're done setting up some of the required vars and
- * we can start our own logging.
- */
-function presetErrorHandling() {
-  // Set some basic common settings so we know we'll get to see any errors etc.
-  error_reporting(E_ALL);
-  ini_set('ignore_repeated_errors', 0);
-  ini_set('ignore_repeated_source', 0);
-  ini_set('html_errors', 0);
-  ini_set('display_errors', 1);
-  ini_set('error_log', NULL);
-  ini_set('log_errors', 0);
-  ini_set('track_errors', 0);
-}// function presetErrorHandling
-/**
  * Function used to set constants from general area (not in a section) of the
  * configuration file.
  *
@@ -237,47 +205,4 @@ function setGeneralSectionConstants(array $section) {
     define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
   };
 }// function setGeneralSectionConstants
-/**
- * Function use to show the usage message on command line.
- *
- * @ignore
- */
-function usage() {
-  $cutLine = 78;
-  $ragLine = $cutLine - 5;
-  $mess = PHP_EOL . 'Usage: ' . basename(__FILE__);
-  $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
-  $mess .= 'OPTIONs:' . PHP_EOL;
-  $options = array();
-  $options['c:'] = array('op' => '  -c, --config=FILE', 'desc' =>
-    'Read configuration from FILE. This is an optional setting to allow the use'
-    . ' of a custom configuration file. FILE must be in "ini" format. Defaults'
-    . ' to <yapeal_base>/config/yapeal.ini.');
-  $options['h'] = array('op' => '  -h, --help', 'desc' => 'Show this help.');
-  $options['l:'] = array('op' => '  -l, --log=LOG', 'desc' =>
-    'LOG should be the path and name of a file that holds logging configuration'
-    . ' settings. The file can be in either INI or XML format. Optional setting'
-    . ' that defaults to config/log4php.xml');
-  $options['V'] = array('op' => '  -V, --version', 'desc' =>
-    'Show version and licensing information.');
-  $width = 0;
-  foreach ($options as $k => $v) {
-    if (strlen($v['op']) > $width) {
-      $width = strlen($v['op']);
-    };
-  };// foreach $options ...
-  $width += 4;
-  $break = PHP_EOL . str_pad('', $width);
-  $descCut = $cutLine - $width;
-  $descRag = $descCut - 5;
-  foreach ($options as $k => $v) {
-    $option = str_pad($v['op'], $width);
-    // Make description text ragged right with forced word wrap at full width.
-    $desc = wordwrap($v['desc'], $descRag, PHP_EOL);
-    $desc = wordwrap($v['desc'], $descCut, PHP_EOL, TRUE);
-    $option .= str_replace(PHP_EOL, $break, $desc);
-    $mess .= $option . PHP_EOL . PHP_EOL;
-  };// foreach $options ...
-  fwrite(STDOUT, $mess);
-};// function usage
 ?>

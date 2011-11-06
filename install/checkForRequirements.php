@@ -70,34 +70,17 @@ require_once YAPEAL_BASE . 'revision.php';
 require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
-// Must have getopt() to get command line parameters.
-if (!function_exists('getopt')) {
-  $mess = 'getopt() not available can not perform checks!' . PHP_EOL;
-  fwrite(STDERR, $mess);
-  exit(2);
-};
+require_once YAPEAL_INC . 'showVersion.php';
 $shortOpts = array('c:');
 $longOpts = array('config:');
 // Parser command line options first in case user just wanted to see help.
 $options = parseCommandLineOptions($shortOpts, $longOpts);
-$exit = FALSE;
 if (isset($options['help'])) {
-  $file = basename(__FILE__);
-  usage($file, $shortOpts, $longOpts);
-  $exit = TRUE;
+  usage(__FILE__, $shortOpts, $longOpts);
+  exit(0);
 };
 if (isset($options['version'])) {
-  $mess = basename(__FILE__);
-  $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ')' . PHP_EOL . PHP_EOL;
-  $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-  $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
-  $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-  $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-  $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-  fwrite(STDOUT, $mess);
-  $exit = TRUE;
-};
-if ($exit == TRUE) {
+  showVersion(__FILE__);
   exit(0);
 };
 // Insure minimum version of PHP we need to run.
@@ -131,6 +114,12 @@ if (($cv['features'] & CURL_VERSION_SSL) != CURL_VERSION_SSL) {
 // Check for minimum MySQL client.
 if (mysqli_get_client_version() < 50000) {
   $mess = 'MySQL client version is older than 5.0.' . PHP_EOL;
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+// Must have getopt() to get command line parameters.
+if (!function_exists('getopt')) {
+  $mess = 'getopt() not available can not perform checks!' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };

@@ -70,33 +70,20 @@ require_once YAPEAL_BASE . 'revision.php';
 require_once YAPEAL_INC . 'parseCommandLineOptions.php';
 require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
-// If function getopts available get any command line parameters.
-if (function_exists('getopt')) {
-  $shortOpts = array('c:', 'd:', 'p:', 's:', 'u:');
-  $longOpts = array('config:', 'database:', 'password:', 'privileges:',
-    'server:', 'username:');
-  $options = parseCommandLineOptions($shortOpts, $longOpts);
-  $exit = FALSE;
-  if (isset($options['help'])) {
-    $file = basename(__FILE__);
-    usage($file, $shortOpts, $longOpts);
-    $exit = TRUE;
-  };
-  if (isset($options['version'])) {
-    $mess = basename(__FILE__);
-    $mess .= ' ' . YAPEAL_VERSION . ' (' . YAPEAL_STABILITY . ')' . PHP_EOL . PHP_EOL;
-    $mess .= 'Copyright (c) 2008-2011, Michael Cummings.' . PHP_EOL;
-    $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
-    $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-    $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
-    $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
-    fwrite(STDOUT, $mess);
-    $exit = TRUE;
-  };
-  if ($exit == TRUE) {
-    exit(0);
-  };
-};// if function_exists getopt ...
+require_once YAPEAL_INC . 'showVersion.php';
+$shortOpts = array('c:', 'd:', 'p:', 's:', 'u:');
+$longOpts = array('config:', 'database:', 'password:', 'privileges:',
+  'server:', 'username:');
+$options = parseCommandLineOptions($shortOpts, $longOpts);
+$exit = FALSE;
+if (isset($options['help'])) {
+  usage(__FILE__, $shortOpts, $longOpts);
+  exit(0);
+};
+if (isset($options['version'])) {
+  showVersion(__FILE__);
+  exit(0);
+};
 if (!empty($options['config'])) {
   $section = getSettingsFromIniFile($options['config'], 'Database');
   unset($options['config']);

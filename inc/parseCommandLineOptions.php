@@ -74,6 +74,9 @@ if (count(get_included_files()) < 2) {
  */
 function parseCommandLineOptions(array $shortOptions = NULL,
   array $longOptions = NULL) {
+  if (!function_exists('getopt')) {
+    return array();
+  };
   $shortOptions = array_merge($shortOptions, array('h', 'V'));
   $shortOptions = implode('', $shortOptions);
   $longOptions = array_merge($longOptions, array('help', 'version'));

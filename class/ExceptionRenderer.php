@@ -68,7 +68,10 @@ class ExceptionRenderer implements LoggerRendererObject {
     };
     $mess .= '    Trace:' . PHP_EOL;
     $mess .= $e->getTraceAsString() . PHP_EOL;
-    $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH);
+    $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
+		if (method_exists($e, 'getPrevious') && $e->getPrevious() !== null) {
+			$mess .= 'Caused by: ' . get_class($e->getPrevious());
+		};
     return $mess;
   }// function render
 }// class ExceptionRenderer

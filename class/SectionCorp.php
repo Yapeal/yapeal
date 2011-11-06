@@ -78,16 +78,20 @@ class SectionCorp extends ASection {
       $sql = $this->getSQLQuery();
       $result = $con->GetAll($sql);
       if (count($result) == 0) {
-        $mess = 'No corporations for corp section';
-        Logger::getLogger('yapeal')->info($mess);
+        if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+          $mess = 'No corporations for corp section';
+          Logger::getLogger('yapeal')->info($mess);
+        };
         return FALSE;
       };// if empty $result ...
       // Build name of filter based on mode.
       $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
       $corpList = array_filter($result, $filter);
       if (empty($corpList)) {
-        $mess = 'No active corporations for corp section';
-        Logger::getLogger('yapeal')->info($mess);
+        if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+          $mess = 'No active corporations for corp section';
+          Logger::getLogger('yapeal')->info($mess);
+        };
         return FALSE;
       };
       // Randomize order so no one corporation can starve the rest in case of
@@ -131,8 +135,10 @@ class SectionCorp extends ASection {
               $con = YapealDBConnection::connect(YAPEAL_DSN);
               $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
               if ($con->GetOne($sql) != 1) {
-                $mess = 'Failed to get lock for ' . $class . $hash;
-                Logger::getLogger('yapeal')->info($mess);
+                if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+                  $mess = 'Failed to get lock for ' . $class . $hash;
+                  Logger::getLogger('yapeal')->info($mess);
+                };
                 continue;
               };// if $con->GetOne($sql) ...
             }
@@ -150,8 +156,10 @@ class SectionCorp extends ASection {
           };// if CachedUntil::cacheExpired...
           // See if Yapeal has been running for longer than 'soft' limit.
           if (YAPEAL_MAX_EXECUTE < time()) {
-            $mess = 'Yapeal has been working very hard and needs a break';
-            Logger::getLogger('yapeal')->info($mess);
+            if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+              $mess = 'Yapeal has been working very hard and needs a break';
+              Logger::getLogger('yapeal')->info($mess);
+            };
             exit;
           };// if YAPEAL_MAX_EXECUTE < time() ...
         };// foreach $apis ...

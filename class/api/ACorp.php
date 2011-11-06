@@ -217,10 +217,12 @@ abstract class ACorp extends AApiRequest {
           // The key access has changed deactivate API for corporation if
           // registered mode is not 'ignored'.
           if (YAPEAL_REGISTERED_MODE != 'ignored') {
-            $mess = 'Deactivating Eve API: ' . $this->api;
-            $mess .= ' for corporation ' . $this->params['corporationID'];
-            $mess .= ' as they are not enlisted in factional warfare';
-            Logger::getLogger('yapeal')->info($mess);
+            if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+              $mess = 'Deactivating Eve API: ' . $this->api;
+              $mess .= ' for corporation ' . $this->params['corporationID'];
+              $mess .= ' as they are not enlisted in factional warfare';
+              Logger::getLogger('yapeal')->info($mess);
+            };
             // A new row for corporation will be created if needed. This allows
             // the 'optional' registered mode to work correctly.
             $corp = new RegisteredCorporation($this->params['corporationID']);
@@ -284,10 +286,12 @@ abstract class ACorp extends AApiRequest {
           // The key access has changed deactivate API for corporation if
           // registered mode is not 'ignored'.
           if (YAPEAL_REGISTERED_MODE != 'ignored') {
-            $mess = 'Deactivating Eve API: ' . $this->api;
-            $mess .= ' for corporation ' . $this->params['corporationID'];
-            $mess .= ' as this API is no longer allowed by owner with this key';
-            Logger::getLogger('yapeal')->info($mess);
+            if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+              $mess = 'Deactivating Eve API: ' . $this->api;
+              $mess .= ' for corporation ' . $this->params['corporationID'];
+              $mess .= ' as this API is no longer allowed by owner with this key';
+              Logger::getLogger('yapeal')->info($mess);
+            };
             // A new row for corporation will be created if needed. This allows
             // the 'optional' registered mode to work correctly.
             $corp = new RegisteredCorporation($this->params['corporationID']);

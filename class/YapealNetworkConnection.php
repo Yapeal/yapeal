@@ -96,8 +96,10 @@ class YapealNetworkConnection {
   public function retrieveXml($url, $postList) {
     $result = $this->con->post($url, $postList);
     if (!$this->con->success) {
-      $mess = $this->con->error. ' for API ' . $url;
-      Logger::getLogger('yapeal')->info($mess);
+      if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+        $mess = $this->con->error. ' for API ' . $url;
+        Logger::getLogger('yapeal')->info($mess);
+      };
       return FALSE;
     };
     return $result;

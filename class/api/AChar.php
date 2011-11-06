@@ -217,10 +217,12 @@ abstract class AChar extends AApiRequest {
           // The key access has changed deactivate API for character if
           // registered mode is not 'ignored'.
           if (YAPEAL_REGISTERED_MODE != 'ignored') {
-            $mess = 'Deactivating Eve API: ' . $this->api;
-            $mess .= ' for characterID: ' . $this->params['characterID'];
-            $mess .= ' as they are not enlisted in factional warfare';
-            Logger::getLogger('yapeal')->info($mess);
+            if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+              $mess = 'Deactivating Eve API: ' . $this->api;
+              $mess .= ' for characterID: ' . $this->params['characterID'];
+              $mess .= ' as they are not enlisted in factional warfare';
+              Logger::getLogger('yapeal')->info($mess);
+            };
             // A new row for character will be created if needed. This allows
             // the 'optional' registered mode to work correctly.
             $char = new RegisteredCharacter($this->params['characterID']);

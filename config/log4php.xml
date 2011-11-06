@@ -88,6 +88,7 @@
     <appender_ref ref="cli"/>
   </root>
   <logger name="yapeal">
+    <level value="info"/>
     <appender_ref ref="fatalLog"/>
     <appender_ref ref="errorLog"/>
     <appender_ref ref="warningLog"/>

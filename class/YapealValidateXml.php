@@ -176,14 +176,18 @@ class YapealValidateXml {
       $cacheFile = $cachePath . $this->api . '.xsd';
       // Can not use schema if it is missing.
       if (!is_file($cacheFile)) {
-        $mess = 'Missing schema file ' . $cacheFile;
-        Logger::getLogger('yapeal')->info($mess);
+        if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+          $mess = 'Missing schema file ' . $cacheFile;
+          Logger::getLogger('yapeal')->info($mess);
+        };
         $cacheFile = realpath(YAPEAL_CACHE . 'unknown.xsd');
       };// if !is_file ...
       // Have to have a good schema.
       if (!$xr->setSchema($cacheFile)) {
-        $mess = 'Could not load schema file ' . $cacheFile;
-        Logger::getLogger('yapeal')->info($mess);
+        if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+          $mess = 'Could not load schema file ' . $cacheFile;
+          Logger::getLogger('yapeal')->info($mess);
+        };
         return FALSE;
       };// if !$xr->setSchema ...
     } else {

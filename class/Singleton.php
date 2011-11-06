@@ -92,8 +92,10 @@ class Singleton {
 	public static function &get($name, $args = array())	{
 		if (isset(self::$instance[$name])) {
       if (!empty($args)) {
-        $mess = '$args ignored as an instance of ' . $name . ' already exists';
-        Logger::getLogger('yapeal')->info($mess);
+        if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+          $mess = '$args ignored as an instance of ' . $name . ' already exists';
+          Logger::getLogger('yapeal')->info($mess);
+        };
       };
       return self::$instance[$name];
     };

@@ -388,8 +388,10 @@ class YapealQueryBuilder implements Countable {
    */
   public function store($upsert = NULL) {
     if ($this->rowCount == 0) {
-      $mess = 'No rows for ' . $this->tableName;
-      Logger::getLogger('yapeal')->info($mess);
+      if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+        $mess = 'No rows for ' . $this->tableName;
+        Logger::getLogger('yapeal')->info($mess);
+      };
       return FALSE;
     };
     if (!is_bool($upsert)) {

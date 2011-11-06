@@ -97,8 +97,10 @@ class CachedInterval {
       };
     };// foreach self::$intervalList ...
     if ($found === FALSE) {
-      $mess = $api . ' is an unknown API for section ' . $section;
-      Logger::getLogger('yapeal')->info($mess);
+      if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+        $mess = $api . ' is an unknown API for section ' . $section;
+        Logger::getLogger('yapeal')->info($mess);
+      };
     };
     return $interval;
   }// function getInterval

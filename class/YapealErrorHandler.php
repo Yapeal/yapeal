@@ -131,6 +131,7 @@ class YapealErrorHandler {
       fwrite(STDERR, $mess);
       exit(1);
     };
+    self::$logConfig = $file;
   }// function setLoggingSectionProperties
   /**
    * Function used to setup error and exception logging.

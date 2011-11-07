@@ -105,7 +105,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get database connection in ' . __CLASS__;
-      throw new RuntimeException($mess, 1);
+      throw new RuntimeException($mess);
     }
     // Get a new access mask object.
     $this->am = new AccessMask();
@@ -123,12 +123,12 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
             $this->properties['keyID'] = $id;
           } else {
             $mess = 'Unknown key ' . $id;
-            throw new DomainException($mess, 3);
+            throw new DomainException($mess);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer';
-        throw new InvalidArgumentException($mess, 4);
+        throw new InvalidArgumentException($mess);
       };// else ...
     };// if !empty $id ...
   }// function __construct
@@ -245,6 +245,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists;
@@ -260,7 +261,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
    * field for this database table.
    */
   public function getItemByName($name) {
-    throw new LogicException('Not implimented for ' . __CLASS__ . ' table', 1);
+    throw new LogicException('Not implimented for ' . __CLASS__ . ' table');
   }// function getItemByName
   /**
    * Function used to check if database record already existed.

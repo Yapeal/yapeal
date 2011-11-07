@@ -74,6 +74,9 @@ if (count(get_included_files()) < 2) {
  */
 function parseCommandLineOptions(array $shortOptions = NULL,
   array $longOptions = NULL) {
+  if (!function_exists('getopt')) {
+    return array();
+  };
   $shortOptions = array_merge($shortOptions, array('h', 'V'));
   $shortOptions = implode('', $shortOptions);
   $longOptions = array_merge($longOptions, array('help', 'version'));
@@ -86,14 +89,25 @@ function parseCommandLineOptions(array $shortOptions = NULL,
   if (empty($options)) {
     return $settings;
   };
-  $optionsOnlyMap = array('h' => 'help', 'help' => 'help', 'V' => 'version',
-    'version' => 'version');
-  $optionsWithValuesMap = array('c' => 'config', 'config' => 'config',
-    'd' => 'database', 'database' => 'database','driver' => 'driver',
-    'p' => 'password', 'password' => 'password', 's' => 'host',
-    'server' =>'host', 'suffix' => 'suffix', 'table-prefix' => 'table_prefix',
-    'u' => 'username', 'username' => 'username');
-  $optionsWithListMap = array('priviledges' => 'priviledges', 'xml' => 'xml');
+  $optionsOnlyMap = array(
+    'h' => 'help', 'help' => 'help',
+    'V' => 'version', 'version' => 'version'
+  );
+  $optionsWithValuesMap = array(
+    'c' => 'config', 'config' => 'config',
+    'd' => 'database', 'database' => 'database',
+    'driver' => 'driver',
+    'l' => 'log-config', 'log' => 'log-config',
+    'p' => 'password', 'password' => 'password',
+    's' => 'host', 'server' =>'host',
+    'suffix' => 'suffix',
+    'table-prefix' => 'table_prefix',
+    'u' => 'username', 'username' => 'username'
+  );
+  $optionsWithListMap = array(
+    'privileges' => 'privileges',
+    'xml' => 'xml'
+  );
   foreach ($options as $opt => $value) {
     if (array_key_exists($opt, $optionsOnlyMap)) {
       $settings[$optionsOnlyMap[$opt]] = TRUE;

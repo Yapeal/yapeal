@@ -116,10 +116,11 @@ class serverServerStatus extends AServer {
       };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

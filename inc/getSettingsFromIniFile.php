@@ -58,7 +58,7 @@ if (count(get_included_files()) < 2) {
  *
  * @todo Look at making this into a full class instead of just a function.
  */
-function getSettingsFromIniFile($file = NULL, $section =NULL) {
+function getSettingsFromIniFile($file = NULL, $section = NULL) {
   // Check if given custom configuration file.
   if (empty($file) || !is_string($file)) {
     $file = @getenv('YAPEAL_INI');

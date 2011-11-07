@@ -103,9 +103,15 @@ class corpWalletTransactions extends ACorp {
       // oldest available date from the XML.
       $this->date = $future;
       $this->beforeID = '0';
-      $rowCount = 1000;
-      $first = TRUE;
+      // Only try to get a few rows the first time.
+      $rowCount = 32;
+      // SQL use to find actual number of records for this owner and account.
+      $sql = 'select sum(if(`ownerID`=' . $this->ownerID . ',1,0))';
+      $sql .= ' from ' . YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+      $sql .= ' where `accountKey`=' . $this->account;
       try {
+        // Need database connection to do some counting.
+        $dbCon = YapealDBConnection::connect(YAPEAL_DSN);
         do {
           // Give each wallet 60 seconds to finish. This should never happen but
           // is here to catch runaways.
@@ -120,11 +126,12 @@ class corpWalletTransactions extends ACorp {
           $apiParams = $this->params;
           // Added the accountKey to params.
           $apiParams['accountKey'] = $this->account;
+          // This tells API server where to start from when walking.
+          $apiParams['fromID'] = $this->beforeID;
           // This tells API server how many rows we want.
           $apiParams['rowCount'] = $rowCount;
           // First get a new cache instance.
-          $cache = new YapealApiCache($this->api, $this->section,
-            $this->ownerID, $apiParams);
+          $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
           // See if there is a valid cached copy of the API XML.
           $result = $cache->getCachedApi();
           // If it's not cached need to try to get it.
@@ -151,6 +158,8 @@ class corpWalletTransactions extends ACorp {
           $this->xr = new XMLReader();
           // Pass XML to reader.
           $this->xr->XML($result);
+          // Calculate how many records there should be if have no dups in XML.
+          $expectedCount = $dbCon->GetOne($sql) + $rowCount;
           // Outer structure of XML is processed here.
           while ($this->xr->read()) {
             if ($this->xr->nodeType == XMLReader::ELEMENT &&
@@ -164,19 +173,30 @@ class corpWalletTransactions extends ACorp {
             };// if $this->xr->nodeType ...
           };// while $this->xr->read() ...
           $this->xr->close();
-          /* There are two normal conditions to end walking. They are:
-           * Got less rows than expected because there are no more to get while
-           * walking backwards.
+          $actual = $dbCon->GetOne($sql) + 0;
+          /* There are three normal conditions to end walking. They are:
+           * Got less rows than expected because there are no more to get.
            * The oldest row we got is oldest API allows us to get.
+           * Some of the rows are duplicates of existing records and there is no
+           * reason to waste any time walking back to get more.
            */
-          if (($first === FALSE && $this->rowCount != $rowCount)
-            || $this->date < $oldest) {
+          if ($this->rowCount != $rowCount || $this->date < $oldest
+            || $actual < $expectedCount) {
             // Have to continue with next account not just break while.
             continue 2;
           };
-          // This tells API server where to start from when walking backwards.
-          $apiParams['fromID'] = $this->beforeID;
-          $first = FALSE;
+          /* Get less rows at first but keep getting more until we hit maximum.
+           * Wastes some time when doing initial walk for new owners but works
+           * well after that.
+           */
+          if ($rowCount < 129) {
+            $rowCount *= 2;
+          } else {
+            $rowCount = 256;
+          };
+          // Give API servers time to figure out we got last one before trying
+          // to walk back for more.
+          sleep(2);
         } while ($counter--);
       }
       catch (YapealApiErrorException $e) {
@@ -188,6 +208,7 @@ class corpWalletTransactions extends ACorp {
         break;
       }
       catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -251,10 +272,11 @@ class corpWalletTransactions extends ACorp {
       };// while $xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

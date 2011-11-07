@@ -63,16 +63,16 @@ if (count(get_included_files()) < 2) {
  */
 function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $shortOptions = array_merge($shortOptions, array('h', 'V'));
-  if (version_compare(PHP_VERSION, '5.3.0', '>=')
-    || strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
+  if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
     $longOptions = array_merge($longOptions, array('help', 'version'));
   } else {
     $longOptions = array();
   };
+  $file = basename($file);
   $cutLine = 78;
   $ragLine = $cutLine - 5;
   $mess = PHP_EOL . 'Usage: ' . $file;
-  $mess .= ' [OPTION]...' . PHP_EOL . PHP_EOL;
+  $mess .= ' [[-h | -V] | Options ...]' . PHP_EOL . PHP_EOL;
   $desc = 'The script reads database settings from [Database] section of the';
   $desc .= ' configuration file, either the default one in';
   $desc .= ' <yapeal_base>/config/yapeal.ini or the custom one from the -c or';
@@ -90,12 +90,12 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
   $mess .= $desc . PHP_EOL . PHP_EOL;
   $desc = 'Mandatory arguments to long options are mandatory for short options';
-  $desc .= ' too. For most OPTIONs if they are used more than once only the';
+  $desc .= ' as well. For most OPTIONs if they are used more than once only the';
   $desc .= ' last value will be used. Exceptions to this will be noted below.';
   $desc = wordwrap($desc, $ragLine, PHP_EOL);
   $desc = wordwrap($desc, $cutLine, PHP_EOL, TRUE);
   $mess .= $desc . PHP_EOL . PHP_EOL;
-  $mess .= 'OPTIONs:' . PHP_EOL;
+  $mess .= 'Options:' . PHP_EOL;
   $options = array();
   $options['c:'] = array('op' => '  -c, --config=FILE', 'desc' =>
     'Read configuration from FILE. This is an optional setting to allow the use'
@@ -107,6 +107,10 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
     'DRIVER is only use during testing and should only be used if directed to'
     . ' do so by a developer. Optional setting that defaults to mysql://.');
   $options['h'] = array('op' => '  -h, --help', 'desc' => 'Show this help.');
+  $options['l:'] = array('op' => '  -l, --log-config=LOG', 'desc' =>
+    'LOG should be the path and name of a file that holds logging configuration'
+    . ' settings. The file can be in either INI or XML format. Optional setting'
+    . ' that defaults to <yapeal_base>/config/log4php.xml');
   $options['p:'] = array('op' => '  -p, password=PASS', 'desc' =>
     'PASS is the password for the database server.');
   $options['privileges:'] = array('op' => '  --privileges=PRIVS', 'desc' =>

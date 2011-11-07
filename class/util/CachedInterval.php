@@ -86,7 +86,7 @@ class CachedInterval {
   public function getInterval($api, $section) {
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
-      throw new InvalidArgumentException($mess, 1);
+      throw new InvalidArgumentException($mess);
     };
     $found = FALSE;
     $interval = 3600;// Use an hour as default.
@@ -97,8 +97,10 @@ class CachedInterval {
       };
     };// foreach self::$intervalList ...
     if ($found === FALSE) {
-      $mess = $api . ' is an unknown API for section ' . $section;
-      trigger_error($mess, E_USER_NOTICE);
+      if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+        $mess = $api . ' is an unknown API for section ' . $section;
+        Logger::getLogger('yapeal')->info($mess);
+      };
     };
     return $interval;
   }// function getInterval
@@ -117,7 +119,7 @@ class CachedInterval {
   public function changeInterval($api, $section, $interval) {
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
-      throw new InvalidArgumentException($mess, 2);
+      throw new InvalidArgumentException($mess);
     };
     $found = FALSE;
     for ($i = 0, $cnt = count(self::$intervalList); $i < $cnt; ++$i) {
@@ -147,7 +149,7 @@ class CachedInterval {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get database connection in ' . __CLASS__;
-      throw new RuntimeException($mess, 3);
+      throw new RuntimeException($mess);
     }
     $sql = 'select `api`,`interval`,`section`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'util' . __CLASS__ . '`';
@@ -156,7 +158,7 @@ class CachedInterval {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get data from table in ' . __CLASS__;
-      throw new RuntimeException($mess, 4);
+      throw new RuntimeException($mess);
     }
     // If the table is empty add a default for APIKeyInfo interval only.
     if (empty(self::$intervalList)) {

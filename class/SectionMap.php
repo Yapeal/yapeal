@@ -97,8 +97,10 @@ class SectionMap extends ASection {
             $con = YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
             if ($con->GetOne($sql) != 1) {
-              $mess = 'Failed to get lock for ' . $class . $hash;
-              trigger_error($mess, E_USER_NOTICE);
+              if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+                $mess = 'Failed to get lock for ' . $class . $hash;
+                Logger::getLogger('yapeal')->info($mess);
+              };
               continue;
             };// if $con->GetOne($sql) ...
           }
@@ -116,14 +118,16 @@ class SectionMap extends ASection {
         };// if CachedUntil::cacheExpired...
         // See if Yapeal has been running for longer than 'soft' limit.
         if (YAPEAL_MAX_EXECUTE < time()) {
-          $mess = 'Yapeal has been working very hard and needs a break';
-          trigger_error($mess, E_USER_NOTICE);
+          if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+            $mess = 'Yapeal has been working very hard and needs a break';
+            Logger::getLogger('yapeal')->info($mess);
+          };
           exit;
         };// if YYAPEAL_MAX_EXECUTE < time() ...
       };// foreach $apis ...
     }
     catch (ADODB_Exception $e) {
-      // Do nothing use observers to log info
+      Logger::getLogger('yapeal')->warn($e);
     }
     // Only truly successful if API was fetched and stored.
     if ($apiCount == $apiSuccess) {

@@ -99,7 +99,7 @@ class Graphic extends ALimitedObject implements IGetBy {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get database connection in ' . __CLASS__;
-      throw new RuntimeException($mess, 1);
+      throw new RuntimeException($mess);
     }
     // Get a new query builder object.
     $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
@@ -152,6 +152,7 @@ class Graphic extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists;

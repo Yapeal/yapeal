@@ -165,16 +165,17 @@ class corpStarbaseDetail extends ACorp {
           catch (ADODB_Exception $e) {
             $mess = 'Could not delete ' . $this->posID['itemID'];
             $mess .= ' from StarbaseList for ' . $this->ownerID;
-            trigger_error($mess, E_USER_WARNING);
+            Logger::getLogger('yapeal')->warn($mess);
             // Something wrong with query return FALSE.
             return FALSE;
           }
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
         };// if $e->getCode() == 114 ...
         $ret = FALSE;
         continue;
       }
       catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -243,7 +244,7 @@ class corpStarbaseDetail extends ACorp {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   $ret = FALSE;
                   continue;
                 };
@@ -261,7 +262,7 @@ class corpStarbaseDetail extends ACorp {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  trigger_error($mess, E_USER_WARNING);
+                  Logger::getLogger('yapeal')->warn($mess);
                   $ret = FALSE;
                   continue;
                 };
@@ -300,10 +301,11 @@ class corpStarbaseDetail extends ACorp {
       };// while $this->xr->read() ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -341,7 +343,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function combatSettings
   /**
@@ -375,7 +377,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function generalSettings
   /**
@@ -408,7 +410,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -428,7 +430,7 @@ class corpStarbaseDetail extends ACorp {
       $list = $con->GetAll($sql);
     }
     catch (ADODB_Exception $e) {
-      // Something wrong with query return FALSE.
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     if (count($list) == 0) {
@@ -462,6 +464,7 @@ class corpStarbaseDetail extends ACorp {
         $con->Execute($sql);
       }
       catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

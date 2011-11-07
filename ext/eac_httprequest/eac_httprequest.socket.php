@@ -51,7 +51,6 @@ class socketRequest extends curlRequest {
 	 * @return mixed result of request
 	 */
 	protected function request($url) {
-		trigger_error('Socket connection', E_USER_NOTICE);
 		$urlParts = parse_url($url);
 		if ($urlParts['scheme'] == 'https') {
 			$urlParts['host'] = 'ssl://'.$urlParts['host'];

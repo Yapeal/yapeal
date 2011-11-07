@@ -114,6 +114,7 @@ class charAssetList extends AChar {
       $this->qb->store();
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;
@@ -199,7 +200,7 @@ class charAssetList extends AChar {
       };// switch $this->xr->nodeType
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    trigger_error($mess, E_USER_WARNING);
+    Logger::getLogger('yapeal')->warn($mess);
     return $inherit['index'];
   }// function nestedSet
   /**
@@ -220,6 +221,7 @@ class charAssetList extends AChar {
       $con->Execute($sql);
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

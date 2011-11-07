@@ -158,30 +158,30 @@ abstract class AAccount extends AApiRequest {
         case 212:// Authentication failure (final pass).
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
           $mess .= ' as the Eve key information is incorrect';
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
           $key = new RegisteredKey($this->params['keyID'], FALSE);
           $key->isActive = 0;
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
-            trigger_error($mess, E_USER_WARNING);
+            Logger::getLogger('yapeal')->warn($mess);
           };// if !$user->store() ...
           break;
         case 211:// Login denied by account status.
           // The account isn't active deactivate key.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
           $mess .= ' as the Eve account is currently suspended';
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
           $key = new RegisteredKey($this->params['keyID'], FALSE);
           $key->isActive = 0;
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
-            trigger_error($mess, E_USER_WARNING);
+            Logger::getLogger('yapeal')->warn($mess);
           };// if !$user->store() ...
           break;
         case 222://Key has expired. Contact key owner for access renewal.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
           $mess .= ' as it needs to be renewed by owner';
-          trigger_error($mess, E_USER_WARNING);
+          Logger::getLogger('yapeal')->warn($mess);
           // Deactivate for char and corp sections by expiring the key.
           $sql = 'update `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
           $sql .= ' set `expires` = "' . gmdate('Y-m-d H:i:s') . '"';
@@ -194,7 +194,7 @@ abstract class AAccount extends AApiRequest {
           $key->isActive = 0;
           if (FALSE === $key->store()) {
             $mess = 'Could not deactivate keyID: ' . $this->params['keyID'];
-            trigger_error($mess, E_USER_WARNING);
+            Logger::getLogger('yapeal')->warn($mess);
           };// if !$user->store() ...
           break;
         case 901:// Web site database temporarily disabled.
@@ -212,6 +212,7 @@ abstract class AAccount extends AApiRequest {
       };// switch $code ...
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

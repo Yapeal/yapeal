@@ -105,7 +105,7 @@ class Sections extends ALimitedObject implements IGetBy {
     }
     catch (ADODB_Exception $e) {
       $mess = 'Failed to get database connection in ' . __CLASS__;
-      throw new RuntimeException($mess, 1);
+      throw new RuntimeException($mess);
     }
     // Get a new access mask object.
     $this->am = new AccessMask();
@@ -123,7 +123,7 @@ class Sections extends ALimitedObject implements IGetBy {
             $this->properties['sectionID'] = $id;
           } else {
             $mess = 'Unknown section ' . $id;
-            throw new DomainException($mess, 2);
+            throw new DomainException($mess);
           };// else ...
         };
         // else if it's a string ...
@@ -134,12 +134,12 @@ class Sections extends ALimitedObject implements IGetBy {
             $this->properties['section'] = $id;
           } else {
             $mess = 'Unknown section ' . $id;
-            throw new DomainException($mess, 3);
+            throw new DomainException($mess);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer or a string';
-        throw new InvalidArgumentException($mess, 4);
+        throw new InvalidArgumentException($mess);
       };// else ...
     };// if !empty $id ...
   }// function __construct
@@ -165,7 +165,7 @@ class Sections extends ALimitedObject implements IGetBy {
   public function addActiveAPI($name) {
     if(!isset($this->properties['section'])) {
       $mess = 'Can not add API when section is unknown';
-      throw new RuntimeException($mess, 5);
+      throw new RuntimeException($mess);
     };
     $mask = $this->am->apisToMask($name, $this->properties['section']);
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
@@ -190,7 +190,7 @@ class Sections extends ALimitedObject implements IGetBy {
   public function deleteActiveAPI($name) {
     if(!isset($this->properties['section'])) {
       $mess = 'Can not remove API when section is unknown';
-      throw new RuntimeException($mess, 6);
+      throw new RuntimeException($mess);
     };
     $mask = $this->am->apisToMask($name, $this->properties['section']);
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
@@ -221,6 +221,7 @@ class Sections extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists();
@@ -237,7 +238,7 @@ class Sections extends ALimitedObject implements IGetBy {
   public function getItemByName($name) {
     if (!in_array(ucfirst($name), $this->sectionList)) {
       $mess = 'Unknown section: ' . $name;
-      throw new DomainException($mess, 7);
+      throw new DomainException($mess);
     };// if !in_array...
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
@@ -252,6 +253,7 @@ class Sections extends ALimitedObject implements IGetBy {
       };
     }
     catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       $this->recordExists = FALSE;
     }
     return $this->recordExists();

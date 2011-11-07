@@ -103,6 +103,13 @@ if (!defined('YAPEAL_EXT')) {
    */
   define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
 };
+if (!defined('YAPEAL_INTERFACE')) {
+  /**
+   * The 'interface' directory is normally just above base but can be moved in
+   * some configurations.
+   */
+  define('YAPEAL_INTERFACE', YAPEAL_BASE . 'interface' . DS);
+};
 if (!defined('YAPEAL_LOG')) {
   /**
    * The 'log' directory is normally just above base but can be moved in some

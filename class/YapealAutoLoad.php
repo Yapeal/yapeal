@@ -64,11 +64,11 @@ class YapealAutoLoad {
   /**
    * @var array
    */
-  private static $dirList = array(YAPEAL_CLASS, YAPEAL_EXT);
+  private static $dirList = array(YAPEAL_CLASS, YAPEAL_EXT, YAPEAL_INTERFACE);
   /**
    * @var array
    */
-  private static $suffixList = array('.php', '.class.php', '.inc.php', '.class', '.inc');
+  private static $suffixList = array('.php', '.inc.php', '.class.php', '.class', '.inc');
   /**
    * Pure static class.
    */

@@ -85,6 +85,9 @@ class FilterFileFinder extends FilterIterator {
    */
   public function __construct($path, $match, $type = self::PREFIX,
     $piece = PATHINFO_FILENAME) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $this->path = $path;
     $this->match = $match;
     $this->type = $type;

@@ -74,6 +74,9 @@ class charAssetList extends AChar {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     // Cut off 'A' and lower case abstract class name to make section name.
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
@@ -89,6 +92,9 @@ class charAssetList extends AChar {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -137,6 +143,9 @@ class charAssetList extends AChar {
    * @return integer Current index for lft/rgt counting.
    */
   protected function nestedSet($inherit) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:

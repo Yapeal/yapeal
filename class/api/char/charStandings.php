@@ -66,6 +66,9 @@ class charStandings extends AChar {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     // Cut off 'A' and lower case abstract class name to make section name.
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);

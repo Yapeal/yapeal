@@ -1,3 +1,22 @@
+2011-11-06
+
+(default) Updated ADOdb to version 5.14.
+
+Merged, reverted, remerge, ... I'm really not sure what I ended up doing but
+Yapeal now has a new logging system based on log4php. It's configure with the
+new config/logger.xml file.
+
+class/YapealErrorHandler.php now is just sets up the new logger and does hook
+for standard PHP errors. Yapeal use to make a lot of changes and overriding of
+the local error handling in PHP which meant it didn't always play nice with
+others. It still makes some changes but is a little less heavy handed about it
+now.
+
+I'd like to thank Zaepho for letting me know about log4php as it kept me from
+having to roll something myself that wouldn't have been nearly as easy of use
+when I tried doing some other things with Yapeal. To find out more about it
+check out the web site http://logging.apache.org/log4php/.
+
 2011-11-03
 
 (default) Changed class/YapealQueryBuilder.php to not just track number of rows

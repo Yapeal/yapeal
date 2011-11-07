@@ -26,6 +26,7 @@
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
+ * @link       http://logging.apache.org/log4php/
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -77,6 +78,10 @@ class YapealErrorHandler {
     if (error_reporting() == 0) {
       return FALSE;
     };
+    /*
+     * Do not add any of the E_USER_* constants to switch except if you believe
+     * in free energy and like infinite loops.
+     */
     switch ($errno) {
       case E_ERROR:
       case E_RECOVERABLE_ERROR:

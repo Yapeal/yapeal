@@ -97,15 +97,9 @@ class charWalletTransactions extends AChar {
     $counter = 1000;
     $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
     $this->beforeID = '0';
-    // Only try to get a few rows the first time.
-    $rowCount = 16;
-    // SQL use to find actual number of records for this owner and account.
-    $sql = 'select count(1)';
-    $sql .= ' from ' . YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-    $sql .= ' where `ownerID`=' . $this->ownerID;
+    $rowCount = 250;
+    $first = TRUE;
     try {
-        // Need database connection to do some counting.
-        $dbCon = YapealDBConnection::connect(YAPEAL_DSN);
       do {
         // Give each API 60 seconds to finish. This should never happen but is
         // here to catch runaways.
@@ -120,8 +114,6 @@ class charWalletTransactions extends AChar {
         $apiParams = $this->params;
         // Added the accountKey to params.
         $apiParams['accountKey'] = 1000;
-        // This tells API server where to start from when walking.
-        $apiParams['fromID'] = $this->beforeID;
         // This tells API server how many rows we want.
         $apiParams['rowCount'] = $rowCount;
         // First get a new cache instance.
@@ -150,8 +142,6 @@ class charWalletTransactions extends AChar {
         $this->xr = new XMLReader();
         // Pass XML to reader.
         $this->xr->XML($result);
-        // Calculate how many records there should be if have no dups in XML.
-        $expectedCount = $dbCon->GetOne($sql) + $rowCount;
         // Outer structure of XML is processed here.
         while ($this->xr->read()) {
           if ($this->xr->nodeType == XMLReader::ELEMENT &&
@@ -160,37 +150,25 @@ class charWalletTransactions extends AChar {
           };// if $this->xr->nodeType ...
         };// while $this->xr->read() ...
         $this->xr->close();
-        $actual = $dbCon->GetOne($sql) + 0;
-        /* There are three normal conditions to end walking. They are:
-         * Got less rows than expected because there are no more to get.
+        /* There are two normal conditions to end walking. They are:
+         * Got less rows than expected because there are no more to get while
+         * walking backwards.
          * The oldest row we got is oldest API allows us to get.
-         * Some of the rows are duplicates of existing records and there is no
-         * reason to waste any time walking back to get more.
          */
-        if ($this->rowCount != $rowCount || $this->date < $oldest
-          || $actual < $expectedCount) {
+        if (($first === FALSE && $this->rowCount != $rowCount)
+          || $this->date < $oldest) {
           // Have to break while.
           break;
         };
-        /* Get less rows at first but keep getting more until we hit maximum.
-         * Wastes some time when doing initial walk for new owners but works
-         * well after that.
-         */
-        if ($rowCount < 129) {
-          $rowCount *= 2;
-        } else {
-          $rowCount = 256;
-        };
+        // This tells API server where to start from when walking backwards.
+        $apiParams['fromID'] = $this->beforeID;
+        $first = FALSE;
       } while ($counter--);
     }
     catch (YapealApiErrorException $e) {
       // Any API errors that need to be handled in some way are handled in this
       // function.
       $this->handleApiError($e);
-      return FALSE;
-    }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     return $result;
@@ -205,8 +183,8 @@ class charWalletTransactions extends AChar {
    */
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-    // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Get a new query instance with autoStore off.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
     // Set any column defaults needed.
     $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
     $qb->setDefaults($defaults);

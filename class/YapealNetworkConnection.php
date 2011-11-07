@@ -64,6 +64,9 @@ class YapealNetworkConnection {
    * Constructor
    */
   public function __construct() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $accept = 'text/xml,application/xml,application/xhtml+xml;q=0.9';
     $accept .= ',text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;q=0.5';
     $headers = array(
@@ -94,6 +97,9 @@ class YapealNetworkConnection {
    * @return mixed Returns XML data from API or FALSE for any connection error.
    */
   public function retrieveXml($url, $postList) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $result = $this->con->post($url, $postList);
     if (!$this->con->success) {
       if (Logger::getLogger('yapeal')->isInfoEnabled()) {

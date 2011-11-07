@@ -61,9 +61,19 @@ class YapealErrorHandler {
    */
   private static $logConfig = '';
   /**
-   * Constructor
+   * Static only class.
    */
-  private function __construct() {}// function __construct
+  final public function __construct() {
+    $mess = 'Illegally attempted to make instance of ' . __CLASS__;
+    throw new LogicException($mess);
+  }// function __construct
+  /**
+   * No backdoor through cloning either.
+   */
+  final public function __clone() {
+    $mess = 'Illegally attempted to clone ' . __CLASS__;
+    throw new LogicException($mess);
+  }// function __clone
   /**
    * Method that PHP will call to handle errors.
    *
@@ -74,6 +84,9 @@ class YapealErrorHandler {
    * @param array $vars Array containing all the defined variables and constants.
    */
   public static function handle($errno, $errmsg, $filename, $line, $vars) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // obey @ protocol
     if (error_reporting() == 0) {
       return FALSE;
@@ -116,6 +129,9 @@ class YapealErrorHandler {
    */
   public static function setLoggingSectionProperties(array $section,
     $file = NULL) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Check if given custom configuration file.
     if (empty($file) || !is_string($file)) {
       if (!empty($section['log_config'])) {
@@ -139,6 +155,9 @@ class YapealErrorHandler {
    *
    */
   public static function setupCustomErrorAndExceptionSettings() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     Logger::configure(self::$logConfig);
     // Start using custom error handler.
     set_error_handler(array('YapealErrorHandler', 'handle'));

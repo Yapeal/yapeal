@@ -110,6 +110,9 @@ class FilterFileFinder extends FilterIterator {
    * prefix, suffix, or contains the matching string.
    */
   public function accept() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $pathinfo = self::pathinfo_utf($this->current(), $this->piece);
     switch ($this->type) {
       case self::PREFIX:
@@ -141,6 +144,9 @@ class FilterFileFinder extends FilterIterator {
    * @return string Returns a list of stripped file names.
    */
   static public function getStrippedFiles($path, $match) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $files = new self($path, $match);
     $fileList = array();
     if (!empty($files)) {
@@ -166,6 +172,9 @@ class FilterFileFinder extends FilterIterator {
    * are returned as an associative array.
    */
   static public function pathinfo_utf($path, $options = 0) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $path = str_replace(array("\\","\\\\"), DS, $path);
     // Get rid of any double '/'s that might have crept in.
     $path = str_replace('//', DS, $path);
@@ -219,6 +228,9 @@ class FilterFileFinder extends FilterIterator {
    * @return string Returns $str in reverse order.
    */
   protected function strrev_utf($str, $preserve_numbers = FALSE) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     //split string into string-portions (1 byte characters, numerical entities or numbers)
     $parts = array();
     while ($str) {

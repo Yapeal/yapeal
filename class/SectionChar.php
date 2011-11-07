@@ -59,6 +59,9 @@ class SectionChar extends ASection {
    * Constructor
    */
   public function __construct() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
     parent::__construct();
   }// function __construct
@@ -68,6 +71,9 @@ class SectionChar extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if ($this->abort === TRUE) {
       return FALSE;
     };
@@ -180,6 +186,9 @@ class SectionChar extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     switch (YAPEAL_REGISTERED_MODE) {
       case 'required':
         $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
@@ -249,6 +258,9 @@ class SectionChar extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function ignoredFilter(&$row) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Filter out if isActive is NULL or FALSE
     if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
       return FALSE;
@@ -287,6 +299,9 @@ class SectionChar extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function optionalFilter(&$row) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // If isActive from utilRegisteredCharacter is not empty and set to FALSE
     // then return FALSE.
     if (!is_null($row['RCActive']) && $row['RCActive'] == 0) {
@@ -332,6 +347,9 @@ class SectionChar extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function requiredFilter(&$row) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // isActive is not optional.
     if (is_null($row['RCActive'])) {
       $mess = 'IsActive can not be null in utilRegisteredCharacter when';

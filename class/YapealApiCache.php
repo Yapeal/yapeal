@@ -108,6 +108,9 @@ class YapealApiCache {
    */
   public function __construct($api, $section, $owner = 0, $postParams = array()) {
     $params = '';
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     if (!empty($postParams)) {
       foreach ($postParams as $k => $v) {
         $params .= $k . '=' . $v;
@@ -132,6 +135,9 @@ class YapealApiCache {
    * @return bool Returns TRUE if XML was cached, FALSE otherwise.
    */
   public function cacheXml($xml) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (empty($xml)) {
       $mess = 'XML was empty' . PHP_EOL;
       Logger::getLogger('yapeal')->warn($mess);
@@ -199,6 +205,9 @@ class YapealApiCache {
    * @return bool Returns TRUE if XML was cached, FALSE otherwise.
    */
   private function cacheXmlDatabase($xml) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       // Get a new query instance.
       $qb = new YapealQueryBuilder(YAPEAL_TABLE_PREFIX . 'utilXmlCache',
@@ -222,6 +231,9 @@ class YapealApiCache {
    * @return bool Returns TRUE if XML was cached, FALSE otherwise.
    */
   private function cacheXmlFile($xml) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Build cache file path
     $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
     if (!is_dir($cachePath)) {
@@ -247,6 +259,9 @@ class YapealApiCache {
    * Used to delete any cached XML.
    */
   public function delCachedApi() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     switch (self::$cacheOutput) {
       case 'both':
         $this->delCachedDatabase($xml);
@@ -271,6 +286,9 @@ class YapealApiCache {
    * @return bool Returns TRUE if the cached copy of XML was deleted else FALSE.
    */
   private function delCachedDatabase() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
@@ -290,6 +308,9 @@ class YapealApiCache {
    * @return bool Returns TRUE if the cached copy of XML was deleted else FALSE.
    */
   private function delCachedFile() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Build cache file path
     $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
     if (!is_dir($cachePath)) {
@@ -315,6 +336,9 @@ class YapealApiCache {
    * returns FALSE.
    */
   public function getCachedApi() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     switch (self::$cacheOutput) {
       case 'both':
         $xml = $this->getCachedDatabase();
@@ -356,6 +380,9 @@ class YapealApiCache {
    * returns FALSE.
    */
   private function getCachedDatabase() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select sql_no_cache `xml`';
@@ -391,6 +418,9 @@ class YapealApiCache {
    * returns FALSE.
    */
   private function getCachedFile() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Build cache file path
     $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
     if (!is_dir($cachePath)) {
@@ -421,6 +451,9 @@ class YapealApiCache {
    * @return bool Return TRUE if current XML was Validated and valid.
    */
   public function isValid() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->vd->isValid();
   }// function isValid
   /**
@@ -429,6 +462,9 @@ class YapealApiCache {
    * @param array $section A list of settings for this section of configuration.
    */
   public static function setCacheSectionProperties(array $section) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     self::$cacheOutput = $section['cache_output'];
   }// function setCacheSectionProperties
 }

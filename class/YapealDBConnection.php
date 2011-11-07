@@ -58,14 +58,14 @@ class YapealDBConnection {
    */
   private function __construct() {
     $mess = 'Illegally attempted to make instance of ' . __CLASS__;
-    throw new LogicException($mess, 1);
+    throw new LogicException($mess);
   }// function __construct
   /**
    * No backdoor through cloning either.
    */
   final public function __clone() {
     $mess = 'Illegally attempted to clone ' . __CLASS__;
-    throw new LogicException($mess , 2);
+    throw new LogicException($mess);
   }// function __clone
   /**
    * Use to get a ADOdb connection object.
@@ -85,6 +85,9 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function connect($dsn) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (empty($dsn) || !is_string($dsn)) {
       throw new InvalidArgumentException('Bad value passed for $dsn');
     };
@@ -113,6 +116,9 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function releaseAll() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (!empty(self::$connections)) {
       foreach (self::$connections as $k => $v) {
         self::$connections[$k]->Close();
@@ -128,6 +134,9 @@ class YapealDBConnection {
    * @param array $section A list of settings for this section of configuration.
    */
   public static function setDatabaseSectionConstants(array $section) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (!defined('YAPEAL_DSN')) {
       // Put all the pieces of the ADOdb DSN together.
       $dsn = $section['driver'] . $section['username'] . ':';

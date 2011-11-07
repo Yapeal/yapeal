@@ -93,6 +93,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.
@@ -156,6 +159,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @throws DomainException Throws DomainException if $name could not be found.
    */
   public function addActiveAPI($name) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $mask = $this->am->apisToMask($name, 'corp');
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
       $ret = TRUE;
@@ -176,6 +182,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @throws DomainException Throws DomainException if $name could not be found.
    */
   public function deleteActiveAPI($name) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $mask = $this->am->apisToMask($name, 'corp');
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
       $this->properties['activeAPIMask'] ^= $mask;
@@ -193,6 +202,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool TRUE if corp was retrieved.
    */
   public function getItemById($id) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
     $sql .= ' where `corporationID`=' . $id;
@@ -233,6 +245,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool TRUE if item was retrieved else FALSE.
    */
   public function getItemByName($name) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
     try {
@@ -271,6 +286,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if the the database record already existed.
    */
   public function recordExists() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->recordExists;
   }// function recordExists
   /**
@@ -282,6 +300,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if column exists in table and default was set.
    */
   public function setDefault($name, $value) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->qb->setDefault($name, $value);
   }// function setDefault
   /**
@@ -292,6 +313,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if all column defaults could be set, else FALSE.
    */
   public function setDefaults(array $defaults) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->qb->setDefaults($defaults);
   }// function setDefaults
   /**
@@ -300,6 +324,9 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...

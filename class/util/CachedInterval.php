@@ -66,6 +66,9 @@ class CachedInterval {
    * Constructor
    */
   public function __construct() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     // If list is empty grab it from database.
     if (empty(self::$intervalList)) {
       self::resetAll();
@@ -84,6 +87,9 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function getInterval($api, $section) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
       throw new InvalidArgumentException($mess);
@@ -117,6 +123,9 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function changeInterval($api, $section, $interval) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
       throw new InvalidArgumentException($mess);
@@ -143,6 +152,9 @@ class CachedInterval {
    * database fails or can't get data from table.
    */
   public static function resetAll() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       // Get a database connection.
       $con = YapealDBConnection::connect(YAPEAL_DSN);

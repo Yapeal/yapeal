@@ -120,6 +120,9 @@ class YapealQueryBuilder implements Countable {
    * connection or table column information.
    */
   public function __construct($tableName, $dsn, $autoStoreMode = TRUE) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     if (!is_string($tableName)) {
       $mess = '$tableName must be a string in ' . __CLASS__;
       throw new InvalidArgumentException($mess);
@@ -184,6 +187,9 @@ class YapealQueryBuilder implements Countable {
    * @return string Returns the rows ready to be printed.
    */
   public function __toString() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $value = '"' . implode('","', array_keys($this->colTypes)) . '"' . PHP_EOL;
     foreach ($this->rows as $row) {
       $value .= trim($row, '()') . PHP_EOL;
@@ -199,6 +205,9 @@ class YapealQueryBuilder implements Countable {
    * @return bool Returns TRUE if row was added, else FALSE.
    */
   public function addRow($row) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Merging defaults with API row should make a complete database record.
     $data = array_merge($this->defaults, $row);
     $diff = array_diff(array_keys($this->colTypes), array_keys($data), $this->nullables);
@@ -268,6 +277,9 @@ class YapealQueryBuilder implements Countable {
    * @return int Returns count for rows.
    */
   public function count() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->rowCount;
   }// function count
   /**
@@ -277,6 +289,9 @@ class YapealQueryBuilder implements Countable {
    * ADO types.
    */
   public function getColumnTypes() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     return $this->colTypes;
   }// function getColumnTypes
   /**
@@ -292,6 +307,9 @@ class YapealQueryBuilder implements Countable {
    * InvalidArgumentException.
    */
   protected function metaType($fieldobj) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (is_object($fieldobj)) {
         $t = $fieldobj->type;
         $len = $fieldobj->max_length;
@@ -357,6 +375,9 @@ class YapealQueryBuilder implements Countable {
    * added. All defaults must be set before starting to add data rows.
    */
   public function setDefault($name, $value) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if ($this->count() > 0) {
       $mess = 'Defaults must be set before any data rows are added';
       throw new LogicException($mess, 1);
@@ -378,6 +399,9 @@ class YapealQueryBuilder implements Countable {
    * @return bool Returns TRUE if all column defaults could be set, else FALSE.
    */
   public function setDefaults(array $defaults) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if(empty($defaults)) {
       $mess = 'List must contain as least one column name and value';
       Logger::getLogger('yapeal')->warn($mess);
@@ -397,17 +421,23 @@ class YapealQueryBuilder implements Countable {
    * @param bool $mode Setting for autoStore mode.
    */
   public function setAutoStoreMode($mode) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $this->autoStore = (bool)$mode;
   }// function setAutoStoreMode
   /**
    * Set the max number of rows to use in a single insert/upsert when using
    * autostore.
    *
-   * @param mixed $autoStoreRows Sets how many rows can be added before they are
+   * @param int $autoStoreRows Sets how many rows can be added before they are
    * automatically stored.
    */
   public function setAutoStoreRows($autoStoreRows) {
-    $this->autoStoreRows = $autoStoreRows;
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
+    $this->autoStoreRows = (int)$autoStoreRows;
   }// function setAutoStoreRows
   /**
    * Set the max (soft) size in bytes of the data rows for a single
@@ -420,10 +450,13 @@ class YapealQueryBuilder implements Countable {
    * This is made available mostly for people to use when they don't have an
    * option to increase the setting in my.cnf.
    *
-   * @param mixed $autoStoreSize Sets max (soft) byte size.
+   * @param int $autoStoreSize Sets max (soft) byte size.
    */
   public static function setAutoStoreSize($autoStoreSize) {
-    self::$autoStoreSize = $autoStoreSize;
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
+    self::$autoStoreSize = (int)$autoStoreSize;
   }// function setAutoStoreSize
   /**
    * Finishes making insert/upsert, empties out rows, then inserts/upserts data
@@ -434,6 +467,9 @@ class YapealQueryBuilder implements Countable {
    * @return bool Returns TRUE if upsert worked, else FALSE.
    */
   public function store($upsert = NULL) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if ($this->rowCount == 0) {
       if (Logger::getLogger('yapeal')->isInfoEnabled()) {
         $mess = 'No rows for ' . $this->tableName;
@@ -496,6 +532,9 @@ class YapealQueryBuilder implements Countable {
    * @return bool Returns value of $this->upsert.
    */
   public function useUpsert($is = NULL) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if (is_bool($is)) {
       $this->upsert = $is;
     };

@@ -67,14 +67,14 @@ class Singleton {
    */
   final public function __construct() {
     $mess = 'Illegally attempted to make instance of ' . __CLASS__;
-    throw new LogicException($mess, 1);
+    throw new LogicException($mess);
   }// function __construct
   /**
    * No backdoor through cloning either.
    */
   final public function __clone() {
     $mess = 'Illegally attempted to clone ' . __CLASS__;
-    throw new LogicException($mess , 2);
+    throw new LogicException($mess);
   }// function __clone
   /**
    * Used to get instance of a class.
@@ -90,6 +90,9 @@ class Singleton {
    * instance is not possible.
    */
 	public static function &get($name, $args = array())	{
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
 		if (isset(self::$instance[$name])) {
       if (!empty($args)) {
         if (Logger::getLogger('yapeal')->isInfoEnabled()) {
@@ -150,6 +153,9 @@ class Singleton {
    * @return string Returns a comma separated list of all the singletons.
    */
   public static function getAll() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $list = array_keys(self::$instance);
     return implode(',', $list);
   }// function getAll
@@ -159,6 +165,9 @@ class Singleton {
    * @return void
    */
   static public function releaseAll() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     self::$instance = array();
   }// function releaseAll
 }

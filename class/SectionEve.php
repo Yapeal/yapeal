@@ -59,6 +59,9 @@ class SectionEve extends ASection {
    * Constructor
    */
   public function __construct() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
     parent::__construct();
   }
@@ -68,6 +71,9 @@ class SectionEve extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     if ($this->abort === TRUE) {
       return FALSE;
     };

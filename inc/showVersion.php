@@ -52,8 +52,6 @@ if (count(get_included_files()) < 2) {
  * Function to show version information of script.
  *
  * @param string $file Name of script file.
- *
- * @package    Yapeal
  */
 function showVersion($file) {
   $mess = basename($file) . ' ';

@@ -53,8 +53,6 @@ if (count(get_included_files()) < 2) {
  * configuration file.
  *
  * @param array $section A list of settings for this section of configuration.
- *
- * @package    Yapeal
  */
 function setGeneralSectionConstants(array $section) {
   if (!defined('YAPEAL_APPLICATION_AGENT')) {

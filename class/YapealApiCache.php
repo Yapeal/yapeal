@@ -462,7 +462,7 @@ class YapealApiCache {
    * @param array $section A list of settings for this section of configuration.
    */
   public static function setCacheSectionProperties(array $section) {
-    if (Logger::getLogger('yapeal')->isInfoEnabled()) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     self::$cacheOutput = $section['cache_output'];

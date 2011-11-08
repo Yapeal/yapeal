@@ -94,7 +94,7 @@ class charKillLog extends AChar {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // Cut off 'A' and lower case abstract class name to make section name.
@@ -108,7 +108,7 @@ class charKillLog extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     // This counter is used to insure do ... while can't become infinite loop.
@@ -188,7 +188,7 @@ class charKillLog extends AChar {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
@@ -321,7 +321,7 @@ class charKillLog extends AChar {
    * @return integer Current index for lft/rgt counting.
    */
   protected function nestedSet($inherit) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     while ($this->xr->read()) {
@@ -392,7 +392,7 @@ class charKillLog extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attack() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     while ($this->xr->read()) {

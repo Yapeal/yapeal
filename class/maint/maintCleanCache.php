@@ -59,7 +59,7 @@ class maintCleanCache {
    * Constructor
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
@@ -74,7 +74,7 @@ class maintCleanCache {
      * anyway.
      */
     public function doWork() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
       $limit = strtotime('7 days ago');

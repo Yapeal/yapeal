@@ -65,7 +65,7 @@ abstract class AChar extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $required = array('characterID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
@@ -108,7 +108,7 @@ abstract class AChar extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $default = 'https://api.eveonline.com/' . $this->section;
@@ -161,7 +161,7 @@ abstract class AChar extends AApiRequest {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {

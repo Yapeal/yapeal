@@ -65,7 +65,7 @@ class charContactList extends AChar {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // Cut off 'A' and lower case abstract class name to make section name.
@@ -82,7 +82,7 @@ class charContactList extends AChar {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {

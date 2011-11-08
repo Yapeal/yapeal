@@ -59,7 +59,7 @@ class SectionCorp extends ASection {
    * Constructor
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
@@ -71,7 +71,7 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if ($this->abort === TRUE) {
@@ -187,7 +187,7 @@ class SectionCorp extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     switch (YAPEAL_REGISTERED_MODE) {
@@ -259,7 +259,7 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function ignoredFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     // Filter out if isActive is NULL or FALSE
@@ -300,7 +300,7 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function optionalFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     // If isActive from utilRegisteredCorporation is not empty and set to FALSE
@@ -348,7 +348,7 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function requiredFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     // isActive is not optional.

@@ -85,7 +85,7 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function connect($dsn) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (empty($dsn) || !is_string($dsn)) {
@@ -116,7 +116,7 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function releaseAll() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!empty(self::$connections)) {
@@ -134,7 +134,7 @@ class YapealDBConnection {
    * @param array $section A list of settings for this section of configuration.
    */
   public static function setDatabaseSectionConstants(array $section) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!defined('YAPEAL_DSN')) {

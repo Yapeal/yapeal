@@ -65,7 +65,7 @@ class charCharacterSheet  extends AChar {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // Cut off 'A' and lower case abstract class name to make section name.
@@ -79,7 +79,7 @@ class charCharacterSheet  extends AChar {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
@@ -182,7 +182,7 @@ class charCharacterSheet  extends AChar {
    * @return bool Returns TRUE if data stored to database table.
    */
   protected function attributes() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
@@ -225,7 +225,7 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributeEnhancers() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
@@ -283,7 +283,7 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
@@ -327,7 +327,7 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function skills() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
@@ -377,7 +377,7 @@ class charCharacterSheet  extends AChar {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tables = array('Attributes', 'AttributeEnhancers', 'Certificates',

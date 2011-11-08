@@ -59,7 +59,7 @@ class SectionMap extends ASection {
    * Constructor
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
@@ -71,7 +71,7 @@ class SectionMap extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if ($this->abort === TRUE) {

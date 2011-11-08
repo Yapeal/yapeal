@@ -65,7 +65,7 @@ class corpContainerLog extends ACorp {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // Cut off 'A' and lower case abstract class name to make section name.
@@ -83,7 +83,7 @@ class corpContainerLog extends ACorp {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;

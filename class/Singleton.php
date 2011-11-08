@@ -90,7 +90,7 @@ class Singleton {
    * instance is not possible.
    */
 	public static function &get($name, $args = array())	{
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
 		if (isset(self::$instance[$name])) {
@@ -153,7 +153,7 @@ class Singleton {
    * @return string Returns a comma separated list of all the singletons.
    */
   public static function getAll() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $list = array_keys(self::$instance);
@@ -165,7 +165,7 @@ class Singleton {
    * @return void
    */
   static public function releaseAll() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     self::$instance = array();

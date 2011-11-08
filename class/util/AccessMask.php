@@ -69,7 +69,7 @@ class AccessMask {
    * database fails or can't get data from table.
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // If list is empty grab it from database.
@@ -115,7 +115,7 @@ class AccessMask {
    * given a DomainException is thrown.
    */
   public function apisToMask($apis, $section = NULL) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (is_string($apis)) {
@@ -182,7 +182,7 @@ class AccessMask {
    * @return array Returns the access mask list.
    */
   public function getMaskList() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return self::$maskList;
@@ -199,7 +199,7 @@ class AccessMask {
    * @return array Returns the access mask list for a section.
    */
   public function getSectionMaskList($section, $status = AccessMask::COMPLETE) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $mask = $this->getSectionToMask($section, $status);
@@ -217,7 +217,7 @@ class AccessMask {
    * @return array Returns the access mask for section.
    */
   public function getSectionToMask($section, $status = AccessMask::COMPLETE) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $mask = 0;
@@ -243,7 +243,7 @@ class AccessMask {
    * throw a InvalidArgumentException.
    */
   public function maskToAPIs($mask, $section) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (is_array($mask)) {
@@ -269,7 +269,7 @@ class AccessMask {
    * @return int Returns $x | $y
    */
   protected function reduceOR($x, $y) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $x | $y;

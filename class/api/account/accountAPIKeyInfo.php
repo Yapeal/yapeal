@@ -65,7 +65,7 @@ class accountAPIKeyInfo extends AAccount {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // Cut off 'A' and lower case abstract class name to make section name.
@@ -79,7 +79,7 @@ class accountAPIKeyInfo extends AAccount {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
@@ -174,7 +174,7 @@ class accountAPIKeyInfo extends AAccount {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {
@@ -203,7 +203,7 @@ class accountAPIKeyInfo extends AAccount {
    * @return Bool Return TRUE if store was successful.
    */
   protected function characters($type) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     while ($this->xr->read()) {

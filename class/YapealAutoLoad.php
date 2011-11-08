@@ -87,9 +87,6 @@ class YapealAutoLoad {
    * Used to activate autoloading.
    */
   public static function activateAutoLoad() {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (FALSE == spl_autoload_functions()) {
       spl_autoload_register(array('YapealAutoLoad', 'autoLoad'));
       if (function_exists('__autoload')) {
@@ -108,9 +105,6 @@ class YapealAutoLoad {
    * @return bool TRUE if extension was already in the list.
    */
   public static function addExtension($ext) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!in_array($ext, self::$suffixList)) {
       self::$suffixList[] = $ext;
       return FALSE;
@@ -125,9 +119,6 @@ class YapealAutoLoad {
    * @return bool TRUE if directory was already in the list.
    */
   public static function addPath($dir) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!in_array($dir, self::$dirList)) {
       self::$dirList[] = $dir;
       return FALSE;
@@ -143,9 +134,6 @@ class YapealAutoLoad {
    * @return bool TRUE if class/interface is found.
    */
   public static function autoLoad($className) {
-    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     foreach (self::$dirList as $dir) {
       $files = new FilterFileFinder($dir, $className, FilterFileFinder::CONTAINS);
       foreach ($files as $name => $object) {

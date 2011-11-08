@@ -111,11 +111,11 @@ if (!empty($options['log-config'])) {
 } else {
   YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
 };
+YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
 YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
 setGeneralSectionConstants($iniVars);
 unset($iniVars);
-YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 try {
   /**
    * Give ourself a 'soft' limit of 10 minutes to finish.

@@ -95,6 +95,9 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $posList = $this->posList();
     if (FALSE === $posList) {
       return FALSE;
@@ -320,6 +323,9 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function combatSettings() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -358,6 +364,9 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function generalSettings() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -394,6 +403,9 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -426,6 +438,9 @@ class corpStarbaseDetail extends ACorp {
    * no POSes found for corporation.
    */
   protected function posList() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $list = array();
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -458,6 +473,9 @@ class corpStarbaseDetail extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tables = array('CombatSettings', 'Fuel', 'GeneralSettings',
       'StarbaseDetail');
     foreach ($tables as $table) {

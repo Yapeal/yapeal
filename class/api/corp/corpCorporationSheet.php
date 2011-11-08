@@ -79,6 +79,9 @@ class corpCorporationSheet  extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Need to exclude some params when passing them to API server so it doesn't
     // get confused.
     $apiParams = $this->params;
@@ -253,6 +256,9 @@ class corpCorporationSheet  extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function logo() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'Logo';
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -295,6 +301,9 @@ class corpCorporationSheet  extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);

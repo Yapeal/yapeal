@@ -131,6 +131,9 @@ class corpContactList  extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -175,6 +178,9 @@ class corpContactList  extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tables = array('AllianceContactList', 'CorporateContactList');
     foreach ($tables as $table) {
       try {

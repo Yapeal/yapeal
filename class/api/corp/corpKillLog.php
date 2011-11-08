@@ -108,6 +108,9 @@ class corpKillLog extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // This counter is used to insure do ... while can't become infinite loop.
     $counter = 1000;
     $this->date = '1970-01-01 00:00:01';
@@ -322,6 +325,9 @@ class corpKillLog extends ACorp {
    * @return integer Current index for lft/rgt counting.
    */
   protected function nestedSet($inherit) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -390,6 +396,9 @@ class corpKillLog extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attack() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:

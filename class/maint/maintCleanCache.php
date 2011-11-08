@@ -59,6 +59,9 @@ class maintCleanCache {
    * Constructor
    */
   public function __construct() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $this->sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
   }// function __construct()
     /**
@@ -71,6 +74,9 @@ class maintCleanCache {
      * anyway.
      */
     public function doWork() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
       $limit = strtotime('7 days ago');
       foreach ($this->sections as $section) {
         $path = YAPEAL_CACHE . $section . DS;

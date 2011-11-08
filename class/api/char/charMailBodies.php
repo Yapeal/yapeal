@@ -79,6 +79,9 @@ class charMailBodies extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       // First get a new cache instance.
       $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $this->params);
@@ -141,6 +144,9 @@ class charMailBodies extends AChar {
    * @return mixed Returns a list of messages IDs or FALSE on error.
    */
   protected function getIds() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     $sql = 'select mm.`messageID`';
     $sql .= ' from ';

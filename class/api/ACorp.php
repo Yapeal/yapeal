@@ -65,6 +65,9 @@ abstract class ACorp extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__CLASS__);
+    };
     $required = array('corporationID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
     foreach ($required as $k => $v) {
       if (!isset($params[$k])) {
@@ -105,6 +108,9 @@ abstract class ACorp extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $default = 'https://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     $sql = 'select proxy from ';
@@ -155,6 +161,9 @@ abstract class ACorp extends AApiRequest {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.

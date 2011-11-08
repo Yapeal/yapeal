@@ -86,6 +86,9 @@ abstract class AApiRequest {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // First get a new cache instance.
     $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $this->params);
     try {
@@ -237,6 +240,9 @@ abstract class AApiRequest {
    * @return mixed Returns result of sprintf call, or FALSE on error.
    */
   protected static function sprintfn ($format, array $args = array()) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     // Mapping of argument names to their corresponding sprintf numeric argument
     // value.
     $arg_nums = array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);

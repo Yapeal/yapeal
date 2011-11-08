@@ -182,6 +182,9 @@ class charCharacterSheet  extends AChar {
    * @return bool Returns TRUE if data stored to database table.
    */
   protected function attributes() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -222,6 +225,9 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributeEnhancers() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -277,6 +283,9 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -318,6 +327,9 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function skills() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -365,6 +377,9 @@ class charCharacterSheet  extends AChar {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
+    if (Logger::getLogger('yapeal')->isEnabledFor(LoggerLevel::TRACE)) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
     $tables = array('Attributes', 'AttributeEnhancers', 'Certificates',
       'CorporationRoles', 'CorporationRolesAtBase', 'CorporationRolesAtHQ',
       'CorporationRolesAtOther', 'CorporationTitles', 'Skills'

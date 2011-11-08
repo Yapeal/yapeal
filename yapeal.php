@@ -172,10 +172,10 @@ try {
   /* ************************************************************************
    * Final admin stuff
    * ************************************************************************/
-  // Release all the ADOdb connections.
-  YapealDBConnection::releaseAll();
   // Reset cache intervals
   CachedInterval::resetAll();
+  // Release all the ADOdb connections.
+  YapealDBConnection::releaseAll();
 }
 catch (Exception $e) {
   $mess = 'Uncaught exception in ' . basename(__FILE__);

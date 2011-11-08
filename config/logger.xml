@@ -33,7 +33,7 @@
 <log4php:configuration xmlns:log4php="http://logging.apache.org/log4php/">
   <appender name="fatalLog" class="LoggerAppenderRollingFile" threshold="FATAL">
     <param name="file" value="log/yapeal_fatal.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="1MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMin" value="fatal"/>
       <param name="acceptOnMatch" value="false"/>
@@ -45,7 +45,7 @@
   </appender>
   <appender name="errorLog" class="LoggerAppenderRollingFile" threshold="ERROR">
     <param name="file" value="log/yapeal_error.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="1MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMax" value="error"/>
       <param name="levelMin" value="error"/>
@@ -58,7 +58,7 @@
   </appender>
   <appender name="warningLog" class="LoggerAppenderRollingFile" threshold="WARN">
     <param name="file" value="log/yapeal_warning.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="1MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMax" value="warn"/>
       <param name="levelMin" value="warn"/>
@@ -71,7 +71,7 @@
   </appender>
   <appender name="infoLog" class="LoggerAppenderRollingFile" threshold="INFO">
     <param name="file" value="log/yapeal_info.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="1MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMax" value="info"/>
       <param name="levelMin" value="info"/>

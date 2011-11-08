@@ -84,7 +84,7 @@
   </appender>
   <appender name="debugLog" class="LoggerAppenderRollingFile" threshold="DEBUG">
     <param name="file" value="log/yapeal_debug.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="10MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMax" value="debug"/>
       <param name="levelMin" value="debug"/>
@@ -97,7 +97,7 @@
   </appender>
   <appender name="traceLog" class="LoggerAppenderRollingFile">
     <param name="file" value="log/yapeal_trace.log"/>
-    <param name="maxFileSize" value="100KB"/>
+    <param name="maxFileSize" value="10MB"/>
     <filter class="LoggerFilterLevelRange">
       <param name="levelMax" value="trace"/>
       <param name="acceptOnMatch" value="false"/>

@@ -55,6 +55,10 @@ require_once YAPEAL_CLASS . 'FilterFileFinder.php';
  *
  * @package Yapeal
  * @subpackage Autoload
+ *
+ * @uses YAPEAL_CLASS Constant with path to class directory.
+ * @uses YAPEAL_INTERFACE Constant with path to interface directory.
+ * @uses YAPEAL_EXT Constant with path to external packages directory.
  */
 class YapealAutoLoad {
   /**

@@ -166,8 +166,9 @@ try {
     catch (ADODB_Exception $e) {
       Logger::getLogger('yapeal')->fatal($e);
     }
-    // Going to sleep for a second to let DB time to flush etc between sections.
-    sleep(1);
+    // Going to sleep for a tenth of a second to let DB time to flush etc
+    // between sections.
+    usleep(100000);
   };// foreach $section ...
   /* ************************************************************************
    * Final admin stuff

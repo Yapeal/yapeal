@@ -138,8 +138,8 @@ class corpWalletTransactions extends ACorp {
             $proxy = $this->getProxy();
             $con = new YapealNetworkConnection();
             $result = $con->retrieveXml($proxy, $apiParams);
-            // FALSE means there was an error and it has already been report so just
-            // return to caller.
+            // FALSE means there was an error and it has already been report so
+            // just return to caller.
             if (FALSE === $result) {
               return FALSE;
             };

@@ -113,7 +113,7 @@ class corpWalletJournal extends ACorp {
       // Use an hour in the future as date and let $this->parserAPI() finds the
       // oldest available date from the XML.
       $this->date = $future;
-      $this->beforeID = 0;
+      $this->beforeID = '0';
       $rowCount = 1000;
       $first = TRUE;
       try {
@@ -198,6 +198,11 @@ class corpWalletJournal extends ACorp {
         // Break out of foreach as once one wallet returns an error they all do.
         break;
       }
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
+        $ret = FALSE;
+        continue;
+      }
     };// foreach range(1000, 1006) ...
     return $ret;
   }// function apiStore
@@ -215,7 +220,7 @@ class corpWalletJournal extends ACorp {
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $defaults = array('accountKey' => $this->account,
       'ownerID' => $this->ownerID

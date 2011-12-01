@@ -123,7 +123,8 @@ class charWalletTransactions extends AChar {
         // This tells API server how many rows we want.
         $apiParams['rowCount'] = $rowCount;
         // First get a new cache instance.
-        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID,
+          $apiParams);
         // See if there is a valid cached copy of the API XML.
         $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.
@@ -131,8 +132,8 @@ class charWalletTransactions extends AChar {
           $proxy = $this->getProxy();
           $con = new YapealNetworkConnection();
           $result = $con->retrieveXml($proxy, $apiParams);
-          // FALSE means there was an error and it has already been report so just
-          // return to caller.
+          // FALSE means there was an error and it has already been report so
+          // just return to caller.
           if (FALSE === $result) {
             return FALSE;
           };
@@ -193,7 +194,7 @@ class charWalletTransactions extends AChar {
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance with autoStore off.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
     $qb->setDefaults($defaults);

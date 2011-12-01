@@ -102,7 +102,7 @@ class charWalletJournal extends AChar {
      */
     $counter = 1000;
     $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
-    $this->beforeID = 0;
+    $this->beforeID = '0';
     $rowCount = 250;
     $first = TRUE;
     try {
@@ -194,7 +194,7 @@ class charWalletJournal extends AChar {
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance with autoStore off.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN, FALSE);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
     $qb->setDefaults($defaults);

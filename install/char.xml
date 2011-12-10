@@ -631,6 +631,10 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`singleton`" type="I2" size="5">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
     <field name="`typeID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>

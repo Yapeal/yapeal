@@ -105,6 +105,7 @@
     <xs:attribute name="flag" use="required" type="xs:integer"/>
     <xs:attribute name="qtyDestroyed" use="required" type="xs:unsignedLong"/>
     <xs:attribute name="qtyDropped" use="required" type="xs:unsignedLong"/>
+    <xs:attribute name="singleton" use="required" type="xs:integer"/>
     <xs:attribute name="typeID" use="required" type="eveID"/>
   </xs:complexType>
 </xs:schema>

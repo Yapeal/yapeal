@@ -200,6 +200,7 @@ class charKillLog extends AChar {
     // Get a new query instance for items.
     $this->items = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Items', YAPEAL_DSN);
+    $this->items->setDefault('singleton', 0);
     // Get a new query instance for victim.
     $this->victim = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN);

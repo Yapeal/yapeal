@@ -113,8 +113,11 @@ class corpKillLog extends ACorp {
     };
     // This counter is used to insure do ... while can't become infinite loop.
     $counter = 1000;
-    $this->date = '1970-01-01 00:00:01';
+    $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
     $this->beforeID = 0;
+    $rowCount = 100;
+    // Need to add extra stuff to normal parameters to make walking work.
+    $apiParams = $this->params;
     try {
       do {
         // Give each API 60 seconds to finish. This should never happen but is
@@ -126,10 +129,6 @@ class corpKillLog extends ACorp {
          * and is safer than assuming.
          */
         $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
-        // Need to add extra stuff to normal parameters to make walking work.
-        $apiParams = $this->params;
-        // This tells API server where to start from when walking.
-        $apiParams['beforeKillID'] = $this->beforeID;
         // First get a new cache instance.
         $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
@@ -165,9 +164,11 @@ class corpKillLog extends ACorp {
         };// while $this->xr->read() ...
         $this->xr->close();
         // Leave loop if already got as many entries as API servers allow.
-        if ($this->rowCount != 100 || $this->date < $oldest) {
+        if ($this->rowCount != $rowCount || $this->date < $oldest) {
           break;
         };
+        // This tells API server where to start from when walking.
+        $apiParams['beforeKillID'] = $this->beforeID;
       } while ($counter--);
     }
     catch (YapealApiErrorException $e) {

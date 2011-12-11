@@ -111,6 +111,8 @@ class corpWalletTransactions extends ACorp {
       $this->beforeID = '0';
       $rowCount = 1000;
       $first = TRUE;
+      // Need to add extra stuff to normal parameters to make walking work.
+      $apiParams = $this->params;
       try {
         do {
           // Give each wallet 60 seconds to finish. This should never happen but
@@ -122,8 +124,6 @@ class corpWalletTransactions extends ACorp {
            * and is safer than assuming.
            */
           $oldest = gmdate('Y-m-d H:i:s', strtotime('30 days ago'));
-          // Need to add extra stuff to normal parameters to make walking work.
-          $apiParams = $this->params;
           // Added the accountKey to params.
           $apiParams['accountKey'] = $this->account;
           // This tells API server how many rows we want.

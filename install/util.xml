@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema version = "0.3" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation = "xmlschema03.xsd">
+<schema version="0.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
 <!--
 /**
  * XML from Yapeal.
@@ -220,7 +219,7 @@
       (8, 'char', 'CharacterSheet', 'Character Sheet information. Contains basic "Show Info" information along with clones, account balance, implants, attributes, skills, certificates and corporation roles.', 16),
       (16, 'char', 'ContactList', 'List of character contacts and relationship levels.', 16),
       (32, 'char', 'ContactNotifications', 'Most recent contact notifications for the character.', 16),
-      (64, 'char', 'FacWarStats', 'Characters Factional Warfare Statistics.', 2),
+      (64, 'char', 'FacWarStats', 'Characters Factional Warfare Statistics.', 8),
       (128, 'char', 'IndustryJobs', 'Character jobs, completed and active.', 16),
       (256, 'char', 'KillLog', 'Characters kill log.', 16),
       (512, 'char', 'MailBodies', 'EVE Mail bodies. Requires MailMessages as well to function.', 16),

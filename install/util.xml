@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema version = "0.3">
-<!--
+<schema version="0.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
+  <!--
 /**
  * XML from Yapeal.
  *

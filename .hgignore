@@ -1,6 +1,14 @@
 syntax: glob
 .hgsub
 *.komodoproject
+test.php
+cache/account/*.xml
+cache/ADOdb/*.sql
+cache/char/*.xml
+cache/corp/*.xml
+cache/eve/*.xml
+cache/map/*.xml
+cache/server/*.xml
 config/yapeal.ini
 log/*.log
 export/

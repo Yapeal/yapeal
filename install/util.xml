@@ -106,8 +106,9 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`isActive`" type="L" size="1"/>
     <field name="`characterName`" type="C" size="100"/>
+    <field name="`isActive`" type="L" size="1"/>
+    <field name="`isMarketUploader`" type="L" size="1"/>
     <field name="`proxy`" type="C" size="255"/>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
@@ -122,6 +123,7 @@
     </field>
     <field name="`corporationName`" type="C" size="150"/>
     <field name="`isActive`" type="L" size="1"/>
+    <field name="`isMarketUploader`" type="L" size="1"/>
     <field name="`proxy`" type="C" size="255"/>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
@@ -131,6 +133,7 @@
       <UNSIGNED/>
     </field>
     <field name="`isActive`" type="L" size="1"/>
+    <field name="`isMarketUploader`" type="L" size="1"/>
     <field name="`keyID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -152,6 +155,9 @@
       <UNSIGNED/>
     </field>
     <field name="`isActive`" type="L" size="1">
+      <NOTNULL/>
+    </field>
+    <field name="`isMarketUploader`" type="L" size="1">
       <NOTNULL/>
     </field>
     <field name="`proxy`" type="C" size="255"/>

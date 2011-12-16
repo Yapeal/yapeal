@@ -243,7 +243,7 @@
       (8, 'corp', 'CorporationSheet', 'Exposes basic "Show Info" information as well as Member Limit and basic division and wallet info.', 16),
       (16, 'corp', 'ContactList', 'Corporate contact list and relationships.', 16),
       (32, 'corp', 'ContainerLog', 'Corporate secure container acess log.', 16),
-      (64, 'corp', 'FacWarStats', 'Corporations Factional Warfare Statistics.', 2),
+      (64, 'corp', 'FacWarStats', 'Corporations Factional Warfare Statistics.', 8),
       (128, 'corp', 'IndustryJobs', 'Corporation jobs, completed and active.', 16),
       (256, 'corp', 'KillLog', 'Corporation kill log.', 16),
       (512, 'corp', 'MemberSecurity', 'Member roles and titles.', 2),

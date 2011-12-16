@@ -81,8 +81,8 @@ class corpFacWarStats extends ACorp {
    *
    * @return bool Returns TRUE always.
    */
-  protected function parserAPI() {
+  /*protected function parserAPI() {
     return TRUE;
-  }// function parserAPI
+  }*/ // function parserAPI
 }
 ?>

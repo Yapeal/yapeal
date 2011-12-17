@@ -75,18 +75,6 @@ class eveFacWarStats extends AEve {
     parent::__construct($params);
   }// function __construct
   /**
-   * Dummy API parser for XML.
-   *
-   * This is a dummy parser used to allow caching of the XML even though an
-   * actual parser that processes the API doesn't exist yet.
-   *
-   * @return bool Returns TRUE always.
-   */
-  /*protected function parserAPI() {
-    return TRUE;
-  }*/ // function parserAPI
-
-  /**
    * API parser for XML.
    *
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
@@ -103,16 +91,6 @@ class eveFacWarStats extends AEve {
         switch ($this->xr->nodeType) {
           case XMLReader::ELEMENT:
             switch ($this->xr->localName) {
-              /*case 'killsYesterday':
-              case 'killsLastWeek':
-              case 'killsTotal':
-              case 'victoryPointsYesterday':
-              case 'victoryPointsLastWeek':
-              case 'victoryPointsTotal':
-                $name = $this->xr->localName;
-                $this->xr->read();
-                $row[$name] = $this->xr->value;
-                break;*/
               case 'totals':
                 // Check if empty.
                 if ($this->xr->isEmptyElement == TRUE) {
@@ -173,7 +151,7 @@ class eveFacWarStats extends AEve {
   /**
    * Handles totals from XML Note.
    *
-   * @return bool Returns TRUE if data stored to database table.
+   * @return array Returns array of data to store in database table.
    */
   protected function totals() {
     if (Logger::getLogger('yapeal')->isDebugEnabled()) {

@@ -43,7 +43,7 @@
                 <xs:element name="rowset">
                   <xs:complexType>
                     <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowTypeCA"/>
                     </xs:sequence>
                     <xs:attribute name="columns" use="required" type="eveColumns"/>
                     <xs:attribute name="key" use="required" fixed="contactID"/>
@@ -62,7 +62,7 @@
                 <xs:element name="rowset">
                   <xs:complexType>
                     <xs:sequence>
-                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowTypeCA"/>
                     </xs:sequence>
                     <xs:attribute name="columns" use="required" type="eveColumns"/>
                     <xs:attribute name="key" use="required" fixed="contactID"/>
@@ -91,6 +91,11 @@
     <xs:attribute name="contactID" use="required" type="eveID"/>
     <xs:attribute name="contactName" use="required" type="xs:string"/>
     <xs:attribute name="inWatchlist" use="required" type="xs:NCName"/>
+    <xs:attribute name="standing" use="required" type="xs:decimal"/>
+  </xs:complexType>
+  <xs:complexType name="rowTypeCA">
+    <xs:attribute name="contactID" use="required" type="eveID"/>
+    <xs:attribute name="contactName" use="required" type="xs:string"/>
     <xs:attribute name="standing" use="required" type="xs:decimal"/>
   </xs:complexType>
 </xs:schema>

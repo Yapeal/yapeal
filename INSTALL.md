@@ -253,7 +253,7 @@ you can use:
 
   Then:
 
-  `hg clone https://dragonrun1@code.google.com/p/yapeal/`
+  `hg clone https://code.google.com/p/yapeal/`
 
   OR
 
@@ -270,7 +270,7 @@ from cmd.exe prompt:
 
   Then:
 
-  `hg clone https://dragonrun1@code.google.com/p/yapeal/`
+  `hg clone https://code.google.com/p/yapeal/`
 
   OR
 

@@ -23,9 +23,9 @@
                     <xs:sequence>
                       <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
                     </xs:sequence>
-    <xs:attribute name="columns" use="required" type="eveColumns"/>
-    <xs:attribute name="key" use="required" fixed="contactID"/>
-    <xs:attribute name="name" use="required" fixed="corporateContactList"/>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" use="required" fixed="contactID"/>
+                    <xs:attribute name="name" use="required" fixed="corporateContactList"/>
                   </xs:complexType>
                   <xs:key name="rowIdCorporateContactListKey">
                     <xs:annotation>
@@ -40,9 +40,9 @@
                     <xs:sequence>
                       <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
                     </xs:sequence>
-    <xs:attribute name="columns" use="required" type="eveColumns"/>
-    <xs:attribute name="key" use="required" fixed="contactID"/>
-    <xs:attribute name="name" use="required" fixed="allianceContactList"/>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" use="required" fixed="contactID"/>
+                    <xs:attribute name="name" use="required" fixed="allianceContactList"/>
                   </xs:complexType>
                   <xs:key name="rowIdAllianceContactListKey">
                     <xs:annotation>

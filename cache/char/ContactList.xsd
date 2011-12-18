@@ -40,6 +40,54 @@
                     <xs:field xpath="@contactName"/>
                   </xs:key>
                 </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowTypeCA"/>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" use="required" fixed="contactID"/>
+                    <xs:attribute name="name" use="required" fixed="corporateContactList"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporateContactListKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@contactID"/>
+                  </xs:key>
+                  <xs:key name="rowNameKeyCorp">
+                    <xs:annotation>
+                      <xs:documentation>Names must be unique</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@contactName"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowTypeCA"/>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" use="required" fixed="contactID"/>
+                    <xs:attribute name="name" use="required" fixed="allianceContactList"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdAllianceContactListKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@contactID"/>
+                  </xs:key>
+                  <xs:key name="rowNameKeyAlliance">
+                    <xs:annotation>
+                      <xs:documentation>Names must be unique</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@contactName"/>
+                  </xs:key>
+                </xs:element>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -53,6 +101,11 @@
     <xs:attribute name="contactID" use="required" type="eveID"/>
     <xs:attribute name="contactName" use="required" type="xs:string"/>
     <xs:attribute name="inWatchlist" use="required" type="xs:NCName"/>
+    <xs:attribute name="standing" use="required" type="xs:decimal"/>
+  </xs:complexType>
+  <xs:complexType name="rowTypeCA">
+    <xs:attribute name="contactID" use="required" type="eveID"/>
+    <xs:attribute name="contactName" use="required" type="xs:string"/>
     <xs:attribute name="standing" use="required" type="xs:decimal"/>
   </xs:complexType>
 </xs:schema>

@@ -1,3 +1,31 @@
+2011-12-17
+
+(default) Updated char/ContactList to work with update API that now includes
+alliance and corporation rowsets. A database update is required so everyone
+needs to run install/createMySQLTables.php.
+
+2011-12-12
+
+(default) Started work on adding a new feature to MarketOrder APIs to allow
+Yapeal to optionally upload data to market sites like EMK, etc.
+
+2011-12-11
+
+(default) Updates to all of the install/*.xml files to include reference to the
+xmlschema03.xsd so editors that understand XSDs can validate the xml files and
+offer syntax help when editing. It took several tries but finally got it right.
+
+2011-12-10
+
+(default) Added 'singleton' column database tables etc to work with the new
+attribute added to KillLog APIs. Make sure to run install/createMySQLTables.php
+since there is a database update required.
+
+Finally found and fixed error that was stopping WalletJournals,
+WalletTransactions, and KillLogs that was keep them from walking correctly and
+cause near infinite loop in those API classes. Everyone needs to do update as
+this bug does cause a large CPU usage issue and greatly slows down Yapeal.
+
 2011-11-06
 
 (default) Updated ADOdb to version 5.14.

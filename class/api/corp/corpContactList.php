@@ -76,13 +76,12 @@ class corpContactList  extends ACorp {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       while ($this->xr->read()) {

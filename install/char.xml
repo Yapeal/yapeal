@@ -51,6 +51,24 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="charAllianceContactList">
+    <descr>Sub table from /char/ContactList.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="charAssetList">
     <descr>Table for /char/AssetList.xml.aspx</descr>
     <field name="`ownerID`" type="I8" size="20">
@@ -320,6 +338,24 @@
     </field>
     <field name="`messageData`" type="X"/>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charCorporateContactList">
+    <descr>Sub table from /char/ContactList.xml.aspx</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactName`" type="C" size="255">
+      <NOTNULL/>
+    </field>
+    <field name="`standing`" type="N" size="5.2">
+      <NOTNULL/>
+    </field>
+    <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charContracts">
     <descr>Table for /char/Contracts.xml.aspx</descr>

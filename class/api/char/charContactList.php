@@ -74,6 +74,101 @@ class charContactList extends AChar {
     parent::__construct($params);
   }// function __construct
   /**
+   * Per API parser for XML.
+   *
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
+    try {
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'rowset':
+                // Check if empty.
+                if ($this->xr->isEmptyElement == 1) {
+                  break;
+                };// if $this->xr->isEmptyElement ...
+                // Grab rowset name.
+                $subTable = $this->xr->getAttribute('name');
+                if (empty($subTable)) {
+                  $mess = 'Name of rowset is missing in ' . $this->api;
+                  Logger::getLogger('yapeal')->warn($mess);
+                  return FALSE;
+                };
+                $this->rowset($subTable);
+                break;
+              default: // Nothing to do here.
+            };// $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default: // Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
+    }
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
+      return FALSE;
+    }
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    Logger::getLogger('yapeal')->warn($mess);
+    return FALSE;
+  }// function parserAPI
+  /**
+   * Used to store XML to rowset tables.
+   *
+   * @param string $table Name of the table for this rowset.
+   *
+   * @return Bool Return TRUE if store was successful.
+   */
+  protected function rowset($table) {
+    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+      Logger::getLogger('yapeal')->trace(__METHOD__);
+    };
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Save some overhead for tables that are truncated or in some way emptied.
+    $qb->useUpsert(FALSE);
+    $qb->setDefault('ownerID', $this->ownerID);
+    while ($this->xr->read()) {
+      switch ($this->xr->nodeType) {
+        case XMLReader::ELEMENT:
+          switch ($this->xr->localName) {
+            case 'row':
+              // Walk through attributes and add them to row.
+              while ($this->xr->moveToNextAttribute()) {
+                $row[$this->xr->name] = $this->xr->value;
+              }; // while $this->xr->moveToNextAttribute() ...
+              $qb->addRow($row);
+              break;
+          }; // switch $this->xr->localName ...
+          break;
+        case XMLReader::END_ELEMENT:
+          if ($this->xr->localName == 'rowset') {
+            // Insert any leftovers.
+            if (count($qb) > 0) {
+              $qb->store();
+            }; // if count $rows ...
+            $qb = NULL;
+            return TRUE;
+          }; // if $this->xr->localName == 'row' ...
+          break;
+      }; // switch $this->xr->nodeType
+    }; // while $this->xr->read() ...
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    Logger::getLogger('yapeal')->warn($mess);
+    return FALSE;
+  }// function rowset
+  /**
    * Method used to prepare database table(s) before parsing API XML data.
    *
    * If there is any need to delete records or empty tables before parsing XML
@@ -85,18 +180,21 @@ class charContactList extends AChar {
     if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
-      // Empty out old data then upsert (insert) new.
-      $sql = 'delete from `';
-      $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-      $sql .= ' where `ownerID`=' . $this->ownerID;
-      $con->Execute($sql);
-    }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
-      return FALSE;
-    }
+    $tables = array('AllianceContactList', $this->api, 'CorporateContactList');
+    foreach ($tables as $table) {
+      try {
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        // Empty out old data then upsert (insert) new.
+        $sql = 'delete from `';
+        $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
+        $sql .= ' where `ownerID`=' . $this->ownerID;
+        $con->Execute($sql);
+      }
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
+        return FALSE;
+      }
+    };// foreach $tables ...
     return TRUE;
   }// function prepareTables
 }

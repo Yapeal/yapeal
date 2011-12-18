@@ -34,7 +34,7 @@ general idea is the same.
     Windows:
     Use the built-in zip handling of Vista or Win7's Windows Explorer to extract
     Yapeal where you want to put it. A path without any spaces in it is
-    recomended as it saves you having to quote things when working from the
+    recommended as it saves you having to quote things when working from the
     command line. For example `C:\yapeal\` is better than "My Documents" but
     either should work.
 
@@ -58,9 +58,9 @@ general idea is the same.
     go into here you'll need to do a quick search online for "Adding Command
     Prompt" or "Command Prompt here" which should get you started.
 
-    Now I'm going to assume you extracted Yapeal to `C:\yapeal\`. To move to that
-    directory at the command prompt do `cd c:\yapeal\` and you should be able to
-    do a dir command and see the files and directories from Yapeal.
+    Now I'm going to assume you extracted Yapeal to `C:\yapeal\`. To move to
+    that directory at the command prompt do `cd c:\yapeal\` and you should be
+    able to do a dir command and see the files and directories from Yapeal.
 
     You should now be caught up to the Linux folks.
 
@@ -237,15 +237,15 @@ probably want to active more of the APIs as only a few are active by default
 you'll also need to add key, and optionally character, and corporation
 information to the utilRegistered* tables in the database for any of the
 account, char, or corp APIs to work. More information about adding information
-and activing APIs can be found in the wiki and on the forum thread.
+and activating APIs can be found in the wiki and on the forum thread.
 
 ## Installing From Mercurial ##
 
 To install from the Mercurial repository on GoogleCode or SourceForge first
 setup a working copy. This shouldn't be where you plan on run Yapeal from but be
-a convenant place like your My Documents (Documents on Vista/Win7) or some place
-like it on Linux. The reason to not put your working copy where you plan to run
-Yapeal is it will make upgrading it easier without all the extra .hg/
+a convenient place like your My Documents (Documents on Vista/Win7) or some
+place like it on Linux. The reason to not put your working copy where you plan
+to run Yapeal is it will make upgrading it easier without all the extra .hg/
 directories, etc. you have with a working copy. For Linux on the command line
 you can use:
 
@@ -253,7 +253,7 @@ you can use:
 
   Then:
 
-  `hg clone https://dragonrun1@code.google.com/p/yapeal/`
+  `hg clone https://code.google.com/p/yapeal/`
 
   OR
 
@@ -270,7 +270,7 @@ from cmd.exe prompt:
 
   Then:
 
-  `hg clone https://dragonrun1@code.google.com/p/yapeal/`
+  `hg clone https://code.google.com/p/yapeal/`
 
   OR
 

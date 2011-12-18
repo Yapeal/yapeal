@@ -511,7 +511,7 @@
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charFacWarStats">
-    <descr>Table from /char/FacWarStats.xml.aspx</descr>
+    <descr>Table from /char/FacWarStats.xml.aspx that holds the status info about a Character in the Faction Warfare</descr>
     <field name="`ownerID`" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>

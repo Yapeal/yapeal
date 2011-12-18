@@ -83,7 +83,7 @@ class eveFacWarTopStats extends AEve {
     if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section;
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -195,7 +195,7 @@ class eveFacWarTopStats extends AEve {
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
-    $qb->useUpsert(TRUE);
+    $qb->useUpsert(FALSE);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -237,19 +237,22 @@ class eveFacWarTopStats extends AEve {
     if (Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $tables = array('FacWarTopStatsCharactersKillsLastWeek',        'FacWarTopStatsCharactersKillsTotal',
-                    'FacWarTopStatsCharactersKillsYesterday',       'FacWarTopStatsCharactersVictoryPointsLastWeek',
-                    'FacWarTopStatsCharactersVictoryPointsTotal',   'FacWarTopStatsCharactersVictoryPointsYesterday',
-                    'FacWarTopStatsCorporationsKillsLastWeek',      'FacWarTopStatsCorporationsKillsTotal',
-                    'FacWarTopStatsCorporationsKillsYesterday',     'FacWarTopStatsCorporationsVictoryPointsLastWeek',
-                    'FacWarTopStatsCorporationsVictoryPointsTotal', 'FacWarTopStatsCorporationsVictoryPointsYesterday');
+    $tables = array('CharactersKillsLastWeek',        'CharactersKillsTotal',
+                    'CharactersKillsYesterday',       'CharactersVictoryPointsLastWeek',
+                    'CharactersVictoryPointsTotal',   'CharactersVictoryPointsYesterday',
+                    'CorporationsKillsLastWeek',      'CorporationsKillsTotal',
+                    'CorporationsKillsYesterday',     'CorporationsVictoryPointsLastWeek',
+                    'CorporationsVictoryPointsTotal', 'CorporationsVictoryPointsYesterday',
+                    'FactionsKillsLastWeek',          'FactionsKillsTotal',
+                    'FactionsKillsYesterday',         'FactionsVictoryPointsLastWeek',
+                    'FactionsVictoryPointsTotal',     'FactionsVictoryPointsYesterday');
     foreach ($tables as $table) {
       try {
         $con = YapealDBConnection::connect(YAPEAL_DSN);
         // Empty out old data then upsert (insert) new.
         $sql = 'TRUNCATE TABLE `';
         $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
-        //$con->Execute($sql);
+        $con->Execute($sql);
       }
       catch (ADODB_Exception $e) {
         Logger::getLogger('yapeal')->warn($e);

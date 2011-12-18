@@ -49,6 +49,84 @@
     <field name="`startDate`" type="T"/>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="eveCharactersKillsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Kills Last Week</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCharactersKillsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Kills Total</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCharactersKillsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Kills Yesterday</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCharactersVictoryPointsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Victory Points Last Week</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCharactersVictoryPointsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Victory Points Total</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCharactersVictoryPointsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Characters Victory Points Yesterday</descr>
+    <field name="characterID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="characterName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="eveConquerableStationList">
     <field name="`corporationID`" type="I8" size="20">
       <UNSIGNED/>
@@ -67,6 +145,84 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="eveCorporationsKillsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Kills Last Week</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCorporationsKillsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Kills Total</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCorporationsKillsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Kills Yesterday</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCorporationsVictoryPointsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Victory Points Last Week</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCorporationsVictoryPointsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Victory Points Total</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveCorporationsVictoryPointsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Corporations Victory Points Yesterday</descr>
+    <field name="corporationID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="corporationName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="eveErrorList">
     <field name="`errorCode`" type="I2" size="3">
       <KEY/>
@@ -78,7 +234,7 @@
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveFactions">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
+    <descr>Subtable from /eve/FacWarStats.xml.aspx that holds the factions status on the warfare.</descr>
     <field name="factionID" type="I8" size="20">
       <KEY/>
       <UNSIGNED/>
@@ -118,8 +274,86 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <table name="eveFactionsKillsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Kills Last Week</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveFactionsKillsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Kills Total</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveFactionsKillsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Kills Yesterday</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="kills" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveFactionsVictoryPointsLastWeek">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Victory Points Last Week</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveFactionsVictoryPointsTotal">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Victory Points Total</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="eveFactionsVictoryPointsYesterday">
+    <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare Top Status for Factions Victory Points Yesterday</descr>
+    <field name="factionID" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="factionName" type="C" size="32"/>
+    <field name="victoryPoints" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
   <table name="eveFactionWars">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
+    <descr>Subtable from /eve/FacWarStats.xml.aspx that holds the info on what faction is at war with what faction</descr>
     <field name="factionID" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -133,7 +367,7 @@
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="eveFacWarStats">
-    <descr>Table from /eve/FacWarStats.xml.aspx</descr>
+    <descr>Table from /eve/FacWarStats.xml.aspx this holds the overall kills and victory point there have been in EVE history</descr>
     <field name="killsYesterday" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -155,240 +389,6 @@
       <UNSIGNED/>
     </field>
     <field name="victoryPointsTotal" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersKillsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersKillsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersKillsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersVictoryPointsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersVictoryPointsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCharactersVictoryPointsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="characterID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="characterName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsKillsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsKillsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsKillsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsVictoryPointsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsVictoryPointsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsCorporationsVictoryPointsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="corporationID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="corporationName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsKillsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsKillsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsKillsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="kills" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsVictoryPointsLastWeek">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsVictoryPointsTotal">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
-      <NOTNULL/>
-      <UNSIGNED/>
-    </field>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-  </table>
-  <table name="eveFacWarTopStatsFactionsVictoryPointsYesterday">
-    <descr>Subtable from /eve/FacWarStats.xml.aspx</descr>
-    <field name="factionID" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="factionName" type="C" size="32"/>
-    <field name="victoryPoints" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>

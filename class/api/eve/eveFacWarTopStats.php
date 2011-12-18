@@ -96,15 +96,6 @@ class eveFacWarTopStats extends AEve {
                 if ($this->xr->isEmptyElement == TRUE) {
                   break;
                 };// if $this->xr->isEmptyElement ...
-                // Grab node name.
-                /*$subTable = $this->xr->localName;
-                // Check for method with same name as node.
-                if (!is_callable(array($this, $subTable))) {
-                  $mess = 'Unknown what-to-be rowset ' . $subTable;
-                  $mess .= ' found in ' . $this->api;
-                  Logger::getLogger('yapeal')->warn($mess);
-                  return FALSE;
-                };*/
                 // Parse node into there own tables
                 $this->parseSubTable($tableName . ucfirst($this->xr->localName));
                 break;

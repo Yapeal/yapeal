@@ -1,6 +1,6 @@
 2011-12-17
 
-(default) Updated char/ContactList to work with update API that now includes
+(default) Updated char/ContactList to work with updated API that now includes
 alliance and corporation rowsets. A database update is required so everyone
 needs to run install/createMySQLTables.php.
 

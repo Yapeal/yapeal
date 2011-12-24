@@ -224,13 +224,17 @@ general idea is the same.
 
     _All database tables have been installed or updated as needed._
 
+    If you get an error message about problems with the 'util' section try
+    dropping the `utilAccessMask` and `utilCachedInterval` tables and run it
+    again.
+
     In this example you should have noticed I use a so called long option
-    "--database". They have worked for a long time on Linux but have only been
-    added for Windows starting with PHP 5.3.0. The reason I'm pointing it out is
-    if you decided to use them and they don't seem to be doing anything or you
-    get errors you might try using the short version instead and see if it
-    helps. Talking about help you can get some quick help instructions by using
-    the -h or --help parameter with any of these commands.
+    "--database". They have worked for awhile on Linux but have only been added
+    for Windows starting with PHP 5.3.0. The reason I'm pointing it out is if
+    you decided to use them and they don't seem to be doing anything or you get
+    errors you might try using the short version instead and see if it helps.
+    Talking about help you can get some quick help instructions by using the -h
+    or --help parameter with any of these commands.
 
 After the above steps everything should be in place to run Yapeal. You'll
 probably want to active more of the APIs as only a few are active by default

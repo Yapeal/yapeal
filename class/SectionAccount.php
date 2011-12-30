@@ -59,7 +59,7 @@ class SectionAccount extends ASection {
    * Constructor
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
@@ -71,7 +71,7 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if ($this->abort === TRUE) {
@@ -186,7 +186,7 @@ class SectionAccount extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $sql = 'select urk.`keyID`,urk.`vCode`,urk.`activeAPIMask` as "RKMask",';
@@ -213,7 +213,7 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function ignoredFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
@@ -252,7 +252,7 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function optionalFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!is_null($row['RKActive']) && $row['RKActive'] == 0) {
@@ -287,7 +287,7 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function requiredFilter(&$row) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (is_null($row['RKActive'])) {

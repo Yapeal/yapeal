@@ -64,7 +64,7 @@ class SectionMaint extends ASection {
    *
    */
   public function __construct() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
@@ -80,7 +80,7 @@ class SectionMaint extends ASection {
    * @return bool Returns TRUE if all scripts ran cleanly else FALSE.
    */
   public function pullXML() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if ($this->abort === TRUE) {

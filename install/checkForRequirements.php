@@ -150,12 +150,12 @@ if (!empty($mess)) {
 };
 // Check if log directory is writable.
 if (!is_writable(YAPEAL_LOG)) {
-  $mess = YAPEAL_LOG . ' is not writeable.' . PHP_EOL;
+  $mess = YAPEAL_LOG . ' is not writable.' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };
 // Check for required Logging section settings.
-$required = array('log_config');
+$required = array('log_config', 'trace_enabled');
 $mess = '';
 foreach ($required as $setting) {
   if (!isset($iniVars['Logging'][$setting])) {
@@ -169,7 +169,7 @@ if (!empty($mess)) {
 };
 // Check if cache directory is writable.
 if (!is_writable(YAPEAL_CACHE)) {
-  $mess = YAPEAL_CACHE . ' is not writeable.' . PHP_EOL;
+  $mess = YAPEAL_CACHE . ' is not writable.' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };
@@ -180,7 +180,7 @@ if (!isset($iniVars['Cache']['cache_output'])) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-// Check if required cache directories exist and are writeable.
+// Check if required cache directories exist and are writable.
 if ($iniVars['Cache']['cache_output'] == 'file' ||
   $iniVars['Cache']['cache_output'] == 'both') {
   $required = array('account', 'ADOdb', 'char', 'corp', 'eve', 'map', 'server');
@@ -191,7 +191,7 @@ if ($iniVars['Cache']['cache_output'] == 'file' ||
       exit(2);
     };
     if (!is_writable(YAPEAL_CACHE . $section)) {
-      $mess = YAPEAL_CACHE . $section . ' is not writeable.' . PHP_EOL;
+      $mess = YAPEAL_CACHE . $section . ' is not writable.' . PHP_EOL;
       fwrite(STDERR, $mess);
       exit(2);
     };

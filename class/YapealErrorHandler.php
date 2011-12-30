@@ -143,6 +143,13 @@ class YapealErrorHandler {
       exit(1);
     };
     self::$logConfig = $file;
+    if (!empty($section['trace_enabled'])) {
+      if (!defined('YAPEAL_TRACE_ENABLED')) {
+        define('YAPEAL_TRACE_ENABLED', $section['trace_enabled']);
+      };
+    } else {
+      define('YAPEAL_TRACE_ENABLED', FALSE);
+    };
   }// function setLoggingSectionProperties
   /**
    * Function used to setup error and exception logging.

@@ -91,7 +91,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $path = YAPEAL_CLASS . 'api' . DS;
@@ -142,7 +142,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool TRUE if graphic was retrieved.
    */
   public function getItemById($id) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
@@ -182,7 +182,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if the the database record already existed.
    */
   public function recordExists() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->recordExists;
@@ -196,7 +196,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if column exists in table and default was set.
    */
   public function setDefault($name, $value) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->qb->setDefault($name, $value);
@@ -209,7 +209,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if all column defaults could be set, else FALSE.
    */
   public function setDefaults(array $defaults) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->qb->setDefaults($defaults);
@@ -220,7 +220,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (FALSE === $this->qb->addRow($this->properties)) {

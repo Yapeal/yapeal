@@ -65,7 +65,7 @@ abstract class AMap extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->params = $params;
@@ -81,7 +81,7 @@ abstract class AMap extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $default = 'https://api.eveonline.com/' . $this->section;
@@ -118,7 +118,7 @@ abstract class AMap extends AApiRequest {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {
@@ -152,7 +152,7 @@ abstract class AMap extends AApiRequest {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {

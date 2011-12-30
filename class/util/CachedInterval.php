@@ -66,7 +66,7 @@ class CachedInterval {
    * Constructor
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     // If list is empty grab it from database.
@@ -87,7 +87,7 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function getInterval($api, $section) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!is_string($api) || !is_string($section)) {
@@ -123,7 +123,7 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function changeInterval($api, $section, $interval) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!is_string($api) || !is_string($section)) {
@@ -152,7 +152,7 @@ class CachedInterval {
    * database fails or can't get data from table.
    */
   public static function resetAll() {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {

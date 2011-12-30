@@ -97,7 +97,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
     $this->sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
@@ -166,7 +166,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * $this->properties['section'] is not set.
    */
   public function addActiveAPI($name) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if(!isset($this->properties['section'])) {
@@ -194,7 +194,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * $this->properties['section'] is not set.
    */
   public function deleteActiveAPI($name) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if(!isset($this->properties['section'])) {
@@ -217,7 +217,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool TRUE if section was retrieved.
    */
   public function getItemById($id) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
@@ -248,7 +248,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @throws DomainException If $name not in $this->sectionList.
    */
   public function getItemByName($name) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (!in_array(ucfirst($name), $this->sectionList)) {
@@ -279,7 +279,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if the the database record already existed.
    */
   public function recordExists() {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->recordExists;
@@ -293,7 +293,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if column exists in table and default was set.
    */
   public function setDefault($name, $value) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->qb->setDefault($name, $value);
@@ -306,7 +306,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if all column defaults could be set, else FALSE.
    */
   public function setDefaults(array $defaults) {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     return $this->qb->setDefaults($defaults);
@@ -317,7 +317,7 @@ class Sections extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    if (YAPEAL_TRACE_ENABLED && Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     if (FALSE === $this->qb->addRow($this->properties)) {

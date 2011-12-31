@@ -30,7 +30,7 @@
  * @link       http://logging.apache.org/log4php/
  */
 -->
-<log4php:configuration xmlns:log4php="http://logging.apache.org/log4php/">
+<log4php:configuration xmlns:log4php="http://logging.apache.org/log4php">
   <appender name="fatalLog" class="LoggerAppenderRollingFile" threshold="FATAL">
     <param name="file" value="log/yapeal_fatal.log"/>
     <param name="maxFileSize" value="1MB"/>
@@ -116,29 +116,29 @@
   </appender>
   <renderer renderedClass="Exception" renderingClass="ExceptionRenderer"/>
   <root>
-    <appender_ref ref="cli"/>
+    <appender-ref ref="cli"/>
   </root>
   <!-- This logger is the main one used throughout Yapeal. You can change it as
   you like. The default is to log to command line and files in log/. -->
   <logger name="yapeal">
     <level value="info"/>
-    <appender_ref ref="fatalLog"/>
-    <appender_ref ref="errorLog"/>
-    <appender_ref ref="warningLog"/>
-    <appender_ref ref="infoLog"/>
-    <appender_ref ref="debugLog"/>
-    <appender_ref ref="traceLog"/>
+    <appender-ref ref="fatalLog"/>
+    <appender-ref ref="errorLog"/>
+    <appender-ref ref="warningLog"/>
+    <appender-ref ref="infoLog"/>
+    <appender-ref ref="debugLog"/>
+    <appender-ref ref="traceLog"/>
   </logger>
   <!-- This logger is used to capture all types of normal PHP errors into
   Yapeal's logs from a set_error_handler() method that is setup in Yapeal. Do
   not add any LoggerAppenderPhp Appenders to it except if you believe in free
   energy and like infinite loops -->
   <logger name="yapeal_capture" additivity="false">
-    <appender_ref ref="fatalLog"/>
-    <appender_ref ref="errorLog"/>
-    <appender_ref ref="warningLog"/>
-    <appender_ref ref="infoLog"/>
-    <appender_ref ref="debugLog"/>
-    <appender_ref ref="traceLog"/>
+    <appender-ref ref="fatalLog"/>
+    <appender-ref ref="errorLog"/>
+    <appender-ref ref="warningLog"/>
+    <appender-ref ref="infoLog"/>
+    <appender-ref ref="debugLog"/>
+    <appender-ref ref="traceLog"/>
   </logger>
 </log4php:configuration>

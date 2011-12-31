@@ -68,6 +68,7 @@ element. -->
 <!ATTLIST appender
   name      ID  #REQUIRED
   class     CDATA   #REQUIRED
+  threshold CDATA
 >
 
 <!ELEMENT layout (param*)>

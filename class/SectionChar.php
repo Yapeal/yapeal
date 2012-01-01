@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to pull Eve APIs for char section.
@@ -189,9 +188,9 @@ class SectionChar extends ASection {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
+    $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
     switch (YAPEAL_REGISTERED_MODE) {
       case 'required':
-        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
         $sql .= 'urc.`isActive` as "RCActive",aaki.`accessMask`,';
         $sql .= 'urc.`activeAPIMask` as "RCMask"';
         $sql .= ' from';
@@ -208,7 +207,6 @@ class SectionChar extends ASection {
         $sql .= ' aaki.`type` in ("Account","Character")';
         break;
       case 'optional':
-        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
         $sql .= 'urk.`isActive` as "RKActive",urc.`isActive` as "RCActive",';
         $sql .= 'aaki.`accessMask`,urk.`activeAPIMask` as "RKMask",';
         $sql .= 'urc.`activeAPIMask` as "RCMask"';
@@ -226,7 +224,6 @@ class SectionChar extends ASection {
         $sql .= ' aaki.`type` in ("Account","Character")';
         break;
       case 'ignored':
-        $sql = 'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
         $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,';
         $sql .= 'urk.`activeAPIMask` as "RKMask"';
         $sql .= ' from';
@@ -290,7 +287,7 @@ class SectionChar extends ASection {
    *
    * The best way to view this mode is it allows you to farther restrict the
    * settings in utilSections using the optional settings from
-   * utilRegisiteredKey and utilRegisteredCharacter if you choose to. Any
+   * utilRegisteredKey and utilRegisteredCharacter if you choose to. Any
    * non-null optional settings in utilRegisteredCharacter has priority over the
    * ones in utilRegisteredKey which are ignored in that case.
    *

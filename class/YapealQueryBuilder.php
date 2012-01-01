@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to build SQL queries.
@@ -182,7 +182,7 @@ class YapealQueryBuilder implements Countable {
    *
    * The output is formatted as CSV (Comma Separated Values) with a header line
    * and string quoted. Note that decimal values are treated like strings and
-   * blobs are in hexdecminal form with 0x appended but not quoted.
+   * blobs are in hexadecimal form with 0x appended but not quoted.
    *
    * @return string Returns the rows ready to be printed.
    */
@@ -272,7 +272,7 @@ class YapealQueryBuilder implements Countable {
     return TRUE;
   }// function addRow
   /**
-   * Implimentation of count() for countable interface.
+   * Implementation of count() for countable interface.
    *
    * @return int Returns count for rows.
    */
@@ -285,7 +285,7 @@ class YapealQueryBuilder implements Countable {
   /**
    * Function to access the list of columns and their generic ADO types.
    *
-   * @return array Returns an array of column names and their assocated generic
+   * @return array Returns an array of column names and their associated generic
    * ADO types.
    */
   public function getColumnTypes() {
@@ -359,7 +359,7 @@ class YapealQueryBuilder implements Countable {
         return 'N';
     };// switch strtoupper($t) ...
     $mess = 'Unknown ADOFieldObject type in ' . __CLASS__ . PHP_EOL;
-    $mess .= ' type recieved was ' . $t;
+    $mess .= ' type received was ' . $t;
     Logger::getLogger('yapeal')->error($mess);
     exit(2);
   }// function metaType
@@ -494,7 +494,7 @@ class YapealQueryBuilder implements Countable {
     if ($upsert === TRUE) {
       // Add update part to make upsert.
       $sql .= ' on duplicate key update ';
-      // Loop thru and build update.
+      // Loop through and build update.
       $updates = array();
       foreach (array_keys($this->colTypes) as $k) {
         $updates[] = '`' . $k . '`=values(`' . $k . '`)';

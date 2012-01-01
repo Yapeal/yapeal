@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Interface to get record from database table by Id or when available other
@@ -61,7 +60,8 @@ interface IGetBy {
    *
    * For database tables that don't have an 'id' type field that can be use
    * they should throw a LogicException. To put it in other words this method is
-   * optional for some tables because it doesn't make logical sense to impliment it.
+   * optional for some tables because it doesn't make logical sense to implement
+   * it.
    *
    * @param mixed $id Id of record wanted.
    *
@@ -76,7 +76,8 @@ interface IGetBy {
    *
    * For database tables that don't have a 'name' type field that can be use
    * they should throw a LogicException. To put it in other words this method is
-   * optional for some tables because it doesn't make logical sense to impliment it.
+   * optional for some tables because it doesn't make logical sense to implement
+   * it.
    *
    * @param mixed $name Name of record wanted.
    *

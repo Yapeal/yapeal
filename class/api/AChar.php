@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Abstract class for Char APIs.
@@ -211,7 +210,7 @@ abstract class AChar extends AApiRequest {
               Logger::getLogger('yapeal')->warn($mess);
             };// if $char->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
-          // Always deactive key no matter the registered mode.
+          // Always deactivates key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
           $mess .= ' as the Eve API information is incorrect';
           Logger::getLogger('yapeal')->warn($mess);
@@ -264,7 +263,7 @@ abstract class AChar extends AApiRequest {
               Logger::getLogger('yapeal')->warn($mess);
             };// if $char->store() ...
           };// if YAPEAL_REGISTERED_MODE ...
-          // Always deactive key no matter the registered mode.
+          // Always deactivates key no matter the registered mode.
           $mess = 'Deactivating keyID: ' . $this->params['keyID'];
           $mess .= ' as the Eve account is currently suspended';
           Logger::getLogger('yapeal')->warn($mess);

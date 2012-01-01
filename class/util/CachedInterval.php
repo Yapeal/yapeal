@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilCachedInterval table.
@@ -132,8 +131,8 @@ class CachedInterval {
     };
     $found = FALSE;
     for ($i = 0, $cnt = count(self::$intervalList); $i < $cnt; ++$i) {
-      if (self::$intervalList[$i]['section'] = $section
-        && self::$intervalList[$i]['api'] = $api) {
+      if (self::$intervalList[$i]['section'] == $section
+        && self::$intervalList[$i]['api'] == $api) {
         self::$intervalList[$i]['interval'] = $interval;
         $found = TRUE;
       };

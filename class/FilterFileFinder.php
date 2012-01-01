@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class to recursive search through a directory for files/directories that match
@@ -149,7 +148,7 @@ class FilterFileFinder extends FilterIterator {
     return $fileList;
   }// function getStrippedFiles
   /**
-   * UTF-8 compatable version of pathinfo().
+   * UTF-8 compatible version of pathinfo().
    *
    * @param string $path The path being checked.
    * @param integer $options You can specify which elements are returned with
@@ -187,31 +186,25 @@ class FilterFileFinder extends FilterIterator {
     switch ($options) {
       case PATHINFO_DIRNAME:
         return $dirname;
-        break;
       case PATHINFO_BASENAME:
         return $basename;
-        break;
       case PATHINFO_EXTENSION:
         return $extension;
-        break;
       case PATHINFO_FILENAME:
         return $filename;
-        break;
-      default:
-        return array(
-          'dirname' => $dirname,
-          'basename' => $basename,
-          'extension' => $extension,
-          'filename' => $filename
-        );
-        break;
     };// switch $options ...
+    return array(
+      'dirname' => $dirname,
+      'basename' => $basename,
+      'extension' => $extension,
+      'filename' => $filename
+    );
   }// function pathinfo_utf
   /**
    * UTF-8 safe string reverse that also supports HTML type numerical entities
    *
    * @param string $str String to be reversed.
-   * @param bool $preserve_numbers Weither to reverse numbers or not.
+   * @param bool $preserve_numbers Whither to reverse numbers or not.
    *
    * @return string Returns $str in reverse order.
    */

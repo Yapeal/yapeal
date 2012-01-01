@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilRegisteredKey table.
@@ -88,7 +87,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param integer $id Id of key wanted.
+   * @param mixed $id Id of key wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
    * if $id doesn't exist in database.
    *
@@ -175,10 +174,9 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
     $mask = $this->am->apisToMask($name, $section);
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
       return TRUE;
-    } else {
-      $this->properties['activeAPIMask'] |= $mask;
-      return FALSE;
-    };// if $this->properties['activeAPIMask'] ...
+    };
+    $this->properties['activeAPIMask'] |= $mask;
+    return FALSE;
   }// function addActiveAPI
   /**
    * Used to delete an API from the list in activeAPI.
@@ -273,7 +271,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy {
    * field for this database table.
    */
   public function getItemByName($name) {
-    throw new LogicException('Not implimented for ' . __CLASS__ . ' table');
+    throw new LogicException('Not implemented for ' . __CLASS__ . ' table');
   }// function getItemByName
   /**
    * Function used to check if database record already existed.

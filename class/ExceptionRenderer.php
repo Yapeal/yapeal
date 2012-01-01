@@ -38,15 +38,14 @@ if (isset($_REQUEST['viewSource'])) {
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess . PHP_EOL);
-    fwrite(STDOUT, 'error' . PHP_EOL);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class called by Logger when it needs to render an exception object.
@@ -58,10 +57,12 @@ class ExceptionRenderer implements LoggerRendererObject {
   /**
    * Method called by logger to render any exceptions in log messages.
    *
+   * @param Exception $e The exception to be rendered.
+   *
    * @return string Returns message string containing the exception message,
    * exception code (if known), and trace for all types of exceptions.
    */
-  public function render($e) {
+  public function render(Exception $e) {
     $mess =  $e->getMessage() . PHP_EOL;
     if ($e->getCode()) {
       $mess .= '     Code: ' . $e->getCode() . PHP_EOL;

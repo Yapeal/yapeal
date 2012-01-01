@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Function use to show the usage message on command line.
@@ -130,7 +129,7 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $options['table-prefix:'] = array('op' => '  --table-prefix=PREFIX', 'desc' =>
     'Append PREFIX to all the table names. This is an optional setting that is'
     . ' mostly useful when combining Yapeal tables with the tables from an'
-    . ' application in the same database. Dafaults to empty string.');
+    . ' application in the same database. Defaults to empty string.');
   $options['u:'] = array('op' => '  -u, --username=USER', 'desc' =>
     'USER is the user name for the database server.');
   $options['V'] = array('op' => '  -V, --version', 'desc' =>
@@ -163,7 +162,7 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
     $option = str_pad($v['op'], $width);
     // Make description text ragged right with forced word wrap at full width.
     $desc = wordwrap($v['desc'], $descRag, PHP_EOL);
-    $desc = wordwrap($v['desc'], $descCut, PHP_EOL, TRUE);
+    $desc = wordwrap($desc, $descCut, PHP_EOL, TRUE);
     $option .= str_replace(PHP_EOL, $break, $desc);
     $mess .= $option . PHP_EOL . PHP_EOL;
   };// foreach $options ...

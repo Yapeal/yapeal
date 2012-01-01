@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store char ContactList API.
@@ -83,7 +83,6 @@ class charContactList extends AChar {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
           case XMLReader::ELEMENT:
@@ -144,6 +143,7 @@ class charContactList extends AChar {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
+              $row = array();
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;

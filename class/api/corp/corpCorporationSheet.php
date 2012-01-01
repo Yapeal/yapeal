@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store CorporationSheet API.
@@ -113,6 +113,7 @@ class corpCorporationSheet  extends ACorp {
       $this->xr = new XMLReader();
       // Pass XML to reader.
       $this->xr->XML($result);
+      $cuntil = '';
       // Outer structure of XML is processed here.
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -169,6 +170,7 @@ class corpCorporationSheet  extends ACorp {
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('allianceName', '');
+    $row = array();
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -263,6 +265,7 @@ class corpCorporationSheet  extends ACorp {
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('ownerID', $this->ownerID);
+    $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -313,6 +316,7 @@ class corpCorporationSheet  extends ACorp {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
+              $row = array();
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;

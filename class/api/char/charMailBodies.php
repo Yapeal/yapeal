@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store char MailBodies API.
@@ -177,7 +176,7 @@ class charMailBodies extends AChar {
    * MailBodies API is unusual in that the rows of data use a mix of an
    * attribute and element content.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {

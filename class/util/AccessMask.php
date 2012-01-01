@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilAccessMask table.
@@ -157,7 +156,7 @@ class AccessMask {
       if (!empty($section)) {
         $mess .= ' in section ' . $section;
       };
-      throw new DomainException($mess, 3);
+      throw new DomainException($mess);
       // Some APIs unknown.
     } elseif ($cnt < $acnt) {
       $diff = array_diff($apis, $this->maskToAPIs($mask, $section));
@@ -165,16 +164,15 @@ class AccessMask {
       if (!empty($section)) {
         $mess .= ' in section ' . $section;
       };
-      throw new DomainException($mess, 4);
+      throw new DomainException($mess);
       // Found right number of APIs.
     } elseif ($cnt == $acnt) {
       return $mask;
-      // Found API in multiple sections and the correct section was unknown.
-    } else {
-      $mess = 'Multiple API matches found, $section parameter is required to';
-      $mess .= ' determine which ' . implode(',', $apis) . ' are wanted';
-      throw new DomainException($mess, 5);
-    };// else ...
+    };
+    // Found API in multiple sections and the correct section was unknown.
+    $mess = 'Multiple API matches found, $section parameter is required to';
+    $mess .= ' determine which ' . implode(',', $apis) . ' are wanted';
+    throw new DomainException($mess);
   }// function apisToMask
   /**
    * Returns the whole access mask list for all the known APIs.

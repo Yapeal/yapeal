@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store corp WalletTransactions API.
@@ -102,7 +102,7 @@ class corpWalletTransactions extends ACorp {
     $accounts = range(1000, 1006);
     shuffle($accounts);
     $future = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
-    foreach ($accounts as $k => $this->account) {
+    foreach ($accounts as $this->account) {
       // This counter is used to insure do ... while can't become infinite loop.
       $counter = 1000;
       // Use an hour in the future as date and let $this->parserAPI() finds the
@@ -207,7 +207,7 @@ class corpWalletTransactions extends ACorp {
    * Most common API style is a simple <rowset>. Transactions are a little more
    * complex because of need to do walking back for older records.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -239,6 +239,7 @@ class corpWalletTransactions extends ACorp {
                   $this->date = $date;
                   $this->beforeID = $this->xr->getAttribute('transactionID');
                 };// if $date ...
+                $row = array();
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   $row[$this->xr->name] = $this->xr->value;
@@ -250,7 +251,8 @@ class corpWalletTransactions extends ACorp {
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
               // Save row count and store rows.
-              if ($this->rowCount = count($qb) > 0) {
+              $this->rowCount = count($qb);
+              if ($this->rowCount > 0) {
                 $qb->store();
               };// if count $rows ...
               $qb = NULL;

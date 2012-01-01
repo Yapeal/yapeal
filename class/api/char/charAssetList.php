@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store char AssetList API.
@@ -61,7 +60,7 @@ class charAssetList extends AChar {
   private $qb;
   /**
    * @var array Holds a stack of parent nodes until after their children are
-   * proccessed.
+   * processed.
    */
   private $stack = array();
   /**
@@ -89,7 +88,7 @@ class charAssetList extends AChar {
    * API classes to be empty except for a constructor which sets $this->api and
    * calls their parent constructor.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {

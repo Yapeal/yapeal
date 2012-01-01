@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilCachedUntil table.
@@ -69,11 +68,6 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    */
   protected $qb;
   /**
-   * List of all section APIs
-   * @var array
-   */
-  private $apiList;
-  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
@@ -87,8 +81,8 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    *
    * @throws DomainException If $create is FALSE and a database record for $id
    * doesn't exist a DomainException will be thrown.
-   * @throws InvalidArgmentException If required parameters in $id aren't
-   * correct data types throws InvalidArgmentException.
+   * @throws InvalidArgumentException If required parameters in $id aren't
+   * correct data types throws InvalidArgumentException.
    * @throws LengthException If $id is missing any require parameter throws a
    * LengthException.
    */
@@ -123,13 +117,13 @@ class CachedUntil extends ALimitedObject implements IGetBy {
         case 'X':
           if (!is_string($id[$k])) {
             $mess = '$id["' . $k . '"] must be a string';
-            throw new InvalidArgmentException($mess, 2);
+            throw new InvalidArgumentException($mess);
           };// if !is_string $params[$k] ...
           break;
         case 'I':
           if (0 != strlen(str_replace(range(0,9),'',$id[$k]))) {
             $mess = '$id["' . $k . '"] must be an integer';
-            throw new InvalidArgmentException($mess, 3);
+            throw new InvalidArgumentException($mess);
           };// if 0 == strlen(...
           break;
       };// switch $v ...
@@ -168,7 +162,7 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    * checking the datatime in utilCachedUntil table.
    *
    * @param string $api Which API is data is needed for.
-   * @param string $owner Which owner the API data is needed for.
+   * @param string|int $owner Which owner the API data is needed for.
    *
    * @return bool Returns TRUE if it is time to get the API.
    */
@@ -242,7 +236,7 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    * field for this database table.
    */
   public function getItemByName($name) {
-    throw new LogicException('Not implimented for ' . __CLASS__ . ' table', 1);
+    throw new LogicException('Not implemented for ' . __CLASS__ . ' table', 1);
   }// function getItemByName
   /**
    * Function used to check if database record already existed.

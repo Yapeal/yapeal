@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilSections table.
@@ -176,10 +175,9 @@ class Sections extends ALimitedObject implements IGetBy {
     $mask = $this->am->apisToMask($name, $this->properties['section']);
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
       return TRUE;
-    } else {
-      $this->properties['activeAPIMask'] |= $mask;
-      return FALSE;
-    };// if $this->properties['activeAPIMask'] ...
+    };
+    $this->properties['activeAPIMask'] |= $mask;
+    return FALSE;
   }// function addActiveAPI
   /**
    * Used to delete an API from the list in activeAPI.
@@ -205,9 +203,8 @@ class Sections extends ALimitedObject implements IGetBy {
     if (($this->properties['activeAPIMask'] & $mask) > 0) {
       $this->properties['activeAPIMask'] ^= $mask;
       return TRUE;
-    } else {
-      return FALSE;
-    };// if $this->properties['activeAPIMask'] ...
+    };
+    return FALSE;
   }// function deleteActiveAPI
   /**
    * Used to get section from Sections table by section ID.

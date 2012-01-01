@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store char IndustryJobs API.

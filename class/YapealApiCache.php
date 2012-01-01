@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to manage caching of XML from Eve APIs.
@@ -68,7 +67,7 @@ class YapealApiCache {
    */
   private static $cacheOutput = 'file';
   /**
-   * @var integer Holds current Unix time to have consistant caching time.
+   * @var integer Holds current Unix time to have consistent caching time.
    */
   private $curTime;
   /**
@@ -101,7 +100,7 @@ class YapealApiCache {
    * @param string $api Name of the Eve API being cached.
    * @param string $section The api section that $api belongs to. For Eve
    * APIs will be one of account, char, corp, eve, map, or server.
-   * @param string $owner Owner for current Eve API being cached. This maybe
+   * @param string|int $owner Owner for current Eve API being cached. This maybe
    * empty for some APIs i.e. eve, map, and server.
    * @param array $postParams The list of required params used in getting API.
    * This maybe empty for some APIs i.e. eve, map, and server.
@@ -185,8 +184,8 @@ class YapealApiCache {
       case 'none':
         return FALSE;
       default:
-        $mess = 'Invalid value of "' . YAPEAL_CACHE_OUTPUT;
-        $mess .= '" for YAPEAL_CACHE_OUTPUT.';
+        $mess = 'Invalid value of "' . self::$cacheOutput;
+        $mess .= '" for cache_output.';
         $mess .= ' Check that the setting in config/yapeal.ini is correct.';
         Logger::getLogger('yapeal')->warn($mess);
         return FALSE;
@@ -264,18 +263,18 @@ class YapealApiCache {
     };
     switch (self::$cacheOutput) {
       case 'both':
-        $this->delCachedDatabase($xml);
-        $this->delCachedFile($xml);
+        $this->delCachedDatabase();
+        $this->delCachedFile();
         break;
       case 'database':
-        $this->delCachedDatabase($xml);
+        $this->delCachedDatabase();
         break;
       case 'file':
-        $this->delCachedFile($xml);
+        $this->delCachedFile();
         break;
       default:
-        $mess = 'Invalid value of "' . YAPEAL_CACHE_OUTPUT;
-        $mess .= '" for YAPEAL_CACHE_OUTPUT.';
+        $mess = 'Invalid value of "' . self::$cacheOutput;
+        $mess .= '" for cache_output.';
         $mess .= ' Check that the setting in config/yapeal.ini is correct.';
         Logger::getLogger('yapeal')->warn($mess);
     };// switch YAPEAL_CACHE_OUTPUT ...
@@ -360,8 +359,8 @@ class YapealApiCache {
       case 'none':
         return FALSE;
       default:
-        $mess = 'Invalid value of "' . YAPEAL_CACHE_OUTPUT;
-        $mess .= '" for YAPEAL_CACHE_OUTPUT.';
+        $mess = 'Invalid value of "' . self::$cacheOutput;
+        $mess .= '" for cache_output.';
         $mess .= ' Check that the setting in config/yapeal.ini is correct.';
         Logger::getLogger('yapeal')->warn($mess);
         return FALSE;

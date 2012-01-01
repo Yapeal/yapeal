@@ -55,7 +55,7 @@ $included = get_included_files();
 if (count($included) > 1 || $included[0] != __FILE__) {
   $mess = basename(__FILE__)
     . ' must be called directly and can not be included.' . PHP_EOL;
-  fwrite(STDERR, $mess . PHP_EOL);
+  fwrite(STDERR, $mess);
   exit(1);
 };
 // Set the default timezone to GMT.
@@ -118,7 +118,7 @@ setGeneralSectionConstants($iniVars);
 unset($iniVars);
 try {
   /**
-   * Give ourself a 'soft' limit of 10 minutes to finish.
+   * Give ourselves a 'soft' limit of 10 minutes to finish.
    */
   define('YAPEAL_MAX_EXECUTE', strtotime('10 minutes'));
   /**

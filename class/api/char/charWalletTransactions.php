@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store char WalletTransactions API.
@@ -186,7 +186,7 @@ class charWalletTransactions extends AChar {
    * Most common API style is a simple <rowset>. Transactions are a little more
    * complex because of need to do walking back for older records.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -216,6 +216,7 @@ class charWalletTransactions extends AChar {
                   $this->date = $date;
                   $this->beforeID = $this->xr->getAttribute('transactionID');
                 };// if $date ...
+                $row = array();
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   $row[$this->xr->name] = $this->xr->value;

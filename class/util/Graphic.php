@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Wrapper class for utilGraphic table.
@@ -69,11 +68,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    */
   protected $qb;
   /**
-   * List of all section APIs
-   * @var array
-   */
-  private $apiList;
-  /**
    * Set to TRUE if a database record exists.
    * @var bool
    */
@@ -81,7 +75,7 @@ class Graphic extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param integer $id Id of user wanted.
+   * @param mixed $id Id of user wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
    * if $id doesn't exist in database.
    *
@@ -94,7 +88,6 @@ class Graphic extends ALimitedObject implements IGetBy {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__CLASS__);
     };
-    $path = YAPEAL_CLASS . 'api' . DS;
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.
@@ -118,12 +111,12 @@ class Graphic extends ALimitedObject implements IGetBy {
             $this->properties['ownerID'] = $id;
           } else {
             $mess = 'Unknown owner ' . $id;
-            throw new DomainException($mess, 3);
+            throw new DomainException($mess);
           };// else ...
         };
       } else {
         $mess = 'Parameter $id must be an integer';
-        throw new InvalidArgumentException($mess, 4);
+        throw new InvalidArgumentException($mess);
       };// else ...
     };// if !empty $id ...
   }// function __construct
@@ -174,7 +167,7 @@ class Graphic extends ALimitedObject implements IGetBy {
    * field for this database table.
    */
   public function getItemByName($name) {
-    throw new LogicException('Not implimented for ' . __CLASS__ . ' table', 1);
+    throw new LogicException('Not implemented for ' . __CLASS__ . ' table');
   }// function getItemByName
   /**
    * Function used to check if database record already existed.

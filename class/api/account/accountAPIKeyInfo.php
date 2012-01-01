@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store account APIKeyInfo API.
@@ -55,6 +55,14 @@ if (count(get_included_files()) < 2) {
  * @subpackage Api_account
  */
 class accountAPIKeyInfo extends AAccount {
+  /**
+   * @var YapealQueryBuilder Holds YapealQueryBuilder for bridge table.
+   */
+  protected $bridge;
+  /**
+   * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
+   */
+  protected $characters;
   /**
    * Constructor
    *
@@ -76,7 +84,7 @@ class accountAPIKeyInfo extends AAccount {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -95,6 +103,7 @@ class accountAPIKeyInfo extends AAccount {
       YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->bridge->useUpsert(FALSE);
+    $type = '';
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -138,7 +147,7 @@ class accountAPIKeyInfo extends AAccount {
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
               // Save row count and store rows.
-              if ($this->rowCount = count($qb) > 0) {
+              if (count($qb) > 0) {
                 $qb->store();
               };// if count $rows ...
               $qb = NULL;

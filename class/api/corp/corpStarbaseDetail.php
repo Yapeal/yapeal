@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store corp StarbaseDetail API.
@@ -191,7 +190,7 @@ class corpStarbaseDetail extends ACorp {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -406,12 +405,12 @@ class corpStarbaseDetail extends ACorp {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
+              $row = array('posID' => $this->posID['itemID']);
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;
@@ -441,7 +440,6 @@ class corpStarbaseDetail extends ACorp {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $list = array();
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select `itemID`';

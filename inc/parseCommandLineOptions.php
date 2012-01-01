@@ -43,16 +43,15 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Function used to parser command line options.
  *
  * This function was made to save having to make one every it might be needed.
- * It also helps with consistant option handle which should lead to less user as
+ * It also helps with consistent option handle which should lead to less user as
  * well as programmer confusion.
  *
  * The -h, --help and -V, --version options don't have to be included in the

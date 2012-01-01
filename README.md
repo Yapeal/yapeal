@@ -10,7 +10,7 @@ There you should find information to help you out. Another resource is the
 Yapeal thread on Eve Online forums which you'll find at
 <https://forums.eveonline.com/default.aspx?g=posts&t=7540>.
 
-For documention on the internal works of the library check out the files in
+For documentation on the internal works of the library check out the files in
 <https://sourceforge.net/projects/yapeal/files/docs/>
 
 For additional information about any changes see the commit messages in the

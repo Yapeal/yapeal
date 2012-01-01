@@ -122,7 +122,8 @@ $split = array();
 // May need to do a little escaping on database name.
 $database = str_replace('_', '\\_', $options['database']);
 $sql = 'show grants';
-if ($result = $mysqli->query($sql)) {
+$result = $mysqli->query($sql);
+if ($result) {
   while ($row = $result->fetch_row()) {
     $dbPos = strpos($row[0], '`' . $database . '`');
     // If not the right table continue.

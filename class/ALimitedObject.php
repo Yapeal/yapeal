@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Abstract class for basic object with properties
@@ -80,9 +79,8 @@ abstract class ALimitedObject {
     };// if !in_array...
     if (isset($this->properties[$name])) {
       return $this->properties[$name];
-    } else {
-      return NULL;
-    };// if isset...
+    };
+    return NULL;
   }// function __get
   /**
    * Magic isset for fields in properties array.

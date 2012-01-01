@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store char MailMessages API.
@@ -79,7 +78,7 @@ class charMailMessages extends AChar {
    * Only reason this isn't just simple rowset is because toCorpOrAllianceID and
    * toListID need special handling.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -96,6 +95,7 @@ class charMailMessages extends AChar {
           case XMLReader::ELEMENT:
             switch ($this->xr->localName) {
               case 'row':
+                $row = array();
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   if (($this->xr->name == 'toCorpOrAllianceID' ||

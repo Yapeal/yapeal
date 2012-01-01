@@ -50,10 +50,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 if (!defined('ADODB_ERROR_HANDLER_TYPE')) {
   define('ADODB_ERROR_HANDLER_TYPE', E_USER_ERROR);
@@ -139,20 +138,20 @@ class ADODB_Exception extends Exception implements IYapealSubject {
   /**
    * Used by observers to register so they can be notified.
    *
-   * @param IYapealObserver $observer The observer being added.
+   * @param object $observer The observer being added.
    */
-  public static function attach(IYapealObserver $observer) {
+  public static function attach($observer) {
     if (is_callable($observer)) {
       $idx = spl_object_hash($observer);
       self::$observers[$idx] = $observer;
     };
   }// function attach
   /**
-   * Used by observers to unregister from being notified.
+   * Used by observers to un-register from being notified.
    *
-   * @param IYapealObserver $observer The observer being removed.
+   * @param object $observer The observer being removed.
    */
-  public static function detach(IYapealObserver $observer) {
+  public static function detach($observer) {
     if (is_callable($observer)) {
       $idx = spl_object_hash($observer);
       if (array_key_exists($idx, self::$observers)) {

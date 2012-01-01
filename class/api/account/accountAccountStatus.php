@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store eve SkillTree API.
@@ -76,7 +75,7 @@ class accountAccountStatus extends AAccount {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -87,6 +86,7 @@ class accountAccountStatus extends AAccount {
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $qb->setDefault('keyID', $this->params['keyID']);
+    $row = array();
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {

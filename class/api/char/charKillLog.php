@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store char KillLog API.
@@ -77,7 +77,7 @@ class charKillLog extends AChar {
   private $rowCount;
   /**
    * @var array Holds a stack of parent nodes until after their children are
-   * proccessed.
+   * processed.
    */
   private $stack = array();
   /**
@@ -187,7 +187,7 @@ class charKillLog extends AChar {
   /**
    * Full implementation of multiple tables and nested sets from XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -206,6 +206,7 @@ class charKillLog extends AChar {
     // Get a new query instance for victim.
     $this->victim = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN);
+    $typeID = 0;
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -273,7 +274,8 @@ class charKillLog extends AChar {
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
               // Save row count and store rows.
-              if ($this->rowCount = count($qb) > 0) {
+              $this->rowCount = count($qb);
+              if ($this->rowCount > 0) {
                 $qb->store();
               };// if count $rows ...
               $qb = NULL;

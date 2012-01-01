@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Interface classes need to implement to observable exceptions.
@@ -58,13 +57,13 @@ interface IYapealSubject {
   /**
    * Used by observers to register so they can be notified.
    *
-   * @param SplObserver $observer The observer being added.
+   * @param IYapealObserver $observer The observer being added.
    */
   public static function attach(IYapealObserver $observer);
   /**
-   * Used by observers to unregister from being notified.
+   * Used by observers to un-register from being notified.
    *
-   * @param SplObserver $observer The observer being removed.
+   * @param IYapealObserver $observer The observer being removed.
    */
   public static function detach(IYapealObserver $observer);
   /**

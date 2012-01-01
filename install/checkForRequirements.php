@@ -50,7 +50,7 @@ $included = get_included_files();
 if (count($included) > 1 || $included[0] != __FILE__) {
   $mess = basename(__FILE__)
     . ' must be called directly and can not be included.' . PHP_EOL;
-  fwrite(STDERR, $mess . PHP_EOL);
+  fwrite(STDERR, $mess);
   exit(1);
 };
 /**

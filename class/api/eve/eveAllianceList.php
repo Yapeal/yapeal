@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to fetch and store AllianceList API.
@@ -80,7 +79,7 @@ class eveAllianceList extends AEve {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -102,6 +101,7 @@ class eveAllianceList extends AEve {
           case XMLReader::ELEMENT:
             switch ($this->xr->localName) {
               case 'row':
+                $row = array();
                 // Grab allianceID for memberCorporation table.
                 $allianceID = $this->xr->getAttribute('allianceID');
                 // Walk through attributes and add them to row.
@@ -160,7 +160,7 @@ class eveAllianceList extends AEve {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
-              $row['allianceID'] = $allianceID;
+              $row = array('allianceID' => $allianceID);
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;

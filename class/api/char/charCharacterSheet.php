@@ -46,7 +46,7 @@ if (count(get_included_files()) < 2) {
   } else {
     fwrite(STDERR, $mess);
     exit(1);
-  };
+  }
 };
 /**
  * Class used to fetch and store CharacterSheet API.
@@ -76,7 +76,7 @@ class charCharacterSheet  extends AChar {
   /**
    * Per API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -86,6 +86,7 @@ class charCharacterSheet  extends AChar {
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('allianceName', '');
+    $row = array();
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -112,7 +113,6 @@ class charCharacterSheet  extends AChar {
                 } else {
                   // Move to text node.
                   $this->xr->read();
-                  $value = $this->xr->value;
                   $row[$name] = $this->xr->value;
                 };
                 break;
@@ -233,6 +233,7 @@ class charCharacterSheet  extends AChar {
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
+    $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -292,6 +293,7 @@ class charCharacterSheet  extends AChar {
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $qb->setDefault('ownerID', $this->ownerID);
+    $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -339,6 +341,7 @@ class charCharacterSheet  extends AChar {
       'published' => 1
     );
     $qb->setDefaults($defaults);
+    $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:

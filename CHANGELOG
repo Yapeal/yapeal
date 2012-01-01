@@ -234,7 +234,7 @@ types.
 
 Updated yapeal.php to use new don't include guard and better PHP_SAPI detection.
 
-Did some refactoring on yapeal.php inc/common_*.php to simpify things and move
+Did some refactoring on yapeal.php inc/common_*.php to simplify things and move
 many of the tests done in inc/common_backend.php over to
 install/checkForRequirements.php instead. These changes will be needed for some
 planned future changes to Yapeal but were also just some long overdue code
@@ -489,7 +489,7 @@ or replace them.
 no longer work with Yapeal but HTTPS proxies should. Future versions will allow
 for per user/char/corp configuring of certificate file to use for now
 self-signed ones need to be either added to config/cacert.pem or replace it if
-using proxy for all conections.
+using proxy for all connections.
 
 (branches/incursion/) Merged some changes from trunk/ into incrusion branch like
 the fix for issue 65 and issue 66.
@@ -500,8 +500,8 @@ step in getting ready for https conversion.
 (trunk/) Merged in change from branches/incrusion/ for bad hash that was being
 used in class/YapealApiCache.php.
 
-Users should clear thier XML cache(s) file, database, or both depending on which
-they use. Linux users can clear thier file cache by doing the following:
+Users should clear their XML cache(s) file, database, or both depending on which
+they use. Linux users can clear their file cache by doing the following:
 
 rm -R cache/*.xml
 
@@ -519,8 +519,8 @@ Another try at fully fixing issue 65.
 used wasn't always unique for all cached XML files because the owner was not
 being included in it.
 
-Users should clear thier XML cache(s) file, database, or both depending on which
-they use. Linux users can clear thier file cache by doing the following:
+Users should clear their XML cache(s) file, database, or both depending on which
+they use. Linux users can clear their file cache by doing the following:
 
 rm -R cache/*.xml
 
@@ -641,7 +641,7 @@ These new methods will let application developers to turn on an internal logging
 of all errors triggered while Yapeal is running. They can then access the list
 and display or otherwise use it however they choose. Care should be taken when
 using this as the list can become very large quickly in cases where Yapeal is
-misconfigured or API servers return lots of errors.
+mis-configured or API servers return lots of errors.
 
 Fixed mixed line endings in ext/eac_httprequest/ files which caused Yapeal to
 fail without any errors when trying to get XML from APIs for some developers.

@@ -43,10 +43,9 @@ if (count(get_included_files()) < 2) {
   if (PHP_SAPI != 'cli') {
     header('HTTP/1.0 403 Forbidden', TRUE, 403);
     die($mess);
-  } else {
-    fwrite(STDERR, $mess);
-    exit(1);
   };
+  fwrite(STDERR, $mess);
+  exit(1);
 };
 /**
  * Class used to call internal maintenance scripts in Yapeal.
@@ -75,7 +74,7 @@ class SectionMaint extends ASection {
     //$this->scriptList = array_intersect($allowedScripts, $knownScripts);
   }
   /**
-   * Function called by Yapeal.php to start section running maintanance scripts.
+   * Function called by Yapeal.php to start section running maintenance scripts.
    *
    * @return bool Returns TRUE if all scripts ran cleanly else FALSE.
    */
@@ -109,7 +108,7 @@ class SectionMaint extends ASection {
           $hash = hash('sha1', $class);
           // These are passed on to the script class instance and used as part
           // of hash for lock.
-          $params = array();
+          //$params = array();
           // Use lock to keep from wasting time trying to running scripts that
           // another Yapeal is already working on.
           try {
@@ -151,9 +150,8 @@ class SectionMaint extends ASection {
     // Only truly successful if all scripts ran successfully.
     if ($scriptCount == $scriptSuccess) {
       return TRUE;
-    } else {
-      return FALSE;
-    }// else $scriptCount == $scriptSuccess ...
+    };
+    return FALSE;
   }// function pullXML
 }
 ?>

@@ -69,6 +69,8 @@ if (count(get_included_files()) < 2) {
  * same options as setopt() work i.e. single colon for required values and
  * double colons for ones that take a optional value.
  *
+ * @return array Returns an array of options or an empty array.
+ *
  * @todo Look at making this into a full class instead of just a function.
  */
 function parseCommandLineOptions(array $shortOptions = NULL,

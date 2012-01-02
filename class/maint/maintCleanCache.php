@@ -71,6 +71,8 @@ class maintCleanCache {
      * utilCachedInterval so any XML file older then that aren't being used and
      * are just taking up space since Yapeal will have to grab them again
      * anyway.
+     *
+     * @return bool Always returns TRUE.
      */
     public function doWork() {
     if (YAPEAL_TRACE_ENABLED) {

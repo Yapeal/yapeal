@@ -81,6 +81,8 @@ class YapealErrorHandler {
    * @param string $filename Name of file where error happened.
    * @param integer $line Line number where error happened.
    * @param array $vars Array containing all the defined variables and constants.
+   *
+   * @return bool Returns TRUE if error is handled by this function else FALSE.
    */
   public static function handle($errno, $errmsg, $filename, $line, $vars) {
     // obey @ protocol

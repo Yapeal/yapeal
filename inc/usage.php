@@ -74,7 +74,7 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $mess .= ' [[-h | -V] | Options ...]' . PHP_EOL . PHP_EOL;
   $desc = 'The script reads database settings from [Database] section of the';
   $desc .= ' configuration file, either the default one in';
-  $desc .= ' <yapeal_base>/config/yapeal.ini or the custom one from the -c or';
+  $desc .= ' < yapeal_base>/config/yapeal.ini or the custom one from the -c or';
   $desc .= ' --config OPTION.';
   $desc .= ' Command line options have priority over settings in the';
   $desc .= ' configuration file and the configuration file has priority over';

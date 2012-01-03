@@ -94,7 +94,7 @@ class YapealDBConnection {
     $ADODB_COUNTRECS = FALSE;
     $ADODB_CACHE_DIR = YAPEAL_CACHE . 'ADOdb';
     if (empty(self::$connections)) {
-      require_once YAPEAL_CLASS . 'ADODB_Exception.php';
+      require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb-exceptions.inc.php';
       require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb.inc.php';
     };
     $hash = hash('sha1', $dsn);

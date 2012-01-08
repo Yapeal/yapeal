@@ -23,7 +23,8 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2011, Michael Cummings
+ * @author     Claus G. Pedersen <satissis@gmail.com>
+ * @copyright  Copyright (c) 2008-2011, Michael Cummings, Claus G. Pedersen
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @subpackage Install
@@ -507,6 +508,59 @@
     <field name="`titleName`" type="C" size="255">
       <NOTNULL/>
     </field>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+  </table>
+  <table name="charFacWarStats">
+    <descr>Table from /char/FacWarStats.xml.aspx that holds the status info about a Character in the Faction Warfare</descr>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionID`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`factionName`" type="C" size="32">
+      <NOTNULL/>
+    </field>
+    <field name="`enlisted`" type="T">
+      <NOTNULL/>
+    </field>
+    <field name="`currentRank`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`highestRank`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`killsYesterday`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`killsLastWeek`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`killsTotal`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`victoryPointsYesterday`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`victoryPointsLastWeek`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <field name="`victoryPointsTotal`" type="I8" size="20">
+      <NOTNULL/>
+      <UNSIGNED/>
+    </field>
+    <index name="`charFacWarStats1`">
+      <col>`factionID`</col>
+    </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charIndustryJobs">
@@ -1247,7 +1301,7 @@
   </sql>
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
-      VALUES(74440635,0,2,'char')
+      VALUES(74440699,0,2,'char')
       ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
     </query>
   </sql>

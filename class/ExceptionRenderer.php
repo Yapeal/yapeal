@@ -62,7 +62,7 @@ class ExceptionRenderer implements LoggerRendererObject {
    * @return string Returns message string containing the exception message,
    * exception code (if known), and trace for all types of exceptions.
    */
-  public function render(Exception $e) {
+  public function render($e) {
     $mess =  $e->getMessage() . PHP_EOL;
     if ($e->getCode()) {
       $mess .= '     Code: ' . $e->getCode() . PHP_EOL;

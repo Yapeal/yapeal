@@ -76,7 +76,7 @@ class YapealQueryBuilder implements Countable {
    */
   protected $colTypes = array();
   /**
-   * @var string Holds an instance of the DB connection.
+   * @var ADOConnection Holds an instance of the DB connection.
    */
   protected $con;
   /**
@@ -154,7 +154,9 @@ class YapealQueryBuilder implements Countable {
     foreach ($this->colObjects as $col) {
       // Add any columns with default values to default list.
       if (isset($col->has_default) && $col->has_default === TRUE) {
-        $this->defaults[$col->name] = $col->default_value;
+        if ($col->default_value !== 'CURRENT_TIMESTAMP') {
+          $this->defaults[$col->name] = $col->default_value;
+        };
       };// if isset $col->has_default ...
       // Add any null-able columns to null list.
       if (isset($col->not_null) && $col->not_null === FALSE) {

@@ -156,6 +156,8 @@ class YapealQueryBuilder implements Countable {
       if (isset($col->has_default) && $col->has_default === TRUE) {
         if ($col->default_value !== 'CURRENT_TIMESTAMP') {
           $this->defaults[$col->name] = $col->default_value;
+        } else {
+          $this->defaults[$col->name] = 'NULL';
         };
       };// if isset $col->has_default ...
       // Add any null-able columns to null list.

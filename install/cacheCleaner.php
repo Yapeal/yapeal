@@ -1,7 +1,7 @@
 #!/usr/bin/php -Cq
 <?php
 /**
- * Contains code used to add or update tables in database.
+ * Contains code used to test if user has privileges on a MySQL database.
  *
  * PHP version 5
  *

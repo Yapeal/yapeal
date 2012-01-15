@@ -274,7 +274,7 @@
       (8, 'eve', 'CharacterName', 'Returns the name associated with an ownerID or a typeID.', 1),
       (16, 'eve', 'ConquerableStationList', 'Conquerable Station List including Outpost.', 16),
       (32, 'eve', 'ErrorList', 'Returns a list of error codes that can be returned by the EVE API servers.', 16),
-      (64, 'eve', 'FacWarStats', 'Returns global stats on the factions in factional warfare including the number of pilots in each faction, the number of systems they control, and how many kills and victory points each and all factions obtained yesterday, in the last week, and total.', 8),
+      (64, 'eve', 'FacWarStats', 'Returns global stats on the factions in factional warfare including the number of pilots in each faction, the number of systems they control, and how many kills and victory points each and all factions obtained yesterday, in the last week, and total.', 16),
       (128, 'eve', 'FacWarTopStats', 'Returns Factional Warfare Top 100 Stats.', 16),
       (256, 'eve', 'RefTypes', 'Returns a list of transaction types used in the Journal Entries.', 16),
       (512, 'eve', 'SkillTree', 'XML of currently in-game skills (including unpublished skills).', 1),

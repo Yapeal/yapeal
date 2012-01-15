@@ -402,7 +402,7 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-	  <field name="`availability`" type="C" size="255">
+	   <field name="`availability`" type="C" size="255">
       <NOTNULL/>
     </field>
     <field name="`dateIssued`" type="T">

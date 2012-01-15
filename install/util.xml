@@ -215,10 +215,17 @@
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilAccessMask`</query>
     <!--<query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
       VALUES
       (1, 'account', 'APIKeyInfo', 'Used to get information about a keyID', 16),
       (33554432, 'account', 'AccountStatus', 'EVE player account status.', 16),
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
+      VALUES
       (1, 'char', 'AccountBalance', 'Current balance of characters wallet.', 16),
       (2, 'char', 'AssetList', 'Entire asset list of character.', 16),
       (4, 'char', 'CalendarEventAttendees', 'Event attendee responses. Requires UpcomingCalendarEvents to function.', 2),
@@ -243,6 +250,11 @@
       (2097152, 'char', 'WalletJournal', 'Wallet journal of character.', 16),
       (4194304, 'char', 'WalletTransactions', 'Market transaction journal of character.', 16),
       (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16),
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
+      VALUES
       (1, 'corp', 'AccountBalance', 'Current balance of all corporation accounts.', 16),
       (2, 'corp', 'AssetList', 'List of all corporation assets.', 16),
       (4, 'corp', 'MemberMedals', 'List of medals awarded to corporation members.', 16),
@@ -267,7 +279,11 @@
       (2097152, 'corp', 'WalletTransactions', 'Market transactions of all corporate accounts.', 16),
       (4194304, 'corp', 'Titles', 'Titles of corporation and the roles they grant.', 2),
       (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16),
-      (0, 'corp', 'CalendarEventAttendees', '', 1),
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
+      VALUES
       (1, 'eve', 'AllianceList', 'Returns a list of alliances in eve.', 16),
       (2, 'eve', 'CertificateTree', 'Returns a list of certificates in eve.', 1),
       (4, 'eve', 'CharacterID', 'Returns the ownerID for a given character, faction, alliance or corporation name, or the typeID for other objects such as stations, solar systems, planets, etc.', 1),
@@ -292,6 +308,8 @@
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilCachedInterval`</query>
     <!--<query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
+  </sql>
+  <sql prefixmethod="MANUAL">
     <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
       ('account', 'AccountStatus', 3600),

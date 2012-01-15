@@ -106,8 +106,7 @@ $required = array('database', 'host', 'password', 'username');
 $mess = '';
 foreach ($required as $setting) {
   if (empty($options[$setting])) {
-    $mess .= 'Missing required setting ' . $setting;
-    $mess .= ' in section [Database].' . PHP_EOL;
+    $mess .= 'Missing required setting ' . $setting . PHP_EOL;;
   };
 };// foreach $required ...
 if (!empty($mess)) {

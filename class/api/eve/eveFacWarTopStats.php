@@ -79,7 +79,7 @@ class eveFacWarTopStats extends AEve {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section;
@@ -131,7 +131,7 @@ class eveFacWarTopStats extends AEve {
    * @return array Returns array of data to store in database table.
    */
   protected function parseSubTable($table) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $row = array();
@@ -178,7 +178,7 @@ class eveFacWarTopStats extends AEve {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($tableName) {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     //$tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
@@ -224,7 +224,7 @@ class eveFacWarTopStats extends AEve {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
+    if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tables = array('CharactersKillsLastWeek',        'CharactersKillsTotal',

@@ -173,10 +173,16 @@ if (!is_writable(YAPEAL_CACHE)) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-// Check for required Cache section setting.
-if (!isset($iniVars['Cache']['cache_output'])) {
-  $mess = 'Missing required setting "cache_output"';
-  $mess .= ' in section [Cache].' . PHP_EOL;
+// Check for required Cache section settings.
+$required = array('cache_length', 'cache_output');
+$mess = '';
+foreach ($required as $setting) {
+  if (!isset($iniVars['Cache'][$setting])) {
+    $mess .= 'Missing required setting ' . $setting;
+    $mess .= ' in section [Cache].' . PHP_EOL;
+  };// if isset $iniVars...
+};// foreach $required ...
+if (!empty($mess)) {
   fwrite(STDERR, $mess);
   exit(2);
 };

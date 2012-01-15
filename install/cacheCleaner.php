@@ -1,7 +1,7 @@
 #!/usr/bin/php -Cq
 <?php
 /**
- * Contains code used to add or update tables in database.
+ * Contains code used to delete old cached XML.
  *
  * PHP version 5
  *
@@ -28,6 +28,7 @@
  * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
+ * @since      2012-01-15
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -55,6 +56,8 @@ if (count($included) > 1 || $included[0] != __FILE__) {
   fwrite(STDERR, $mess);
   exit(1);
 };
+// Set the default timezone to GMT.
+date_default_timezone_set('GMT');
 /**
  * Define short name for directory separator which always uses unix '/'.
  * @ignore
@@ -74,7 +77,7 @@ require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
 require_once YAPEAL_INC . 'usage.php';
 require_once YAPEAL_INC . 'showVersion.php';
 require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb.inc.php';
-require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb-xmlschema03.inc.php';
+require_once YAPEAL_CLASS . 'FilterFileFinder.php';
 $shortOpts = array('c:', 'd:', 'p:', 's:', 't:', 'u:');
 $longOpts = array('config:', 'database:', 'driver:', 'password:', 'server:',
   'suffix:', 'table-prefix:', 'username:', 'xml:');
@@ -88,10 +91,12 @@ if (isset($options['version'])) {
   exit(0);
 };
 if (!empty($options['config'])) {
-  $section = getSettingsFromIniFile($options['config'], 'Database');
+  $dbSettings = getSettingsFromIniFile($options['config'], 'Database');
+  $cacheSettings = getSettingsFromIniFile($options['config'], 'Cache');
   unset($options['config']);
 } else {
-  $section = getSettingsFromIniFile(NULL, 'Database');
+  $dbSettings = getSettingsFromIniFile(NULL, 'Database');
+  $cacheSettings = getSettingsFromIniFile(NULL, 'Cache');
 };
 if (isset($options['xml'])) {
   $sections = explode(' ', $options['xml']);
@@ -99,78 +104,63 @@ if (isset($options['xml'])) {
 } else {
   $sections = array('util', 'account', 'char', 'corp', 'eve', 'map', 'server');
 };
-// Merge the configuration file settings with ones from command line.
+// Merge the configuration file Database settings with ones from command line.
 // Settings from command line will override any from file.
-$options = array_merge($section, $options);
+$options = array_merge($dbSettings, $options);
 $required = array('database', 'host', 'password', 'username');
 $mess = '';
 foreach ($required as $setting) {
   if (empty($options[$setting])) {
-    $mess .= 'Missing required setting ' . $setting . PHP_EOL;;
+    $mess .= 'Missing required setting ' . $setting . PHP_EOL;
   };
 };// foreach $required ...
 if (!empty($mess)) {
   fwrite(STDERR, $mess);
   exit(2);
 };
-$dsn = 'mysql://' . $options['username'] . ':' . $options['password'] . '@';
+$dsn = 'mysqli://' . $options['username'] . ':' . $options['password'] . '@';
 $dsn .= $options['host'] . '/' . $options['database'];
 if (isset($options['suffix'])) {
   $dsn .= $options['suffix'];
 } else {
   $dsn .= '?new';
 };
-$ret = 0;
-try {
-  // Get connection to DB.
-  $db = ADONewConnection($dsn);
-  foreach ($sections as $section) {
-    $file = $dir . DS . 'install' . DS . $section . '.xml';
-    if (!is_file($file)) {
-      $mess = 'Could not find XML file ' . $file . PHP_EOL;
-      fwrite(STDERR, $mess);
-      continue;
-    };
-    $xml = file_get_contents($file);
-    if (FALSE === $xml) {
-      $mess = 'Could not get contents of XML file ' . $file;
-      fwrite(STDERR, $mess);
-      continue;
-    };
-    // Get new Schema.
-    $schema = new adoSchema($db);
-    // Some settings for Schema.
-    $schema->ExecuteInline(FALSE);
-    $schema->ContinueOnError(FALSE);
-    $schema->SetUpgradeMethod('ALTER');
-    if (isset($options['table_prefix'])) {
-      $schema->SetPrefix($options['table_prefix'], FALSE);
-    };
-    $sql = $schema->ParseSchemaString($xml);
-    $result = $schema->ExecuteSchema($sql);
-    $save = $schema->SaveSQL(YAPEAL_CACHE . 'ADOdb' . DS . $section . '.sql');
-    if (FALSE === $save) {
-      $mess = 'Could not save ' . YAPEAL_CACHE . 'ADOdb' . DS . $section . '.sql' . PHP_EOL;
-      fwrite(STDERR, $mess);
-    };
-    if ($result == 2) {
-      ++$ret;
-    } else if ($result == 1) {
-      $mess = 'Error executing schema for ' . $section . PHP_EOL;
-      fwrite(STDERR, $mess);
-    } else {
-      $mess = 'Failed to execute schema for ' . $section . PHP_EOL;
-      fwrite(STDERR, $mess);
-    };
-    $schema = NULL;
-  };// foreach $sections as $section ...
-  if (count($sections) != $ret) {
-    $mess .= 'There were problems during processing please check any error';
-    $mess .= ' messages from above and correct.' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(2);
+// Need settings from Cache section as well.
+$required = array('cache_length', 'cache_output');
+$mess = '';
+foreach ($required as $setting) {
+  if (empty( $cacheSettings[$setting])) {
+    $mess .= 'Missing required setting ' . $setting . PHP_EOL;
   };
-} catch (Exception $e) {
+};// foreach $required ...
+if (!empty($mess)) {
+  fwrite(STDERR, $mess);
+  exit(2);
+};
+try {
+  switch ($cacheSettings['cache_output']) {
+    case 'both':
+      cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
+      cleanFiles($sections, $cacheSettings['cache_length']);
+      break;
+    case 'database':
+      cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
+      break;
+    case 'file':
+      cleanFiles($sections, $cacheSettings['cache_length']);
+      break;
+    case 'none':
+      break;
+    default:
+      $mess = 'Unknown "cache_output" mode: ' . $cacheSettings['cache_output']
+        . PHP_EOL;
+      fwrite(STDERR, $mess);
+      exit(2);
+  };
+  cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
+  cleanFiles($sections, $cacheSettings['cache_length']);
+}
+catch (Exception $e) {
   $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
   if ($e->getCode()) {
     $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
@@ -182,7 +172,53 @@ try {
   fwrite(STDERR, $mess);
   exit(2);
 }
-$mess = 'All database tables have been installed or updated as needed.' . PHP_EOL;
+$mess = 'Cache has been cleaned.' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
+/**
+ * This is used to delete any database records from the XML cache that are more
+ * than a configurable number of days old.
+ *
+ * @param string $dsn The DSN for database connection.
+ * @param array $sections List of sections that will be cleaned.
+ * @param int $cacheLength Anything older than this number in days is deleted.
+ */
+function cleanDatabase($dsn, array $sections, $cacheLength) {
+  $cacheLength .= ' days ago';
+  $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
+  // Get connection to DB.
+  $db = ADONewConnection($dsn);
+  $mess = '';
+  foreach ($sections as $section) {
+    $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache';
+    $sql .= ' where `section`=' . $db->qstr($section);
+    $sql .= ' and `modified`<' . $db->qstr($dateTime);
+    $db->Execute($sql);
+  };// foreach $sections as $section ...
+}// function cleanDatabase
+/**
+ * This is used to delete any cached XML files that are more than a configurable
+ * number of days old.
+ *
+ * @param array $sections List of sections that will be cleaned.
+ * @param int $cacheLength Anything older than this number in days is deleted.
+ */
+function cleanFiles($sections, $cacheLength) {
+  $timeStamp = strtotime($cacheLength. ' days ago');
+  // Clear out any old cached file information before starting.
+  clearstatcache(TRUE);
+  $mess = '';
+  foreach ($sections as $section) {
+    $path = YAPEAL_CACHE . $section . DS;
+    $files = new FilterFileFinder($path, 'xml', FilterFileFinder::SUFFIX);
+    foreach ($files as $file) {
+      $mTime = @filemtime($file);
+      $cTime = @filectime($file);
+      // Find old files that haven't been modified and ones that have.
+      if (($mTime === FALSE && $cTime < $timeStamp) || $mTime < $timeStamp) {
+        @unlink($file);
+      };
+    };// foreach $files as $file ...
+  };// foreach $sections as $section ...
+}// function cleanFiles
 ?>

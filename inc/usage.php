@@ -50,6 +50,9 @@ if (count(get_included_files()) < 2) {
 /**
  * Function use to show the usage message on command line.
  *
+ * Note that the 'h' and 'V' options and their corresponding long versions will
+ * be included automatically without having to add them to the parameters.
+ *
  * @param string $file Name of script file.
  * @param array $shortOptions An array of short options to accept. The elements
  * should be in the same format as the short option parameter for setopt() i.e.
@@ -135,13 +138,13 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $options['V'] = array('op' => '  -V, --version', 'desc' =>
     'Show version and licensing information.');
   $options['xml:'] = array('op' => '  --xml=XML', 'desc' =>
-    'Optional XML file list. It is either a quoted space separated list of xml'
-    . ' file names to use or can be used multiple times and the values from'
-    . ' each one will be appended to the list. For example you can either do'
-    . ' ' . $file . ' -xml="util account" OR'
+    'Optional XML section list. It is either a quoted space separated list of'
+    . ' xml section names to use or can be used multiple times and the values'
+    . ' from each one will be appended to the list. For example you can either'
+    . ' do ' . $file . ' -xml="util account" OR'
     . ' ' . $file . ' -xml="util" -xml="account". This option should rarely be'
     . ' needed as Yapeal uses the default list "util account char corp eve map'
-    . ' server" which includes all the files normally needed.');
+    . ' server" which includes all the sections normally needed.');
   $width = 0;
   foreach ($options as $k => $v) {
     if (!(in_array($k, $shortOptions) || in_array($k, $longOptions))) {

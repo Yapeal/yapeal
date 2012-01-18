@@ -104,27 +104,6 @@ if (isset($options['xml'])) {
 } else {
   $sections = array('util', 'account', 'char', 'corp', 'eve', 'map', 'server');
 };
-// Merge the configuration file Database settings with ones from command line.
-// Settings from command line will override any from file.
-$options = array_merge($dbSettings, $options);
-$required = array('database', 'host', 'password', 'username');
-$mess = '';
-foreach ($required as $setting) {
-  if (empty($options[$setting])) {
-    $mess .= 'Missing required setting ' . $setting . PHP_EOL;
-  };
-};// foreach $required ...
-if (!empty($mess)) {
-  fwrite(STDERR, $mess);
-  exit(2);
-};
-$dsn = 'mysqli://' . $options['username'] . ':' . $options['password'] . '@';
-$dsn .= $options['host'] . '/' . $options['database'];
-if (isset($options['suffix'])) {
-  $dsn .= $options['suffix'];
-} else {
-  $dsn .= '?new';
-};
 // Need settings from Cache section as well.
 $required = array('cache_length', 'cache_output');
 $mess = '';
@@ -140,11 +119,13 @@ if (!empty($mess)) {
 try {
   switch ($cacheSettings['cache_output']) {
     case 'both':
-      cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
+      cleanDatabase($sections, $cacheSettings['cache_length'], $dbSettings,
+        $options);
       cleanFiles($sections, $cacheSettings['cache_length']);
       break;
     case 'database':
-      cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
+      cleanDatabase($sections, $cacheSettings['cache_length'], $dbSettings,
+        $options);
       break;
     case 'file':
       cleanFiles($sections, $cacheSettings['cache_length']);
@@ -157,8 +138,6 @@ try {
       fwrite(STDERR, $mess);
       exit(2);
   };
-  cleanDatabase($dsn, $sections, $cacheSettings['cache_length']);
-  cleanFiles($sections, $cacheSettings['cache_length']);
 }
 catch (Exception $e) {
   $mess =  'EXCEPTION: ' . $e->getMessage() . PHP_EOL;
@@ -179,18 +158,46 @@ exit(0);
  * This is used to delete any database records from the XML cache that are more
  * than a configurable number of days old.
  *
- * @param string $dsn The DSN for database connection.
  * @param array $sections List of sections that will be cleaned.
  * @param int $cacheLength Anything older than this number in days is deleted.
+ * @param array $dbSettings Database settings from ini file.
+ * @param array $options Command line options.
  */
-function cleanDatabase($dsn, array $sections, $cacheLength) {
+function cleanDatabase(array $sections, $cacheLength, array $dbSettings,
+  array $options) {
+  // Merge the configuration file Database settings with ones from command line.
+  // Settings from command line will override any from file.
+  $options = array_merge($dbSettings, $options);
+  $required = array('database', 'host', 'password', 'username');
+  $mess = '';
+  foreach ($required as $setting) {
+    if (empty($options[$setting])) {
+      $mess .= 'Missing required setting ' . $setting . PHP_EOL;
+    };
+  };// foreach $required ...
+  if (!empty($mess)) {
+    fwrite(STDERR, $mess);
+    exit(2);
+  };
+  $dsn = 'mysqli://' . $options['username'] . ':' . $options['password'] . '@';
+  $dsn .= $options['host'] . '/' . $options['database'];
+  if (isset($options['suffix'])) {
+    $dsn .= $options['suffix'];
+  } else {
+    $dsn .= '?new';
+  };
+  if (!isset($options['table_prefix'])) {
+    $prefix = '';
+  } else {
+    $prefix = $dbSettings['table_prefix'];
+  }
   $cacheLength .= ' days ago';
   $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
   // Get connection to DB.
   $db = ADONewConnection($dsn);
   $mess = '';
   foreach ($sections as $section) {
-    $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache';
+    $sql = 'delete from `' . $prefix . 'utilXmlCache`';
     $sql .= ' where `section`=' . $db->qstr($section);
     $sql .= ' and `modified`<' . $db->qstr($dateTime);
     $db->Execute($sql);

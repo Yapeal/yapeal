@@ -102,7 +102,7 @@ if (isset($options['xml'])) {
   $sections = explode(' ', $options['xml']);
   unset($options['xml']);
 } else {
-  $sections = array('util', 'account', 'char', 'corp', 'eve', 'map', 'server');
+  $sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
 };
 // Need settings from Cache section as well.
 $required = array('cache_length', 'cache_output');
@@ -191,7 +191,7 @@ function cleanDatabase(array $sections, $cacheLength, array $dbSettings,
   } else {
     $prefix = $dbSettings['table_prefix'];
   }
-  $cacheLength .= ' days ago';
+  $cacheLength = time() - $cacheLength * 86400;
   $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
   // Get connection to DB.
   $db = ADONewConnection($dsn);
@@ -211,7 +211,7 @@ function cleanDatabase(array $sections, $cacheLength, array $dbSettings,
  * @param int $cacheLength Anything older than this number in days is deleted.
  */
 function cleanFiles($sections, $cacheLength) {
-  $timeStamp = strtotime($cacheLength. ' days ago');
+  $timeStamp = time() - $cacheLength * 86400;
   // Clear out any old cached file information before starting.
   clearstatcache(TRUE);
   $mess = '';

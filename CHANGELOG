@@ -8,6 +8,14 @@ exist. Everyone should delete everything in their class/api/corp/ directory
 before re-installing to insure old file is removed completely so the old file
 does not continue to cause errors.
 
+Added and un-added extended parameter for corp/MemberTracking API until CCP
+fixes issues with it not working correctly. Since players can't make or update
+keys to allow extended data but API has been changed to provide only limited
+data Yapeal will report invalid API XMLs and log many missing required field
+errors for the API. Deactivate the API on your corps for now to prevent the
+extra error logging as the API data in the database isn't being updated either
+at this time until CCP fixes issues on their side.
+
 2011-12-17
 
 (default) Updated char/ContactList to work with updated API that now includes

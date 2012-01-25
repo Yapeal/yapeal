@@ -1,3 +1,13 @@
+2012-01-25
+
+(default) Fixed extra commas that were missed in conversion of utilAccessMask to
+using multiple inserts.
+
+Deleted bogus class/api/corp/corpCalendarEventAttendees.php as that API does not
+exist. Everyone should delete everything in their class/api/corp/ directory
+before re-installing to insure old file is removed completely so the old file
+does not continue to cause errors.
+
 2011-12-17
 
 (default) Updated char/ContactList to work with updated API that now includes

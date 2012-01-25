@@ -220,7 +220,7 @@
     <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
       VALUES
       (1, 'account', 'APIKeyInfo', 'Used to get information about a keyID', 16),
-      (33554432, 'account', 'AccountStatus', 'EVE player account status.', 16),
+      (33554432, 'account', 'AccountStatus', 'EVE player account status.', 16)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
@@ -249,7 +249,7 @@
       (1048576, 'char', 'UpcomingCalendarEvents', 'Upcoming events on characters calendar.', 2),
       (2097152, 'char', 'WalletJournal', 'Wallet journal of character.', 16),
       (4194304, 'char', 'WalletTransactions', 'Market transaction journal of character.', 16),
-      (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16),
+      (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
@@ -278,7 +278,7 @@
       (1048576, 'corp', 'WalletJournal', 'Wallet journal for all corporate accounts.', 16),
       (2097152, 'corp', 'WalletTransactions', 'Market transactions of all corporate accounts.', 16),
       (4194304, 'corp', 'Titles', 'Titles of corporation and the roles they grant.', 2),
-      (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16),
+      (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">

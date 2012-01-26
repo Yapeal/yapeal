@@ -235,7 +235,7 @@
       (2097152, 'char', 'WalletJournal', 'Wallet journal of character.', 16),
       (4194304, 'char', 'WalletTransactions', 'Market transaction journal of character.', 16),
       (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16),
-      (134217728, 'char', 'Locations' 'Allows the fetching of coordinate and name data for items owned by the character.', 1)
+      (134217728, 'char', 'Locations', 'Allows the fetching of coordinate and name data for items owned by the character.', 1)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">

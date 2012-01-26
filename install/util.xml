@@ -144,10 +144,6 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
-  <table name="utilRegisteredUser">
-    <descr>Table used in old two key API system. New custom key system has totally move away from having users.</descr>
-    <DROP/>
-  </table>
   <table name="utilSections">
     <descr>Table used to allow admin control over which API will be available to registered user/char/corp also controls all other API sections</descr>
     <field name="`activeAPIMask`" type="I8" size="20">
@@ -179,9 +175,7 @@
     <field name="`api`" type="C" size="32">
       <NOTNULL/>
     </field>
-    <field name="`modified`" type="T">
-      <NOTNULL/>
-    </field>
+    <field name="`modified`" type="T"/>
     <field name="`section`" type="C" size="8">
       <NOTNULL/>
     </field>
@@ -194,27 +188,18 @@
     </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
-  <!--<sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilCachedUntil` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
-  </sql>-->
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
-    <!--<query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphicType` ENUM('gif','jpg','png') NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `ownerType` ENUM('char','corp') NOT NULL DEFAULT 'char'</query>-->
   </sql>
-  <!--<sql prefixmethod="MANUAL">
-    <query platform="mysql">ALTER TABLE `%%PutilSections` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>
-  </sql>-->
   <sql prefixmethod="MANUAL">
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `api` CHAR(32) COLLATE ascii_general_ci NOT NULL</query>
-    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
+    <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</query>
     <query>ALTER TABLE `%%PutilXmlCache` MODIFY `hash` CHAR(40) COLLATE ascii_general_ci NOT NULL</query>
-    <!--<query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') COLLATE ascii_general_ci NOT NULL</query>-->
     <query platform="mysql">ALTER TABLE `%%PutilXmlCache` MODIFY `xml` LONGTEXT</query>
   </sql>
+  <!-- utilAccessMask queries -->
   <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilAccessMask`</query>
-    <!--<query platform="mysql">ALTER TABLE `%%PutilAccessMask` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
   </sql>
   <sql prefixmethod="MANUAL">
     <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
@@ -249,7 +234,8 @@
       (1048576, 'char', 'UpcomingCalendarEvents', 'Upcoming events on characters calendar.', 2),
       (2097152, 'char', 'WalletJournal', 'Wallet journal of character.', 16),
       (4194304, 'char', 'WalletTransactions', 'Market transaction journal of character.', 16),
-      (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16)
+      (67108864, 'char', 'Contracts', 'List of all Contracts the character is involved in.', 16),
+      (134217728, 'char', 'Locations' 'Allows the fetching of coordinate and name data for items owned by the character.', 1)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
@@ -260,13 +246,13 @@
       (4, 'corp', 'MemberMedals', 'List of medals awarded to corporation members.', 16),
       (8, 'corp', 'CorporationSheet', 'Exposes basic "Show Info" information as well as Member Limit and basic division and wallet info.', 16),
       (16, 'corp', 'ContactList', 'Corporate contact list and relationships.', 16),
-      (32, 'corp', 'ContainerLog', 'Corporate secure container acess log.', 16),
+      (32, 'corp', 'ContainerLog', 'Corporate secure container access log.', 16),
       (64, 'corp', 'FacWarStats', 'Corporations Factional Warfare Statistics.', 8),
       (128, 'corp', 'IndustryJobs', 'Corporation jobs, completed and active.', 16),
       (256, 'corp', 'KillLog', 'Corporation kill log.', 16),
       (512, 'corp', 'MemberSecurity', 'Member roles and titles.', 2),
       (1024, 'corp', 'MemberSecurityLog', 'Member role and title change log.', 2),
-      (2048, 'corp', 'MemberTracking', 'Extensive Member information. Time of last logoff, last known location and ship.', 16),
+      (2048, 'corp', 'MemberTrackingLimited', 'Limited Member information.', 16),
       (4096, 'corp', 'MarketOrders', 'List of all corporate market orders.', 16),
       (8192, 'corp', 'Medals', 'List of all medals created by the corporation.', 16),
       (16384, 'corp', 'OutpostList', 'List of all outposts controlled by the corporation.', 16),
@@ -278,7 +264,9 @@
       (1048576, 'corp', 'WalletJournal', 'Wallet journal for all corporate accounts.', 16),
       (2097152, 'corp', 'WalletTransactions', 'Market transactions of all corporate accounts.', 16),
       (4194304, 'corp', 'Titles', 'Titles of corporation and the roles they grant.', 2),
-      (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16)
+      (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16),
+      (16777216, 'corp', 'Locations', 'Allows the fetching of coordinate and name data for items owned by the corporation.', 1),
+      (33554432, 'corp', 'MemberTracking', 'Extensive Member information. Time of last logoff, last known location and ship.', 1)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
@@ -296,24 +284,39 @@
       (512, 'eve', 'SkillTree', 'XML of currently in-game skills (including unpublished skills).', 1),
       (0, 'eve', 'CharacterInfo', 'Character information, exposes skill points and current ship information on top of "Show Info" information.', 1),
       (8388608, 'eve', 'CharacterInfoPublic', 'Character information, exposes skill points and current ship information on top of "Show Info" information.', 1),
-      (16777216, 'eve', 'CharacterInfoPrivate', 'Sensitive Character Information, exposes account balance and last known location on top of the other Character Information call.', 1),
-      (1, 'map', 'FacWarSystems', 'Returns a list of contestable solarsystems and the NPC faction currently occupying them. It should be noted that this file only returns a non-zero ID if the occupying faction is not the sovereign faction.', 16),
-      (2, 'map', 'Jumps', 'Returns a list of systems where any jumps have happenned.', 16),
-      (4, 'map', 'Kills', 'Returns the number of kills in solarsystems within the last hour. Only solar system where kills have been made are listed, so assume zero in case the system is not listed.', 16),
-      (8, 'map', 'Sovereignty', 'Returns a list of solarsystems and what faction or alliance controls them. ', 16),
-      (16, 'map', 'SovereigntyStatus', 'Returns a list of all sovereignty structures in EVE. This API has been disabled and is not expected to return but was included for completeness.', 1),
-      (1, 'server', 'ServerStatus', 'Returns current Eve server status and number of players online.', 16)
+      (16777216, 'eve', 'CharacterInfoPrivate', 'Sensitive Character Information, exposes account balance and last known location on top of the other Character Information call.', 1)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
+      VALUES
+      (1, 'map', 'FacWarSystems', 'Returns a list of contestable solarsystems  and the NPC faction currently occupying them. It should be noted that this file only returns a non-zero ID if the occupying faction is not the sovereign faction.', 16),
+      (2, 'map', 'Jumps', 'Returns a list of systems where any jumps have happened.', 16),
+      (4, 'map', 'Kills', 'Returns the number of kills in solarsystems within the last hour. Only solar system where kills have been made are listed, so assume zero in case the system is not listed.', 16),
+      (8, 'map', 'Sovereignty', 'Returns a list of solarsystems and what faction or alliance controls them. ', 16),
+      (16, 'map', 'SovereigntyStatus', 'Returns a list of all sovereignty structures in EVE. This API has been disabled and is not expected to return but was included for completeness.', 1)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilAccessMask` (`mask`, `section`, `api`, `description`, `status`)
+      VALUES
+      (1, 'server', 'ServerStatus', 'Returns current Eve server status and number of players online.', 16)
+    </query>
+  </sql>
+  <!-- utilCachedInterval queries -->
+  <sql prefixmethod="MANUAL">
     <query>TRUNCATE `%%PutilCachedInterval`</query>
-    <!--<query platform="mysql">ALTER TABLE `%%PutilCachedInterval` MODIFY `section` ENUM('account','char','corp','eve','map','server','util') NOT NULL</query>-->
   </sql>
   <sql prefixmethod="MANUAL">
     <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
       VALUES
       ('account', 'AccountStatus', 3600),
-      ('account', 'APIKeyInfo', 300),
+      ('account', 'APIKeyInfo', 300)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
       ('char', 'AccountBalance', 900),
       ('char', 'AssetList', 21600),
       ('char', 'CalendarEventAttendees', 3600),
@@ -324,6 +327,7 @@
       ('char', 'FacWarStats', 3600),
       ('char', 'IndustryJobs', 900),
       ('char', 'KillLog', 3600),
+      ('char', 'Locations', 3600),
       ('char', 'MailBodies', 1800),
       ('char', 'MailingLists', 21600),
       ('char', 'MailMessages', 1800),
@@ -337,10 +341,14 @@
       ('char', 'Standings', 3600),
       ('char', 'UpcomingCalendarEvents', 900),
       ('char', 'WalletJournal', 1620),
-      ('char', 'WalletTransactions', 3600),
+      ('char', 'WalletTransactions', 3600)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
       ('corp', 'AccountBalance', 900),
       ('corp', 'AssetList', 21600),
-      ('corp', 'CalendarEventAttendees', 3600),
       ('corp', 'ContactList', 900),
       ('corp', 'ContainerLog', 3600),
       ('corp', 'Contracts', 900),
@@ -348,6 +356,7 @@
       ('corp', 'FacWarStats', 3600),
       ('corp', 'IndustryJobs', 900),
       ('corp', 'KillLog', 3600),
+      ('corp', 'Locations', 3600),
       ('corp', 'MarketOrders', 3600),
       ('corp', 'Medals', 3600),
       ('corp', 'MemberMedals', 3600),
@@ -362,7 +371,12 @@
       ('corp', 'StarbaseList', 3600),
       ('corp', 'Titles', 3600),
       ('corp', 'WalletJournal', 1620),
-      ('corp', 'WalletTransactions', 3600),
+      ('corp', 'WalletTransactions', 3600)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
       ('eve', 'AllianceList', 3600),
       ('eve', 'CertificateTree', 86400),
       ('eve', 'CharacterInfo', 3600),
@@ -371,11 +385,21 @@
       ('eve', 'FacWarStats', 3600),
       ('eve', 'FacWarTopStats', 3600),
       ('eve', 'RefTypes', 86400),
-      ('eve', 'SkillTree', 86400),
+      ('eve', 'SkillTree', 86400)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
       ('map', 'FacWarSystems', 3600),
       ('map', 'Jumps', 3600),
       ('map', 'Kills', 3600),
-      ('map', 'Sovereignty', 3600),
+      ('map', 'Sovereignty', 3600)
+    </query>
+  </sql>
+  <sql prefixmethod="MANUAL">
+    <query>INSERT INTO `%%PutilCachedInterval` (`section`,`api`,`interval`)
+      VALUES
       ('server', 'ServerStatus', 180)
     </query>
   </sql>

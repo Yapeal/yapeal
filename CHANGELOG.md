@@ -1,4 +1,6 @@
-2012-01-25
+# CHANGELOG #
+
+## 2012-01-25
 
 (default) Fixed extra commas that were missed in conversion of utilAccessMask to
 using multiple inserts.
@@ -16,24 +18,30 @@ errors for the API. Deactivate the API on your corps for now to prevent the
 extra error logging as the API data in the database isn't being updated either
 at this time until CCP fixes issues on their side.
 
-2011-12-17
+Converted CHANGELOG to CHANGELOG.md.
+
+Converted COPYING and COPYING-LESSER to markdown format as well.
+
+Updated README.md to reflect new file names.
+
+## 2011-12-17
 
 (default) Updated char/ContactList to work with updated API that now includes
 alliance and corporation rowsets. A database update is required so everyone
 needs to run install/createMySQLTables.php.
 
-2011-12-12
+## 2011-12-12
 
 (default) Started work on adding a new feature to MarketOrder APIs to allow
 Yapeal to optionally upload data to market sites like EMK, etc.
 
-2011-12-11
+## 2011-12-11
 
 (default) Updates to all of the install/*.xml files to include reference to the
 xmlschema03.xsd so editors that understand XSDs can validate the xml files and
 offer syntax help when editing. It took several tries but finally got it right.
 
-2011-12-10
+## 2011-12-10
 
 (default) Added 'singleton' column database tables etc to work with the new
 attribute added to KillLog APIs. Make sure to run install/createMySQLTables.php
@@ -44,7 +52,7 @@ WalletTransactions, and KillLogs that was keep them from walking correctly and
 cause near infinite loop in those API classes. Everyone needs to do update as
 this bug does cause a large CPU usage issue and greatly slows down Yapeal.
 
-2011-11-06
+## 2011-11-06
 
 (default) Updated ADOdb to version 5.14.
 
@@ -63,7 +71,7 @@ having to roll something myself that wouldn't have been nearly as easy of use
 when I tried doing some other things with Yapeal. To find out more about it
 check out the web site http://logging.apache.org/log4php/.
 
-2011-11-03
+## 2011-11-03
 
 (default) Changed class/YapealQueryBuilder.php to not just track number of rows
 in inserts/upserts but also size in bytes so it limits packet size when sending
@@ -72,17 +80,17 @@ them to MySQL to help people work around the default low level server is set to.
 Turned off autoStore in YapealApiCache::cacheXmlDatabase() to prevent NOTICE: No
 rows for utilXmlCache error.
 
-2011-11-01
+## 2011-11-01
 
 (default) Fixing WARNING error many people are having with long options in
 yapeal.php since it seems even in Linux it was uncommon to be able to use them
 before PHP 5.3.
 
-2011-10-31
+## 2011-10-31
 
 (/) Switch to Mercurial is done and all development will continue in it.
 
-2011-10-17
+## 2011-10-17
 
 (trunk/) Added new 'status' column to utilAccessMask table. This column can be
 used to filter APIs by how well they are supported by Yapeal. This column is a
@@ -110,7 +118,7 @@ that has been added to table.
 
 Updated ActiveAPIMask in install/*.xml to include APIs with status of COMPLETE.
 
-2011-10-16
+## 2011-10-16
 
 (trunk/) Added inc/usage.php to replace the per script functions in the install/
 scripts.
@@ -143,7 +151,7 @@ refactored everything and dropped many of them from inc/common_paths.php.
 
 Deleted unused class/CurlRequest.php.
 
-2011-10-12
+## 2011-10-12
 
 (trunk/) Moved getSettingsFromIniFile() into own file in install and refactored
 the other scripts to start using it.
@@ -156,11 +164,11 @@ changed inc/common_backend.php to use new install/getSettingsFromIniFile.php
 moved new function scripts into inc/ and updated everything to use at new
 location.
 
-2011-10-10
+## 2011-10-10
 
 (trunk/) Updated INSTALL.txt to reflect changes to the scripts in install/
 
-2011-10-09
+## 2011-10-09
 
 (trunk/) An addition refinement on issue 76 to take care of double '/'s.
 
@@ -174,7 +182,7 @@ directly in cache/
 Updated install/createMySQLDatabase.php, install/testForMySQLDatabasePrivs.php
 like the other scripts. WIP on the other ones not used in install instructions.
 
-2011-10-08
+## 2011-10-08
 
 (trunk/) Added new parserOptions() function to yapeal.php and updated usage().
 Yapeal now should be better at handling command line options add give version
@@ -197,7 +205,7 @@ ext/eac_httprequest/eac_httprequest.curl.php.
 Function-alized inc/common_backend.php to make code clearer and to aid in any
 future moves to making into class.
 
-2011-10-06
+## 2011-10-06
 
 (trunk/) Did some clean up on error message formatting in
 class/YapealErrorHandler.php.
@@ -216,22 +224,22 @@ Updated class/PrintingExceptionObserver.php for new error message formatting.
 Added new is_callable() guard to attach() and detach() in
 class/YapealApiException.php and class/ADODB_Exception.php.
 
-2011-10-05
+## 2011-10-05
 
 (trunk/) Fix for issue 86. Changed to text column instead.
 
 Another try at fixing issue 76.
 
-2011-09-22
+## 2011-09-22
 
 (trunk/) Additional changes for issue 83.
 
-2011-09-21
+## 2011-09-21
 
 (trunk/) Fix for issue 83. addActiveAPI() and deleteActiveAPI() had not been
 updated for CAK.
 
-2011-09-18
+## 2011-09-18
 
 (trunk/) Fixed many bugs in the class/util/Registered* classes. They have also
 been made a little smarter and will try to fill in columns from other database
@@ -242,7 +250,7 @@ UpcomingCalendarEvents in cache code.
 
 Made a few updates to INSTALL.txt and README.
 
-2011-09-17
+## 2011-09-17
 
 (trunk/) Fixed missing columns from query in SectionAccount::getAPIQuery() for
 the ignored mode.
@@ -267,31 +275,31 @@ once xmlschema project can be finished and used in Yapeal. May need to drop all
 util* tables except for the utilRegistered* tables to get tables to update
 correctly the first time.
 
-2011-09-16
+## 2011-09-16
 
 (trunk/) Fixed notice in SectionCorp.php and SectionChar.php about undefined
 $mask variable.
 
-2011-09-15
+## 2011-09-15
 
 (trunk/) Fixed issue 81 in install/util.xml.
 
-2011-09-14
+## 2011-09-14
 
 (trunk/) merged branches/keys/ into trunk/
 
 (branches/keys/) Has now been merged with trunk/ and being deleted along with
 some of the other branches from keys.
 
-2011-09-13
+## 2011-09-13
 
 (branches/keys/) Fixed errors in contract and notificationTexts XSDs.
 
-2011-09-12
+## 2011-09-12
 
 (branches/keys/) Added support for contracts. contractItems and ContractBids still needs to be added.
 
-2011-09-11
+## 2011-09-11
 
 (branches/contracts/) Deleted unneeded prepareTables() that was throwing away
 history.
@@ -313,7 +321,7 @@ Started working on several of the install/*.php scripts to convert them for CAK.
 addTestCharacter.php and addTestCorporation.php should now work but the new
 addTestKey.php is still a WIP. addTestUser.php has been deleted.
 
-2011-09-03
+## 2011-09-03
 
 (branches/keys/) Updated the utilRegistered* classes to use new AccessMask class.
 
@@ -324,7 +332,7 @@ to work with the register mode setting from config/yapeal.ini.
 Made some changes to the Section* classes to try making notice log quieter
 again.
 
-2011-08-30
+## 2011-08-30
 
 (branches/keys/) Updated class/util/CachedInterval.php to be less buggy and more
 useful.
@@ -335,7 +343,7 @@ Updated YapealAPICache class to use CachedInterval class.
 
 install/util.xml Fixed typo in SkillInTraining row.
 
-2011-08-25
+## 2011-08-25
 
 (branches/keys/) Merged branches/notification/ into keys.
 
@@ -348,28 +356,28 @@ already in the database.
 (admin/) Updated phing/build.xml with some new test targets and re-structured
 some of the existing ones.
 
-2011-08-24
+## 2011-08-24
 
 (branches/notification/) Made updates to some of the SQL to better use primary
 keys.
 
-2011-08-22
+## 2011-08-22
 
 (branches/notification/) Added new branch to integrate new notificationTexts API
 from patrick at nospam ch.tario.org into Yapeal. Thanks for the help.
 
-2011-08-20
+## 2011-08-20
 
 (branches/keys/) Update util.xml to set assetLists for 6 hours instead of 24.
 
 Dropped non-API legecy column 'changed' from MarketOrder tables.
 
-2011-08-16
+## 2011-08-16
 
 (branches/keys/) Did some refactoring on yapeal.php, ASection.php, and
 Section*.php files to make them less interdependent.
 
-2011-08-14
+## 2011-08-14
 
 (branches/keys/) Fixed a couple of errors one of my alpha testers found.
 
@@ -386,7 +394,7 @@ Fixed error in cache/corp/ContainerLog.xsd.
 Updated masks in utilSections table to reflect APIs that haven't been
 implemented in Yapeal yet so notice log doesn't fill up with meaningless noise.
 
-2011-08-13
+## 2011-08-13
 
 (branches/keys/) Lots of work on getting char section working. It's working
 without problems in testing now.
@@ -405,7 +413,7 @@ Added new rawQuantity column to AssetList APIs. Found out about that change when
 I got invalid XML errors during testing. CCP had said something about it in
 contracts but didn't know it was being added to assets as well.
 
-2011-08-01
+## 2011-08-01
 
 (branches/keys/) Lots of work done on new key stuff after taking first week to
 form ideas and some kind of plan. Things that have been changed in random order:
@@ -428,12 +436,12 @@ new custom key and activeAPIMask system. Work is still in progress on char and
 corp stuff. The new APIs that aren't part of custom key changes are being
 ignored for now until everything is working again.
 
-2011-07-23
+## 2011-07-23
 
 (branches/keys/) Created new branch from trunk/ to start work on new custom API
 key stuff.
 
-2011-07-11
+## 2011-07-11
 
 (trunk/) Updated WalletTransactions for new journalTransactionID field that was
 add. Thanks for the heads up on that CCP :P
@@ -443,13 +451,13 @@ it'll work better for people. The old file had general certs for all CAs vs new
 one has just the chain needed for Eve APIs. Hopefully this will reduce the
 number of errors being seen.
 
-2011-04-19
+## 2011-04-19
 
 (trunk/) Fixed for issue 71 where transactions involving 2 wallets in the same
 corporation would only show once in DB table when corporation is buying and
 selling stuff to itself etc do to table primary key not including accountKey.
 
-2011-04-11
+## 2011-04-11
 
 (trunk/) Updated cache/char/CharacterSheet.xsd to reflect change in skills
 rowset from using 'unpublished' to using 'published'.
@@ -467,7 +475,7 @@ insert only functionality of class/YapealQueryBuilder.php.
 
 (branches/cloud/) Saving some work done.
 
-2011-02-26
+## 2011-02-26
 
 (trunk/) Changed default for proxy in A*::getProxy() to use https.
 
@@ -481,16 +489,16 @@ is allowed.
 
 (trunk/) Fixed minor formatting problem in per class constructors.
 
-2011-02-21
+## 2011-02-21
 
 (trunk/) Updated AccountStatus.xsd to allow for GTC offers.
 
-2011-02-19
+## 2011-02-19
 
 (trunk/) Take out some old test messages that had mistakenly been left in
 WalletJournal and WalletTransactions API classes.
 
-2011-02-17
+## 2011-02-17
 
 Fixed an interdependency between class/api/A*.php and the per api instance
 classes where error messages in constructors on parent were dependent on
@@ -501,7 +509,7 @@ or replace them.
 
 (branches/incursion/) Merged in branches/https/ changes.
 
-2011-02-05
+## 2011-02-05
 
 (branches/https/) Made changes to convert Yapeal to use https. HTTP proxies will
 no longer work with Yapeal but HTTPS proxies should. Future versions will allow
@@ -531,7 +539,7 @@ truncate utilXMLCache;
 
 Another try at fully fixing issue 65.
 
-2011-02-04
+## 2011-02-04
 
 (branches/incursion/) Fixed bug in class/YapealApiCache.php where hash being
 used wasn't always unique for all cached XML files because the owner was not
@@ -548,17 +556,17 @@ and delete them from the cache/* folders.
 All users will also need to clear the utilXMLCache database table using:
 truncate utilXMLCache;
 
-2011-01-31
+## 2011-01-31
 
 (branches/incursion/) Changed all references to eve-online.com over to
 eveonline.com as first step in getting ready for https conversion.
 
-2011-01-27
+## 2011-01-27
 
 (branches/incursion/) Copied over some of the changes from WalletJournal into
 WalletTransactions as well.
 
-2011-01-25
+## 2011-01-25
 
 (branches/incursion/) Made several changes to WalletJournal for char and corp to
 work better with new caching. Starting with I pulled in revision 1146 fix from
@@ -568,18 +576,18 @@ Fixed error where corp APIs were check char cachedUntil times in utilCachedUntil
 This was a nasty little bug that took a while to spot in class/SectionCorp.php.
 It should cut down on a few API errors plus get corp APIs at correct times again.
 
-2011-01-24
+## 2011-01-24
 
 (branches/incursion/) Updated corp/, eve/, map/, and /server/ XSDs to do more
 checks on the XML. Can now catch more error cases.
 
-2011-01-23
+## 2011-01-23
 
 (branches/incursion/) Updated account/ and char/ XSDs to do more checks on the
 XML. Can now catch more error cases. Work is continuing on doing the same for
 the others.
 
-2011-01-22
+## 2011-01-22
 
 Branched trunk/ to work on some additions/fixes for Incursion.
 
@@ -592,11 +600,11 @@ couple days ago like I thought it had.
 Added fix for 'bad behaviour with limited key requesting fullkey apipages'
 (issue 66)
 
-2011-01-15
+## 2011-01-15
 
 Fixed error message when install/createMySQLTables.php was run without parameters.
 
-2011-01-11 (rev 1137)
+## 2011-01-11 (rev 1137)
 
 Did some code cleanup on class/ADODB_Exception.php
 
@@ -612,7 +620,7 @@ returned during API errors conditions is always in the future. In some cases
 with API errors 101, 103, 115-117, 119 the new cachedUntil date/time can be in
 the past which caused repeated tries to get API before servers are ready.
 
-2011-01-10 (rev 1136)
+## 2011-01-10 (rev 1136)
 
 Added new utilGraphic table and removed graphic and graphicType columns from
 utilRegisteredCharacter and utilRegisteredCorporation tables. New class to
@@ -638,7 +646,7 @@ Yapeal manually.
 Changed name of INSTALL to INSTALL.txt because one OS (Windows c$!p) can't
 figure out how to use case differences to tell files apart from directories.
 
-2011-01-09 (rev 1136)
+## 2011-01-09 (rev 1136)
 
 Adding this changelog in hopes that I might actually use it.
 

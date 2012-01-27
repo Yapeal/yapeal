@@ -889,22 +889,13 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`grantableRoles`" type="C" size="64">
-      <NOTNULL/>
-    </field>
-    <field name="`location`" type="C" size="255">
-      <NOTNULL/>
-    </field>
+    <field name="`grantableRoles`" type="C" size="64"/>
+    <field name="`location`" type="C" size="255"/>
     <field name="`locationID`" type="I8" size="20">
-      <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`logoffDateTime`" type="T">
-      <NOTNULL/>
-    </field>
-    <field name="`logonDateTime`" type="T">
-      <NOTNULL/>
-    </field>
+    <field name="`logoffDateTime`" type="T"/>
+    <field name="`logonDateTime`" type="T"/>
     <field name="`name`" type="C" size="255">
       <NOTNULL/>
     </field>
@@ -912,14 +903,9 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`roles`" type="C" size="64">
-      <NOTNULL/>
-    </field>
-    <field name="`shipType`" type="C" size="255">
-      <NOTNULL/>
-    </field>
+    <field name="`roles`" type="C" size="64"/>
+    <field name="`shipType`" type="C" size="255"/>
     <field name="`shipTypeID`" type="I8" size="20">
-      <NOTNULL/>
       <UNSIGNED/>
     </field>
     <field name="`startDateTime`" type="T">

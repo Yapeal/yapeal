@@ -46,15 +46,15 @@
     <xs:attribute name="base" use="required" type="xs:string"/>
     <xs:attribute name="baseID" use="required" type="eveID"/>
     <xs:attribute name="characterID" use="required" type="eveID"/>
-    <xs:attribute name="grantableRoles" use="required" type="xs:unsignedLong"/>
-    <xs:attribute name="location" use="required" type="xs:string"/>
-    <xs:attribute name="locationID" use="required" type="eveID"/>
-    <xs:attribute name="logoffDateTime" use="required" type="eveDT"/>
-    <xs:attribute name="logonDateTime" use="required" type="eveDT"/>
+    <xs:attribute name="grantableRoles" use="optional" type="xs:unsignedLong"/>
+    <xs:attribute name="location" use="optional" type="xs:string"/>
+    <xs:attribute name="locationID" use="optional" type="eveID"/>
+    <xs:attribute name="logoffDateTime" use="optional" type="eveDT"/>
+    <xs:attribute name="logonDateTime" use="optional" type="eveDT"/>
     <xs:attribute name="name" use="required" type="xs:string"/>
-    <xs:attribute name="roles" use="required" type="xs:unsignedLong"/>
-    <xs:attribute name="shipType" use="required" type="xs:string"/>
-    <xs:attribute name="shipTypeID" use="required" type="eveID"/>
+    <xs:attribute name="roles" use="optional" type="xs:unsignedLong"/>
+    <xs:attribute name="shipType" use="optional" type="xs:string"/>
+    <xs:attribute name="shipTypeID" use="optional" type="eveID"/>
     <xs:attribute name="startDateTime" use="required" type="eveDT"/>
     <xs:attribute name="title" use="required" type="xs:string"/>
   </xs:complexType>

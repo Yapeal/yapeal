@@ -124,7 +124,7 @@ abstract class ALimitedObject {
    *
    * The output is formatted as CSV (Comma Separated Values) with a header line
    * and string quoted. Note that decimal values are treated like strings and
-   * blobs are in hexdecminal form with 0x appended but not quoted.
+   * blobs are in hexadecimal form with 0x appended but not quoted.
    *
    * @return string Returns the rows ready to be printed.
    */

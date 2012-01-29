@@ -76,7 +76,7 @@ abstract class AApiRequest {
    */
   protected $section;
   /**
-   * @var object Holds instance of XMLReader.
+   * @var XMLReader Holds instance of XMLReader.
    */
   protected $xr;
   /**

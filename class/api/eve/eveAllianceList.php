@@ -55,7 +55,7 @@ if (count(get_included_files()) < 2) {
  */
 class eveAllianceList extends AEve {
   /**
-   * @var object Query instance for corporation rows to be added to table.
+   * @var YapealQueryBuilder Query instance for corporation rows to be added to table.
    */
   private $corporations;
   /**

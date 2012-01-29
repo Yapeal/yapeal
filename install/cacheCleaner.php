@@ -195,7 +195,6 @@ function cleanDatabase(array $sections, $cacheLength, array $dbSettings,
   $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
   // Get connection to DB.
   $db = ADONewConnection($dsn);
-  $mess = '';
   foreach ($sections as $section) {
     $sql = 'delete from `' . $prefix . 'utilXmlCache`';
     $sql .= ' where `section`=' . $db->qstr($section);
@@ -214,7 +213,6 @@ function cleanFiles($sections, $cacheLength) {
   $timeStamp = time() - $cacheLength * 86400;
   // Clear out any old cached file information before starting.
   clearstatcache(TRUE);
-  $mess = '';
   foreach ($sections as $section) {
     $path = YAPEAL_CACHE . $section . DS;
     $files = new FilterFileFinder($path, 'xml', FilterFileFinder::SUFFIX);

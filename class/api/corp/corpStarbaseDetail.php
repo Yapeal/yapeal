@@ -59,15 +59,15 @@ class corpStarbaseDetail extends ACorp {
    */
   private $posID;
   /**
-   * @var object Query instance for combatSettings table.
+   * @var YapealQueryBuilder Query instance for combatSettings table.
    */
   private $combat;
   /**
-   * @var object Query instance for fuel table.
+   * @var YapealQueryBuilder Query instance for fuel table.
    */
   private $fuel;
   /**
-   * @var object Query instance for generalSettings table.
+   * @var YapealQueryBuilder Query instance for generalSettings table.
    */
   private $general;
   /**

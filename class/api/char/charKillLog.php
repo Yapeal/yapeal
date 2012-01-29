@@ -56,7 +56,7 @@ if (count(get_included_files()) < 2) {
  */
 class charKillLog extends AChar {
   /**
-   * @var object QueryBuilder instance for attackers table.
+   * @var YapealQueryBuilder QueryBuilder instance for attackers table.
    */
   protected $attackers;
   /**
@@ -68,7 +68,7 @@ class charKillLog extends AChar {
    */
   private $date;
   /**
-   * @var object QueryBuilder instance for items table.
+   * @var YapealQueryBuilder QueryBuilder instance for items table.
    */
   protected $items;
   /**
@@ -81,7 +81,7 @@ class charKillLog extends AChar {
    */
   private $stack = array();
   /**
-   * @var object QueryBuilder instance for victim table.
+   * @var YapealQueryBuilder QueryBuilder instance for victim table.
    */
   protected $victim;
   /**

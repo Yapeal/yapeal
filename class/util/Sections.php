@@ -56,11 +56,11 @@ if (count(get_included_files()) < 2) {
 class Sections extends ALimitedObject implements IGetBy {
   /**
    * Hold an instance of the AccessMask class.
-   * @var object
+   * @var AccessMask
    */
   protected $am;
   /**
-   * @var string Holds an instance of the DB connection.
+   * @var ADODB_mysqli Holds an instance of the DB connection.
    */
   protected $con;
   /**
@@ -70,7 +70,7 @@ class Sections extends ALimitedObject implements IGetBy {
   protected $tableName;
   /**
    * Holds query builder object.
-   * @var object
+   * @var YapealQueryBuilder
    */
   protected $qb;
   /**

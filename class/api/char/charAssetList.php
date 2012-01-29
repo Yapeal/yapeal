@@ -55,7 +55,7 @@ if (count(get_included_files()) < 2) {
  */
 class charAssetList extends AChar {
   /**
-   * @var object Holds queryBuilder instance.
+   * @var YapealQueryBuilder Holds queryBuilder instance.
    */
   private $qb;
   /**

@@ -56,7 +56,7 @@ if (count(get_included_files()) < 2) {
  */
 class YapealNetworkConnection {
   /**
-   * @var mixed Holds API connection object.
+   * @var curlRequest Holds API connection object.
    */
   private $con;
   /**

@@ -103,7 +103,6 @@ class accountAPIKeyInfo extends AAccount {
       YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->bridge->useUpsert(FALSE);
-    $type = '';
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -113,11 +112,8 @@ class accountAPIKeyInfo extends AAccount {
                 $row = array('keyID' => $this->params['keyID']);
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
-                  // Save key type.
-                  if ($this->xr->name == 'type') {
-                    $type = $this->xr->value;
-                    // Skip empty expires values.
-                  } elseif ($this->xr->name == 'expires'
+                  // Skip empty expires values.
+                  if ($this->xr->name == 'expires'
                     && $this->xr->value == '') {
                     continue;
                   };
@@ -138,7 +134,7 @@ class accountAPIKeyInfo extends AAccount {
                   return FALSE;
                 };
                 if ($subTable == 'characters') {
-                  $this->characters($type);
+                  $this->characters();
                 };// if $subTable ...
                 break;
               default:// Nothing to do here.
@@ -207,11 +203,9 @@ class accountAPIKeyInfo extends AAccount {
   /**
    * Used to store XML to characters table.
    *
-   * @param string $type Used to pass in key type for forming bridge table.
-   *
    * @return Bool Return TRUE if store was successful.
    */
-  protected function characters($type) {
+  protected function characters() {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };

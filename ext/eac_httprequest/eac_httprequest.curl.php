@@ -170,6 +170,7 @@ class curlRequest {
 	 *
 	 * @param string $option curl_setopt option name
 	 * @param mixed $value curl_setopt value
+   * @param bool $_temp
 	 * @return void
 	 */
 	public function setOption($option, $value, $_temp = false) {
@@ -263,6 +264,8 @@ class curlRequest {
 	 * @param string $header header (header-name: header-value)
 	 * @param bool $replace true = replace header
 	 * @param bool $_temp true = temporary/non-sticky (used internally)
+   * @param string $_key
+   * @param string $_value
 	 * @return void
 	 */
 	public function header(
@@ -594,8 +597,8 @@ class curlRequest {
 	 * send (email) last result
 	 *
 	 * @param string $to the 'to' email address
-	 * @param string $from the 'from' email address
-	 * @param string $subject the email subject
+	 * @param string|bool $from the 'from' email address
+	 * @param string|bool $subject the email subject
 	 * @param string|array $xheaders extra headers (delimited by ';' or an array)
 	 * @param string $EOL end-of-line character (\n or \r\n)
 	 * @return int mail status
@@ -637,6 +640,7 @@ class curlRequest {
 	/**
 	 * get last result
 	 *
+   * @param string|null $fp Ignored
 	 * @return mixed result of last request
 	 */
 	public function getLastResult($fp = null) {
@@ -766,7 +770,9 @@ class curlRequest {
 	 * split a header into key,value
 	 *
 	 * @param string|null $header an http header string
-	 * @return array header_name=>header_value (updates header/key/value parameters)
+   * @param string $key
+   * @param string $value
+	 * @return array|null header_name=>header_value (updates header/key/value parameters)
 	 */
 	private function splitHeader(&$header, &$key, &$value) {
 		if (!$header) {

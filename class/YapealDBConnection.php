@@ -76,7 +76,7 @@ class YapealDBConnection {
    *
    * @param string $dsn An ADOdb compatible connection string.
    *
-   * @return ADOConnection Returns ADOdb connection object.
+   * @return ADODB_mysqli Returns ADOdb connection object.
    *
    * @throws InvalidArgumentException if $dsn is empty or if $dsn isn't a string
    * it will throw InvalidArgumentException.

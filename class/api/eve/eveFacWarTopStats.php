@@ -76,7 +76,7 @@ class eveFacWarTopStats extends AEve {
   /**
    * API parser for XML.
    *
-   * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
     if (YAPEAL_TRACE_ENABLED) {
@@ -95,7 +95,7 @@ class eveFacWarTopStats extends AEve {
                 if ($this->xr->isEmptyElement == TRUE) {
                   break;
                 };// if $this->xr->isEmptyElement ...
-                // Parse node into there own tables
+                // Parse node into its own table.
                 $this->parseSubTable($tableName . ucfirst($this->xr->localName));
                 break;
               default:// Nothing to do here.
@@ -103,13 +103,6 @@ class eveFacWarTopStats extends AEve {
             break;
           case XMLReader::END_ELEMENT:
             if ($this->xr->localName == 'result') {
-              if ($row && is_array($row) && count($row) > 0) {
-                $qb->addRow($row);
-              }
-              if (count($qb) > 0) {
-                $qb->store();
-              };// if count $rows ...
-              $qb = NULL;
               return TRUE;
             };// if $this->xr->localName == 'row' ...
             break;
@@ -128,13 +121,14 @@ class eveFacWarTopStats extends AEve {
   /**
    * Handles totals from XML Note.
    *
-   * @return array Returns array of data to store in database table.
+   * @param string Name of the table to parse.
+   *
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parseSubTable($table) {
     if (YAPEAL_TRACE_ENABLED) {
       Logger::getLogger('yapeal')->trace(__METHOD__);
     };
-    $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -160,7 +154,7 @@ class eveFacWarTopStats extends AEve {
             case 'characters':
             case 'corporations':
             case 'factions':
-              return true;
+              return TRUE;
           }; // switch $this->xr->localName
           break;
         default:// Nothing to do here.
@@ -173,9 +167,9 @@ class eveFacWarTopStats extends AEve {
   /**
    * Used to store XML to rowset tables.
    *
-   * @param string $table Name of the table for this rowset.
+   * @param string $tableName Name of the table for this rowset.
    *
-   * @return Bool Return TRUE if store was successful.
+   * @return Bool Returns TRUE if store was successful.
    */
   protected function rowset($tableName) {
     if (YAPEAL_TRACE_ENABLED) {
@@ -191,6 +185,7 @@ class eveFacWarTopStats extends AEve {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
+              $row = array();
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;

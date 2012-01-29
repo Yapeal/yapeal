@@ -340,7 +340,7 @@ abstract class AChar extends AApiRequest {
         default:
           return FALSE;
           break;
-      };// switch $code ...
+      }// switch $code ...
     }
     catch (ADODB_Exception $e) {
       Logger::getLogger('yapeal')->error($e);

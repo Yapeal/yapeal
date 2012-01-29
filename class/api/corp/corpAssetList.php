@@ -55,7 +55,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpAssetList extends ACorp {
   /**
-   * @var object Holds queryBuilder instance.
+   * @var YapealQueryBuilder Holds queryBuilder instance.
    */
   private $qb;
   /**
@@ -201,9 +201,7 @@ class corpAssetList extends ACorp {
               // Level decrease with end of each parent rowset.
               --$inherit['level'];
               break;
-            default:
-              break;
-          }// switch $this->xr->localName ...
+          };// switch $this->xr->localName ...
           break;
       };// switch $this->xr->nodeType
     };// while $xr->read() ...

@@ -266,7 +266,7 @@
       (4194304, 'corp', 'Titles', 'Titles of corporation and the roles they grant.', 2),
       (8388608, 'corp', 'Contracts', 'List of recent Contracts the corporation is involved in.', 16),
       (16777216, 'corp', 'Locations', 'Allows the fetching of coordinate and name data for items owned by the corporation.', 1),
-      (33554432, 'corp', 'MemberTracking', 'Extensive Member information. Time of last logoff, last known location and ship.', 1)
+      (33554432, 'corp', 'MemberTracking', 'Extensive Member information. Time of last logoff, last known location and ship.', 16)
     </query>
   </sql>
   <sql prefixmethod="MANUAL">

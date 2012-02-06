@@ -70,7 +70,7 @@ class corpMemberTracking extends ACorp {
     // Cut off 'A' and lower case abstract class name to make section name.
     $this->section = strtolower(substr(get_parent_class($this), 1));
     $this->api = str_replace($this->section, '', __CLASS__);
-    //$params['extended'] = 1;
+    $params['extended'] = 1;
     parent::__construct($params);
   }// function __construct
   /**

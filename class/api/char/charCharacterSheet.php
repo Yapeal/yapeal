@@ -79,9 +79,6 @@ class charCharacterSheet  extends AChar {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -182,9 +179,6 @@ class charCharacterSheet  extends AChar {
    * @return bool Returns TRUE if data stored to database table.
    */
   protected function attributes() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -225,9 +219,6 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attributeEnhancers() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -284,9 +275,6 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -329,9 +317,6 @@ class charCharacterSheet  extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function skills() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -380,9 +365,6 @@ class charCharacterSheet  extends AChar {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tables = array('Attributes', 'AttributeEnhancers', 'Certificates',
       'CorporationRoles', 'CorporationRolesAtBase', 'CorporationRolesAtHQ',
       'CorporationRolesAtOther', 'CorporationTitles', 'Skills'

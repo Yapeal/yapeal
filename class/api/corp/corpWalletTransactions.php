@@ -95,9 +95,6 @@ class corpWalletTransactions extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $ret = TRUE;
     $accounts = range(1000, 1006);
     shuffle($accounts);
@@ -210,9 +207,6 @@ class corpWalletTransactions extends ACorp {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);

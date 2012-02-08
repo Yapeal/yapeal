@@ -79,9 +79,6 @@ class corpContactList  extends ACorp {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       while ($this->xr->read()) {
         switch ($this->xr->nodeType) {
@@ -129,9 +126,6 @@ class corpContactList  extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -177,9 +171,6 @@ class corpContactList  extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tables = array('AllianceContactList', 'CorporateContactList');
     foreach ($tables as $table) {
       try {

@@ -86,9 +86,6 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function getInterval($api, $section) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
       throw new InvalidArgumentException($mess);
@@ -122,9 +119,6 @@ class CachedInterval {
    * throw an InvalidArgumentException.
    */
   public function changeInterval($api, $section, $interval) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!is_string($api) || !is_string($section)) {
       $mess = '$api and $section must be strings';
       throw new InvalidArgumentException($mess);
@@ -151,9 +145,6 @@ class CachedInterval {
    * database fails or can't get data from table.
    */
   public static function resetAll() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       // Get a database connection.
       $con = YapealDBConnection::connect(YAPEAL_DSN);

@@ -70,9 +70,6 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if ($this->abort === TRUE) {
       return FALSE;
     };
@@ -185,9 +182,6 @@ class SectionAccount extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $sql = 'select urk.`keyID`,urk.`vCode`,urk.`activeAPIMask` as "RKMask",';
     $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,aaki.`type`';
     $sql .= ' from';
@@ -212,9 +206,6 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function ignoredFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
       return FALSE;
     };
@@ -251,9 +242,6 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function optionalFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!is_null($row['RKActive']) && $row['RKActive'] == 0) {
       return FALSE;
     };
@@ -286,9 +274,6 @@ class SectionAccount extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function requiredFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (is_null($row['RKActive'])) {
       $mess = 'IsActive can not be null in utilRegisteredKey when';
       $mess .= ' registered_mode = "required"';

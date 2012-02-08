@@ -81,9 +81,6 @@ class corpStarbaseList extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.

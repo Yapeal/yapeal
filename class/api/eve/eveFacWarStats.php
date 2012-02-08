@@ -79,9 +79,6 @@ class eveFacWarStats extends AEve {
    * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -154,9 +151,6 @@ class eveFacWarStats extends AEve {
    * @return array Returns array of data to store in database table.
    */
   protected function totals() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $row = array();
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -194,9 +188,6 @@ class eveFacWarStats extends AEve {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -241,9 +232,6 @@ class eveFacWarStats extends AEve {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tables = array('FactionWars', 'FacWarStats');
     foreach ($tables as $table) {
       try {

@@ -107,9 +107,6 @@ abstract class AChar extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $default = 'https://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     $sql = 'select proxy from ';
@@ -160,9 +157,6 @@ abstract class AChar extends AApiRequest {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       switch ($e->getCode()) {
         // All of these codes give a new cachedUntil time to use.

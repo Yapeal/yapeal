@@ -84,9 +84,6 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function connect($dsn) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (empty($dsn) || !is_string($dsn)) {
       throw new InvalidArgumentException('Bad value passed for $dsn');
     };
@@ -115,9 +112,6 @@ class YapealDBConnection {
    * from ADOdb.
    */
   public static function releaseAll() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!empty(self::$connections)) {
       foreach (self::$connections as $k => $v) {
         self::$connections[$k]->Close();
@@ -133,9 +127,6 @@ class YapealDBConnection {
    * @param array $section A list of settings for this section of configuration.
    */
   public static function setDatabaseSectionConstants(array $section) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (!defined('YAPEAL_DSN')) {
       // Put all the pieces of the ADOdb DSN together.
       $dsn = $section['driver'] . $section['username'] . ':';

@@ -114,9 +114,6 @@ class AccessMask {
    * given a DomainException is thrown.
    */
   public function apisToMask($apis, $section = NULL) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (is_string($apis)) {
       $apis = explode(',', $apis);
     } elseif (is_array($apis)) {
@@ -180,9 +177,6 @@ class AccessMask {
    * @return array Returns the access mask list.
    */
   public function getMaskList() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return self::$maskList;
   }// function getMaskList
   /**
@@ -197,9 +191,6 @@ class AccessMask {
    * @return array Returns the access mask list for a section.
    */
   public function getSectionMaskList($section, $status = AccessMask::COMPLETE) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $mask = $this->getSectionToMask($section, $status);
     return $this->maskToAPIs($mask, $section);
   }// function getSectionMaskList
@@ -215,9 +206,6 @@ class AccessMask {
    * @return array Returns the access mask for section.
    */
   public function getSectionToMask($section, $status = AccessMask::COMPLETE) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $mask = 0;
     foreach (self::$maskList as $row) {
       if ($row['section'] == $section) {
@@ -241,9 +229,6 @@ class AccessMask {
    * throw a InvalidArgumentException.
    */
   public function maskToAPIs($mask, $section) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (is_array($mask)) {
       $mask = array_reduce($mask, array($this, 'reduceOR'), 0);
     } elseif (!is_int($mask)) {
@@ -267,9 +252,6 @@ class AccessMask {
    * @return int Returns $x | $y
    */
   protected function reduceOR($x, $y) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $x | $y;
   }// function reduceOR
   /**

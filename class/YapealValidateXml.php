@@ -110,9 +110,6 @@ class YapealValidateXml {
    * @return string Returns cachedUntil date time from XML.
    */
   public function getCachedUntil() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->cachedUntil;
   }// function getCachedUntil
   /**
@@ -121,9 +118,6 @@ class YapealValidateXml {
    * @return string Returns currentTime date time from XML.
    */
   public function getCurrentTime() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->currentTime;
   }// function getCurrentTime
   /**
@@ -132,9 +126,6 @@ class YapealValidateXml {
    * @return array Returns API error from XML as assoc array.
    */
   public function getApiError() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return array('code' => $this->errorCode, 'message' => $this->errorMessage);
   }// function getApiError
   /**
@@ -143,9 +134,6 @@ class YapealValidateXml {
    * @return bool Return TRUE if current XML is API error.
    */
   public function isApiError() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->apiError;
   }// function isValid
   /**
@@ -154,9 +142,6 @@ class YapealValidateXml {
    * @return bool Return TRUE if current XML was Validated and valid.
    */
   public function isValid() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->validXML;
   }// function isValid
   /**
@@ -165,9 +150,6 @@ class YapealValidateXml {
    * @return bool Return TRUE if the XML validates.
    */
   public function validateXML() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     // Get a XMLReader instance.
     $xr = new XMLReader();
     // Check for HTML errors.

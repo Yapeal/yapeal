@@ -82,9 +82,6 @@ class serverServerStatus extends AServer {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);

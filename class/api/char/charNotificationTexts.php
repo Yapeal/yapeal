@@ -78,9 +78,6 @@ class charNotificationTexts extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       // First get a new cache instance.
       $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $this->params);
@@ -143,9 +140,6 @@ class charNotificationTexts extends AChar {
    * @return mixed Returns a list of notification IDs or FALSE on error.
    */
   protected function getIds() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $con = YapealDBConnection::connect(YAPEAL_DSN);
     $sql = 'select n.`notificationID`';
     $sql .= ' from ';
@@ -176,9 +170,6 @@ class charNotificationTexts extends AChar {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);

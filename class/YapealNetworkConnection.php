@@ -96,9 +96,6 @@ class YapealNetworkConnection {
    * @return mixed Returns XML data from API or FALSE for any connection error.
    */
   public function retrieveXml($url, $postList) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $result = $this->con->post($url, $postList);
     if (!$this->con->success) {
       if (Logger::getLogger('yapeal')->isInfoEnabled()) {

@@ -82,9 +82,6 @@ class corpOutpostServiceDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $outpostList = $this->outpostList();
     if (FALSE === $outpostList) {
       return FALSE;
@@ -157,9 +154,6 @@ class corpOutpostServiceDetail extends ACorp {
    * or no outposts found for corporation.
    */
   protected function outpostList() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select `stationID`';
@@ -191,9 +185,6 @@ class corpOutpostServiceDetail extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.

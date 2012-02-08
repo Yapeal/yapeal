@@ -135,9 +135,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool TRUE if graphic was retrieved.
    */
   public function getItemById($id) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
     $sql .= ' from `' . $this->tableName . '`';
     $sql .= ' where `ownerID`=' . $id;
@@ -175,9 +172,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if the the database record already existed.
    */
   public function recordExists() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->recordExists;
   }// function recordExists
   /**
@@ -189,9 +183,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if column exists in table and default was set.
    */
   public function setDefault($name, $value) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->qb->setDefault($name, $value);
   }// function setDefault
   /**
@@ -202,9 +193,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Returns TRUE if all column defaults could be set, else FALSE.
    */
   public function setDefaults(array $defaults) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     return $this->qb->setDefaults($defaults);
   }// function setDefaults
   /**
@@ -213,9 +201,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * @return bool Return TRUE if store was successful.
    */
   public function store() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if (FALSE === $this->qb->addRow($this->properties)) {
       return FALSE;
     };// if FALSE === ...

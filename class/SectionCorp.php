@@ -70,9 +70,6 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if ($this->abort === TRUE) {
       return FALSE;
     };
@@ -186,9 +183,6 @@ class SectionCorp extends ASection {
    * @return string Returns the SQL query string.
    */
   protected function getSQLQuery() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $sql = 'select akb.`keyID`,ac.`corporationID`,urk.`vCode`,aaki.`expires`,';
     switch (YAPEAL_REGISTERED_MODE) {
       case 'required':
@@ -256,9 +250,6 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function ignoredFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     // Filter out if isActive is NULL or FALSE
     if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
       return FALSE;
@@ -297,9 +288,6 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function optionalFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     // If isActive from utilRegisteredCorporation is not empty and set to FALSE
     // then return FALSE.
     if (!is_null($row['RCActive']) && $row['RCActive'] == 0) {
@@ -345,9 +333,6 @@ class SectionCorp extends ASection {
    * @return bool Returns TRUE if row should exist in result.
    */
   protected function requiredFilter(&$row) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     // isActive is not optional.
     if (is_null($row['RCActive'])) {
       $mess = 'IsActive can not be null in utilRegisteredCorporation when';

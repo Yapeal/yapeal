@@ -91,9 +91,6 @@ class corpAssetList extends ACorp {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -142,9 +139,6 @@ class corpAssetList extends ACorp {
    * @return integer Current index for lft/rgt counting.
    */
   protected function nestedSet($inherit) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -218,9 +212,6 @@ class corpAssetList extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.

@@ -89,9 +89,6 @@ class Singleton {
    * instance is not possible.
    */
 	public static function &get($name, $args = array())	{
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
 		if (isset(self::$instance[$name])) {
       if (!empty($args)) {
         if (Logger::getLogger('yapeal')->isInfoEnabled()) {
@@ -152,9 +149,6 @@ class Singleton {
    * @return string Returns a comma separated list of all the singletons.
    */
   public static function getAll() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $list = array_keys(self::$instance);
     return implode(',', $list);
   }// function getAll
@@ -164,9 +158,6 @@ class Singleton {
    * @return void
    */
   static public function releaseAll() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     self::$instance = array();
   }// function releaseAll
 }

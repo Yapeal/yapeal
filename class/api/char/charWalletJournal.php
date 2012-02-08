@@ -91,9 +91,6 @@ class charWalletJournal extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     /* This counter is used to insure do ... while can't become infinite loop.
      * Using 1000 means at most last 255794 rows can be retrieved. That works
      * out to over 355 entries per hour over the maximum 30 days allowed by
@@ -189,9 +186,6 @@ class charWalletJournal extends AChar {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance with autoStore off.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);

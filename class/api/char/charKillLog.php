@@ -108,9 +108,6 @@ class charKillLog extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     // This counter is used to insure do ... while can't become infinite loop.
     $counter = 1000;
     $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
@@ -190,9 +187,6 @@ class charKillLog extends AChar {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -326,9 +320,6 @@ class charKillLog extends AChar {
    * @return integer Current index for lft/rgt counting.
    */
   protected function nestedSet($inherit) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -397,9 +388,6 @@ class charKillLog extends AChar {
    * @return Bool Return TRUE if store was successful.
    */
   protected function attack() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:

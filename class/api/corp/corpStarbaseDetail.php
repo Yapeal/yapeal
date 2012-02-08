@@ -94,9 +94,6 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   public function apiStore() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $posList = $this->posList();
     if (FALSE === $posList) {
       return FALSE;
@@ -193,9 +190,6 @@ class corpStarbaseDetail extends ACorp {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     $defaults = array('ownerID' => $this->ownerID);
     // Get a new query instance.
@@ -322,9 +316,6 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function combatSettings() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -363,9 +354,6 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function generalSettings() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $row = array('posID' => $this->posID['itemID']);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -402,9 +390,6 @@ class corpStarbaseDetail extends ACorp {
    * @return Bool Return TRUE if store was successful.
    */
   protected function rowset($table) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -437,9 +422,6 @@ class corpStarbaseDetail extends ACorp {
    * no POSes found for corporation.
    */
   protected function posList() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select `itemID`';
@@ -471,9 +453,6 @@ class corpStarbaseDetail extends ACorp {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tables = array('CombatSettings', 'Fuel', 'GeneralSettings',
       'StarbaseDetail');
     foreach ($tables as $table) {

@@ -107,9 +107,6 @@ abstract class AAccount extends AApiRequest {
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $default = 'https://api.eveonline.com/' . $this->section;
     $default .= '/' . $this->api . '.xml.aspx';
     $sql = 'select proxy from ';
@@ -153,9 +150,6 @@ abstract class AAccount extends AApiRequest {
    * @return bool Returns TRUE if handled the error else FALSE.
    */
   protected function handleApiError($e) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       switch ($e->getCode()) {
         case 202:// API key authentication failure.

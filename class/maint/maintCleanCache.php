@@ -75,9 +75,6 @@ class maintCleanCache {
      * @return bool Always returns TRUE.
      */
     public function doWork() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
       $limit = strtotime('7 days ago');
       foreach ($this->sections as $section) {
         $path = YAPEAL_CACHE . $section . DS;

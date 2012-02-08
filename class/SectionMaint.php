@@ -79,9 +79,6 @@ class SectionMaint extends ASection {
    * @return bool Returns TRUE if all scripts ran cleanly else FALSE.
    */
   public function pullXML() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if ($this->abort === TRUE) {
       return FALSE;
     };

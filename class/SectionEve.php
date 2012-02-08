@@ -70,9 +70,6 @@ class SectionEve extends ASection {
    * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
    */
   public function pullXML() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     if ($this->abort === TRUE) {
       return FALSE;
     };

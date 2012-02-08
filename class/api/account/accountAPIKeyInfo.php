@@ -87,9 +87,6 @@ class accountAPIKeyInfo extends AAccount {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -179,9 +176,6 @@ class accountAPIKeyInfo extends AAccount {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     try {
       $con = YapealDBConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
@@ -206,9 +200,6 @@ class accountAPIKeyInfo extends AAccount {
    * @return Bool Return TRUE if store was successful.
    */
   protected function characters() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:

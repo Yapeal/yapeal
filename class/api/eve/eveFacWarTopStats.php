@@ -79,9 +79,6 @@ class eveFacWarTopStats extends AEve {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section;
     try {
       while ($this->xr->read()) {
@@ -126,9 +123,6 @@ class eveFacWarTopStats extends AEve {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parseSubTable($table) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
         case XMLReader::ELEMENT:
@@ -172,9 +166,6 @@ class eveFacWarTopStats extends AEve {
    * @return Bool Returns TRUE if store was successful.
    */
   protected function rowset($tableName) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     //$tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
     $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
@@ -219,9 +210,6 @@ class eveFacWarTopStats extends AEve {
    * @return bool Will return TRUE if table(s) were prepared correctly.
    */
   protected function prepareTables() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
-    };
     $tables = array('CharactersKillsLastWeek',        'CharactersKillsTotal',
                     'CharactersKillsYesterday',       'CharactersVictoryPointsLastWeek',
                     'CharactersVictoryPointsTotal',   'CharactersVictoryPointsYesterday',

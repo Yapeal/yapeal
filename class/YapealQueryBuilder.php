@@ -120,9 +120,6 @@ class YapealQueryBuilder implements Countable {
    * connection or table column information.
    */
   public function __construct($tableName, $dsn, $autoStoreMode = TRUE) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     if (!is_string($tableName)) {
       $mess = '$tableName must be a string in ' . __CLASS__;
       throw new InvalidArgumentException($mess);

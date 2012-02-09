@@ -64,9 +64,6 @@ abstract class AServer extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $this->params = $params;
   }// function __construct
   /**

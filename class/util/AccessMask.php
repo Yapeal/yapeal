@@ -68,9 +68,6 @@ class AccessMask {
    * database fails or can't get data from table.
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     // If list is empty grab it from database.
     if (empty(self::$maskList)) {
       try {

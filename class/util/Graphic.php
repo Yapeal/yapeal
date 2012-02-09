@@ -85,9 +85,6 @@ class Graphic extends ALimitedObject implements IGetBy {
    * doesn't exist a DomainException will be thrown.
    */
   public function __construct($id = NULL, $create = TRUE) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
     try {
       // Get a database connection.

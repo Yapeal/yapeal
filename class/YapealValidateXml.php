@@ -98,9 +98,6 @@ class YapealValidateXml {
    * APIs will be one of account, char, corp, eve, map, or server.
    */
   public function __construct($api, $section) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $this->api = $api;
     $this->section = $section;
   }// function __constructor

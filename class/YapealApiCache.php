@@ -107,9 +107,6 @@ class YapealApiCache {
    */
   public function __construct($api, $section, $owner = 0, $postParams = array()) {
     $params = '';
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     if (!empty($postParams)) {
       foreach ($postParams as $k => $v) {
         $params .= $k . '=' . $v;

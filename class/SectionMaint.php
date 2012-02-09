@@ -63,9 +63,6 @@ class SectionMaint extends ASection {
    *
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $this->section = strtolower(str_replace('Section', '', __CLASS__));
     parent::__construct();
     //$this->section = strtolower(str_replace('Section', '', __CLASS__));

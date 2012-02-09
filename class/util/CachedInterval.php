@@ -65,9 +65,6 @@ class CachedInterval {
    * Constructor
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     // If list is empty grab it from database.
     if (empty(self::$intervalList)) {
       self::resetAll();

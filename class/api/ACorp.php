@@ -64,9 +64,6 @@ abstract class ACorp extends AApiRequest {
    * @throws LengthException for any missing required $params.
    */
   public function __construct(array $params) {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $required = array('corporationID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
     foreach ($required as $k => $v) {
       if (!isset($params[$k])) {

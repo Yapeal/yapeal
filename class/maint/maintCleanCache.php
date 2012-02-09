@@ -58,9 +58,6 @@ class maintCleanCache {
    * Constructor
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $this->sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
   }// function __construct()
     /**

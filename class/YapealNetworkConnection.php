@@ -63,9 +63,6 @@ class YapealNetworkConnection {
    * Constructor
    */
   public function __construct() {
-    if (YAPEAL_TRACE_ENABLED) {
-      Logger::getLogger('yapeal')->trace(__CLASS__);
-    };
     $accept = 'text/xml,application/xml,application/xhtml+xml;q=0.9';
     $accept .= ',text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;q=0.5';
     $headers = array(

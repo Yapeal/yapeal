@@ -1,4 +1,4 @@
-# Welcome to Yapeal (Yet Another PHP Eve Api Library) #
+# YAPEAL (Yet Another PHP Eve Api Library) #
 
 For manual installation instructions from archives (zip, tar.bz2) or
 [Mercurial][1] see the [INSTALL.md][2] file.

@@ -1,4 +1,4 @@
-# Introduction #
+# INSTALLATION #
 
 Below are the instructions for installing [Yapeal][1] from the archives but you
 can find instructions about installing from the [Mercurial][2] as well after
@@ -27,7 +27,8 @@ general idea is the same.
     <http://sourceforge.net/projects/yapeal/files/archives/yapeal-latest.tar.bz2/download>
 
    Which you choose doesn't really matter as both contain the same code and was
-   done to make it more convenient for the user when extracting.
+   done to make it more convenient for the user when extracting but the
+   'tar.bz2' version is smaller.
 
 2. Extract archive
 
@@ -40,7 +41,9 @@ general idea is the same.
 
     Linux:
 
-    `cd /where/I/want/to/put/it/;tar -jxvf /where/I/downloaded/archive/yapeal-latest.tar.bz2`
+    `cd /where/I/want/to/put/it/`
+
+    `tar -jxvf /where/I/downloaded/archive/yapeal-latest.tar.bz2`
 
 3. **Update:** Start cmd.exe (Windows only)
 
@@ -86,10 +89,10 @@ general idea is the same.
 
     Now you'll need to edit config/yapeal.ini. In Windows use NotePad or another
     editor that works well for code editing (Not WordPad or MS Word). You should
-    be able to start NotePad from cmd.exe with the file open by using notepad
-    config\yapeal.ini. In Linux most editors should work but the more basic the
-    better with Vim or Emacs both being good options. A Vim example: vim
-    config/yapeal.ini
+    be able to start NotePad from cmd.exe with the file open by using `notepad
+    config\yapeal.ini`. In Linux most editors should work but the more basic the
+    better with Vim or Emacs both being good options. A Vim example: `vim
+    config/yapeal.ini`
 
     For most people you'll only need to change the settings in the `[Database]`
     section like database, username, password. Changing `[Cache]`
@@ -159,7 +162,7 @@ general idea is the same.
 
     `php -f ./checkForRequirements.php -- -V`
 
-    You should a few lines of output containing the version information from
+    You should get a few lines of output containing the version information from
     `install/checkForRequirements.php`
 
 9. Check MySQL user access

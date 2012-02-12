@@ -50,16 +50,15 @@ if (count(get_included_files()) < 2) {
 /**
  * Function used to parser command line options.
  *
- * This function was made to save having to make one every it might be needed.
- * It also helps with consistent option handle which should lead to less user as
- * well as programmer confusion.
+ * This function was made to save having to make new one every time it might be
+ * needed. It also helps with consistent option handle which should lead to less
+ * user as well as programmer confusion.
  *
  * The -h, --help and -V, --version options don't have to be included in the
  * parameters as they will always be include automatically.
  *
- * Note that with older versions of PHP on some platforms (Windows) long options
- * aren't available so all required options must have a short form that can be
- * used.
+ * Note that with older versions of PHP long options aren't available so all
+ * required options must have a short form that can be used.
  *
  * @param array $shortOptions An array of short options to accept. The elements
  * should be in the same format as the short option parameter for setopt() i.e.

@@ -57,7 +57,7 @@ function showVersion($file) {
   $mess .= 'Copyright (c) 2008-2012, Michael Cummings.' . PHP_EOL;
   $mess .= 'License LGPLv3+: GNU LGPL version 3 or later' . PHP_EOL;
   $mess .= ' <http://www.gnu.org/copyleft/lesser.html>.' . PHP_EOL;
-  $mess .= 'See COPYING and COPYING-LESSER for more details.' . PHP_EOL;
+  $mess .= 'See COPYING.md and COPYING-LESSER.md for more details.' . PHP_EOL;
   $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
   fwrite(STDOUT, $mess);
 }// function showVersion

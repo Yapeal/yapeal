@@ -112,7 +112,7 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   $options['l:'] = array('op' => '  -l, --log-config=LOG', 'desc' =>
     'LOG should be the path and name of a file that holds logging configuration'
     . ' settings. The file can be in either INI or XML format. Optional setting'
-    . ' that defaults to <yapeal_base>/config/log4php.xml');
+    . ' that defaults to <yapeal_base>/config/logger.xml');
   $options['p:'] = array('op' => '  -p, password=PASS', 'desc' =>
     'PASS is the password for the database server.');
   $options['privileges:'] = array('op' => '  --privileges=PRIVS', 'desc' =>

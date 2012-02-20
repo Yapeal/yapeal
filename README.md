@@ -4,9 +4,9 @@ For manual installation instructions from archives (zip, tar.bz2) or
 [Mercurial][1] see the [INSTALL.md][2] file.
 
 For more information on configuring, setup, or troubleshooting Yapeal check out
-the project Wiki at <http://code.google.com/p/yapeal/> especially the new
-starter guide at <http://code.google.com/p/yapeal/wiki/StarterGuide>. In the
-starter guide you should find a lot of information to help you with getting
+the project Wiki at <https://sourceforge.net/p/yapeal/wiki/Home/> especially the
+new starter guide at <https://sourceforge.net/p/yapeal/wiki/StarterGuide/>. In
+the starter guide you should find a lot of information to help you with getting
 started using Yapeal. Another resource is the Yapeal thread on Eve Online forums
 which you'll find at
 <https://forums.eveonline.com/default.aspx?g=posts&t=7540>.

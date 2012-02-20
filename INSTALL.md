@@ -4,7 +4,7 @@ Below are the instructions for installing [Yapeal][1] from the archives but you
 can find instructions about installing from the [Mercurial][2] as well after
 them. Only the first couple of steps are different.
 
-## Installing From Archives ##
+## Installing From Archives
 
 If you are installing from one of the [archives][3] (tar.bz2, zip) the following
 instructions should be helpful. In most of the general text I will mostly use
@@ -246,7 +246,7 @@ information to the utilRegistered* tables in the database for any of the
 account, char, or corp APIs to work. More information about adding information
 and activating APIs can be found in the wiki and on the forum thread.
 
-## Installing From Mercurial ##
+## Installing From Mercurial
 
 To install from the Mercurial repository on GoogleCode or SourceForge first
 setup a working copy. This shouldn't be where you plan on run Yapeal from but be
@@ -277,11 +277,7 @@ from cmd.exe prompt:
 
   Then:
 
-  `hg clone https://code.google.com/p/yapeal/`
-
-  OR
-
-  `hg clone http://yapeal.hg.sourceforge.net:8000/hgroot/yapeal/yapeal`
+  `hg clone http://hg.code.sf.net/p/yapeal/code`
 
 Now that you have a working copy you can export from it to where you plan on
 running Yapeal.

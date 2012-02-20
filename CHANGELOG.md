@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## 2012-02-19
+
+(default) Fixed issue with walking for KillLog APIs assuming kills are sorted.
+
+Updated *.md files to reflect moving everything over to Source Forge.
+
 ## 2012-01-25
 
 (default) Fixed extra commas that were missed in conversion of utilAccessMask to

@@ -207,21 +207,20 @@ class corpKillLog extends ACorp {
           case XMLReader::ELEMENT:
             switch ($this->xr->localName) {
               case 'row':
+                /* This code should only be ran for outer 'kills' rows so might
+                 * be safe to assume the attribute can't be empty but didn't.
+                 */
+                $date = $this->xr->getAttribute('killTime');
+                // If this date is the oldest so far need to save date and
+                // killID to use in walking.
+                if (!empty($date) && $date < $this->date) {
+                  $this->date = $date;
+                  $this->beforeID = $this->xr->getAttribute('killID');
+                };// if $date ...
                 $row = array();
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   $row[$this->xr->name] = $this->xr->value;
-                  switch ($this->xr->name) {
-                    case 'killTime':
-                      // Save date for walking.
-                      $this->date = $this->xr->value;
-                      break;
-                    case 'killID':
-                      // Save killID for walking.
-                      $this->beforeID = $this->xr->value;
-                      break;
-                    default:// Nothing to do here.
-                  };// switch $this->xr->name ...
                 };// while $this->xr->moveToNextAttribute() ...
                 $qb->addRow($row);
                 break;

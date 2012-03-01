@@ -147,14 +147,14 @@ try {
     $result = $con->GetCol($sql);
   }
   catch(ADODB_Exception $e) {
-    // Nothing to do here was already report to logs.
+    Logger::getLogger('yapeal')->fatal($e);
   }
-  $result = array_map('ucfirst', $result);
   if (count($result) == 0) {
     $mess = 'No sections were found in utilSections check database.';
     Logger::getLogger('yapeal')->error($mess);
     exit(2);
   };
+  $result = array_map('ucfirst', $result);
   $sectionList = array_intersect($sectionList, $result);
   // Now take the list of sections and call each in turn.
   foreach ($sectionList as $sec) {

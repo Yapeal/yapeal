@@ -499,9 +499,6 @@ class curlRequest {
 		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array(&$this, 'parseHeader'));
 		$this->lastResult = curl_exec($ch);
-		if (curl_errno($ch)) {
-			print 'curl_error: ' . curl_error($ch) . PHP_EOL;
-		}
 		$this->info = array_merge($this->info, curl_getinfo($ch));
 		$this->error = curl_error($ch);
 		curl_close($ch);

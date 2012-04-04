@@ -84,8 +84,9 @@ if (isset($options['version'])) {
   exit(0);
 };
 // Insure minimum version of PHP we need to run.
-if (version_compare(PHP_VERSION, '5.2.4', '<')) {
-  $mess = 'Need minimum of PHP 5.2.4 to use this software!' . PHP_EOL;
+$version = '5.2.8';
+if (version_compare(PHP_VERSION, $version, '<')) {
+  $mess = 'Need minimum of PHP ' . $version . ' to use this software!' . PHP_EOL;
   fwrite(STDERR, $mess);
   exit(2);
 };

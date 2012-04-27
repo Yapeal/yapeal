@@ -311,7 +311,11 @@ class YapealQueryBuilder implements Countable {
       case 'TINYTEXT':
       case 'ENUM':
       case 'SET':
-        if ($len <= 255) return 'C';
+        if ($len <= 255) {
+          return 'C';
+        } else {
+          return 'X';
+        }
       case 'TEXT':
       case 'LONGTEXT':
       case 'MEDIUMTEXT':

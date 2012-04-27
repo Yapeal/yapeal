@@ -147,8 +147,8 @@ class corpOutpostServiceDetail extends ACorp {
   /**
    * Get per corp list of outposts from corpOutpostList.
    *
-   * @return mixed List of stationIDs for this corp's outposts or FALSE if error
-   * or no outposts found for corporation.
+   * @return array|bool List of stationIDs for this corp's outposts or FALSE if
+   * error or no outposts found for corporation.
    */
   protected function outpostList() {
     try {

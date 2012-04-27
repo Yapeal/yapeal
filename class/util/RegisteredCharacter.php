@@ -50,6 +50,9 @@ if (count(get_included_files()) < 2) {
 /**
  * Wrapper class for utilRegisteredCharacter table.
  *
+ * @property int $isActive
+ * @property int $activeAPIMask
+ *
  * @package Yapeal
  * @subpackage Wrappers
  */
@@ -82,7 +85,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param mixed $id Id of Character wanted.
+   * @param int|string $id Id of Character wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
    * if $id doesn't exist in database.
    *
@@ -90,6 +93,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
    * InvalidArgumentException.
    * @throws DomainException If $create is FALSE and a database record for $id
    * doesn't exist a DomainException will be thrown.
+   * @throws RuntimeException Throws RuntimeException if fails to get database
+   * connection.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
@@ -187,7 +192,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   /**
    * Used to get user from utilRegisteredCharacter table by char ID.
    *
-   * @param $id Id of Character wanted.
+   * @param int $id Id of Character wanted.
    *
    * @return bool TRUE if char was retrieved.
    */
@@ -227,7 +232,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy {
   /**
    * Used to get item from table by name.
    *
-   * @param $name Name of record wanted.
+   * @param string $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
    */

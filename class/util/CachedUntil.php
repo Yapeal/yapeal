@@ -50,6 +50,8 @@ if (count(get_included_files()) < 2) {
 /**
  * Wrapper class for utilCachedUntil table.
  *
+ * @property string $cachedUntil
+ *
  * @package    Yapeal
  * @subpackage Wrappers
  */
@@ -85,6 +87,8 @@ class CachedUntil extends ALimitedObject implements IGetBy {
    * correct data types throws InvalidArgumentException.
    * @throws LengthException If $id is missing any require parameter throws a
    * LengthException.
+   * @throws RuntimeException Throws RuntimeException if fails to get database
+   * connection.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
@@ -107,7 +111,7 @@ class CachedUntil extends ALimitedObject implements IGetBy {
       if (!isset($id[$k])) {
         $mess = 'Missing required parameter $id["' . $k . '"]';
         $mess .= ' to constructor in ' . __CLASS__;
-        throw new LengthException($mess, 1);
+        throw new LengthException($mess);
       };// if !isset $id[$k] ...
       switch ($v) {
         case 'C':
@@ -136,7 +140,7 @@ class CachedUntil extends ALimitedObject implements IGetBy {
       } else {
         $mess = 'No cached time for API = ' . $id['api'];
         $mess .= ' exists for ownerID = ' . $id['ownerID'];
-        throw new DomainException($mess, 4);
+        throw new DomainException($mess);
       };// else TRUE == $create ...
     };// if FALSE === $this->getItemById($id) ...
     // See if any columns beyond required were include and insure they get

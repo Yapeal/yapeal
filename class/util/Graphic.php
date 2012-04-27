@@ -75,14 +75,16 @@ class Graphic extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param mixed $id Id of user wanted.
+   * @param int|string $id Id of user wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
-   * if $id doesn't exist in database.
+   * if $id does not exist in database.
    *
    * @throws InvalidArgumentException If $id isn't a number throws an
    * InvalidArgumentException.
    * @throws DomainException If $create is FALSE and a database record for $id
-   * doesn't exist a DomainException will be thrown.
+   * does not exist a DomainException will be thrown.
+   * @throws RuntimeException Throws RuntimeException if fails to get database
+   * connection.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
@@ -127,7 +129,7 @@ class Graphic extends ALimitedObject implements IGetBy {
   /**
    * Used to get graphic from Graphic table by owner ID.
    *
-   * @param $id Id of graphic owner wanted.
+   * @param int $id Id of graphic owner wanted.
    *
    * @return bool TRUE if graphic was retrieved.
    */
@@ -153,7 +155,7 @@ class Graphic extends ALimitedObject implements IGetBy {
   /**
    * Used to get item from table by name.
    *
-   * @param $name Name of record wanted.
+   * @param string $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
    *

@@ -129,6 +129,9 @@ class YapealApiCache {
    * @param string $xml The Eve API XML to be cached.
    *
    * @return bool Returns TRUE if XML was cached, FALSE otherwise.
+   *
+   * @throws YapealApiErrorException Throws YapealApiErrorException for any API
+   * errors.
    */
   public function cacheXml($xml) {
     if (empty($xml)) {

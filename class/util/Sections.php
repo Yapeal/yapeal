@@ -50,6 +50,9 @@ if (count(get_included_files()) < 2) {
 /**
  * Wrapper class for utilSections table.
  *
+ * @property int $isActive
+ * @property mixed $activeAPIMask
+ *
  * @package    Yapeal
  * @subpackage Wrappers
  */
@@ -86,14 +89,16 @@ class Sections extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param mixed $id Id of Section wanted.
+   * @param int|string $id Id of Section wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
-   * if $id doesn't exist in database.
+   * if $id does not exist in database.
    *
    * @throws InvalidArgumentException If $id isn't a number or string throws an
    * InvalidArgumentException.
    * @throws DomainException If $create is FALSE and a database record for $id
-   * doesn't exist a DomainException will be thrown.
+   * does not exist a DomainException will be thrown.
+   * @throws RuntimeException Throws RuntimeException if fails to get database
+   * connection.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $this->sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
@@ -200,7 +205,7 @@ class Sections extends ALimitedObject implements IGetBy {
   /**
    * Used to get section from Sections table by section ID.
    *
-   * @param $id Id of section wanted.
+   * @param int $id Id of section wanted.
    *
    * @return bool TRUE if section was retrieved.
    */
@@ -226,7 +231,7 @@ class Sections extends ALimitedObject implements IGetBy {
   /**
    * Used to get item from table by name.
    *
-   * @param $name Name of record wanted.
+   * @param string $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
    *

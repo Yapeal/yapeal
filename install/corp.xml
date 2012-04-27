@@ -905,9 +905,7 @@
     </field>
     <field name="`roles`" type="C" size="64"/>
     <field name="`shipType`" type="C" size="255"/>
-    <field name="`shipTypeID`" type="I8" size="20">
-      <UNSIGNED/>
-    </field>
+    <field name="`shipTypeID`" type="I8" size="20"/>
     <field name="`startDateTime`" type="T">
       <NOTNULL/>
     </field>

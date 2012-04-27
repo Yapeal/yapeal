@@ -115,7 +115,7 @@ class eveFacWarTopStats extends AEve {
   /**
    * Handles totals from XML Note.
    *
-   * @param string Name of the table to parse.
+   * @param string $table Name of the table to parse.
    *
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
@@ -160,7 +160,7 @@ class eveFacWarTopStats extends AEve {
    *
    * @param string $tableName Name of the table for this rowset.
    *
-   * @return Bool Returns TRUE if store was successful.
+   * @return bool Returns TRUE if store was successful.
    */
   protected function rowset($tableName) {
     //$tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);

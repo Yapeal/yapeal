@@ -61,6 +61,9 @@ class YapealNetworkConnection {
   private $con;
   /**
    * Constructor
+   *
+   * @throws YapealApiException Throws YapealApiException on missing database
+   * connection.
    */
   public function __construct() {
     $accept = 'text/xml,application/xml,application/xhtml+xml;q=0.9';

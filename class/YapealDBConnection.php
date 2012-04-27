@@ -54,6 +54,8 @@ class YapealDBConnection {
   private static $connections = array();
   /**
    * Static only class.
+   *
+   * @throws LogicException Throws LogicException if new is used.
    */
   private function __construct() {
     $mess = 'Illegally attempted to make instance of ' . __CLASS__;
@@ -61,6 +63,8 @@ class YapealDBConnection {
   }// function __construct
   /**
    * No backdoor through cloning either.
+   *
+   * @throws LogicException Throws LogicException if cloning of class is tried.
    */
   final public function __clone() {
     $mess = 'Illegally attempted to clone ' . __CLASS__;

@@ -74,6 +74,8 @@ class YapealAutoLoad {
   private static $suffixList = array('.php', '.inc.php', '.class.php', '.class', '.inc');
   /**
    * Static only class.
+   *
+   * @throws LogicException Throws LogicException if new is used.
    */
   final public function __construct() {
     $mess = 'Illegally attempted to make instance of ' . __CLASS__;
@@ -81,6 +83,8 @@ class YapealAutoLoad {
   }// function __construct
   /**
    * No backdoor through cloning either.
+   *
+   * @throws LogicException Throws LogicException if cloning of class is tried.
    */
   final public function __clone() {
     $mess = 'Illegally attempted to clone ' . __CLASS__;

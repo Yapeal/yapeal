@@ -50,6 +50,9 @@ if (count(get_included_files()) < 2) {
 /**
  * Wrapper class for utilRegisteredCorporation table.
  *
+ * @property int $isActive
+ * @property int $activeAPIMask
+ *
  * @package    Yapeal
  * @subpackage Wrappers
  */
@@ -82,14 +85,16 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
   /**
    * Constructor
    *
-   * @param mixed $id Id of corporation wanted.
+   * @param int|string $id Id of corporation wanted.
    * @param bool $create When $create is set to FALSE will throw DomainException
-   * if $id doesn't exist in database.
+   * if $id does not exist in database.
    *
    * @throws InvalidArgumentException If $id isn't a number or string throws an
    * InvalidArgumentException.
    * @throws DomainException If $create is FALSE and a database record for $id
    * doesn't exist a DomainException will be thrown.
+   * @throws RuntimeException Throws RuntimeException if fails to get database
+   * connection.
    */
   public function __construct($id = NULL, $create = TRUE) {
     $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
@@ -187,7 +192,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
   /**
    * Used to get corp from utilRegisteredCorporation table by corp ID.
    *
-   * @param $id Id of corporation wanted.
+   * @param int $id Id of corporation wanted.
    *
    * @return bool TRUE if corp was retrieved.
    */
@@ -227,7 +232,7 @@ class RegisteredCorporation extends ALimitedObject implements IGetBy {
   /**
    * Used to get item from table by name.
    *
-   * @param $name Name of record wanted.
+   * @param string $name Name of record wanted.
    *
    * @return bool TRUE if item was retrieved else FALSE.
    */

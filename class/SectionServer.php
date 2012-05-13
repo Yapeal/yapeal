@@ -136,4 +136,4 @@ class SectionServer extends ASection {
     }// else $apiCount == $apiSuccess ...
   }// function pullXML
 }
-?>
+

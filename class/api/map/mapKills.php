@@ -70,4 +70,4 @@ class mapKills extends AMap {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

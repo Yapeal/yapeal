@@ -197,4 +197,4 @@ class corpOutpostServiceDetail extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

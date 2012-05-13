@@ -70,4 +70,4 @@ class eveRefTypes extends AEve {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

@@ -434,4 +434,3 @@ class YapealApiCache {
     self::$cacheOutput = $section['cache_output'];
   }// function setCacheSectionProperties
 }
-?>

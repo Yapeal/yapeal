@@ -93,4 +93,4 @@ class charMailingLists extends AChar {
     return TRUE;
   }// function prepareTables
 }
-?>
+

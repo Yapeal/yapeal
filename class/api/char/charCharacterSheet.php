@@ -383,4 +383,4 @@ class charCharacterSheet  extends AChar {
     return TRUE;
   }// function prepareTables
 }
-?>
+

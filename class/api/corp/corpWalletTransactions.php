@@ -262,4 +262,4 @@ class corpWalletTransactions extends ACorp {
     return FALSE;
   }// function parserAPI
 }
-?>
+

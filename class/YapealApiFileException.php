@@ -56,4 +56,4 @@ if (count(get_included_files()) < 2) {
  * @uses YapealApiException
  */
 class YapealApiFileException extends YapealApiException {}
-?>
+

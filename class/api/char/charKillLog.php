@@ -410,4 +410,4 @@ class charKillLog extends AChar {
     return FALSE;
   }// function rowset
 }
-?>
+

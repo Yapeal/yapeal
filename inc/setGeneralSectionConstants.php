@@ -74,4 +74,4 @@ function setGeneralSectionConstants(array $section) {
     define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
   };
 }// function setGeneralSectionConstants
-?>
+

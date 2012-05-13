@@ -81,4 +81,4 @@ class eveCharacterInfo extends AEve {
     return TRUE;
   }// function parserAPI
 }
-?>
+

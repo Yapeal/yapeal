@@ -171,4 +171,4 @@ function usage($file, array $shortOptions = NULL, array $longOptions = NULL) {
   };// foreach $options ...
   fwrite(STDOUT, $mess);
 };// function usage
-?>
+

@@ -93,4 +93,4 @@ class corpOutpostList extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

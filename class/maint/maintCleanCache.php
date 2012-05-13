@@ -103,4 +103,4 @@ class maintCleanCache {
       return TRUE;
     }// function doWork()
 }
-?>
+

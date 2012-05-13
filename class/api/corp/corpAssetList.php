@@ -224,4 +224,4 @@ class corpAssetList extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

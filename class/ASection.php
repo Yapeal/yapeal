@@ -114,4 +114,4 @@ abstract class ASection {
    */
   abstract public function pullXML();
 }
-?>
+

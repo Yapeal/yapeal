@@ -70,4 +70,4 @@ class mapSovereignty extends AMap {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

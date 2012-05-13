@@ -70,4 +70,4 @@ class mapJumps extends AMap {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

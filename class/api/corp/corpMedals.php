@@ -70,4 +70,4 @@ class corpMedals extends ACorp {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

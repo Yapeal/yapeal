@@ -126,4 +126,4 @@ class charMailMessages extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

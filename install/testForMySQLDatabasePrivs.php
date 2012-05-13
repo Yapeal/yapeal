@@ -158,4 +158,4 @@ $mess = $options['username'] . ' has the needed privileges on the ';
 $mess .= $options['database'] . ' database.' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-?>
+

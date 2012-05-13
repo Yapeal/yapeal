@@ -210,4 +210,4 @@ class charMailBodies extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

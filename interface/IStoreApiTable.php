@@ -64,4 +64,4 @@ interface IStoreApiTable {
    */
   public function apiStore();
 }
-?>
+

@@ -249,4 +249,4 @@ class charWalletJournal extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

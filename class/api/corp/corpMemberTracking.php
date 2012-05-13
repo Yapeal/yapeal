@@ -94,4 +94,4 @@ class corpMemberTracking extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

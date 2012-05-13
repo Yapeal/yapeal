@@ -267,4 +267,4 @@ class corpWalletJournal extends ACorp {
     return FALSE;
   }// function parserAPI
 }
-?>
+

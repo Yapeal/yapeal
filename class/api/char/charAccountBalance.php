@@ -70,4 +70,4 @@ class charAccountBalance extends AChar {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

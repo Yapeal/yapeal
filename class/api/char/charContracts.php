@@ -128,4 +128,4 @@ class charContracts extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

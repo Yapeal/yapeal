@@ -246,4 +246,4 @@ class eveFacWarStats extends AEve {
     return TRUE;
   }// function prepareTables
 }
-?>
+

@@ -76,4 +76,4 @@ class ExceptionRenderer implements LoggerRendererObject {
     return $mess;
   }// function render
 }// class ExceptionRenderer
-?>
+

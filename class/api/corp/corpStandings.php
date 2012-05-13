@@ -189,4 +189,4 @@ class corpStandings extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

@@ -359,4 +359,4 @@ class SectionChar extends ASection {
     return TRUE;
   }// function requiredFilter
 }
-?>
+

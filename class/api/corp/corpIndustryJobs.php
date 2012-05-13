@@ -70,4 +70,4 @@ class corpIndustryJobs extends ACorp {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

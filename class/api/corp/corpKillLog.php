@@ -413,4 +413,4 @@ class corpKillLog extends ACorp {
     return FALSE;
   }// function rowset
 }
-?>
+

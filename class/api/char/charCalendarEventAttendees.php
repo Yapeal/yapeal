@@ -81,4 +81,4 @@ class charCalendarEventAttendees extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

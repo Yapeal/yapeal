@@ -136,4 +136,4 @@ class SectionMap extends ASection {
     }// else $apiCount == $apiSuccess ...
   }// function pullXML
 }
-?>
+

@@ -340,4 +340,4 @@ abstract class AChar extends AApiRequest {
     return TRUE;
   }// function handleApiError
 }
-?>
+

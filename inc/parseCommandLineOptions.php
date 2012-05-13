@@ -137,4 +137,4 @@ function parseCommandLineOptions(array $shortOptions = NULL,
   };// foreach $options...
   return $settings;
 }// function parseCommandLineOptions
-?>
+

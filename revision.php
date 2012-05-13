@@ -71,4 +71,4 @@ if (!defined('YAPEAL_STABILITY')) {
    */
   define('YAPEAL_STABILITY', 'Beta');
 };
-?>
+

@@ -131,4 +131,4 @@ class charSkillInTraining  extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

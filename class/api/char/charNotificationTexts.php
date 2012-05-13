@@ -207,4 +207,4 @@ class charNotificationTexts extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

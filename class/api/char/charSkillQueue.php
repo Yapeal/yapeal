@@ -93,4 +93,4 @@ class charSkillQueue extends AChar {
     return TRUE;
   }// function prepareTables
 }
-?>
+

@@ -166,4 +166,4 @@ class YapealErrorHandler {
     set_error_handler(array('YapealErrorHandler', 'handle'));
   }// function setupCustomErrorAndExceptionSettings
 }
-?>
+

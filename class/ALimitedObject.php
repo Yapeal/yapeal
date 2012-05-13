@@ -165,4 +165,4 @@ abstract class ALimitedObject {
     unset($this->properties[$name]);
   }// function __unset
 }
-?>
+

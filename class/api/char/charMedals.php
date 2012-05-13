@@ -81,4 +81,4 @@ class charMedals extends AChar {
     return TRUE;
   }// function parserAPI
 }
-?>
+

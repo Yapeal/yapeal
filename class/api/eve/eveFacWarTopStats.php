@@ -232,4 +232,4 @@ class eveFacWarTopStats extends AEve {
     return TRUE;
   }// function prepareTables
 }
-?>
+

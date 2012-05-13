@@ -88,4 +88,4 @@ function getSettingsFromIniFile($file = NULL, $section = NULL) {
   };
   return $settings;
 }// function getSettingsFromIniFile
-?>
+

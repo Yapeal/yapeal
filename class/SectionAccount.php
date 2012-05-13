@@ -305,4 +305,4 @@ class SectionAccount extends ASection {
     return TRUE;
   }// function requiredFilter
 }
-?>
+

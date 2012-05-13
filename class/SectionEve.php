@@ -136,4 +136,4 @@ class SectionEve extends ASection {
     }// else $apiCount == $apiSuccess ...
   }// function pullXML
 }
-?>
+

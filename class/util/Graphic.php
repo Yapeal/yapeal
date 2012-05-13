@@ -206,4 +206,4 @@ class Graphic extends ALimitedObject implements IGetBy {
     return $this->qb->store();
   }// function store
 }
-?>
+

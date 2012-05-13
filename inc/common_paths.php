@@ -116,4 +116,4 @@ if (!defined('YAPEAL_LOG')) {
    */
   define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
 };
-?>
+

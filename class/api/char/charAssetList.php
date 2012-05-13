@@ -226,4 +226,4 @@ class charAssetList extends AChar {
     return TRUE;
   }// function prepareTables
 }
-?>
+

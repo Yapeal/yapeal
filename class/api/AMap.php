@@ -156,4 +156,4 @@ abstract class AMap extends AApiRequest {
     return TRUE;
   }// function prepareTables
 }
-?>
+

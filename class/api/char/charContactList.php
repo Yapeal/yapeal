@@ -186,4 +186,4 @@ class charContactList extends AChar {
     return TRUE;
   }// function prepareTables
 }
-?>
+

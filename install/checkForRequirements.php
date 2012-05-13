@@ -239,4 +239,4 @@ if (!in_array($iniVars['registered_mode'], $required)) {
 $mess = 'All tests passed!!!' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-?>
+

@@ -533,4 +533,4 @@ class YapealQueryBuilder implements Countable {
    */
   const MAX_UPSERT_SIZE = 990000;
 }
-?>
+

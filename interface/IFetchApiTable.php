@@ -64,4 +64,4 @@ interface IFetchApiTable {
    */
   public function apiFetch();
 }
-?>
+

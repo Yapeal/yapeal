@@ -81,4 +81,4 @@ class corpMemberSecurityLog extends ACorp {
     return TRUE;
   }// function parserAPI
 }
-?>
+

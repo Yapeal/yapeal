@@ -93,7 +93,7 @@ class YapealNetworkConnection {
    * @param array $postList A list of data that will be passed to the API server.
    * example: array(UserID => '123', apiKey => 'abc123', ...)
    *
-   * @return mixed Returns XML data from API or FALSE for any connection error.
+   * @return string|false Returns XML data from API or FALSE for any connection error.
    */
   public function retrieveXml($url, $postList) {
     $result = $this->con->post($url, $postList);
@@ -107,4 +107,4 @@ class YapealNetworkConnection {
     return $result;
   }// function retrieveXml
 }
-?>
+

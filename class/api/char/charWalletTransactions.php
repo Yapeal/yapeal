@@ -239,4 +239,4 @@ class charWalletTransactions extends AChar {
     return FALSE;
   }// function parserAPI
 }
-?>
+

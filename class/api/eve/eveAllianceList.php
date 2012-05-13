@@ -198,4 +198,4 @@ class eveAllianceList extends AEve {
     return TRUE;
   }// function prepareTables
 }
-?>
+

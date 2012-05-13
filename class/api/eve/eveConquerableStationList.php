@@ -70,4 +70,4 @@ class eveConquerableStationList extends AEve {
     parent::__construct($params);
   }// function __construct
 }
-?>
+

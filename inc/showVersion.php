@@ -61,4 +61,4 @@ function showVersion($file) {
   $mess .= 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
   fwrite(STDOUT, $mess);
 }// function showVersion
-?>
+

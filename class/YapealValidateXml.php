@@ -227,4 +227,4 @@ class YapealValidateXml {
     return TRUE;
   }// function validateXML
 }
-?>
+

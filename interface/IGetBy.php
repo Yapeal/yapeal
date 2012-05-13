@@ -88,4 +88,4 @@ interface IGetBy {
    */
   public function getItemByName($name);
 }
-?>
+

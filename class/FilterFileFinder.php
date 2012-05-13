@@ -234,4 +234,4 @@ class FilterFileFinder extends FilterIterator {
   const CONTAINS = 'contains';
   const SUFFIX = 'suffix';
 }
-?>
+

@@ -185,4 +185,4 @@ try {
 $mess = 'All database tables have been installed or updated as needed.' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-?>
+

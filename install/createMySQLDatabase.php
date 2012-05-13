@@ -121,4 +121,4 @@ if ($mysqli->query($sql) === FALSE) {
 $mess = 'Database ' . $options['database'] . ' created successfully!' . PHP_EOL;
 fwrite(STDOUT, $mess);
 exit(0);
-?>
+

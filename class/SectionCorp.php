@@ -360,4 +360,4 @@ class SectionCorp extends ASection {
     return TRUE;
   }// function requiredFilter
 }
-?>
+

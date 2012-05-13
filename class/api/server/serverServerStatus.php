@@ -123,4 +123,4 @@ class serverServerStatus extends AServer {
     return FALSE;
   }// function parserAPI
 }
-?>
+

@@ -165,4 +165,4 @@ class Singleton {
     self::$instance = array();
   }// function releaseAll
 }
-?>
+

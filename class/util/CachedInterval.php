@@ -167,4 +167,4 @@ class CachedInterval {
     };// if empty $self::$intervalList ...
   }// function resetAll
 }
-?>
+

@@ -469,4 +469,4 @@ class corpStarbaseDetail extends ACorp {
     return TRUE;
   }// function prepareTables
 }
-?>
+

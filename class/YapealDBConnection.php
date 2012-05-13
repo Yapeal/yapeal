@@ -57,7 +57,7 @@ class YapealDBConnection {
    *
    * @throws LogicException Throws LogicException if new is used.
    */
-  private function __construct() {
+  final public function __construct() {
     $mess = 'Illegally attempted to make instance of ' . __CLASS__;
     throw new LogicException($mess);
   }// function __construct
@@ -149,4 +149,4 @@ class YapealDBConnection {
     };
   }// function setDatabaseSectionConstants
 }
-?>
+

@@ -73,7 +73,7 @@ abstract class AMap extends AApiRequest {
    * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
    * be available as well as anything included in $params for __construct().
    *
-   * @return string Returns the URL for proxy as string if found else it will
+   * @return mixed Returns the URL for proxy as string if found else it will
    * return the default string needed to use API server directly.
    */
   protected function getProxy() {

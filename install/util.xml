@@ -205,6 +205,7 @@
     </index>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
+  <!-- Some required manual overrides to fields -->
   <sql prefixmethod="MANUAL">
     <query platform="mysql">ALTER TABLE `%%PutilGraphic` MODIFY `graphic` MEDIUMBLOB DEFAULT NULL</query>
   </sql>
@@ -420,6 +421,7 @@
       ('server', 'ServerStatus', 180)
     </query>
   </sql>
+  <!-- Test key query -->
   <sql prefixmethod="MANUAL">
     <query platform="mysql">INSERT INTO `%%PutilRegisteredKey` (`activeAPIMask`,`isActive`,`keyID`,`vCode`)
       VALUES(8388608,1,1156,'abc123')

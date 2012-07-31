@@ -79,14 +79,14 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="`characterName`" type="C" size="100">
+    <field name="`characterName`" type="C" size="255">
       <NOTNULL/>
     </field>
     <field name="`corporationID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
     </field>
-    <field name="`corporationName`" type="C" size="150">
+    <field name="`corporationName`" type="C" size="255">
       <NOTNULL/>
     </field>
     <index name="`accountCharacters1`">

@@ -151,7 +151,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="kills" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -164,7 +164,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="kills" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -177,7 +177,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="kills" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -190,7 +190,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="victoryPoints" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -203,7 +203,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="victoryPoints" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>
@@ -216,7 +216,7 @@
       <KEY/>
       <UNSIGNED/>
     </field>
-    <field name="corporationName" type="C" size="32"/>
+    <field name="corporationName" type="C" size="255"/>
     <field name="victoryPoints" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>

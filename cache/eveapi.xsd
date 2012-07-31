@@ -35,6 +35,11 @@
       <xs:minInclusive value="0" fixed="true"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="eveIDNegative">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="-1" fixed="true"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:simpleType name="eveISK">
     <xs:restriction base="xs:decimal">
       <xs:totalDigits value="17" fixed="true"/>

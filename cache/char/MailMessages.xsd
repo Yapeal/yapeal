@@ -50,5 +50,6 @@
     <xs:attribute name="toCorpOrAllianceID" use="required" type="xs:string"/>
     <xs:attribute name="toCharacterIDs" use="required" type="xs:string"/>
     <xs:attribute name="toListID" use="optional" type="xs:string"/>
+    <xs:attribute name="senderTypeID" use="required" type="eveID"/>
   </xs:complexType>
 </xs:schema>

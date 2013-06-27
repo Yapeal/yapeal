@@ -50,6 +50,7 @@
     <xs:attribute name="eventTitle" use="required" type="xs:string"/>
     <xs:attribute name="importance" use="required" type="eveBoolean"/>
     <xs:attribute name="ownerID" use="required" type="eveID"/>
+    <xs:attribute name="ownerTypeID" use="required" type="eveID"/>
     <xs:attribute name="ownerName" use="required" type="xs:string"/>
     <xs:attribute name="response" use="required">
       <xs:simpleType>

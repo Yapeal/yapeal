@@ -61,6 +61,9 @@
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`contactTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`contactName`" type="C" size="255">
       <NOTNULL/>
     </field>
@@ -366,6 +369,9 @@
     </field>
     <field name="`contactID`" type="I8" size="20">
       <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactTypeID`" type="I8" size="20">
       <UNSIGNED/>
     </field>
     <field name="`contactName`" type="C" size="255">
@@ -1207,6 +1213,12 @@
       <NOTNULL/>
       <UNSIGNED/>
     </field>
+    <field name="`owner1TypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`owner2TypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="corpWalletTransactions">
@@ -1227,6 +1239,9 @@
       <UNSIGNED/>
     </field>
     <field name="`clientName`" type="C" size="255"/>
+    <field name="`clientTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`journalTransactionID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>

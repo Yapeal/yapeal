@@ -61,6 +61,9 @@
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`contactTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`contactName`" type="C" size="255">
       <NOTNULL/>
     </field>
@@ -304,6 +307,9 @@
       <KEY/>
       <UNSIGNED/>
     </field>
+    <field name="`contactTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`contactName`" type="C" size="255">
       <NOTNULL/>
     </field>
@@ -347,6 +353,9 @@
     </field>
     <field name="`contactID`" type="I8" size="20">
       <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`contactTypeID`" type="I8" size="20">
       <UNSIGNED/>
     </field>
     <field name="`contactName`" type="C" size="255">
@@ -804,6 +813,9 @@
       <UNSIGNED/>
     </field>
     <field name="`toListID`" type="X"/>
+    <field name="`senderTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charMarketOrders">
@@ -1120,6 +1132,7 @@
     <xs:attribute name="eventTitle" use="required" type="xs:string"/>
     <xs:attribute name="importance" use="required" type="eveBoolean"/>
     <xs:attribute name="ownerID" use="required" type="eveID"/>
+    <xs:attribute name="ownerTypeID" use="required" type="eveID"/>
     <xs:attribute name="ownerName" use="required" type="xs:string"/>
     <field name="`characterID`" type="I8" size="20">
       <KEY/>
@@ -1220,6 +1233,12 @@
       <DEFAULT value="0"/>
       <UNSIGNED/>
     </field>
+    <field name="`owner1TypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
+    <field name="`owner2TypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
   </table>
   <table name="charWalletTransactions">
@@ -1236,6 +1255,9 @@
       <UNSIGNED/>
     </field>
     <field name="`clientName`" type="C" size="255"/>
+    <field name="`clientTypeID`" type="I8" size="20">
+      <UNSIGNED/>
+    </field>
     <field name="`journalTransactionID`" type="I8" size="20">
       <NOTNULL/>
       <UNSIGNED/>

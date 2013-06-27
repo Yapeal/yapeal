@@ -45,6 +45,7 @@
   <xs:complexType name="rowType">
     <xs:attribute name="clientID" use="required" type="eveID"/>
     <xs:attribute name="clientName" use="required" type="xs:string"/>
+    <xs:attribute name="clientTypeID" use="required" type="eveID"/>
     <xs:attribute name="journalTransactionID" use="required" type="eveID"/>
     <xs:attribute name="price" use="required" type="xs:decimal"/>
     <xs:attribute name="quantity" use="required" type="xs:unsignedLong"/>

@@ -55,5 +55,7 @@
     <xs:attribute name="reason" use="required" type="xs:string"/>
     <xs:attribute name="refID" use="required" type="eveID"/>
     <xs:attribute name="refTypeID" use="required" type="xs:unsignedShort"/>
+    <xs:attribute name="owner1TypeID" use="required" type="eveID"/>
+    <xs:attribute name="owner2TypeID" use="required" type="eveID"/>
   </xs:complexType>
 </xs:schema>

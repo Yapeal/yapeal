@@ -63,6 +63,7 @@
   </xs:element>
   <xs:complexType name="rowType">
     <xs:attribute name="contactID" use="required" type="eveID"/>
+    <xs:attribute name="contactTypeID" use="required" type="eveID"/>
     <xs:attribute name="contactName" use="required" type="xs:string"/>
     <xs:attribute name="standing" use="required" type="xs:decimal"/>
   </xs:complexType>

@@ -15,3 +15,4 @@ export/
 upload/
 docs/
 .idea/
+config/yapeal.ini

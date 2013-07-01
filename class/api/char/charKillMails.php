@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains killLog class.
+ * Contains killmails class.
  *
  * PHP version 5
  *
@@ -49,12 +49,12 @@ if (count(get_included_files()) < 2) {
   }
 };
 /**
- * Class used to fetch and store corp KillLog API.
+ * Class used to fetch and store char KillMails API.
  *
  * @package Yapeal
- * @subpackage Api_corp
+ * @subpackage Api_char
  */
-class corpKillLog extends ACorp {
+class charKillMails extends AChar {
   /**
    * @var YapealQueryBuilder QueryBuilder instance for attackers table.
    */
@@ -62,7 +62,7 @@ class corpKillLog extends ACorp {
   /**
    * @var string Holds the refID from each row in turn to use when walking.
    */
-  private $beforeID;
+  private $fromID;
   /**
    * @var string Holds the date from each row in turn to use when walking.
    */
@@ -108,8 +108,8 @@ class corpKillLog extends ACorp {
     // This counter is used to insure do ... while can't become infinite loop.
     $counter = 1000;
     $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
-    $this->beforeID = 0;
-    $rowCount = 100;
+    $this->fromID = 0;
+    $rowCount = 25;
     // Need to add extra stuff to normal parameters to make walking work.
     $apiParams = $this->params;
     try {
@@ -124,7 +124,8 @@ class corpKillLog extends ACorp {
          */
         $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
         // First get a new cache instance.
-        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID,
+          $apiParams);
         // See if there is a valid cached copy of the API XML.
         $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.
@@ -132,8 +133,8 @@ class corpKillLog extends ACorp {
           $proxy = $this->getProxy();
           $con = new YapealNetworkConnection();
           $result = $con->retrieveXml($proxy, $apiParams);
-          // FALSE means there was an error and it has already been report so just
-          // return to caller.
+          // FALSE means there was an error and it has already been report so
+          // just return to caller.
           if (FALSE === $result) {
             return FALSE;
           };
@@ -162,7 +163,7 @@ class corpKillLog extends ACorp {
           break;
         };
         // This tells API server where to start from when walking.
-        $apiParams['beforeKillID'] = $this->beforeID;
+        $apiParams['fromID'] = $this->fromID;
       } while ($counter--);
     }
     catch (YapealApiErrorException $e) {
@@ -178,11 +179,7 @@ class corpKillLog extends ACorp {
     return $result;
   }// function apiStore
   /**
-   * Simple <rowset> per API parser for XML.
-   *
-   * Most common API style is a simple <rowset>. This implementation allows most
-   * API classes to be empty except for a constructor which sets $this->api and
-   * calls their parent constructor.
+   * Full implementation of multiple tables and nested sets from XML.
    *
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
@@ -215,7 +212,7 @@ class corpKillLog extends ACorp {
                 // killID to use in walking.
                 if (!empty($date) && $date < $this->date) {
                   $this->date = $date;
-                  $this->beforeID = $this->xr->getAttribute('killID');
+                  $this->fromID = $this->xr->getAttribute('killID');
                 };// if $date ...
                 $row = array();
                 // Walk through attributes and add them to row.
@@ -225,7 +222,7 @@ class corpKillLog extends ACorp {
                 $qb->addRow($row);
                 break;
               case 'victim':
-                $row = array('killID' => $this->beforeID);
+                $row = array('killID' => $this->fromID);
                // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
                   // Save the ship type to use for root node of items table.
@@ -249,9 +246,9 @@ class corpKillLog extends ACorp {
                   return FALSE;
                 };
                 if ($subTable == 'items') {
-                  $inherit = array('killID' => $this->beforeID, 'index' => 2,
+                  $inherit = array('killID' => $this->fromID, 'index' => 2,
                     'level' => 1);
-                  $row = array('flag' => 0, 'killID' => $this->beforeID,
+                  $row = array('flag' => 0, 'killID' => $this->fromID,
                     'lft' => 0, 'lvl' => 0, 'qtyDestroyed' => 1,
                     'qtyDropped' => 0, 'typeID' => $typeID
                   );
@@ -392,7 +389,7 @@ class corpKillLog extends ACorp {
         case XMLReader::ELEMENT:
           switch ($this->xr->localName) {
             case 'row':
-              $row = array('killID' => $this->beforeID);
+              $row = array('killID' => $this->fromID);
               // Walk through attributes and add them to row.
               while ($this->xr->moveToNextAttribute()) {
                 $row[$this->xr->name] = $this->xr->value;

@@ -405,6 +405,11 @@
       <NOTNULL/>
     </field>
     <field name="`description`" type="X"/>
+    <field name="`factionID`" type="I8" size="20">
+      <NOTNULL/>
+      <DEFAULT value="0"/>
+      <UNSIGNED/>
+    </field>
     <field name="`memberCount`" type="I2" size="5">
       <NOTNULL/>
       <UNSIGNED/>

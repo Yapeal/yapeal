@@ -28,6 +28,7 @@
                 <xs:element name="description" type="xs:string"/>
                 <xs:element name="url" type="xs:anyURI"/>
                 <xs:element name="allianceID" type="eveID"/>
+                <xs:element name="factionID" type="eveID"/>
                 <xs:element minOccurs="0" name="allianceName" type="xs:string"/>
                 <xs:element name="taxRate" type="xs:decimal"/>
                 <xs:element name="memberCount" type="xs:unsignedLong"/>

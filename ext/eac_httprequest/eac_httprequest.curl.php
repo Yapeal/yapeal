@@ -150,7 +150,7 @@ class curlRequest {
 		$this->options['CURLOPT_RETURNTRANSFER'] = 1;// return results as string
 		$this->options['CURLOPT_BINARYTRANSFER'] = 0;// no binary transfer
         $this->options['CURLOPT_SSL_VERIFYPEER'] = 1; // verify ssl certs
-        $this->options['CURLOPT_SSL_VERIFYHOST'] = 1; // verify ssl host
+        $this->options['CURLOPT_SSL_VERIFYHOST'] = 2; // verify ssl host
         $this->options['CURLOPT_CAINFO'] =  YAPEAL_CONFIG . 'eveonline.crt';
         $this->options['CURLOPT_COOKIEJAR'] = YAPEAL_CACHE . 'curl_cookies.txt';
 		$this->options['CURLOPT_REFERER'] = 'http://code.google.com/p/yapeal/';

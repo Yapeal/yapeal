@@ -1,0 +1,41 @@
+{
+    "name":        "yapeal/yapeal",
+    "description": "Yet Another Php Eve Api Library",
+    "license":     "LGPL-3.0+",
+    "authors":     [
+        {
+            "name":  "Michael Cummings",
+            "email": "dragonaire@users.sourceforge.net",
+            "role":  "Developer"
+        },
+        {
+            "name":  "Somerset Mahm",
+            "email": "somersetmahm@users.sourceforge.net",
+            "role":  "Developer"
+        }
+    ],
+    "support":     {
+        "issues": "https://sourceforge.net/p/yapeal/tickets/",
+        "source": "https://sourceforge.net/projects/yapeal/files/",
+        "wiki":   "https://sourceforge.net/p/yapeal/wiki/Home/"
+    },
+    "require":     {
+        "ext-curl":       "*",
+        "ext-date":       "*",
+        "ext-hash":       "*",
+        "ext-mysql":      "*",
+        "ext-mysqli":     "*",
+        "ext-openssl":    "*",
+        "ext-Reflection": "*",
+        "ext-SimpleXML":  "*",
+        "ext-SPL":        "*",
+        "ext-xmlreader":  "*",
+        "lib-curl":       ">=7.15.0",
+        "lib-openssl":    ">=0.9.8",
+        "php":            ">=5.3.0"
+    },
+    "require-dev": {
+        "ext-xsl":                     "*",
+        "phpdocumentor/phpdocumentor": "dev-develop"
+    }
+}

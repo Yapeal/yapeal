@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\AChar;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains AssetList class.
  *
@@ -55,7 +58,7 @@ if (count(get_included_files()) < 2) {
  */
 class charAssetList extends AChar {
   /**
-   * @var YapealQueryBuilder Holds queryBuilder instance.
+   * @var QueryBuilder Holds queryBuilder instance.
    */
   private $qb;
   /**
@@ -90,7 +93,7 @@ class charAssetList extends AChar {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $this->qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->qb->useUpsert(FALSE);
     // Set any column defaults needed.
@@ -112,8 +115,8 @@ class charAssetList extends AChar {
       // Insert root node and any leftovers.
       $this->qb->store();
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;
@@ -199,7 +202,7 @@ class charAssetList extends AChar {
       };// switch $this->xr->nodeType
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return $inherit['index'];
   }// function nestedSet
   /**
@@ -212,15 +215,15 @@ class charAssetList extends AChar {
    */
   protected function prepareTables() {
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
       $sql = 'delete from `';
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
       $sql .= ' where `ownerID`=' . $this->ownerID;
       $con->Execute($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

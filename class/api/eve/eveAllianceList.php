@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\AEve;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains AllianceList class.
  *
@@ -55,7 +58,7 @@ if (count(get_included_files()) < 2) {
  */
 class eveAllianceList extends AEve {
   /**
-   * @var YapealQueryBuilder Query instance for corporation rows to be added to table.
+   * @var QueryBuilder Query instance for corporation rows to be added to table.
    */
   private $corporations;
   /**
@@ -81,11 +84,11 @@ class eveAllianceList extends AEve {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     // Get a new query instance.
-    $this->corporations = new YapealQueryBuilder(
+    $this->corporations = new QueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations', YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->corporations->useUpsert(FALSE);
@@ -130,12 +133,12 @@ class eveAllianceList extends AEve {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -168,7 +171,7 @@ class eveAllianceList extends AEve {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -181,7 +184,7 @@ class eveAllianceList extends AEve {
    */
   protected function prepareTables() {
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
       $sql = 'truncate table `';
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
@@ -191,8 +194,8 @@ class eveAllianceList extends AEve {
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations' . '`';
       $con->Execute($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

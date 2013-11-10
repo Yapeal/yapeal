@@ -1,4 +1,9 @@
 <?php
+use Yapeal\Api\ACorp;
+use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\YapealNetworkConnection;
+use Yapeal\YapealApiCache;
+
 /**
  * Contains OutpostServiceDetail class.
  *
@@ -136,8 +141,8 @@ class corpOutpostServiceDetail extends ACorp {
         $ret = FALSE;
         continue;
       }
-      catch (ADODB_Exception $e) {
-        Logger::getLogger('yapeal')->warn($e);
+      catch (\ADODB_Exception $e) {
+        \Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -152,15 +157,15 @@ class corpOutpostServiceDetail extends ACorp {
    */
   protected function outpostList() {
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
       $sql = 'select `stationID`';
       $sql .= ' from ';
       $sql .= '`' . YAPEAL_TABLE_PREFIX . $this->section . 'OutpostList' . '`';
       $sql .= ' where `ownerID`=' . $this->ownerID;
       $list = $con->GetAll($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     if (count($list) == 0) {
@@ -183,15 +188,15 @@ class corpOutpostServiceDetail extends ACorp {
    */
   protected function prepareTables() {
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
       $sql = 'delete from `';
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
       $sql .= ' where `ownerID`=' . $this->ownerID;
       $con->Execute($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

@@ -1,4 +1,6 @@
 <?php
+use Yapeal\Api\AEve;
+
 /**
  * Contains CharacterInfo class.
  *

@@ -1,4 +1,10 @@
 <?php
+use Yapeal\Api\AChar;
+use Yapeal\Database\QueryBuilder;
+use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\YapealNetworkConnection;
+use Yapeal\YapealApiCache;
+
 /**
  * Contains MailBodies class.
  *
@@ -124,10 +130,10 @@ class charMailBodies extends AChar {
       $this->handleApiError($e);
       return FALSE;
     }
-    catch (ADODB_Exception $e) {
+    catch (\ADODB_Exception $e) {
       // Catch any uncaught ADOdb exceptions here.
       $mess = 'Uncaught ADOdb exception' . PHP_EOL;
-      Logger::getLogger('yapeal')->warn($mess);
+      \Logger::getLogger('yapeal')->warn($mess);
       return FALSE;
     }
   }// function apiStore
@@ -137,7 +143,7 @@ class charMailBodies extends AChar {
    * @return mixed Returns a list of messages IDs or FALSE on error.
    */
   protected function getIds() {
-    $con = YapealDBConnection::connect(YAPEAL_DSN);
+    $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
     $sql = 'select mm.`messageID`';
     $sql .= ' from ';
     $sql .= '`' . YAPEAL_TABLE_PREFIX . 'charMailMessages` as mm';
@@ -149,8 +155,8 @@ class charMailBodies extends AChar {
     try {
       $result = $con->getCol($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     if (count($result) == 0) {
@@ -172,7 +178,7 @@ class charMailBodies extends AChar {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $qb->setDefault('ownerID', $this->ownerID);
     try {
@@ -201,12 +207,12 @@ class charMailBodies extends AChar {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\AChar;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains CharacterSheet class.
  *
@@ -78,7 +81,7 @@ class charCharacterSheet  extends AChar {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('allianceName', '');
     $row = array();
     try {
@@ -122,7 +125,7 @@ class charCharacterSheet  extends AChar {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  Logger::getLogger('yapeal')->warn($mess);
+                  \Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->$subTable();
@@ -136,7 +139,7 @@ class charCharacterSheet  extends AChar {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  Logger::getLogger('yapeal')->warn($mess);
+                  \Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 if ($subTable == 'skills') {
@@ -162,12 +165,12 @@ class charCharacterSheet  extends AChar {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -178,7 +181,7 @@ class charCharacterSheet  extends AChar {
   protected function attributes() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $row = array('ownerID' => $this->ownerID);
@@ -207,7 +210,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function attributes
   /**
@@ -218,7 +221,7 @@ class charCharacterSheet  extends AChar {
   protected function attributeEnhancers() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $row = array();
@@ -261,7 +264,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function attributeEnhancers
   /**
@@ -274,7 +277,7 @@ class charCharacterSheet  extends AChar {
   protected function rowset($table) {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $qb->setDefault('ownerID', $this->ownerID);
@@ -305,7 +308,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -316,7 +319,7 @@ class charCharacterSheet  extends AChar {
   protected function skills() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $defaults = array('level' => 0, 'ownerID' => $this->ownerID,
@@ -350,7 +353,7 @@ class charCharacterSheet  extends AChar {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function skills
   /**
@@ -368,15 +371,15 @@ class charCharacterSheet  extends AChar {
     );
     foreach ($tables as $table) {
       try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
         // Empty out old data then upsert (insert) new.
         $sql = 'delete from `';
         $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
         $sql .= ' where `ownerID`=' . $this->ownerID;
         $con->Execute($sql);
       }
-      catch (ADODB_Exception $e) {
-        Logger::getLogger('yapeal')->warn($e);
+      catch (\ADODB_Exception $e) {
+        \Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

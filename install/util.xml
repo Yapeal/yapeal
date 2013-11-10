@@ -75,7 +75,7 @@
     <field name="`cachedUntil`" type="T">
       <NOTNULL/>
     </field>
-    <field name="`section`" type="C" size="8">
+    <field name="`section`" type="C" size="12">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>

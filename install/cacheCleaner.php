@@ -1,5 +1,7 @@
 #!/usr/bin/php -Cq
 <?php
+use Yapeal\Autoload\FilterFileFinder;
+
 /**
  * Contains code used to delete old cached XML.
  *
@@ -193,8 +195,10 @@ function cleanDatabase(array $sections, $cacheLength, array $dbSettings,
   }
   $cacheLength = time() - $cacheLength * 86400;
   $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
-  // Get connection to DB.
-  $db = ADONewConnection($dsn);
+  /*
+   * @global \ADOConnection $db
+   */
+  $db = \ADONewConnection($dsn);
   foreach ($sections as $section) {
     $sql = 'delete from `' . $prefix . 'utilXmlCache`';
     $sql .= ' where `section`=' . $db->qstr($section);

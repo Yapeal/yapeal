@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\ACorp;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains corp ContainerLog class.
  *
@@ -82,7 +85,7 @@ class corpContainerLog extends ACorp {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $qb->setDefault('ownerID', $this->ownerID);
     $row = array();
@@ -125,12 +128,12 @@ class corpContainerLog extends ACorp {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\AChar;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains SkillInTraining class.
  *
@@ -77,7 +80,7 @@ class charSkillInTraining  extends AChar {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     $row = array('currentTQTime' => YAPEAL_START_TIME, 'offset' => 0,
       'ownerID' => $this->params['characterID'], 'skillInTraining' => 0,
       'trainingDestinationSP' => 0, 'trainingEndTime' => YAPEAL_START_TIME,
@@ -122,12 +125,12 @@ class charSkillInTraining  extends AChar {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

@@ -1,4 +1,6 @@
 <?php
+use Yapeal\Api\AChar;
+
 /**
  * Contains MailingLists class.
  *
@@ -79,15 +81,15 @@ class charMailingLists extends AChar {
    */
   protected function prepareTables() {
     try {
-      $con = YapealDBConnection::connect(YAPEAL_DSN);
+      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
       $sql = 'delete from `';
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
       $sql .= ' where `ownerID`=' . $this->ownerID;
       $con->Execute($sql);
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->warn($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;

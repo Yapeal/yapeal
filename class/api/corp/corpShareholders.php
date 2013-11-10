@@ -1,4 +1,6 @@
 <?php
+use Yapeal\Api\ACorp;
+
 /**
  * Contains Shareholders class.
  *

@@ -1,4 +1,6 @@
 <?php
+use Yapeal\Api\AChar;
+
 /**
  * Contains AccountBalance class.
  *

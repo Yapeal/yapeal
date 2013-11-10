@@ -1,4 +1,7 @@
 <?php
+use Yapeal\Api\AChar;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Contains Contracts class.
  *
@@ -78,12 +81,12 @@ class charContracts extends AChar {
    * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
    */
   protected function parserAPI() {
-    if (Logger::getLogger('yapeal')->isDebugEnabled()) {
-      Logger::getLogger('yapeal')->trace(__METHOD__);
+    if (\Logger::getLogger('yapeal')->isDebugEnabled()) {
+      \Logger::getLogger('yapeal')->trace(__METHOD__);
     };
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance with autoStore off.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $qb->setDefault('ownerID', $this->ownerID);
     try {
@@ -95,7 +98,7 @@ class charContracts extends AChar {
                 $row = array();
                 // Walk through attributes and add them to row.
                 while ($this->xr->moveToNextAttribute()) {
-                  // Allow YapealQueryBuilder to handle NULL columns.
+                  // Allow QueryBuilder to handle NULL columns.
                   if (($this->xr->name == 'dateAccepted'
                     || $this->xr->name == 'dateCompleted')
                     && $this->xr->value == '') {
@@ -119,12 +122,12 @@ class charContracts extends AChar {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

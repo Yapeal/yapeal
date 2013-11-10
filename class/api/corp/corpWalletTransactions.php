@@ -1,4 +1,10 @@
 <?php
+use Yapeal\Api\ACorp;
+use Yapeal\Database\QueryBuilder;
+use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\YapealNetworkConnection;
+use Yapeal\YapealApiCache;
+
 /**
  * Contains WalletTransactions class.
  *
@@ -187,8 +193,8 @@ class corpWalletTransactions extends ACorp {
         // Break out of foreach as once one wallet returns an error they all do.
         break;
       }
-      catch (ADODB_Exception $e) {
-        Logger::getLogger('yapeal')->warn($e);
+      catch (\ADODB_Exception $e) {
+        \Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -206,7 +212,7 @@ class corpWalletTransactions extends ACorp {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $defaults = array('accountKey' => $this->account,
       'ownerID' => $this->ownerID
@@ -253,12 +259,12 @@ class corpWalletTransactions extends ACorp {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (ADODB_Exception $e) {
-      Logger::getLogger('yapeal')->error($e);
+    catch (\ADODB_Exception $e) {
+      \Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    Logger::getLogger('yapeal')->warn($mess);
+    \Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

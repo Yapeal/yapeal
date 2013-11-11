@@ -117,8 +117,8 @@ class AccessMask
             $apis = array_values($apis);
         } else {
             $mess = 'Must use either string or array for $apis';
-            throw new InvalidArgumentException($mess, 1);
-        };
+            throw new InvalidArgumentException($mess);
+        }
         $acnt = count($apis);
         $cnt = 0;
         $mask = 0;
@@ -129,9 +129,9 @@ class AccessMask
                     if ($row['api'] == $api) {
                         $mask |= $row['mask'];
                         ++$cnt;
-                    };
-                }; // foreach self::$maskList ...
-            }; // foreach $apis ...
+                    }
+                }
+            }
             // Use section to limit API search.
         } else {
             foreach ($apis as $api) {
@@ -139,16 +139,16 @@ class AccessMask
                     if ($row['section'] == $section && $row['api'] == $api) {
                         $mask |= $row['mask'];
                         ++$cnt;
-                    };
-                }; // foreach self::$maskList ...
-            }; // foreach $apis ...
-        }; // else empty($section) ...
+                    }
+                }
+            }
+        }
         // No API match found.
         if ($cnt == 0) {
             $mess = 'All of the APIs ' . implode(', ', $apis) . ' are unknown';
             if (!empty($section)) {
                 $mess .= ' in section ' . $section;
-            };
+            }
             throw new DomainException($mess);
             // Some APIs unknown.
         } elseif ($cnt < $acnt) {
@@ -210,9 +210,9 @@ class AccessMask
             if ($row['section'] == $section) {
                 if (($row['status'] & $status) > 0) {
                     $mask |= $row['mask'];
-                };
-            };
-        }; // foreach self::$maskList ...
+                }
+            }
+        }
         return $mask;
     }
     /**
@@ -233,14 +233,14 @@ class AccessMask
             $mask = array_reduce($mask, array($this, 'reduceOR'), 0);
         } elseif (!is_int($mask)) {
             $mess = 'Must use either integer or array of integers for $mask';
-            throw new InvalidArgumentException($mess, 6);
-        };
+            throw new InvalidArgumentException($mess);
+        }
         $apis = array();
         foreach (self::$maskList as $row) {
             if ($row['section'] == $section && ($mask & $row['mask']) > 0) {
                 $apis[] = $row['api'];
-            }; // if $mask ...
-        }; // foreach self::$maskList ...
+            }
+        }
         return $apis;
     }
     /**

@@ -28,7 +28,7 @@
  */
 namespace Yapeal\Section;
 
-use Logger;
+use Psr\Log\LogLevel;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Util\CachedUntil;
 
@@ -47,7 +47,6 @@ class Account extends ASection
         $this->section = strtolower(basename(__CLASS__));
         parent::__construct();
     }
-    // function __construct
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
      *
@@ -61,40 +60,10 @@ class Account extends ASection
         $apiCount = 0;
         $apiSuccess = 0;
         try {
-            $con = DatabaseConnection::connect(YAPEAL_DSN);
-            $sql = $this->getSQLQuery();
-            /*
-             * @global \ADORecordSet[] $result
-             */
-            $result = $con->GetAll($sql);
-            if (count($result) == 0) {
-                if (Logger::getLogger('yapeal')
-                    ->isInfoEnabled()
-                ) {
-                    $mess = 'No keys for account section';
-                    Logger::getLogger('yapeal')
-                        ->info($mess);
-                };
+            $keyList = $this->getRandomOrderedKeyList();
+            if ($keyList === false) {
                 return false;
-            }; // if empty $result ...
-            // Build name of filter based on mode.
-            $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
-            $keyList = array_filter($result, $filter);
-            if (empty($keyList)) {
-                if (Logger::getLogger('yapeal')
-                    ->isInfoEnabled()
-                ) {
-                    $mess = 'No active keys for account section';
-                    Logger::getLogger('yapeal')
-                        ->info($mess);
-                };
-                return false;
-            };
-            // Randomize order so no one key can starve the rest in case of
-            // errors, etc.
-            if (count($keyList) > 1) {
-                shuffle($keyList);
-            };
+            }
             // Ok now that we have a list of keys we can check which APIs need updated.
             foreach ($keyList as $ky) {
                 // Skip keys with no APIs.
@@ -104,8 +73,7 @@ class Account extends ASection
                 $apis = $this->am->maskToAPIs($ky['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
-                    Logger::getLogger('yapeal')
-                        ->warn($mess);
+                    $this->logger->log(LogLevel::WARNING, $mess);
                     continue;
                 };
                 // Randomize order in which APIs are tried if there is a list.
@@ -114,10 +82,12 @@ class Account extends ASection
                 };
                 foreach ($apis as $api) {
                     // If the cache for this API has expired try to get update.
-                    if (CachedUntil::cacheExpired(
-                            $api,
-                            $ky['keyID']
-                        ) === true
+                    if (CachedUntil::isExpired(
+                        $api,
+                        $ky['keyID'],
+                        null,
+                        $this->logger
+                    )
                     ) {
                         ++$apiCount;
                         $class = $this->section . $api;
@@ -130,7 +100,7 @@ class Account extends ASection
                         $parameters = '';
                         foreach ($params as $k => $v) {
                             $parameters .= $k . '=' . $v;
-                        };
+                        }
                         $hash = hash('sha1', $class . $parameters);
                         // Use lock to keep from wasting time trying to do API that another
                         // Yapeal is already working on.
@@ -139,18 +109,11 @@ class Account extends ASection
                             $sql =
                                 'select get_lock(' . $con->qstr($hash) . ',5)';
                             if ($con->GetOne($sql) != 1) {
-                                if (Logger::getLogger('yapeal')
-                                    ->isInfoEnabled()
-                                ) {
-                                    $mess =
-                                        'Failed to get lock for '
-                                        . $class
-                                        . $hash;
-                                    Logger::getLogger('yapeal')
-                                        ->info($mess);
-                                };
+                                $mess =
+                                    'Failed to get lock for ' . $class . $hash;
+                                $this->logger->log(LogLevel::ERROR, $mess);
                                 continue;
-                            }; // if $con->GetOne($sql) ...
+                            }
                         } catch (\ADODB_Exception $e) {
                             continue;
                         }
@@ -160,26 +123,20 @@ class Account extends ASection
                         $instance = new $class($params);
                         if ($instance->apiStore()) {
                             ++$apiSuccess;
-                        };
+                        }
                         $instance = null;
-                    }; // if CachedUntil::cacheExpired...
+                    }
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
-                        if (Logger::getLogger('yapeal')
-                            ->isInfoEnabled()
-                        ) {
-                            $mess =
-                                'Yapeal has been working very hard and needs a break';
-                            Logger::getLogger('yapeal')
-                                ->info($mess);
-                        };
+                        $mess =
+                            'Yapeal has been working very hard and needs a break';
+                        $this->logger->log(LogLevel::INFO, $mess);
                         exit;
-                    }; // if YAPEAL_MAX_EXECUTE < time() ...
-                }; // foreach $apis ...
-            }; // foreach $userList
+                    }
+                }
+            }
         } catch (\ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                ->warn($e);
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
         }
         // Only truly successful if all APIs were fetched and stored.
         if ($apiCount == $apiSuccess) {
@@ -187,9 +144,40 @@ class Account extends ASection
         } else {
             return false;
         }
-        // else $apiCount == $apiSuccess ...
     }
-    // function pullXML
+    protected function getRandomOrderedKeyList()
+    {
+        $result = array();
+        try {
+            $con = DatabaseConnection::connect(YAPEAL_DSN);
+            $sql = $this->getSQLQuery();
+            /*
+             * @global \ADORecordSet[] $result
+             */
+            $result = $con->GetAll($sql);
+        } catch (\ADODB_Exception $e) {
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
+        }
+        if (count($result) == 0) {
+            $mess = 'No keys for account section';
+            $this->logger->log(LogLevel::INFO, $mess);
+            return false;
+        }
+        // Build name of filter based on mode.
+        $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
+        $keyList = array_filter($result, $filter);
+        if (empty($keyList)) {
+            $mess = 'No active keys for account section';
+            $this->logger->log(LogLevel::INFO, $mess);
+            return false;
+        }
+        // Randomize order so no one key can starve the rest in case of
+        // errors, etc.
+        if (count($keyList) > 1) {
+            shuffle($keyList);
+        }
+        return $keyList;
+    }
     /**
      * Used to get the correct SQL for each mode of YAPEAL_REGISTERED_MODE.
      *
@@ -207,7 +195,6 @@ class Account extends ASection
         $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
         return $sql;
     }
-    // function getSQLQuery
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'ignored'.
      *
@@ -248,7 +235,6 @@ class Account extends ASection
         };
         return true;
     }
-    // function ignoredFilter
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'optional'.
      *
@@ -284,7 +270,6 @@ class Account extends ASection
         };
         return true;
     }
-    // function optionalFilter
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'required'.
      *
@@ -300,8 +285,7 @@ class Account extends ASection
         if (is_null($row['RKActive'])) {
             $mess = 'IsActive can not be null in utilRegisteredKey when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                ->warn($mess);
+            $this->logger->log(LogLevel::WARNING, $mess);
             return false;
         };
         if ($row['RKActive'] == 0) {
@@ -310,8 +294,7 @@ class Account extends ASection
         if (is_null($row['RKMask'])) {
             $mess = 'activeAPIMask can not be null in utilRegisteredKey when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                ->warn($mess);
+            $this->logger->log(LogLevel::WARNING, $mess);
             return false;
         };
         $row['mask'] = $this->mask;
@@ -332,6 +315,4 @@ class Account extends ASection
         };
         return true;
     }
-    // function requiredFilter
 }
-

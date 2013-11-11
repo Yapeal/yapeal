@@ -28,63 +28,68 @@
  */
 namespace Yapeal\Util;
 
+use DomainException;
+use InvalidArgumentException;
+use LengthException;
+use LogicException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use RuntimeException;
+use Yapeal\Database\DatabaseConnection;
+use Yapeal\Database\QueryBuilder;
+
 /**
- * Wrapper class for utilCachedUntil table.
+ * CachedUntil class
  *
  * @property string $cachedUntil
  *
- * @package    Yapeal\Util
+ * @package Yapeal\Util
  */
 class CachedUntil extends ALimitedObject implements IGetBy
 {
     /**
-     * @var \ADODB_mysqli Holds an instance of the DB connection.
+     * @var \ADOConnection Holds an instance of the DB connection.
      */
     protected $con;
     /**
-     * Holds query builder object.
-     *
-     * @var \Yapeal\Database\QueryBuilder
+     * @var QueryBuilder Holds instance query builder.
      */
     protected $qb;
     /**
-     * @var string Holds the table name of the query is being built.
+     * @var string Holds the table name of the query that is being built.
      */
     protected $tableName;
     /**
-     * Set to TRUE if a database record exists.
-     *
-     * @var bool
+     * @var bool Set to TRUE if a database record exists.
      */
     private $recordExists;
     /**
      * Constructor
      *
-     * @param mixed $id     Id of cached time wanted.
-     * @param bool  $create When $create is set to FALSE will throw DomainException
-     *                      if $id doesn't exist in database.
+     * @param mixed               $id     Id of cached time wanted.
+     * @param bool                $create When $create is set to FALSE will throw
+     *                                    DomainException if $id does NOT exist in database.
+     * @param \ADOConnection|null $con    DB connection instance to use.
+     * @param QueryBuilder|null   $qb     QueryBuilder instance to use.
      *
-     * @throws \DomainException If $create is FALSE and a database record for $id
-     * does NOT exist a DomainException will be thrown.
-     * @throws \InvalidArgumentException If required parameters in $id aren't
+     * @throws DomainException If $create is FALSE and a database record for
+     * $id does NOT exist a DomainException will be thrown.
+     * @throws InvalidArgumentException If required parameters in $id are NOT
      * correct data types throws InvalidArgumentException.
-     * @throws \LengthException If $id is missing any require parameter throws a
+     * @throws LengthException If $id is missing any require parameter throws a
      * LengthException.
-     * @throws \RuntimeException Throws RuntimeException if fails to get database
+     * @throws RuntimeException Throws RuntimeException if fails to get database
      * connection.
      */
-    public function __construct($id = null, $create = true)
-    {
-        $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
-        try {
-            // Get a database connection.
-            $this->con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
-        } catch (\ADODB_Exception $e) {
-            $mess = 'Failed to get database connection in ' . __CLASS__;
-            throw new \RuntimeException($mess);
-        }
-        // Get a new query builder object.
-        $this->qb = new \Yapeal\Database\QueryBuilder($this->tableName, YAPEAL_DSN);
+    public function __construct(
+        $id = null,
+        $create = true,
+        \ADOConnection $con = null,
+        QueryBuilder $qb = null
+    ) {
+        $this->setTableName(YAPEAL_TABLE_PREFIX . 'util' . basename(__CLASS__));
+        $this->setCon($con);
+        $this->setQb($qb);
         // Get a list of column names and their ADOdb generic types.
         $this->colTypes = $this->qb->getColumnTypes();
         // Was $id set?
@@ -92,26 +97,29 @@ class CachedUntil extends ALimitedObject implements IGetBy
         // Check if $id is valid.
         foreach ($required as $k => $v) {
             if (!isset($id[$k])) {
-                $mess = 'Missing required parameter $id["' . $k . '"]';
-                $mess .= ' to constructor in ' . __CLASS__;
-                throw new \LengthException($mess);
-            }; // if !isset $id[$k] ...
+                $mess =
+                    'Missing required parameter $id["'
+                    . $k
+                    . '"] to constructor in '
+                    . __CLASS__;
+                throw new LengthException($mess);
+            }
             switch ($v) {
                 case 'C':
                 case 'X':
                     if (!is_string($id[$k])) {
                         $mess = '$id["' . $k . '"] must be a string';
-                        throw new \InvalidArgumentException($mess);
-                    }; // if !is_string $params[$k] ...
+                        throw new InvalidArgumentException($mess);
+                    }
                     break;
                 case 'I':
                     if (0 != strlen(str_replace(range(0, 9), '', $id[$k]))) {
                         $mess = '$id["' . $k . '"] must be an integer';
-                        throw new \InvalidArgumentException($mess);
-                    }; // if 0 == strlen(...
+                        throw new InvalidArgumentException($mess);
+                    }
                     break;
-            }; // switch $v ...
-        }; // foreach $required ...
+            }
+        }
         // Check if record already exists in database table.
         if (false === $this->getItemById($id)) {
             // If record doesn't exists should it be created?
@@ -119,67 +127,80 @@ class CachedUntil extends ALimitedObject implements IGetBy
                 // Add required columns from $id to object.
                 foreach ($required as $k => $v) {
                     $this->$k = $id[$k];
-                }; // foreach $required ...
+                }
             } else {
                 $mess = 'No cached time for API = ' . $id['api'];
                 $mess .= ' exists for ownerID = ' . $id['ownerID'];
-                throw new \DomainException($mess);
-            }; // else TRUE == $create ...
-        }; // if FALSE === $this->getItemById($id) ...
+                throw new DomainException($mess);
+            }
+        }
         // See if any columns beyond required were include and insure they get
         // set/updated as well.
         if (count($id) > count($required)) {
             foreach (array_diff_key($id, $required) as $k => $v) {
                 $this->$k = $v;
-            }; // foreach array_diff_key($id, $required) ...
-        }; // if count($id) ...
+            }
+        }
     }
-    // function __construct
     /**
-     * Used to tell if it is time to get the current API for the current owner by
-     * checking the datatime in utilCachedUntil table.
+     * Checks for cachedUntil datetime in database to see if it's expired or
+     * even exists.
      *
-     * @param string     $api   Which API is data is needed for.
-     * @param string|int $owner Which owner the API data is needed for.
+     * Cache is considered expired if any of the following are true:
+     *
+     * For any database connection exceptions.
+     * No existing database record found.
+     * At or past cachedUntil datetime.
+     *
+     * @param string               $api   Which API is data is needed for.
+     * @param string|int           $owner Which owner the API data is needed for.
+     * @param \ADOConnection|null  $con
+     * @param LoggerInterface|null $logger
      *
      * @return bool Returns TRUE if it is time to get the API.
      */
-    public static function cacheExpired($api, $owner = 0)
-    {
+    public static function isExpired(
+        $api,
+        $owner = 0,
+        \ADOConnection $con = null,
+        LoggerInterface $logger = null
+    ) {
         $now = time();
-        $sql = 'select `cachedUntil`';
-        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilCachedUntil`';
-        $sql .= ' where';
-        $sql .= ' `ownerID`=' . $owner;
+        $sql =
+            'select `cachedUntil`'
+            . ' from `'
+            . YAPEAL_TABLE_PREFIX
+            . 'utilCachedUntil`'
+            . ' where'
+            . ' `ownerID`='
+            . (int)$owner;
         try {
-            // Get a database connection.
-            $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+            if (is_null($con)) {
+                $con = DatabaseConnection::connect(YAPEAL_DSN);
+            }
             $sql .= ' and `api`=' . $con->qstr($api);
             $result = (string)$con->GetOne($sql);
         } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                ->warn($e);
+            $logger->log(LogLevel::WARNING, $e->getMessage());
             return true;
         }
         if (empty($result)) {
             return true;
-        };
-        $cuntil = strtotime($result . ' +0000');
-        if ($now < $cuntil) {
-            return false;
-        };
-        return true;
+        }
+        $cachedUntil = strtotime($result . ' +0000');
+        if ($now >= $cachedUntil) {
+            return true;
+        }
+        return false;
     }
-    // function __destruct
     /**
-     * Destructor used to make sure to release ADOdb resource correctly more for
-     * peace of mind than actual need.
+     * Destructor used to make sure to release DB connection correctly. Used
+     * more for peace of mind than any actual need.
      */
     public function __destruct()
     {
         $this->con = null;
     }
-    //function cacheExpired
     /**
      * Used to get cachedUntil time from cachedUntil table by ID.
      *
@@ -189,27 +210,28 @@ class CachedUntil extends ALimitedObject implements IGetBy
      */
     public function getItemById($id)
     {
-        $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
-        $sql .= ' from `' . $this->tableName . '`';
-        $sql .= ' where';
-        $sql .= ' `ownerID`=' . $id['ownerID'];
+        $this->recordExists = false;
+        $sql =
+            'select `'
+            . implode('`,`', array_keys($this->colTypes))
+            . '` from `'
+            . $this->tableName
+            . '` where `ownerID`='
+            . (int)$id['ownerID']
+            . ' and `api`=';
         try {
-            $sql .= ' and `api`=' . $this->con->qstr($id['api']);
+            $sql .= $this->con->qstr($id['api']);
             $result = $this->con->GetRow($sql);
-            if (count($result) == 0) {
-                $this->recordExists = false;
-            } else {
-                $this->properties = $result;
-                $this->recordExists = true;
-            };
         } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                ->warn($e);
-            $this->recordExists = false;
+            $this->logger->log(LogLevel::WARNING, $e->getMessage());
+            return false;
+        }
+        if (false !== $result) {
+            $this->properties = $result;
+            $this->recordExists = true;
         }
         return $this->recordExists;
     }
-    // function getItemById
     /**
      * Used to get item from table by name.
      *
@@ -217,16 +239,20 @@ class CachedUntil extends ALimitedObject implements IGetBy
      *
      * @return bool TRUE if item was retrieved else FALSE.
      *
-     * @throws \LogicException Throws LogicException because there is no 'name' type
-     * field for this database table.
+     * @throws LogicException Throws LogicException because there is no 'name'
+     * type field for this database table.
      */
     public function getItemByName($name)
     {
-        throw new \LogicException('Not implemented for '
-            . __CLASS__
-            . ' table', 1);
+        throw new LogicException('Not implemented for ' . __CLASS__);
     }
-    // function getItemByName
+    /**
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
     /**
      * Function used to check if database record already existed.
      *
@@ -236,7 +262,26 @@ class CachedUntil extends ALimitedObject implements IGetBy
     {
         return $this->recordExists;
     }
-    // function recordExists
+    /**
+     * @param \ADOConnection|null $con
+     *
+     * @return self Returns self to allow fluid interface.
+     * @throws RuntimeException Throws RuntimeException if fails to get database
+     * connection.
+     */
+    public function setCon(\ADOConnection $con = null)
+    {
+        if (is_null($con)) {
+            try {
+                $con = DatabaseConnection::connect(YAPEAL_DSN);
+            } catch (\ADODB_Exception $e) {
+                $mess = 'Failed to get database connection in ' . __CLASS__;
+                throw new RuntimeException($mess);
+            }
+        }
+        $this->con = $con;
+        return $this;
+    }
     /**
      * Used to set default for column.
      *
@@ -249,7 +294,6 @@ class CachedUntil extends ALimitedObject implements IGetBy
     {
         return $this->qb->setDefault($name, $value);
     }
-    // function setDefault
     /**
      * Used to set defaults for multiple columns.
      *
@@ -261,7 +305,26 @@ class CachedUntil extends ALimitedObject implements IGetBy
     {
         return $this->qb->setDefaults($defaults);
     }
-    // function setDefaults
+    /**
+     * @param \Yapeal\Database\QueryBuilder $qb
+     *
+     * @return self Returns self to allow fluid interface.
+     */
+    public function setQb($qb)
+    {
+        $this->qb = $qb;
+        return $this;
+    }
+    /**
+     * @param string $tableName
+     *
+     * @return self Returns self to allow fluid interface.
+     */
+    public function setTableName($tableName)
+    {
+        $this->tableName = (string)$tableName;
+        return $this;
+    }
     /**
      * Used to store data into table.
      *
@@ -271,9 +334,8 @@ class CachedUntil extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
     }
-    // function store
 }
 

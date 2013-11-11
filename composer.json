@@ -1,10 +1,10 @@
 {
-    "name":        "yapeal/yapeal",
-    "description": "Yet Another Php Eve Api Library: Used to access the Eve Online XML API data and place it into a database.",
-    "keywords":    [
+    "name":              "yapeal/yapeal",
+    "description":       "Yet Another Php Eve Api Library: Used to access the Eve Online XML API data and place it into a database.",
+    "keywords":          [
         "curl", "database", "Eve-Online", "rest", "PDO", "Yapeal", "Eve API"],
-    "license":     "LGPL-3.0+",
-    "authors":     [
+    "license":           "LGPL-3.0+",
+    "authors":           [
         {
             "name":  "Michael Cummings",
             "email": "dragonaire@users.sourceforge.net",
@@ -16,7 +16,7 @@
             "role":  "Developer"
         }
     ],
-    "support":     {
+    "support":           {
         "issues": "https://sourceforge.net/p/yapeal/tickets/",
         "source": "https://sourceforge.net/projects/yapeal/files/",
         "wiki":   "https://sourceforge.net/p/yapeal/wiki/Home/"
@@ -30,23 +30,24 @@
             "":         "src/"
         }
     },
-    "require":     {
-        "ext-curl":       "*",
-        "ext-date":       "*",
-        "ext-hash":       "*",
-        "ext-mysql":      "*",
-        "ext-mysqli":     "*",
-        "ext-openssl":    "*",
-        "ext-PDO":        "*",
-        "ext-Reflection": "*",
-        "ext-SimpleXML":  "*",
-        "ext-SPL":        "*",
-        "ext-xmlreader":  "*",
-        "lib-curl":       ">=7.15.0",
-        "lib-openssl":    ">=0.9.8",
-        "php":            ">=5.3.6"
+    "require":           {
+        "ext-curl":        "*",
+        "ext-date":        "*",
+        "ext-hash":        "*",
+        "ext-mysql":       "*",
+        "ext-mysqli":      "*",
+        "ext-openssl":     "*",
+        "ext-PDO":         "*",
+        "ext-Reflection":  "*",
+        "ext-SimpleXML":   "*",
+        "ext-SPL":         "*",
+        "ext-xmlreader":   "*",
+        "lib-curl":        ">=7.15.0",
+        "lib-openssl":     ">=0.9.8",
+        "monolog/monolog": "~1.6.0",
+        "php":             ">=5.3.6"
     },
-    "require-dev": {
+    "require-dev":       {
         "ext-xsl":                     "*",
         "phpdocumentor/phpdocumentor": "dev-develop"
     }

@@ -29,6 +29,7 @@
 namespace Yapeal\Section;
 
 use Logger;
+use Psr\Log\LogLevel;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Util\CachedUntil;
 
@@ -70,7 +71,7 @@ class Server extends ASection
         try {
             foreach ($apis as $api) {
                 // If the cache for this API has expire try to get update.
-                if (CachedUntil::cacheExpired($api) === true) {
+                if (CachedUntil::isExpired($api,0,null,$this->logger)) {
                     ++$apiCount;
                     $class = $this->section . $api;
                     $hash = hash('sha1', $class);
@@ -83,14 +84,9 @@ class Server extends ASection
                         $con = DatabaseConnection::connect(YAPEAL_DSN);
                         $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
-                            if (Logger::getLogger('yapeal')
-                                ->isInfoEnabled()
-                            ) {
-                                $mess =
+                            $mess =
                                     'Failed to get lock for ' . $class . $hash;
-                                Logger::getLogger('yapeal')
-                                    ->info($mess);
-                            };
+                            $this->logger->log(LogLevel::INFO, $mess);
                             continue;
                         }; // if $con->GetOne($sql) ...
                     } catch (\ADODB_Exception $e) {
@@ -107,20 +103,14 @@ class Server extends ASection
                 }; // if CachedUntil::cacheExpired...
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
-                    if (Logger::getLogger('yapeal')
-                        ->isInfoEnabled()
-                    ) {
-                        $mess =
+                    $mess =
                             'Yapeal has been working very hard and needs a break';
-                        Logger::getLogger('yapeal')
-                            ->info($mess);
-                    };
+                    $this->logger->log(LogLevel::INFO, $mess);
                     exit;
                 }; // if YAPEAL_MAX_EXECUTE < time() ...
             }; // foreach $apis ...
         } catch (\ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                ->warn($e);
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
         }
         // Only truly successful if API was fetched and stored.
         if ($apiCount == $apiSuccess) {

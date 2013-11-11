@@ -1596,13 +1596,14 @@
 		$sz = sizeof($rezarr);
 		return $rezarr[abs(rand()) % $sz];
 	}
-
-	/**
-	* Return one row of sql statement. Recordset is disposed for you.
-	*
-	* @param sql			SQL statement
-	* @param [inputarr]		input bind array
-	*/
+    /**
+     * Return one row of sql statement. Recordset is disposed for you.
+     *
+     * @param  string          $sql      SQL statement
+     * @param array|bool|false $inputarr input bind array
+     *
+     * @return array|bool
+     */
 	function GetRow($sql,$inputarr=false)
 	{
 	global $ADODB_COUNTRECS;
@@ -1612,15 +1613,16 @@
 		$rs = $this->Execute($sql,$inputarr);
 
 		$ADODB_COUNTRECS = $crecs;
-		if ($rs) {
-			if (!$rs->EOF) $arr = $rs->fields;
-			else $arr = array();
-			$rs->Close();
-			return $arr;
-		}
-
-		$false = false;
-		return $false;
+        if ($rs) {
+            if (!$rs->EOF) {
+                $arr = $rs->fields;
+            } else {
+                $arr = array();
+            }
+            $rs->Close();
+            return $arr;
+        }
+		return false;
 	}
 
 	function CacheGetRow($secs2cache,$sql=false,$inputarr=false)

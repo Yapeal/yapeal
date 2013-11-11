@@ -28,6 +28,9 @@
  */
 namespace Yapeal\Util;
 
+use Yapeal\Database\DatabaseConnection;
+use Yapeal\Database\QueryBuilder;
+
 /**
  * Wrapper class for utilGraphic table.
  *
@@ -74,13 +77,13 @@ class Graphic extends ALimitedObject implements IGetBy
         $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
         try {
             // Get a database connection.
-            $this->con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+            $this->con = DatabaseConnection::connect(YAPEAL_DSN);
         } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
             throw new \RuntimeException($mess);
         }
         // Get a new query builder object.
-        $this->qb = new \Yapeal\Database\QueryBuilder($this->tableName, YAPEAL_DSN);
+        $this->qb = new QueryBuilder($this->tableName, YAPEAL_DSN);
         // Get a list of column names and their ADOdb generic types.
         $this->colTypes = $this->qb->getColumnTypes();
         // Was $id set?
@@ -99,10 +102,9 @@ class Graphic extends ALimitedObject implements IGetBy
             } else {
                 $mess = 'Parameter $id must be an integer';
                 throw new \InvalidArgumentException($mess);
-            }; // else ...
-        }; // if !empty $id ...
+            }
+        }
     }
-    // function __construct
     /**
      * Destructor used to make sure to release ADOdb resource correctly more for
      * peace of mind than actual need.
@@ -111,7 +113,6 @@ class Graphic extends ALimitedObject implements IGetBy
     {
         $this->con = null;
     }
-    // function __destruct
     /**
      * Used to get graphic from Graphic table by owner ID.
      *
@@ -201,7 +202,7 @@ class Graphic extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
     }
     // function store

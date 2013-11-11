@@ -29,6 +29,10 @@
 namespace Yapeal\Section;
 
 use Logger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Yapeal\Autoload\FilterFileFinder;
 use Yapeal\Util\AccessMask;
 use Yapeal\Util\Sections;
@@ -38,7 +42,7 @@ use Yapeal\Util\Sections;
  *
  * @package Yapeal\Section
  */
-abstract class ASection
+abstract class ASection implements LoggerAwareInterface
 {
     /**
      * @var bool Use to signal to child that parent constructor aborted.
@@ -48,6 +52,10 @@ abstract class ASection
      * @var AccessMask Hold AccessMask class used to convert between mask and APIs.
      */
     protected $am;
+    /**
+     * @var LoggerInterface Holds logger instance used for all logging.
+     */
+    protected $logger;
     /**
      * @var array Holds the mask of APIs for this section.
      */
@@ -59,14 +67,14 @@ abstract class ASection
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(LoggerInterface $logger = null)
     {
+        $this->setLogger($logger);
         try {
             $section =
                 new Sections(strtolower($this->section), false);
         } catch (\Exception $e) {
-            Logger::getLogger('yapeal')
-                ->error($e);
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
             // Section does not exist in utilSections table or other error occurred.
             $this->abort = true;
             return;
@@ -91,17 +99,29 @@ abstract class ASection
         } else {
             $this->abort = true;
             $mess = 'No known APIs found for section ' . $this->section;
-            Logger::getLogger('yapeal')
-                ->error($mess);
+            $this->logger->log(LogLevel::ERROR, $mess);
             return;
-        }; // else $foundAPIs ...
+        }
     }
-    // function __construct
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
      *
      * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
      */
     abstract public function pullXML();
+    /**
+     * Sets a logger instance on the object
+     *
+     * @param LoggerInterface|null $logger
+     *
+     * @return null|void
+     */
+    public function setLogger(LoggerInterface $logger = null)
+    {
+        if (is_null($logger)) {
+            $logger = new NullLogger();
+        }
+        $this->logger = $logger;
+    }
 }
 

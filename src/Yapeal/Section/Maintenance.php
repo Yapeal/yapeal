@@ -28,7 +28,7 @@
  */
 namespace Yapeal\Section;
 
-use Logger;
+use Psr\Log\LogLevel;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Util\CachedUntil;
 
@@ -69,15 +69,10 @@ class Maintenance extends ASection
         $scriptCount = 0;
         $scriptSuccess = 0;
         if (count($this->scriptList) == 0) {
-            if (Logger::getLogger('yapeal')
-                ->isInfoEnabled()
-            ) {
-                $mess =
-                    'None of the allowed scripts are currently active for '
-                    . $this->section;
-                Logger::getLogger('yapeal')
-                    ->info($mess);
-            };
+            $mess =
+                'None of the allowed scripts are currently active for '
+                . $this->section;
+            $this->logger->log(LogLevel::INFO, $mess);
             return false;
         };
         // Randomize order in which scripts are tried if there is a list.
@@ -87,7 +82,7 @@ class Maintenance extends ASection
         try {
             foreach ($this->scriptList as $script) {
                 // If timer has expired time to run script again.
-                if (CachedUntil::cacheExpired($script) === true) {
+                if (CachedUntil::isExpired($script, 0, null, $this->logger)) {
                     ++$scriptCount;
                     $class = $this->section . $script;
                     $hash = hash('sha1', $class);
@@ -100,16 +95,10 @@ class Maintenance extends ASection
                         $con = DatabaseConnection::connect(YAPEAL_DSN);
                         $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
-                            if (Logger::getLogger('yapeal')
-                                ->isInfoEnabled()
-                            ) {
-                                $mess =
-                                    'Failed to get lock for ' . $class . $hash;
-                                Logger::getLogger('yapeal')
-                                    ->info($mess);
-                            };
+                            $mess = 'Failed to get lock for ' . $class . $hash;
+                            $this->logger->log(LogLevel::INFO, $mess);
                             continue;
-                        }; // if $con->GetOne($sql) ...
+                        }
                     } catch (\ADODB_Exception $e) {
                         continue;
                     }
@@ -124,20 +113,14 @@ class Maintenance extends ASection
                 }; // if CachedUntil::cacheExpired...
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
-                    if (Logger::getLogger('yapeal')
-                        ->isInfoEnabled()
-                    ) {
-                        $mess =
-                            'Yapeal has been working very hard and needs a break';
-                        Logger::getLogger('yapeal')
-                            ->info($mess);
-                    };
+                    $mess =
+                        'Yapeal has been working very hard and needs a break';
+                    $this->logger->log(LogLevel::INFO, $mess);
                     exit;
                 }; // if YAPEAL_MAX_EXECUTE < time() ...
             }; // foreach $scripts ...
         } catch (\ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                ->warn($e);
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
         }
         // Only truly successful if all scripts ran successfully.
         if ($scriptCount == $scriptSuccess) {
@@ -145,6 +128,5 @@ class Maintenance extends ASection
         };
         return false;
     }
-    // function pullXML
 }
 

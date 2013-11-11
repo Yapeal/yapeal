@@ -28,21 +28,28 @@
  */
 namespace Yapeal\Util;
 
+use DomainException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Abstract class for basic object with properties
  *
- * @package    Yapeal\Util
+ * @package Yapeal\Util
  */
-abstract class ALimitedObject
+abstract class ALimitedObject implements LoggerAwareInterface
 {
     /**
      * @var array List of columns and their generic ADO types.
      */
     protected $colTypes = array();
     /**
-     * Holds the current properties.
-     *
-     * @var array
+     * @var LoggerInterface Holds logger instance used for all logging.
+     */
+    protected $logger;
+    /**
+     * @var array Holds the current properties.
      */
     protected $properties;
     /**
@@ -52,21 +59,20 @@ abstract class ALimitedObject
      *
      * @return mixed Value of $name from $properties if it exists or NULL if not.
      *
-     * @throws \DomainException If $name not in $this->colTypes throws a
+     * @throws DomainException If $name not in $this->colTypes throws a
      * DomainException.
      */
     public function __get($name)
     {
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
-            throw new \DomainException($mess, 1);
+            throw new DomainException($mess);
         }; // if !in_array...
         if (isset($this->properties[$name])) {
             return $this->properties[$name];
         };
         return null;
     }
-    // function __get
     /**
      * Magic isset for fields in properties array.
      *
@@ -78,7 +84,6 @@ abstract class ALimitedObject
     {
         return isset($this->properties[$name]);
     }
-    // function __isset
     /**
      * Magic setter for fields in $properties array or if $value is an array adds
      * a new public property $name to class and assign $value to it.
@@ -88,7 +93,7 @@ abstract class ALimitedObject
      *
      * @return bool TRUE if $name already existed.
      *
-     * @throws \DomainException If $name not in $this->types throws DomainException.
+     * @throws DomainException If $name not in $this->types throws DomainException.
      */
     public function __set($name, $value)
     {
@@ -100,7 +105,7 @@ abstract class ALimitedObject
         };
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
-            throw new \DomainException($mess, 1);
+            throw new DomainException($mess);
         }; // if !in_array...
         if (isset($this->properties[$name])) {
             $ret = true;
@@ -108,7 +113,6 @@ abstract class ALimitedObject
         $this->properties[$name] = $value;
         return $ret;
     }
-    // function __set
     /**
      * Magic function to show object when being printed.
      *
@@ -139,16 +143,15 @@ abstract class ALimitedObject
                         $set[] = '0x' . bin2hex($v);
                     } else {
                         $set[] = (string)$v;
-                    }; // else '0x' !== substr($row[$field], 0, 2) ...
+                    }
                     break;
                 default:
                     $set[] = (string)$v;
-            }; // switch $this->colTypes[$k] ...
-        }; // foreach $this->properties ...
+            }
+        }
         $value .= implode(',', $set) . PHP_EOL;
         return $value;
     }
-    // function __toString ...
     /**
      * Used to unset fields of $properties array.
      *
@@ -158,6 +161,19 @@ abstract class ALimitedObject
     {
         unset($this->properties[$name]);
     }
-    // function __unset
+    /**
+     * Sets a logger instance on the object
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return null
+     */
+    public function setLogger(LoggerInterface $logger = null)
+    {
+        if (is_null($logger)) {
+            $logger = new NullLogger();
+        }
+        $this->logger = $logger;
+    }
 }
 

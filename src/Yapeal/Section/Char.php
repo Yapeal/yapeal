@@ -28,7 +28,7 @@
  */
 namespace Yapeal\Section;
 
-use Logger;
+use Psr\Log\LogLevel;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Util\CachedUntil;
 
@@ -64,26 +64,16 @@ class Char extends ASection
             $sql = $this->getSQLQuery();
             $result = $con->GetAll($sql);
             if (count($result) == 0) {
-                if (Logger::getLogger('yapeal')
-                    ->isInfoEnabled()
-                ) {
-                    $mess = 'No characters for char section';
-                    Logger::getLogger('yapeal')
-                        ->info($mess);
-                };
+                $mess = 'No characters for char section';
+                $this->logger->log(LogLevel::INFO, $mess);
                 return false;
-            }; // if empty $result ...
+            }
             // Build name of filter based on mode.
             $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
             $charList = array_filter($result, $filter);
             if (empty($charList)) {
-                if (Logger::getLogger('yapeal')
-                    ->isInfoEnabled()
-                ) {
-                    $mess = 'No active characters for char section';
-                    Logger::getLogger('yapeal')
-                        ->info($mess);
-                };
+                $mess = 'No active characters for char section';
+                $this->logger->log(LogLevel::INFO, $mess);
                 return false;
             };
             // Randomize order so no one character can starve the rest in case of
@@ -99,8 +89,7 @@ class Char extends ASection
                 $apis = $this->am->maskToAPIs($chr['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
-                    Logger::getLogger('yapeal')
-                        ->warn($mess);
+                    $this->logger->log(LogLevel::WARNING, $mess);
                     continue;
                 };
                 // Randomize order in which APIs are tried if there is a list.
@@ -109,10 +98,12 @@ class Char extends ASection
                 };
                 foreach ($apis as $api) {
                     // If the cache for this API has expired try to get update.
-                    if (CachedUntil::cacheExpired(
-                            $api,
-                            $chr['characterID']
-                        ) === true
+                    if (CachedUntil::isExpired(
+                        $api,
+                        $chr['characterID'],
+                        null,
+                        $this->logger
+                    )
                     ) {
                         ++$apiCount;
                         $class = $this->section . $api;
@@ -135,18 +126,11 @@ class Char extends ASection
                             $sql =
                                 'select get_lock(' . $con->qstr($hash) . ',5)';
                             if ($con->GetOne($sql) != 1) {
-                                if (Logger::getLogger('yapeal')
-                                    ->isInfoEnabled()
-                                ) {
-                                    $mess =
-                                        'Failed to get lock for '
-                                        . $class
-                                        . $hash;
-                                    Logger::getLogger('yapeal')
-                                        ->info($mess);
-                                };
+                                $mess =
+                                    'Failed to get lock for ' . $class . $hash;
+                                $this->logger->log(LogLevel::INFO, $mess);
                                 continue;
-                            }; // if $con->GetOne($sql) ...
+                            }
                         } catch (\ADODB_Exception $e) {
                             continue;
                         }
@@ -161,21 +145,15 @@ class Char extends ASection
                     }; // if CachedUntil::cacheExpired...
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
-                        if (Logger::getLogger('yapeal')
-                            ->isInfoEnabled()
-                        ) {
-                            $mess =
-                                'Yapeal has been working very hard and needs a break';
-                            Logger::getLogger('yapeal')
-                                ->info($mess);
-                        };
+                        $mess =
+                            'Yapeal has been working very hard and needs a break';
+                        $this->logger->log(LogLevel::INFO, $mess);
                         exit;
                     }; // if YAPEAL_MAX_EXECUTE < time() ...
                 }; // foreach $apis ...
             }; // foreach $charList
         } catch (\ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                ->warn($e);
+            $this->logger->log(LogLevel::ERROR, $e->getMessage());
         }
         // Only truly successful if API was fetched and stored.
         if ($apiCount == $apiSuccess) {
@@ -387,8 +365,7 @@ class Char extends ASection
         if (is_null($row['RCActive'])) {
             $mess = 'IsActive can not be null in utilRegisteredCharacter when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                ->warn($mess);
+            $this->logger->log(LogLevel::WARNING, $mess);
             return false;
         };
         // Deactivated.
@@ -406,8 +383,7 @@ class Char extends ASection
             $mess =
                 'activeAPIMask can not be null in utilRegisteredCharacter when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                ->warn($mess);
+            $this->logger->log(LogLevel::WARNING, $mess);
             return false;
         };
         $row['mask'] = $this->mask & $row['RCMask'];

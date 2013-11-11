@@ -3,6 +3,7 @@
 use Yapeal\Autoload\YapealAutoLoad;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Error\ErrorHandler;
+use Yapeal\Util\CachedInterval;
 use Yapeal\YapealApiCache;
 
 /**
@@ -141,7 +142,7 @@ try {
     $sql = 'select `section`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
     try {
-        $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+        $con = DatabaseConnection::connect(YAPEAL_DSN);
         $result = $con->GetCol($sql);
     } catch (\ADODB_Exception $e) {
         \Logger::getLogger('yapeal')
@@ -172,11 +173,12 @@ try {
      * Final admin stuff
      * ************************************************************************/
     // Reset cache intervals
-    \Yapeal\Util\CachedInterval::resetAll();
+    CachedInterval::resetAll();
     // Release all the ADOdb connections.
-    \Yapeal\Database\DatabaseConnection::releaseAll();
+    DatabaseConnection::releaseAll();
 } catch (Exception $e) {
     $mess = 'Uncaught exception in ' . basename(__FILE__);
+
     \Logger::getLogger('yapeal')
         ->fatal($mess);
     \Logger::getLogger('yapeal')

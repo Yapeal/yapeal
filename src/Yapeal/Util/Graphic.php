@@ -35,6 +35,9 @@ use Yapeal\Database\QueryBuilder;
  * Wrapper class for utilGraphic table.
  *
  * @package    Yapeal\Util
+ * @deprecated This class and table were once use by an old legacy web installer
+ *             that has NOT existed in Yapeal for a long time. This is probably
+ *             the last version to include them.
  */
 class Graphic extends ALimitedObject implements IGetBy
 {

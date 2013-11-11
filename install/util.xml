@@ -80,22 +80,8 @@
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
-  <table name="utilConfig">
-    <DROP/>
-  </table>
   <table name="utilGraphic">
-    <descr>Deprecated - Table is probably already dropped by the time you've noticed this message. Used to maintain a list of graphics for registered chars and corps</descr>
-    <field name="`graphic`" type="B"/>
-    <field name="`graphicType`" type="C" size="4"/>
-    <field name="`ownerID`" type="I8" size="20">
-      <KEY/>
-      <UNSIGNED/>
-    </field>
-    <field name="`ownerType`" type="C" size="4"/>
-    <index name="`utilGraphic1`">
-      <col>`OwnerType`</col>
-    </index>
-    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
+    <DROP/>
   </table>
   <table name="utilRegisteredCharacter">
     <descr>Used to maintain a list of characters that are registered with Yapeal to have their APIs gotten</descr>

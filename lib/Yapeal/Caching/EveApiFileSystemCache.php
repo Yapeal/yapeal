@@ -75,9 +75,10 @@ class EveApiFileSystemCache
         $api,
         $hash,
         $section,
-        $cacheBase = YAPEAL_CACHE,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        $cacheBase = YAPEAL_CACHE
     ) {
+        $this->setLogger($logger);
         $this->setApi($api);
         $this->setCacheBase($cacheBase);
         $this->setHash($hash);

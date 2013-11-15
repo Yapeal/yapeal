@@ -32,8 +32,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use Yapeal\Database\DatabaseConnection;
-use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Util\CachedInterval;
 use Yapeal\Util\CachedUntil;
@@ -57,6 +55,10 @@ class EveApiCache implements LoggerAwareInterface
      * @var integer Cache interval for this API.
      */
     private $cacheInterval;
+    /**
+     * @var EveApiCacheInterface[]
+     */
+    private $drivers;
     /**
      * @var string Holds SHA1 hash of $section, $api, $postParams.
      */
@@ -105,6 +107,7 @@ class EveApiCache implements LoggerAwareInterface
         $this->setOwnerId($owner);
         $this->setPostParams($postParams);
         $this->setSection($section);
+        $this->setDrivers($this->getDefaultDrivers());
     }
     /**
      * function used to set constants from [Cache] section of the configuration file.
@@ -114,6 +117,20 @@ class EveApiCache implements LoggerAwareInterface
     public static function setCacheSectionProperties(array $section)
     {
         self::$cacheOutput = $section['cache_output'];
+    }
+    /**
+     * @param EveApiCacheInterface $driver
+     * @param string               $key
+     *
+     * @return self Returns self to allow fluid interface.
+     */
+    public function addDriver(EveApiCacheInterface $driver, $key = null)
+    {
+        if (is_null($key)) {
+            $key = spl_object_hash($driver);
+        }
+        $this->drivers[(string)$key] = $driver;
+        return $this;
     }
     /**
      * Function used to save API XML to cache database table and/or file and
@@ -177,57 +194,24 @@ class EveApiCache implements LoggerAwareInterface
         // Use now + interval + random value to update cachedUntil.
         $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
         $cu->store();
-        switch (self::$cacheOutput) {
-            case 'both':
-                $this->cacheXmlToDatabase($xml);
-                $this->cacheXmlFile($xml);
-                break;
-            case 'database':
-                $this->cacheXmlToDatabase($xml);
-                break;
-            case 'file':
-                $this->cacheXmlFile($xml);
-                break;
-            case 'none':
-                break;
-            default:
-                $mess =
-                    'Invalid value of "'
-                    . self::$cacheOutput
-                    . '" for cache_output. Check that the setting in'
-                    . ' yapeal.(ini, json) is correct.';
-                $this->logger->log(LogLevel::ERROR, $mess);
-                return false;
+        if (!empty($this->drivers)) {
+            foreach ($this->drivers as $driver) {
+                $driver->cacheXml($xml);
+            }
         }
         return true;
     }
     /**
      * Used to delete any cached XML.
      *
-     * @param \ADOConnection|null $con
-     *
      * @return self Returns self to allow fluid interface.
      */
-    public function deleteCachedApi(\ADOConnection $con = null)
+    public function deleteCachedApi()
     {
-        switch (self::$cacheOutput) {
-            case 'both':
-                $this->deleteCachedXmlFromDatabase($con);
-                $this->deleteCachedXmlFile();
-                break;
-            case 'database':
-                $this->deleteCachedXmlFromDatabase($con);
-                break;
-            case 'file':
-                $this->deleteCachedXmlFile();
-                break;
-            default:
-                $mess =
-                    'Invalid value of "'
-                    . self::$cacheOutput
-                    . '" for cache_output. Check that the setting in'
-                    . ' yapeal.(ini, json) is correct.';
-                $this->logger->log(LogLevel::ERROR, $mess);
+        if (!empty($this->drivers)) {
+            foreach ($this->drivers as $driver) {
+                $driver->deleteCachedXml();
+            }
         }
         return $this;
     }
@@ -241,55 +225,68 @@ class EveApiCache implements LoggerAwareInterface
      */
     public function getCachedApi(\XMLReader $xr = null)
     {
+        if (is_null($xr)) {
+            $xr = new \XMLReader();
+        }
+        $xml = false;
+        if (!empty($this->drivers)) {
+            foreach ($this->drivers as $driver) {
+                $xml = $driver->getCachedXml();
+                if (false === $xml) {
+                    continue;
+                }
+                if (false === $this->validateXml($xml, $xr)) {
+                    $xml = false;
+                    continue;
+                }
+                $currentTimeXml = $this->getXmlCurrentTime($xml, $xr);
+                if (false === $currentTimeXml) {
+                    $xml = false;
+                    continue;
+                }
+                $currentTimeXml =
+                    strtotime($currentTimeXml . ' +0000')
+                    + $this->cacheInterval;
+                if (time() > $currentTimeXml) {
+                    $xml = false;
+                    continue;
+                }
+            }
+        }
+        return $xml;
+    }
+    /**
+     * @return array
+     */
+    public function getDefaultDrivers()
+    {
+        $drivers = array();
         switch (self::$cacheOutput) {
             case 'both':
-                $xml = $this->getCachedDatabase();
-                // If not cached in DB try file.
-                if (false === $xml) {
-                    $xml = $this->getCachedFile();
-                    // If XML was cached to file but not to database add it to database.
-                    if ($xml !== false) {
-                        $this->cacheXmlToDatabase($xml);
-                    }
-                }
+                $drivers['database'] =
+                    new EveApiDatabaseCache($this->api, $this->hash, $this->section, $this->logger);
+                $drivers['file'] =
+                    new EveApiFileSystemCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'database':
-                $xml = $this->getCachedDatabase();
+                $drivers['database'] =
+                    new EveApiDatabaseCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'file':
-                $xml = $this->getCachedFile();
+                $drivers['file'] =
+                    new EveApiFileSystemCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'none':
-                return false;
+                break;
             default:
                 $mess =
                     'Invalid value of "'
                     . self::$cacheOutput
                     . '" for cache_output. Check that the setting in'
                     . ' yapeal.(ini, json) is correct.';
-                $this->logger->log(LogLevel::ERROR, $mess);
-                return false;
+                $this->logger->log(LogLevel::CRITICAL, $mess);
         }
-        if ($xml === false) {
-            return false;
-        }
-        if (is_null($xr)) {
-            $xr = new \XMLReader();
-        }
-        if (false === $this->validateXml($xml, $xr)) {
-            return false;
-        }
-        $currentTimeXml = $this->getXmlCurrentTime($xml, $xr);
-        if ($currentTimeXml === false) {
-            return false;
-        }
-        $currentTimeXml =
-            strtotime($currentTimeXml . ' +0000') + $this->cacheInterval;
-        // If already past cachedUntil datetime need to get XML again.
-        if (time() > $currentTimeXml) {
-            return false;
-        }
-        return $xml;
+        return $drivers;
     }
     /**
      * @param string $api
@@ -309,6 +306,32 @@ class EveApiCache implements LoggerAwareInterface
     public function setCacheInterval($cacheInterval)
     {
         $this->cacheInterval = $cacheInterval;
+        return $this;
+    }
+    /**
+     * Used to (re)set all cache drivers at once.
+     *
+     * @param EveApiCacheInterface[] $drivers
+     *
+     * @return self Returns self to allow fluid interface.
+     */
+    public function setDrivers(array $drivers = array())
+    {
+        $this->drivers = array();
+        if (!empty($drivers)) {
+            foreach ($drivers as $key => $value) {
+                if ($value instanceof EveApiCacheInterface) {
+                    $this->addDriver($value, $key);
+                } else {
+                    $mess =
+                        'Class '
+                        . get_class($value)
+                        . ' does NOT implement EveApiCacheInterface'
+                        . ' and could NOT be added as a driver';
+                    $this->logger->log(LogLevel::ERROR, $mess);
+                }
+            }
+        }
         return $this;
     }
     /**
@@ -414,49 +437,6 @@ class EveApiCache implements LoggerAwareInterface
         return $isValid;
     }
     /**
-     * Used to save API XML into file.
-     *
-     * @param string $xml The Eve API XML to be cached.
-     */
-    private function cacheXmlFile($xml)
-    {
-        $cachePath = $this->getCacheDirPath();
-        if (false === $cachePath) {
-            return;
-        }
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
-        $ret = file_put_contents($cacheFile, $xml);
-        if (false == $ret || $ret == -1) {
-            $mess = 'Could not cache XML to ' . $cacheFile;
-            $this->logger->log(LogLevel::ERROR, $mess);
-        }
-    }
-    /**
-     * Function used to save API XML into database table.
-     *
-     * @param string $xml The Eve API XML to be cached.
-     */
-    private function cacheXmlToDatabase($xml)
-    {
-        try {
-            // Get a new query instance.
-            $qb = new QueryBuilder(YAPEAL_TABLE_PREFIX
-                . 'utilXmlCache', YAPEAL_DSN, false);
-            $row = array(
-                'api' => $this->api,
-                'hash' => $this->hash,
-                'section' => $this->section,
-                'xml' => $xml
-            );
-            $qb->addRow($row);
-            $qb->store();
-        } catch (\ADODB_Exception $e) {
-            $this->logger->log(LogLevel::WARNING, $e->getMessage());
-            $mess = 'Could NOT cache XML to database';
-            $this->logger->log(LogLevel::ERROR, $mess);
-        }
-    }
-    /**
      * @param $api
      * @param $section
      * @param $owner
@@ -471,105 +451,6 @@ class EveApiCache implements LoggerAwareInterface
             }
         }
         $this->hash = hash('sha1', $params);
-    }
-    /**
-     * Used to delete any cached XML from file.
-     *
-     * @return bool Returns TRUE if the cached copy of XML was deleted else FALSE.
-     */
-    private function deleteCachedXmlFile()
-    {
-        $cachePath = $this->getCacheDirPath();
-        if (false === $cachePath) {
-            return false;
-        }
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
-        if (!file_exists($cacheFile) || !is_file($cacheFile)) {
-            return false;
-        }
-        return @unlink($cacheFile);
-    }
-    /**
-     * Used to delete any cached XML from database.
-     *
-     * @param \ADOConnection|null $con
-     *
-     * @return bool Returns TRUE if the cached copy of XML was deleted else FALSE.
-     */
-    private function deleteCachedXmlFromDatabase(\ADOConnection $con = null)
-    {
-        try {
-            if (is_null($con)) {
-                $con = DatabaseConnection::connect(YAPEAL_DSN);
-            }
-            $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
-            $sql .= ' where';
-            $sql .= ' `hash`=' . $con->qstr($this->hash);
-            $con->Execute($sql);
-        } catch (\ADODB_Exception $e) {
-            $this->logger->log(LogLevel::ERROR, $e->getMessage());
-            $mess = 'Could NOT delete cached XML from database';
-            $this->logger->log(LogLevel::DEBUG, $mess);
-            return false;
-        }
-        return true;
-    }
-    /**
-     * Used to fetch API XML from database table.
-     *
-     * @param \ADOConnection|null $con
-     *
-     * @return string|false Returns XML if data is available, else returns FALSE.
-     */
-    private function getCachedDatabase(\ADOConnection $con = null)
-    {
-        try {
-            if (is_null($con)) {
-                $con = DatabaseConnection::connect(YAPEAL_DSN);
-            }
-            $sql = 'select sql_no_cache `xml`';
-            $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
-            $sql .= ' where';
-            $sql .= ' `hash`=' . $con->qstr($this->hash);
-            $result = (string)$con->GetOne($sql);
-        } catch (\ADODB_Exception $e) {
-            $this->logger->log(LogLevel::ERROR, $e->getMessage());
-            $mess = 'Could NOT retrieve cached XML from database';
-            $this->logger->log(LogLevel::DEBUG, $mess);
-            return false;
-        }
-        if (empty($result)) {
-            $mess = 'Retrieved cached XML from database was empty';
-            $this->logger->log(LogLevel::WARNING, $mess);
-            return false;
-        }
-        return $result;
-    }
-    /**
-     * Function used to fetch API XML from file.
-     *
-     * @return string|false Returns XML if file is available, else returns FALSE.
-     */
-    private function getCachedFile()
-    {
-        // Build cache file path
-        $cachePath = YAPEAL_CACHE . $this->section . DS;
-        if (!is_dir($cachePath)) {
-            $mess =
-                'XML cache '
-                . $cachePath
-                . ' is not a directory or does not exist';
-            $this->logger->log(LogLevel::CRITICAL, $mess);
-            return false;
-        };
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
-        $result = @file_get_contents($cacheFile);
-        if (false === $result || empty($result)) {
-            $mess = 'Could NOT retrieve cached XML file ' . $cacheFile;
-            $this->logger->log(LogLevel::DEBUG, $mess);
-            return false;
-        }
-        return $result;
     }
     /**
      * @param string     $xml
@@ -628,26 +509,5 @@ class EveApiCache implements LoggerAwareInterface
         }
         $this->cacheInterval =
             (int)$ci->getInterval($this->api, $this->section);
-    }
-    /**
-     * @return bool|string
-     */
-    private function getCacheDirPath(){
-        // Build cache file path
-        $cachePath = YAPEAL_CACHE . $this->section . DS;
-        if (!is_dir($cachePath)) {
-            $mess =
-                'XML cache '
-                . $cachePath
-                . ' is not a directory or is not accessible';
-            $this->logger->log(LogLevel::CRITICAL, $mess);
-            return false;
-        }
-        if (!is_writable($cachePath)) {
-            $mess = 'XML cache directory ' . $cachePath . ' is not writable';
-            $this->logger->log(LogLevel::CRITICAL, $mess);
-            return false;
-        }
-        return $cachePath;
     }
 }

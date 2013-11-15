@@ -66,19 +66,20 @@ class EveApiDatabaseCache implements EveApiCacheInterface, LoggerAwareInterface
      */
     private $section;
     /**
-     * @param  string                  $api
-     * @param  string                  $hash
-     * @param  string                  $section
-     * @param \ADOConnection           $con
+     * @param  string         $api
+     * @param  string         $hash
+     * @param  string         $section
+     * @param \ADOConnection  $con
      * @param LoggerInterface $logger
      */
     public function __construct(
         $api,
         $hash,
         $section,
-        \ADOConnection $con = null,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        \ADOConnection $con = null
     ) {
+        $this->setLogger($logger);
         $this->setApi($api);
         $this->setCon($con);
         $this->setHash($hash);

@@ -3,7 +3,7 @@ use Yapeal\Api\AChar;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains NotificationTexts class.
@@ -83,7 +83,7 @@ class charNotificationTexts extends AChar {
   public function apiStore() {
     try {
       // First get a new cache instance.
-      $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $this->params);
+      $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $this->params);
       // See if there is a valid cached copy of the API XML.
       $result = $cache->getCachedApi();
       // If it's not cached need to try to get it.

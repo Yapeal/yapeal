@@ -34,7 +34,7 @@ use XMLReader;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Abstract class to hold common methods for API classes.
@@ -76,7 +76,7 @@ abstract class AApiRequest
     {
         // First get a new cache instance.
         $cache =
-            new YapealApiCache($this->api, $this->section, $this->ownerID, $this->params);
+            new EveApiCache($this->api, $this->section, $this->ownerID, $this->params);
         try {
             // Get valid cached copy if there is one.
             $result = $cache->getCachedApi();
@@ -137,7 +137,6 @@ abstract class AApiRequest
             return false;
         }
     }
-    // function apiStore
     /**
      * Version of sprintf for cases where named arguments are desired (php syntax)
      *
@@ -268,6 +267,5 @@ abstract class AApiRequest
             ->warn($mess);
         return false;
     }
-    // function sprintfn
 }
 

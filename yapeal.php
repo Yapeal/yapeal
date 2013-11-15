@@ -4,7 +4,7 @@ use Yapeal\Autoload\YapealAutoLoad;
 use Yapeal\Database\DatabaseConnection;
 use Yapeal\Error\ErrorHandler;
 use Yapeal\Util\CachedInterval;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Used to get information from Eve-online API and store in database.
@@ -122,7 +122,7 @@ if (!empty($options['log-config'])) {
     ErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
 };
 ErrorHandler::setupCustomErrorAndExceptionSettings();
-YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
+EveApiCache::setCacheSectionProperties($iniVars['Cache']);
 DatabaseConnection::setDatabaseSectionConstants($iniVars['Database']);
 setGeneralSectionConstants($iniVars);
 unset($iniVars);

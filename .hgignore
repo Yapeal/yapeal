@@ -3,6 +3,7 @@ syntax: glob
 *.komodoproject
 composer.phar
 test.php
+junk.php
 cache/account/*.xml
 cache/ADOdb/*.sql
 cache/char/*.xml

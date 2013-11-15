@@ -66,6 +66,8 @@ abstract class ASection implements LoggerAwareInterface
     protected $section;
     /**
      * Constructor
+     *
+     * @param LoggerInterface|null $logger
      */
     public function __construct(LoggerInterface $logger = null)
     {

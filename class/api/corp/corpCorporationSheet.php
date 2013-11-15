@@ -3,7 +3,7 @@ use Yapeal\Api\ACorp;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains CorporationSheet class.
@@ -87,7 +87,7 @@ class corpCorporationSheet  extends ACorp {
     $apiParams = $this->params;
     unset($apiParams['corporationID']);
     // First get a new cache instance.
-    $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+    $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
     try {
       // See if there is a valid cached copy of the API XML.
       $result = $cache->getCachedApi();

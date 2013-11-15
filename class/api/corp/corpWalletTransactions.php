@@ -3,7 +3,7 @@ use Yapeal\Api\ACorp;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains WalletTransactions class.
@@ -129,7 +129,7 @@ class corpWalletTransactions extends ACorp {
           // This tells API server how many rows we want.
           $apiParams['rowCount'] = $rowCount;
           // First get a new cache instance.
-          $cache = new YapealApiCache($this->api, $this->section,
+          $cache = new EveApiCache($this->api, $this->section,
             $this->ownerID, $apiParams);
           // See if there is a valid cached copy of the API XML.
           $result = $cache->getCachedApi();

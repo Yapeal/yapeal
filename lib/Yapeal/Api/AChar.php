@@ -401,6 +401,5 @@ abstract class AChar extends AApiRequest
         }
         return true;
     }
-    // function handleApiError
 }
 

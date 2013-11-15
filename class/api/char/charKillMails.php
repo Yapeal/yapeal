@@ -3,7 +3,7 @@ use Yapeal\Api\AChar;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains killmails class.
@@ -130,7 +130,7 @@ class charKillMails extends AChar {
          */
         $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
         // First get a new cache instance.
-        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID,
+        $cache = new EveApiCache($this->api, $this->section, $this->ownerID,
           $apiParams);
         // See if there is a valid cached copy of the API XML.
         $result = $cache->getCachedApi();

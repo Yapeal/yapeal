@@ -3,7 +3,7 @@ use Yapeal\Api\ACorp;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains StarbaseDetail class.
@@ -113,7 +113,7 @@ class corpStarbaseDetail extends ACorp {
         // This tells API server which tower we want.
         $apiParams['itemID'] = (string)$this->posID['itemID'];
         // First get a new cache instance.
-        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
         $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.

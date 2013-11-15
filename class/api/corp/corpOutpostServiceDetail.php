@@ -2,7 +2,7 @@
 use Yapeal\Api\ACorp;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\YapealApiCache;
+use Yapeal\Caching\EveApiCache;
 
 /**
  * Contains OutpostServiceDetail class.
@@ -96,7 +96,7 @@ class corpOutpostServiceDetail extends ACorp {
         // This tells API server which outpost we want.
         $apiParams['itemID'] = (string)$this->outpostID['stationID'];
         // First get a new cache instance.
-        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
         $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.

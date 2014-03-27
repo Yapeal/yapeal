@@ -53,7 +53,6 @@ abstract class AMap extends AApiRequest
     {
         $this->params = $params;
     }
-    // function __construct
     /**
      * Per API section function that returns API proxy.
      *
@@ -91,7 +90,6 @@ abstract class AMap extends AApiRequest
             return $default;
         }
     }
-    // function getProxy
     /**
      * Handles some Eve API error codes in special ways.
      *
@@ -126,7 +124,6 @@ abstract class AMap extends AApiRequest
         }
         return true;
     }
-    // function handleApiError
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -150,6 +147,5 @@ abstract class AMap extends AApiRequest
         }
         return true;
     }
-    // function prepareTables
 }
 

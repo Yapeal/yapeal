@@ -21,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2013, Michael Cummings
+ * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
@@ -41,7 +41,7 @@ use Yapeal\Util\CachedUntil;
  *
  * @package    Yapeal
  */
-class EveApiCache implements LoggerAwareInterface
+class EveApiCache implements EveApiCacheInterface, LoggerAwareInterface
 {
     /**
      * @var string Value from [Cache] section for cache_output.
@@ -100,10 +100,12 @@ class EveApiCache implements LoggerAwareInterface
         CachedInterval $ci = null,
         LoggerInterface $logger = null
     ) {
-        $this->calculateHash($api, $section, $owner, $postParams);
-        $this->setApi($api);
-        $this->setDefaultCacheInterval($ci);
         $this->setLogger($logger);
+        $this->setApi($api);
+        $this->setCacheInterval($this->getDefaultCacheInterval($ci));
+        $this->setHash(
+            $this->getDefaultHash($api, $section, $owner, $postParams)
+        );
         $this->setOwnerId($owner);
         $this->setPostParams($postParams);
         $this->setSection($section);
@@ -120,16 +122,16 @@ class EveApiCache implements LoggerAwareInterface
     }
     /**
      * @param EveApiCacheInterface $driver
-     * @param string               $key
      *
      * @return self Returns self to allow fluid interface.
      */
-    public function addDriver(EveApiCacheInterface $driver, $key = null)
+    public function addDriver(EveApiCacheInterface $driver)
     {
-        if (is_null($key)) {
-            $key = spl_object_hash($driver);
+        if (!empty($this->drivers) && in_array($driver, $this->drivers, true)) {
+            $mess = 'Ignoring duplicate driver ' . get_class($driver);
+            $this->logger->log(LogLevel::WARNING, $mess);
         }
-        $this->drivers[(string)$key] = $driver;
+        $this->drivers[] = $driver;
         return $this;
     }
     /**
@@ -171,7 +173,7 @@ class EveApiCache implements LoggerAwareInterface
          */
         $cu->cachedUntil = YAPEAL_START_TIME;
         $cu->store();
-        if (false === $this->validateXml($xml, $xr)) {
+        if (false === $this->isValidXml($xml, $xr)) {
             $mess =
                 'Caching invalid API XML for '
                 . $this->section
@@ -179,9 +181,9 @@ class EveApiCache implements LoggerAwareInterface
                 . $this->api;
             $this->logger->log(LogLevel::NOTICE, $mess);
         }
-        $apiError = $this->gotXmlError($xml, $xr);
+        $apiError = $this->getXmlError($xml, $xr);
         // Throw exception for any API errors.
-        if ($apiError !== false) {
+        if (false !== $apiError) {
             throw new YapealApiErrorException($apiError['message'], $apiError['code']);
         }
         $until = time() + $this->cacheInterval;
@@ -206,7 +208,7 @@ class EveApiCache implements LoggerAwareInterface
      *
      * @return self Returns self to allow fluid interface.
      */
-    public function deleteCachedApi()
+    public function deleteCachedXml()
     {
         if (!empty($this->drivers)) {
             foreach ($this->drivers as $driver) {
@@ -223,7 +225,7 @@ class EveApiCache implements LoggerAwareInterface
      * @return string|false Returns XML string if cached copy is available and
      * NOT expired, else returns FALSE.
      */
-    public function getCachedApi(\XMLReader $xr = null)
+    public function getCachedXml(\XMLReader $xr = null)
     {
         if (is_null($xr)) {
             $xr = new \XMLReader();
@@ -235,7 +237,7 @@ class EveApiCache implements LoggerAwareInterface
                 if (false === $xml) {
                     continue;
                 }
-                if (false === $this->validateXml($xml, $xr)) {
+                if (false === $this->isValidXml($xml, $xr)) {
                     $xml = false;
                     continue;
                 }
@@ -248,12 +250,25 @@ class EveApiCache implements LoggerAwareInterface
                     strtotime($currentTimeXml . ' +0000')
                     + $this->cacheInterval;
                 if (time() > $currentTimeXml) {
+                    $driver->deleteCachedXml();
                     $xml = false;
                     continue;
                 }
             }
         }
         return $xml;
+    }
+    /**
+     * @param CachedInterval|null $ci
+     *
+     * @return int
+     */
+    public function getDefaultCacheInterval(CachedInterval $ci = null)
+    {
+        if (is_null($ci)) {
+            $ci = new CachedInterval();
+        }
+        return $ci->getInterval($this->api, $this->section);
     }
     /**
      * @return array
@@ -263,17 +278,17 @@ class EveApiCache implements LoggerAwareInterface
         $drivers = array();
         switch (self::$cacheOutput) {
             case 'both':
-                $drivers['database'] =
+                $drivers[] =
                     new EveApiDatabaseCache($this->api, $this->hash, $this->section, $this->logger);
-                $drivers['file'] =
+                $drivers[] =
                     new EveApiFileSystemCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'database':
-                $drivers['database'] =
+                $drivers[] =
                     new EveApiDatabaseCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'file':
-                $drivers['file'] =
+                $drivers[] =
                     new EveApiFileSystemCache($this->api, $this->hash, $this->section, $this->logger);
                 break;
             case 'none':
@@ -289,6 +304,129 @@ class EveApiCache implements LoggerAwareInterface
         return $drivers;
     }
     /**
+     * @param $api
+     * @param $section
+     * @param $owner
+     * @param $postParams
+     *
+     * @return string
+     */
+    public function getDefaultHash($api, $section, $owner, $postParams)
+    {
+        $params = $section . $api . $owner;
+        if (!empty($postParams)) {
+            foreach ($postParams as $k => $v) {
+                $params .= $k . '=' . $v;
+            }
+        }
+        return hash('sha1', $params);
+    }
+    /**
+     * @param string     $xml
+     * @param \XMLReader $xr
+     *
+     * @return string|false
+     */
+    public function getXmlCurrentTime($xml, \XMLReader $xr)
+    {
+        $result = false;
+        $xr->XML($xml);
+        while (@$xr->read()) {
+            if ($xr->nodeType == $xr::ELEMENT
+                && $xr->localName == 'currentTime'
+            ) {
+                $xr->read();
+                $result = (string)$xr->value;
+                break;
+            }
+        }
+        return $result;
+    }
+    /**
+     * @param string     $xml
+     * @param \XMLReader $xr
+     *
+     * @return array|false
+     */
+    public function getXmlError($xml, \XMLReader $xr)
+    {
+        $result = false;
+        $xr->XML($xml);
+        while (@$xr->read()) {
+            if ($xr->nodeType == $xr::ELEMENT && $xr->localName == 'error') {
+                $result = array();
+                // API error returned.
+                // See if error code attribute is available.
+                if (true === $xr->hasAttributes) {
+                    $result['code'] = (int)$xr->getAttribute('code');
+                }
+                // Move to message text.
+                $xr->read();
+                $result['message'] = (string)$xr->value;
+                break;
+            }
+        }
+        return $result;
+    }
+    /**
+     * Used to validate structure of Eve API XML file.
+     *
+     * @param string          $xml        XML to be validated.
+     * @param \XMLReader|null $xr
+     * @param string          $xsdBaseDir Base directory where the per api XSD files can be found.
+     *
+     * @return bool Return TRUE if the XML validates.
+     */
+    public function isValidXml(
+        $xml,
+        \XMLReader $xr = null,
+        $xsdBaseDir = __DIR__
+    ) {
+        if (!is_dir($xsdBaseDir)) {
+            $mess = 'Could NOT find or was not a directory ' . $xsdBaseDir;
+            $this->logger->log(LogLevel::CRITICAL, $mess);
+            return false;
+        }
+        // Check for HTML errors.
+        if (false !== strpos($xml, '<!DOCTYPE html')) {
+            $mess =
+                'API returned HTML error page. Check to make sure API '
+                . $this->section
+                . DS
+                . $this->api
+                . ' is a valid API.';
+            $this->logger->log(LogLevel::WARNING, $mess);
+            return false;
+        }
+        if (is_null($xr)) {
+            $xr = new \XMLReader();
+        }
+        // Pass XML data to XMLReader so it can be checked.
+        $xr->XML($xml);
+        // Need to look for XSD Schema for this API to use while validating.
+        // Build W3C Schema file name
+        $cacheFile =
+            $xsdBaseDir . '/' . $this->section . '/' . $this->api . '.xsd';
+        // Can not use schema if it is missing.
+        if (!is_file($cacheFile)) {
+            $mess = 'Missing schema file ' . $cacheFile;
+            $this->logger->log(LogLevel::WARNING, $mess);
+            $cacheFile = $xsdBaseDir . '/unknown.xsd';
+        }
+        // Have to have a good schema.
+        if (!$xr->setSchema($cacheFile)) {
+            $mess = 'Could not load schema file ' . $cacheFile;
+            $this->logger->log(LogLevel::CRITICAL, $mess);
+            return false;
+        }
+        // Scan through API XML.
+        while (@$xr->read()) {
+        }
+        $isValid = (boolean)$xr->isValid();
+        $xr->close();
+        return $isValid;
+    }
+    /**
      * @param string $api
      *
      * @return self Returns self to allow fluid interface.
@@ -299,13 +437,13 @@ class EveApiCache implements LoggerAwareInterface
         return $this;
     }
     /**
-     * @param string $cacheInterval
+     * @param int $cacheInterval
      *
      * @return self Returns self to allow fluid interface.
      */
     public function setCacheInterval($cacheInterval)
     {
-        $this->cacheInterval = $cacheInterval;
+        $this->cacheInterval = (int)$cacheInterval;
         return $this;
     }
     /**
@@ -319,19 +457,29 @@ class EveApiCache implements LoggerAwareInterface
     {
         $this->drivers = array();
         if (!empty($drivers)) {
-            foreach ($drivers as $key => $value) {
-                if ($value instanceof EveApiCacheInterface) {
-                    $this->addDriver($value, $key);
+            foreach ($drivers as $driver) {
+                if ($driver instanceof EveApiCacheInterface) {
+                    $this->addDriver($driver);
                 } else {
                     $mess =
                         'Class '
-                        . get_class($value)
+                        . get_class($driver)
                         . ' does NOT implement EveApiCacheInterface'
                         . ' and could NOT be added as a driver';
                     $this->logger->log(LogLevel::ERROR, $mess);
                 }
             }
         }
+        return $this;
+    }
+    /**
+     * @param string $hash
+     *
+     * @return self Returns self to allow fluid interface.
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
         return $this;
     }
     /**
@@ -377,137 +525,5 @@ class EveApiCache implements LoggerAwareInterface
     {
         $this->section = $section;
         return $this;
-    }
-    /**
-     * Used to validate structure of Eve API XML file.
-     *
-     * @param string          $xml        XML to be validated.
-     * @param \XMLReader|null $xr
-     * @param string          $xsdBaseDir Base directory where the per api XSD files can be found.
-     *
-     * @return bool Return TRUE if the XML validates.
-     */
-    public function validateXml(
-        $xml,
-        \XMLReader $xr = null,
-        $xsdBaseDir = __DIR__
-    ) {
-        if (!is_dir($xsdBaseDir)) {
-            $mess = 'Could NOT find or was not a directory ' . $xsdBaseDir;
-            $this->logger->log(LogLevel::CRITICAL, $mess);
-            return false;
-        }
-        if (is_null($xr)) {
-            $xr = new \XMLReader();
-        }
-        // Check for HTML errors.
-        if (false !== strpos($xml, '<!DOCTYPE html')) {
-            $mess =
-                'API returned HTML error page. Check to make sure API '
-                . $this->section
-                . DS
-                . $this->api
-                . ' is a valid API.';
-            $this->logger->log(LogLevel::WARNING, $mess);
-            return false;
-        }
-        // Pass XML data to XMLReader so it can be checked.
-        $xr->XML($xml);
-        // Need to look for XSD Schema for this API to use while validating.
-        // Build W3C Schema file name
-        $cacheFile =
-            $xsdBaseDir . '/' . $this->section . '/' . $this->api . '.xsd';
-        // Can not use schema if it is missing.
-        if (!is_file($cacheFile)) {
-            $mess = 'Missing schema file ' . $cacheFile;
-            $this->logger->log(LogLevel::WARNING, $mess);
-            $cacheFile = $xsdBaseDir . '/unknown.xsd';
-        }
-        // Have to have a good schema.
-        if (!$xr->setSchema($cacheFile)) {
-            $mess = 'Could not load schema file ' . $cacheFile;
-            $this->logger->log(LogLevel::CRITICAL, $mess);
-            return false;
-        }
-        // Scan through API XML.
-        while (@$xr->read()) {
-        }
-        $isValid = (boolean)$xr->isValid();
-        $xr->close();
-        return $isValid;
-    }
-    /**
-     * @param $api
-     * @param $section
-     * @param $owner
-     * @param $postParams
-     */
-    private function calculateHash($api, $section, $owner, $postParams)
-    {
-        $params = $section . $api . $owner;
-        if (!empty($postParams)) {
-            foreach ($postParams as $k => $v) {
-                $params .= $k . '=' . $v;
-            }
-        }
-        $this->hash = hash('sha1', $params);
-    }
-    /**
-     * @param string     $xml
-     * @param \XMLReader $xr
-     *
-     * @return string|false
-     */
-    private function getXmlCurrentTime($xml, \XMLReader $xr)
-    {
-        $result = false;
-        $xr->XML($xml);
-        while (@$xr->read()) {
-            if ($xr->nodeType == $xr::ELEMENT
-                && $xr->localName == 'currentTime'
-            ) {
-                $xr->read();
-                $result = (string)$xr->value;
-                break;
-            }
-        }
-        return $result;
-    }
-    /**
-     * @param string     $xml
-     * @param \XMLReader $xr
-     *
-     * @return array|false
-     */
-    private function gotXmlError($xml, \XMLReader $xr)
-    {
-        $result = false;
-        $xr->XML($xml);
-        while (@$xr->read()) {
-            if ($xr->nodeType == $xr::ELEMENT && $xr->localName == 'error') {
-                $result = array();
-                // API error returned.
-                // See if error code attribute is available.
-                if (true === $xr->hasAttributes) {
-                    $result['code'] = (int)$xr->getAttribute('code');
-                }
-                // Move to message text.
-                $xr->read();
-                $result['message'] = (string)$xr->value;
-                break;
-            }
-        }
-        return $result;
-    }
-    /**
-     * @param CachedInterval|null $ci
-     */
-    private function setDefaultCacheInterval(CachedInterval $ci = null)
-    {
-        if (is_null($ci)) {
-            $ci = new CachedInterval();
-        }
-        $this->cacheInterval =
-            (int)$ci->getInterval($this->api, $this->section);
     }
 }

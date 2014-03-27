@@ -21,7 +21,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2013, Michael Cummings
+ * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @subpackage AApiRequest
  * @link       http://code.google.com/p/yapeal/
@@ -79,7 +79,7 @@ abstract class AApiRequest
             new EveApiCache($this->api, $this->section, $this->ownerID, $this->params);
         try {
             // Get valid cached copy if there is one.
-            $result = $cache->getCachedApi();
+            $result = $cache->getCachedXml();
             // If XML is not cached need to try to get it from API server or proxy.
             if (false === $result) {
                 $proxy = $this->getProxy();

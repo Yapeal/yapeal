@@ -27,7 +27,7 @@ use Yapeal\Caching\EveApiCache;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2013, Michael Cummings
+ * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -90,7 +90,7 @@ class corpCorporationSheet  extends ACorp {
     $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
     try {
       // See if there is a valid cached copy of the API XML.
-      $result = $cache->getCachedApi();
+      $result = $cache->getCachedXml();
       // If it's not cached need to try to get it.
       if (FALSE === $result) {
         $proxy = $this->getProxy();

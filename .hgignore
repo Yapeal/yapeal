@@ -2,6 +2,7 @@ syntax: glob
 .hgsub
 *.komodoproject
 composer.phar
+junk.php
 test.php
 cache/account/*.xml
 cache/ADOdb/*.sql
@@ -15,6 +16,7 @@ log/*.log
 export/
 upload/
 vendor/
+xdebug/
 docs/
 .idea/
 config/yapeal.ini

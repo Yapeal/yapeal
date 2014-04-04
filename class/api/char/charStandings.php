@@ -1,7 +1,4 @@
 <?php
-use Yapeal\Api\AChar;
-use Yapeal\Database\QueryBuilder;
-
 /**
  * Contains Standings class.
  *
@@ -25,7 +22,7 @@ use Yapeal\Database\QueryBuilder;
  *
  * @author     Simon Dellenbach <simon@dellenba.ch>
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -95,7 +92,7 @@ class charStandings extends AChar {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->rowset($prefix . ucfirst($subTable));
@@ -112,12 +109,12 @@ class charStandings extends AChar {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -130,7 +127,7 @@ class charStandings extends AChar {
   protected function rowset($table) {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $table;
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $qb->setDefault('ownerID', $this->params['characterID']);
@@ -161,7 +158,7 @@ class charStandings extends AChar {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -178,15 +175,15 @@ class charStandings extends AChar {
     );
     foreach ($tables as $table) {
       try {
-        $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
         // Empty out old data then upsert (insert) new.
         $sql = 'delete from `';
         $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
         $sql .= ' where `ownerID`=' . $this->ownerID;
         $con->Execute($sql);
       }
-      catch (\ADODB_Exception $e) {
-        \Logger::getLogger('yapeal')->warn($e);
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

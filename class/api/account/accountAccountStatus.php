@@ -21,91 +21,103 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Api\AAccount;
-use Yapeal\Database\QueryBuilder;
-
+/**
+ * @internal Allow viewing of the source code in web browser.
+ */
+if (isset($_REQUEST['viewSource'])) {
+  highlight_file(__FILE__);
+  exit();
+};
+/**
+ * @internal Only let this code be included.
+ */
+if (count(get_included_files()) < 2) {
+  $mess = basename(__FILE__)
+    . ' must be included it can not be ran directly.' . PHP_EOL;
+  if (PHP_SAPI != 'cli') {
+    header('HTTP/1.0 403 Forbidden', TRUE, 403);
+    die($mess);
+  };
+  fwrite(STDERR, $mess);
+  exit(1);
+};
 /**
  * Class used to fetch and store eve SkillTree API.
  *
- * @package Yapeal\Api\Account
+ * @package Yapeal
+ * @subpackage Api_account
  */
-class accountAccountStatus extends AAccount
-{
-    /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws LengthException for any missing required $params.
-     */
-    public function __construct(array $params)
-    {
-        // Cut off 'A' and lower case abstract class name to make section name.
-        $this->section = strtolower(substr(get_parent_class($this), 1));
-        $this->api = str_replace($this->section, '', __CLASS__);
-        parent::__construct($params);
+class accountAccountStatus extends AAccount {
+  /**
+   * Constructor
+   *
+   * @param array $params Holds the required parameters like keyID, vCode, etc
+   * used in HTML POST parameters to API servers which varies depending on API
+   * 'section' being requested.
+   *
+   * @throws LengthException for any missing required $params.
+   */
+  public function __construct(array $params) {
+    // Cut off 'A' and lower case abstract class name to make section name.
+    $this->section = strtolower(substr(get_parent_class($this), 1));
+    $this->api = str_replace($this->section, '', __CLASS__);
+    parent::__construct($params);
+  }// function __construct
+  /**
+   * Per API parser for XML.
+   *
+   * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
+   */
+  protected function parserAPI() {
+    $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
+    // Get a new query instance.
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+    // Set any column defaults needed.
+    $qb->setDefault('keyID', $this->params['keyID']);
+    $row = array();
+    try {
+      while ($this->xr->read()) {
+        switch ($this->xr->nodeType) {
+          case XMLReader::ELEMENT:
+            switch ($this->xr->localName) {
+              case 'createDate':
+              case 'logonCount':
+              case 'logonMinutes':
+              case 'paidUntil':
+                // Grab node name.
+                $name = $this->xr->localName;
+                // Move to text node.
+                $this->xr->read();
+                $row[$name] = $this->xr->value;
+                break;
+              default:// Nothing to do.
+            };// switch $this->xr->localName ...
+            break;
+          case XMLReader::END_ELEMENT:
+            if ($this->xr->localName == 'result') {
+              $qb->addRow($row);
+              $qb->store();
+              $qb = NULL;
+              return TRUE;
+            };// if $this->xr->localName == 'row' ...
+            break;
+          default:// Nothing to do.
+        };// switch $this->xr->nodeType ...
+      };// while $this->xr->read() ...
     }
-    // function __construct
-    /**
-     * Per API parser for XML.
-     *
-     * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
-     */
-    protected function parserAPI()
-    {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Set any column defaults needed.
-        $qb->setDefault('keyID', $this->params['keyID']);
-        $row = array();
-        try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
-                    case XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
-                            case 'createDate':
-                            case 'logonCount':
-                            case 'logonMinutes':
-                            case 'paidUntil':
-                                // Grab node name.
-                                $name = $this->xr->localName;
-                                // Move to text node.
-                                $this->xr->read();
-                                $row[$name] = $this->xr->value;
-                                break;
-                            default: // Nothing to do.
-                        }; // switch $this->xr->localName ...
-                        break;
-                    case XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
-                            $qb->addRow($row);
-                            $qb->store();
-                            $qb = null;
-                            return true;
-                        }; // if $this->xr->localName == 'row' ...
-                        break;
-                    default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                ->error($e);
-            return false;
-        }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-            ->warn($mess);
-        return false;
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
+      return FALSE;
     }
-    // function parserAPI
+    $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+    Logger::getLogger('yapeal')->warn($mess);
+    return FALSE;
+  }// function parserAPI
 }
 

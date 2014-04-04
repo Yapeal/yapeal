@@ -1,10 +1,4 @@
 <?php
-use Yapeal\Api\ACorp;
-use Yapeal\Database\QueryBuilder;
-use Yapeal\Exception\YapealApiErrorException;
-use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\Caching\EveApiCache;
-
 /**
  * Contains CorporationSheet class.
  *
@@ -27,7 +21,7 @@ use Yapeal\Caching\EveApiCache;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -87,10 +81,10 @@ class corpCorporationSheet  extends ACorp {
     $apiParams = $this->params;
     unset($apiParams['corporationID']);
     // First get a new cache instance.
-    $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+    $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
     try {
       // See if there is a valid cached copy of the API XML.
-      $result = $cache->getCachedXml();
+      $result = $cache->getCachedApi();
       // If it's not cached need to try to get it.
       if (FALSE === $result) {
         $proxy = $this->getProxy();
@@ -139,7 +133,7 @@ class corpCorporationSheet  extends ACorp {
       $data = array( 'api' => $this->api, 'cachedUntil' => $cuntil,
         'ownerID' => $this->ownerID, 'section' => $this->section
       );
-      $cu = new \Yapeal\Util\CachedUntil($data);
+      $cu = new CachedUntil($data);
       $cu->store();
       $this->xr->close();
       return $result;
@@ -150,9 +144,9 @@ class corpCorporationSheet  extends ACorp {
       $this->handleApiError($e);
       return FALSE;
     }
-    catch (\ADODB_Exception $e) {
+    catch (ADODB_Exception $e) {
       $mess = 'Uncaught ADOdb exception' . PHP_EOL;
-      \Logger::getLogger('yapeal')->warn($mess);
+      Logger::getLogger('yapeal')->warn($mess);
       // Catch any uncaught ADOdb exceptions here.
       return FALSE;
     }
@@ -165,7 +159,7 @@ class corpCorporationSheet  extends ACorp {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('allianceName', '');
     $row = array();
     try {
@@ -205,7 +199,7 @@ class corpCorporationSheet  extends ACorp {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->$subTable();
@@ -219,7 +213,7 @@ class corpCorporationSheet  extends ACorp {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 $this->rowset($subTable);
@@ -241,12 +235,12 @@ class corpCorporationSheet  extends ACorp {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -257,7 +251,7 @@ class corpCorporationSheet  extends ACorp {
   protected function logo() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'Logo';
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('ownerID', $this->ownerID);
     $row = array();
     while ($this->xr->read()) {
@@ -287,7 +281,7 @@ class corpCorporationSheet  extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function logo
   /**
@@ -300,7 +294,7 @@ class corpCorporationSheet  extends ACorp {
   protected function rowset($table) {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     $qb->setDefault('ownerID', $this->ownerID);
     while ($this->xr->read()) {
       switch ($this->xr->nodeType) {
@@ -329,7 +323,7 @@ class corpCorporationSheet  extends ACorp {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
 }

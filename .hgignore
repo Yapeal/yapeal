@@ -3,7 +3,6 @@ syntax: glob
 *.komodoproject
 composer.phar
 test.php
-junk.php
 cache/account/*.xml
 cache/ADOdb/*.sql
 cache/char/*.xml
@@ -18,3 +17,4 @@ upload/
 vendor/
 docs/
 .idea/
+config/yapeal.ini

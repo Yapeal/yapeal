@@ -1,10 +1,8 @@
 {
-    "name":              "yapeal/yapeal",
-    "description":       "Yet Another Php Eve Api Library: Used to access the Eve Online XML API data and place it into a database.",
-    "keywords":          [
-        "curl", "database", "Eve-Online", "rest", "PDO", "Yapeal", "Eve API"],
-    "license":           "LGPL-3.0+",
-    "authors":           [
+    "name":        "yapeal/yapeal",
+    "description": "Yet Another Php Eve Api Library",
+    "license":     "LGPL-3.0+",
+    "authors":     [
         {
             "name":  "Michael Cummings",
             "email": "dragonaire@users.sourceforge.net",
@@ -16,52 +14,28 @@
             "role":  "Developer"
         }
     ],
-    "support":           {
+    "support":     {
         "issues": "https://sourceforge.net/p/yapeal/tickets/",
         "source": "https://sourceforge.net/projects/yapeal/files/",
         "wiki":   "https://sourceforge.net/p/yapeal/wiki/Home/"
     },
-    "homepage":          "https://sourceforge.net/p/yapeal",
-    "minimum-stability": "dev",
-    "prefer-stable":     true,
-    "autoload":          {
-        "psr-0": {
-            "Yapeal\\": ["lib/", "bin/"]
-        }
+    "require":     {
+        "ext-curl":       "*",
+        "ext-date":       "*",
+        "ext-hash":       "*",
+        "ext-mysql":      "*",
+        "ext-mysqli":     "*",
+        "ext-openssl":    "*",
+        "ext-Reflection": "*",
+        "ext-SimpleXML":  "*",
+        "ext-SPL":        "*",
+        "ext-xmlreader":  "*",
+        "lib-curl":       ">=7.15.0",
+        "lib-openssl":    ">=0.9.8",
+        "php":            ">=5.3.0"
     },
-    "require":           {
-        "ext-curl":        "*",
-        "ext-date":        "*",
-        "ext-hash":        "*",
-        "ext-mysql":       "*",
-        "ext-mysqli":      "*",
-        "ext-openssl":     "*",
-        "ext-PDO":         "*",
-        "ext-Reflection":  "*",
-        "ext-SimpleXML":   "*",
-        "ext-SPL":         "*",
-        "ext-xmlreader":   "*",
-        "lib-curl":        ">=7.15.0",
-        "lib-openssl":     ">=0.9.8",
-        "monolog/monolog": "~1.6.0",
-        "php":             ">=5.3.6"
-    },
-    "require-dev":       {
-        "cilex/cilex": "~1.0.1",
-        "ext-xsl":                          "*",
-        "mikey179/vfsStream":               "1.2.*",
-        "phpdocumentor/phpdocumentor":      "2.1.*",
-        "phpdocumentor/template-new-black": "1.3.1",
-        "phpmd/phpmd":                      "1.5.*",
-        "phpunit/phpunit":                  "~3.7.28",
-        "phpunit/dbunit":                   "~1.2.3",
-        "phpunit/php-code-coverage":        "~1.2.1",
-        "phpunit/php-invoker":              "~1.1.0",
-        "phpunit/phpunit-mock-objects":     "~1.2.0",
-        "sebastian/phpcpd":                 "1.4.*",
-        "squizlabs/php_codesniffer":        "1.4.*",
-        "twig/twig":                        "1.14.*",
-        "symfony/config":                   "~2.3.6",
-        "symfony/console":                  "~2.3.6"
+    "require-dev": {
+        "ext-xsl":                     "*",
+        "phpdocumentor/phpdocumentor": "dev-develop"
     }
 }

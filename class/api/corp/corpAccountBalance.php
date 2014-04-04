@@ -1,6 +1,4 @@
 <?php
-use Yapeal\Api\ACorp;
-
 /**
  * Contains AccountBalance class.
  *
@@ -23,7 +21,7 @@ use Yapeal\Api\ACorp;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/

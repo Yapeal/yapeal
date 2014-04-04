@@ -23,7 +23,7 @@
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Michael Cummings <mgcummings@yahoo.com>
- * @copyright Copyright (c) 2008-2014, Michael Cummings
+ * @copyright Copyright (c) 2008-2013, Michael Cummings
  * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package Yapeal
  * @subpackage Install
@@ -75,13 +75,27 @@
     <field name="`cachedUntil`" type="T">
       <NOTNULL/>
     </field>
-    <field name="`section`" type="C" size="12">
+    <field name="`section`" type="C" size="8">
       <NOTNULL/>
     </field>
     <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
-  <table name="utilGraphic">
+  <table name="utilConfig">
     <DROP/>
+  </table>
+  <table name="utilGraphic">
+    <descr>Used to maintain a list of graphics for registered chars and corps</descr>
+    <field name="`graphic`" type="B"/>
+    <field name="`graphicType`" type="C" size="4"/>
+    <field name="`ownerID`" type="I8" size="20">
+      <KEY/>
+      <UNSIGNED/>
+    </field>
+    <field name="`ownerType`" type="C" size="4"/>
+    <index name="`utilGraphic1`">
+      <col>`OwnerType`</col>
+    </index>
+    <opt platform="mysql"> ENGINE = InnoDB COLLATE = ascii_general_ci</opt>
   </table>
   <table name="utilRegisteredCharacter">
     <descr>Used to maintain a list of characters that are registered with Yapeal to have their APIs gotten</descr>

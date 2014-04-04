@@ -1,7 +1,4 @@
 <?php
-use Yapeal\Api\AAccount;
-use Yapeal\Database\QueryBuilder;
-
 /**
  * Contains APIKeyInfo class.
  *
@@ -24,7 +21,7 @@ use Yapeal\Database\QueryBuilder;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -59,11 +56,11 @@ if (count(get_included_files()) < 2) {
  */
 class accountAPIKeyInfo extends AAccount {
   /**
-   * @var QueryBuilder Holds QueryBuilder for bridge table.
+   * @var YapealQueryBuilder Holds YapealQueryBuilder for bridge table.
    */
   protected $bridge;
   /**
-   * @var QueryBuilder Holds QueryBuilder for characters table.
+   * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
    */
   protected $characters;
   /**
@@ -89,14 +86,14 @@ class accountAPIKeyInfo extends AAccount {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     // Get a new query instance for Characters.
-    $this->characters = new QueryBuilder(
+    $this->characters = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Characters', YAPEAL_DSN);
     // Get a new query instance for KeyBridge.
-    $this->bridge = new QueryBuilder(
+    $this->bridge = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->bridge->useUpsert(FALSE);
@@ -127,7 +124,7 @@ class accountAPIKeyInfo extends AAccount {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 if ($subTable == 'characters') {
@@ -159,12 +156,12 @@ class accountAPIKeyInfo extends AAccount {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -177,7 +174,7 @@ class accountAPIKeyInfo extends AAccount {
    */
   protected function prepareTables() {
     try {
-      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       // Empty out old data then upsert (insert) new.
       $sql = 'delete from `';
       $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
@@ -188,8 +185,8 @@ class accountAPIKeyInfo extends AAccount {
       $sql .= ' where `keyID`=' . $this->params['keyID'];
       $con->Execute($sql);
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->warn($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     return TRUE;
@@ -227,7 +224,7 @@ class accountAPIKeyInfo extends AAccount {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function characters
 }

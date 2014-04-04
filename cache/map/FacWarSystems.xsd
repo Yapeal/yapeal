@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:element name="eveapi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="currentTime" type="eveNEDT"/>
+        <xs:choice>
+          <xs:element name="error">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="result">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@solarSystemID"/>
+                  </xs:key>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="cachedUntil" type="eveNEDT"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="rowType">
+    <xs:attribute name="contested" use="required" type="eveBoolean"/>
+    <xs:attribute name="occupyingFactionID" use="required" type="eveID"/>
+    <xs:attribute name="occupyingFactionName" use="required" type="xs:string"/>
+    <xs:attribute name="owningFactionID" use="required" type="eveID"/>
+    <xs:attribute name="owningFactionName" use="required" type="xs:string"/>
+    <xs:attribute name="solarSystemID" use="required" type="eveID"/>
+    <xs:attribute name="solarSystemName" use="required" type="xs:string"/>
+  </xs:complexType>
+</xs:schema>

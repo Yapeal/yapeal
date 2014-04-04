@@ -1,10 +1,4 @@
 <?php
-use Yapeal\Api\AChar;
-use Yapeal\Database\QueryBuilder;
-use Yapeal\Exception\YapealApiErrorException;
-use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\Caching\EveApiCache;
-
 /**
  * Contains WalletJournal class.
  *
@@ -27,7 +21,7 @@ use Yapeal\Caching\EveApiCache;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -123,10 +117,10 @@ class charWalletJournal extends AChar {
         // This tells API server how many rows we want.
         $apiParams['rowCount'] = $rowCount;
         // First get a new cache instance.
-        $cache = new EveApiCache($this->api, $this->section, $this->ownerID,
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID,
           $apiParams);
         // See if there is a valid cached copy of the API XML.
-        $result = $cache->getCachedXml();
+        $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.
         if (FALSE === $result) {
           $proxy = $this->getProxy();
@@ -191,7 +185,7 @@ class charWalletJournal extends AChar {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance with autoStore off.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Set any column defaults needed.
     $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
     $qb->setDefaults($defaults);
@@ -246,12 +240,12 @@ class charWalletJournal extends AChar {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
 }

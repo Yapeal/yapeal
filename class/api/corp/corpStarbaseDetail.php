@@ -1,10 +1,4 @@
 <?php
-use Yapeal\Api\ACorp;
-use Yapeal\Database\QueryBuilder;
-use Yapeal\Exception\YapealApiErrorException;
-use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\Caching\EveApiCache;
-
 /**
  * Contains StarbaseDetail class.
  *
@@ -27,7 +21,7 @@ use Yapeal\Caching\EveApiCache;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -65,15 +59,15 @@ class corpStarbaseDetail extends ACorp {
    */
   private $posID;
   /**
-   * @var QueryBuilder Query instance for combatSettings table.
+   * @var YapealQueryBuilder Query instance for combatSettings table.
    */
   private $combat;
   /**
-   * @var QueryBuilder Query instance for fuel table.
+   * @var YapealQueryBuilder Query instance for fuel table.
    */
   private $fuel;
   /**
-   * @var QueryBuilder Query instance for generalSettings table.
+   * @var YapealQueryBuilder Query instance for generalSettings table.
    */
   private $general;
   /**
@@ -113,9 +107,9 @@ class corpStarbaseDetail extends ACorp {
         // This tells API server which tower we want.
         $apiParams['itemID'] = (string)$this->posID['itemID'];
         // First get a new cache instance.
-        $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
-        $result = $cache->getCachedXml();
+        $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.
         if (FALSE === $result) {
           $proxy = $this->getProxy();
@@ -160,27 +154,27 @@ class corpStarbaseDetail extends ACorp {
           $mess .= ' from StarbaseList for ' . $this->ownerID;
           $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList';
           try {
-            $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'delete from ';
             $sql .= '`' . $tableName . '`';
             $sql .= ' where `ownerID`=' . $this->ownerID;
             $sql .= ' and `itemID`=' . $this->posID['itemID'];
             $con->Execute($sql);
           }
-          catch (\ADODB_Exception $e) {
+          catch (ADODB_Exception $e) {
             $mess = 'Could not delete ' . $this->posID['itemID'];
             $mess .= ' from StarbaseList for ' . $this->ownerID;
-            \Logger::getLogger('yapeal')->warn($mess);
+            Logger::getLogger('yapeal')->warn($mess);
             // Something wrong with query return FALSE.
             return FALSE;
           }
-          \Logger::getLogger('yapeal')->warn($mess);
+          Logger::getLogger('yapeal')->warn($mess);
         };// if $e->getCode() == 114 ...
         $ret = FALSE;
         continue;
       }
-      catch (\ADODB_Exception $e) {
-        \Logger::getLogger('yapeal')->warn($e);
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         $ret = FALSE;
         continue;
       }
@@ -196,26 +190,26 @@ class corpStarbaseDetail extends ACorp {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     $defaults = array('ownerID' => $this->ownerID);
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     $qb->setDefaults($defaults);
     // Get a new query instance.
-    $this->combat = new QueryBuilder(
+    $this->combat = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
     );
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->combat->useUpsert(FALSE);
     $this->combat->setDefaults($defaults);
     // Get a new query instance.
-    $this->fuel = new QueryBuilder(
+    $this->fuel = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
     );
     // Save some overhead for tables that are truncated or in some way emptied.
     $this->fuel->useUpsert(FALSE);
     $this->fuel->setDefaults($defaults);
     // Get a new query instance.
-    $this->general = new QueryBuilder(
+    $this->general = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
     );
     // Save some overhead for tables that are truncated or in some way emptied.
@@ -249,7 +243,7 @@ class corpStarbaseDetail extends ACorp {
                 if (!is_callable(array($this, $subTable))) {
                   $mess = 'Unknown what-to-be rowset ' . $subTable;
                   $mess .= ' found in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   $ret = FALSE;
                   continue;
                 };
@@ -267,7 +261,7 @@ class corpStarbaseDetail extends ACorp {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   $ret = FALSE;
                   continue;
                 };
@@ -305,12 +299,12 @@ class corpStarbaseDetail extends ACorp {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -348,7 +342,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function combatSettings
   /**
@@ -382,7 +376,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function generalSettings
   /**
@@ -415,7 +409,7 @@ class corpStarbaseDetail extends ACorp {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -426,15 +420,15 @@ class corpStarbaseDetail extends ACorp {
    */
   protected function posList() {
     try {
-      $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+      $con = YapealDBConnection::connect(YAPEAL_DSN);
       $sql = 'select `itemID`';
       $sql .= ' from ';
       $sql .= '`' . YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList' . '`';
       $sql .= ' where `ownerID`=' . $this->ownerID;
       $list = $con->GetAll($sql);
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->warn($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->warn($e);
       return FALSE;
     }
     if (count($list) == 0) {
@@ -460,15 +454,15 @@ class corpStarbaseDetail extends ACorp {
       'StarbaseDetail');
     foreach ($tables as $table) {
       try {
-        $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
         // Empty out old data then upsert (insert) new.
         $sql = 'delete from `';
         $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
         $sql .= ' where `ownerID`=' . $this->ownerID;
         $con->Execute($sql);
       }
-      catch (\ADODB_Exception $e) {
-        \Logger::getLogger('yapeal')->warn($e);
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

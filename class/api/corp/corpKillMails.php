@@ -1,10 +1,4 @@
 <?php
-use Yapeal\Api\ACorp;
-use Yapeal\Database\QueryBuilder;
-use Yapeal\Exception\YapealApiErrorException;
-use Yapeal\Network\YapealNetworkConnection;
-use Yapeal\Caching\EveApiCache;
-
 /**
  * Contains killmails class.
  *
@@ -27,7 +21,7 @@ use Yapeal\Caching\EveApiCache;
  *  along with Yapeal. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -62,7 +56,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpKillMails extends ACorp {
   /**
-   * @var QueryBuilder QueryBuilder instance for attackers table.
+   * @var YapealQueryBuilder QueryBuilder instance for attackers table.
    */
   protected $attackers;
   /**
@@ -74,7 +68,7 @@ class corpKillMails extends ACorp {
    */
   private $date;
   /**
-   * @var QueryBuilder QueryBuilder instance for items table.
+   * @var YapealQueryBuilder QueryBuilder instance for items table.
    */
   protected $items;
   /**
@@ -87,7 +81,7 @@ class corpKillMails extends ACorp {
    */
   private $stack = array();
   /**
-   * @var QueryBuilder QueryBuilder instance for victim table.
+   * @var YapealQueryBuilder QueryBuilder instance for victim table.
    */
   protected $victim;
   /**
@@ -130,9 +124,9 @@ class corpKillMails extends ACorp {
          */
         $oldest = gmdate('Y-m-d H:i:s', strtotime('7 days ago'));
         // First get a new cache instance.
-        $cache = new EveApiCache($this->api, $this->section, $this->ownerID, $apiParams);
+        $cache = new YapealApiCache($this->api, $this->section, $this->ownerID, $apiParams);
         // See if there is a valid cached copy of the API XML.
-        $result = $cache->getCachedXml();
+        $result = $cache->getCachedApi();
         // If it's not cached need to try to get it.
         if (FALSE === $result) {
           $proxy = $this->getProxy();
@@ -177,8 +171,8 @@ class corpKillMails extends ACorp {
       $this->handleApiError($e);
       return FALSE;
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     return $result;
@@ -195,16 +189,16 @@ class corpKillMails extends ACorp {
   protected function parserAPI() {
     $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Get a new query instance for attackers.
-    $this->attackers = new QueryBuilder(
+    $this->attackers = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Attackers', YAPEAL_DSN);
     // Get a new query instance for items.
-    $this->items = new QueryBuilder(
+    $this->items = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Items', YAPEAL_DSN);
     $this->items->setDefault('singleton', 0);
     // Get a new query instance for victim.
-    $this->victim = new QueryBuilder(
+    $this->victim = new YapealQueryBuilder(
       YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN);
     $typeID = 0;
     try {
@@ -251,7 +245,7 @@ class corpKillMails extends ACorp {
                 $subTable = $this->xr->getAttribute('name');
                 if (empty($subTable)) {
                   $mess = 'Name of rowset is missing in ' . $this->api;
-                  \Logger::getLogger('yapeal')->warn($mess);
+                  Logger::getLogger('yapeal')->warn($mess);
                   return FALSE;
                 };
                 if ($subTable == 'items') {
@@ -299,12 +293,12 @@ class corpKillMails extends ACorp {
         };// switch $this->xr->nodeType
       };// while $xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -384,7 +378,7 @@ class corpKillMails extends ACorp {
       };// switch $this->xr->nodeType
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return $inherit['index'];
   }// function nestedSet
   /**
@@ -415,7 +409,7 @@ class corpKillMails extends ACorp {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
 }

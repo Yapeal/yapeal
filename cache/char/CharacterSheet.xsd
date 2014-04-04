@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:include schemaLocation="../eveapi.xsd"/>
+  <xs:element name="eveapi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="currentTime" type="eveNEDT"/>
+        <xs:choice>
+          <xs:element name="error">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="result">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="characterID" type="eveID"/>
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="DoB" type="eveDT"/>
+                <xs:element name="race" type="xs:string"/>
+                <xs:element name="bloodLine" type="xs:string"/>
+                <xs:element name="ancestry" type="xs:string"/>
+                <xs:element name="gender" type="xs:NCName"/>
+                <xs:element name="corporationName" type="xs:string"/>
+                <xs:element name="corporationID" type="eveID"/>
+                <xs:element name="allianceName" type="xs:string" minOccurs="0"/>
+                <xs:element name="allianceID" type="eveID" minOccurs="0"/>
+                <xs:element name="cloneName" type="xs:string"/>
+                <xs:element name="cloneSkillPoints" type="xs:unsignedLong"/>
+                <xs:element name="balance" type="xs:decimal"/>
+                <xs:element name="attributeEnhancers">
+                  <xs:complexType>
+                    <xs:choice minOccurs="0" maxOccurs="5">
+                      <xs:element name="charismaBonus" type="attributeBonusType"/>
+                      <xs:element name="intelligenceBonus" type="attributeBonusType"/>
+                      <xs:element name="memoryBonus" type="attributeBonusType"/>
+                      <xs:element name="perceptionBonus" type="attributeBonusType"/>
+                      <xs:element name="willpowerBonus" type="attributeBonusType"/>
+                    </xs:choice>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="attributes">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="intelligence" type="xs:unsignedByte"/>
+                      <xs:element name="memory" type="xs:unsignedByte"/>
+                      <xs:element name="charisma" type="xs:unsignedByte"/>
+                      <xs:element name="perception" type="xs:unsignedByte"/>
+                      <xs:element name="willpower" type="xs:unsignedByte"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="level" type="xs:unsignedByte"/>
+                          <xs:attribute name="skillpoints" type="xs:unsignedLong"/>
+                          <xs:attribute name="typeID" type="eveID"/>
+                          <xs:attribute name="published" type="eveBoolean" use="optional"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="typeID"/>
+                    <xs:attribute name="name" fixed="skills"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdSkillsKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@typeID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="certificateID" type="eveID"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="certificateID"/>
+                    <xs:attribute name="name" fixed="certificates"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCertificatesKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@certificateID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="roleID" type="eveID"/>
+                          <xs:attribute name="roleName" type="xs:string"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="roleID"/>
+                    <xs:attribute name="name" fixed="corporationRoles"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporationRolesKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@roleID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="roleID" type="eveID"/>
+                          <xs:attribute name="roleName" type="xs:string"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="roleID"/>
+                    <xs:attribute name="name" fixed="corporationRolesAtHQ"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporationRolesAtHQKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@roleID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="roleID" type="eveID"/>
+                          <xs:attribute name="roleName" type="xs:string"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="roleID"/>
+                    <xs:attribute name="name" fixed="corporationRolesAtBase"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporationRolesAtBaseKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@roleID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="roleID" type="eveID"/>
+                          <xs:attribute name="roleName" type="xs:string"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="roleID"/>
+                    <xs:attribute name="name" fixed="corporationRolesAtOther"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporationRolesAtOtherKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@roleID"/>
+                  </xs:key>
+                </xs:element>
+                <xs:element name="rowset">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="titleID" type="eveID"/>
+                          <xs:attribute name="titleName" type="xs:string"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="columns" use="required" type="eveColumns"/>
+                    <xs:attribute name="key" fixed="titleID"/>
+                    <xs:attribute name="name" fixed="corporationTitles"/>
+                  </xs:complexType>
+                  <xs:key name="rowIdCorporationTitlesKey">
+                    <xs:annotation>
+                      <xs:documentation>The attribute named by the key attribute on the rowset is a key for the rows</xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@titleID"/>
+                  </xs:key>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="cachedUntil" type="eveNEDT"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="attributeBonusType">
+    <xs:sequence>
+      <xs:element name="augmentatorName" type="xs:string"/>
+      <xs:element name="augmentatorValue" type="xs:unsignedByte"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

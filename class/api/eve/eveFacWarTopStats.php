@@ -1,7 +1,4 @@
 <?php
-use Yapeal\Api\AEve;
-use Yapeal\Database\QueryBuilder;
-
 /**
  * Contains FacWarTopStats class.
  *
@@ -25,7 +22,7 @@ use Yapeal\Database\QueryBuilder;
  *
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @author     Claus G. Pedersen <satissis@gmail.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings, Claus G. Pedersen
+ * @copyright  Copyright (c) 2008-2013, Michael Cummings, Claus G. Pedersen
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
@@ -107,12 +104,12 @@ class eveFacWarTopStats extends AEve {
         };// switch $this->xr->nodeType ...
       };// while $this->xr->read() ...
     }
-    catch (\ADODB_Exception $e) {
-      \Logger::getLogger('yapeal')->error($e);
+    catch (ADODB_Exception $e) {
+      Logger::getLogger('yapeal')->error($e);
       return FALSE;
     }
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function parserAPI
   /**
@@ -136,7 +133,7 @@ class eveFacWarTopStats extends AEve {
               $subTable = $this->xr->getAttribute('name');
               if (empty($subTable)) {
                 $mess = 'Name of rowset is missing in ' . $this->api;
-                \Logger::getLogger('yapeal')->warn($mess);
+                Logger::getLogger('yapeal')->warn($mess);
                 return FALSE;
               };
               $this->rowset($table . $subTable);
@@ -155,7 +152,7 @@ class eveFacWarTopStats extends AEve {
       };// switch $this->xr->nodeType ...
     };// while $xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function attributes
   /**
@@ -168,7 +165,7 @@ class eveFacWarTopStats extends AEve {
   protected function rowset($tableName) {
     //$tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
     // Get a new query instance.
-    $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+    $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
     // Save some overhead for tables that are truncated or in some way emptied.
     $qb->useUpsert(FALSE);
     while ($this->xr->read()) {
@@ -198,7 +195,7 @@ class eveFacWarTopStats extends AEve {
       };// switch $this->xr->nodeType
     };// while $this->xr->read() ...
     $mess = 'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-    \Logger::getLogger('yapeal')->warn($mess);
+    Logger::getLogger('yapeal')->warn($mess);
     return FALSE;
   }// function rowset
   /**
@@ -221,14 +218,14 @@ class eveFacWarTopStats extends AEve {
                     'FactionsVictoryPointsTotal',     'FactionsVictoryPointsYesterday');
     foreach ($tables as $table) {
       try {
-        $con = \Yapeal\Database\DatabaseConnection::connect(YAPEAL_DSN);
+        $con = YapealDBConnection::connect(YAPEAL_DSN);
         // Empty out old data then upsert (insert) new.
         $sql = 'TRUNCATE TABLE `';
         $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
         $con->Execute($sql);
       }
-      catch (\ADODB_Exception $e) {
-        \Logger::getLogger('yapeal')->warn($e);
+      catch (ADODB_Exception $e) {
+        Logger::getLogger('yapeal')->warn($e);
         return FALSE;
       }
     };// foreach $tables ...

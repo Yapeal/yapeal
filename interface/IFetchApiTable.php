@@ -32,37 +32,37 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
-
 /**
  * Interface for getting (pulling) an Eve API.
  *
- * @package Yapeal
+ * @package    Yapeal
  * @subpackage Api
  */
-interface IFetchApiTable {
-  /**
-   * Used to get an item from Eve API.
-   *
-   * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
-   *
-   * @return boolean Returns TRUE if item received.
-   */
-  public function apiFetch();
+interface IFetchApiTable
+{
+    /**
+     * Used to get an item from Eve API.
+     *
+     * Parent item (object) should call all child(ren)'s apiFetch() as appropriate.
+     *
+     * @return boolean Returns TRUE if item received.
+     */
+    public function apiFetch();
 }
 

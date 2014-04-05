@@ -32,89 +32,90 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
 // Define short name for directory separator which always uses '/'.
 if (!defined('DS')) {
-  /**
-   * Define short name for directory separator which always uses unix '/'.
-   * @ignore
-   */
-  define('DS', '/');
+    /**
+     * Define short name for directory separator which always uses unix '/'.
+     *
+     * @ignore
+     */
+    define('DS', '/');
 };
 if (!defined('YAPEAL_INC')) {
-  // Used to over come path issues caused by how script is ran on server.
-  $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
-  /**
-   * Since this file has to be in the 'inc' directory we can set that path now.
-   */
-  define('YAPEAL_INC', $dir . DS);
+    // Used to over come path issues caused by how script is ran on server.
+    $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
+    /**
+     * Since this file has to be in the 'inc' directory we can set that path now.
+     */
+    define('YAPEAL_INC', $dir . DS);
 };
 if (!defined('YAPEAL_BASE')) {
-  // Check if the base path for Yapeal has been set in the environment.
-  $dir = @getenv('YAPEAL_BASE');
-  if ($dir === FALSE) {
-    $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
-  };
-  /**
-   * We know the 'base' directory should be just above 'inc' by default.
-   */
-  define('YAPEAL_BASE', $dir . DS);
+    // Check if the base path for Yapeal has been set in the environment.
+    $dir = @getenv('YAPEAL_BASE');
+    if ($dir === false) {
+        $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
+    };
+    /**
+     * We know the 'base' directory should be just above 'inc' by default.
+     */
+    define('YAPEAL_BASE', $dir . DS);
 };
 if (!defined('YAPEAL_CACHE')) {
-  /**
-   * The 'cache' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
+    /**
+     * The 'cache' directory is normally just above base but can be moved in some
+     * configurations.
+     */
+    define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
 };
 if (!defined('YAPEAL_CLASS')) {
-  /**
-   * The 'class' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
+    /**
+     * The 'class' directory is normally just above base but can be moved in some
+     * configurations.
+     */
+    define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
 };
 if (!defined('YAPEAL_CONFIG')) {
-  /**
-   * The 'config' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_CONFIG', YAPEAL_BASE . 'config' . DS);
+    /**
+     * The 'config' directory is normally just above base but can be moved in some
+     * configurations.
+     */
+    define('YAPEAL_CONFIG', YAPEAL_BASE . 'config' . DS);
 };
 if (!defined('YAPEAL_EXT')) {
-  /**
-   * The 'ext' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
+    /**
+     * The 'ext' directory is normally just above base but can be moved in some
+     * configurations.
+     */
+    define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
 };
 if (!defined('YAPEAL_INTERFACE')) {
-  /**
-   * The 'interface' directory is normally just above base but can be moved in
-   * some configurations.
-   */
-  define('YAPEAL_INTERFACE', YAPEAL_BASE . 'interface' . DS);
+    /**
+     * The 'interface' directory is normally just above base but can be moved in
+     * some configurations.
+     */
+    define('YAPEAL_INTERFACE', YAPEAL_BASE . 'interface' . DS);
 };
 if (!defined('YAPEAL_LOG')) {
-  /**
-   * The 'log' directory is normally just above base but can be moved in some
-   * configurations.
-   */
-  define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
+    /**
+     * The 'log' directory is normally just above base but can be moved in some
+     * configurations.
+     */
+    define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
 };
 

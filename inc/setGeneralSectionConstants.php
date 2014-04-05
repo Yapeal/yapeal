@@ -32,20 +32,20 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__) . ' must be included it can not be ran directly';
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__) . ' must be included it can not be ran directly';
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
 /**
  * Function used to set constants from general area (not in a section) of the
@@ -53,26 +53,27 @@ if (count(get_included_files()) < 2) {
  *
  * @param array $section A list of settings for this section of configuration.
  */
-function setGeneralSectionConstants(array $section) {
-  if (!defined('YAPEAL_APPLICATION_AGENT')) {
-    $curl = curl_version();
-    $user_agent = $section['application_agent'];
-    $user_agent .= ' Yapeal/'. YAPEAL_VERSION . ' ' . YAPEAL_STABILITY;
-    $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
-    $user_agent .= ' libcurl/' . $curl['version'];
-    $user_agent = trim($user_agent);
-    /**
-     * Used as default user agent in network connections.
-     */
-    define('YAPEAL_APPLICATION_AGENT', $user_agent);
-  };
-  if (!defined('YAPEAL_REGISTERED_MODE')) {
-    /**
-     * Determines how utilRegisteredKey, utilRegisteredCharacter, and
-     * utilRegisteredCorporation tables are used, it also allows some columns in
-     * this tables to be optional depending on value.
-     */
-    define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
-  };
+function setGeneralSectionConstants(array $section)
+{
+    if (!defined('YAPEAL_APPLICATION_AGENT')) {
+        $curl = curl_version();
+        $user_agent = $section['application_agent'];
+        $user_agent .= ' Yapeal/' . YAPEAL_VERSION . ' ' . YAPEAL_STABILITY;
+        $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
+        $user_agent .= ' libcurl/' . $curl['version'];
+        $user_agent = trim($user_agent);
+        /**
+         * Used as default user agent in network connections.
+         */
+        define('YAPEAL_APPLICATION_AGENT', $user_agent);
+    };
+    if (!defined('YAPEAL_REGISTERED_MODE')) {
+        /**
+         * Determines how utilRegisteredKey, utilRegisteredCharacter, and
+         * utilRegisteredCorporation tables are used, it also allows some columns in
+         * this tables to be optional depending on value.
+         */
+        define('YAPEAL_REGISTERED_MODE', $section['registered_mode']);
+    };
 }// function setGeneralSectionConstants
 

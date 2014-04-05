@@ -32,48 +32,48 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
-
 /**
  * Interface for loading (selecting) Eve API from a database table.
  *
- * @package Yapeal
+ * @package    Yapeal
  * @subpackage Api
  */
-interface ILoadApiTable {
-  /**
-   * Used to load an item by ID from database.
-   *
-   * @param mixed $item ID of an item to load. Can be an integer for normal IDs
-   * or string for big integer IDs
-   * @param string $field column name to use in where clause.
-   *
-   * @return array Returns an array containing item or NULL if item not found.
-   */
-  function apiLoadByID($item = NULL, $field = NULL);
-  /**
-   * Used to load a named item from database.
-   *
-   * @param string $item Name of an item to load.
-   * @param string $field column name to use in where clause.
-   *
-   * @return array Returns an array containing item or NULL if item not found.
-   */
-  function apiLoadByName($item = NULL, $field = NULL);
+interface ILoadApiTable
+{
+    /**
+     * Used to load an item by ID from database.
+     *
+     * @param mixed  $item  ID of an item to load. Can be an integer for normal IDs
+     *                      or string for big integer IDs
+     * @param string $field column name to use in where clause.
+     *
+     * @return array Returns an array containing item or NULL if item not found.
+     */
+    function apiLoadByID($item = null, $field = null);
+    /**
+     * Used to load a named item from database.
+     *
+     * @param string $item  Name of an item to load.
+     * @param string $field column name to use in where clause.
+     *
+     * @return array Returns an array containing item or NULL if item not found.
+     */
+    function apiLoadByName($item = null, $field = null);
 }
 

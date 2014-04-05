@@ -32,35 +32,38 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
 /**
  * Class used to clean out old unused cached API XML files from cache directory.
  *
- * @package Yapeal
+ * @package    Yapeal
  * @subpackage maintenance
  */
-class maintCleanCache {
-  /**
-   * Constructor
-   */
-  public function __construct() {
-    $this->sections = array('account', 'char', 'corp', 'eve', 'map', 'server');
-  }// function __construct()
+class maintCleanCache
+{
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->sections =
+            array('account', 'char', 'corp', 'eve', 'map', 'server');
+    }// function __construct()
     /**
      * This function finds and deletes any XML files in cache/ that haven't been
      * modified for seven days or more.
@@ -72,36 +75,40 @@ class maintCleanCache {
      *
      * @return bool Always returns TRUE.
      */
-    public function doWork() {
-      $limit = strtotime('7 days ago');
-      foreach ($this->sections as $section) {
-        $path = YAPEAL_CACHE . $section . DS;
-        $files = new DirectoryIterator($path);
-        foreach ($files as $item) {
-          $name = $item->getFileName();
-          // Only need to be concerned with expired XML Files.
-          if ($item->isFile() && $item->isWritable()
-            && substr($name, -3) == 'xml' && $item->getMTime() < $limit) {
-            $result = @unlink($name);
-            if ($result === FALSE) {
-              $mess = 'Could not delete ' . $name;
-              Logger::getLogger('yapeal')->warn($mess);
-            };// if $result...
-          };// if $item->isFile() ...
-        };// foreach $files ...
-      };// foreach $this->sections ...
-      $sql = ' delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
-      $sql .= ' where';
-      $sql .= ' `modified` = ';
-      try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
-        $sql .= $con->qstr(gmdate('Y-m-d H:i:s', $limit));
-        $con->Execute($sql);
-      }
-      catch(ADODB_Exception $e) {
-        // Nothing to do here was already report to logs.
-      }
-      return TRUE;
-    }// function doWork()
+    public function doWork()
+    {
+        $limit = strtotime('7 days ago');
+        foreach ($this->sections as $section) {
+            $path = YAPEAL_CACHE . $section . DS;
+            $files = new DirectoryIterator($path);
+            foreach ($files as $item) {
+                $name = $item->getFileName();
+                // Only need to be concerned with expired XML Files.
+                if ($item->isFile() && $item->isWritable()
+                    && substr($name, -3) == 'xml'
+                    && $item->getMTime() < $limit
+                ) {
+                    $result = @unlink($name);
+                    if ($result === false) {
+                        $mess = 'Could not delete ' . $name;
+                        Logger::getLogger('yapeal')
+                              ->warn($mess);
+                    }; // if $result...
+                }; // if $item->isFile() ...
+            }; // foreach $files ...
+        }; // foreach $this->sections ...
+        $sql = ' delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
+        $sql .= ' where';
+        $sql .= ' `modified` = ';
+        try {
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $sql .= $con->qstr(gmdate('Y-m-d H:i:s', $limit));
+            $con->Execute($sql);
+        } catch (ADODB_Exception $e) {
+            // Nothing to do here was already report to logs.
+        }
+        return true;
+    }
+    // function doWork()
 }
 

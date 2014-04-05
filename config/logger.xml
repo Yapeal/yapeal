@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
 /**
  * XML from Yapeal.
  *
@@ -32,114 +31,118 @@
  */
 -->
 <log4php:configuration xmlns:log4php="http://logging.apache.org/log4php">
-  <appender name="fatalLog" class="LoggerAppenderRollingFile" threshold="FATAL">
-    <param name="file" value="log/yapeal_fatal.log"/>
-    <param name="maxFileSize" value="1MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMin" value="fatal"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="errorLog" class="LoggerAppenderRollingFile" threshold="ERROR">
-    <param name="file" value="log/yapeal_error.log"/>
-    <param name="maxFileSize" value="1MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMax" value="error"/>
-      <param name="levelMin" value="error"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="warningLog" class="LoggerAppenderRollingFile" threshold="WARN">
-    <param name="file" value="log/yapeal_warning.log"/>
-    <param name="maxFileSize" value="1MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMax" value="warn"/>
-      <param name="levelMin" value="warn"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="infoLog" class="LoggerAppenderRollingFile" threshold="INFO">
-    <param name="file" value="log/yapeal_info.log"/>
-    <param name="maxFileSize" value="1MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMax" value="info"/>
-      <param name="levelMin" value="info"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="debugLog" class="LoggerAppenderRollingFile" threshold="DEBUG">
-    <param name="file" value="log/yapeal_debug.log"/>
-    <param name="maxFileSize" value="10MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMax" value="debug"/>
-      <param name="levelMin" value="debug"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="traceLog" class="LoggerAppenderRollingFile">
-    <param name="file" value="log/yapeal_trace.log"/>
-    <param name="maxFileSize" value="10MB"/>
-    <filter class="LoggerFilterLevelRange">
-      <param name="levelMax" value="trace"/>
-      <param name="acceptOnMatch" value="false"/>
-    </filter>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <appender name="cli" class="LoggerAppenderConsole">
-    <param name="target" value="STDERR"/>
-    <layout class="LoggerLayoutPattern">
-      <param name="conversionPattern"
-        value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
-    </layout>
-  </appender>
-  <renderer renderedClass="Exception" renderingClass="ExceptionRenderer"/>
-  <root>
-    <appender-ref ref="cli"/>
-  </root>
-  <!-- This logger is the main one used throughout Yapeal. You can change it as
-  you like. The default is to log to command line and files in log/. -->
-  <logger name="yapeal">
-    <level value="info"/>
-    <appender-ref ref="fatalLog"/>
-    <appender-ref ref="errorLog"/>
-    <appender-ref ref="warningLog"/>
-    <appender-ref ref="infoLog"/>
-    <appender-ref ref="debugLog"/>
-    <appender-ref ref="traceLog"/>
-  </logger>
-  <!-- This logger is used to capture all types of normal PHP errors into
-  Yapeal's logs from a set_error_handler() method that is setup in Yapeal. Do
-  not add any LoggerAppenderPhp Appenders to it except if you believe in free
-  energy and like infinite loops -->
-  <logger name="yapeal_capture" additivity="false">
-    <appender-ref ref="fatalLog"/>
-    <appender-ref ref="errorLog"/>
-    <appender-ref ref="warningLog"/>
-    <appender-ref ref="infoLog"/>
-    <appender-ref ref="debugLog"/>
-    <appender-ref ref="traceLog"/>
-  </logger>
+    <appender name="fatalLog" class="LoggerAppenderRollingFile"
+              threshold="FATAL">
+        <param name="file" value="log/yapeal_fatal.log"/>
+        <param name="maxFileSize" value="1MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMin" value="fatal"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="errorLog" class="LoggerAppenderRollingFile"
+              threshold="ERROR">
+        <param name="file" value="log/yapeal_error.log"/>
+        <param name="maxFileSize" value="1MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMax" value="error"/>
+            <param name="levelMin" value="error"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="warningLog" class="LoggerAppenderRollingFile"
+              threshold="WARN">
+        <param name="file" value="log/yapeal_warning.log"/>
+        <param name="maxFileSize" value="1MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMax" value="warn"/>
+            <param name="levelMin" value="warn"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="infoLog" class="LoggerAppenderRollingFile" threshold="INFO">
+        <param name="file" value="log/yapeal_info.log"/>
+        <param name="maxFileSize" value="1MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMax" value="info"/>
+            <param name="levelMin" value="info"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="debugLog" class="LoggerAppenderRollingFile"
+              threshold="DEBUG">
+        <param name="file" value="log/yapeal_debug.log"/>
+        <param name="maxFileSize" value="10MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMax" value="debug"/>
+            <param name="levelMin" value="debug"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="traceLog" class="LoggerAppenderRollingFile">
+        <param name="file" value="log/yapeal_trace.log"/>
+        <param name="maxFileSize" value="10MB"/>
+        <filter class="LoggerFilterLevelRange">
+            <param name="levelMax" value="trace"/>
+            <param name="acceptOnMatch" value="false"/>
+        </filter>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <appender name="cli" class="LoggerAppenderConsole">
+        <param name="target" value="STDERR"/>
+        <layout class="LoggerLayoutPattern">
+            <param name="conversionPattern"
+                   value="%d{Y-m-d H:i:s.u}%n%9p: %m%n     File: %F(%L)%n"/>
+        </layout>
+    </appender>
+    <renderer renderedClass="Exception" renderingClass="ExceptionRenderer"/>
+    <root>
+        <appender-ref ref="cli"/>
+    </root>
+    <!-- This logger is the main one used throughout Yapeal. You can change it as
+    you like. The default is to log to command line and files in log/. -->
+    <logger name="yapeal">
+        <level value="info"/>
+        <appender-ref ref="fatalLog"/>
+        <appender-ref ref="errorLog"/>
+        <appender-ref ref="warningLog"/>
+        <appender-ref ref="infoLog"/>
+        <appender-ref ref="debugLog"/>
+        <appender-ref ref="traceLog"/>
+    </logger>
+    <!-- This logger is used to capture all types of normal PHP errors into
+    Yapeal's logs from a set_error_handler() method that is setup in Yapeal. Do
+    not add any LoggerAppenderPhp Appenders to it except if you believe in free
+    energy and like infinite loops -->
+    <logger name="yapeal_capture" additivity="false">
+        <appender-ref ref="fatalLog"/>
+        <appender-ref ref="errorLog"/>
+        <appender-ref ref="warningLog"/>
+        <appender-ref ref="infoLog"/>
+        <appender-ref ref="debugLog"/>
+        <appender-ref ref="traceLog"/>
+    </logger>
 </log4php:configuration>

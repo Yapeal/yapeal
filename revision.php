@@ -36,40 +36,40 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
 if (!defined('YAPEAL_VERSION')) {
-  $version = str_replace('@', '', '@buildversion@');
-  if ($version == 'buildversion') {
-    $version = strftime("%y.%j.%H%M");
+    $version = str_replace('@', '', '@buildversion@');
+    if ($version == 'buildversion') {
+        $version = strftime("%y.%j.%H%M");
+        /**
+         * @ignore
+         */
+        define('YAPEAL_STABILITY', 'Local');
+    };
     /**
-     * @ignore
+     * Track version of script.
      */
-    define('YAPEAL_STABILITY', 'Local');
-  };
-  /**
-   * Track version of script.
-   */
-  define('YAPEAL_VERSION', $version);
+    define('YAPEAL_VERSION', $version);
 };
 if (!defined('YAPEAL_STABILITY')) {
-  /**
-   * Track stability of script.
-   */
-  define('YAPEAL_STABILITY', 'Beta');
+    /**
+     * Track stability of script.
+     */
+    define('YAPEAL_STABILITY', 'Beta');
 };
 

@@ -32,54 +32,58 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
 /**
  * Class used to fetch and store corp MemberSecurityLog API.
  *
- * @package Yapeal
+ * @package    Yapeal
  * @subpackage Api_corp
  */
-class corpMemberSecurityLog extends ACorp {
-  /**
-   * Constructor
-   *
-   * @param array $params Holds the required parameters like keyID, vCode, etc
-   * used in HTML POST parameters to API servers which varies depending on API
-   * 'section' being requested.
-   *
-   * @throws LengthException for any missing required $params.
-   */
-  public function __construct(array $params) {
-    // Cut off 'A' and lower case abstract class name to make section name.
-    $this->section = strtolower(substr(get_parent_class($this), 1));
-    $this->api = str_replace($this->section, '', __CLASS__);
-    parent::__construct($params);
-  }// function __construct
-  /**
-   * Dummy API parser for XML.
-   *
-   * This is a dummy parser used to allow caching of the XML even though an
-   * actual parser that processes the API doesn't exist yet.
-   *
-   * @return bool Returns TRUE always.
-   */
-  protected function parserAPI() {
-    return TRUE;
-  }// function parserAPI
+class corpMemberSecurityLog extends ACorp
+{
+    /**
+     * Constructor
+     *
+     * @param array $params Holds the required parameters like keyID, vCode, etc
+     *                      used in HTML POST parameters to API servers which varies depending on API
+     *                      'section' being requested.
+     *
+     * @throws LengthException for any missing required $params.
+     */
+    public function __construct(array $params)
+    {
+        // Cut off 'A' and lower case abstract class name to make section name.
+        $this->section = strtolower(substr(get_parent_class($this), 1));
+        $this->api = str_replace($this->section, '', __CLASS__);
+        parent::__construct($params);
+    }// function __construct
+    /**
+     * Dummy API parser for XML.
+     *
+     * This is a dummy parser used to allow caching of the XML even though an
+     * actual parser that processes the API doesn't exist yet.
+     *
+     * @return bool Returns TRUE always.
+     */
+    protected function parserAPI()
+    {
+        return true;
+    }
+    // function parserAPI
 }
 

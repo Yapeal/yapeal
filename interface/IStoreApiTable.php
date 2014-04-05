@@ -32,37 +32,37 @@
  * @internal Allow viewing of the source code in web browser.
  */
 if (isset($_REQUEST['viewSource'])) {
-  highlight_file(__FILE__);
-  exit();
+    highlight_file(__FILE__);
+    exit();
 };
 /**
  * @internal Only let this code be included.
  */
 if (count(get_included_files()) < 2) {
-  $mess = basename(__FILE__)
-    . ' must be included it can not be ran directly.' . PHP_EOL;
-  if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', TRUE, 403);
-    die($mess);
-  };
-  fwrite(STDERR, $mess);
-  exit(1);
+    $mess = basename(__FILE__)
+        . ' must be included it can not be ran directly.' . PHP_EOL;
+    if (PHP_SAPI != 'cli') {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        die($mess);
+    };
+    fwrite(STDERR, $mess);
+    exit(1);
 };
-
 /**
  * Interface for storing Eve API data into database table(s).
  *
- * @package Yapeal
+ * @package    Yapeal
  * @subpackage Api
  */
-interface IStoreApiTable {
-  /**
-   * Used to save an item into database.
-   *
-   * Parent item (object) should call all child(ren)'s apiStore() as appropriate.
-   *
-   * @return boolean Returns TRUE if item was saved to database.
-   */
-  public function apiStore();
+interface IStoreApiTable
+{
+    /**
+     * Used to save an item into database.
+     *
+     * Parent item (object) should call all child(ren)'s apiStore() as appropriate.
+     *
+     * @return boolean Returns TRUE if item was saved to database.
+     */
+    public function apiStore();
 }
 

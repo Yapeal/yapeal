@@ -34,7 +34,7 @@
 if (isset($_REQUEST['viewSource'])) {
     highlight_file(__FILE__);
     exit();
-};
+}
 /**
  * @internal Only let this code be included.
  */
@@ -47,7 +47,7 @@ if (count(get_included_files()) < 2) {
     };
     fwrite(STDERR, $mess);
     exit(1);
-};
+}
 /**
  * Abstract class for Char APIs.
  *
@@ -74,7 +74,7 @@ abstract class AChar extends AApiRequest
                 $mess .= ' to constructor for ' . $this->api;
                 $mess .= ' in ' . __CLASS__;
                 throw new LengthException($mess, 1);
-            }; // if !isset $params[$k] ...
+            }
             switch ($v) {
                 case 'C':
                 case 'X':
@@ -96,11 +96,11 @@ abstract class AChar extends AApiRequest
                         throw new LengthException($mess, 3);
                     }; // if 0 == strlen(...
                     break;
-            }; // switch $v ...
-        }; // foreach $required ...
+            }
+        }
         $this->ownerID = $params['characterID'];
         $this->params = $params;
-    }// function __construct
+    }
     /**
      * Per API section function that returns API proxy.
      *
@@ -108,6 +108,7 @@ abstract class AChar extends AApiRequest
      * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
+     * @throws InvalidArgumentException
      * @return mixed Returns the URL for proxy as string if found else it will
      */
     protected function getProxy()
@@ -126,7 +127,7 @@ abstract class AChar extends AApiRequest
                 $tables[] =
                     '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`'
                     . ' where `characterID`=' . $this->params['characterID'];
-            };
+            }
             $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey`'
                 . ' where `keyID`=' . $this->params['keyID'];
             $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilSections`'
@@ -138,28 +139,29 @@ abstract class AChar extends AApiRequest
                 // any legal URL.
                 if (strlen($result) > 4) {
                     break;
-                };
-            }; // foreach ...
+                }
+            }
             if (empty($result)) {
                 return $default;
-            }; // if empty $result ...
+            }
             // Need to make substitution array by adding api, section, and params.
             $subs = array('api' => $this->api, 'section' => $this->section);
             $subs = array_merge($subs, $this->params);
             $proxy = self::sprintfn($result, $subs);
             if (false === $proxy) {
                 return $default;
-            };
+            }
             return $proxy;
         } catch (ADODB_Exception $e) {
             return $default;
         }
-    }// function getProxy
+    }
     /**
      * Handles some Eve API error codes in special ways.
      *
      * @param object $e Eve API exception returned.
      *
+     * @throws InvalidArgumentException
      * @return bool Returns TRUE if handled the error else FALSE.
      */
     protected function handleApiError($e)
@@ -178,7 +180,7 @@ abstract class AChar extends AApiRequest
                     // times in the past :P
                     if ($cuntil < YAPEAL_START_TIME) {
                         $cuntil = YAPEAL_START_TIME;
-                    };
+                    }
                     $data = array(
                         'api' => $this->api,
                         'cachedUntil' => $cuntil,
@@ -211,14 +213,14 @@ abstract class AChar extends AApiRequest
                         // If new character need to set required columns.
                         if (false === $char->recordExists()) {
                             $char->activeAPIMask = 0;
-                        }; // if $char->recordExists() ...
+                        }
                         if (false === $char->store()) {
                             $mess = 'Could not deactivate characterID: ';
                             $mess .= $this->params['characterID'];
                             Logger::getLogger('yapeal')
                                   ->warn($mess);
-                        }; // if $char->store() ...
-                    }; // if YAPEAL_REGISTERED_MODE ...
+                        }
+                    }
                     // Always deactivates key no matter the registered mode.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve API information is incorrect';
@@ -231,7 +233,7 @@ abstract class AChar extends AApiRequest
                             . $this->params['keyID'];
                         Logger::getLogger('yapeal')
                               ->warn($mess);
-                    }; // if $key->store() ...
+                    }
                     break;
                 case 124: // Character not enlisted in Factional Warfare. (Key accessMask outdated)
                     // The key access has changed deactivate API for character if
@@ -246,7 +248,7 @@ abstract class AChar extends AApiRequest
                             $mess .= ' as they are not enlisted in factional warfare';
                             Logger::getLogger('yapeal')
                                   ->info($mess);
-                        };
+                        }
                         // A new row for character will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
                         $char = new RegisteredCharacter(
@@ -255,15 +257,15 @@ abstract class AChar extends AApiRequest
                         // If new character need to set required columns.
                         if (false === $char->recordExists()) {
                             $char->isActive = 1;
-                        }; // if $char->recordExists() ...
+                        }
                         $char->deleteActiveAPI($this->api);
                         if (false === $char->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
                             $mess .= ' for ' . $this->params['characterID'];
                             Logger::getLogger('yapeal')
                                   ->warn($mess);
-                        }; // if $char->store() ...
-                    }; // if YAPEAL_REGISTERED_MODE ...
+                        }
+                    }
                     break;
                 case 211: // Login denied by account status.
                     // The account is not active deactivate key and character too if
@@ -285,8 +287,8 @@ abstract class AChar extends AApiRequest
                             $mess .= $this->params['characterID'];
                             Logger::getLogger('yapeal')
                                   ->warn($mess);
-                        }; // if $char->store() ...
-                    }; // if YAPEAL_REGISTERED_MODE ...
+                        }
+                    }
                     // Always deactivates key no matter the registered mode.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve account is currently suspended';
@@ -299,7 +301,7 @@ abstract class AChar extends AApiRequest
                             . $this->params['keyID'];
                         Logger::getLogger('yapeal')
                               ->warn($mess);
-                    }; // if $key->store() ...
+                    }
                     break;
                 case 221: // Illegal page request! (Key accessMask outdated)
                     // The key access has changed deactivate API for character if
@@ -319,15 +321,15 @@ abstract class AChar extends AApiRequest
                         // If new character need to set some required columns.
                         if (false === $char->recordExists()) {
                             $char->isActive = 1;
-                        }; // if $char->recordExists() ...
+                        }
                         $char->deleteActiveAPI($this->api);
                         if (false === $char->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
                             $mess .= ' for ' . $this->params['characterID'];
                             Logger::getLogger('yapeal')
                                   ->warn($mess);
-                        }; // if $char->store() ...
-                    }; // if YAPEAL_REGISTERED_MODE ...
+                        }
+                    }
                     // The key access has changed deactivate API for key.
                     $mess = 'Deactivating Eve API: ' . $this->api;
                     $mess .= ' for keyID: ' . $this->params['keyID'];
@@ -341,7 +343,7 @@ abstract class AChar extends AApiRequest
                         $mess .= ' for ' . $this->params['keyID'];
                         Logger::getLogger('yapeal')
                               ->warn($mess);
-                    }; // if !$key->store() ...
+                    }
                     break;
                 case 222: //Key has expired. Contact key owner for access renewal.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
@@ -364,7 +366,7 @@ abstract class AChar extends AApiRequest
                             . $this->params['keyID'];
                         Logger::getLogger('yapeal')
                               ->warn($mess);
-                    }; // if $key->store() ...
+                    }
                     break;
                 case 901: // Web site database temporarily disabled.
                 case 902: // EVE backend database temporarily disabled.
@@ -382,7 +384,6 @@ abstract class AChar extends AApiRequest
                     return false;
                     break;
             }
-            // switch $code ...
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -390,6 +391,5 @@ abstract class AChar extends AApiRequest
         }
         return true;
     }
-    // function handleApiError
 }
 

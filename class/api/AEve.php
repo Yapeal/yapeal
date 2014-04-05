@@ -34,7 +34,7 @@
 if (isset($_REQUEST['viewSource'])) {
     highlight_file(__FILE__);
     exit();
-};
+}
 /**
  * @internal Only let this code be included.
  */
@@ -47,7 +47,7 @@ if (count(get_included_files()) < 2) {
     };
     fwrite(STDERR, $mess);
     exit(1);
-};
+}
 /**
  * Abstract class for Eve APIs.
  *
@@ -68,7 +68,7 @@ abstract class AEve extends AApiRequest
     public function __construct(array $params)
     {
         $this->params = $params;
-    }// function __construct
+    }
     /**
      * Per API section function that returns API proxy.
      *
@@ -76,6 +76,7 @@ abstract class AEve extends AApiRequest
      * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
+     * @throws InvalidArgumentException
      * @return mixed Returns the URL for proxy as string if found else it will
      * return the default string needed to use API server directly.
      */
@@ -93,19 +94,19 @@ abstract class AEve extends AApiRequest
             $result = $con->GetOne($sql);
             if (empty($result)) {
                 return $default;
-            }; // if empty $result ...
+            }
             // Need to make substitution array by adding api, section, and params.
             $subs = array('api' => $this->api, 'section' => $this->section);
             $subs = array_merge($subs, $this->params);
             $proxy = self::sprintfn($result, $subs);
             if (false === $proxy) {
                 return $default;
-            };
+            }
             return $proxy;
         } catch (ADODB_Exception $e) {
             return $default;
         }
-    }// function getProxy
+    }
     /**
      * Handles some Eve API error codes in special ways.
      *
@@ -146,6 +147,7 @@ abstract class AEve extends AApiRequest
      * If there is any need to delete records or empty tables before parsing XML
      * and adding the new data this method should be used to do so.
      *
+     * @throws InvalidArgumentException
      * @return bool Will return TRUE if table(s) were prepared correctly.
      */
     protected function prepareTables()
@@ -163,6 +165,5 @@ abstract class AEve extends AApiRequest
         }
         return true;
     }
-    // function prepareTables
 }
 

@@ -114,34 +114,6 @@
         </field>
         <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
-    <!--<table name="mapSovereigntyStatus">
-      <field name="`completionTime`" type="T">
-        <NOTNULL/>
-      </field>
-      <field name="`ownerID`" type="I8" size="20">
-        <NOTNULL/>
-        <UNSIGNED/>
-      </field>
-      <field name="`solarSystemID`" type="I8" size="20">
-        <KEY/>
-        <UNSIGNED/>
-      </field>
-      <field name="`startTime`" type="T">
-        <NOTNULL/>
-      </field>
-      <field name="`state`" type="I1" size="3">
-        <NOTNULL/>
-      </field>
-      <field name="`structureID`" type="I8" size="20">
-        <NOTNULL/>
-        <UNSIGNED/>
-      </field>
-      <field name="`structureTypeID`" type="I8" size="20">
-        <NOTNULL/>
-        <UNSIGNED/>
-      </field>
-      <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
-    </table>-->
     <sql prefixmethod="MANUAL">
         <query platform="mysql">ALTER TABLE `%%PmapFacWarSystems` MODIFY
             `contested` BOOLEAN NOT NULL

@@ -60,5 +60,8 @@
         <xs:attribute name="owningFactionName" use="required" type="xs:string"/>
         <xs:attribute name="solarSystemID" use="required" type="eveID"/>
         <xs:attribute name="solarSystemName" use="required" type="xs:string"/>
+        <xs:attribute name="victoryPoints" use="required" type="xs:integer"/>
+        <xs:attribute name="victoryPointThreshold" use="required"
+                      type="xs:integer"/>
     </xs:complexType>
 </xs:schema>

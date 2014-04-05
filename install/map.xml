@@ -54,6 +54,12 @@
         <field name="`solarSystemName`" type="C" size="255">
             <NOTNULL/>
         </field>
+        <field name="`victoryPoints`" type="I8" size="20">
+            <UNSIGNED/>
+        </field>
+        <field name="`victoryPointThreshold`" type="I8" size="20">
+            <UNSIGNED/>
+        </field>
         <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="mapJumps">

@@ -54,6 +54,7 @@
     <xs:complexType name="rowType">
         <xs:attribute name="messageID" use="required" type="eveID"/>
         <xs:attribute name="senderID" use="required" type="eveID"/>
+        <xs:attribute name="senderName" use="required" type="xs:string"/>
         <xs:attribute name="sentDate" type="eveDT"/>
         <xs:attribute name="title" use="required" type="xs:string"/>
         <xs:attribute name="toCorpOrAllianceID" use="required"

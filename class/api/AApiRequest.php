@@ -35,7 +35,7 @@
 if (isset($_REQUEST['viewSource'])) {
     highlight_file(__FILE__);
     exit();
-};
+}
 /**
  * @internal Only let this code be included.
  */
@@ -45,10 +45,10 @@ if (count(get_included_files()) < 2) {
     if (PHP_SAPI != 'cli') {
         header('HTTP/1.0 403 Forbidden', true, 403);
         die($mess);
-    };
+    }
     fwrite(STDERR, $mess);
     exit(1);
-};
+}
 /**
  * Abstract class to hold common methods for API classes.
  *
@@ -60,6 +60,7 @@ abstract class AApiRequest
     /**
      * Used to store XML to MySQL table(s).
      *
+     * @throws LogicException
      * @return Bool Return TRUE if store was successful.
      */
     public function apiStore()
@@ -83,28 +84,17 @@ abstract class AApiRequest
                 // need to return to caller.
                 if (false === $result) {
                     return false;
-                };
+                }
                 // Cache the received result.
                 $cache->cacheXml($result);
-                // Check if XML is valid.
-                if (false === $cache->isValid()) {
-                    // No use going any farther if the XML isn't valid.
-                    return false;
-                };
-            }; // if FALSE === $result ...
-            if (in_array(
-                'prepareTables',
-                get_class_methods($this->section . $this->api)
-            )
-            ) {
-                if ($this->prepareTables() !== true) {
-                    $mess = 'Could not prepare ' . $this->section . $this->api;
-                    $mess .= ' API tables to accept new data for '
-                        . $this->ownerID;
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
-                };
-            };
+            }
+            if ($this->prepareTables() !== true) {
+                $mess = 'Could not prepare ' . $this->section . $this->api;
+                $mess .= ' API tables to accept new data for '
+                    . $this->ownerID;
+                Logger::getLogger('yapeal')
+                      ->warn($mess);
+            }
             // Create XMLReader.
             $this->xr = new XMLReader();
             // Pass XML to reader.
@@ -115,8 +105,8 @@ abstract class AApiRequest
                     && $this->xr->localName == 'result'
                 ) {
                     $result = $this->parserAPI();
-                }; // if $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
             return $result;
         } catch (YapealApiErrorException $e) {
             // Any API errors that need to be handled in some way are handled in this
@@ -154,7 +144,7 @@ abstract class AApiRequest
     /**
      * @var XMLReader Holds instance of XMLReader.
      */
-    protected $xr; // function apiStore
+    protected $xr;
     /**
      * Version of sprintf for cases where named arguments are desired (php syntax)
      *
@@ -202,14 +192,14 @@ abstract class AApiRequest
                 Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
-            }; // if ! array_key_exists(...
+            }
             // Replace the named argument with the corresponding numeric one.
             $replace = $arg_nums[$arg_key];
             $format = substr_replace($format, $replace, $arg_pos, $arg_len);
             // Skip to end of replacement for next iteration.
             // Moved this into for loop increment where it belonged.
             //$pos = $arg_pos + strlen($replace);
-        }; // for $pos = 0; ...
+        }
         return vsprintf($format, array_values($args));
     }
     /**
@@ -235,6 +225,7 @@ abstract class AApiRequest
      * API classes to be empty except for a constructor which sets $this->api and
      * calls their parent constructor.
      *
+     * @throws LogicException
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
      */
     protected function parserAPI()
@@ -245,10 +236,10 @@ abstract class AApiRequest
         // Save some overhead for tables that are truncated or in some way emptied.
         if (in_array('prepareTables', get_class_methods($this))) {
             $qb->useUpsert(false);
-        };
+        }
         if ($this->ownerID != 0) {
             $qb->setDefault('ownerID', $this->ownerID);
-        };
+        }
         try {
             while ($this->xr->read()) {
                 switch ($this->xr->nodeType) {
@@ -259,23 +250,23 @@ abstract class AApiRequest
                                 // Walk through attributes and add them to row.
                                 while ($this->xr->moveToNextAttribute()) {
                                     $row[$this->xr->name] = $this->xr->value;
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                }
                                 $qb->addRow($row);
                                 break;
-                        }; // switch $this->xr->localName ...
+                        };
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -287,6 +278,18 @@ abstract class AApiRequest
               ->warn($mess);
         return false;
     }
-    // function sprintfn
+    /**
+     * Method used to prepare database table(s) before parsing API XML data.
+     *
+     * If there is any need to delete records or empty tables before parsing XML
+     * and adding the new data this method should be used to do so by overriding
+     * it in extending class.
+     *
+     * @return bool Will return TRUE if table(s) were prepared correctly.
+     */
+    protected function prepareTables()
+    {
+        return true;
+    }
 }
 

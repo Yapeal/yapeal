@@ -288,6 +288,13 @@
         <field name="`DoB`" type="T">
             <NOTNULL/>
         </field>
+        <field name="`factionID`" type="I8" size="20">
+          <DEFAULT value="0"/>
+          <UNSIGNED/>
+        </field>
+        <field name="`factionName`" type="C" size="255">
+          <DEFAULT value=""/>
+        </field>
         <field name="`gender`" type="C" size="255">
             <NOTNULL/>
         </field>

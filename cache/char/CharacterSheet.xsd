@@ -35,6 +35,10 @@
                                             minOccurs="0"/>
                                 <xs:element name="allianceID" type="eveID"
                                             minOccurs="0"/>
+                                <xs:element name="factionName" type="xs:string"
+                                            minOccurs="0"/>
+                                <xs:element name="factionID" type="eveID"
+                                            minOccurs="0"/>
                                 <xs:element name="cloneName" type="xs:string"/>
                                 <xs:element name="cloneSkillPoints"
                                             type="xs:unsignedLong"/>

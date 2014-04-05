@@ -203,12 +203,15 @@ class charCharacterSheet extends AChar
                             case 'corporationID':
                             case 'corporationName':
                             case 'DoB':
+                            case 'factionID':
+                            case 'factionName':
                             case 'gender':
                             case 'name':
                             case 'race':
                                 // Grab node name.
                                 $name = $this->xr->localName;
-                                if ($name == 'allianceName'
+                                if (($name == 'allianceName'
+                                        || $name == 'factionName')
                                     && $this->xr->isEmptyElement == true
                                 ) {
                                     $row[$name] = '';

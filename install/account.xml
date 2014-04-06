@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3"
-        xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
     <!--
     /**
      * XML from Yapeal.
@@ -53,7 +52,7 @@
         <field name="`paidUntil`" type="T">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="accountAPIKeyInfo">
         <field name="`keyID`" type="I8" size="20">
@@ -74,7 +73,7 @@
         <index name="`accountAPIKeyInfo1`">
             <col>`type`</col>
         </index>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="accountCharacters">
         <field name="`characterID`" type="I8" size="20">
@@ -94,7 +93,7 @@
         <index name="`accountCharacters1`">
             <col>`corporationID`</col>
         </index>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="accountKeyBridge">
         <field name="`keyID`" type="I8" size="20">
@@ -110,20 +109,15 @@
             <col>`keyID`</col>
             <UNIQUE/>
         </index>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PaccountAPIKeyInfo` MODIFY `type`
-            ENUM('Account','Character','Corporation') COLLATE ascii_general_ci
-            NOT NULL
-        </query>
+         <query platform="mysql">ALTER TABLE `%%PaccountAPIKeyInfo` MODIFY `type` ENUM('Account','Character','Corporation') COLLATE ascii_general_ci NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">INSERT INTO `%%PutilSections`
-            (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+        <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
             VALUES(33554433,1,1,'account')
-            ON DUPLICATE KEY UPDATE
-            `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+            ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
         </query>
     </sql>
 </schema>

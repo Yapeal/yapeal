@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3"
-        xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
     <!--
     /**
      * XML from Yapeal.
@@ -51,7 +50,7 @@
         <field name="`balance`" type="N" size="17.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charAllianceContactList">
         <descr>Sub table from /char/ContactList.xml.aspx</descr>
@@ -72,7 +71,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charAssetList">
         <descr>Table for /char/AssetList.xml.aspx</descr>
@@ -123,7 +122,7 @@
         <index name="`charAssetList2`">
             <col>`locationID`</col>
         </index>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charAttackers">
         <descr>Sub table from /char/KillMails.xml.aspx</descr>
@@ -171,7 +170,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charAttributeEnhancers">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -189,7 +188,7 @@
         <field name="`bonusName`" type="C" size="100">
             <KEY/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charAttributes">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -217,7 +216,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCalendarEventAttendees">
         <descr>Table for /char/CalendarEventAttendees.xml.aspx</descr>
@@ -235,7 +234,7 @@
         <field name="`response`" type="C" size="32">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCertificates">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -247,7 +246,7 @@
             <KEY/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCharacterSheet">
         <descr>Main table for /char/CharacterSheet.xml.aspx</descr>
@@ -304,7 +303,7 @@
         <field name="`race`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charContactList">
         <descr>Table for /char/ContactList.xml.aspx</descr>
@@ -329,7 +328,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charContactNotifications">
         <descr>Table for /char/ContactNotifications.xml.aspx</descr>
@@ -352,7 +351,7 @@
             <NOTNULL/>
         </field>
         <field name="`messageData`" type="X"/>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporateContactList">
         <descr>Sub table from /char/ContactList.xml.aspx</descr>
@@ -373,7 +372,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charContracts">
         <descr>Table for /char/Contracts.xml.aspx</descr>
@@ -451,7 +450,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporationRoles">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -466,7 +465,7 @@
         <field name="`roleName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporationRolesAtBase">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -481,7 +480,7 @@
         <field name="`roleName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporationRolesAtHQ">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -496,7 +495,7 @@
         <field name="`roleName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporationRolesAtOther">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -511,7 +510,7 @@
         <field name="`roleName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charCorporationTitles">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -526,7 +525,7 @@
         <field name="`titleName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charFacWarStats">
         <descr>Table from /char/FacWarStats.xml.aspx that holds the status info
@@ -581,7 +580,7 @@
         <index name="`charFacWarStats1`">
             <col>`factionID`</col>
         </index>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charIndustryJobs">
         <descr>Table for /char/IndustryJobs.xml.aspx</descr>
@@ -649,8 +648,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <field name="`installedItemLicensedProductionRunsRemaining`" type="I8"
-               size="20">
+        <field name="`installedItemLicensedProductionRunsRemaining`" type="I8" size="20">
             <NOTNULL/>
         </field>
         <field name="`installedItemLocationID`" type="I8" size="20">
@@ -710,7 +708,7 @@
         <field name="`timeMultiplier`" type="N" size="4.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charItems">
         <descr>Sub table from /char/KillMails.xml.aspx</descr>
@@ -750,7 +748,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charKillMails">
         <descr>Main table for /char/KillMails.xml.aspx</descr>
@@ -769,7 +767,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charKillLog">
         <descr>Replaced by KillMails</descr>
@@ -788,7 +786,7 @@
             <KEY/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charMailingLists">
         <descr>Table for /char/MailingLists.xml.aspx</descr>
@@ -803,7 +801,7 @@
             <KEY/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charMailMessages">
         <descr>Table for /char/MailMessages.xml.aspx</descr>
@@ -835,7 +833,7 @@
         <field name="`senderTypeID`" type="I8" size="20">
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charMarketOrders">
         <descr>Table for /char/MarketOrders.xml.aspx</descr>
@@ -897,7 +895,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <!--<table name="charMedals">
       <descr>Table for /char/Medals.xml.aspx</descr>
@@ -947,7 +945,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charNotificationTexts">
         <descr>Table for /char/NotificationTexts.xml.aspx</descr>
@@ -962,7 +960,7 @@
         <field name="`text`" type="X">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charResearch">
         <descr>Table for /char/Research.xml.aspx</descr>
@@ -986,7 +984,7 @@
         <field name="`researchStartDate`" type="T">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charSkillInTraining">
         <descr>Table for /char/SkillInTraining.xml.aspx</descr>
@@ -1020,7 +1018,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charSkillQueue">
         <descr>Table for /char/SkillQueue.xml.aspx</descr>
@@ -1054,7 +1052,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charSkills">
         <descr>Sub table from /char/CharacterSheet.xml.aspx</descr>
@@ -1078,7 +1076,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charStandingsFromAgents">
         <descr>Sub table from /char/Standings.xml.aspx</descr>
@@ -1096,7 +1094,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charStandingsFromFactions">
         <descr>Sub table from /char/Standings.xml.aspx</descr>
@@ -1114,7 +1112,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charStandingsFromNPCCorporations">
         <descr>Sub table from /char/Standings.xml.aspx</descr>
@@ -1132,7 +1130,7 @@
         <field name="`standing`" type="N" size="5.2">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charStandingsToCharacters">
         <descr>Replaced by ContactList</descr>
@@ -1203,7 +1201,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charWalletJournal">
         <descr>Table from /char/WalletJournal.xml.aspx</descr>
@@ -1258,7 +1256,7 @@
         <field name="`owner2TypeID`" type="I8" size="20">
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="charWalletTransactions">
         <descr>Table from /char/WalletTransactions.xml.aspx</descr>
@@ -1314,54 +1312,36 @@
         <field name="`typeName`" type="C" size="255">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharAssetList` MODIFY
-            `singleton` BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharAssetList` MODIFY `singleton` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharAttackers` MODIFY
-            `finalBlow` BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharAttackers` MODIFY `finalBlow` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharContactList` MODIFY
-            `inWatchlist` BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharContactList` MODIFY `inWatchlist` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharContracts` MODIFY `forCorp`
-            BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharContracts` MODIFY `forCorp` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharIndustryJobs` MODIFY
-            `completed` BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharIndustryJobs` MODIFY `completed` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `bid`
-            BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharMarketOrders` MODIFY `bid` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharNotifications` MODIFY `read`
-            BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharNotifications` MODIFY `read` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `published`
-            BOOLEAN NOT NULL
-        </query>
+        <query platform="mysql">ALTER TABLE `%%PcharSkills` MODIFY `published` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">INSERT INTO `%%PutilSections`
-            (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+        <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
             VALUES(74440635,1,2,'char')
-            ON DUPLICATE KEY UPDATE
-            `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+            ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
         </query>
     </sql>
 </schema>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3"
-        xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
     <!--
     /**
      * XML from Yapeal.
@@ -49,7 +48,7 @@
         <field name="`name`" type="C" size="255"/>
         <field name="`shortName`" type="C" size="255"/>
         <field name="`startDate`" type="T"/>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersKillsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -64,7 +63,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersKillsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -79,7 +78,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersKillsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -94,7 +93,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersVictoryPointsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -109,7 +108,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersVictoryPointsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -124,7 +123,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCharactersVictoryPointsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -139,7 +138,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveConquerableStationList">
         <field name="`corporationID`" type="I8" size="20">
@@ -157,7 +156,7 @@
         <field name="`stationTypeID`" type="I8" size="20">
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsKillsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -172,7 +171,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsKillsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -187,7 +186,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsKillsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -202,7 +201,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsVictoryPointsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -217,7 +216,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsVictoryPointsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -232,7 +231,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveCorporationsVictoryPointsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -247,7 +246,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveErrorList">
         <field name="`errorCode`" type="I2" size="3">
@@ -257,7 +256,7 @@
         <field name="`errorText`" type="X">
             <NOTNULL/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactions">
         <descr>Subtable from /eve/FacWarStats.xml.aspx that holds the factions
@@ -300,7 +299,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsKillsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -315,7 +314,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsKillsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -330,7 +329,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsKillsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -345,7 +344,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsVictoryPointsLastWeek">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -360,7 +359,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsVictoryPointsTotal">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -375,7 +374,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionsVictoryPointsYesterday">
         <descr>Table from /eve/FacWarStats.xml.aspx that holds Faction Warfare
@@ -390,7 +389,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFactionWars">
         <descr>Subtable from /eve/FacWarStats.xml.aspx that holds the info on
@@ -406,7 +405,7 @@
             <UNSIGNED/>
         </field>
         <field name="againstName" type="C" size="32"/>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveFacWarStats">
         <descr>Table from /eve/FacWarStats.xml.aspx this holds the overall kills
@@ -436,7 +435,7 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveMemberCorporations">
         <field name="`allianceID`" type="I8" size="20">
@@ -448,7 +447,7 @@
             <UNSIGNED/>
         </field>
         <field name="`startDate`" type="T"/>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <table name="eveRefTypes">
         <field name="`refTypeID`" type="I2" size="5">
@@ -456,14 +455,12 @@
             <UNSIGNED/>
         </field>
         <field name="`refTypeName`" type="C" size="255"/>
-        <opt platform="mysql">ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
+        <opt platform="mysql"> ENGINE = InnoDB COLLATE = utf8_unicode_ci</opt>
     </table>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">INSERT INTO `%%PutilSections`
-            (`activeAPIMask`,`isActive`,`sectionID`,`section`)
+        <query platform="mysql">INSERT INTO `%%PutilSections` (`activeAPIMask`,`isActive`,`sectionID`,`section`)
             VALUES(497,1,4,'eve')
-            ON DUPLICATE KEY UPDATE
-            `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
+            ON DUPLICATE KEY UPDATE `activeAPIMask`=VALUES(`activeAPIMask`),`sectionID`=VALUES(`sectionID`),`section`=VALUES(`section`)
         </query>
     </sql>
 </schema>

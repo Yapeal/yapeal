@@ -293,4 +293,4 @@ Have fun, Dragonaire
 
 [1]: http://code.google.com/p/yapeal/ "Yapeal Home Page"
 [2]: http://mercurial.selenic.com/ "Mercurial Home Page"
-[3]: https://sourceforge.net/projects/yapeal/files/ "Yapeal Downloads"
+[3]: http://sourceforge.net/projects/yapeal/files/ "Yapeal Downloads"

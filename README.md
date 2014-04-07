@@ -23,7 +23,7 @@ Licensing requirements can be found in [COPYING.md][4] and
 Thanks for using Yapeal, Dragonaire
 
 [1]: http://mercurial.selenic.com/ "Mercurial"
-[2]: http://sourceforge.net/projects/yapeal/files/INSTALL.md/download "INSTALL.md"
-[3]: http://sourceforge.net/projects/yapeal/files/CHANGELOG.md/download "CHANGELOG.md"
-[4]: http://sourceforge.net/projects/yapeal/files/COPYING.md/download "COPY.md"
-[5]: http://sourceforge.net/projects/yapeal/files/COPYING-LESSER.md/download "COPY-LESSER.md"
+[2]: https://github.com/Dragonrun1/yapeal/blob/1.0.x/INSTALL.md "INSTALL.md"
+[3]: https://github.com/Dragonrun1/yapeal/blob/1.0.x/CHANGELOG.md "CHANGELOG.md"
+[4]: https://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING.md "COPY.md"
+[5]: https://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING-LESSER.md "COPY-LESSER.md"

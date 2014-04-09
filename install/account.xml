@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.3" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
+<schema version="0.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="xmlschema03.xsd">
     <!--
     /**
      * XML from Yapeal.
@@ -88,6 +88,20 @@
             <UNSIGNED/>
         </field>
         <field name="`corporationName`" type="C" size="255">
+            <NOTNULL/>
+        </field>
+        <field name="`allianceID`" type="I8" size="20">
+            <NOTNULL/>
+            <UNSIGNED/>
+        </field>
+        <field name="`allianceName`" type="C" size="255">
+            <NOTNULL/>
+        </field>
+        <field name="`factionID`" type="I8" size="20">
+            <NOTNULL/>
+            <UNSIGNED/>
+        </field>
+        <field name="`factionName`" type="C" size="255">
             <NOTNULL/>
         </field>
         <index name="`accountCharacters1`">

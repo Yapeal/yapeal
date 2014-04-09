@@ -99,7 +99,7 @@ class accountAPIKeyInfo extends AAccount
                             while ($this->xr->moveToNextAttribute()) {
                                 if ($this->xr->name == 'characterID') {
                                     $bridge['characterID'] = $this->xr->value;
-                                };
+                                }
                                 $row[$this->xr->name] = $this->xr->value;
                             }
                             $this->bridge->addRow($bridge);

@@ -34,7 +34,7 @@
 if (isset($_REQUEST['viewSource'])) {
     highlight_file(__FILE__);
     exit();
-};
+}
 /**
  * @internal Only let this code be included.
  */
@@ -48,7 +48,7 @@ if (count(get_included_files()) < 2) {
         fwrite(STDERR, $mess);
         exit(1);
     }
-};
+}
 /**
  * Class used to fetch and store account APIKeyInfo API.
  *
@@ -80,7 +80,7 @@ class accountAPIKeyInfo extends AAccount
         /**
      * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
      */
-    protected $characters;// function __construct
+    protected $characters;
         /**
      * Used to store XML to characters table.
      *
@@ -101,25 +101,25 @@ class accountAPIKeyInfo extends AAccount
                                     $bridge['characterID'] = $this->xr->value;
                                 };
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $this->bridge->addRow($bridge);
                             $this->characters->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Per API parser for XML.
      *
@@ -156,16 +156,16 @@ class accountAPIKeyInfo extends AAccount
                                         && $this->xr->value == ''
                                     ) {
                                         continue;
-                                    };
+                                    }
                                     $row[$this->xr->name] = $this->xr->value;
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                }
                                 $qb->addRow($row);
                                 break;
                             case 'rowset':
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -174,35 +174,35 @@ class accountAPIKeyInfo extends AAccount
                                     Logger::getLogger('yapeal')
                                           ->warn($mess);
                                     return false;
-                                };
+                                }
                                 if ($subTable == 'characters') {
                                     $this->characters();
-                                }; // if $subTable ...
+                                }
                                 break;
                             default: // Nothing to do here.
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             // Save row count and store rows.
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             // Store rows.
                             if (count($this->characters) > 0) {
                                 $this->characters->store();
-                            }; // if count $this->items ...
+                            }
                             $this->characters = null;
                             if (count($this->bridge) > 0) {
                                 $this->bridge->store();
-                            }; // if count $this->items ...
+                            }
                             $this->bridge = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -213,8 +213,8 @@ class accountAPIKeyInfo extends AAccount
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function prepareTables
-/**
+    }
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -242,6 +242,4 @@ class accountAPIKeyInfo extends AAccount
         }
         return true;
     }
-    // function characters
 }
-

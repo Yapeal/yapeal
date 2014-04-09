@@ -57,7 +57,7 @@ if (count(get_included_files()) < 2) {
  */
 class accountAPIKeyInfo extends AAccount
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -77,11 +77,11 @@ class accountAPIKeyInfo extends AAccount
      * @var YapealQueryBuilder Holds YapealQueryBuilder for bridge table.
      */
     protected $bridge;
-        /**
+    /**
      * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
      */
     protected $characters;
-        /**
+    /**
      * Used to store XML to characters table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -220,6 +220,7 @@ class accountAPIKeyInfo extends AAccount
      * If there is any need to delete records or empty tables before parsing XML
      * and adding the new data this method should be used to do so.
      *
+     * @throws InvalidArgumentException
      * @return bool Will return TRUE if table(s) were prepared correctly.
      */
     protected function prepareTables()
@@ -227,13 +228,13 @@ class accountAPIKeyInfo extends AAccount
         try {
             $con = YapealDBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
-            $sql = 'delete from `';
-            $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-            $sql .= ' where `keyID`=' . $this->params['keyID'];
+            $sql = 'delete from `'
+                . YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`'
+                . ' where `keyID`=' . $this->params['keyID'];
             $con->Execute($sql);
-            $sql = 'delete from `';
-            $sql .= YAPEAL_TABLE_PREFIX . 'accountKeyBridge`';
-            $sql .= ' where `keyID`=' . $this->params['keyID'];
+            $sql = 'delete from `'
+                . YAPEAL_TABLE_PREFIX . 'accountKeyBridge`'
+                . ' where `keyID`=' . $this->params['keyID'];
             $con->Execute($sql);
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')

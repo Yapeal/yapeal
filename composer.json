@@ -1,6 +1,7 @@
 {
     "name": "yapeal/yapeal",
-    "description": "Yet Another Php Eve Api Library",
+    "description": "Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online API data and place it into a database.",
+    "keywords": ["curl", "database", "Eve", "Eve-Online", "mysql", "mysqli", "ADOdb", "REST", "RESTful"],
     "license": "LGPL-3.0+",
     "authors": [
         {
@@ -14,10 +15,12 @@
             "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/Dragonrun1/yapeal",
     "support": {
-        "issues": "https://sourceforge.net/p/yapeal/tickets/",
-        "source": "https://sourceforge.net/projects/yapeal/files/",
-        "wiki": "https://sourceforge.net/p/yapeal/wiki/Home/"
+        "forum": "https://forums.eveonline.com/default.aspx?g=posts&t=7540",
+        "issues": "https://github.com/Dragonrun1/yapeal/issues?state=open",
+        "source": "https://github.com/Dragonrun1/yapeal",
+        "wiki": "https://github.com/Dragonrun1/yapeal/wiki"
     },
     "require": {
         "ext-curl": "*",

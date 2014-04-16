@@ -39,6 +39,6 @@
     },
     "require-dev": {
         "ext-xsl": "*",
-        "phpdocumentor/phpdocumentor": "dev-develop"
+        "phpdocumentor/phpdocumentor": "~2.4"
     }
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/php -Cq
+#!/usr/bin/env php
 <?php
 /**
  * Used to get information from Eve-online API and store in database.

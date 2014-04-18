@@ -53,18 +53,6 @@ class ValidateEveApiXml
         $this->section = $section;
     }
     /**
-     * Returns API error.
-     *
-     * @return array Returns API error from XML as assoc array.
-     */
-    public function getApiError()
-    {
-        return array(
-            'code' => $this->errorCode,
-            'message' => $this->errorMessage
-        );
-    }
-    /**
      * Returns cachedUntil date time.
      *
      * @return string Returns cachedUntil date time from XML.
@@ -83,29 +71,46 @@ class ValidateEveApiXml
         return $this->currentTime;
     }
     /**
+     * @return int
+     */
+    public function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+    /**
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+    /**
      * Returns if current XML is API error.
      *
      * @return bool Return TRUE if current XML is API error.
      */
     public function isApiError()
     {
-        return $this->apiError;
+        if ($this->errorCode != 0 || $this->errorMessage != '') {
+            return true;
+        }
+        return false;
     }
     /**
      * Returns if current cached XML is valid.
      *
      * @return bool Return TRUE if current XML was Validated and valid.
      */
-    public function isValid()
+    public function isValidXml()
     {
-        return $this->validXML;
+        return $this->validXml;
     }
     /**
      * Used to validate structure of Eve API XML file.
      *
-     * @return bool Return TRUE if the XML validates.
+     * @return self
      */
-    public function validateXML()
+    public function scanXml()
     {
         // Get a XMLReader instance.
         $xr = new \XMLReader();
@@ -117,7 +122,7 @@ class ValidateEveApiXml
             $mess .= ' is a valid API.';
             \Logger::getLogger('yapeal')
                   ->warn($mess);
-            return false;
+            return $this;
         }
         // Pass XML data to XMLReader so it can be checked.
         $xr->XML($this->xml);
@@ -145,24 +150,24 @@ class ValidateEveApiXml
                 \Logger::getLogger('yapeal')
                        ->info($mess);
             }
-            return false;
+            return $this;
         }
         // Now ready to start going through API XML.
         while (@$xr->read()) {
             if ($xr->nodeType == \XMLReader::ELEMENT) {
                 switch ($xr->localName) {
                     case 'cachedUntil':
-                        // Grab cachedUntil from API.
+                        // Grab cachedUntil from XML.
                         $xr->read();
                         $this->cachedUntil = $xr->value;
                         break;
                     case 'currentTime':
-                        // Grab current time from API.
+                        // Grab current time from XML.
                         $xr->read();
                         $this->currentTime = $xr->value;
                         break;
                     case 'error':
-                        // API error returned.
+                        // API XML error returned.
                         // See if error code attribute is available.
                         if (true == $xr->hasAttributes) {
                             $this->errorCode = (int)$xr->getAttribute('code');
@@ -170,14 +175,13 @@ class ValidateEveApiXml
                         // Move to message text.
                         $xr->read();
                         $this->errorMessage = $xr->value;
-                        $this->apiError = true;
                         break;
                 }
             }
         }
-        $this->validXML = (boolean)$xr->isValid();
+        $this->validXml = (boolean)$xr->isValid();
         $xr->close();
-        return true;
+        return $this;
     }
     /**
      * @var string Name of the Eve API being cached.
@@ -187,10 +191,6 @@ class ValidateEveApiXml
      * @var string The api section that $api belongs to.
      */
     protected $section;
-    /**
-     * @var boolean Used to track if XML contains Eve API error.
-     */
-    private $apiError = false;
     /**
      * @var string Holds the cachedUntil date time from API.
      */
@@ -210,6 +210,6 @@ class ValidateEveApiXml
     /**
      * @var boolean Used to track if XML is valid.
      */
-    private $validXML = false;
+    private $validXml = false;
 }
 

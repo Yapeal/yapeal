@@ -69,7 +69,7 @@ class YapealApiCache
         $this->vd = new ValidateEveApiXml($api, $section);
         $this->curTime = time();
         $ci = new CachedInterval();
-        $this->cacheInterval = $ci->getInterval($api, $section);
+        $this->cacheInterval = (int)$ci->getInterval($api, $section);
     }
     /**
      * function used to set constants from [Cache] section of the configuration file.
@@ -113,21 +113,21 @@ class YapealApiCache
         $cu->store();
         // check if XML is valid.
         $this->vd->xml = $xml;
-        $this->vd->validateXML();
+        $this->vd->scanXml();
         // Throw exception for any API errors.
-        if (true == $this->vd->isApiError()) {
+        if ($this->vd->isApiError()) {
             // Throw exception
             // Have to use API error code for special API error handling to work.
-            $error = $this->vd->getApiError();
-            throw new YapealApiErrorException(
-                $error['message'], $error['code']
+            throw new YapealApiErrorException (
+                $this->vd->getErrorMessage(),
+                $this->vd->getErrorCode()
             );
         }
         // Use now + interval + random value for cachedUntil.
         $until = $this->curTime + $this->cacheInterval;
         // Add random number of seconds to cache interval. Randomness is larger the
         // later in the day it is. Between 0 and 1 + 0 .. 23 hours * 15 seconds added.
-        $until += mt_rand(0, ((1 + gmdate("G")) * 15));
+        $until += mt_rand(0, ((1 + (int)gmdate("G")) * 15));
         $cu->cachedUntil = gmdate('Y-m-d H:i:s', $until);
         $cu->store();
         $cu = null;
@@ -152,12 +152,12 @@ class YapealApiCache
                       ->warn($mess);
                 return false;
         }
-        if (false == $this->vd->isValid()) {
+        if (false == $this->vd->isValidXml()) {
             $mess = 'Caching invalid API XML for ' . $this->section . DS
                 . $this->api;
             Logger::getLogger('yapeal')
                   ->warn($mess);
-        };
+        }
         return true;
     }
     /**
@@ -226,6 +226,16 @@ class YapealApiCache
         if ($this->curTime > $currentXML) {
             return false;
         }
+        // Temp fix for Issue #3
+        $data = array(
+            'api' => $this->api,
+            'ownerID' => $this->ownerID,
+            'section' => $this->section
+        );
+        $cu = new CachedUntil($data);
+        $cu->cachedUntil = gmdate('Y-m-d H:i:s', $currentXML);
+        $cu->store();
+        $cu = null;
         return $xml;
     }
     /**
@@ -235,7 +245,7 @@ class YapealApiCache
      */
     public function isValid()
     {
-        return $this->vd->isValid();
+        return $this->vd->isValidXml();
     }
     /**
      * @var string Name of the Eve API being cached.
@@ -262,7 +272,7 @@ class YapealApiCache
      */
     private static $cacheOutput = 'file';
     /**
-     * @var string Cache interval for this API.
+     * @var int Cache interval for this API.
      */
     private $cacheInterval;
     /**
@@ -274,7 +284,7 @@ class YapealApiCache
      */
     private $hash;
     /**
-     * @var object Holds the validator.
+     * @var ValidateEveApiXml Holds the validator.
      */
     private $vd;
     /**
@@ -410,7 +420,7 @@ class YapealApiCache
             // Validate the XML.
             $this->vd->xml = (string)$result;
             // Check if XML is valid.
-            $this->vd->validateXML();
+            $this->vd->scanXml();
             $currentXML = strtotime($this->vd->getCurrentTime() . ' +0000')
                 + $this->cacheInterval;
             // If already past cachedUntil need to get XML again.
@@ -450,7 +460,7 @@ class YapealApiCache
         }
         // Validate the XML.
         $this->vd->xml = $result;
-        $this->vd->validateXML();
+        $this->vd->scanXml();
         $currentXML = strtotime($this->vd->getCurrentTime() . ' +0000')
             + $this->cacheInterval;
         // If already past cachedUntil need to get XML again.

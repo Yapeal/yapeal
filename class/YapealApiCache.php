@@ -48,6 +48,8 @@ if (count(get_included_files()) < 2) {
     fwrite(STDERR, $mess);
     exit(1);
 };
+use Yapeal\Validation\ValidateEveApiXml;
+
 /**
  * Class used to manage caching of XML from Eve APIs.
  *
@@ -84,7 +86,7 @@ class YapealApiCache
         $this->ownerID = $owner;
         $this->section = $section;
         $this->postParams = $postParams;
-        $this->vd = new YapealValidateXml($api, $section);
+        $this->vd = new ValidateEveApiXml($api, $section);
         $this->curTime = time();
         $ci = new CachedInterval();
         $this->cacheInterval = $ci->getInterval($api, $section);

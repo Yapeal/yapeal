@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains YapealValidateXml class.
+ * Contains ValidateEveApiXml class.
  *
  * PHP version 5
  *
@@ -28,13 +28,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Validation;
+
 /**
  * Class used to validate XML from Eve APIs.
- *
- * @package    Yapeal
- * @subpackage YapealValidateXml
  */
-class YapealValidateXml
+class ValidateEveApiXml
 {
     /**
      * @var string Hold the XML.
@@ -44,8 +43,9 @@ class YapealValidateXml
      * Constructor
      *
      * @param string $api     Name of the Eve API being cached.
-     * @param string $section The api section that $api belongs to. For Eve
-     *                        APIs will be one of account, char, corp, eve, map, or server.
+     * @param string $section The api section that $api belongs to. For Eve APIs
+     *                        will be one of account, char, corp, eve, map, or
+     *                        server.
      */
     public function __construct($api, $section)
     {
@@ -108,14 +108,14 @@ class YapealValidateXml
     public function validateXML()
     {
         // Get a XMLReader instance.
-        $xr = new XMLReader();
+        $xr = new \XMLReader();
         // Check for HTML errors.
         if (false !== strpos($this->xml, '<!DOCTYPE html')) {
             $mess = 'API returned HTML error page.';
             $mess .= ' Check to make sure API ';
             $mess .= $this->section . DS . $this->api;
             $mess .= ' is a valid API.';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -130,41 +130,33 @@ class YapealValidateXml
         $xr->XML($this->xml);
         // Need to look for XSD Schema for this API to use while validating.
         // Build cache file path.
-        $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
-        if (is_dir($cachePath)) {
-            // Build W3C Schema file name
-            $cacheFile = $cachePath . $this->api . '.xsd';
-            // Can not use schema if it is missing.
-            if (!is_file($cacheFile)) {
-                if (Logger::getLogger('yapeal')
-                          ->isInfoEnabled()
-                ) {
-                    $mess = 'Missing schema file ' . $cacheFile;
-                    Logger::getLogger('yapeal')
-                          ->info($mess);
-                }
-                $cacheFile = realpath(YAPEAL_CACHE . 'unknown.xsd');
+        $cachePath = __DIR__ . DIRECTORY_SEPARATOR . $this->section
+            . DIRECTORY_SEPARATOR;
+        $cacheFile = $cachePath . $this->api . '.xsd';
+        if (!is_readable($cacheFile) || !is_file($cacheFile)) {
+            if (\Logger::getLogger('yapeal')
+                       ->isInfoEnabled()
+            ) {
+                $mess = 'Could NOT access XSD schema file: ' . $cacheFile;
+                \Logger::getLogger('yapeal')
+                       ->info($mess);
             }
-            // Have to have a good schema.
-            if (!$xr->setSchema($cacheFile)) {
-                if (Logger::getLogger('yapeal')
-                          ->isInfoEnabled()
-                ) {
-                    $mess = 'Could not load schema file ' . $cacheFile;
-                    Logger::getLogger('yapeal')
-                          ->info($mess);
-                }
-                return false;
+            $cacheFile = $cachePath . 'unknown.xsd';
+        }
+        // Have to have a good schema.
+        if (!$xr->setSchema($cacheFile)) {
+            if (\Logger::getLogger('yapeal')
+                       ->isInfoEnabled()
+            ) {
+                $mess = 'Could NOT load schema file ' . $cacheFile;
+                \Logger::getLogger('yapeal')
+                       ->info($mess);
             }
-        } else {
-            $mess = 'Could not access cache directory to get XSD file';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
             return false;
         }
         // Now ready to start going through API XML.
         while (@$xr->read()) {
-            if ($xr->nodeType == XMLReader::ELEMENT) {
+            if ($xr->nodeType == \XMLReader::ELEMENT) {
                 switch ($xr->localName) {
                     case 'cachedUntil':
                         // Grab cachedUntil from API.

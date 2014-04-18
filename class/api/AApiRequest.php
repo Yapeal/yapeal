@@ -29,6 +29,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Caching\EveApiXmlCache;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -66,7 +68,7 @@ abstract class AApiRequest
     public function apiStore()
     {
         // First get a new cache instance.
-        $cache = new YapealApiCache(
+        $cache = new EveApiXmlCache(
             $this->api,
             $this->section,
             $this->ownerID,

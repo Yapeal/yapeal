@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Caching\EveApiXmlCache;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -56,7 +58,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpOutpostServiceDetail extends ACorp
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -91,7 +93,7 @@ class corpOutpostServiceDetail extends ACorp
                 // This tells API server which outpost we want.
                 $apiParams['itemID'] = (string)$this->outpostID['stationID'];
                 // First get a new cache instance.
-                $cache = new YapealApiCache(
+                $cache = new EveApiXmlCache(
                     $this->api,
                     $this->section,
                     $this->ownerID,
@@ -180,7 +182,7 @@ class corpOutpostServiceDetail extends ACorp
         };
         return $list;
     }// function apiStore
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML

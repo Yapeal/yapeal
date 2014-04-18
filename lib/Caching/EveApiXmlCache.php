@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains YapealApiCache class.
+ * Contains EveApiXmlCache class.
  *
  * PHP version 5
  *
@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Caching;
+
 use Yapeal\Validation\ValidateEveApiXml;
 
 /**
@@ -36,7 +38,7 @@ use Yapeal\Validation\ValidateEveApiXml;
  * @package    Yapeal
  * @subpackage YapealAPICache
  */
-class YapealApiCache
+class EveApiXmlCache
 {
     /**
      * Constructor

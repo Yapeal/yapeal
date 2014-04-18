@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Caching\EveApiXmlCache;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -57,7 +59,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpWalletTransactions extends ACorp
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -73,7 +75,7 @@ class corpWalletTransactions extends ACorp
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
     }
-/**
+    /**
      * Used to store XML to MySQL table(s).
      *
      * @return Bool Return TRUE if store was successful.
@@ -111,7 +113,7 @@ class corpWalletTransactions extends ACorp
                     // This tells API server how many rows we want.
                     $apiParams['rowCount'] = $rowCount;
                     // First get a new cache instance.
-                    $cache = new YapealApiCache(
+                    $cache = new EveApiXmlCache(
                         $this->api, $this->section,
                         $this->ownerID, $apiParams
                     );
@@ -194,11 +196,11 @@ class corpWalletTransactions extends ACorp
      * @var string Holds the refID from each row in turn to use when walking.
      */
     protected $beforeID;
-        /**
+    /**
      * @var string Holds the date from each row in turn to use when walking.
      */
-    protected $date;// function __construct
-        /**
+    protected $date; // function __construct
+    /**
      * Parsers the XML from API.
      *
      * Most common API style is a simple <rowset>. Transactions are a little more

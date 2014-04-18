@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Caching\EveApiXmlCache;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -56,7 +58,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpStarbaseDetail extends ACorp
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -72,7 +74,7 @@ class corpStarbaseDetail extends ACorp
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
     }
-/**
+    /**
      * Used to store XML to MySQL table(s).
      *
      * @return Bool Return TRUE if store was successful.
@@ -95,7 +97,7 @@ class corpStarbaseDetail extends ACorp
                 // This tells API server which tower we want.
                 $apiParams['itemID'] = (string)$this->posID['itemID'];
                 // First get a new cache instance.
-                $cache = new YapealApiCache(
+                $cache = new EveApiXmlCache(
                     $this->api,
                     $this->section,
                     $this->ownerID,
@@ -176,7 +178,7 @@ class corpStarbaseDetail extends ACorp
         }; // foreach $posList ...
         return $ret;
     }
-/**
+    /**
      * Used to store XML to StarbaseDetail CombatSettings table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -218,7 +220,7 @@ class corpStarbaseDetail extends ACorp
               ->warn($mess);
         return false;
     }
-/**
+    /**
      * Used to store XML to StarbaseDetail GeneralSettings table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -419,7 +421,7 @@ class corpStarbaseDetail extends ACorp
         };
         return $list;
     }// function apiStore
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -487,18 +489,18 @@ class corpStarbaseDetail extends ACorp
               ->warn($mess);
         return false;
     }// function combatSettings
-        /**
+    /**
      * @var YapealQueryBuilder Query instance for combatSettings table.
      */
-    private $combat;// function generalSettings
-        /**
+    private $combat; // function generalSettings
+    /**
      * @var YapealQueryBuilder Query instance for fuel table.
      */
-    private $fuel;// function rowset
-        /**
+    private $fuel; // function rowset
+    /**
      * @var YapealQueryBuilder Query instance for generalSettings table.
      */
-    private $general;// function posList
+    private $general; // function posList
     /**
      * @var integer Holds current POS ID.
      */

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:include schemaLocation="../../../cache/eveapi.xsd"/>
+    <xs:element name="eveapi">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="currentTime" type="eveNEDT"/>
+                <xs:choice>
+                    <xs:element name="error">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="result">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="serverOpen" type="eveBoolean"/>
+                                <xs:element name="onlinePlayers" type="xs:unsignedLong"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+                <xs:element name="cachedUntil" type="eveNEDT"/>
+            </xs:sequence>
+            <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

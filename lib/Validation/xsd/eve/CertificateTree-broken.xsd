@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:include schemaLocation="../../../cache/eveapi.xsd"/>
+    <xs:include schemaLocation="../../../cache/rowset.xsd"/>
+    <xs:element name="result">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="rowset" type="rowset"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="row">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="rowset">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="row">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="unbounded" name="rowset" type="rowset"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="categoryID" type="eveID"/>
+                                    <xs:attribute name="categoryName" type="xs:string"/>
+                                    <xs:attribute name="certificateID" type="eveID"/>
+                                    <xs:attribute name="classID" type="eveID"/>
+                                    <xs:attribute name="className" type="xs:string"/>
+                                    <xs:attribute name="corporationID" type="eveID"/>
+                                    <xs:attribute name="description" type="xs:string"/>
+                                    <xs:attribute name="grade" type="xs:unsignedByte"/>
+                                    <xs:attribute name="level" type="xs:unsignedByte"/>
+                                    <xs:attribute name="typeID" type="eveID"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="columns" use="required" type="eveColumns"/>
+                        <xs:attribute name="key" use="optional" type="xs:NCName"/>
+                        <xs:attribute name="name" use="required" type="xs:NCName"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="categoryID" type="eveID"/>
+            <xs:attribute name="categoryName" type="xs:string"/>
+            <xs:attribute name="certificateID" type="eveID"/>
+            <xs:attribute name="classID" type="eveID"/>
+            <xs:attribute name="className" type="xs:string"/>
+            <xs:attribute name="corporationID" type="eveID"/>
+            <xs:attribute name="description" type="xs:string"/>
+            <xs:attribute name="grade" type="xs:unsignedByte"/>
+            <xs:attribute name="level" type="xs:unsignedByte"/>
+            <xs:attribute name="typeID" type="eveID"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="requiredSkillsRow">
+        <xs:attribute name="typeID" type="eveID"/>
+        <xs:attribute name="level" type="xs:unsignedByte"/>
+    </xs:complexType>
+    <xs:complexType name="requiredCertificatesRow">
+        <xs:attribute name="certificateID" type="eveID"/>
+        <xs:attribute name="grade" type="xs:unsignedByte"/>
+    </xs:complexType>
+    <xs:complexType name="requiredSkillsRowset">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="requiredSkillsRow"/>
+        </xs:sequence>
+        <xs:attribute name="columns" use="required" type="xs:string"/>
+        <xs:attribute name="key" use="optional" type="xs:NCName"/>
+        <xs:attribute name="name" use="required" fixed="requiredSkills"/>
+    </xs:complexType>
+    <xs:complexType name="requiredCertificatesRowset">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="requiredCertificatesRow"/>
+        </xs:sequence>
+        <xs:attribute name="columns" use="required" type="xs:string"/>
+        <xs:attribute name="key" use="optional" type="xs:NCName"/>
+        <xs:attribute name="name" use="required" fixed="requiredCertificates"/>
+    </xs:complexType>
+    <xs:complexType name="certificatesRow">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="rowset" type="requiredSkillsRowset"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="rowset" type="requiredCertificatesRowset"/>
+        </xs:sequence>
+        <xs:attribute name="certificateID" type="eveID"/>
+        <xs:attribute name="grade" type="xs:unsignedByte"/>
+        <xs:attribute name="corporationID" type="eveID"/>
+        <xs:attribute name="description" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="certificatesRowset">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="certificatesRow"/>
+        </xs:sequence>
+        <xs:attribute name="columns" use="required" type="xs:string"/>
+        <xs:attribute name="key" use="optional" type="xs:NCName"/>
+        <xs:attribute name="name" use="required" fixed="certificates"/>
+    </xs:complexType>
+    <xs:complexType name="classesRow">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="rowset" type="certificatesRowset"/>
+        </xs:sequence>
+        <xs:attribute name="classID" type="eveID"/>
+        <xs:attribute name="className" type="xs:string"/>
+    </xs:complexType>
+</xs:schema>

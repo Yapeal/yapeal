@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:include schemaLocation="../eveapi.xsd"/>
+    <xs:element name="eveapi">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="currentTime" type="eveNEDT"/>
+                <xs:choice>
+                    <xs:element name="error">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="result">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="rowset">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element minOccurs="0" maxOccurs="unbounded" name="row" type="rowType"/>
+                                        </xs:sequence>
+                                        <xs:attributeGroup ref="rowsetAttrs"/>
+                                    </xs:complexType>
+                                    <xs:key name="rowIdKey">
+                                        <xs:annotation>
+                                            <xs:documentation>The attribute
+                                                named by the key attribute on
+                                                the rowset is a key for the rows
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:selector xpath=".//row"/>
+                                        <xs:field xpath="@jobID"/>
+                                    </xs:key>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+                <xs:element name="cachedUntil" type="eveNEDT"/>
+            </xs:sequence>
+            <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="rowType">
+        <xs:attribute name="activityID" use="required" type="eveID"/>
+        <xs:attribute name="assemblyLineID" use="required" type="eveID"/>
+        <xs:attribute name="beginProductionTime" use="required" type="eveDT"/>
+        <xs:attribute name="charMaterialMultiplier" use="required" type="xs:decimal"/>
+        <xs:attribute name="charTimeMultiplier" use="required" type="xs:decimal"/>
+        <xs:attribute name="completed" use="required" type="eveBoolean"/>
+        <xs:attribute name="completedStatus" use="required" type="xs:unsignedByte"/>
+        <xs:attribute name="completedSuccessfully" use="required" type="eveBoolean"/>
+        <xs:attribute name="containerID" use="required" type="eveID"/>
+        <xs:attribute name="containerLocationID" use="required" type="eveID"/>
+        <xs:attribute name="containerTypeID" use="required" type="eveID"/>
+        <xs:attribute name="endProductionTime" use="required" type="eveDT"/>
+        <xs:attribute name="installTime" use="required" type="eveDT"/>
+        <xs:attribute name="installedInSolarSystemID" use="required" type="eveID"/>
+        <xs:attribute name="installedItemCopy" use="required" type="eveBoolean"/>
+        <xs:attribute name="installedItemFlag" use="required" type="xs:unsignedShort"/>
+        <xs:attribute name="installedItemID" use="required" type="eveID"/>
+        <xs:attribute name="installedItemLicensedProductionRunsRemaining" use="required" type="xs:long"/>
+        <xs:attribute name="installedItemLocationID" use="required" type="eveID"/>
+        <xs:attribute name="installedItemMaterialLevel" use="required" type="xs:decimal"/>
+        <xs:attribute name="installedItemProductivityLevel" use="required" type="xs:decimal"/>
+        <xs:attribute name="installedItemQuantity" use="required" type="xs:unsignedByte"/>
+        <xs:attribute name="installedItemTypeID" use="required" type="eveID"/>
+        <xs:attribute name="installerID" use="required" type="eveID"/>
+        <xs:attribute name="jobID" use="required" type="eveID"/>
+        <xs:attribute name="licensedProductionRuns" use="required" type="xs:unsignedLong"/>
+        <xs:attribute name="materialMultiplier" use="required" type="xs:decimal"/>
+        <xs:attribute name="outputFlag" use="required" type="xs:unsignedShort"/>
+        <xs:attribute name="outputLocationID" use="required" type="eveID"/>
+        <xs:attribute name="outputTypeID" use="required" type="eveID"/>
+        <xs:attribute name="pauseProductionTime" use="required" type="eveDT"/>
+        <xs:attribute name="runs" use="required" type="xs:unsignedLong"/>
+        <xs:attribute name="timeMultiplier" use="required" type="xs:decimal"/>
+    </xs:complexType>
+</xs:schema>

@@ -70,7 +70,7 @@ class EveApiXmlCache
         $this->postParams = $postParams;
         $this->vd = new ValidateEveApiXml($api, $section);
         $this->curTime = time();
-        $ci = new CachedInterval();
+        $ci = new \CachedInterval();
         $this->cacheInterval = (int)$ci->getInterval($api, $section);
     }
     /**
@@ -88,16 +88,15 @@ class EveApiXmlCache
      *
      * @param string $xml The Eve API XML to be cached.
      *
+     * @throws \YapealApiErrorException
      * @return bool Returns TRUE if XML was cached, FALSE otherwise.
      *
-     * @throws YapealApiErrorException Throws YapealApiErrorException for any API
-     * errors.
      */
     public function cacheXml($xml)
     {
         if (empty($xml)) {
             $mess = 'XML was empty' . PHP_EOL;
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -106,7 +105,7 @@ class EveApiXmlCache
             'ownerID' => $this->ownerID,
             'section' => $this->section
         );
-        $cu = new CachedUntil($data);
+        $cu = new \CachedUntil($data);
         // Update utilCachedUntil table with default short cache date/time. This
         // is changed when there is an API error that returns a different one or
         // normally is set to the new calculated date/time if there aren't any
@@ -120,7 +119,7 @@ class EveApiXmlCache
         if ($this->vd->isApiError()) {
             // Throw exception
             // Have to use API error code for special API error handling to work.
-            throw new YapealApiErrorException (
+            throw new \YapealApiErrorException (
                 $this->vd->getErrorMessage(),
                 $this->vd->getErrorCode()
             );
@@ -150,14 +149,14 @@ class EveApiXmlCache
                 $mess = 'Invalid value of "' . self::$cacheOutput;
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
-                Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
         }
         if (false == $this->vd->isValidXml()) {
             $mess = 'Caching invalid API XML for ' . $this->section . DS
                 . $this->api;
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
         }
         return true;
@@ -182,7 +181,7 @@ class EveApiXmlCache
                 $mess = 'Invalid value of "' . self::$cacheOutput;
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
-                Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                       ->warn($mess);
         }
     }
@@ -218,7 +217,7 @@ class EveApiXmlCache
                 $mess = 'Invalid value of "' . self::$cacheOutput;
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
-                Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
         }
@@ -234,7 +233,7 @@ class EveApiXmlCache
             'ownerID' => $this->ownerID,
             'section' => $this->section
         );
-        $cu = new CachedUntil($data);
+        $cu = new \CachedUntil($data);
         $cu->cachedUntil = gmdate('Y-m-d H:i:s', $currentXML);
         $cu->store();
         $cu = null;
@@ -300,7 +299,7 @@ class EveApiXmlCache
     {
         try {
             // Get a new query instance.
-            $qb = new YapealQueryBuilder(
+            $qb = new \YapealQueryBuilder(
                 YAPEAL_TABLE_PREFIX . 'utilXmlCache',
                 YAPEAL_DSN, false
             );
@@ -312,8 +311,8 @@ class EveApiXmlCache
             );
             $qb->addRow($row);
             $qb->store();
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }
@@ -333,13 +332,13 @@ class EveApiXmlCache
         if (!is_dir($cachePath)) {
             $mess = 'XML cache ' . $cachePath
                 . ' is not a directory or does not exist';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
         if (!is_writable($cachePath)) {
             $mess = 'XML cache directory ' . $cachePath . ' is not writable';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -347,7 +346,7 @@ class EveApiXmlCache
         $ret = file_put_contents($cacheFile, $xml);
         if (false == $ret || $ret == -1) {
             $mess = 'Could not cache XML to ' . $cacheFile;
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -361,13 +360,13 @@ class EveApiXmlCache
     private function delCachedDatabase()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = \YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
             $sql .= ' where';
             $sql .= ' `hash`=' . $con->qstr($this->hash);
             $con->Execute($sql);
-        } catch (Exception $e) {
-            Logger::getLogger('yapeal')
+        } catch (\Exception $e) {
+            \Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }
@@ -385,13 +384,13 @@ class EveApiXmlCache
         if (!is_dir($cachePath)) {
             $mess = 'XML cache ' . $cachePath
                 . ' is not a directory or does not exist';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
         if (!is_writable($cachePath)) {
             $mess = 'XML cache directory ' . $cachePath . ' is not writable';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -410,7 +409,7 @@ class EveApiXmlCache
     private function getCachedDatabase()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = \YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'select sql_no_cache `xml`';
             $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
             $sql .= ' where';
@@ -431,8 +430,8 @@ class EveApiXmlCache
                 $this->delCachedDatabase();
                 return false;
             }
-        } catch (Exception $e) {
-            Logger::getLogger('yapeal')
+        } catch (\Exception $e) {
+            \Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }
@@ -451,7 +450,7 @@ class EveApiXmlCache
         if (!is_dir($cachePath)) {
             $mess = 'XML cache ' . $cachePath
                 . ' is not a directory or does not exist';
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }

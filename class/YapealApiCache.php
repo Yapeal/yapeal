@@ -28,26 +28,6 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
 use Yapeal\Validation\ValidateEveApiXml;
 
 /**
@@ -118,7 +98,7 @@ class YapealApiCache
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if empty($xml) ...
+        }
         $data = array(
             'api' => $this->api,
             'ownerID' => $this->ownerID,
@@ -142,7 +122,7 @@ class YapealApiCache
             throw new YapealApiErrorException(
                 $error['message'], $error['code']
             );
-        }; // if $this->vd->isApiError() ...
+        }
         // Use now + interval + random value for cachedUntil.
         $until = $this->curTime + $this->cacheInterval;
         // Add random number of seconds to cache interval. Randomness is larger the
@@ -171,7 +151,7 @@ class YapealApiCache
                 Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
-        }; // switch YAPEAL_CACHE_OUTPUT ...
+        }
         if (false == $this->vd->isValid()) {
             $mess = 'Caching invalid API XML for ' . $this->section . DS
                 . $this->api;
@@ -202,7 +182,7 @@ class YapealApiCache
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
                 Logger::getLogger('yapeal')
                       ->warn($mess);
-        }; // switch YAPEAL_CACHE_OUTPUT ...
+        }
     }
     /**
      * Used to fetch API XML from database table and/or file.
@@ -221,8 +201,8 @@ class YapealApiCache
                     // If XML was cached to file but not to database add it to database.
                     if ($xml !== false) {
                         $this->cacheXmlDatabase($xml);
-                    }; // if $xml !== FALSE ...
-                }; // if FALSE === $xml ...
+                    }
+                }
                 break;
             case 'database':
                 $xml = $this->getCachedDatabase();
@@ -239,7 +219,7 @@ class YapealApiCache
                 Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
-        }; // switch YAPEAL_CACHE_OUTPUT ...
+        }
         $currentXML = strtotime($this->vd->getCurrentTime() . ' +0000')
             + $this->cacheInterval;
         // If already past cachedUntil need to get XML again.
@@ -276,27 +256,27 @@ class YapealApiCache
     /**
      * @var string Hold the XML.
      */
-    protected $xml; // function __constructor
+    protected $xml;
     /**
      * @var string Value from [Cache] section for cache_output.
      */
-    private static $cacheOutput = 'file'; // function cacheXml
+    private static $cacheOutput = 'file';
     /**
      * @var string Cache interval for this API.
      */
-    private $cacheInterval; // function cacheXmlDatabase
+    private $cacheInterval;
     /**
      * @var integer Holds current Unix time to have consistent caching time.
      */
-    private $curTime; // function cacheXmlFile
+    private $curTime;
     /**
      * @var string Holds SHA1 hash of $section, $api, $postParams.
      */
-    private $hash; // function delCachedApi
+    private $hash;
     /**
      * @var object Holds the validator.
      */
-    private $vd; // function delCachedDatabase
+    private $vd;
     /**
      * Function used to save API XML into database table.
      *
@@ -326,7 +306,7 @@ class YapealApiCache
             return false;
         }
         return true;
-    }// function getCachedFile
+    }
     /**
      * Used to save API XML into file.
      *
@@ -344,13 +324,13 @@ class YapealApiCache
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if !is_dir $cachePath ...
+        }
         if (!is_writable($cachePath)) {
             $mess = 'XML cache directory ' . $cachePath . ' is not writable';
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if !is_writable $cachePath ...
+        }
         $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
         $ret = file_put_contents($cacheFile, $xml);
         if (false == $ret || $ret == -1) {
@@ -358,9 +338,9 @@ class YapealApiCache
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if FALSE == $ret ||...
+        }
         return true;
-    }// function getCachedApi
+    }
     /**
      * Used to delete any cached XML from database.
      *
@@ -380,7 +360,7 @@ class YapealApiCache
             return false;
         }
         return true;
-    }// function getCachedDatabase
+    }
     /**
      * Used to delete any cached XML from file.
      *
@@ -396,19 +376,19 @@ class YapealApiCache
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         if (!is_writable($cachePath)) {
             $mess = 'XML cache directory ' . $cachePath . ' is not writable';
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if !is_writable $cachePath ...
+        }
         $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
         if (!file_exists($cacheFile) || !is_file($cacheFile)) {
             return false;
         }
         return @unlink($cacheFile);
-    }// function getCachedFile
+    }
     /**
      * Used to fetch API XML from database table.
      *
@@ -426,7 +406,7 @@ class YapealApiCache
             $result = $con->GetOne($sql);
             if (empty($result)) {
                 return false;
-            };
+            }
             // Validate the XML.
             $this->vd->xml = (string)$result;
             // Check if XML is valid.
@@ -438,14 +418,14 @@ class YapealApiCache
                 // Delete cached XML from database.
                 $this->delCachedDatabase();
                 return false;
-            };
+            }
         } catch (Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }
         return $result;
-    }// function isValid
+    }
     /**
      * Function used to fetch API XML from file.
      *
@@ -462,12 +442,12 @@ class YapealApiCache
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
         $result = @file_get_contents($cacheFile);
         if (false === $result || empty($result)) {
             return false;
-        }; // if FALSE === $result ...
+        }
         // Validate the XML.
         $this->vd->xml = $result;
         $this->vd->validateXML();
@@ -478,8 +458,7 @@ class YapealApiCache
             // Delete cached XML from filesystem.
             $this->delCachedFile();
             return false;
-        };
+        }
         return $result;
     }
-    // function setCacheSectionProperties
 }

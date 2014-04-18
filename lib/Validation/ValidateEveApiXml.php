@@ -119,16 +119,9 @@ class ValidateEveApiXml
                   ->warn($mess);
             return false;
         }
-        // Check for XML header.
-        //if (FALSE === strpos($xml, "?xml version='1.0'")) {
-        //  $mess = 'API server returned unknown type of data.';
-        //  Logger::getLogger('yapeal')->warn($mess);
-        //  $this->validXML = FALSE;
-        //  return FALSE;
-        //};// if strpos $xml...
         // Pass XML data to XMLReader so it can be checked.
         $xr->XML($this->xml);
-        // Need to look for XSD Schema for this API to use while validating.
+        // Need to get for XSD Schema for this API to use while validating.
         // Build cache file path.
         $cachePath = __DIR__ . DIRECTORY_SEPARATOR . $this->section
             . DIRECTORY_SEPARATOR;

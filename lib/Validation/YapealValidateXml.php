@@ -29,26 +29,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to validate XML from Eve APIs.
  *
  * @package    Yapeal
@@ -138,7 +118,7 @@ class YapealValidateXml
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // if FALSE !== strpos <!DOCTYPE html ...
+        }
         // Check for XML header.
         //if (FALSE === strpos($xml, "?xml version='1.0'")) {
         //  $mess = 'API server returned unknown type of data.';
@@ -162,9 +142,9 @@ class YapealValidateXml
                     $mess = 'Missing schema file ' . $cacheFile;
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 $cacheFile = realpath(YAPEAL_CACHE . 'unknown.xsd');
-            }; // if !is_file ...
+            }
             // Have to have a good schema.
             if (!$xr->setSchema($cacheFile)) {
                 if (Logger::getLogger('yapeal')
@@ -173,15 +153,15 @@ class YapealValidateXml
                     $mess = 'Could not load schema file ' . $cacheFile;
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 return false;
-            }; // if !$xr->setSchema ...
+            }
         } else {
             $mess = 'Could not access cache directory to get XSD file';
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        }; // else is_dir ...
+        }
         // Now ready to start going through API XML.
         while (@$xr->read()) {
             if ($xr->nodeType == XMLReader::ELEMENT) {
@@ -201,15 +181,15 @@ class YapealValidateXml
                         // See if error code attribute is available.
                         if (true == $xr->hasAttributes) {
                             $this->errorCode = (int)$xr->getAttribute('code');
-                        };
+                        }
                         // Move to message text.
                         $xr->read();
                         $this->errorMessage = $xr->value;
                         $this->apiError = true;
                         break;
-                }; // switch $xr->localName ...
-            }; // if $xr->nodeType ...
-        }; // while $xr->read() ...
+                }
+            }
+        }
         $this->validXML = (boolean)$xr->isValid();
         $xr->close();
         return true;
@@ -221,31 +201,30 @@ class YapealValidateXml
     /**
      * @var string The api section that $api belongs to.
      */
-    protected $section; // function __constructor
+    protected $section;
     /**
      * @var boolean Used to track if XML contains Eve API error.
      */
-    private $apiError = false; // function getCachedUntil
+    private $apiError = false;
     /**
      * @var string Holds the cachedUntil date time from API.
      */
-    private $cachedUntil = '1970-01-01 00:00:02'; // function getCurrentTime
+    private $cachedUntil = '1970-01-01 00:00:02';
     /**
      * @var string Holds the currentTime date time from API.
      */
-    private $currentTime = '1970-01-01 00:00:01'; // function getApiError
+    private $currentTime = '1970-01-01 00:00:01';
     /**
      * @var integer Holds the API error code if there is one.
      */
-    private $errorCode = 0; // function isValid
+    private $errorCode = 0;
     /**
      * @var string Holds the API error message if there is one.
      */
-    private $errorMessage = ''; // function isValid
+    private $errorMessage = '';
     /**
      * @var boolean Used to track if XML is valid.
      */
     private $validXML = false;
-    // function validateXML
 }
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env php
-
 <?php
 /**
  * Used to get information from Eve-online API and store in database.
@@ -34,13 +33,8 @@
  * @link       http://www.eveonline.com/
  * @since      revision 561
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
+use Yapeal\Caching\EveApiXmlCache;
+
 /**
  * @internal Only let this code be ran in CLI.
  */
@@ -103,6 +97,21 @@ if (empty($iniVars)) {
 };
 require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
 YapealAutoLoad::activateAutoLoad();
+// Include Composer's auto-loader for all the classes that are being moved.
+/*
+ * Find auto loader from one of
+ * vendor/bin/
+ * OR ./
+ * OR bin/
+ * OR lib/Yapeal/
+ * OR vendor/yapeal/yapeal/bin/
+ */
+(@include_once dirname(__DIR__) . '/autoload.php')
+|| (@include_once __DIR__ . '/vendor/autoload.php')
+|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
+|| die('Could not find required auto class loader. Aborting ...');
 /**
  * Define constants and properties from settings in configuration.
  */
@@ -116,7 +125,7 @@ if (!empty($options['log-config'])) {
     YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
 };
 YapealErrorHandler::setupCustomErrorAndExceptionSettings();
-YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
+EveApiXmlCache::setCacheSectionProperties($iniVars['Cache']);
 YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
 setGeneralSectionConstants($iniVars);
 unset($iniVars);

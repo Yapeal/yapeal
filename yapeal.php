@@ -34,6 +34,7 @@
  * @since      revision 561
  */
 use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Database\YapealDBConnection;
 
 /**
  * @internal Only let this code be ran in CLI.

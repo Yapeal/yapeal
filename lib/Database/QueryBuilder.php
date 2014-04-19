@@ -30,6 +30,8 @@
  */
 namespace Yapeal\Database;
 
+use ADODB_mysqli;
+
 /**
  * Class used to build SQL queries.
  *
@@ -68,9 +70,9 @@ class QueryBuilder implements \Countable
      * @param string $dsn           ADOdb DSN for database connection.
      * @param bool   $autoStoreMode Used to turn autostore on or off.
      *
-     * @throws InvalidArgumentException Throws InvalidArgumentException if
+     * @throws \InvalidArgumentException Throws InvalidArgumentException if
      * $tableName or $dsn aren't strings.
-     * @throws RuntimeException Throws RuntimeException if can't get ADOdb
+     * @throws \RuntimeException Throws RuntimeException if can't get ADOdb
      * connection or table column information.
      */
     public function __construct($tableName, $dsn, $autoStoreMode = true)
@@ -78,17 +80,17 @@ class QueryBuilder implements \Countable
         if (!is_string($tableName)) {
             $mess = '$tableName must be a string in ' . __CLASS__;
             throw new \InvalidArgumentException($mess);
-        }; // if !is_string $tableName ...
+        }
         // Keep table name for later.
         $this->tableName = $tableName;
         if (!is_string($dsn)) {
             $mess = '$dsn must be a string in ' . __CLASS__;
             throw new \InvalidArgumentException($mess);
-        }; // if !is_string $params[$k] ...
+        }
         //$this->dsn = $dsn;
         try {
             // Get a database connection.
-            $this->con = \YapealDBConnection::connect($dsn);
+            $this->con = \Yapeal\Database\YapealDBConnection::connect($dsn);
         } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
             throw new \RuntimeException($mess);
@@ -108,15 +110,15 @@ class QueryBuilder implements \Countable
                     $this->defaults[$col->name] = $col->default_value;
                 } else {
                     $this->nullables[] = $col->name;
-                };
-            }; // if isset $col->has_default ...
+                }
+            }
             // Add any null-able columns to null list.
             if (isset($col->not_null) && $col->not_null === false) {
                 $this->nullables[] = $col->name;
-            }; // if isset $col->has_default ...
+            }
             // Make list of column names and their ADOdb generic types.
             $this->colTypes[$col->name] = $this->metaType($col);
-        }; // foreach $this->columns ...
+        }
         $this->autoStore = (bool)$autoStoreMode;
     }
     /**
@@ -148,7 +150,7 @@ class QueryBuilder implements \Countable
             $mess = 'Query destroyed before all rows were saved';
             \Logger::getLogger('yapeal')
                    ->warn($mess);
-        };
+        }
     }
     /**
      * Magic function to show object when being printed.
@@ -165,7 +167,7 @@ class QueryBuilder implements \Countable
             '"' . implode('","', array_keys($this->colTypes)) . '"' . PHP_EOL;
         foreach ($this->rows as $row) {
             $value .= trim($row, '()') . PHP_EOL;
-        };
+        }
         return $value;
     }
     /**
@@ -191,7 +193,7 @@ class QueryBuilder implements \Countable
             \Logger::getLogger('yapeal')
                    ->warn($mess);
             return false;
-        };
+        }
         // Check for extra unknown fields in the data. This should only happen when
         // API has changed and the version of Yapeal is out of date.
         $diff = array_diff(array_keys($data), array_keys($this->colTypes));
@@ -200,7 +202,7 @@ class QueryBuilder implements \Countable
             $mess .= ') that will be ignored for ' . $this->tableName;
             \Logger::getLogger('yapeal')
                    ->warn($mess);
-        };
+        }
         // Make a new array where database fields and API data fields overlap.
         //$fields = array_intersect(array_keys($this->colTypes), array_keys($data), $this->nullables);
         $set = array();
@@ -209,7 +211,7 @@ class QueryBuilder implements \Countable
             if (!isset($data[$field]) && in_array($field, $this->nullables)) {
                 $set[] = 'NULL';
                 continue;
-            };
+            }
             switch ($this->colTypes[$field]) {
                 case 'C':
                 case 'D':
@@ -230,12 +232,12 @@ class QueryBuilder implements \Countable
                         } else {
                             $set[] = (string)$data[$field];
                         }
-                    }; // else '0x' !== substr($row[$field], 0, 2) ...
+                    }
                     break;
                 default:
                     $set[] = (string)$data[$field];
-            }; // switch $types($field) ...
-        }; // foreach $fields ...
+            }
+        }
         $newRow = '(' . implode(',', $set) . ')';
         // Put completed row in with the rest.
         $this->rows[] = $newRow;
@@ -248,7 +250,7 @@ class QueryBuilder implements \Countable
                 || self::$autoStoreSize <= $this->rowSize)
         ) {
             $this->store();
-        }; // if $this->autoStore === TRUE ...
+        }
         return true;
     }
     /**
@@ -298,7 +300,7 @@ class QueryBuilder implements \Countable
      *
      * @return bool Returns TRUE if column exists in table and default was set.
      *
-     * @throws LogicException Throws LogicException if any rows have already been
+     * @throws \LogicException Throws LogicException if any rows have already been
      * added. All defaults must be set before starting to add data rows.
      */
     public function setDefault($name, $value)
@@ -313,7 +315,7 @@ class QueryBuilder implements \Countable
             \Logger::getLogger('yapeal')
                    ->warn($mess);
             return false;
-        }; // if !array_key_exists $name ...
+        }
         $this->defaults[$name] = $value;
         return true;
     }
@@ -332,13 +334,12 @@ class QueryBuilder implements \Countable
                    ->warn($mess);
             return false;
         }
-        // if empty $defaults ...
         $ret = true;
         foreach ($defaults as $k => $v) {
             if (false === $this->setDefault($k, $v)) {
                 $ret = false;
-            }; // if !$this->setDefault($k, $v) ...
-        }; // foreach $defaults ...
+            }
+        }
         return $ret;
     }
     /**
@@ -358,12 +359,12 @@ class QueryBuilder implements \Countable
                 $mess = 'No rows for ' . $this->tableName;
                 \Logger::getLogger('yapeal')
                        ->info($mess);
-            };
+            }
             return false;
-        };
+        }
         if (!is_bool($upsert)) {
             $upsert = $this->upsert;
-        };
+        }
         // Make insert part of upsert.
         $sql = 'insert into `' . $this->tableName;
         $sql .= '` (`' . implode('`,`', array_keys($this->colTypes)) . '`)';
@@ -382,9 +383,9 @@ class QueryBuilder implements \Countable
             $updates = array();
             foreach (array_keys($this->colTypes) as $k) {
                 $updates[] = '`' . $k . '`=values(`' . $k . '`)';
-            };
+            }
             $sql .= implode(',', $updates);
-        };
+        }
         // Use a transaction for larger inserts/upserts to make them faster but fall
         // back to normal insert/upsert if transaction fails.
         if ($cnt > 3) {
@@ -396,8 +397,8 @@ class QueryBuilder implements \Countable
                        ->warn($mess);
             } else {
                 return true;
-            }; // else FALSE === $this->con->CompleteTrans() ...
-        }; // if $this->count() > 10 ...
+            }
+        }
         try {
             $this->con->Execute($sql);
         } catch (\ADODB_Exception $e) {
@@ -407,7 +408,7 @@ class QueryBuilder implements \Countable
             return false;
         }
         return true;
-    }// function __construct
+    }
     /**
      * Sets if store() should use plain insert or upsert (insert with duplicate
      * key update).
@@ -420,53 +421,53 @@ class QueryBuilder implements \Countable
     {
         if (is_bool($is)) {
             $this->upsert = $is;
-        };
+        }
         return $this->upsert;
-    }// function __destruct
+    }
     /**
      * @var mixed Holds max byte size of data rows for autoStore mode.
      */
-    protected static $autoStoreSize = self::MAX_UPSERT_SIZE; // function __toString ...
+    protected static $autoStoreSize = self::MAX_UPSERT_SIZE;
     /**
      * @var bool Use to determine if autoStore mode is active or not.
      */
-    protected $autoStore = true; // function addRow
+    protected $autoStore = true;
     /**
      * @var mixed Holds max row count for autoStore mode.
      */
-    protected $autoStoreRows = self::MAX_UPSERT_ROWS; // function count
+    protected $autoStoreRows = self::MAX_UPSERT_ROWS;
     /**
-     * @var string List of column ADOFieldObjects for table.
+     * @var array List of column ADOFieldObjects for table.
      */
-    protected $colObjects = array(); // function getColumnTypes
+    protected $colObjects = array();
     /**
      * @var array List of columns and their generic ADO types.
      */
-    protected $colTypes = array(); // function metaType
+    protected $colTypes = array();
     /**
-     * @var ADOConnection Holds an instance of the DB connection.
+     * @var ADODB_mysqli Holds an instance of the DB connection.
      */
-    protected $con; // function setDefault
+    protected $con;
     /**
      * @var array Holds a list of default column values.
      */
-    protected $defaults = array(); // function setDefaults
+    protected $defaults = array();
     /**
      * @var array Holds a list of null-able columns.
      */
-    protected $nullables = array(); // function setAutoStoreMode
+    protected $nullables = array();
     /**
      * @var array Holds the built rows of data to be inserted.
      */
-    protected $rows = array(); // function setAutoStoreRows
+    protected $rows = array();
     /**
      * @var string Holds the table name of the query that is being built.
      */
-    protected $tableName; // function setAutoStoreSize
+    protected $tableName;
     /**
      * @var bool Used by store() to decided between plain insert or upsert.
      */
-    protected $upsert = true; // function store
+    protected $upsert = true;
     /**
      * Function that will return ADOdb generic data type for an ADOFieldObject.
      *
@@ -476,7 +477,7 @@ class QueryBuilder implements \Countable
      *
      * @return string Returns a single character string of the ADOdb generic type.
      *
-     * @throws InvalidArgumentException If $fieldobj isn't an object throws an
+     * @throws \InvalidArgumentException If $fieldobj isn't an object throws an
      * InvalidArgumentException.
      */
     protected function metaType($fieldobj)
@@ -487,7 +488,7 @@ class QueryBuilder implements \Countable
         } else {
             $mess = 'Parameter $fieldobj must be an ADOFieldObject';
             throw new \InvalidArgumentException($mess, 1);
-        }; // else is_object $fieldobj
+        }
         switch (strtoupper($t)) {
             case 'STRING':
             case 'CHAR':
@@ -532,13 +533,13 @@ class QueryBuilder implements \Countable
             case 'DEC':
             case 'FIXED':
                 return 'N';
-        }; // switch strtoupper($t) ...
+        }
         $mess = 'Unknown ADOFieldObject type in ' . __CLASS__ . PHP_EOL;
         $mess .= ' type received was ' . $t;
         \Logger::getLogger('yapeal')
                ->error($mess);
         exit(2);
-    }// function useUpsert
+    }
     /**
      * @var integer Holds current number of rows.
      */

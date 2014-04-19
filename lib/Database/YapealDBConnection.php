@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains YapealDBConnection class.
+ * Contains Yapeal\Database\YapealDBConnection class.
  *
  *
  * PHP version 5
@@ -29,36 +29,22 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
+namespace Yapeal\Database;
+
 /**
  * A factory to manage ADOdb connections to databases.
- *
- * @package    Yapeal
- * @subpackage ADOdb
  */
 class YapealDBConnection
 {
     /**
      * Static only class.
      *
-     * @throws LogicException Throws LogicException if new is used.
+     * @throws \LogicException Throws LogicException if new is used.
      */
     final public function __construct()
     {
         $mess = 'Illegally attempted to make instance of ' . __CLASS__;
-        throw new LogicException($mess);
+        throw new \LogicException($mess);
     }
     /**
      * Use to get a ADOdb connection object.
@@ -66,22 +52,22 @@ class YapealDBConnection
      * This method will create a new ADOdb connection for each DSN it is passed and
      * return the same connection for any other requests for the same DSN. It was
      * developed to get around some problems with how ADOdb handles connections
-     * that wasn't compatible with what I needed.
+     * that was not compatible with what I needed.
      *
      * @param string $dsn An ADOdb compatible connection string.
      *
-     * @return ADODB_mysqli Returns ADOdb connection object.
+     * @return \ADODB_mysqli Returns ADOdb connection object.
      *
-     * @throws InvalidArgumentException if $dsn is empty or if $dsn isn't a string
+     * @throws \InvalidArgumentException if $dsn is empty or if $dsn isn't a string
      * it will throw InvalidArgumentException.
-     * @throws ADODB_Exception Passes through any problem with actual connection
+     * @throws \ADODB_Exception Passes through any problem with actual connection
      * from ADOdb.
      */
     public static function connect($dsn)
     {
         if (empty($dsn) || !is_string($dsn)) {
-            throw new InvalidArgumentException('Bad value passed for $dsn');
-        };
+            throw new \InvalidArgumentException('Bad value passed for $dsn');
+        }
         global $ADODB_COUNTRECS, $ADODB_CACHE_DIR;
         $ADODB_COUNTRECS = false;
         $ADODB_CACHE_DIR =
@@ -92,23 +78,23 @@ class YapealDBConnection
                 . DIRECTORY_SEPARATOR . 'ADOdb' . DIRECTORY_SEPARATOR;
             require_once $adoDir . 'adodb-exceptions.inc.php';
             require_once $adoDir . 'adodb.inc.php';
-        };
+        }
         $hash = hash('sha1', $dsn);
         if (!array_key_exists($hash, self::$connections)) {
-            /** @var ADODB_mysqli $ado */
-            $ado = NewADOConnection($dsn);
+            /** @var \ADODB_mysqli $ado */
+            $ado = \NewADOConnection($dsn);
             $ado->debug = false;
             $ado->SetFetchMode(ADODB_FETCH_ASSOC);
             $ado->Execute('set names utf8');
             $ado->Execute('set time_zone="+0:00"');
             self::$connections[$hash] = $ado;
-        };
+        }
         return self::$connections[$hash];
-    }// function __construct
+    }
     /**
      * Function to close and release all existing ADOdb connections.
      *
-     * @throws ADODB_Exception Passes through any problem with actual connection
+     * @throws \ADODB_Exception Passes through any problem with actual connection
      * from ADOdb.
      */
     public static function releaseAll()
@@ -118,9 +104,9 @@ class YapealDBConnection
                 self::$connections[$k]->Close();
                 self::$connections[$k] = null;
                 unset(self::$connections[$k]);
-            }; // foreach self::$connections ....
-        }; // if !empty...
-    }// function __clone
+            }
+        }
+    }
     /**
      * Function used to set constants from [Database] section of the configuration
      * file.
@@ -138,28 +124,27 @@ class YapealDBConnection
              * Defines the DSN used for ADOdb connection.
              */
             define('YAPEAL_DSN', $dsn);
-        };
+        }
         if (!defined('YAPEAL_TABLE_PREFIX')) {
             /**
              * Defines the table prefix used for all Yapeal tables.
              */
             define('YAPEAL_TABLE_PREFIX', $section['table_prefix']);
-        };
-    }// function connect
+        }
+    }
     /**
      * No backdoor through cloning either.
      *
-     * @throws LogicException Throws LogicException if cloning of class is tried.
+     * @throws \LogicException Throws LogicException if cloning of class is tried.
      */
     final public function __clone()
     {
         $mess = 'Illegally attempted to clone ' . __CLASS__;
-        throw new LogicException($mess);
-    }// function releaseAll
+        throw new \LogicException($mess);
+    }
     /**
-     * @var array List of ADOdb connection resources.
+     * @var \ADODB_mysqli[] List of ADOdb connection resources.
      */
     private static $connections = array();
-    // function setDatabaseSectionConstants
 }
 

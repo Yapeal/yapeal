@@ -31,6 +31,7 @@
 namespace Yapeal\Caching;
 
 use Yapeal\Database\QueryBuilder;
+use Yapeal\Database\YapealDBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Validation\ValidateEveApiXml;
 
@@ -369,7 +370,7 @@ class EveApiXmlCache
     private function delCachedDatabase()
     {
         try {
-            $con = \YapealDBConnection::connect(YAPEAL_DSN);
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
             $sql .= ' where';
             $sql .= ' `hash`=' . $con->qstr($this->hash);
@@ -417,7 +418,7 @@ class EveApiXmlCache
     private function getCachedDatabase()
     {
         try {
-            $con = \YapealDBConnection::connect(YAPEAL_DSN);
+            $con = YapealDBConnection::connect(YAPEAL_DSN);
             $sql = 'select sql_no_cache `xml`';
             $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
             $sql .= ' where';

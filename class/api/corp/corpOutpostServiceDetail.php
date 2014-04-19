@@ -29,6 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Database\YapealDBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**

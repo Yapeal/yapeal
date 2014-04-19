@@ -30,6 +30,7 @@
  */
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\QueryBuilder;
+use Yapeal\Database\YapealDBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**

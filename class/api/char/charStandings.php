@@ -30,6 +30,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\QueryBuilder;
+use Yapeal\Database\YapealDBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.

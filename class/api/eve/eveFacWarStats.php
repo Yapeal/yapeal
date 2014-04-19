@@ -29,6 +29,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\YapealQueryBuilder;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -152,7 +154,7 @@ class eveFacWarStats extends AEve
               ->warn($mess);
         return false;
     }// function parserAPI
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -224,7 +226,7 @@ class eveFacWarStats extends AEve
               ->warn($mess);
         return false;
     }// function rowset
-/**
+    /**
      * Handles totals from XML Note.
      *
      * @return array Returns array of data to store in database table.

@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\YapealQueryBuilder;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -56,7 +58,7 @@ if (count(get_included_files()) < 2) {
  */
 class eveAllianceList extends AEve
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -143,7 +145,7 @@ class eveAllianceList extends AEve
               ->warn($mess);
         return false;
     }// function __construct
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML

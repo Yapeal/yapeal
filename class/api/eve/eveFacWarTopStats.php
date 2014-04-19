@@ -29,6 +29,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\YapealQueryBuilder;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */
@@ -168,7 +170,7 @@ class eveFacWarTopStats extends AEve
               ->warn($mess);
         return false;
     }// function attributes
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -213,7 +215,7 @@ class eveFacWarTopStats extends AEve
         }; // foreach $tables ...
         return true;
     }// function rowset
-/**
+    /**
      * Used to store XML to rowset tables.
      *
      * @param string $tableName Name of the table for this rowset.

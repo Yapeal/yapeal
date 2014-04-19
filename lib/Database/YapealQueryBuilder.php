@@ -28,34 +28,15 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
+namespace Yapeal\Database;
+
 /**
  * Class used to build SQL queries.
  *
  * @package    Yapeal
  * @subpackage YapealQueryBuilder
  */
-class YapealQueryBuilder implements Countable
+class YapealQueryBuilder implements \Countable
 {
     /**
      * Set max SQL insert/upsert size.
@@ -96,28 +77,28 @@ class YapealQueryBuilder implements Countable
     {
         if (!is_string($tableName)) {
             $mess = '$tableName must be a string in ' . __CLASS__;
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }; // if !is_string $tableName ...
         // Keep table name for later.
         $this->tableName = $tableName;
         if (!is_string($dsn)) {
             $mess = '$dsn must be a string in ' . __CLASS__;
-            throw new InvalidArgumentException($mess);
+            throw new \InvalidArgumentException($mess);
         }; // if !is_string $params[$k] ...
         //$this->dsn = $dsn;
         try {
             // Get a database connection.
-            $this->con = YapealDBConnection::connect($dsn);
-        } catch (ADODB_Exception $e) {
+            $this->con = \YapealDBConnection::connect($dsn);
+        } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
-            throw new RuntimeException($mess);
+            throw new \RuntimeException($mess);
         }
         try {
             // Get a list of column objects.
             $this->colObjects = $this->con->MetaColumns($tableName, false);
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get ADOFieldObjects for columns in ' . __CLASS__;
-            throw new RuntimeException($mess);
+            throw new \RuntimeException($mess);
         }
         // Extract some column information into more useful forms.
         foreach ($this->colObjects as $col) {
@@ -165,8 +146,8 @@ class YapealQueryBuilder implements Countable
         $this->con = null;
         if ($this->rowCount > 0) {
             $mess = 'Query destroyed before all rows were saved';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
         };
     }
     /**
@@ -207,8 +188,8 @@ class YapealQueryBuilder implements Countable
         if (count($diff)) {
             $mess = 'Row was missing required fields (' . implode(', ', $diff);
             $mess .= ') that are needed for ' . $this->tableName;
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         };
         // Check for extra unknown fields in the data. This should only happen when
@@ -217,8 +198,8 @@ class YapealQueryBuilder implements Countable
         if (count($diff)) {
             $mess = 'Row has extra unknown fields (' . implode(', ', $diff);
             $mess .= ') that will be ignored for ' . $this->tableName;
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
         };
         // Make a new array where database fields and API data fields overlap.
         //$fields = array_intersect(array_keys($this->colTypes), array_keys($data), $this->nullables);
@@ -324,13 +305,13 @@ class YapealQueryBuilder implements Countable
     {
         if ($this->count() > 0) {
             $mess = 'Defaults must be set before any data rows are added';
-            throw new LogicException($mess, 1);
+            throw new \LogicException($mess, 1);
         }
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Ignoring default for unknown column ' . $name;
             $mess .= ' which does not exist in table ' . $this->tableName;
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         }; // if !array_key_exists $name ...
         $this->defaults[$name] = $value;
@@ -347,8 +328,8 @@ class YapealQueryBuilder implements Countable
     {
         if (empty($defaults)) {
             $mess = 'List must contain as least one column name and value';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         }
         // if empty $defaults ...
@@ -371,12 +352,12 @@ class YapealQueryBuilder implements Countable
     public function store($upsert = null)
     {
         if ($this->rowCount == 0) {
-            if (Logger::getLogger('yapeal')
-                      ->isInfoEnabled()
+            if (\Logger::getLogger('yapeal')
+                       ->isInfoEnabled()
             ) {
                 $mess = 'No rows for ' . $this->tableName;
-                Logger::getLogger('yapeal')
-                      ->info($mess);
+                \Logger::getLogger('yapeal')
+                       ->info($mess);
             };
             return false;
         };
@@ -411,18 +392,18 @@ class YapealQueryBuilder implements Countable
             $this->con->Execute($sql);
             if (false === $this->con->CompleteTrans()) {
                 $mess = 'Transaction failed for ' . $this->tableName;
-                Logger::getLogger('yapeal')
-                      ->warn($mess);
+                \Logger::getLogger('yapeal')
+                       ->warn($mess);
             } else {
                 return true;
             }; // else FALSE === $this->con->CompleteTrans() ...
         }; // if $this->count() > 10 ...
         try {
             $this->con->Execute($sql);
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             $mess = 'Insert/upsert failed for ' . $this->tableName;
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         }
         return true;
@@ -505,7 +486,7 @@ class YapealQueryBuilder implements Countable
             $len = $fieldobj->max_length;
         } else {
             $mess = 'Parameter $fieldobj must be an ADOFieldObject';
-            throw new InvalidArgumentException($mess, 1);
+            throw new \InvalidArgumentException($mess, 1);
         }; // else is_object $fieldobj
         switch (strtoupper($t)) {
             case 'STRING':
@@ -554,8 +535,8 @@ class YapealQueryBuilder implements Countable
         }; // switch strtoupper($t) ...
         $mess = 'Unknown ADOFieldObject type in ' . __CLASS__ . PHP_EOL;
         $mess .= ' type received was ' . $t;
-        Logger::getLogger('yapeal')
-              ->error($mess);
+        \Logger::getLogger('yapeal')
+               ->error($mess);
         exit(2);
     }// function useUpsert
     /**

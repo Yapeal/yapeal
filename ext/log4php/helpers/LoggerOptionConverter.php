@@ -21,9 +21,9 @@
 /**
  * A convenience class to convert property values to specific types.
  *
- * @version $Revision: 1059292 $ 
+ * @version $Revision: 1059292 $
  * @package log4php
- * @subpackage helpers
+
  * @static
  * @since 0.5
  */
@@ -40,7 +40,7 @@ class LoggerOptionConverter {
 	 * It returns a value referenced by <var>$key</var> using this search criteria:
 	 * - if <var>$key</var> is a constant then return it. Else
 	 * - if <var>$key</var> is set in <var>$_ENV</var> then return it. Else
-	 * - return <var>$def</var>. 
+	 * - return <var>$def</var>.
 	 *
 	 * @param string $key The key to search for.
 	 * @param string $def The default value to return.
@@ -88,9 +88,9 @@ class LoggerOptionConverter {
 		} elseif (is_bool($value)) {
 			return $value;
 		} elseif (is_int($value)) {
-			return !($value == 0); // true is everything but 0 like in C 
+			return !($value == 0); // true is everything but 0 like in C
 		}
-		
+
 		trigger_error("Could not convert ".var_export($value,1)." to boolean!", E_USER_WARNING);
 		return $default;
 	}
@@ -168,7 +168,7 @@ class LoggerOptionConverter {
 			if(!$result instanceof LoggerLevel) {
 				$result = $defaultValue;
 			}
-		} 
+		}
 		return $result;
 	}
 
@@ -198,7 +198,7 @@ class LoggerOptionConverter {
 		}
 		if(is_numeric($s)) {
 			return (float)$s * $multiplier;
-		} 
+		}
 		return $default;
 	}
 
@@ -224,7 +224,7 @@ class LoggerOptionConverter {
 		// "1"|on|true        => string(1) "1"
 		// "true"             => string(4) "true"
 		// "false"            => string(5) "false"
-		// 
+		//
 		// As the integer 1 and the boolean true are therefore indistinguable
 		// it's up to the setter how to deal with it, they can not be cast
 		// into a boolean here. {@see toBoolean}
@@ -240,30 +240,30 @@ class LoggerOptionConverter {
 	/**
 	 * Perform variable substitution in string <var>$val</var> from the
 	 * values of keys found with the {@link getSystemProperty()} method.
-	 * 
+	 *
 	 * <p>The variable substitution delimeters are <b>${</b> and <b>}</b>.
-	 * 
+	 *
 	 * <p>For example, if the "MY_CONSTANT" contains "value", then
 	 * the call
 	 * <code>
 	 * $s = LoggerOptionConverter::substVars("Value of key is ${MY_CONSTANT}.");
 	 * </code>
 	 * will set the variable <i>$s</i> to "Value of key is value.".</p>
-	 * 
+	 *
 	 * <p>If no value could be found for the specified key, then the
 	 * <var>$props</var> parameter is searched, if the value could not
 	 * be found there, then substitution defaults to the empty string.</p>
-	 * 
+	 *
 	 * <p>For example, if {@link getSystemProperty()} cannot find any value for the key
 	 * "inexistentKey", then the call
 	 * <code>
 	 * $s = LoggerOptionConverter::substVars("Value of inexistentKey is [${inexistentKey}]");
 	 * </code>
 	 * will set <var>$s</var> to "Value of inexistentKey is []".</p>
-	 * 
-	 * <p>A warn is thrown if <var>$val</var> contains a start delimeter "${" 
+	 *
+	 * <p>A warn is thrown if <var>$val</var> contains a start delimeter "${"
 	 * which is not balanced by a stop delimeter "}" and an empty string is returned.</p>
-	 * 
+	 *
 	 * @param string $val The string on which variable substitution is performed.
 	 * @param array $props
 	 * @return string
@@ -285,7 +285,7 @@ class LoggerOptionConverter {
 					return $sbuf;
 				}
 			} else {
-			
+
 				$sbuf .= substr($val, $i, $j-$i);
 				$k = strpos($val, self::DELIM_STOP, $j);
 				if($k === false) {
@@ -303,7 +303,7 @@ class LoggerOptionConverter {
 
 					if(!empty($replacement)) {
 						// Do variable substitution on the replacement string
-						// such that we can solve "Hello ${x2}" as "Hello p1" 
+						// such that we can solve "Hello ${x2}" as "Hello p1"
 						// the where the properties are
 						// x1=p1
 						// x2=${x1}

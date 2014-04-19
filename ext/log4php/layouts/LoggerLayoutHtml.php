@@ -22,18 +22,18 @@
  * This layout outputs events in a HTML table.
  *
  * Configurable parameters for this layout are:
- * 
+ *
  * - title
  * - locationInfo
  *
  * An example for this layout:
- * 
+ *
  * {@example ../../examples/php/layout_html.php 19}<br>
- * 
+ *
  * The corresponding XML file:
- * 
+ *
  * {@example ../../examples/resources/layout_html.properties 18}
- * 
+ *
  * The above will print a HTML table that looks, converted back to plain text, like the following:<br>
  * <pre>
  *    Log session start time Wed Sep 9 00:11:30 2009
@@ -41,10 +41,10 @@
  *    Time Thread Level Category   Message
  *    0    8318   INFO  root       Hello World!
  * </pre>
- * 
+ *
  * @version $Revision: 1059292 $
  * @package log4php
- * @subpackage layouts
+
  */
 class LoggerLayoutHtml extends LoggerLayout {
 
@@ -61,7 +61,7 @@ class LoggerLayoutHtml extends LoggerLayout {
 	 * @var boolean
 	 */
 	private $locationInfo = false;
-	
+
 	/**
 	 * The <b>Title</b> option takes a String value. This option sets the
 	 * document title of the generated HTML document.
@@ -69,13 +69,13 @@ class LoggerLayoutHtml extends LoggerLayout {
 	 * @var string
 	 */
 	private $title = "Log4php Log Messages";
-	
+
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 	}
-	
+
 	/**
 	 * The <b>LocationInfo</b> option takes a boolean value. By
 	 * default, it is set to false which means there will be no location
@@ -101,7 +101,7 @@ class LoggerLayoutHtml extends LoggerLayout {
 	public function getLocationInfo() {
 		return $this->locationInfo;
 	}
-	
+
 	/**
 	 * The <b>Title</b> option takes a String value. This option sets the
 	 * document title of the generated HTML document.
@@ -117,33 +117,33 @@ class LoggerLayoutHtml extends LoggerLayout {
 	public function getTitle() {
 		return $this->title;
 	}
-	
+
 	/**
 	 * @return string Returns the content type output by this layout, i.e "text/html".
 	 */
 	public function getContentType() {
 		return "text/html";
 	}
-	
+
 	/**
 	 * @param LoggerLoggingEvent $event
 	 * @return string
 	 */
 	public function format(LoggerLoggingEvent $event) {
 		$sbuf = PHP_EOL . "<tr>" . PHP_EOL;
-	
+
 		$sbuf .= "<td>";
 		$sbuf .= $event->getTime();
 		$sbuf .= "</td>" . PHP_EOL;
-	
+
 		$sbuf .= "<td title=\"" . $event->getThreadName() . " thread\">";
 		$sbuf .= $event->getThreadName();
 		$sbuf .= "</td>" . PHP_EOL;
-	
+
 		$sbuf .= "<td title=\"Level\">";
-		
+
 		$level = $event->getLevel();
-		
+
 		if ($level->equals(LoggerLevel::getLevelDebug())) {
 			$sbuf .= "<font color=\"#339933\">$level</font>";
 		} else if ($level->equals(LoggerLevel::getLevelWarn())) {
@@ -152,11 +152,11 @@ class LoggerLayoutHtml extends LoggerLayout {
 			$sbuf .= $level;
 		}
 		$sbuf .= "</td>" . PHP_EOL;
-	
+
 		$sbuf .= "<td title=\"" . htmlentities($event->getLoggerName(), ENT_QUOTES) . " category\">";
 		$sbuf .= htmlentities($event->getLoggerName(), ENT_QUOTES);
 		$sbuf .= "</td>" . PHP_EOL;
-	
+
 		if ($this->locationInfo) {
 			$locInfo = $event->getLocationInformation();
 			$sbuf .= "<td>";
@@ -169,7 +169,7 @@ class LoggerLayoutHtml extends LoggerLayout {
 		$sbuf .= "</td>" . PHP_EOL;
 
 		$sbuf .= "</tr>" . PHP_EOL;
-		
+
 		if ($event->getNDC() != null) {
 			$sbuf .= "<tr><td bgcolor=\"#EEEEEE\" style=\"font-size : xx-small;\" colspan=\"6\" title=\"Nested Diagnostic Context\">";
 			$sbuf .= "NDC: " . htmlentities($event->getNDC(), ENT_QUOTES);

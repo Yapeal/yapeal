@@ -22,19 +22,19 @@
  * Use this class to quickly configure the package.
  *
  * An example how to use this configurator:
- * 
+ *
  * {@example ../../examples/php/configurator_basic.php 19}
  *
  * @version $Revision: 883108 $
  * @package log4php
- * @subpackage configurators
+
  */
 class LoggerConfiguratorBasic implements LoggerConfigurator {
 
 	/**
-	 * Add a {@link LoggerAppenderConsole} that uses 
+	 * Add a {@link LoggerAppenderConsole} that uses
 	 * the {@link LoggerLayoutTTCC} to the root category.
-	 * 
+	 *
 	 * @param string $url not used here
 	 */
 	public function configure(LoggerHierarchy $hierarchy, $url = null) {

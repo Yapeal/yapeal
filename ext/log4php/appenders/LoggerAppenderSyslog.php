@@ -22,21 +22,21 @@
  * Log events using php {@link PHP_MANUAL#syslog} function.
  *
  * This appender can be configured by changing the following attributes:
- * 
+ *
  * - layout           - Sets the layout class for this appender
  * - ident            - Set the ident of the syslog message.
  * - priority         - Set the priority value for the syslog message.
  * - facility         - Set the facility value for the syslog message
- * - overridePriority - If the priority of the message to be sent can be 
- *                      defined by a value in the properties-file, set 
+ * - overridePriority - If the priority of the message to be sent can be
+ *                      defined by a value in the properties-file, set
  *                      parameter value to "true"
- * - option           - Set the option value for the syslog message. 
+ * - option           - Set the option value for the syslog message.
  *                      This value is used as a parameter for php openlog()
  *                      and passed on to the syslog daemon.
  *
  * Levels are mapped as follows:
  * - <b>level >= FATAL</b> to LOG_ALERT
- * - <b>FATAL > level >= ERROR</b> to LOG_ERR 
+ * - <b>FATAL > level >= ERROR</b> to LOG_ERR
  * - <b>ERROR > level >= WARN</b> to LOG_WARNING
  * - <b>WARN  > level >= INFO</b> to LOG_INFO
  * - <b>INFO  > level >= DEBUG</b> to LOG_DEBUG
@@ -50,10 +50,10 @@
  *
  * @version $Revision: 1062665 $
  * @package log4php
- * @subpackage appenders
- */ 
+
+ */
 class LoggerAppenderSyslog extends LoggerAppender {
-	
+
 	/**
 	 * The ident string is added to each message. Typically the name of your application.
 	 *
@@ -64,19 +64,19 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	/**
 	 * The priority parameter value indicates the level of importance of the message.
 	 * It is passed on to the Syslog daemon.
-	 * 
+	 *
 	 * @var int Syslog priority
 	 */
 	private $_priority;
-	
+
 	/**
 	 * The option used when generating a log message.
 	 * It is passed on to the Syslog daemon.
-	 * 
+	 *
 	 * @var int Syslog priority
 	 */
 	private $_option;
-	
+
 	/**
 	 * The facility value indicates the source of the message.
 	 * It is passed on to the Syslog daemon.
@@ -84,7 +84,7 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	 * @var const int Syslog facility
 	 */
 	private $_facility;
-	
+
 	/**
 	 * If it is necessary to define logging priority in the .properties-file,
 	 * set this variable to "true".
@@ -104,18 +104,18 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	public function __destruct() {
 		$this->close();
 	}
-	
+
 	public function setDry($dry) {
 		$this->dry = $dry;
 	}
-	
+
 	/**
 	 * Set the ident of the syslog message.
 	 *
 	 * @param string Ident
 	 */
 	public function setIdent($ident) {
-		$this->_ident = $ident; 
+		$this->_ident = $ident;
 	}
 
 	/**
@@ -126,8 +126,8 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	public function setPriority($priority) {
 		$this->_priority = $priority;
 	}
-	
-	
+
+
 	/**
 	 * Set the facility value for the syslog message.
 	 *
@@ -135,21 +135,21 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	 */
 	public function setFacility($facility) {
 		$this->_facility = $facility;
-	} 
-	
+	}
+
 	/**
-	 * If the priority of the message to be sent can be defined by a value in the properties-file, 
+	 * If the priority of the message to be sent can be defined by a value in the properties-file,
 	 * set parameter value to "true".
 	 *
 	 * @param bool Override priority
 	 */
 	public function setOverridePriority($overridePriority) {
 		$this->_overridePriority = $overridePriority;
-	} 
-	
+	}
+
 	/**
 	 * Set the option value for the syslog message.
-	 * This value is used as a parameter for php openlog()	
+	 * This value is used as a parameter for php openlog()
 	 * and passed on to the syslog daemon.
 	 *
 	 * @param string	$option
@@ -157,7 +157,7 @@ class LoggerAppenderSyslog extends LoggerAppender {
 	public function setOption($option) {
 		$this->_option = $option;
 	}
-	
+
 	public function activateOptions() {
 		// Deprecated as of 5.3 and removed in 6.0
 		// define_syslog_variables();
@@ -175,12 +175,12 @@ class LoggerAppenderSyslog extends LoggerAppender {
 		if($this->_option == NULL){
 			$this->_option = LOG_PID | LOG_CONS;
 		}
-		
+
 		$level	 = $event->getLevel();
 		if($this->layout === null) {
 			$message = $event->getRenderedMessage();
 		} else {
-			$message = $this->layout->format($event); 
+			$message = $this->layout->format($event);
 		}
 
 		// If the priority of a syslog message can be overridden by a value defined in the properties-file,
@@ -188,14 +188,14 @@ class LoggerAppenderSyslog extends LoggerAppender {
 		if(!$this->dry) {
 			// Attach the process ID to the message, use the facility defined in the .properties-file
 			openlog($this->_ident, $this->_option, $this->_facility);
-		
+
 			if($this->_overridePriority) {
-				syslog($this->_priority, $message);			   
+				syslog($this->_priority, $message);
 			} else {
 				if($level->isGreaterOrEqual(LoggerLevel::getLevelFatal())) {
 					syslog(LOG_ALERT, $message);
 				} else if ($level->isGreaterOrEqual(LoggerLevel::getLevelError())) {
-					syslog(LOG_ERR, $message);		  
+					syslog(LOG_ERR, $message);
 				} else if ($level->isGreaterOrEqual(LoggerLevel::getLevelWarn())) {
 					syslog(LOG_WARNING, $message);
 				} else if ($level->isGreaterOrEqual(LoggerLevel::getLevelInfo())) {

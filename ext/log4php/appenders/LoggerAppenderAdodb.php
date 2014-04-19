@@ -31,7 +31,7 @@ require_once(ADODB_DIR . '/adodb.inc.php');
  *
  * @deprecated Use LoggerAppenderPDO instead
  * @package log4php
- * @subpackage appenders
+
  * @since 0.9
  */
 class LoggerAppenderAdodb extends LoggerAppender {
@@ -41,66 +41,66 @@ class LoggerAppenderAdodb extends LoggerAppender {
 	 * @var boolean
 	 */
 	var $createTable = true;
-	
+
 	/**
 	 * The type of database to connect to
 	 * @var string
 	 */
 	var $type;
-	
+
 	/**
 	 * Database user name
 	 * @var string
 	 */
 	var $user;
-	
+
 	/**
 	 * Database password
 	 * @var string
 	 */
 	var $password;
-	
+
 	/**
 	 * Database host to connect to
 	 * @var string
 	 */
 	var $host;
-	
+
 	/**
 	 * Name of the database to connect to
 	 * @var string
 	 */
 	var $database;
-	
+
 	/**
 	 * A {@link LoggerPatternLayout} string used to format a valid insert query (mandatory).
 	 * @var string
 	 */
 	var $sql;
-	
+
 	/**
 	 * Table name to write events. Used only if {@link $createTable} is true.
 	 * @var string
-	 */	
+	 */
 	var $table;
-	
+
 	/**
 	 * @var object Adodb instance
 	 * @access private
 	 */
 	var $db = null;
-	
+
 	/**
 	 * @var boolean used to check if all conditions to append are true
 	 * @access private
 	 */
 	var $canAppend = true;
-	
-	/**	
+
+	/**
 	 * @access private
 	 */
 	var $requiresLayout = false;
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -118,7 +118,7 @@ class LoggerAppenderAdodb extends LoggerAppender {
 	 * @return boolean true if all ok.
 	 */
 	function activateOptions()
-	{		
+	{
 		$this->db = &ADONewConnection($this->type);
 		if (! $this->db->PConnect($this->host, $this->user, $this->password, $this->database)) {
 			$this->db = null;
@@ -126,17 +126,17 @@ class LoggerAppenderAdodb extends LoggerAppender {
 			$this->canAppend = false;
 			return;
 		}
-		
+
 		$this->layout = LoggerReflectionUtils::createObject('LoggerLayoutPattern');
 		$this->layout->setConversionPattern($this->getSql());
-	
+
 		// test if log table exists
 		$sql = 'select * from ' . $this->table . ' where 1 = 0';
 		$dbrs = $this->db->Execute($sql);
 		if ($dbrs == false and $this->getCreateTable()) {
 			$query = "CREATE TABLE {$this->table} (timestamp varchar(32),logger varchar(32),level varchar(32),message varchar(64),thread varchar(32),file varchar(64),line varchar(4) );";
 
-					 
+
 			$result = $this->db->Execute($query);
 			if (! $result) {
 				$this->canAppend = false;
@@ -145,21 +145,21 @@ class LoggerAppenderAdodb extends LoggerAppender {
 		}
 		$this->canAppend = true;
 	}
-	
+
 	function append(LoggerLoggingEvent $event) {
 		if ($this->canAppend) {
 			$query = $this->layout->format($event);
 			$this->db->Execute($query);
 		}
 	}
-	
+
 	function close()
 	{
 		if ($this->db !== null)
 			$this->db->Close();
 		$this->closed = true;
 	}
-	
+
 	/**
 	 * @return boolean
 	 */
@@ -167,7 +167,7 @@ class LoggerAppenderAdodb extends LoggerAppender {
 	{
 		return $this->createTable;
 	}
-	
+
 	/**
 	 * @return string the sql pattern string
 	 */
@@ -175,7 +175,7 @@ class LoggerAppenderAdodb extends LoggerAppender {
 	{
 		return $this->sql;
 	}
-	
+
 	/**
 	 * @return string the table name to create
 	 */
@@ -183,81 +183,81 @@ class LoggerAppenderAdodb extends LoggerAppender {
 	{
 		return $this->table;
 	}
-	
+
 	/**
 	 * @return string the database to connect to
 	 */
 	function getDatabase() {
 		return $this->database;
 	}
-	
+
 	/**
 	 * @return string the database to connect to
 	 */
 	function getHost() {
 		return $this->host;
 	}
-	
+
 	/**
 	 * @return string the user to connect with
 	 */
 	function getUser() {
 		return $this->user;
 	}
-	
+
 	/**
 	 * @return string the password to connect with
 	 */
 	function getPassword() {
 		return $this->password;
 	}
-	
+
 	/**
 	 * @return string the type of database to connect to
 	 */
 	function getType() {
 		return $this->type;
 	}
-	
+
 	function setCreateTable($flag)
 	{
 		$this->createTable = LoggerOptionConverter::toBoolean($flag, true);
 	}
-	
+
 	function setType($newType)
 	{
 		$this->type = $newType;
 	}
-	
+
 	function setDatabase($newDatabase)
 	{
 		$this->database = $newDatabase;
 	}
-	
+
 	function setHost($newHost)
 	{
 		$this->host = $newHost;
 	}
-	
+
 	function setUser($newUser)
 	{
 		$this->user = $newUser;
 	}
-	
+
 	function setPassword($newPassword)
 	{
 		$this->password = $newPassword;
 	}
-	
+
 	function setSql($sql)
 	{
-		$this->sql = $sql;	
+		$this->sql = $sql;
 	}
-	
+
 	function setTable($table)
 	{
 		$this->table = $table;
 	}
-	
+
 }
 

@@ -20,10 +20,10 @@
 
 /**
  * @package log4php
- * @subpackage helpers
+
  */
 class LoggerLiteralPatternConverter extends LoggerPatternConverter {
-	
+
 	/**
 	 * @var string
 	 */

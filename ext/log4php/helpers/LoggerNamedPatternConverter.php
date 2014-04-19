@@ -20,7 +20,7 @@
 
 /**
  * @package log4php
- * @subpackage helpers
+
  * @abstract
  */
 class LoggerNamedPatternConverter extends LoggerPatternConverter {

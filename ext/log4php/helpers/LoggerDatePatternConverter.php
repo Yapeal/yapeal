@@ -20,7 +20,7 @@
 
 /**
  * @package log4php
- * @subpackage helpers
+
  */
 class LoggerDatePatternConverter extends LoggerPatternConverter {
 
@@ -28,7 +28,7 @@ class LoggerDatePatternConverter extends LoggerPatternConverter {
 	 * @var string
 	 */
 	private $df;
-	
+
 	/**
 	 * Constructor
 	 *

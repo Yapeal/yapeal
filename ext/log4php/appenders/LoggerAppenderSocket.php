@@ -22,7 +22,7 @@
  * Serialize events and send them to a network socket.
  *
  * This appender can be configured by changing the following attributes:
- * 
+ *
  * - locationInfo       - Sets the location info for the xml layout (true or false)
  * - log4jNamespace     - Sets the namespace for log4j (true or false)
  * - port               - Sets the port of the socket.
@@ -31,60 +31,60 @@
  * - useXml             - true, if xml should be transmitted.
  *                        false, if a serialized php object should be transmitted
  *
- * Parameters are {@link $remoteHost}, {@link $port}, {@link $timeout}, 
+ * Parameters are {@link $remoteHost}, {@link $port}, {@link $timeout},
  * {@link $locationInfo}, {@link $useXml} and {@link $log4jNamespace}.
  *
  * An example:
- * 
+ *
  * {@example ../../examples/php/appender_socket.php 19}
- * 
+ *
  * {@example ../../examples/resources/appender_socket.properties 18}
- * 
+ *
  * @version $Revision: 1062667 $
  * @package log4php
- * @subpackage appenders
- */ 
+
+ */
 class LoggerAppenderSocket extends LoggerAppender {
 
 	/**
 	 * This appender does not require a layout.
 	 */
 	protected $requiresLayout = false;
-	
+
 	/**
 	 * @var mixed socket connection resource
 	 */
 	private $sp = false;
-	
+
 	/**
-	 * Target host. On how to define remote hostaname see 
+	 * Target host. On how to define remote hostaname see
 	 * {@link PHP_MANUAL#fsockopen}
-	 * @var string 
+	 * @var string
 	 */
 	private $remoteHost = '';
-	
+
 	/**
 	 * @var integer the network port.
 	 */
 	private $port = 4446;
-	
+
 	/**
 	 * @var boolean get event's location info.
 	 */
 	private $locationInfo = false;
-	
+
 	/**
 	 * @var integer connection timeout
 	 */
 	private $timeout = 30;
-	
+
 	/**
 	 * @var boolean output events via {@link LoggerXmlLayout}
 	 */
 	private $useXml = false;
-	
+
 	/**
-	 * @var boolean forward this option to {@link LoggerXmlLayout}. 
+	 * @var boolean forward this option to {@link LoggerXmlLayout}.
 	 *				Ignored if {@link $useXml} is <i>false</i>.
 	 */
 	private $log4jNamespace = false;
@@ -93,14 +93,14 @@ class LoggerAppenderSocket extends LoggerAppender {
 	 * @var LoggerXmlLayout
 	 */
 	private $xmlLayout = null;
-	
+
 	/** @var indiciates if this appender should run in dry mode */
 	private $dry = false;
-	
+
 	public function __destruct() {
 		$this->close();
 	}
-	
+
 	/**
 	 * Create a socket connection using defined parameters
 	 */
@@ -119,11 +119,11 @@ class LoggerAppenderSocket extends LoggerAppender {
 				$this->xmlLayout->setLocationInfo($this->getLocationInfo());
 				$this->xmlLayout->setLog4jNamespace($this->getLog4jNamespace());
 				$this->xmlLayout->activateOptions();
-			}			 
+			}
 		}
 		$this->closed = false;
 	}
-	
+
 	public function close() {
 		if($this->closed != true) {
 			if(!$this->dry and $this->sp !== false) {
@@ -136,21 +136,21 @@ class LoggerAppenderSocket extends LoggerAppender {
 	public function setDry($dry) {
 		$this->dry = $dry;
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getHostname() {
 		return $this->getRemoteHost();
 	}
-	
+
 	/**
 	 * @return boolean
 	 */
 	public function getLocationInfo() {
 		return $this->locationInfo;
-	} 
-	 
+	}
+
 	/**
 	 * @return boolean
 	 */
@@ -164,25 +164,25 @@ class LoggerAppenderSocket extends LoggerAppender {
 	public function getPort() {
 		return $this->port;
 	}
-	
+
 	public function getRemoteHost() {
 		return $this->remoteHost;
 	}
-	
+
 	/**
 	 * @return integer
 	 */
 	public function getTimeout() {
 		return $this->timeout;
 	}
-	
+
 	/**
 	 * @var boolean
 	 */
 	public function getUseXml() {
 		return $this->useXml;
-	} 
-	 
+	}
+
 	public function reset() {
 		$this->close();
 		parent::reset();
@@ -193,52 +193,52 @@ class LoggerAppenderSocket extends LoggerAppender {
 	 */
 	public function setLocationInfo($flag) {
 		$this->locationInfo = LoggerOptionConverter::toBoolean($flag, $this->getLocationInfo());
-	} 
+	}
 
 	/**
 	 * @param mixed
 	 */
 	public function setLog4jNamespace($flag) {
 		$this->log4jNamespace = LoggerOptionConverter::toBoolean($flag, $this->getLog4jNamespace());
-	} 
-			
+	}
+
 	/**
 	 * @param integer
 	 */
 	public function setPort($port) {
 		$port = LoggerOptionConverter::toInt($port, 0);
 		if($port > 0 and $port < 65535) {
-			$this->port = $port;	
+			$this->port = $port;
 		}
 	}
-	
+
 	/**
 	 * @param string
 	 */
 	public function setRemoteHost($hostname) {
 		$this->remoteHost = $hostname;
 	}
-	
+
 	/**
 	 * @param integer
 	 */
 	public function setTimeout($timeout) {
 		$this->timeout = LoggerOptionConverter::toInt($timeout, $this->getTimeout());
 	}
-	
+
 	/**
 	 * @param mixed
 	 */
 	public function setUseXml($flag) {
 		$this->useXml = LoggerOptionConverter::toBoolean($flag, $this->getUseXml());
-	} 
- 
+	}
+
 	public function append(LoggerLoggingEvent $event) {
 		if($this->sp || $this->dry) {
 			if($this->getLocationInfo()) {
 				$event->getLocationInformation();
 			}
-		
+
 			if(!$this->getUseXml()) {
 				$sEvent = serialize($event);
 				if(!$this->dry) {

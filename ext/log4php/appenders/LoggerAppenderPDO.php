@@ -36,88 +36,88 @@
  * An example:
  *
  * {@example ../../examples/php/appender_pdo.php 19}
- * 
+ *
  * {@example ../../examples/resources/appender_pdo.properties 18}
- * 
+ *
  * @version $Revision: 806678 $
  * @package log4php
- * @subpackage appenders
+
  * @since 2.0
  */
 class LoggerAppenderPDO extends LoggerAppender {
 
-	/** 
+	/**
 	 * Create the log table if it does not exists (optional).
-	 * @var string 
+	 * @var string
 	 */
 	private $createTable = true;
-	
-	/** 
+
+	/**
 	 * Database user name.
-	 * @var string 
+	 * @var string
 	 */
 	private $user = '';
-	
-	/** 
+
+	/**
 	 * Database password
-	 * @var string 
+	 * @var string
 	 */
 	private $password = '';
-	
-	/** 
+
+	/**
 	 * DSN string for enabling a connection.
-	 * @var string 
+	 * @var string
 	 */
 	private $dsn;
-	
-	/** 
+
+	/**
 	 * A {@link LoggerPatternLayout} string used to format a valid insert query.
 	 * @deprecated Use {@link $insertSql} and {@link $insertPattern} which properly handle quotes in the messages!
-	 * @var string 
+	 * @var string
 	 */
 	private $sql;
-	
-	/** 
+
+	/**
 	 * Can be set to a complete insert statement with ? that are replaced using {@link insertPattern}.
-	 * @var string 
+	 * @var string
 	 */
 	private $insertSql = "INSERT INTO __TABLE__ (timestamp, logger, level, message, thread, file, line) VALUES (?,?,?,?,?,?,?)";
 
-	/** 
+	/**
 	 * A comma separated list of {@link LoggerPatternLayout} format strings that replace the "?" in {@link $sql}.
-	 * @var string 
+	 * @var string
 	 */
 	private $insertPattern = "%d,%c,%p,%m,%t,%F,%L";
 
-	/** 
+	/**
 	 * Table name to write events. Used only for CREATE TABLE if {@link $createTable} is true.
-	 * @var string 
+	 * @var string
 	 */
 	private $table = 'log4php_log';
-	
-	/** 
+
+	/**
 	 * The PDO instance.
-	 * @var PDO 
+	 * @var PDO
 	 */
 	private $db = null;
-	
-	/** 
+
+	/**
 	 * Prepared statement for the INSERT INTO query.
-	 * @var PDOStatement 
+	 * @var PDOStatement
 	 */
 	private $preparedInsert;
 
-	/** 
+	/**
 	 * Set in activateOptions() and later used in append() to check if all conditions to append are true.
-	 * @var boolean 
+	 * @var boolean
 	 */
 	private $canAppend = true;
-	
+
 	/**
 	 * This appender does not require a layout.
 	 */
 	protected $requiresLayout = false;
-	
+
 	/**
 	 * Constructor.
 	 * This apender doesn't require a layout.
@@ -126,11 +126,11 @@ class LoggerAppenderPDO extends LoggerAppender {
 	public function __construct($name = '') {
 		parent::__construct($name);
 	}
-	
+
 	public function __destruct() {
 	   $this->close();
    	}
-   	
+
 	/**
 	 * Setup db connection.
 	 * Based on defined options, this method connects to db defined in {@link $dsn}
@@ -148,16 +148,16 @@ class LoggerAppenderPDO extends LoggerAppender {
 				$this->db = new PDO($this->dsn,$this->user,$this->password);
 			}
 			$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			
+
 			// test if log table exists
 			try {
 				$result = $this->db->query('SELECT * FROM ' . $this->table . ' WHERE 1 = 0');
-				$result->closeCursor(); 
+				$result->closeCursor();
 			} catch (PDOException $e) {
 				// It could be something else but a "no such table" is the most likely
 				$result = false;
 			}
-			
+
 			// create table if necessary
 			if ($result == false and $this->createTable) {
 				// The syntax should at least be compatible with MySQL, PostgreSQL, SQLite and Oracle.
@@ -175,9 +175,9 @@ class LoggerAppenderPDO extends LoggerAppender {
 			$this->canAppend = false;
 			throw new LoggerException($e);
 		}
-		
+
 		$this->layout = new LoggerLayoutPattern();
-		
+
 		//
 		// Keep compatibility to legacy option $sql which already included the format patterns!
 		//
@@ -195,10 +195,10 @@ class LoggerAppenderPDO extends LoggerAppender {
 		$this->canAppend = true;
 		return true;
 	}
-	
+
 	/**
 	 * Appends a new event to the database.
-	 * 
+	 *
 	 * @throws LoggerException If the pattern conversion or the INSERT statement fails.
 	 */
 	public function append(LoggerLoggingEvent $event) {
@@ -219,7 +219,7 @@ class LoggerAppenderPDO extends LoggerAppender {
 				throw new LoggerException($e);
 			}
 		}
-	
+
 	/**
 	 * Closes the connection to the logging database
 	 */
@@ -231,23 +231,23 @@ class LoggerAppenderPDO extends LoggerAppender {
 			$this->closed = true;
 		}
 	}
-	
+
 	/**
-	 * Sets the username for this connection. 
+	 * Sets the username for this connection.
 	 * Defaults to ''
 	 */
 	public function setUser($user) {
 		$this->user = $user;
 	}
-	
+
 	/**
-	 * Sets the password for this connection. 
+	 * Sets the password for this connection.
 	 * Defaults to ''
 	 */
 	public function setPassword($password) {
 		$this->password = $password;
 	}
-	
+
 	/**
 	 * Indicator if the logging table should be created on startup,
 	 * if its not existing.
@@ -255,24 +255,24 @@ class LoggerAppenderPDO extends LoggerAppender {
 	public function setCreateTable($flag) {
 		$this->createTable = LoggerOptionConverter::toBoolean($flag, true);
 	}
-   
+
    	/**
 	 * Sets the SQL string into which the event should be transformed.
 	 * Defaults to:
-	 * 
-	 * INSERT INTO $this->table 
-	 * ( timestamp, logger, level, message, thread, file, line) 
-	 * VALUES 
+	 *
+	 * INSERT INTO $this->table
+	 * ( timestamp, logger, level, message, thread, file, line)
+	 * VALUES
 	 * ('%d','%c','%p','%m','%t','%F','%L')
-	 * 
+	 *
 	 * It's not necessary to change this except you have customized logging'
 	 *
 	 * @deprecated See {@link setInsertSql} and {@link setInsertPattern}.
 	 */
 	public function setSql($sql) {
-		$this->sql = $sql;	
+		$this->sql = $sql;
 	}
-	
+
 	/**
 	 * Sets the SQL INSERT string to use with {@link $insertPattern}.
 	 *
@@ -300,7 +300,7 @@ class LoggerAppenderPDO extends LoggerAppender {
 	public function setTable($table) {
 		$this->table = $table;
 	}
-	
+
 	/**
 	 * Sets the DSN string for this connection. In case of
 	 * SQLite it could look like this: 'sqlite:appenders/pdotest.sqlite'
@@ -308,7 +308,7 @@ class LoggerAppenderPDO extends LoggerAppender {
 	public function setDSN($dsn) {
 		$this->dsn = $dsn;
 	}
-	
+
 	/**
 	 * Sometimes databases allow only one connection to themselves in one thread.
 	 * SQLite has this behaviour. In that case this handle is needed if the database

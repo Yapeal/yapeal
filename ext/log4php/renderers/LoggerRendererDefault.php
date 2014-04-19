@@ -20,9 +20,9 @@
 
 /**
  * The default Renderer renders objects by type casting.
- * 
+ *
  * Example:
- * 
+ *
  * {@example ../../examples/php/renderer_default.php 19}<br>
  * {@example ../../examples/resources/renderer_default.properties 18}<br>
  * <pre>
@@ -34,7 +34,7 @@
  * </pre>
  *
  * @package log4php
- * @subpackage renderers
+
  * @since 0.3
  */
 class LoggerRendererDefault implements LoggerRendererObject {

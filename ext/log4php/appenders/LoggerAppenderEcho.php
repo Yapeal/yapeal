@@ -19,18 +19,18 @@
  */
 
 /**
- * LoggerAppenderEcho uses {@link PHP_MANUAL#echo echo} function to output events. 
- * 
- * <p>This appender requires a layout.</p>	
- * 
+ * LoggerAppenderEcho uses {@link PHP_MANUAL#echo echo} function to output events.
+ *
+ * <p>This appender requires a layout.</p>
+ *
  * An example php file:
- * 
+ *
  * {@example ../../examples/php/appender_echo.php 19}
- * 
+ *
  * An example configuration file:
- * 
+ *
  * {@example ../../examples/resources/appender_echo.properties 18}
- * 
+ *
  * The above example would print the following:
  * <pre>
  *    Tue Sep  8 22:44:55 2009,812 [6783] DEBUG appender_echo - Hello World!
@@ -38,15 +38,15 @@
  *
  * @version $Revision: 1062665 $
  * @package log4php
- * @subpackage appenders
+
  */
 class LoggerAppenderEcho extends LoggerAppender {
 	/** boolean used internally to mark first append */
 	private $firstAppend = true;
-	
-	/** 
+
+	/**
 	 * If set to true, a <br /> element will be inserted before each line
-	 * break in the logged message. Default value is false. @var boolean 
+	 * break in the logged message. Default value is false. @var boolean
 	 */
 	private $htmlLineBreaks = false;
 
@@ -54,7 +54,7 @@ class LoggerAppenderEcho extends LoggerAppender {
 		parent::__construct($name);
 		$this->firstAppend = true;
 	}
-	
+
 	public function __destruct() {
 		$this->close();
 	}
@@ -62,7 +62,7 @@ class LoggerAppenderEcho extends LoggerAppender {
 	public function activateOptions() {
 		$this->closed = false;
 	}
-	
+
 	public function close() {
 		if($this->closed != true) {
 			if(!$this->firstAppend) {
@@ -79,14 +79,14 @@ class LoggerAppenderEcho extends LoggerAppender {
 				$this->firstAppend = false;
 			}
 			$text = $this->layout->format($event);
-			
+
 			if ($this->htmlLineBreaks) {
 				$text = nl2br($text);
 			}
 			echo $text;
-		} 
+		}
 	}
-	
+
 	public function setHtmlLineBreaks($value) {
 		$this->htmlLineBreaks = LoggerOptionConverter::toBoolean($value, false);
 	}

@@ -28,28 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
 // Need to require one last class before autoloader can take over.
-require_once YAPEAL_CLASS . 'FilterFileFinder.php';
+require_once __DIR__ . '/FilterFileFinder.php';
 /**
  * Class used to manage auto loading of other classes/interfaces.
  *
@@ -81,7 +61,7 @@ class YapealAutoLoad
             spl_autoload_register(array('YapealAutoLoad', 'autoLoad'));
             if (function_exists('__autoload')) {
                 spl_autoload_register('__autoload', false);
-            };
+            }
         } else {
             // Prepend if other autoloaders already exist.
             spl_autoload_register(
@@ -89,38 +69,8 @@ class YapealAutoLoad
                 false,
                 true
             );
-        }; // else FALSE == spl_autoload_functions() ...
+        }
     }
-    /**
-     * Add an extension to the list used for class/interface names.
-     *
-     * @param string $ext The extension to be added to list.
-     *
-     * @return bool TRUE if extension was already in the list.
-     */
-    public static function addExtension($ext)
-    {
-        if (!in_array($ext, self::$suffixList)) {
-            self::$suffixList[] = $ext;
-            return false;
-        };
-        return true;
-    }
-    /**
-     * Add a directory to the list to be searched in for class/interface files.
-     *
-     * @param string $dir The directory to be added to list.
-     *
-     * @return bool TRUE if directory was already in the list.
-     */
-    public static function addPath($dir)
-    {
-        if (!in_array($dir, self::$dirList)) {
-            self::$dirList[] = $dir;
-            return false;
-        };
-        return true;
-    }// function __construct
     /**
      * Searches through the common class directory locations for the file
      * containing the class/interface we need.
@@ -131,7 +81,17 @@ class YapealAutoLoad
      */
     public static function autoLoad($className)
     {
-        foreach (self::$dirList as $dir) {
+        $ext = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext'
+            . DIRECTORY_SEPARATOR;
+        $dirList = array(__DIR__ . DIRECTORY_SEPARATOR, $ext);
+        $suffixList = array(
+            '.php',
+            '.inc.php',
+            '.class.php',
+            '.class',
+            '.inc'
+        );
+        foreach ($dirList as $dir) {
             $files = new FilterFileFinder(
                 $dir,
                 $className,
@@ -139,13 +99,13 @@ class YapealAutoLoad
             );
             foreach ($files as $name => $object) {
                 $bn = basename($name);
-                foreach (self::$suffixList as $suffix) {
+                foreach ($suffixList as $suffix) {
                     if ($bn == $className . $suffix
                         || $bn == strtolower($className) . $suffix
                         || $bn == 'I' . $className . $suffix
                         || $bn == 'I' . strtolower($className) . $suffix
                     ) {
-                        include_once($name);
+                        include_once $name;
                         // Does the class/interface requested actually exist now?
                         if (class_exists($className, false)
                             || interface_exists(
@@ -155,13 +115,13 @@ class YapealAutoLoad
                         ) {
                             // Yes, we're done.
                             return true;
-                        }; // if class_exists...
-                    }; // if basename...
-                }; // foreach self::$suffixList ...
-            }; // foreach $files ...
-        }; // foreach self::$dirList ...
+                        }
+                    }
+                }
+            }
+        }
         return false;
-    }// function __clone
+    }
     /**
      * No backdoor through cloning either.
      *
@@ -171,24 +131,6 @@ class YapealAutoLoad
     {
         $mess = 'Illegally attempted to clone ' . __CLASS__;
         throw new LogicException($mess);
-    }// function activateAutoLoad
-    /**
-     * @var object
-     */
-    protected static $instance;
-    /**
-     * @var array
-     */
-    private static $dirList = array(YAPEAL_CLASS, YAPEAL_EXT, YAPEAL_INTERFACE);
-    /**
-     * @var array
-     */
-    private static $suffixList = array(
-        '.php',
-        '.inc.php',
-        '.class.php',
-        '.class',
-        '.inc'
-    );
+    }
 }
 

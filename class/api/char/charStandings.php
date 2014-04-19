@@ -75,6 +75,15 @@ class charStandings extends AChar
         parent::__construct($params);
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function parserAPI
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -124,7 +133,7 @@ class charStandings extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }// function rowset
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -155,7 +164,7 @@ class charStandings extends AChar
             }
         }; // foreach $tables ...
         return true;
-    }// function rowset
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -203,6 +212,5 @@ class charStandings extends AChar
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

@@ -258,6 +258,15 @@ class corpStarbaseDetail extends ACorp
         return false;
     }
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function __construct
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -389,7 +398,7 @@ class corpStarbaseDetail extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function __construct
+    }// function apiStore
     /**
      * Get per corp list of starbases from corpStarbaseList.
      *
@@ -420,7 +429,7 @@ class corpStarbaseDetail extends ACorp
             shuffle($list);
         };
         return $list;
-    }// function apiStore
+    }// function parserAPI
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -452,7 +461,7 @@ class corpStarbaseDetail extends ACorp
             }
         }; // foreach $tables ...
         return true;
-    }// function parserAPI
+    }// function combatSettings
     /**
      * Used to store XML to rowset tables.
      *
@@ -488,23 +497,22 @@ class corpStarbaseDetail extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function combatSettings
+    } // function generalSettings
     /**
      * @var YapealQueryBuilder Query instance for combatSettings table.
      */
-    private $combat; // function generalSettings
+    private $combat; // function rowset
     /**
      * @var YapealQueryBuilder Query instance for fuel table.
      */
-    private $fuel; // function rowset
+    private $fuel; // function posList
     /**
      * @var YapealQueryBuilder Query instance for generalSettings table.
      */
-    private $general; // function posList
+    private $general;
     /**
      * @var integer Holds current POS ID.
      */
     private $posID;
-    // function prepareTables
 }
 

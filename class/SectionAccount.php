@@ -165,6 +165,9 @@ class SectionAccount extends ASection
                         // Give each API 60 seconds to finish. This should never happen but
                         // is here to catch runaways.
                         set_time_limit(60);
+                        /**
+                         * @var AApiRequest $instance
+                         */
                         $instance = new $class($params);
                         if ($instance->apiStore()) {
                             ++$apiSuccess;

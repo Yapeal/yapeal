@@ -57,7 +57,7 @@ if (count(get_included_files()) < 2) {
  */
 class accountAPIKeyInfo extends AAccount
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -77,11 +77,11 @@ class accountAPIKeyInfo extends AAccount
      * @var YapealQueryBuilder Holds YapealQueryBuilder for bridge table.
      */
     protected $bridge;
-        /**
+    /**
      * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
      */
-    protected $characters;// function __construct
-        /**
+    protected $characters; // function __construct
+    /**
      * Used to store XML to characters table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -120,6 +120,15 @@ class accountAPIKeyInfo extends AAccount
               ->warn($mess);
         return false;
     }// function parserAPI
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function prepareTables
     /**
      * Per API parser for XML.
      *
@@ -213,8 +222,8 @@ class accountAPIKeyInfo extends AAccount
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function prepareTables
-/**
+    }
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -242,6 +251,5 @@ class accountAPIKeyInfo extends AAccount
         }
         return true;
     }
-    // function characters
 }
 

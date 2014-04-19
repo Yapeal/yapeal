@@ -74,6 +74,15 @@ class corpContactList extends ACorp
         parent::__construct($params);
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function parserAPI
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -122,8 +131,8 @@ class corpContactList extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
-        /**
+    }// function rowset
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -149,8 +158,8 @@ class corpContactList extends ACorp
             }
         }; // foreach $tables ...
         return true;
-    }// function rowset
-/**
+    }
+    /**
      * Used to store XML to rowset tables.
      *
      * @param string $table Name of the table for this rowset.
@@ -197,6 +206,5 @@ class corpContactList extends ACorp
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

@@ -166,6 +166,9 @@ class charContactList extends AChar
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $qb->setDefault('ownerID', $this->ownerID);
+        if ($table == 'contactList') {
+            $qb->setDefault('inWatchlist', 0);
+        }
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
                 case XMLReader::ELEMENT:

@@ -176,6 +176,15 @@ class charCharacterSheet extends AChar
         return false;
     }// function attributes
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function attributeEnhancers
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -286,7 +295,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function attributeEnhancers
+    }// function rowset
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -323,7 +332,7 @@ class charCharacterSheet extends AChar
             }
         }; // foreach $tables ...
         return true;
-    }// function rowset
+    }// function skills
     /**
      * Used to store XML to rowset tables.
      *
@@ -370,7 +379,8 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function skills
+    }
+    // function prepareTables
     /**
      * Used to store XML to CharacterSheet's skills table.
      *
@@ -422,6 +432,5 @@ class charCharacterSheet extends AChar
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

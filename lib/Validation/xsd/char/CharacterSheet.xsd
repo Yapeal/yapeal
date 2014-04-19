@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-    <xs:include schemaLocation="../../../cache/eveapi.xsd"/>
+    <xs:include schemaLocation="../eveapi.xsd"/>
     <xs:element name="eveapi">
         <xs:complexType>
             <xs:sequence>

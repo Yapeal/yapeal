@@ -152,6 +152,15 @@ class corpOutpostServiceDetail extends ACorp
         return $ret;
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function apiStore
+    /**
      * Get per corp list of outposts from corpOutpostList.
      *
      * @return array|bool List of stationIDs for this corp's outposts or FALSE if
@@ -181,7 +190,7 @@ class corpOutpostServiceDetail extends ACorp
             shuffle($list);
         };
         return $list;
-    }// function apiStore
+    }// function posList
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -205,11 +214,10 @@ class corpOutpostServiceDetail extends ACorp
             return false;
         }
         return true;
-    }// function posList
+    }
     /**
      * @var integer Holds current Outpost ID.
      */
     private $outpostID;
-    // function prepareTables
 }
 

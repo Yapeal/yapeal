@@ -73,6 +73,15 @@ class corpOutpostList extends ACorp
         parent::__construct($params);
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -96,6 +105,5 @@ class corpOutpostList extends ACorp
         }
         return true;
     }
-    // function prepareTables
 }
 

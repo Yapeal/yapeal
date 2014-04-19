@@ -221,6 +221,15 @@ abstract class AApiRequest
      */
     abstract protected function handleApiError($e); // function parserAPI
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return true;
+    }
+    /**
      * Simple <rowset> per API parser for XML.
      *
      * Most common API style is a simple <rowset>. This implementation allows most
@@ -236,9 +245,7 @@ abstract class AApiRequest
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        if (in_array('prepareTables', get_class_methods($this))) {
-            $qb->useUpsert(false);
-        }
+        $qb->useUpsert($this->needsUpsert());
         if ($this->ownerID != 0) {
             $qb->setDefault('ownerID', $this->ownerID);
         }

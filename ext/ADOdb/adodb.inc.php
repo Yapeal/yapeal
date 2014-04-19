@@ -1851,8 +1851,10 @@ if (!defined('_ADODB_LAYER')) {
         /**
          * Return one row of sql statement. Recordset is disposed for you.
          *
-         * @param sql            SQL statement
-         * @param [inputarr]        input bind array
+         * @param string $sql      SQL statement
+         * @param mixed  $inputarr input bind array
+         *
+         * @return array|bool
          */
         function GetRow($sql, $inputarr = false)
         {

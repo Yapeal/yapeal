@@ -32,26 +32,6 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilSections table.
  *
  * @property int   $isActive
@@ -108,9 +88,8 @@ class Sections extends ALimitedObject implements IGetBy
                     } else {
                         $mess = 'Unknown section ' . $id;
                         throw new DomainException($mess);
-                    }; // else ...
-                };
-                // else if it's a string ...
+                    }
+                }
             } else {
                 if (is_string($id)) {
                     if (false === $this->getItemByName($id)) {
@@ -120,14 +99,14 @@ class Sections extends ALimitedObject implements IGetBy
                         } else {
                             $mess = 'Unknown section ' . $id;
                             throw new DomainException($mess);
-                        }; // else ...
-                    };
+                        }
+                    }
                 } else {
                     $mess = 'Parameter $id must be an integer or a string';
                     throw new InvalidArgumentException($mess);
                 }
-            }; // else ...
-        }; // if !empty $id ...
+            }
+        }
     }
     /**
      * Destructor used to make sure to release ADOdb resource correctly more for
@@ -154,11 +133,11 @@ class Sections extends ALimitedObject implements IGetBy
         if (!isset($this->properties['section'])) {
             $mess = 'Can not add API when section is unknown';
             throw new RuntimeException($mess);
-        };
+        }
         $mask = $this->am->apisToMask($name, $this->properties['section']);
         if (($this->properties['activeAPIMask'] & $mask) > 0) {
             return true;
-        };
+        }
         $this->properties['activeAPIMask'] |= $mask;
         return false;
     }
@@ -179,12 +158,12 @@ class Sections extends ALimitedObject implements IGetBy
         if (!isset($this->properties['section'])) {
             $mess = 'Can not remove API when section is unknown';
             throw new RuntimeException($mess);
-        };
+        }
         $mask = $this->am->apisToMask($name, $this->properties['section']);
         if (($this->properties['activeAPIMask'] & $mask) > 0) {
             $this->properties['activeAPIMask'] ^= $mask;
             return true;
-        };
+        }
         return false;
     }
     /**
@@ -206,7 +185,7 @@ class Sections extends ALimitedObject implements IGetBy
                 $this->recordExists = true;
             } else {
                 $this->recordExists = false;
-            };
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -228,7 +207,7 @@ class Sections extends ALimitedObject implements IGetBy
         if (!in_array(ucfirst($name), $this->sectionList)) {
             $mess = 'Unknown section: ' . $name;
             throw new DomainException($mess);
-        }; // if !in_array...
+        }
         $sql = 'select `' . implode('`,`', array_keys($this->colTypes)) . '`';
         $sql .= ' from `' . $this->tableName . '`';
         try {
@@ -239,7 +218,7 @@ class Sections extends ALimitedObject implements IGetBy
                 $this->recordExists = true;
             } else {
                 $this->recordExists = false;
-            };
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -255,7 +234,7 @@ class Sections extends ALimitedObject implements IGetBy
     public function recordExists()
     {
         return $this->recordExists;
-    }// function __construct
+    }
     /**
      * Used to set default for column.
      *
@@ -267,7 +246,7 @@ class Sections extends ALimitedObject implements IGetBy
     public function setDefault($name, $value)
     {
         return $this->qb->setDefault($name, $value);
-    }// function __destruct
+    }
     /**
      * Used to set defaults for multiple columns.
      *
@@ -278,7 +257,7 @@ class Sections extends ALimitedObject implements IGetBy
     public function setDefaults(array $defaults)
     {
         return $this->qb->setDefaults($defaults);
-    }// function addActiveAPI
+    }
     /**
      * Used to store data into table.
      *
@@ -288,43 +267,42 @@ class Sections extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
-    }// function deleteActiveAPI
+    }
     /**
      * Hold an instance of the AccessMask class.
      *
      * @var AccessMask
      */
-    protected $am; // function getItemById
+    protected $am;
     /**
      * @var ADODB_mysqli Holds an instance of the DB connection.
      */
-    protected $con; // function getItemByName
+    protected $con;
     /**
      * Holds query builder object.
      *
      * @var QueryBuilder
      */
-    protected $qb; // function recordExists
+    protected $qb;
     /**
      * Table name
      *
      * @var string
      */
-    protected $tableName; // function setDefault
+    protected $tableName;
     /**
      * Set to TRUE if a database record exists.
      *
      * @var bool
      */
-    private $recordExists; // function setDefaults
+    private $recordExists;
     /**
      * List of all sections
      *
      * @var array
      */
     private $sectionList;
-    // function store
 }
 

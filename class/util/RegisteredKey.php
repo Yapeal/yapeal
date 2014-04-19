@@ -32,26 +32,6 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilRegisteredKey table.
  *
  * @property int $isActive
@@ -103,13 +83,13 @@ class RegisteredKey extends ALimitedObject implements IGetBy
                     } else {
                         $mess = 'Unknown key ' . $id;
                         throw new DomainException($mess);
-                    }; // else ...
-                };
+                    }
+                }
             } else {
                 $mess = 'Parameter $id must be an integer';
                 throw new InvalidArgumentException($mess);
-            }; // else ...
-        }; // if !empty $id ...
+            }
+        }
     }
     /**
      * Destructor used to make sure to release ADOdb resource correctly more for
@@ -135,7 +115,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
         // APIKeyInfo is always on and does not have a mask value.
         if ($name == 'APIKeyInfo') {
             return true;
-        };
+        }
         // If no section parameter see if key type is known from accountAPIKeyInfo.
         if (empty($section) && !empty($this->type)) {
             if ($this->type == 'Character') {
@@ -145,12 +125,12 @@ class RegisteredKey extends ALimitedObject implements IGetBy
             } else {
                 // Else Account
                 $section = strtolower($this->type);
-            };
-        }; // if empty($section) ...
+            }
+        }
         $mask = $this->am->apisToMask($name, $section);
         if (($this->properties['activeAPIMask'] & $mask) > 0) {
             return true;
-        };
+        }
         $this->properties['activeAPIMask'] |= $mask;
         return false;
     }
@@ -170,7 +150,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
         // APIKeyInfo is always on and does not have a mask value.
         if ($name == 'APIKeyInfo') {
             return false;
-        };
+        }
         // If no section parameter see if key type is known from accountAPIKeyInfo.
         if (empty($section) && !empty($this->type)) {
             if ($this->type == 'Character') {
@@ -180,15 +160,15 @@ class RegisteredKey extends ALimitedObject implements IGetBy
             } else {
                 // Else Account
                 $section = strtolower($this->type);
-            };
-        }; // if empty($section) ...
+            }
+        }
         $mask = $this->am->apisToMask($name, $section);
         if (($this->properties['activeAPIMask'] & $mask) > 0) {
             $this->properties['activeAPIMask'] ^= $mask;
             $ret = true;
         } else {
             $ret = false;
-        }; // if $this->properties['activeAPIMask'] ...
+        }
         return $ret;
     }
     /**
@@ -224,8 +204,8 @@ class RegisteredKey extends ALimitedObject implements IGetBy
                 $result = $this->con->GetOne($sql);
                 if (!empty($result)) {
                     $this->properties['activeAPIMask'] = (string)$result;
-                };
-            };
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -255,7 +235,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
     public function recordExists()
     {
         return $this->recordExists;
-    }// function __construct
+    }
     /**
      * Used to set default for column.
      *
@@ -267,7 +247,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
     public function setDefault($name, $value)
     {
         return $this->qb->setDefault($name, $value);
-    }// function __destruct
+    }
     /**
      * Used to set defaults for multiple columns.
      *
@@ -278,7 +258,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
     public function setDefaults(array $defaults)
     {
         return $this->qb->setDefaults($defaults);
-    }// function addActiveAPI
+    }
     /**
      * Used to store data into table.
      *
@@ -288,44 +268,42 @@ class RegisteredKey extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
-    }// function deleteActiveAPI
+    }
     /**
      * Hold an instance of the AccessMask class.
      *
      * @var object
      */
-    protected $am; // function getItemById
+    protected $am;
     /**
      * Holds an instance of the DB connection.
      *
      * @var object
      */
-    protected $con; // function getItemByName
+    protected $con;
     /**
      * Holds query builder object.
      *
      * @var object
      */
-    protected $qb; // function recordExists
+    protected $qb;
     /**
      * Holds the table name of the query that is being built.
      *
      * @var string
      */
-    protected $tableName; // function setDefault
+    protected $tableName;
     /**
      * Set to TRUE if a database record exists.
      *
      * @var bool
      */
-    private $recordExists; // function setDefaults
+    private $recordExists;
     /**
      * Holds the type returned when querying accountAPIKeyInfo.
      * $var string
      */
     private $type;
-    // function store
 }
-

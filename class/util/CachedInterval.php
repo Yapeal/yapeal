@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilCachedInterval table.
  *
  * Unlike the other wrapper classes this one is read only.
@@ -68,7 +48,7 @@ class CachedInterval
         // If list is empty grab it from database.
         if (empty(self::$intervalList)) {
             self::resetAll();
-        };
+        }
     }
     /**
      * Used to reset intervals back to database defaults.
@@ -102,8 +82,8 @@ class CachedInterval
                     'section' => 'account'
                 )
             );
-        }; // if empty $self::$intervalList ...
-    }// function __construct
+        }
+    }
     /**
      * Used to temporarily change interval for an API.
      *
@@ -121,7 +101,7 @@ class CachedInterval
         if (!is_string($api) || !is_string($section)) {
             $mess = '$api and $section must be strings';
             throw new InvalidArgumentException($mess);
-        };
+        }
         $found = false;
         for ($i = 0, $cnt = count(self::$intervalList);$i < $cnt;++$i) {
             if (self::$intervalList[$i]['section'] == $section
@@ -129,8 +109,8 @@ class CachedInterval
             ) {
                 self::$intervalList[$i]['interval'] = $interval;
                 $found = true;
-            };
-        }; // for $i ...
+            }
+        }
         // No existing interval found for API temporarily add it.
         if ($found === false) {
             self::$intervalList[] = array(
@@ -139,9 +119,8 @@ class CachedInterval
                 'section' => $section
             );
         }
-        // if $found ...
         return $found;
-    }// function getInterval
+    }
     /**
      * Used to get interval for an API.
      *
@@ -159,15 +138,15 @@ class CachedInterval
         if (!is_string($api) || !is_string($section)) {
             $mess = '$api and $section must be strings';
             throw new InvalidArgumentException($mess);
-        };
+        }
         $found = false;
         $interval = 3600; // Use an hour as default.
         foreach (self::$intervalList as $row) {
             if ($row['section'] == $section && $row['api'] == $api) {
                 $interval = $row['interval'];
                 $found = true;
-            };
-        }; // foreach self::$intervalList ...
+            }
+        }
         if ($found === false) {
             if (Logger::getLogger('yapeal')
                       ->isInfoEnabled()
@@ -175,16 +154,15 @@ class CachedInterval
                 $mess = $api . ' is an unknown API for section ' . $section;
                 Logger::getLogger('yapeal')
                       ->info($mess);
-            };
-        };
+            }
+        }
         return $interval;
-    }// function changeInterval
+    }
     /**
      * List of all CachedIntervals
      *
      * @var array
      */
     private static $intervalList;
-    // function resetAll
 }
 

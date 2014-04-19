@@ -32,26 +32,6 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilRegisteredCharacter table.
  *
  * @property int $isActive
@@ -103,9 +83,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
                     } else {
                         $mess = 'Unknown character ' . $id;
                         throw new DomainException($mess);
-                    }; // else ...
-                };
-                // else if it's a string ...
+                    }
+                }
             } else {
                 if (is_string($id)) {
                     if (false === $this->getItemByName($id)) {
@@ -115,14 +94,14 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
                         } else {
                             $mess = 'Unknown character ' . $id;
                             throw new DomainException($mess);
-                        }; // else ...
-                    };
+                        }
+                    }
                 } else {
                     $mess = 'Parameter $id must be an integer or a string';
                     throw new InvalidArgumentException($mess);
                 }
-            }; // else ...
-        }; // if !empty $id ...
+            }
+        }
     }
     /**
      * Destructor used to make sure to release ADOdb resource correctly more for
@@ -150,7 +129,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
         } else {
             $this->properties['activeAPIMask'] |= $mask;
             $ret = false;
-        }; // if $this->properties['activeAPIMask'] ...
+        }
         return $ret;
     }
     /**
@@ -171,7 +150,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
             $ret = true;
         } else {
             $ret = false;
-        }; // if $this->properties['activeAPIMask'] ...
+        }
         return $ret;
     }
     /**
@@ -206,8 +185,8 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
                 $result = $this->con->GetOne($sql);
                 if (!empty($result)) {
                     $this->properties['characterName'] = (string)$result;
-                };
-            };
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -247,15 +226,15 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
                 $result = $this->con->GetOne($sql);
                 if (!empty($result)) {
                     $this->properties['characterID'] = (string)$result;
-                };
-            };
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
             $this->recordExists = false;
         }
         return $this->recordExists();
-    }// function __construct
+    }
     /**
      * Function used to check if database record already existed.
      *
@@ -264,7 +243,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
     public function recordExists()
     {
         return $this->recordExists;
-    }// function __destruct
+    }
     /**
      * Used to set default for column.
      *
@@ -276,7 +255,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
     public function setDefault($name, $value)
     {
         return $this->qb->setDefault($name, $value);
-    }// function addActiveAPI
+    }
     /**
      * Used to set defaults for multiple columns.
      *
@@ -287,7 +266,7 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
     public function setDefaults(array $defaults)
     {
         return $this->qb->setDefaults($defaults);
-    }// function deleteActiveAPI
+    }
     /**
      * Used to store data into table.
      *
@@ -297,39 +276,37 @@ class RegisteredCharacter extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
-    }// function getItemById
+    }
     /**
      * Hold an instance of the AccessMask class.
      *
      * @var object
      */
-    protected $am; // function getItemByName
+    protected $am;
     /**
      * Holds an instance of the DB connection.
      *
      * @var object
      */
-    protected $con; // function recordExists
+    protected $con;
     /**
      * Holds query builder object.
      *
      * @var object
      */
-    protected $qb; // function setDefault
+    protected $qb;
     /**
      * Holds the table name of the query is being built.
      *
      * @var string
      */
-    protected $tableName; // function setDefaults
+    protected $tableName;
     /**
      * Set to TRUE if a database record exists.
      *
      * @var bool
      */
     private $recordExists;
-    // function store
 }
-

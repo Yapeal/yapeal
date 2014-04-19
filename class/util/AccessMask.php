@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilAccessMask table.
  *
  * Unlike the other wrapper classes this one is read only.
@@ -64,10 +44,10 @@ class AccessMask
     /**
      * Constants used with status.
      */
-    const NOT_WORKING = 1; // function __construct
-    const TESTING = 8; // function apisToMask
-    const WIP = 4; // function getMaskList
-    const XSD_ONLY = 2; // function getSectionMaskList
+    const NOT_WORKING = 1;
+    const TESTING = 8;
+    const WIP = 4;
+    const XSD_ONLY = 2;
     /**
      * Constructor
      *
@@ -103,9 +83,9 @@ class AccessMask
                         'description' => 'Used to get information about a keyID'
                     )
                 );
-            };
-        }; // if empty self::$maskList ...
-    }// function getSectionToMask
+            }
+        }
+    }
     /**
      * Converts a list of API names to a mask value.
      *
@@ -130,7 +110,7 @@ class AccessMask
         } else {
             $mess = 'Must use either string or array for $apis';
             throw new InvalidArgumentException($mess, 1);
-        };
+        }
         $acnt = count($apis);
         $cnt = 0;
         $mask = 0;
@@ -141,9 +121,9 @@ class AccessMask
                     if ($row['api'] == $api) {
                         $mask |= $row['mask'];
                         ++$cnt;
-                    };
-                }; // foreach self::$maskList ...
-            }; // foreach $apis ...
+                    }
+                }
+            }
             // Use section to limit API search.
         } else {
             foreach ($apis as $api) {
@@ -151,16 +131,16 @@ class AccessMask
                     if ($row['section'] == $section && $row['api'] == $api) {
                         $mask |= $row['mask'];
                         ++$cnt;
-                    };
-                }; // foreach self::$maskList ...
-            }; // foreach $apis ...
-        }; // else empty($section) ...
+                    }
+                }
+            }
+        }
         // No API match found.
         if ($cnt == 0) {
             $mess = 'All of the APIs ' . implode(', ', $apis) . ' are unknown';
             if (!empty($section)) {
                 $mess .= ' in section ' . $section;
-            };
+            }
             throw new DomainException($mess);
             // Some APIs unknown.
         } elseif ($cnt < $acnt) {
@@ -168,17 +148,17 @@ class AccessMask
             $mess = 'The APIs: ' . implode(', ', $diff) . ' are unknown';
             if (!empty($section)) {
                 $mess .= ' in section ' . $section;
-            };
+            }
             throw new DomainException($mess);
             // Found right number of APIs.
         } elseif ($cnt == $acnt) {
             return $mask;
-        };
+        }
         // Found API in multiple sections and the correct section was unknown.
         $mess = 'Multiple API matches found, $section parameter is required to';
         $mess .= ' determine which ' . implode(',', $apis) . ' are wanted';
         throw new DomainException($mess);
-    }// function maskToAPIs
+    }
     /**
      * Returns the whole access mask list for all the known APIs.
      *
@@ -187,7 +167,7 @@ class AccessMask
     public function getMaskList()
     {
         return self::$maskList;
-    }// function reduceOR
+    }
     /**
      * Returns the access mask list for a single section of known APIs.
      *
@@ -222,9 +202,9 @@ class AccessMask
             if ($row['section'] == $section) {
                 if (($row['status'] & $status) > 0) {
                     $mask |= $row['mask'];
-                };
-            };
-        }; // foreach self::$maskList ...
+                }
+            }
+        }
         return $mask;
     }
     /**
@@ -246,13 +226,13 @@ class AccessMask
         } elseif (!is_int($mask)) {
             $mess = 'Must use either integer or array of integers for $mask';
             throw new InvalidArgumentException($mess, 6);
-        };
+        }
         $apis = array();
         foreach (self::$maskList as $row) {
             if ($row['section'] == $section && ($mask & $row['mask']) > 0) {
                 $apis[] = $row['api'];
-            }; // if $mask ...
-        }; // foreach self::$maskList ...
+            }
+        }
         return $apis;
     }
     /**

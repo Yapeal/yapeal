@@ -32,26 +32,6 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Wrapper class for utilCachedUntil table.
  *
  * @property string $cachedUntil
@@ -99,23 +79,23 @@ class CachedUntil extends ALimitedObject implements IGetBy
                 $mess = 'Missing required parameter $id["' . $k . '"]';
                 $mess .= ' to constructor in ' . __CLASS__;
                 throw new LengthException($mess);
-            }; // if !isset $id[$k] ...
+            }
             switch ($v) {
                 case 'C':
                 case 'X':
                     if (!is_string($id[$k])) {
                         $mess = '$id["' . $k . '"] must be a string';
                         throw new InvalidArgumentException($mess);
-                    }; // if !is_string $params[$k] ...
+                    }
                     break;
                 case 'I':
                     if (0 != strlen(str_replace(range(0, 9), '', $id[$k]))) {
                         $mess = '$id["' . $k . '"] must be an integer';
                         throw new InvalidArgumentException($mess);
-                    }; // if 0 == strlen(...
+                    }
                     break;
-            }; // switch $v ...
-        }; // foreach $required ...
+            }
+        }
         // Check if record already exists in database table.
         if (false === $this->getItemById($id)) {
             // If record doesn't exists should it be created?
@@ -123,20 +103,20 @@ class CachedUntil extends ALimitedObject implements IGetBy
                 // Add required columns from $id to object.
                 foreach ($required as $k => $v) {
                     $this->$k = $id[$k];
-                }; // foreach $required ...
+                }
             } else {
                 $mess = 'No cached time for API = ' . $id['api'];
                 $mess .= ' exists for ownerID = ' . $id['ownerID'];
                 throw new DomainException($mess);
-            }; // else TRUE == $create ...
-        }; // if FALSE === $this->getItemById($id) ...
+            }
+        }
         // See if any columns beyond required were include and insure they get
         // set/updated as well.
         if (count($id) > count($required)) {
             foreach (array_diff_key($id, $required) as $k => $v) {
                 $this->$k = $v;
-            }; // foreach array_diff_key($id, $required) ...
-        }; // if count($id) ...
+            }
+        }
     }
     /**
      * Used to tell if it is time to get the current API for the current owner by
@@ -166,11 +146,11 @@ class CachedUntil extends ALimitedObject implements IGetBy
         }
         if (empty($result)) {
             return true;
-        };
+        }
         $cuntil = strtotime($result . ' +0000');
         if ($now < $cuntil) {
             return false;
-        };
+        }
         return true;
     }
     /**
@@ -202,7 +182,7 @@ class CachedUntil extends ALimitedObject implements IGetBy
             } else {
                 $this->properties = $result;
                 $this->recordExists = true;
-            };
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -226,7 +206,7 @@ class CachedUntil extends ALimitedObject implements IGetBy
             'Not implemented for ' . __CLASS__ . ' table',
             1
         );
-    }// function __construct
+    }
     /**
      * Function used to check if database record already existed.
      *
@@ -235,7 +215,7 @@ class CachedUntil extends ALimitedObject implements IGetBy
     public function recordExists()
     {
         return $this->recordExists;
-    }// function __destruct
+    }
     /**
      * Used to set default for column.
      *
@@ -247,7 +227,7 @@ class CachedUntil extends ALimitedObject implements IGetBy
     public function setDefault($name, $value)
     {
         return $this->qb->setDefault($name, $value);
-    }//function cacheExpired
+    }
     /**
      * Used to set defaults for multiple columns.
      *
@@ -258,7 +238,7 @@ class CachedUntil extends ALimitedObject implements IGetBy
     public function setDefaults(array $defaults)
     {
         return $this->qb->setDefaults($defaults);
-    }// function getItemById
+    }
     /**
      * Used to store data into table.
      *
@@ -268,29 +248,28 @@ class CachedUntil extends ALimitedObject implements IGetBy
     {
         if (false === $this->qb->addRow($this->properties)) {
             return false;
-        }; // if FALSE === ...
+        }
         return $this->qb->store();
-    }// function getItemByName
+    }
     /**
      * @var ADODB_mysqli Holds an instance of the DB connection.
      */
-    protected $con; // function recordExists
+    protected $con;
     /**
      * Holds query builder object.
      *
      * @var QueryBuilder
      */
-    protected $qb; // function setDefault
+    protected $qb;
     /**
      * @var string Holds the table name of the query is being built.
      */
-    protected $tableName; // function setDefaults
+    protected $tableName;
     /**
      * Set to TRUE if a database record exists.
      *
      * @var bool
      */
     private $recordExists;
-    // function store
 }
 

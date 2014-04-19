@@ -62,10 +62,8 @@ function getSettingsFromIniFile($file = null, $section = null)
 {
     // Check if given custom configuration file.
     if (empty($file) || !is_string($file)) {
-        $file = @getenv('YAPEAL_INI');
-        if ($file === false) {
-            $file = YAPEAL_CONFIG . 'yapeal.ini';
-        };
+        $file = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config'
+            . DIRECTORY_SEPARATOR . 'yapeal.ini';
     } else {
         $mess = 'Using custom configuration file ' . $file . PHP_EOL;
         fwrite(STDOUT, $mess);

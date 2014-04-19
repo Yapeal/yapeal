@@ -79,7 +79,8 @@ class maintCleanCache
     {
         $limit = strtotime('7 days ago');
         foreach ($this->sections as $section) {
-            $path = YAPEAL_CACHE . $section . DS;
+            $path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
+                . DIRECTORY_SEPARATOR . $section . DS;
             $files = new DirectoryIterator($path);
             foreach ($files as $item) {
                 $name = $item->getFileName();

@@ -60,19 +60,12 @@ if (count($included) > 1 || $included[0] != __FILE__) {
  * @ignore
  */
 define('DS', '/');
-// Check if the base path for Yapeal has been set in the environment.
-$dir = @getenv('YAPEAL_BASE');
-if ($dir === false) {
-    // Used to overcome path issues caused by how script is ran.
-    $dir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS . '..')) . DS;
-};
+$inc = dirname(__DIR__) . '/inc' . DIRECTORY_SEPARATOR;
 // Get path constants so they can be used.
-require_once $dir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_BASE . 'revision.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
-require_once YAPEAL_INC . 'usage.php';
-require_once YAPEAL_INC . 'showVersion.php';
+require_once $inc . 'parseCommandLineOptions.php';
+require_once $inc . 'getSettingsFromIniFile.php';
+require_once $inc . 'usage.php';
+require_once $inc . 'showVersion.php';
 $shortOpts = array('c:', 'd:', 'p:', 's:', 'u:');
 $longOpts = array(
     'config:',

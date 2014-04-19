@@ -128,14 +128,17 @@ class YapealErrorHandler
         array $section,
         $file = null
     ) {
+        $config = dirname(__DIR__) . '/config/';
         // Check if given custom configuration file.
         if (empty($file) || !is_string($file)) {
             if (!empty($section['log_config'])) {
                 $file = $section['log_config'];
+                // Change so do NOT need YAPEAL_CONFIG constant.
+                $file = str_replace('{config}', $config, $file);
             } else {
                 $file = @getenv('YAPEAL_LOGGER');
                 if ($file === false) {
-                    $file = YAPEAL_CONFIG . 'logger.xml';
+                    $file = $config . 'logger.xml';
                 };
             };
         };

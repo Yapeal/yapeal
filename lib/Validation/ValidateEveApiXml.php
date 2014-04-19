@@ -121,32 +121,34 @@ class ValidateEveApiXml
             $mess .= $this->section . DS . $this->api;
             $mess .= ' is a valid API.';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return $this;
         }
         // Pass XML data to XMLReader so it can be checked.
         $xr->XML($this->xml);
         // Need to get for XSD Schema for this API to use while validating.
         // Build cache file path.
-        $cachePath = __DIR__ . DIRECTORY_SEPARATOR . $this->section
-            . DIRECTORY_SEPARATOR;
-        $cacheFile = $cachePath . $this->api . '.xsd';
-        if (!is_readable($cacheFile) || !is_file($cacheFile)) {
+        $xsdPath =
+            __DIR__ . DIRECTORY_SEPARATOR . 'xsd' . DIRECTORY_SEPARATOR;
+        $xsdFile =
+            $xsdPath . $this->section . DIRECTORY_SEPARATOR . $this->api
+            . '.xsd';
+        if (!is_readable($xsdFile) || !is_file($xsdFile)) {
             if (\Logger::getLogger('yapeal')
                        ->isInfoEnabled()
             ) {
-                $mess = 'Could NOT access XSD schema file: ' . $cacheFile;
+                $mess = 'Could NOT access XSD schema file: ' . $xsdFile;
                 \Logger::getLogger('yapeal')
                        ->info($mess);
             }
-            $cacheFile = $cachePath . 'unknown.xsd';
+            $xsdFile = $xsdPath . 'unknown.xsd';
         }
         // Have to have a good schema.
-        if (!$xr->setSchema($cacheFile)) {
+        if (!$xr->setSchema($xsdFile)) {
             if (\Logger::getLogger('yapeal')
                        ->isInfoEnabled()
             ) {
-                $mess = 'Could NOT load schema file ' . $cacheFile;
+                $mess = 'Could NOT load schema file ' . $xsdFile;
                 \Logger::getLogger('yapeal')
                        ->info($mess);
             }

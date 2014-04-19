@@ -84,13 +84,18 @@ class YapealDBConnection
         };
         global $ADODB_COUNTRECS, $ADODB_CACHE_DIR;
         $ADODB_COUNTRECS = false;
-        $ADODB_CACHE_DIR = YAPEAL_CACHE . 'ADOdb';
+        $ADODB_CACHE_DIR =
+            dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache'
+            . DIRECTORY_SEPARATOR . 'ADOdb';
         if (empty(self::$connections)) {
-            require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb-exceptions.inc.php';
-            require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb.inc.php';
+            $adoDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext'
+                . DIRECTORY_SEPARATOR . 'ADOdb' . DIRECTORY_SEPARATOR;
+            require_once $adoDir . 'adodb-exceptions.inc.php';
+            require_once $adoDir . 'adodb.inc.php';
         };
         $hash = hash('sha1', $dsn);
         if (!array_key_exists($hash, self::$connections)) {
+            /** @var ADODB_mysqli $ado */
             $ado = NewADOConnection($dsn);
             $ado->debug = false;
             $ado->SetFetchMode(ADODB_FETCH_ASSOC);
@@ -152,7 +157,7 @@ class YapealDBConnection
         throw new LogicException($mess);
     }// function releaseAll
     /**
-     * @var resource List of ADOdb connection resources.
+     * @var array List of ADOdb connection resources.
      */
     private static $connections = array();
     // function setDatabaseSectionConstants

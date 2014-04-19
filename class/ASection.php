@@ -82,7 +82,8 @@ abstract class ASection
             return;
         };
         $this->am = new AccessMask();
-        $path = YAPEAL_CLASS . 'api' . DS . $this->section . DS;
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR
+            . $this->section . DIRECTORY_SEPARATOR;
         $foundAPIs = FilterFileFinder::getStrippedFiles($path, $this->section);
         $knownAPIs = $this->am->apisToMask($foundAPIs, $this->section);
         if ($knownAPIs !== false) {

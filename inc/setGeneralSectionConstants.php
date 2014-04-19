@@ -58,7 +58,7 @@ function setGeneralSectionConstants(array $section)
     if (!defined('YAPEAL_APPLICATION_AGENT')) {
         $curl = curl_version();
         $user_agent = $section['application_agent'];
-        $user_agent .= ' Yapeal/' . YAPEAL_VERSION . ' ' . YAPEAL_STABILITY;
+        $user_agent .= ' Yapeal/1.1.x-alpha';
         $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
         $user_agent .= ' libcurl/' . $curl['version'];
         $user_agent = trim($user_agent);

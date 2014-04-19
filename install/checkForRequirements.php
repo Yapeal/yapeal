@@ -54,25 +54,20 @@ if (count($included) > 1 || $included[0] != __FILE__) {
     fwrite(STDERR, $mess);
     exit(1);
 };
-/**
- * Define short name for directory separator which always uses unix '/'.
- *
- * @ignore
- */
-define('DS', '/');
-// Check if the base path for Yapeal has been set in the environment.
-$dir = @getenv('YAPEAL_BASE');
-if ($dir === false) {
-    // Used to overcome path issues caused by how script is ran.
-    $dir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS . '..')) . DS;
+// Insure minimum version of PHP we need to run.
+$version = '5.3.3';
+if (version_compare(PHP_VERSION, $version, '<')) {
+    $mess =
+        'Need minimum of PHP ' . $version . ' to use this software!' . PHP_EOL;
+    fwrite(STDERR, $mess);
+    exit(2);
 };
+$inc = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR;
 // Get path constants so they can be used.
-require_once $dir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_BASE . 'revision.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
-require_once YAPEAL_INC . 'usage.php';
-require_once YAPEAL_INC . 'showVersion.php';
+require_once $inc . 'parseCommandLineOptions.php';
+require_once $inc . 'getSettingsFromIniFile.php';
+require_once $inc . 'usage.php';
+require_once $inc . 'showVersion.php';
 $shortOpts = array('c:');
 $longOpts = array('config:');
 // Parser command line options first in case user just wanted to see help.
@@ -84,14 +79,6 @@ if (isset($options['help'])) {
 if (isset($options['version'])) {
     showVersion(__FILE__);
     exit(0);
-};
-// Insure minimum version of PHP we need to run.
-$version = '5.2.8';
-if (version_compare(PHP_VERSION, $version, '<')) {
-    $mess =
-        'Need minimum of PHP ' . $version . ' to use this software!' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(2);
 };
 // Check for some required extensions
 $required =
@@ -154,8 +141,9 @@ if (!empty($mess)) {
     exit(2);
 };
 // Check if log directory is writable.
-if (!is_writable(YAPEAL_LOG)) {
-    $mess = YAPEAL_LOG . ' is not writable.' . PHP_EOL;
+$dir = dirname(__DIR__) . '/log/';
+if (!is_writable($dir)) {
+    $mess = $dir . ' is not writable.' . PHP_EOL;
     fwrite(STDERR, $mess);
     exit(2);
 };
@@ -173,8 +161,10 @@ if (!empty($mess)) {
     exit(2);
 };
 // Check if cache directory is writable.
-if (!is_writable(YAPEAL_CACHE)) {
-    $mess = YAPEAL_CACHE . ' is not writable.' . PHP_EOL;
+$dir =
+    dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+if (!is_writable($dir)) {
+    $mess = $dir . ' is not writable.' . PHP_EOL;
     fwrite(STDERR, $mess);
     exit(2);
 };
@@ -198,14 +188,14 @@ if ($iniVars['Cache']['cache_output'] == 'file'
     $required =
         array('account', 'ADOdb', 'char', 'corp', 'eve', 'map', 'server');
     foreach ($required as $section) {
-        if (!is_dir(YAPEAL_CACHE . $section)) {
-            $mess = 'Missing required directory ' . YAPEAL_CACHE . $section
+        if (!is_dir($dir . $section)) {
+            $mess = 'Missing required directory ' . $dir . $section
                 . PHP_EOL;
             fwrite(STDERR, $mess);
             exit(2);
         };
-        if (!is_writable(YAPEAL_CACHE . $section)) {
-            $mess = YAPEAL_CACHE . $section . ' is not writable.' . PHP_EOL;
+        if (!is_writable($dir . $section)) {
+            $mess = $dir . $section . ' is not writable.' . PHP_EOL;
             fwrite(STDERR, $mess);
             exit(2);
         };

@@ -74,8 +74,11 @@ class YapealNetworkConnection
             'Connection: Keep-Alive',
             'Keep-Alive: 300'
         );
-        require_once YAPEAL_EXT . 'eac_httprequest' . DS
+        $file =
+            dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext' . DIRECTORY_SEPARATOR
+            . 'eac_httprequest' . DIRECTORY_SEPARATOR
             . 'eac_httprequest.class.php';
+        require_once $file;
         $this->con = Singleton::get('httpRequest');
         if (false === $this->con) {
             $mess = 'Could not get a connection to use for APIs';

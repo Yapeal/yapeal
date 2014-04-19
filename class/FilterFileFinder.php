@@ -137,9 +137,9 @@ class FilterFileFinder extends FilterIterator
      */
     static public function pathinfo_utf($path, $options = 0)
     {
-        $path = str_replace(array("\\", "\\\\"), DS, $path);
+        $path = str_replace(array("\\", "\\\\"), '/', $path);
         // Get rid of any double '/'s that might have crept in.
-        $path = str_replace('//', DS, $path);
+        $path = str_replace('//', '/', $path);
         if (strpos($path, '/') !== false) {
             $pieces = explode('/', $path);
             $basename = end($pieces);

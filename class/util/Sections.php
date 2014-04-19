@@ -76,7 +76,10 @@ class Sections extends ALimitedObject implements IGetBy
     public function __construct($id = null, $create = true)
     {
         $this->sectionList =
-            FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
+            FilterFileFinder::getStrippedFiles(
+                dirname(__DIR__) . DIRECTORY_SEPARATOR,
+                'Section'
+            );
         $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
         try {
             // Get a database connection.

@@ -65,21 +65,16 @@ date_default_timezone_set('GMT');
  * @ignore
  */
 define('DS', '/');
-// Check if the base path for Yapeal has been set in the environment.
-$dir = @getenv('YAPEAL_BASE');
-if ($dir === false) {
-    // Used to overcome path issues caused by how script is ran.
-    $dir = str_replace('\\', DS, realpath(dirname(__FILE__) . DS . '..')) . DS;
-};
+$inc = dirname(__DIR__) . '/inc' . DIRECTORY_SEPARATOR;
 // Get path constants so they can be used.
-require_once $dir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_BASE . 'revision.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
-require_once YAPEAL_INC . 'usage.php';
-require_once YAPEAL_INC . 'showVersion.php';
-require_once YAPEAL_EXT . 'ADOdb' . DS . 'adodb.inc.php';
-require_once YAPEAL_CLASS . 'FilterFileFinder.php';
+require_once $inc . 'parseCommandLineOptions.php';
+require_once $inc . 'getSettingsFromIniFile.php';
+require_once $inc . 'usage.php';
+require_once $inc . 'showVersion.php';
+$adoDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext'
+    . DIRECTORY_SEPARATOR . 'ADOdb' . DIRECTORY_SEPARATOR;
+require_once $adoDir . 'adodb.inc.php';
+require_once dirname(__DIR__) . '/class' . '/FilterFileFinder.php';
 $shortOpts = array('c:', 'd:', 'p:', 's:', 't:', 'u:');
 $longOpts = array(
     'config:',
@@ -242,7 +237,8 @@ function cleanFiles($sections, $cacheLength)
     // Clear out any old cached file information before starting.
     clearstatcache(true);
     foreach ($sections as $section) {
-        $path = YAPEAL_CACHE . $section . DS;
+        $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache'
+            . DIRECTORY_SEPARATOR . $section . DS;
         $files = new FilterFileFinder($path, 'xml', FilterFileFinder::SUFFIX);
         foreach ($files as $file) {
             $mTime = @filemtime($file);

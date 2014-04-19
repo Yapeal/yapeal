@@ -72,6 +72,10 @@ class EveApiXmlCache
         $this->curTime = time();
         $ci = new \CachedInterval();
         $this->cacheInterval = (int)$ci->getInterval($api, $section);
+        $this->cachePath =
+            dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
+            . DIRECTORY_SEPARATOR . $this->section
+            . DIRECTORY_SEPARATOR;
     }
     /**
      * function used to set constants from [Cache] section of the configuration file.
@@ -97,7 +101,7 @@ class EveApiXmlCache
         if (empty($xml)) {
             $mess = 'XML was empty' . PHP_EOL;
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
         $data = array(
@@ -150,14 +154,14 @@ class EveApiXmlCache
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
                 \Logger::getLogger('yapeal')
-                      ->warn($mess);
+                       ->warn($mess);
                 return false;
         }
         if (false == $this->vd->isValidXml()) {
-            $mess = 'Caching invalid API XML for ' . $this->section . DS
-                . $this->api;
+            $mess = 'Caching invalid API XML for ' . $this->section
+                . DIRECTORY_SEPARATOR . $this->api;
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
         }
         return true;
     }
@@ -182,7 +186,7 @@ class EveApiXmlCache
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
                 \Logger::getLogger('yapeal')
-                      ->warn($mess);
+                       ->warn($mess);
         }
     }
     /**
@@ -218,7 +222,7 @@ class EveApiXmlCache
                 $mess .= '" for cache_output.';
                 $mess .= ' Check that the setting in config/yapeal.ini is correct.';
                 \Logger::getLogger('yapeal')
-                      ->warn($mess);
+                       ->warn($mess);
                 return false;
         }
         $currentXML = strtotime($this->vd->getCurrentTime() . ' +0000')
@@ -277,6 +281,10 @@ class EveApiXmlCache
      */
     private $cacheInterval;
     /**
+     * @var string
+     */
+    private $cachePath;
+    /**
      * @var integer Holds current Unix time to have consistent caching time.
      */
     private $curTime;
@@ -313,7 +321,7 @@ class EveApiXmlCache
             $qb->store();
         } catch (\ADODB_Exception $e) {
             \Logger::getLogger('yapeal')
-                  ->warn($e);
+                   ->warn($e);
             return false;
         }
         return true;
@@ -327,27 +335,26 @@ class EveApiXmlCache
      */
     private function cacheXmlFile($xml)
     {
-        // Build cache file path
-        $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
-        if (!is_dir($cachePath)) {
-            $mess = 'XML cache ' . $cachePath
+        if (!is_dir($this->cachePath)) {
+            $mess = 'XML cache ' . $this->cachePath
                 . ' is not a directory or does not exist';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
-        if (!is_writable($cachePath)) {
-            $mess = 'XML cache directory ' . $cachePath . ' is not writable';
+        if (!is_writable($this->cachePath)) {
+            $mess =
+                'XML cache directory ' . $this->cachePath . ' is not writable';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
+        $cacheFile = $this->cachePath . $this->api . $this->hash . '.xml';
         $ret = file_put_contents($cacheFile, $xml);
         if (false == $ret || $ret == -1) {
             $mess = 'Could not cache XML to ' . $cacheFile;
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
         return true;
@@ -367,7 +374,7 @@ class EveApiXmlCache
             $con->Execute($sql);
         } catch (\Exception $e) {
             \Logger::getLogger('yapeal')
-                  ->warn($e);
+                   ->warn($e);
             return false;
         }
         return true;
@@ -379,22 +386,21 @@ class EveApiXmlCache
      */
     private function delCachedFile()
     {
-        // Build cache file path
-        $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
-        if (!is_dir($cachePath)) {
-            $mess = 'XML cache ' . $cachePath
+        if (!is_dir($this->cachePath)) {
+            $mess = 'XML cache ' . $this->cachePath
                 . ' is not a directory or does not exist';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
-        if (!is_writable($cachePath)) {
-            $mess = 'XML cache directory ' . $cachePath . ' is not writable';
+        if (!is_writable($this->cachePath)) {
+            $mess =
+                'XML cache directory ' . $this->cachePath . ' is not writable';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
+        $cacheFile = $this->cachePath . $this->api . $this->hash . '.xml';
         if (!file_exists($cacheFile) || !is_file($cacheFile)) {
             return false;
         }
@@ -432,7 +438,7 @@ class EveApiXmlCache
             }
         } catch (\Exception $e) {
             \Logger::getLogger('yapeal')
-                  ->warn($e);
+                   ->warn($e);
             return false;
         }
         return $result;
@@ -445,16 +451,14 @@ class EveApiXmlCache
      */
     private function getCachedFile()
     {
-        // Build cache file path
-        $cachePath = realpath(YAPEAL_CACHE . $this->section) . DS;
-        if (!is_dir($cachePath)) {
-            $mess = 'XML cache ' . $cachePath
+        if (!is_dir($this->cachePath)) {
+            $mess = 'XML cache ' . $this->cachePath
                 . ' is not a directory or does not exist';
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
-        $cacheFile = $cachePath . $this->api . $this->hash . '.xml';
+        $cacheFile = $this->cachePath . $this->api . $this->hash . '.xml';
         $result = @file_get_contents($cacheFile);
         if (false === $result || empty($result)) {
             return false;

@@ -57,65 +57,11 @@ if (!defined('DS')) {
      */
     define('DS', '/');
 };
-if (!defined('YAPEAL_INC')) {
-    // Used to over come path issues caused by how script is ran on server.
-    $dir = str_replace('\\', DS, realpath(dirname(__FILE__)));
-    /**
-     * Since this file has to be in the 'inc' directory we can set that path now.
-     */
-    define('YAPEAL_INC', $dir . DS);
-};
-if (!defined('YAPEAL_BASE')) {
-    // Check if the base path for Yapeal has been set in the environment.
-    $dir = @getenv('YAPEAL_BASE');
-    if ($dir === false) {
-        $dir = str_replace('\\', DS, realpath(YAPEAL_INC . '..'));
-    };
-    /**
-     * We know the 'base' directory should be just above 'inc' by default.
-     */
-    define('YAPEAL_BASE', $dir . DS);
-};
-if (!defined('YAPEAL_CACHE')) {
-    /**
-     * The 'cache' directory is normally just above base but can be moved in some
-     * configurations.
-     */
-    define('YAPEAL_CACHE', YAPEAL_BASE . 'cache' . DS);
-};
-if (!defined('YAPEAL_CLASS')) {
-    /**
-     * The 'class' directory is normally just above base but can be moved in some
-     * configurations.
-     */
-    define('YAPEAL_CLASS', YAPEAL_BASE . 'class' . DS);
-};
-if (!defined('YAPEAL_CONFIG')) {
-    /**
-     * The 'config' directory is normally just above base but can be moved in some
-     * configurations.
-     */
-    define('YAPEAL_CONFIG', YAPEAL_BASE . 'config' . DS);
-};
 if (!defined('YAPEAL_EXT')) {
+    $ext = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext' . DIRECTORY_SEPARATOR;
     /**
      * The 'ext' directory is normally just above base but can be moved in some
      * configurations.
      */
-    define('YAPEAL_EXT', YAPEAL_BASE . 'ext' . DS);
+    define('YAPEAL_EXT', $ext);
 };
-if (!defined('YAPEAL_INTERFACE')) {
-    /**
-     * The 'interface' directory is normally just above base but can be moved in
-     * some configurations.
-     */
-    define('YAPEAL_INTERFACE', YAPEAL_BASE . 'interface' . DS);
-};
-if (!defined('YAPEAL_LOG')) {
-    /**
-     * The 'log' directory is normally just above base but can be moved in some
-     * configurations.
-     */
-    define('YAPEAL_LOG', YAPEAL_BASE . 'log' . DS);
-};
-

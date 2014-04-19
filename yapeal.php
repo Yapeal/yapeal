@@ -56,24 +56,12 @@ if (count($included) > 1 || $included[0] != __FILE__) {
 };
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
-/**
- * Define short name for directory separator which always uses unix '/'.
- */
-define('DS', '/');
-// Check if the base path for Yapeal has been set in the environment.
-$dir = @getenv('YAPEAL_BASE');
-if ($dir === false) {
-    // Used to overcome path issues caused by how script is ran.
-    $dir = str_replace('\\', DS, dirname(__FILE__)) . DS;
-};
 // Get path constants so they can be used.
-require_once $dir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_BASE . 'revision.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
-require_once YAPEAL_INC . 'usage.php';
-require_once YAPEAL_INC . 'showVersion.php';
-require_once YAPEAL_INC . 'setGeneralSectionConstants.php';
+require_once __DIR__ . '/inc' . '/parseCommandLineOptions.php';
+require_once __DIR__ . '/inc' . '/getSettingsFromIniFile.php';
+require_once __DIR__ . '/inc' . '/usage.php';
+require_once __DIR__ . '/inc' . '/showVersion.php';
+require_once __DIR__ . '/inc' . '/setGeneralSectionConstants.php';
 $shortOpts = array('c:', 'l:');
 $longOpts = array('config:', 'log:');
 // Parser command line options first in case user just wanted to see help.
@@ -95,7 +83,9 @@ if (!empty($options['config'])) {
 if (empty($iniVars)) {
     exit(1);
 };
-require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
+// IDE only seems to like this form for path since need for this loader is going
+// away ASAP not worrying about it.
+require_once __DIR__ . '/class' . '/YapealAutoLoad.php';
 YapealAutoLoad::activateAutoLoad();
 // Include Composer's auto-loader for all the classes that are being moved.
 /*
@@ -142,7 +132,8 @@ try {
     /* ************************************************************************
      * Generate section list
      * ************************************************************************/
-    $sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
+    $sectionList =
+        FilterFileFinder::getStrippedFiles(__DIR__ . '/class/', 'Section');
     if (count($sectionList) == 0) {
         $mess = 'No section classes were found check path setting';
         Logger::getLogger('yapeal')

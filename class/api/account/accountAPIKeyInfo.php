@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -76,11 +76,11 @@ class accountAPIKeyInfo extends AAccount
         parent::__construct($params);
     }
     /**
-     * @var YapealQueryBuilder Holds YapealQueryBuilder for bridge table.
+     * @var QueryBuilder Holds QueryBuilder for bridge table.
      */
     protected $bridge;
     /**
-     * @var YapealQueryBuilder Holds YapealQueryBuilder for characters table.
+     * @var QueryBuilder Holds QueryBuilder for characters table.
      */
     protected $characters; // function __construct
     /**
@@ -140,15 +140,15 @@ class accountAPIKeyInfo extends AAccount
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         // Get a new query instance for Characters.
-        $this->characters = new YapealQueryBuilder(
+        $this->characters = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Characters', YAPEAL_DSN
         );
         // Get a new query instance for KeyBridge.
-        $this->bridge = new YapealQueryBuilder(
+        $this->bridge = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.

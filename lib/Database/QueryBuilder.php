@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains YapealQueryBuilder class.
+ * Contains QueryBuilder class.
  *
  * PHP version 5
  *
@@ -34,9 +34,9 @@ namespace Yapeal\Database;
  * Class used to build SQL queries.
  *
  * @package    Yapeal
- * @subpackage YapealQueryBuilder
+ * @subpackage QueryBuilder
  */
-class YapealQueryBuilder implements \Countable
+class QueryBuilder implements \Countable
 {
     /**
      * Set max SQL insert/upsert size.

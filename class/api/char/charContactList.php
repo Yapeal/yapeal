@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -164,7 +164,7 @@ class charContactList extends AChar
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $qb->setDefault('ownerID', $this->ownerID);

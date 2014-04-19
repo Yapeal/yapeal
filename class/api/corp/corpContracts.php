@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -92,7 +92,7 @@ class corpContracts extends ACorp
         };
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance with autoStore off.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {
@@ -104,7 +104,7 @@ class corpContracts extends ACorp
                                 $row = array();
                                 // Walk through attributes and add them to row.
                                 while ($this->xr->moveToNextAttribute()) {
-                                    // Allow YapealQueryBuilder to handle NULL columns.
+                                    // Allow QueryBuilder to handle NULL columns.
                                     if (($this->xr->name == 'dateAccepted'
                                             ||
                                             $this->xr->name == 'dateCompleted')

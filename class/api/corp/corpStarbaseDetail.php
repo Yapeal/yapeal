@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -278,26 +278,26 @@ class corpStarbaseDetail extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         $defaults = array('ownerID' => $this->ownerID);
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $qb->setDefaults($defaults);
         // Get a new query instance.
-        $this->combat = new YapealQueryBuilder(
+        $this->combat = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
         $this->combat->useUpsert(false);
         $this->combat->setDefaults($defaults);
         // Get a new query instance.
-        $this->fuel = new YapealQueryBuilder(
+        $this->fuel = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
         $this->fuel->useUpsert(false);
         $this->fuel->setDefaults($defaults);
         // Get a new query instance.
-        $this->general = new YapealQueryBuilder(
+        $this->general = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
@@ -501,15 +501,15 @@ class corpStarbaseDetail extends ACorp
         return false;
     } // function generalSettings
     /**
-     * @var YapealQueryBuilder Query instance for combatSettings table.
+     * @var QueryBuilder Query instance for combatSettings table.
      */
     private $combat; // function rowset
     /**
-     * @var YapealQueryBuilder Query instance for fuel table.
+     * @var QueryBuilder Query instance for fuel table.
      */
     private $fuel; // function posList
     /**
-     * @var YapealQueryBuilder Query instance for generalSettings table.
+     * @var QueryBuilder Query instance for generalSettings table.
      */
     private $general;
     /**

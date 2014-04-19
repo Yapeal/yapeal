@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -185,7 +185,7 @@ class charNotificationTexts extends AChar
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {

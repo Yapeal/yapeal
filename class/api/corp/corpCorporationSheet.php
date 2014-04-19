@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -175,7 +175,7 @@ class corpCorporationSheet extends ACorp
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'Logo';
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
         while ($this->xr->read()) {
@@ -219,7 +219,7 @@ class corpCorporationSheet extends ACorp
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         $qb->setDefault('allianceName', '');
         $row = array();
         try {
@@ -320,7 +320,7 @@ class corpCorporationSheet extends ACorp
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         $qb->setDefault('ownerID', $this->ownerID);
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {

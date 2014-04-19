@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -193,7 +193,7 @@ class charWalletJournal extends AChar
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance with autoStore off.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Set any column defaults needed.
         $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
         $qb->setDefaults($defaults);

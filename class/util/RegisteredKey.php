@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -88,7 +88,7 @@ class RegisteredKey extends ALimitedObject implements IGetBy
         // Get a new access mask object.
         $this->am = new AccessMask();
         // Get a new query builder object.
-        $this->qb = new YapealQueryBuilder($this->tableName, YAPEAL_DSN);
+        $this->qb = new QueryBuilder($this->tableName, YAPEAL_DSN);
         // Get a list of column names and their ADOdb generic types.
         $this->colTypes = $this->qb->getColumnTypes();
         // Was $id set?

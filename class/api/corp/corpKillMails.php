@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -162,15 +162,15 @@ class corpKillMails extends ACorp
         return $result;
     }
     /**
-     * @var YapealQueryBuilder QueryBuilder instance for attackers table.
+     * @var QueryBuilder QueryBuilder instance for attackers table.
      */
     protected $attackers;
     /**
-     * @var YapealQueryBuilder QueryBuilder instance for items table.
+     * @var QueryBuilder QueryBuilder instance for items table.
      */
     protected $items;
     /**
-     * @var YapealQueryBuilder QueryBuilder instance for victim table.
+     * @var QueryBuilder QueryBuilder instance for victim table.
      */
     protected $victim;
     /**
@@ -307,18 +307,18 @@ class corpKillMails extends ACorp
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Get a new query instance for attackers.
-        $this->attackers = new YapealQueryBuilder(
+        $this->attackers = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Attackers', YAPEAL_DSN
         );
         // Get a new query instance for items.
-        $this->items = new YapealQueryBuilder(
+        $this->items = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Items', YAPEAL_DSN
         );
         $this->items->setDefault('singleton', 0);
         // Get a new query instance for victim.
-        $this->victim = new YapealQueryBuilder(
+        $this->victim = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN
         );
         $typeID = 0;

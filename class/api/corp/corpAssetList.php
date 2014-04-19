@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -184,7 +184,7 @@ class corpAssetList extends ACorp
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        $this->qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
         $this->qb->useUpsert(false);
         // Set any column defaults needed.
@@ -244,7 +244,7 @@ class corpAssetList extends ACorp
         return true;
     }// function nestedSet
     /**
-     * @var YapealQueryBuilder Holds queryBuilder instance.
+     * @var QueryBuilder Holds queryBuilder instance.
      */
     private $qb;
     /**

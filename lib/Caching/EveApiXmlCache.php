@@ -30,7 +30,7 @@
  */
 namespace Yapeal\Caching;
 
-use Yapeal\Database\YapealQueryBuilder;
+use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Validation\ValidateEveApiXml;
 
@@ -309,7 +309,7 @@ class EveApiXmlCache
     {
         try {
             // Get a new query instance.
-            $qb = new YapealQueryBuilder(
+            $qb = new QueryBuilder(
                 YAPEAL_TABLE_PREFIX . 'utilXmlCache',
                 YAPEAL_DSN, false
             );

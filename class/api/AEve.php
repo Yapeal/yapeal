@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -87,7 +87,7 @@ abstract class AEve extends AApiRequest
         $default = 'https://api.eveonline.com/' . $this->section;
         $default .= '/' . $this->api . '.xml.aspx';
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             $sql = 'select `proxy`';
             $sql .= ' from ';
             $sql .= '`' . YAPEAL_TABLE_PREFIX . 'utilSections`';
@@ -164,7 +164,7 @@ abstract class AEve extends AApiRequest
     protected function prepareTables()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new
             $sql = 'truncate table `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';

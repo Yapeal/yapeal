@@ -29,7 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -171,7 +171,7 @@ class corpOutpostServiceDetail extends ACorp
     protected function outpostList()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             $sql = 'select `stationID`';
             $sql .= ' from ';
             $sql .= '`' . YAPEAL_TABLE_PREFIX . $this->section . 'OutpostList'
@@ -204,7 +204,7 @@ class corpOutpostServiceDetail extends ACorp
     protected function prepareTables()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
             $sql = 'delete from `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';

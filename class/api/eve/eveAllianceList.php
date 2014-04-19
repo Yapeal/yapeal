@@ -28,8 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
-use Yapeal\Database\YapealDBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -157,7 +157,7 @@ class eveAllianceList extends AEve
     protected function prepareTables()
     {
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
             $sql = 'truncate table `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';

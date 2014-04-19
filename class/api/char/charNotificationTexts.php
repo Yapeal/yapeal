@@ -29,8 +29,8 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
-use Yapeal\Database\YapealDBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
@@ -152,7 +152,7 @@ class charNotificationTexts extends AChar
      */
     protected function getIds()
     {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        $con = DBConnection::connect(YAPEAL_DSN);
         $sql = 'select n.`notificationID`';
         $sql .= ' from ';
         $sql .= '`' . YAPEAL_TABLE_PREFIX . 'charNotifications` as n';

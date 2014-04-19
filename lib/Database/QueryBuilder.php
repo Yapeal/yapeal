@@ -31,7 +31,6 @@
 namespace Yapeal\Database;
 
 use ADODB_mysqli;
-use Yapeal\Database\YapealDBConnection;
 
 /**
  * Class used to build SQL queries.
@@ -91,7 +90,7 @@ class QueryBuilder implements \Countable
         //$this->dsn = $dsn;
         try {
             // Get a database connection.
-            $this->con = YapealDBConnection::connect($dsn);
+            $this->con = DBConnection::connect($dsn);
         } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
             throw new \RuntimeException($mess);

@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -104,7 +104,7 @@ class maintCleanCache
         $sql .= ' where';
         $sql .= ' `modified` = ';
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             $sql .= $con->qstr(gmdate('Y-m-d H:i:s', $limit));
             $con->Execute($sql);
         } catch (ADODB_Exception $e) {

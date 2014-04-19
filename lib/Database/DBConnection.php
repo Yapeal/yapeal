@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Yapeal\Database\YapealDBConnection class.
+ * Contains DBConnection class.
  *
  *
  * PHP version 5
@@ -34,7 +34,7 @@ namespace Yapeal\Database;
 /**
  * A factory to manage ADOdb connections to databases.
  */
-class YapealDBConnection
+class DBConnection
 {
     /**
      * Static only class.

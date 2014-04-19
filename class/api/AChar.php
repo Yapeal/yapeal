@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -119,7 +119,7 @@ abstract class AChar extends AApiRequest
         $default .= '/' . $this->api . '.xml.aspx';
         $sql = 'select proxy from ';
         try {
-            $con = YapealDBConnection::connect(YAPEAL_DSN);
+            $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();
             // Only use utilRegisteredCharacter when YAPEAL_REGISTERED_MODE is
             // required or optional.
@@ -358,7 +358,7 @@ abstract class AChar extends AApiRequest
                     $sql .= ' set `expires` = "' . gmdate('Y-m-d H:i:s') . '"';
                     $sql .= ' where `keyID` = ' . $this->params['keyID'];
                     // Get a database connection.
-                    $con = YapealDBConnection::connect(YAPEAL_DSN);
+                    $con = DBConnection::connect(YAPEAL_DSN);
                     $con->Execute($sql);
                     // Deactivate for account section.
                     $key = new RegisteredKey($this->params['keyID'], false);

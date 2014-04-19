@@ -28,8 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
-use Yapeal\Database\YapealDBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -86,7 +86,7 @@ class Sections extends ALimitedObject implements IGetBy
         $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
         try {
             // Get a database connection.
-            $this->con = YapealDBConnection::connect(YAPEAL_DSN);
+            $this->con = DBConnection::connect(YAPEAL_DSN);
         } catch (ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
             throw new RuntimeException($mess);

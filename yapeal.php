@@ -34,7 +34,7 @@
  * @since      revision 561
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 
 /**
  * @internal Only let this code be ran in CLI.
@@ -117,7 +117,7 @@ if (!empty($options['log-config'])) {
 };
 YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 EveApiXmlCache::setCacheSectionProperties($iniVars['Cache']);
-YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
+DBConnection::setDatabaseSectionConstants($iniVars['Database']);
 setGeneralSectionConstants($iniVars);
 unset($iniVars);
 try {
@@ -149,7 +149,7 @@ try {
     $sql = 'select `section`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
     try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
+        $con = DBConnection::connect(YAPEAL_DSN);
         $result = $con->GetCol($sql);
     } catch (ADODB_Exception $e) {
         Logger::getLogger('yapeal')
@@ -183,7 +183,7 @@ try {
     // Reset cache intervals
     CachedInterval::resetAll();
     // Release all the ADOdb connections.
-    YapealDBConnection::releaseAll();
+    DBConnection::releaseAll();
 } catch (Exception $e) {
     $mess = 'Uncaught exception in ' . basename(__FILE__);
     Logger::getLogger('yapeal')

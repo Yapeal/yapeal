@@ -28,7 +28,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\YapealDBConnection;
+use Yapeal\Database\DBConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -99,7 +99,7 @@ class SectionEve extends ASection
                     // Use lock to keep from wasting time trying to do API that another
                     // Yapeal is already working on.
                     try {
-                        $con = YapealDBConnection::connect(YAPEAL_DSN);
+                        $con = DBConnection::connect(YAPEAL_DSN);
                         $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
                             if (Logger::getLogger('yapeal')

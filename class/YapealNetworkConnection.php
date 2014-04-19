@@ -30,27 +30,8 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Exception\YapealApiException;
+use Yapeal\Singleton;
 
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
 /**
  * Wrapper for API network connection.
  *
@@ -85,11 +66,11 @@ class YapealNetworkConnection
         if (false === $this->con) {
             $mess = 'Could not get a connection to use for APIs';
             throw new YapealApiException($mess, 1);
-        };
+        }
         $this->con->setOptions();
         foreach ($headers as $header) {
             $this->con->header($header, true);
-        };
+        }
     }
     /**
      * Will retrieve the XML from API server.
@@ -110,15 +91,14 @@ class YapealNetworkConnection
                 $mess = $this->con->error . ' for API ' . $url;
                 Logger::getLogger('yapeal')
                       ->info($mess);
-            };
+            }
             return false;
-        };
+        }
         return $result;
-    }// function __construct
+    }
     /**
      * @var curlRequest Holds API connection object.
      */
     private $con;
-    // function retrieveXml
 }
 

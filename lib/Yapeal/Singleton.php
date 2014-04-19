@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Singleton class.
+ * Contains Yapeal\Singleton class.
  *
  * PHP version 5
  *
@@ -28,26 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
+namespace Yapeal;
+
 /**
  * Class used to treat any other class like a singleton.
  *
@@ -63,12 +45,12 @@ class Singleton
     /**
      * Static only class.
      *
-     * @throws LogicException Throws LogicException if new is used.
+     * @throws \LogicException Throws LogicException if new is used.
      */
     final public function __construct()
     {
         $mess = 'Illegally attempted to make instance of ' . __CLASS__;
-        throw new LogicException($mess);
+        throw new \LogicException($mess);
     }
     /**
      * Used to get instance of a class.
@@ -87,35 +69,35 @@ class Singleton
     {
         if (isset(self::$instance[$name])) {
             if (!empty($args)) {
-                if (Logger::getLogger('yapeal')
-                          ->isInfoEnabled()
+                if (\Logger::getLogger('yapeal')
+                           ->isInfoEnabled()
                 ) {
                     $mess = '$args ignored as an instance of ' . $name
                         . ' already exists';
-                    Logger::getLogger('yapeal')
-                          ->info($mess);
-                };
-            };
+                    \Logger::getLogger('yapeal')
+                           ->info($mess);
+                }
+            }
             return self::$instance[$name];
-        };
-        $reflectionClass = new ReflectionClass($name);
+        }
+        $reflectionClass = new \ReflectionClass($name);
         if (false === $reflectionClass->isInstantiable()) {
             $mess = $name . ' class is not instantiable';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
-        };
+        }
         if (true === $reflectionClass->hasMethod('__construct')) {
-            $refMethod = new ReflectionMethod($name, '__construct');
+            $refMethod = new \ReflectionMethod($name, '__construct');
             $numParams = $refMethod->getNumberOfParameters();
             if ($numParams == 0) {
                 if (!empty($args)) {
                     $mess = $name
                         . '::__construct() does not accept any parameters.';
                     $mess .= ' $args will be ignored.';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
-                };
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
+                }
                 self::$instance[$name] = $reflectionClass->newInstance();
             } else {
                 $params = $refMethod->getParameters();
@@ -125,30 +107,30 @@ class Singleton
                     if (!isset($args[$key])) {
                         if (!$param->isOptional()) {
                             $missing[] = $param->getName();
-                        };
+                        }
                         continue;
-                    };
+                    }
                     if ($param->isPassedByReference()) {
                         $re_args[$key] = & $args[$key];
                     } else {
                         $re_args[$key] = $args[$key];
-                    };
-                };
+                    }
+                }
                 if (!empty($missing)) {
                     $mess =
                         'The following required parameters for constructor were missing: ';
                     $mess .= implode(', ', $missing);
                     $mess .= ' when calling instance of ' . $name;
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     return false;
-                };
+                }
                 self::$instance[$name] =
                     $reflectionClass->newInstanceArgs((array)$re_args);
-            };
-        };
+            }
+        }
         return self::$instance[$name];
-    }// function __construct
+    }
     /**
      * Will return a comma separated list of singletons. Used for debugging.
      *
@@ -158,7 +140,7 @@ class Singleton
     {
         $list = array_keys(self::$instance);
         return implode(',', $list);
-    }// function __clone
+    }
     /**
      * Used to release all singletons.
      *
@@ -167,21 +149,20 @@ class Singleton
     static public function releaseAll()
     {
         self::$instance = array();
-    }// function get
+    }
     /**
      * No backdoor through cloning either.
      *
-     * @throws LogicException Throws LogicException if cloning of class is tried.
+     * @throws \LogicException Throws LogicException if cloning of class is tried.
      */
     final public function __clone()
     {
         $mess = 'Illegally attempted to clone ' . __CLASS__;
-        throw new LogicException($mess);
-    }// function getAll
+        throw new \LogicException($mess);
+    }
     /**
      * @var array Holds the list of instances.
      */
     static private $instance = array();
-    // function releaseAll
 }
 

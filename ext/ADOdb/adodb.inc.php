@@ -1649,8 +1649,10 @@ if (!defined('_ADODB_LAYER')) {
          * Return first element of first row of sql statement. Recordset is disposed
          * for you.
          *
-         * @param sql            SQL statement
-         * @param [inputarr]        input bind array
+         * @param string           $sql      SQL statement
+         * @param array|bool|false $inputarr input bind array
+         *
+         * @return bool|mixed
          */
         function GetOne($sql, $inputarr = false)
         {
@@ -2665,12 +2667,12 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
          * List columns in a database as an array of ADOFieldObjects.
          * See top of file for definition of object.
          *
-         * @param $table        table name to query
-         * @param $normalize    makes table name case-insensitive (required by some databases)
+         * @param string $table        table name to query
+         * @param bool $normalize    makes table name case-insensitive (required by some databases)
          *
          * @schema is optional database schema to use - not supported by all databases.
          *
-         * @return  array of ADOFieldObjects for current table.
+         * @return  ADOFieldObject[] array of ADOFieldObjects for current table.
          */
         function MetaColumns($table, $normalize = true)
         {
@@ -3064,11 +3066,11 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
          * to the string single-quotes.
          * An example is  $db->qstr("Don't bother",magic_quotes_runtime());
          *
-         * @param s            the string to quote
-         * @param [magic_quotes]    if $s is GET/POST var, set to get_magic_quotes_gpc().
+         * @param string $s            the string to quote
+         * @param mixed $magic_quotes    if $s is GET/POST var, set to get_magic_quotes_gpc().
          *                     This undoes the stupidity of magic quotes for GPC.
          *
-         * @return  quoted string to be sent back to database
+         * @return  string quoted string to be sent back to database
          */
         function qstr($s, $magic_quotes = false)
         {

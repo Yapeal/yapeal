@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -33,31 +32,7 @@ use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
-/**
  * Class used to fetch and store char WalletJournal API.
- *
- * @package    Yapeal
- * @subpackage Api_char
  */
 class charWalletJournal extends AChar
 {
@@ -136,7 +111,7 @@ class charWalletJournal extends AChar
                         // No use going any farther if the XML isn't valid.
                         return false;
                     };
-                }; // if FALSE === $result ...
+                }
                 // Create XMLReader.
                 $this->xr = new XMLReader();
                 // Pass XML to reader.
@@ -147,8 +122,8 @@ class charWalletJournal extends AChar
                         && $this->xr->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
-                    }; // if $this->xr->nodeType ...
-                }; // while $this->xr->read() ...
+                    }
+                }
                 $this->xr->close();
                 /* There are two normal conditions to end walking. They are:
                  * Got less rows than expected because there are no more to get while
@@ -180,7 +155,7 @@ class charWalletJournal extends AChar
     /**
      * @var string Holds the date from each row in turn to use when walking.
      */
-    protected $date; // function __construct
+    protected $date;
     /**
      * Parsers the XML from API.
      *
@@ -215,7 +190,7 @@ class charWalletJournal extends AChar
                                     $this->date = $date;
                                     $this->beforeID =
                                         $this->xr->getAttribute('refID');
-                                }; // if $date ...
+                                }
                                 $row = array();
                                 // Walk through attributes and add them to row.
                                 while ($this->xr->moveToNextAttribute()) {
@@ -226,14 +201,14 @@ class charWalletJournal extends AChar
                                             // Fix blank with zero for upsert.
                                             if ($this->xr->value === '') {
                                                 $row[$this->xr->name] = 0;
-                                            }; // if $this->xr->value ...
+                                            }
                                             break;
                                         default: // Nothing to do here.
-                                    }; // switch $this->xr->name ...
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                    }
+                                }
                                 $qb->addRow($row);
                                 break;
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
@@ -241,13 +216,13 @@ class charWalletJournal extends AChar
                             $this->rowCount = count($qb);
                             if ($this->rowCount > 0) {
                                 $qb->store();
-                            }; // if $this->rowCount ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -258,11 +233,10 @@ class charWalletJournal extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function apiStore
+    }
     /**
      * @var integer Hold row count used in walking.
      */
     private $rowCount;
-    // function parserAPI
 }
 

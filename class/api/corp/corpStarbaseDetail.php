@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -34,30 +33,7 @@ use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store corp StarbaseDetail API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpStarbaseDetail extends ACorp
 {
@@ -87,7 +63,7 @@ class corpStarbaseDetail extends ACorp
         $posList = $this->posList();
         if (false === $posList) {
             return false;
-        }; // if FALSE ...
+        }
         $ret = true;
         $this->prepareTables();
         foreach ($posList as $this->posID) {
@@ -126,7 +102,7 @@ class corpStarbaseDetail extends ACorp
                         $ret = false;
                         break;
                     };
-                }; // if FALSE === $result ...
+                }
                 // Create XMLReader.
                 $this->xr = new XMLReader();
                 // Pass XML to reader.
@@ -139,9 +115,9 @@ class corpStarbaseDetail extends ACorp
                         $result = $this->parserAPI();
                         if ($result === false) {
                             $ret = false;
-                        }; // if $result ...
-                    }; // if $this->xr->nodeType ...
-                }; // while $this->xr->read() ...
+                        }
+                    }
+                }
                 $this->xr->close();
             } catch (YapealApiErrorException $e) {
                 // Any API errors that need to be handled in some way are handled in
@@ -154,7 +130,7 @@ class corpStarbaseDetail extends ACorp
                         YAPEAL_TABLE_PREFIX . $this->section . 'StarbaseList';
                     try {
                         $con = DBConnection::connect(YAPEAL_DSN);
-                        $sql = 'delete from ';
+                        $sql = 'DELETE FROM ';
                         $sql .= '`' . $tableName . '`';
                         $sql .= ' where `ownerID`=' . $this->ownerID;
                         $sql .= ' and `itemID`=' . $this->posID['itemID'];
@@ -169,7 +145,7 @@ class corpStarbaseDetail extends ACorp
                     }
                     Logger::getLogger('yapeal')
                           ->warn($mess);
-                }; // if $e->getCode() == 114 ...
+                }
                 $ret = false;
                 continue;
             } catch (ADODB_Exception $e) {
@@ -178,7 +154,7 @@ class corpStarbaseDetail extends ACorp
                 $ret = false;
                 continue;
             }
-        }; // foreach $posList ...
+        }
         return $ret;
     }
     /**
@@ -204,19 +180,19 @@ class corpStarbaseDetail extends ACorp
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$prefix . ucfirst($this->xr->name)] =
                                     $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             break;
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'combatSettings') {
                         $this->combat->addRow($row);
                         return true;
-                    }; // if $this->xr->localName ...
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
@@ -243,17 +219,17 @@ class corpStarbaseDetail extends ACorp
                             $this->xr->read();
                             $row[$name] = $this->xr->value;
                             break;
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'generalSettings') {
                         $this->general->addRow($row);
                         return true;
-                    }; // if $this->xr->localName ...
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
@@ -268,7 +244,7 @@ class corpStarbaseDetail extends ACorp
     protected function needsUpsert()
     {
         return false;
-    }// function __construct
+    }
     /**
      * Per API parser for XML.
      *
@@ -325,7 +301,7 @@ class corpStarbaseDetail extends ACorp
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab node name.
                                 $subTable = $this->xr->localName;
                                 // Check for method with same name as node.
@@ -341,13 +317,13 @@ class corpStarbaseDetail extends ACorp
                                 $result = $this->$subTable();
                                 if (false === $result) {
                                     $ret = false;
-                                }; // if FALSE ...
+                                }
                                 break;
                             case 'rowset':
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -361,7 +337,7 @@ class corpStarbaseDetail extends ACorp
                                 $result = $this->rowset($subTable);
                                 if (false === $result) {
                                     $ret = false;
-                                }; // if FALSE ...
+                                }
                                 break;
                             default: // Nothing to do here.
                         }; // $this->xr->localName ...
@@ -371,26 +347,26 @@ class corpStarbaseDetail extends ACorp
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             if (count($this->combat) > 0) {
                                 $this->combat->store();
-                            }; // if count $rows ...
+                            }
                             $this->combat = null;
                             if (count($this->fuel) > 0) {
                                 $this->fuel->store();
-                            }; // if count $rows ...
+                            }
                             $this->fuel = null;
                             if (count($this->general) > 0) {
                                 $this->general->store();
-                            }; // if count $rows ...
+                            }
                             $this->general = null;
                             return $ret;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -401,7 +377,7 @@ class corpStarbaseDetail extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function apiStore
+    }
     /**
      * Get per corp list of starbases from corpStarbaseList.
      *
@@ -425,14 +401,14 @@ class corpStarbaseDetail extends ACorp
         }
         if (count($list) == 0) {
             return false;
-        }; // if count($list) ...
+        }
         // Randomize order so no one POS can starve the rest in case of
         // errors, etc.
         if (count($list) > 1) {
             shuffle($list);
         };
         return $list;
-    }// function parserAPI
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -453,7 +429,7 @@ class corpStarbaseDetail extends ACorp
             try {
                 $con = DBConnection::connect(YAPEAL_DSN);
                 // Empty out old data then upsert (insert) new.
-                $sql = 'delete from `';
+                $sql = 'DELETE FROM `';
                 $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
                 $sql .= ' where `ownerID`=' . $this->ownerID;
                 $con->Execute($sql);
@@ -462,9 +438,9 @@ class corpStarbaseDetail extends ACorp
                       ->warn($e);
                 return false;
             }
-        }; // foreach $tables ...
+        }
         return true;
-    }// function combatSettings
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -483,32 +459,32 @@ class corpStarbaseDetail extends ACorp
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $this->$table->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    } // function generalSettings
+    }
     /**
      * @var QueryBuilder Query instance for combatSettings table.
      */
-    private $combat; // function rowset
+    private $combat;
     /**
      * @var QueryBuilder Query instance for fuel table.
      */
-    private $fuel; // function posList
+    private $fuel;
     /**
      * @var QueryBuilder Query instance for generalSettings table.
      */

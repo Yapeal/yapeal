@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -32,30 +31,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store corp AssetList API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpAssetList extends ACorp
 {
@@ -120,8 +96,8 @@ class corpAssetList extends ACorp
                                 // Save any new location so children can inherit it.
                                 if ($this->xr->name == 'locationID') {
                                     $inherit['locationID'] = $this->xr->value;
-                                }; // if $this->xr->name ...
-                            }; // while $this->xr->moveToNextAttribute();
+                                }
+                            }
                             // Move back up to element.
                             $this->xr->moveToElement();
                             // Check if parent node.
@@ -130,7 +106,7 @@ class corpAssetList extends ACorp
                                 $this->stack[] = $row;
                                 // Continue on to process children.
                                 break;
-                            }; // if $xr->isEmptyElement ...
+                            }
                             // Add 'rgt' and increment value.
                             $row['rgt'] = $inherit['index']++;
                             // The $row is complete and ready to add.
@@ -143,7 +119,6 @@ class corpAssetList extends ACorp
                         default:
                             break;
                     }
-                    // switch $this->xr->localName ...
                     break;
                 case XMLReader::END_ELEMENT:
                     switch ($this->xr->localName) {
@@ -162,16 +137,16 @@ class corpAssetList extends ACorp
                             // Level decrease with end of each parent rowset.
                             --$inherit['level'];
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return $inherit['index'];
-    }// function __construct
+    }
     /**
      * Simple <rowset> per API parser for XML.
      *
@@ -219,7 +194,7 @@ class corpAssetList extends ACorp
             return false;
         }
         return true;
-    }// function parserAPI
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -233,7 +208,7 @@ class corpAssetList extends ACorp
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
-            $sql = 'delete from `';
+            $sql = 'DELETE FROM `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
             $sql .= ' where `ownerID`=' . $this->ownerID;
             $con->Execute($sql);
@@ -243,7 +218,7 @@ class corpAssetList extends ACorp
             return false;
         }
         return true;
-    }// function nestedSet
+    }
     /**
      * @var QueryBuilder Holds queryBuilder instance.
      */

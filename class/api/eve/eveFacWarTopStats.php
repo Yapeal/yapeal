@@ -25,7 +25,6 @@
  * @author     Claus G. Pedersen <satissis@gmail.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings, Claus G. Pedersen
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -33,30 +32,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store eve FacWarTopStats API.
- *
- * @package    Yapeal
- * @subpackage Api_eve
  */
 class eveFacWarTopStats extends AEve
 {
@@ -75,7 +51,7 @@ class eveFacWarTopStats extends AEve
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Handles totals from XML Note.
      *
@@ -93,7 +69,7 @@ class eveFacWarTopStats extends AEve
                             // Check if empty.
                             if ($this->xr->isEmptyElement == true) {
                                 break;
-                            }; // if $this->xr->isEmptyElement ...
+                            }
                             // Grab rowset name.
                             $subTable = $this->xr->getAttribute('name');
                             if (empty($subTable)) {
@@ -105,7 +81,7 @@ class eveFacWarTopStats extends AEve
                             };
                             $this->rowset($table . $subTable);
                             break;
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     switch ($this->xr->localName) {
@@ -113,17 +89,17 @@ class eveFacWarTopStats extends AEve
                         case 'corporations':
                         case 'factions':
                             return true;
-                    }; // switch $this->xr->localName
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * API parser for XML.
      *
@@ -143,7 +119,7 @@ class eveFacWarTopStats extends AEve
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == true) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Parse node into its own table.
                                 $this->parseSubTable(
                                     $tableName . ucfirst($this->xr->localName)
@@ -155,11 +131,11 @@ class eveFacWarTopStats extends AEve
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -170,7 +146,7 @@ class eveFacWarTopStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function attributes
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -213,9 +189,9 @@ class eveFacWarTopStats extends AEve
                       ->warn($e);
                 return false;
             }
-        }; // foreach $tables ...
+        }
         return true;
-    }// function rowset
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -239,29 +215,28 @@ class eveFacWarTopStats extends AEve
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $qb->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
-                        }; // if count $rows ...
+                        }
                         $qb = null;
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

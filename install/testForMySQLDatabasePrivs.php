@@ -25,8 +25,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
- * @subpackage Install
  */
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -101,7 +99,7 @@ foreach ($required as $setting) {
         $mess .= 'Missing required setting ' . $setting;
         $mess .= ' in section [Database].' . PHP_EOL;
     };
-}; // foreach $required ...
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -148,11 +146,11 @@ if ($result) {
             // If $split isn't empty there are privs.
             if (!empty($split)) {
                 $split = explode(',', strtolower($split));
-            }; // if !empty $split ...
+            }
         } else {
             continue;
-        }; // else FALSE !== $dbPos ...
-    }; // while $row ...
+        }
+    }
     $result->free();
     $mysqli->close();
     $missing = array_diff($privs, $split);

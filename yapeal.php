@@ -28,7 +28,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  * @since      revision 561
@@ -176,7 +175,7 @@ try {
         // Going to sleep for a tenth of a second to let DB time to flush etc
         // between sections.
         usleep(100000);
-    }; // foreach $section ...
+    }
     /* ************************************************************************
      * Final admin stuff
      * ************************************************************************/

@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -194,7 +193,7 @@ function usage($file, array $shortOptions = null, array $longOptions = null)
         if (strlen($v['op']) > $width) {
             $width = strlen($v['op']);
         };
-    }; // foreach $options ...
+    }
     $width += 4;
     $break = PHP_EOL . str_pad('', $width);
     $descCut = $cutLine - $width;
@@ -209,9 +208,9 @@ function usage($file, array $shortOptions = null, array $longOptions = null)
         $desc = wordwrap($desc, $descCut, PHP_EOL, true);
         $option .= str_replace(PHP_EOL, $break, $desc);
         $mess .= $option . PHP_EOL . PHP_EOL;
-    }; // foreach $options ...
+    }
     fwrite(STDOUT, $mess);
 }
 
-;// function usage
+;
 

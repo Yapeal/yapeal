@@ -24,8 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
- * @subpackage AApiRequest
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -55,9 +53,6 @@ if (count(get_included_files()) < 2) {
 }
 /**
  * Abstract class to hold common methods for API classes.
- *
- * @package    Yapeal
- * @subpackage Api
  */
 abstract class AApiRequest
 {
@@ -221,7 +216,7 @@ abstract class AApiRequest
      *
      * @return bool Returns TRUE if handled the error else FALSE.
      */
-    abstract protected function handleApiError($e); // function parserAPI
+    abstract protected function handleApiError($e);
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *

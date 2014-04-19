@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -34,30 +33,7 @@ use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store char NotificationTexts API.
- *
- * @package    Yapeal
- * @subpackage Api_char
  */
 class charNotificationTexts extends AChar
 {
@@ -76,7 +52,7 @@ class charNotificationTexts extends AChar
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Used to store XML to MySQL table(s).
      *
@@ -117,7 +93,7 @@ class charNotificationTexts extends AChar
                     // No use going any farther if the XML isn't valid.
                     return false;
                 };
-            }; // if FALSE === $result ...
+            }
             // Create XMLReader.
             $this->xr = new XMLReader();
             // Pass XML to reader.
@@ -128,8 +104,8 @@ class charNotificationTexts extends AChar
                     && $this->xr->localName == 'result'
                 ) {
                     $result = $this->parserAPI();
-                }; // if $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
             $this->xr->close();
             return $result;
         } catch (YapealApiErrorException $e) {
@@ -144,7 +120,7 @@ class charNotificationTexts extends AChar
             // Catch any uncaught ADOdb exceptions here.
             return false;
         }
-    }// function apiStore
+    }
     /**
      * Used to get a list of notification IDs.
      *
@@ -178,7 +154,7 @@ class charNotificationTexts extends AChar
             shuffle($result);
         };
         return $result;
-    }// function getMissingIds
+    }
     /**
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
      */
@@ -201,20 +177,20 @@ class charNotificationTexts extends AChar
                                 $row['text'] = $this->xr->readString();
                                 $qb->addRow($row);
                                 break;
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -226,6 +202,5 @@ class charNotificationTexts extends AChar
               ->warn($mess);
         return false;
     }
-    // function parserAPI
 }
 

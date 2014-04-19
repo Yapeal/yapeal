@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -32,30 +31,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store AllianceList API.
- *
- * @package    Yapeal
- * @subpackage Api_eve
  */
 class eveAllianceList extends AEve
 {
@@ -107,34 +83,34 @@ class eveAllianceList extends AEve
                                 // Walk through attributes and add them to row.
                                 while ($this->xr->moveToNextAttribute()) {
                                     $row[$this->xr->name] = $this->xr->value;
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                }
                                 $qb->addRow($row);
                                 // Process member corporations.
                                 if ($this->xr->isEmptyElement != 1) {
                                     $this->rowset($allianceID);
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 break;
                             default: // Nothing to do.
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             // Insert any leftovers.
                             if (count($this->corporations) > 0) {
                                 $this->corporations->store();
-                            }; // if count $rows ...
+                            }
                             $this->corporations = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -145,7 +121,7 @@ class eveAllianceList extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function __construct
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -173,7 +149,7 @@ class eveAllianceList extends AEve
             return false;
         }
         return true;
-    }// function parserAPI
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -192,28 +168,27 @@ class eveAllianceList extends AEve
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $this->corporations->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
     /**
      * @var QueryBuilder Query instance for corporation rows to be added to table.
      */
     private $corporations;
-    // function prepareTables
 }
 

@@ -24,37 +24,13 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-}
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-}
-/**
  * Abstract class for Eve APIs.
- *
- * @package    Yapeal
- * @subpackage Api_eve
  */
 abstract class AEve extends AApiRequest
 {
@@ -135,14 +111,14 @@ abstract class AEve extends AApiRequest
                 default:
                     return false;
                     break;
-            }; // switch $code ...
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
             return false;
         }
         return true;
-    }// function handleApiError
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *

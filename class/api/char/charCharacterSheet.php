@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -32,31 +31,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
-/**
  * Class used to fetch and store CharacterSheet API.
- *
- * @package    Yapeal
- * @subpackage Api_char
  */
 class charCharacterSheet extends AChar
 {
@@ -75,7 +50,7 @@ class charCharacterSheet extends AChar
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Used to store XML to CharacterSheet's attributeEnhancers table.
      *
@@ -109,7 +84,7 @@ class charCharacterSheet extends AChar
                             $row[$name] = $this->xr->value;
                             break;
                         default: // Nothing to do here.
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     switch ($this->xr->localName) {
@@ -123,17 +98,17 @@ class charCharacterSheet extends AChar
                         case 'attributeEnhancers':
                             return $qb->store();
                         default: // Nothing to do here.
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Handles attributes table.
      *
@@ -161,23 +136,23 @@ class charCharacterSheet extends AChar
                             $this->xr->read();
                             $row[$name] = $this->xr->value;
                             break;
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'attributes') {
                         $qb->addRow($row);
                         return $qb->store();
-                    }; // if $this->xr->localName ...
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function attributes
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *
@@ -186,7 +161,7 @@ class charCharacterSheet extends AChar
     protected function needsUpsert()
     {
         return false;
-    }// function attributeEnhancers
+    }
     /**
      * Per API parser for XML.
      *
@@ -238,7 +213,7 @@ class charCharacterSheet extends AChar
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == true) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab node name.
                                 $subTable = $this->xr->localName;
                                 // Check for method with same name as node.
@@ -256,7 +231,7 @@ class charCharacterSheet extends AChar
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == true) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -270,24 +245,24 @@ class charCharacterSheet extends AChar
                                     $this->$subTable();
                                 } else {
                                     $this->rowset($subTable);
-                                }; // else $subTable ...
+                                }
                                 break;
                             default: // Nothing to do here.
-                        }; // $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -298,7 +273,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -324,7 +299,7 @@ class charCharacterSheet extends AChar
             try {
                 $con = DBConnection::connect(YAPEAL_DSN);
                 // Empty out old data then upsert (insert) new.
-                $sql = 'delete from `';
+                $sql = 'DELETE FROM `';
                 $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
                 $sql .= ' where `ownerID`=' . $this->ownerID;
                 $con->Execute($sql);
@@ -333,9 +308,9 @@ class charCharacterSheet extends AChar
                       ->warn($e);
                 return false;
             }
-        }; // foreach $tables ...
+        }
         return true;
-    }// function skills
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -360,30 +335,29 @@ class charCharacterSheet extends AChar
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $qb->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
-                        }; // if count $rows ...
+                        }
                         $qb = null;
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
     }
-    // function prepareTables
     /**
      * Used to store XML to CharacterSheet's skills table.
      *
@@ -412,23 +386,23 @@ class charCharacterSheet extends AChar
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $qb->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
-                        }; // if count $rows ...
+                        }
                         $qb = null;
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')

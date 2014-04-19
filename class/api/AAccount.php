@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -52,9 +51,6 @@ if (count(get_included_files()) < 2) {
 }
 /**
  * Abstract class for Account APIs.
- *
- * @package    Yapeal
- * @subpackage Api_account
  */
 abstract class AAccount extends AApiRequest
 {
@@ -118,7 +114,7 @@ abstract class AAccount extends AApiRequest
     {
         $default = 'https://api.eveonline.com/' . $this->section;
         $default .= '/' . $this->api . '.xml.aspx';
-        $sql = 'select proxy from ';
+        $sql = 'SELECT proxy FROM ';
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();

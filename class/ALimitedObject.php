@@ -24,14 +24,12 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 /**
  * Abstract class for basic object with properties
  *
- * @package    Yapeal
  */
 abstract class ALimitedObject
 {

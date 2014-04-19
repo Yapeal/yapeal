@@ -24,37 +24,13 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store ServerStatus API.
- *
- * @package    Yapeal
- * @subpackage Api_server
  */
 class serverServerStatus extends AServer
 {
@@ -73,7 +49,7 @@ class serverServerStatus extends AServer
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Simple <rowset> per API parser for XML.
      *
@@ -103,7 +79,7 @@ class serverServerStatus extends AServer
                                 $this->xr->read();
                                 $row['serverOpen'] = $this->xr->value;
                                 break;
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
@@ -111,14 +87,14 @@ class serverServerStatus extends AServer
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -130,6 +106,5 @@ class serverServerStatus extends AServer
               ->warn($mess);
         return false;
     }
-    // function parserAPI
 }
 

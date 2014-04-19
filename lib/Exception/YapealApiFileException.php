@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -34,8 +33,6 @@ namespace Yapeal\Exception;
  * Use when can't get file from API mostly but can be used for related IO type
  * problems other places too.
  *
- * @package    Yapeal
- * @subpackage Exceptions
  * @uses       YapealApiException
  */
 class YapealApiFileException extends YapealApiException

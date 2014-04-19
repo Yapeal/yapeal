@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -61,5 +60,5 @@ function showVersion($file)
         . 'See COPYING.md and COPYING-LESSER.md for more details.' . PHP_EOL
         . 'This program comes with ABSOLUTELY NO WARRANTY.' . PHP_EOL . PHP_EOL;
     fwrite(STDOUT, $mess);
-}// function showVersion
+}
 

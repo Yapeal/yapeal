@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -33,30 +32,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store corp OutpostServiceDetail API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpOutpostServiceDetail extends ACorp
 {
@@ -86,7 +62,7 @@ class corpOutpostServiceDetail extends ACorp
         $outpostList = $this->outpostList();
         if (false === $outpostList) {
             return false;
-        }; // if FALSE ...
+        }
         $ret = true;
         foreach ($outpostList as $this->outpostID) {
             try {
@@ -120,7 +96,7 @@ class corpOutpostServiceDetail extends ACorp
                         // No use going any farther if the XML isn't valid.
                         return false;
                     };
-                }; // if FALSE === $result ...
+                }
                 $this->prepareTables();
                 // Create XMLReader.
                 $this->xr = new XMLReader();
@@ -134,9 +110,9 @@ class corpOutpostServiceDetail extends ACorp
                         $result = $this->parserAPI();
                         if ($result === false) {
                             $ret = false;
-                        }; // if $result ...
-                    }; // if $this->xr->nodeType ...
-                }; // while $this->xr->read() ...
+                        }
+                    }
+                }
                 $this->xr->close();
             } catch (YapealApiErrorException $e) {
                 // Any API errors that need to be handled in some way are handled in
@@ -150,9 +126,9 @@ class corpOutpostServiceDetail extends ACorp
                 $ret = false;
                 continue;
             }
-        }; // foreach $posList ...
+        }
         return $ret;
-    }// function __construct
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *
@@ -161,7 +137,7 @@ class corpOutpostServiceDetail extends ACorp
     protected function needsUpsert()
     {
         return false;
-    }// function apiStore
+    }
     /**
      * Get per corp list of outposts from corpOutpostList.
      *
@@ -185,14 +161,14 @@ class corpOutpostServiceDetail extends ACorp
         }
         if (count($list) == 0) {
             return false;
-        }; // if count($list) ...
+        }
         // Randomize order so no one Outpost can starve the rest in case of
         // errors, etc.
         if (count($list) > 1) {
             shuffle($list);
         };
         return $list;
-    }// function posList
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -206,7 +182,7 @@ class corpOutpostServiceDetail extends ACorp
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
-            $sql = 'delete from `';
+            $sql = 'DELETE FROM `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
             $sql .= ' where `ownerID`=' . $this->ownerID;
             $con->Execute($sql);

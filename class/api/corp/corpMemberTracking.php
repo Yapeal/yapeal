@@ -24,37 +24,13 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to fetch and store corp MemberTracking API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpMemberTracking extends ACorp
 {
@@ -74,7 +50,7 @@ class corpMemberTracking extends ACorp
         $this->api = str_replace($this->section, '', __CLASS__);
         $params['extended'] = 1;
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *
@@ -97,7 +73,7 @@ class corpMemberTracking extends ACorp
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
-            $sql = 'delete from `';
+            $sql = 'DELETE FROM `';
             $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
             $sql .= ' where `ownerID`=' . $this->ownerID;
             $con->Execute($sql);

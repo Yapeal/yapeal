@@ -24,37 +24,13 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to clean out old unused cached API XML files from cache directory.
- *
- * @package    Yapeal
- * @subpackage maintenance
  */
 class maintCleanCache
 {
@@ -65,7 +41,7 @@ class maintCleanCache
     {
         $this->sections =
             array('account', 'char', 'corp', 'eve', 'map', 'server');
-    }// function __construct()
+    }
     /**
      * This function finds and deletes any XML files in cache/ that haven't been
      * modified for seven days or more.
@@ -84,6 +60,9 @@ class maintCleanCache
             $path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
                 . DIRECTORY_SEPARATOR . $section . DS;
             $files = new DirectoryIterator($path);
+            /**
+             * @var DirectoryIterator $item
+             */
             foreach ($files as $item) {
                 $name = $item->getFileName();
                 // Only need to be concerned with expired XML Files.
@@ -96,10 +75,10 @@ class maintCleanCache
                         $mess = 'Could not delete ' . $name;
                         Logger::getLogger('yapeal')
                               ->warn($mess);
-                    }; // if $result...
-                }; // if $item->isFile() ...
-            }; // foreach $files ...
-        }; // foreach $this->sections ...
+                    }
+                }
+            }
+        }
         $sql = ' delete from `' . YAPEAL_TABLE_PREFIX . 'utilXmlCache`';
         $sql .= ' where';
         $sql .= ' `modified` = ';
@@ -112,6 +91,5 @@ class maintCleanCache
         }
         return true;
     }
-    // function doWork()
 }
 

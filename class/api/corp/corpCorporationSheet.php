@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -33,31 +32,7 @@ use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
-/**
  * Class used to fetch and store CorporationSheet API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpCorporationSheet extends ACorp
 {
@@ -76,7 +51,7 @@ class corpCorporationSheet extends ACorp
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Used to store XML to MySQL table(s).
      *
@@ -115,7 +90,7 @@ class corpCorporationSheet extends ACorp
                     // No use going any farther if the XML isn't valid.
                     return false;
                 };
-            }; // if FALSE === $result ...
+            }
             // Create XMLReader.
             $this->xr = new XMLReader();
             // Pass XML to reader.
@@ -136,12 +111,12 @@ class corpCorporationSheet extends ACorp
                                 $this->xr->read();
                                 $cuntil = $this->xr->value;
                                 break;
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
             // Update CachedUntil time since we should have a new one.
             $data = array(
                 'api' => $this->api,
@@ -165,7 +140,7 @@ class corpCorporationSheet extends ACorp
             // Catch any uncaught ADOdb exceptions here.
             return false;
         }
-    }// function apiStore
+    }
     /**
      * Used to store XML to CorporationSheet's logo table.
      *
@@ -193,23 +168,23 @@ class corpCorporationSheet extends ACorp
                             $this->xr->read();
                             $row[$name] = $this->xr->value;
                             break;
-                    }; // switch $xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'logo') {
                         $qb->addRow($row);
                         return $qb->store();
-                    }; // if $this->xr->localName ...
+                    }
                     break;
                 default: // Nothing to do here.
-            }; // switch $this->xr->nodeType ...
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Per API parser for XML.
      *
@@ -252,7 +227,7 @@ class corpCorporationSheet extends ACorp
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab node name.
                                 $subTable = $this->xr->localName;
                                 // Check for method with same name as node.
@@ -270,7 +245,7 @@ class corpCorporationSheet extends ACorp
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -290,14 +265,14 @@ class corpCorporationSheet extends ACorp
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -308,7 +283,7 @@ class corpCorporationSheet extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function logo
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -331,29 +306,28 @@ class corpCorporationSheet extends ACorp
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $qb->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
-                        }; // if count $rows ...
+                        }
                         $qb = null;
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
     }
-    // function rowset
 }
 

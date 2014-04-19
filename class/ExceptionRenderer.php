@@ -24,16 +24,11 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 /**
- * Class called by Logger when it needs to render an exception object.
- *
- * @package    Yapeal
- * @subpackage Exception
- */
+ * Class called by Logger when it needs to render an exception object. */
 class ExceptionRenderer implements LoggerRendererObject
 {
     /**

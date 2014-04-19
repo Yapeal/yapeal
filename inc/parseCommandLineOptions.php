@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -111,7 +110,7 @@ function parseCommandLineOptions(
             };
             $settings[$optionsWithValuesMap[$opt]] = (string)$value;
             continue;
-        }; // if ... $optionsWithValuesMap ...
+        }
         if (array_key_exists($opt, $optionsWithListMap)) {
             if (is_array($value)) {
                 // If option is used multiple times combined them.
@@ -124,8 +123,8 @@ function parseCommandLineOptions(
                 $settings[$optionsWithListMap[$opt]] = $value;
             };
             continue;
-        }; // if ... $optionsWithListMap ...
-    }; // foreach $options...
+        }
+    }
     return $settings;
-}// function parseCommandLineOptions
+}
 

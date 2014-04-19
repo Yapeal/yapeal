@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -134,8 +133,8 @@ foreach ($required as $section) {
     if (!isset($iniVars[$section])) {
         $mess .= 'Required section [' . $section;
         $mess .= '] is missing.' . PHP_EOL;
-    }; // if isset ...
-}; // foreach $required ...
+    }
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -154,8 +153,8 @@ foreach ($required as $setting) {
     if (!isset($iniVars['Logging'][$setting])) {
         $mess .= 'Missing required setting ' . $setting;
         $mess .= ' in section [Logging].' . PHP_EOL;
-    }; // if isset $iniVars...
-}; // foreach $required ...
+    }
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -175,8 +174,8 @@ foreach ($required as $setting) {
     if (!isset($iniVars['Cache'][$setting])) {
         $mess .= 'Missing required setting ' . $setting;
         $mess .= ' in section [Cache].' . PHP_EOL;
-    }; // if isset $iniVars...
-}; // foreach $required ...
+    }
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -199,8 +198,8 @@ if ($iniVars['Cache']['cache_output'] == 'file'
             fwrite(STDERR, $mess);
             exit(2);
         };
-    }; // foreach $required ...
-}; // if $iniVars['Cache']['cache_output'] == 'file' || ...
+    }
+}
 // Check for required Database section settings.
 $required = array(
     'database',
@@ -217,7 +216,7 @@ foreach ($required as $setting) {
         $mess .= 'Missing required setting ' . $setting;
         $mess .= ' in section [Database].' . PHP_EOL;
     };
-}; // foreach $required ...
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -228,7 +227,7 @@ if (!isset($iniVars['application_agent'])) {
         . PHP_EOL;
     fwrite(STDERR, $mess);
     exit(2);
-}; // if isset $iniVars['application_agent'] ...
+}
 if (!isset($iniVars['registered_mode'])) {
     $mess = 'Configuration file is outdated and "registered_mode" is not set.'
         . PHP_EOL;

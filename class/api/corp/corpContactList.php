@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -32,31 +31,7 @@ use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
-/**
  * Class used to fetch and store ContactList API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpContactList extends ACorp
 {
@@ -75,7 +50,7 @@ class corpContactList extends ACorp
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *
@@ -84,7 +59,7 @@ class corpContactList extends ACorp
     protected function needsUpsert()
     {
         return false;
-    }// function parserAPI
+    }
     /**
      * Per API parser for XML.
      *
@@ -101,7 +76,7 @@ class corpContactList extends ACorp
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -119,11 +94,11 @@ class corpContactList extends ACorp
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
                     default: // Nothing to do.
-                }; // switch $this->xr->nodeType ...
-            }; // while $this->xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -134,7 +109,7 @@ class corpContactList extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -150,7 +125,7 @@ class corpContactList extends ACorp
             try {
                 $con = DBConnection::connect(YAPEAL_DSN);
                 // Empty out old data then upsert (insert) new.
-                $sql = 'delete from `';
+                $sql = 'DELETE FROM `';
                 $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
                 $sql .= ' where `ownerID`=' . $this->ownerID;
                 $con->Execute($sql);
@@ -159,7 +134,7 @@ class corpContactList extends ACorp
                       ->warn($e);
                 return false;
             }
-        }; // foreach $tables ...
+        }
         return true;
     }
     /**
@@ -186,23 +161,23 @@ class corpContactList extends ACorp
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $qb->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
-                        }; // if count $rows ...
+                        }
                         $qb = null;
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')

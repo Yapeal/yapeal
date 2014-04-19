@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -33,31 +32,7 @@ use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    } else {
-        fwrite(STDERR, $mess);
-        exit(1);
-    }
-};
-/**
  * Class used to fetch and store corp KillMails API.
- *
- * @package    Yapeal
- * @subpackage Api_corp
  */
 class corpKillMails extends ACorp
 {
@@ -128,7 +103,7 @@ class corpKillMails extends ACorp
                         // No use going any farther if the XML isn't valid.
                         return false;
                     };
-                }; // if FALSE === $result ...
+                }
                 // Create XMLReader.
                 $this->xr = new XMLReader();
                 // Pass XML to reader.
@@ -139,8 +114,8 @@ class corpKillMails extends ACorp
                         && $this->xr->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
-                    }; // if $this->xr->nodeType ...
-                }; // while $this->xr->read() ...
+                    }
+                }
                 $this->xr->close();
                 // Leave loop if already got as many entries as API servers allow.
                 if ($this->rowCount != $rowCount || $this->date < $oldest) {
@@ -189,18 +164,18 @@ class corpKillMails extends ACorp
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute() ...
+                            }
                             $this->attackers->addRow($row);
                             break;
-                    }; // switch $this->xr->localName ...
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     if ($this->xr->localName == 'rowset') {
                         return true;
-                    }; // if $this->xr->localName == 'row' ...
+                    }
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $this->xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
@@ -240,7 +215,7 @@ class corpKillMails extends ACorp
                             // Walk through attributes and add them to row.
                             while ($this->xr->moveToNextAttribute()) {
                                 $row[$this->xr->name] = $this->xr->value;
-                            }; // while $this->xr->moveToNextAttribute();
+                            }
                             // Move back up to element.
                             $this->xr->moveToElement();
                             // Check if parent node.
@@ -249,7 +224,7 @@ class corpKillMails extends ACorp
                                 $this->stack[] = $row;
                                 // Continue on to process children.
                                 break;
-                            }; // if $xr->isEmptyElement ...
+                            }
                             // Add 'rgt' and increment value.
                             $row['rgt'] = $inherit['index']++;
                             // The $row is complete and ready to add.
@@ -279,15 +254,15 @@ class corpKillMails extends ACorp
                             if ($inherit['level'] == 0) {
                                 // Return the final index value to parserAPI().
                                 return $inherit['index'];
-                            }; // if $inherit['level'] ...
+                            }
                             break;
                         default:
                             break;
                     }
                     // switch $this->xr->localName ...
                     break;
-            }; // switch $this->xr->nodeType
-        }; // while $xr->read() ...
+            }
+        }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
@@ -338,12 +313,12 @@ class corpKillMails extends ACorp
                                     $this->date = $date;
                                     $this->fromID =
                                         $this->xr->getAttribute('killID');
-                                }; // if $date ...
+                                }
                                 $row = array();
                                 // Walk through attributes and add them to row.
                                 while ($this->xr->moveToNextAttribute()) {
                                     $row[$this->xr->name] = $this->xr->value;
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                }
                                 $qb->addRow($row);
                                 break;
                             case 'victim':
@@ -355,14 +330,14 @@ class corpKillMails extends ACorp
                                         $typeID = $this->xr->value;
                                     };
                                     $row[$this->xr->name] = $this->xr->value;
-                                }; // while $this->xr->moveToNextAttribute() ...
+                                }
                                 $this->victim->addRow($row);
                                 break;
                             case 'rowset':
                                 // Check if empty.
                                 if ($this->xr->isEmptyElement == 1) {
                                     break;
-                                }; // if $this->xr->isEmptyElement ...
+                                }
                                 // Grab rowset name.
                                 $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
@@ -393,10 +368,10 @@ class corpKillMails extends ACorp
                                     if ($subTable == 'attackers') {
                                         $this->attack();
                                     }
-                                }; // else $subTable ...
+                                }
                                 break;
                             default: // Nothing to do here.
-                        }; // switch $this->xr->localName ...
+                        }
                         break;
                     case XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
@@ -404,28 +379,28 @@ class corpKillMails extends ACorp
                             $this->rowCount = count($qb);
                             if ($this->rowCount > 0) {
                                 $qb->store();
-                            }; // if count $rows ...
+                            }
                             $qb = null;
                             // Store rows.
                             if (count($this->victim) > 0) {
                                 $this->victim->store();
-                            }; // if count $this->victim ...
+                            }
                             $this->victim = null;
                             // Store rows.
                             if (count($this->attackers) > 0) {
                                 $this->attackers->store();
-                            }; // if count $this->items ...
+                            }
                             $this->attackers = null;
                             // Store rows.
                             if (count($this->items) > 0) {
                                 $this->items->store();
-                            }; // if count $this->items ...
+                            }
                             $this->items = null;
                             return true;
-                        }; // if $this->xr->localName == 'row' ...
+                        }
                         break;
-                }; // switch $this->xr->nodeType
-            }; // while $xr->read() ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->error($e);
@@ -436,24 +411,23 @@ class corpKillMails extends ACorp
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function __construct
+    }
     /**
      * @var string Holds the date from each row in turn to use when walking.
      */
-    private $date; // function apiStore
+    private $date;
     /**
      * @var string Holds the refID from each row in turn to use when walking.
      */
-    private $fromID; // function parserAPI
+    private $fromID;
     /**
      * @var integer Hold row count used in walking.
      */
-    private $rowCount; // function nestedSet
+    private $rowCount;
     /**
      * @var array Holds a stack of parent nodes until after their children are
      * processed.
      */
     private $stack = array();
-    // function rowset
 }
 

@@ -24,37 +24,15 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-}
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-}
-/**
  * Abstract class for Char APIs.
  *
- * @package    Yapeal
- * @subpackage Api_char
+
  */
 abstract class AChar extends AApiRequest
 {
@@ -85,7 +63,7 @@ abstract class AChar extends AApiRequest
                             . $this->api;
                         $mess .= ' in ' . __CLASS__;
                         throw new LengthException($mess, 2);
-                    }; // if !is_string $params[$k] ...
+                    }
                     break;
                 case 'I':
                     if (0 != strlen(
@@ -96,7 +74,7 @@ abstract class AChar extends AApiRequest
                             . $this->api;
                         $mess .= ' in ' . __CLASS__;
                         throw new LengthException($mess, 3);
-                    }; // if 0 == strlen(...
+                    }
                     break;
             }
         }
@@ -117,7 +95,7 @@ abstract class AChar extends AApiRequest
     {
         $default = 'https://api.eveonline.com/' . $this->section;
         $default .= '/' . $this->api . '.xml.aspx';
-        $sql = 'select proxy from ';
+        $sql = 'SELECT proxy FROM ';
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();

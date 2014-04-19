@@ -24,7 +24,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
@@ -36,9 +35,6 @@ use Yapeal\Database\QueryBuilder;
  *
  * @property int $isActive
  * @property int $activeAPIMask
- *
- * @package    Yapeal
- * @subpackage Wrappers
  */
 class RegisteredKey extends ALimitedObject implements IGetBy
 {

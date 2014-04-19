@@ -25,8 +25,6 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
- * @subpackage Install
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  * @since      2012-01-15
@@ -117,7 +115,7 @@ foreach ($required as $setting) {
     if (empty($cacheSettings[$setting])) {
         $mess .= 'Missing required setting ' . $setting . PHP_EOL;
     };
-}; // foreach $required ...
+}
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
     exit(2);
@@ -193,7 +191,7 @@ function cleanDatabase(
         if (empty($options[$setting])) {
             $mess .= 'Missing required setting ' . $setting . PHP_EOL;
         };
-    }; // foreach $required ...
+    }
     if (!empty($mess)) {
         fwrite(STDERR, $mess);
         exit(2);
@@ -220,10 +218,10 @@ function cleanDatabase(
         $sql .= ' where `section`=' . $db->qstr($section);
         $sql .= ' and `modified`<' . $db->qstr($dateTime);
         $db->Execute($sql);
-    }; // foreach $sections as $section ...
+    }
 }
 
-// function cleanDatabase
+
 /**
  * This is used to delete any cached XML files that are more than a configurable
  * number of days old.
@@ -249,9 +247,9 @@ function cleanFiles($sections, $cacheLength)
             ) {
                 @unlink($file);
             };
-        }; // foreach $files as $file ...
-    }; // foreach $sections as $section ...
+        }
+    }
 }
 
-// function cleanFiles
+
 

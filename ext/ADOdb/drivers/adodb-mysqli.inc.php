@@ -141,7 +141,7 @@ class ADODB_mysqli extends ADOConnection {
 
 	function IfNull( $field, $ifNull )
 	{
-		return " IFNULL($field, $ifNull) "
+		return " IFNULL($field, $ifNull) "; // if MySQL
 	}
 
 	// do not use $ADODB_COUNTRECS

@@ -23,7 +23,7 @@
  * formatting modifiers in conversion modifiers.
  *
  * @package log4php
-
+ * @subpackage helpers
  * @since 0.3
  */
 class LoggerFormattingInfo {

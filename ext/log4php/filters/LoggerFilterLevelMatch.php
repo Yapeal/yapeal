@@ -42,7 +42,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage filters
  * @since 0.6
  */
 class LoggerFilterLevelMatch extends LoggerFilter {

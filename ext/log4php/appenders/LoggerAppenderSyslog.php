@@ -50,7 +50,7 @@
  *
  * @version $Revision: 1062665 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderSyslog extends LoggerAppender {
 

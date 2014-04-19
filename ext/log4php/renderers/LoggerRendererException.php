@@ -22,7 +22,7 @@
  * Exception renderer
  *
  * @package log4php
-
+ * @subpackage renderers
  * @since 2.1
  */
 class LoggerRendererException implements LoggerRendererObject {

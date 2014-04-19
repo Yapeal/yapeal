@@ -29,7 +29,7 @@
  *
  * @version $Revision: 925973 $
  * @package log4php
-
+ * @subpackage helpers
  * @abstract
  * @since 0.3
  */

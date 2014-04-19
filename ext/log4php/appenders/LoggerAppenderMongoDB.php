@@ -28,7 +28,7 @@
  *
  * @version $Revision: 806678 $
  * @package log4php
-
+ * @subpackage appenders
  * @since 2.1
  */
 class LoggerAppenderMongoDB extends LoggerAppender {

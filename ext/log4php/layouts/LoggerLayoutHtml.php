@@ -44,7 +44,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage layouts
  */
 class LoggerLayoutHtml extends LoggerLayout {
 

@@ -46,7 +46,7 @@
  *
  * @version $Revision: 1136787 $
  * @package log4php
-
+ * @subpackage layouts
  */
 class LoggerLayoutTTCC extends LoggerLayout {
 

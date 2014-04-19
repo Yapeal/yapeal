@@ -31,7 +31,7 @@
  *
  * @version $Revision: 1125335 $
  * @package log4php
-
+ * @subpackage renderers
  * @since 0.3
  */
 class LoggerRendererMap {

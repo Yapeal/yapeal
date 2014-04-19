@@ -42,7 +42,7 @@
  *
  * @version $Revision: 883108 $
  * @package log4php
-
+ * @subpackage filters
  * @since 0.3
  */
 class LoggerFilterStringMatch extends LoggerFilter {

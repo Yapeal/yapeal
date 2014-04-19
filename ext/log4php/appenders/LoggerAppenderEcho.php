@@ -38,7 +38,7 @@
  *
  * @version $Revision: 1062665 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderEcho extends LoggerAppender {
 	/** boolean used internally to mark first append */

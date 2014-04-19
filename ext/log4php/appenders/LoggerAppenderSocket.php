@@ -42,7 +42,7 @@
  *
  * @version $Revision: 1062667 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderSocket extends LoggerAppender {
 

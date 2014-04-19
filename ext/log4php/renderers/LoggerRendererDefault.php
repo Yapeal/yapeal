@@ -34,7 +34,7 @@
  * </pre>
  *
  * @package log4php
-
+ * @subpackage renderers
  * @since 0.3
  */
 class LoggerRendererDefault implements LoggerRendererObject {

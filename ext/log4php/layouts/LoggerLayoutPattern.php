@@ -132,7 +132,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage layouts
  * @since 0.3
  */
 class LoggerLayoutPattern extends LoggerLayout {

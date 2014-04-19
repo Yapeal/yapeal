@@ -40,7 +40,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage configurators
  * @since 0.4
  */
 class LoggerConfiguratorXml implements LoggerConfigurator {

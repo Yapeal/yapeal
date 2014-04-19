@@ -46,7 +46,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage layouts
  */
 class LoggerLayoutXml extends LoggerLayout {
 	const LOG4J_NS_PREFIX ='log4j';

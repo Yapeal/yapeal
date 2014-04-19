@@ -48,7 +48,7 @@
  *
  * @version $Revision: 1059522 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderDailyFile extends LoggerAppenderFile {
 

@@ -59,7 +59,7 @@
  *
  * @version $Revision: 1071033 $
  * @package log4php
-
+ * @subpackage configurators
  * @since 0.5
  */
 class LoggerConfiguratorIni implements LoggerConfigurator {

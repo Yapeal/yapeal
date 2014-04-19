@@ -31,7 +31,7 @@
  *
  * @version $Revision: 1059292 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderNull extends LoggerAppender {
 

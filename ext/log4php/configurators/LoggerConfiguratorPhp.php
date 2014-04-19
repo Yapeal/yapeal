@@ -34,7 +34,7 @@
  * {@example ../../examples/resources/configurator_php.php 18}
  *
  * @package log4php
-
+ * @subpackage configurators
  * @since 2.0
  */
 class LoggerConfiguratorPhp implements LoggerConfigurator {

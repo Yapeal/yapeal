@@ -27,7 +27,7 @@
  *
  * @version $Revision: 883108 $
  * @package log4php
-
+ * @subpackage configurators
  */
 class LoggerConfiguratorBasic implements LoggerConfigurator {
 

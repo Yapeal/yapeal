@@ -54,7 +54,7 @@ class ADODB_mysql extends ADOConnection {
 
 	function IfNull( $field, $ifNull )
 	{
-		return " IFNULL($field, $ifNull) "
+		return " IFNULL($field, $ifNull) "; // if MySQL
 	}
 
 

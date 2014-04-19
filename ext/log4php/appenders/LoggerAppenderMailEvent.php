@@ -49,7 +49,7 @@
  *
  * @version $Revision: 1137177 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderMailEvent extends LoggerAppender {
 

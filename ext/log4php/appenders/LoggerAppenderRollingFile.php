@@ -44,7 +44,7 @@
  *
  * @version $Revision: 1134244 $
  * @package log4php
-
+ * @subpackage appenders
  */
 class LoggerAppenderRollingFile extends LoggerAppenderFile {
 

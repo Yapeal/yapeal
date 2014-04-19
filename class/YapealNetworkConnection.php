@@ -29,6 +29,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Exception\YapealApiException;
+
 /**
  * @internal Allow viewing of the source code in web browser.
  */

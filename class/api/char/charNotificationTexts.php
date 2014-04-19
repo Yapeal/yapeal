@@ -29,6 +29,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Exception\YapealApiErrorException;
 
 /**
  * @internal Allow viewing of the source code in web browser.

@@ -39,4 +39,3 @@ namespace Yapeal\Exception;
 class YapealApiException extends YapealException
 {
 }
-

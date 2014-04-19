@@ -30,6 +30,7 @@
  */
 namespace Yapeal\Caching;
 
+use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Validation\ValidateEveApiXml;
 
 /**
@@ -92,7 +93,7 @@ class EveApiXmlCache
      *
      * @param string $xml The Eve API XML to be cached.
      *
-     * @throws \YapealApiErrorException
+     * @throws YapealApiErrorException
      * @return bool Returns TRUE if XML was cached, FALSE otherwise.
      *
      */
@@ -123,7 +124,7 @@ class EveApiXmlCache
         if ($this->vd->isApiError()) {
             // Throw exception
             // Have to use API error code for special API error handling to work.
-            throw new \YapealApiErrorException (
+            throw new YapealApiErrorException (
                 $this->vd->getErrorMessage(),
                 $this->vd->getErrorCode()
             );

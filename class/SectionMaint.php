@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to call internal maintenance scripts in Yapeal.
  *
  * @package    Yapeal
@@ -58,10 +38,6 @@ if (count(get_included_files()) < 2) {
  */
 class SectionMaint extends ASection
 {
-    /**
-     * @var array Holds the list of maintenance scripts.
-     */
-    //private $scriptList;
     /**
      * Constructor
      *
@@ -84,7 +60,7 @@ class SectionMaint extends ASection
     {
         if ($this->abort === true) {
             return false;
-        };
+        }
         $scriptCount = 0;
         $scriptSuccess = 0;
         if (count($this->scriptList) == 0) {
@@ -95,13 +71,13 @@ class SectionMaint extends ASection
                     . $this->section;
                 Logger::getLogger('yapeal')
                       ->info($mess);
-            };
+            }
             return false;
-        };
+        }
         // Randomize order in which scripts are tried if there is a list.
         if (count($this->scriptList) > 1) {
             shuffle($this->scriptList);
-        };
+        }
         try {
             foreach ($this->scriptList as $script) {
                 // If timer has expired time to run script again.
@@ -125,9 +101,9 @@ class SectionMaint extends ASection
                                     'Failed to get lock for ' . $class . $hash;
                                 Logger::getLogger('yapeal')
                                       ->info($mess);
-                            };
+                            }
                             continue;
-                        }; // if $con->GetOne($sql) ...
+                        }
                     } catch (ADODB_Exception $e) {
                         continue;
                     }
@@ -137,9 +113,9 @@ class SectionMaint extends ASection
                     $instance = new $class();
                     if ($instance->doWork()) {
                         ++$scriptSuccess;
-                    };
+                    }
                     $instance = null;
-                }; // if CachedUntil::cacheExpired...
+                }
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
                     if (Logger::getLogger('yapeal')
@@ -149,10 +125,10 @@ class SectionMaint extends ASection
                             'Yapeal has been working very hard and needs a break';
                         Logger::getLogger('yapeal')
                               ->info($mess);
-                    };
+                    }
                     exit;
-                }; // if YAPEAL_MAX_EXECUTE < time() ...
-            }; // foreach $scripts ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -160,9 +136,12 @@ class SectionMaint extends ASection
         // Only truly successful if all scripts ran successfully.
         if ($scriptCount == $scriptSuccess) {
             return true;
-        };
+        }
         return false;
     }
-    // function pullXML
+    /**
+     * @var array Holds the list of maintenance scripts.
+     */
+    private $scriptList;
 }
 

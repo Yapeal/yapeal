@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to pull Eve APIs for account section.
  *
  * @package    Yapeal
@@ -65,7 +45,7 @@ class SectionAccount extends ASection
     {
         $this->section = strtolower(str_replace('Section', '', __CLASS__));
         parent::__construct();
-    }// function __construct
+    }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
      *
@@ -75,7 +55,7 @@ class SectionAccount extends ASection
     {
         if ($this->abort === true) {
             return false;
-        };
+        }
         $apiCount = 0;
         $apiSuccess = 0;
         try {
@@ -89,9 +69,9 @@ class SectionAccount extends ASection
                     $mess = 'No keys for account section';
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 return false;
-            }; // if empty $result ...
+            }
             // Build name of filter based on mode.
             $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
             $keyList = array_filter($result, $filter);
@@ -102,31 +82,31 @@ class SectionAccount extends ASection
                     $mess = 'No active keys for account section';
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 return false;
-            };
+            }
             // Randomize order so no one key can starve the rest in case of
             // errors, etc.
             if (count($keyList) > 1) {
                 shuffle($keyList);
-            };
+            }
             // Ok now that we have a list of keys we can check which APIs need updated.
             foreach ($keyList as $ky) {
                 // Skip keys with no APIs.
                 if ($ky['mask'] == 0) {
                     continue;
-                };
+                }
                 $apis = $this->am->maskToAPIs($ky['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
                     Logger::getLogger('yapeal')
                           ->warn($mess);
                     continue;
-                };
+                }
                 // Randomize order in which APIs are tried if there is a list.
                 if (count($apis) > 1) {
                     shuffle($apis);
-                };
+                }
                 foreach ($apis as $api) {
                     // If the cache for this API has expired try to get update.
                     if (CachedUntil::cacheExpired($api, $ky['keyID']) === true
@@ -142,7 +122,7 @@ class SectionAccount extends ASection
                         $parameters = '';
                         foreach ($params as $k => $v) {
                             $parameters .= $k . '=' . $v;
-                        };
+                        }
                         $hash = hash('sha1', $class . $parameters);
                         // Use lock to keep from wasting time trying to do API that another
                         // Yapeal is already working on.
@@ -158,9 +138,9 @@ class SectionAccount extends ASection
                                         . $hash;
                                     Logger::getLogger('yapeal')
                                           ->info($mess);
-                                };
+                                }
                                 continue;
-                            }; // if $con->GetOne($sql) ...
+                            }
                         } catch (ADODB_Exception $e) {
                             continue;
                         }
@@ -173,9 +153,9 @@ class SectionAccount extends ASection
                         $instance = new $class($params);
                         if ($instance->apiStore()) {
                             ++$apiSuccess;
-                        };
+                        }
                         $instance = null;
-                    }; // if CachedUntil::cacheExpired...
+                    }
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
                         if (Logger::getLogger('yapeal')
@@ -185,11 +165,11 @@ class SectionAccount extends ASection
                                 'Yapeal has been working very hard and needs a break';
                             Logger::getLogger('yapeal')
                                   ->info($mess);
-                        };
+                        }
                         exit;
-                    }; // if YAPEAL_MAX_EXECUTE < time() ...
-                }; // foreach $apis ...
-            }; // foreach $userList
+                    }
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -200,8 +180,7 @@ class SectionAccount extends ASection
         } else {
             return false;
         }
-        // else $apiCount == $apiSuccess ...
-    }// function pullXML
+    }
     /**
      * Used to get the correct SQL for each mode of YAPEAL_REGISTERED_MODE.
      *
@@ -218,7 +197,7 @@ class SectionAccount extends ASection
             . 'accountAPIKeyInfo` as aaki';
         $sql .= ' on (urk.`keyID` = aaki.`keyID`)';
         return $sql;
-    }// function getSQLQuery
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'ignored'.
      *
@@ -238,7 +217,7 @@ class SectionAccount extends ASection
     {
         if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
             return false;
-        };
+        }
         $row['mask'] = $this->mask;
         if (!is_null($row['RKMask'])) {
             // Since there is no mask value for APIKeyInfo in API mask for obvious
@@ -246,19 +225,19 @@ class SectionAccount extends ASection
             $row['mask'] &= $row['RKMask'] | 1;
         } else {
             return false;
-        };
+        }
         if (!is_null($row['accessMask'])) {
             // Since there is no mask value for APIKeyInfo in API mask for obvious
             // reasons it can only be controlled by mask from utilSections.
             $row['mask'] &= $row['accessMask'] | 1;
-        };
+        }
         // Can't get accountStatus API with corporation key or with an unknown key
         // type since it might be a corporation key.
         if (is_null($row['type']) || $row['type'] == 'Corporation') {
             $row['mask'] &= 1;
-        };
+        }
         return true;
-    }// function ignoredFilter
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'optional'.
      *
@@ -275,25 +254,25 @@ class SectionAccount extends ASection
     {
         if (!is_null($row['RKActive']) && $row['RKActive'] == 0) {
             return false;
-        };
+        }
         $row['mask'] = $this->mask;
         if (!is_null($row['accessMask'])) {
             // Since there is no mask value for APIKeyInfo in API mask for obvious
             // reasons it can only be controlled by mask from utilSections.
             $row['mask'] &= $row['accessMask'] | 1;
-        };
+        }
         if (!is_null($row['RKMask'])) {
             // Since there is no mask value for APIKeyInfo in API mask for obvious
             // reasons it can only be controlled by mask from utilSections.
             $row['mask'] &= $row['RKMask'] | 1;
-        };
+        }
         // Can't get accountStatus API with corporation key or with an unknown key
         // type since it might be a corporation key.
         if (is_null($row['type']) || $row['type'] == 'Corporation') {
             $row['mask'] &= 1;
-        };
+        }
         return true;
-    }// function optionalFilter
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'required'.
      *
@@ -312,17 +291,17 @@ class SectionAccount extends ASection
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         if ($row['RKActive'] == 0) {
             return false;
-        };
+        }
         if (is_null($row['RKMask'])) {
             $mess = 'activeAPIMask can not be null in utilRegisteredKey when';
             $mess .= ' registered_mode = "required"';
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         $row['mask'] = $this->mask;
         // Handle missing APIKeyInfo data.
         if (is_null($row['accessMask'])) {
@@ -333,14 +312,13 @@ class SectionAccount extends ASection
             // Since there is no mask value for APIKeyInfo in API mask for obvious
             // reasons it can only be controlled by mask from utilSections.
             $row['mask'] &= $row['accessMask'] & $row['RKMask'] | 1;
-        };
+        }
         // Can't get accountStatus API with corporation key or with an unknown key
         // type since it might be a corporation key.
         if (is_null($row['type']) || $row['type'] == 'Corporation') {
             $row['mask'] &= 1;
-        };
+        }
         return true;
     }
-    // function requiredFilter
 }
 

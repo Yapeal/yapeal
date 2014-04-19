@@ -30,26 +30,6 @@
  * @link       http://logging.apache.org/log4php/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Yapeal's custom error handler.
  *
  * @package    Yapeal
@@ -83,7 +63,7 @@ class YapealErrorHandler
         // obey @ protocol
         if (error_reporting() == 0) {
             return false;
-        };
+        }
         /*
          * Do not add any of the E_USER_* constants to switch except if you believe
          * in free energy and like infinite loops.
@@ -114,9 +94,9 @@ class YapealErrorHandler
                 Logger::getLogger('yapeal_capture')
                       ->info($errmsg);
                 return true;
-        }; // switch $errno ...
+        }
         return false;
-    }// function __construct
+    }
     /**
      * Function used to set constants from [Logging] section of the configuration
      * file.
@@ -139,24 +119,24 @@ class YapealErrorHandler
                 $file = @getenv('YAPEAL_LOGGER');
                 if ($file === false) {
                     $file = $config . 'logger.xml';
-                };
-            };
-        };
+                }
+            }
+        }
         if (!(is_readable($file) && is_file($file))) {
             $mess =
                 'The ' . $file . ' configuration file is missing!' . PHP_EOL;
             fwrite(STDERR, $mess);
             exit(1);
-        };
+        }
         self::$logConfig = $file;
         if (!empty($section['trace_enabled'])) {
             if (!defined('YAPEAL_TRACE_ENABLED')) {
                 define('YAPEAL_TRACE_ENABLED', $section['trace_enabled']);
-            };
+            }
         } else {
             define('YAPEAL_TRACE_ENABLED', false);
-        };
-    }// function __clone
+        }
+    }
     /**
      * Function used to setup error and exception logging.
      *
@@ -176,11 +156,10 @@ class YapealErrorHandler
     {
         $mess = 'Illegally attempted to clone ' . __CLASS__;
         throw new LogicException($mess);
-    }// function setLoggingSectionProperties
+    }
     /**
      * @var int Holds path and name of the config file to use with log4php.
      */
     private static $logConfig = '';
-    // function setupCustomErrorAndExceptionSettings
 }
 

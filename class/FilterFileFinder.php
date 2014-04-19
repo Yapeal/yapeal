@@ -29,26 +29,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class to recursive search through a directory for files/directories that match
  * a search string.
  *
@@ -94,8 +74,11 @@ class FilterFileFinder extends FilterIterator
                 | FilesystemIterator::KEY_AS_PATHNAME
                 | FilesystemIterator::SKIP_DOTS
                 | FilesystemIterator::UNIX_PATHS;
+            /**
+             * @var \RecursiveDirectoryIterator $flat
+             */
             $flat->setFlags($flags);
-        }; // if defined...
+        }
         parent::__construct($flat);
     }
     /**
@@ -111,16 +94,19 @@ class FilterFileFinder extends FilterIterator
         $files = new self($path, $match);
         $fileList = array();
         if (!empty($files)) {
+            /**
+             * @var \RecursiveDirectoryIterator $file
+             */
             foreach ($files as $file) {
                 $fileList[] = str_replace(
                     $match,
                     '',
                     self::pathinfo_utf($file->getPathname(), PATHINFO_FILENAME)
                 );
-            }; // foreach $files ...
-        }; // if !empty $files ...
+            }
+        }
         return $fileList;
-    }// function constructor
+    }
     /**
      * UTF-8 compatible version of pathinfo().
      *
@@ -145,7 +131,7 @@ class FilterFileFinder extends FilterIterator
             $basename = end($pieces);
         } else {
             return false;
-        };
+        }
         if (empty($basename)) {
             return false;
         };
@@ -161,7 +147,7 @@ class FilterFileFinder extends FilterIterator
         } else {
             $extension = '';
             $filename = $basename;
-        };
+        }
         switch ($options) {
             case PATHINFO_DIRNAME:
                 return $dirname;
@@ -171,14 +157,14 @@ class FilterFileFinder extends FilterIterator
                 return $extension;
             case PATHINFO_FILENAME:
                 return $filename;
-        }; // switch $options ...
+        }
         return array(
             'dirname' => $dirname,
             'basename' => $basename,
             'extension' => $extension,
             'filename' => $filename
         );
-    }// function accept
+    }
     /**
      * Required method to make filter work.
      *
@@ -192,31 +178,31 @@ class FilterFileFinder extends FilterIterator
             case self::PREFIX:
                 if (0 === strpos($pathinfo, $this->match)) {
                     return true;
-                };
+                }
                 break;
             case self::CONTAINS:
                 if (false !== strpos($pathinfo, $this->match)) {
                     return true;
-                };
+                }
                 break;
             case self::SUFFIX:
                 $pathinfo = self::strrev_utf($pathinfo);
                 $match = self::strrev_utf($this->match);
                 if (0 === strpos($pathinfo, $match)) {
                     return true;
-                };
+                }
                 break;
-        }; // switch $this->type ...
+        }
         return false;
-    }// function getStrippedFiles
+    }
     /**
      * @var string The string to search for.
      */
-    protected $match; // function pathinfo_utf
+    protected $match;
     /**
      * @var string Contains the filesystem path to be searched.
      */
-    protected $path; // function strrev_utf
+    protected $path;
     /**
      * @var string Specifies which element of $path to look for $match in.
      */
@@ -249,8 +235,8 @@ class FilterFileFinder extends FilterIterator
             } else {
                 $parts[] = substr($str, 0, 1);
                 $str = substr($str, 1);
-            };
-        }; // while $str ...
+            }
+        }
         return implode(array_reverse($parts), '');
     }
 }

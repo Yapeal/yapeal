@@ -29,26 +29,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Abstract class used to hold common methods needed by Section* classes.
  *
  * @package    Yapeal
@@ -74,13 +54,13 @@ abstract class ASection
             // Skip inactive sections.
             $this->abort = true;
             return;
-        };
+        }
         $this->mask = $section->activeAPIMask;
         // Skip if there's no active APIs for this section.
         if ($this->mask == 0) {
             $this->abort = true;
             return;
-        };
+        }
         $this->am = new AccessMask();
         $path = __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR
             . $this->section . DIRECTORY_SEPARATOR;
@@ -94,7 +74,7 @@ abstract class ASection
             Logger::getLogger('yapeal')
                   ->error($mess);
             return;
-        }; // else $foundAPIs ...
+        }
     }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
@@ -113,7 +93,7 @@ abstract class ASection
     /**
      * @var array Holds the mask of APIs for this section.
      */
-    protected $mask; // function __construct
+    protected $mask;
     /**
      * @var string Hold section name.
      */

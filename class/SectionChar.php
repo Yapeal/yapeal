@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to pull Eve APIs for char section.
  *
  * @package    Yapeal
@@ -65,7 +45,7 @@ class SectionChar extends ASection
     {
         $this->section = strtolower(str_replace('Section', '', __CLASS__));
         parent::__construct();
-    }// function __construct
+    }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
      *
@@ -75,7 +55,7 @@ class SectionChar extends ASection
     {
         if ($this->abort === true) {
             return false;
-        };
+        }
         $apiCount = 0;
         $apiSuccess = 0;
         try {
@@ -89,9 +69,9 @@ class SectionChar extends ASection
                     $mess = 'No characters for char section';
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 return false;
-            }; // if empty $result ...
+            }
             // Build name of filter based on mode.
             $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
             $charList = array_filter($result, $filter);
@@ -102,30 +82,30 @@ class SectionChar extends ASection
                     $mess = 'No active characters for char section';
                     Logger::getLogger('yapeal')
                           ->info($mess);
-                };
+                }
                 return false;
-            };
+            }
             // Randomize order so no one character can starve the rest in case of
             // errors, etc.
             if (count($charList) > 1) {
                 shuffle($charList);
-            };
+            }
             foreach ($charList as $chr) {
                 // Skip characters with no APIs.
                 if ($chr['mask'] == 0) {
                     continue;
-                };
+                }
                 $apis = $this->am->maskToAPIs($chr['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
                     Logger::getLogger('yapeal')
                           ->warn($mess);
                     continue;
-                };
+                }
                 // Randomize order in which APIs are tried if there is a list.
                 if (count($apis) > 1) {
                     shuffle($apis);
-                };
+                }
                 foreach ($apis as $api) {
                     // If the cache for this API has expired try to get update.
                     if (CachedUntil::cacheExpired($api, $chr['characterID'])
@@ -143,7 +123,7 @@ class SectionChar extends ASection
                         $parameters = '';
                         foreach ($params as $k => $v) {
                             $parameters .= $k . '=' . $v;
-                        };
+                        }
                         $hash = hash('sha1', $class . $parameters);
                         // Use lock to keep from wasting time trying to do API that another
                         // Yapeal is already working on.
@@ -159,9 +139,9 @@ class SectionChar extends ASection
                                         . $hash;
                                     Logger::getLogger('yapeal')
                                           ->info($mess);
-                                };
+                                }
                                 continue;
-                            }; // if $con->GetOne($sql) ...
+                            }
                         } catch (ADODB_Exception $e) {
                             continue;
                         }
@@ -174,9 +154,9 @@ class SectionChar extends ASection
                         $instance = new $class($params);
                         if ($instance->apiStore()) {
                             ++$apiSuccess;
-                        };
+                        }
                         $instance = null;
-                    }; // if CachedUntil::cacheExpired...
+                    }
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
                         if (Logger::getLogger('yapeal')
@@ -186,11 +166,11 @@ class SectionChar extends ASection
                                 'Yapeal has been working very hard and needs a break';
                             Logger::getLogger('yapeal')
                                   ->info($mess);
-                        };
+                        }
                         exit;
-                    }; // if YAPEAL_MAX_EXECUTE < time() ...
-                }; // foreach $apis ...
-            }; // foreach $charList
+                    }
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -201,8 +181,7 @@ class SectionChar extends ASection
         } else {
             return false;
         }
-        // else $apiCount == $apiSuccess ...
-    }// function pullXML
+    }
     /**
      * Used to get the correct SQL for each mode of YAPEAL_REGISTERED_MODE.
      *
@@ -273,7 +252,7 @@ class SectionChar extends ASection
                 break;
         };
         return $sql;
-    }// function getSQLQuery
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'ignored'.
      *
@@ -293,26 +272,26 @@ class SectionChar extends ASection
         // Filter out if isActive is NULL or FALSE
         if (is_null($row['RKActive']) || $row['RKActive'] == 0) {
             return false;
-        };
+        }
         // If expire is not empty but has expired then return FALSE.
         if (!is_null($row['expires'])
             && gmdate('Y-m-d H:i:s') > $row['expires']
         ) {
             return false;
-        };
+        }
         $row['mask'] = $this->mask;
         if (!is_null($row['RKMask'])) {
             $row['mask'] &= $row['RKMask'];
         } else {
             // Filter out if ActiveAPIMask is NULL
             return false;
-        };
+        }
         // Use APIKeyInfo mask if available.
         if (!is_null($row['accessMask'])) {
             $row['mask'] &= $row['accessMask'];
-        };
+        }
         return true;
-    }// function ignoredFilter
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'optional'.
      *
@@ -341,13 +320,13 @@ class SectionChar extends ASection
             && $row['RKActive'] == 0
         ) {
             return false;
-        };
+        }
         // If expire is not empty but has expired then return FALSE.
         if (!is_null($row['expires'])
             && gmdate('Y-m-d H:i:s') > $row['expires']
         ) {
             return false;
-        };
+        }
         $row['mask'] = $this->mask;
         // Use Character mask if not empty ...
         if (!is_null($row['RCMask'])) {
@@ -355,13 +334,13 @@ class SectionChar extends ASection
             // else use key mask if not empty.
         } elseif (!is_null($row['RKMask'])) {
             $row['mask'] &= $row['RKMask'];
-        };
+        }
         // Use APIKeyInfo mask if available.
         if (!is_null($row['accessMask'])) {
             $row['mask'] &= $row['accessMask'];
-        };
+        }
         return true;
-    }// function optionalFilter
+    }
     /**
      * Filter used when YAPEAL_REGISTERED_MODE == 'required'.
      *
@@ -387,17 +366,17 @@ class SectionChar extends ASection
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         // Deactivated.
         if ($row['RCActive'] == 0) {
             return false;
-        };
+        }
         // If expire is not empty but has expired then return FALSE.
         if (!is_null($row['expires'])
             && gmdate('Y-m-d H:i:s') > $row['expires']
         ) {
             return false;
-        };
+        }
         // activeAPIMask is not optional.
         if (is_null($row['RCMask'])) {
             $mess =
@@ -406,14 +385,12 @@ class SectionChar extends ASection
             Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
-        };
+        }
         $row['mask'] = $this->mask & $row['RCMask'];
         // Use APIKeyInfo mask if available.
         if (!is_null($row['accessMask'])) {
             $row['mask'] &= $row['accessMask'];
-        };
+        }
         return true;
     }
-    // function requiredFilter
 }
-

@@ -29,26 +29,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Abstract class for basic object with properties
  *
  * @package    Yapeal
@@ -70,10 +50,10 @@ abstract class ALimitedObject
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
             throw new DomainException($mess, 1);
-        }; // if !in_array...
+        }
         if (isset($this->properties[$name])) {
             return $this->properties[$name];
-        };
+        }
         return null;
     }
     /**
@@ -105,17 +85,17 @@ abstract class ALimitedObject
         if (is_array($value)) {
             $this->$name = $value;
             return false;
-        };
+        }
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
             throw new DomainException($mess, 1);
-        }; // if !in_array...
+        }
         if (isset($this->properties[$name])) {
             $ret = true;
-        }; // if isset...
+        }
         $this->properties[$name] = $value;
         return $ret;
-    }// function __get
+    }
     /**
      * Magic function to show object when being printed.
      *
@@ -146,15 +126,15 @@ abstract class ALimitedObject
                         $set[] = '0x' . bin2hex($v);
                     } else {
                         $set[] = (string)$v;
-                    }; // else '0x' !== substr($row[$field], 0, 2) ...
+                    }
                     break;
                 default:
                     $set[] = (string)$v;
-            }; // switch $this->colTypes[$k] ...
-        }; // foreach $this->properties ...
+            }
+        }
         $value .= implode(',', $set) . PHP_EOL;
         return $value;
-    }// function __isset
+    }
     /**
      * Used to unset fields of $properties array.
      *
@@ -163,17 +143,16 @@ abstract class ALimitedObject
     public function __unset($name)
     {
         unset($this->properties[$name]);
-    }// function __set
+    }
     /**
      * @var array List of columns and their generic ADO types.
      */
-    protected $colTypes = array(); // function __toString ...
+    protected $colTypes = array();
     /**
      * Holds the current properties.
      *
      * @var array
      */
     protected $properties;
-    // function __unset
 }
 

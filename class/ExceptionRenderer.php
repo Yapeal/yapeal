@@ -29,26 +29,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class called by Logger when it needs to render an exception object.
  *
  * @package    Yapeal
@@ -69,15 +49,13 @@ class ExceptionRenderer implements LoggerRendererObject
         $mess = $e->getMessage() . PHP_EOL;
         if ($e->getCode()) {
             $mess .= '     Code: ' . $e->getCode() . PHP_EOL;
-        };
+        }
         $mess .= '    Trace:' . PHP_EOL;
         $mess .= $e->getTraceAsString() . PHP_EOL;
         $mess .= str_pad(' END TRACE ', 30, '-', STR_PAD_BOTH) . PHP_EOL;
         if (method_exists($e, 'getPrevious') && $e->getPrevious() !== null) {
             $mess .= 'Caused by: ' . get_class($e->getPrevious());
-        };
+        }
         return $mess;
     }
-    // function render
-}// class ExceptionRenderer
-
+}

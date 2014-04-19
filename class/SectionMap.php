@@ -31,26 +31,6 @@
 use Yapeal\Database\DBConnection;
 
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-};
-/**
  * Class used to pull Eve APIs for map section.
  *
  * @package    Yapeal
@@ -75,17 +55,17 @@ class SectionMap extends ASection
     {
         if ($this->abort === true) {
             return false;
-        };
+        }
         $apiCount = 0;
         $apiSuccess = 0;
         $apis = $this->am->maskToAPIs($this->mask, $this->section);
         if (count($apis) == 0) {
             return false;
-        };
+        }
         // Randomize order in which APIs are tried if there is a list.
         if (count($apis) > 1) {
             shuffle($apis);
-        };
+        }
         try {
             foreach ($apis as $api) {
                 // If the cache for this API has expire try to get update.
@@ -109,9 +89,9 @@ class SectionMap extends ASection
                                     'Failed to get lock for ' . $class . $hash;
                                 Logger::getLogger('yapeal')
                                       ->info($mess);
-                            };
+                            }
                             continue;
-                        }; // if $con->GetOne($sql) ...
+                        }
                     } catch (ADODB_Exception $e) {
                         continue;
                     }
@@ -124,9 +104,9 @@ class SectionMap extends ASection
                     $instance = new $class($params);
                     if ($instance->apiStore()) {
                         ++$apiSuccess;
-                    };
+                    }
                     $instance = null;
-                }; // if CachedUntil::cacheExpired...
+                }
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
                     if (Logger::getLogger('yapeal')
@@ -136,10 +116,10 @@ class SectionMap extends ASection
                             'Yapeal has been working very hard and needs a break';
                         Logger::getLogger('yapeal')
                               ->info($mess);
-                    };
+                    }
                     exit;
-                }; // if YAPEAL_MAX_EXECUTE < time() ...
-            }; // foreach $apis ...
+                }
+            }
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
                   ->warn($e);
@@ -150,8 +130,6 @@ class SectionMap extends ASection
         } else {
             return false;
         }
-        // else $apiCount == $apiSuccess ...
     }
-    // function pullXML
 }
 

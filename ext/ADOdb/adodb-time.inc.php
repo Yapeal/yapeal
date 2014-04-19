@@ -821,7 +821,7 @@ global $_month_table_normal,$_month_table_leaf;
 	$_hour_power = 3600;
 	$_min_power = 60;
 
-	if ($d < -12219321600) $d -= 86400*10
+	if ($d < -12219321600) $d -= 86400*10; // if 15 Oct 1582 or earlier, gregorian correction
 
 	$_month_table_normal = array("",31,28,31,30,31,30,31,31,30,31,30,31);
 	$_month_table_leaf = array("",31,29,31,30,31,30,31,31,30,31,30,31);
@@ -1329,8 +1329,8 @@ function adodb_mktime($hr,$min,$sec,$mon=false,$day=false,$year=false,$is_dst=fa
 		$_day_time = $hr * $_hour_power + $min * $_min_power + $sec;
 		$_day_time = $_day_power - $_day_time;
 		$ret = -( $_total_date * $_day_power + $_day_time - $gmt_different);
-		if ($ret < -12220185600) $ret += 10*86400
-		else if ($ret < -12219321600) $ret = -12219321600
+		if ($ret < -12220185600) $ret += 10*86400; // if earlier than 5 Oct 1582 - gregorian correction
+		else if ($ret < -12219321600) $ret = -12219321600; // if in limbo, reset to 15 Oct 1582.
 	}
 	//print " dmy=$day/$mon/$year $hr:$min:$sec => " .$ret;
 	return $ret;

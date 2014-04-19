@@ -28,6 +28,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Exception;
+
 /**
  * Thrown when API return a error code as response to our request.
  *

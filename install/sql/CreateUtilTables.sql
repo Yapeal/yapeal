@@ -178,16 +178,6 @@ VALUES
     (0, 'ServerStatus', '2014-04-09 08:05:58', 'server'),
     (1156, 'APIKeyInfo', '2014-04-09 08:07:22', 'account');
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilGraphic`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilGraphic` (
-    `graphic`     MEDIUMBLOB,
-    `graphicType` VARCHAR(4) DEFAULT NULL,
-    `ownerID`     BIGINT(20) UNSIGNED NOT NULL,
-    `ownerType`   VARCHAR(4) DEFAULT NULL,
-    PRIMARY KEY (`ownerID`),
-    KEY `utilGraphic1` (`ownerType`)
-)
-    ENGINE =InnoDB
-    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredCharacter`;
 CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredCharacter` (
     `activeAPIMask` BIGINT(20) UNSIGNED DEFAULT NULL,

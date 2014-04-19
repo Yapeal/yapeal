@@ -1604,14 +1604,29 @@ if (!defined('_ADODB_LAYER')) {
                 : $rs->fetchMode;
             return $rs2;
         }
-        /*
-	* Return all rows. Compat with PEAR DB
-	*/
+        /**
+         * Return all rows. Compat with PEAR DB
+         *
+         * @param string $sql
+         * @param mixed  $inputarr
+         *
+         * @return array
+         */
         function GetAll($sql, $inputarr = false)
         {
             $arr = $this->GetArray($sql, $inputarr);
             return $arr;
         }
+        /**
+         * Return all rows. Compat with PEAR DB
+         *
+         * @param string $sql
+         * @param mixed  $inputarr
+         * @param bool   $force_array
+         * @param bool   $first2cols
+         *
+         * @return array
+         */
         function GetAssoc(
             $sql,
             $inputarr = false,
@@ -1675,13 +1690,13 @@ if (!defined('_ADODB_LAYER')) {
         // $where should include 'WHERE fld=value'
         function GetMedian($table, $field, $where = '')
         {
-            $total = $this->GetOne("select count(*) from $table $where");
+            $total = $this->GetOne("SELECT count(*) FROM $table $where");
             if (!$total) {
                 return false;
             }
             $midrow = (integer)($total / 2);
             $rs = $this->SelectLimit(
-                "select $field from $table $where order by 1",
+                "SELECT $field FROM $table $where ORDER BY 1",
                 1,
                 $midrow
             );
@@ -2667,8 +2682,8 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
          * List columns in a database as an array of ADOFieldObjects.
          * See top of file for definition of object.
          *
-         * @param string $table        table name to query
-         * @param bool $normalize    makes table name case-insensitive (required by some databases)
+         * @param string $table     table name to query
+         * @param bool   $normalize makes table name case-insensitive (required by some databases)
          *
          * @schema is optional database schema to use - not supported by all databases.
          *
@@ -3067,8 +3082,8 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
          * An example is  $db->qstr("Don't bother",magic_quotes_runtime());
          *
          * @param string $s            the string to quote
-         * @param mixed $magic_quotes    if $s is GET/POST var, set to get_magic_quotes_gpc().
-         *                     This undoes the stupidity of magic quotes for GPC.
+         * @param mixed  $magic_quotes if $s is GET/POST var, set to get_magic_quotes_gpc().
+         *                             This undoes the stupidity of magic quotes for GPC.
          *
          * @return  string quoted string to be sent back to database
          */

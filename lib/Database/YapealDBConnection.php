@@ -71,10 +71,10 @@ class YapealDBConnection
         global $ADODB_COUNTRECS, $ADODB_CACHE_DIR;
         $ADODB_COUNTRECS = false;
         $ADODB_CACHE_DIR =
-            dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache'
+            dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'ADOdb';
         if (empty(self::$connections)) {
-            $adoDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext'
+            $adoDir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'ext'
                 . DIRECTORY_SEPARATOR . 'ADOdb' . DIRECTORY_SEPARATOR;
             require_once $adoDir . 'adodb-exceptions.inc.php';
             require_once $adoDir . 'adodb.inc.php';

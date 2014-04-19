@@ -31,6 +31,7 @@
 namespace Yapeal\Database;
 
 use ADODB_mysqli;
+use Yapeal\Database\YapealDBConnection;
 
 /**
  * Class used to build SQL queries.
@@ -90,7 +91,7 @@ class QueryBuilder implements \Countable
         //$this->dsn = $dsn;
         try {
             // Get a database connection.
-            $this->con = \Yapeal\Database\YapealDBConnection::connect($dsn);
+            $this->con = YapealDBConnection::connect($dsn);
         } catch (\ADODB_Exception $e) {
             $mess = 'Failed to get database connection in ' . __CLASS__;
             throw new \RuntimeException($mess);
@@ -473,7 +474,7 @@ class QueryBuilder implements \Countable
      *
      * This is a custom version of the same function available in ADOdb.
      *
-     * @param object $fieldobj An ADOFieldObject to figure out generic type of.
+     * @param \ADOFieldObject $fieldobj An ADOFieldObject to figure out generic type of.
      *
      * @return string Returns a single character string of the ADOdb generic type.
      *

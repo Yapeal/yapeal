@@ -28,7 +28,10 @@
  * @link       http://www.eveonline.com/
  */
 // Need to require one last class before autoloader can take over.
-require_once __DIR__ . '/FilterFileFinder.php';
+use Yapeal\Filesystem\FilterFileFinder;
+
+require_once dirname(__DIR__) . '/lib' . '/Filesystem'
+    . '/FilterFileFinder.php';
 /**
  * Class used to manage auto loading of other classes/interfaces.
  *

@@ -44,7 +44,7 @@ class SectionMaint extends ASection
         parent::__construct();
         //$this->section = strtolower(str_replace('Section', '', __CLASS__));
         //$path = YAPEAL_CLASS . $this->section . DS;
-        //$knownScripts = FilterFileFinder::getStrippedFiles($path, $this->section);
+        //$knownScripts = Yapeal\Filesystem\Yapeal\Filesystem\FilterFileFinder::getStrippedFiles($path, $this->section);
         //$this->scriptList = array_intersect($allowedScripts, $knownScripts);
     }
     /**

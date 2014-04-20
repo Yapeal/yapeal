@@ -30,6 +30,7 @@
 use Yapeal\ALimitedObject;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
+use Yapeal\Filesystem\FilterFileFinder;
 use Yapeal\IGetBy;
 
 /**

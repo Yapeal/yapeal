@@ -28,22 +28,6 @@
  * @link       http://www.eveonline.com/
  */
 /**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be ran in CLI.
- */
-if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', true, 403);
-    $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
-        . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
-    die($mess);
-};
-/**
  * @internal Only let this code be ran directly.
  */
 $included = get_included_files();

@@ -29,40 +29,10 @@
  * @link       http://www.eveonline.com/
  * @since      2012-01-15
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be ran in CLI.
- */
-if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', true, 403);
-    $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
-        . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
-    die($mess);
-};
-/**
- * @internal Only let this code be ran directly.
- */
-$included = get_included_files();
-if (count($included) > 1 || $included[0] != __FILE__) {
-    $mess = basename(__FILE__)
-        . ' must be called directly and can not be included.' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(1);
-};
+use Yapeal\Filesystem\FilterFileFinder;
+
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
-/**
- * Define short name for directory separator which always uses unix '/'.
- *
- * @ignore
- */
-define('DS', '/');
 $inc = dirname(__DIR__) . '/inc' . DIRECTORY_SEPARATOR;
 // Get path constants so they can be used.
 require_once $inc . 'parseCommandLineOptions.php';
@@ -72,7 +42,7 @@ require_once $inc . 'showVersion.php';
 $adoDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext'
     . DIRECTORY_SEPARATOR . 'ADOdb' . DIRECTORY_SEPARATOR;
 require_once $adoDir . 'adodb.inc.php';
-require_once dirname(__DIR__) . '/class' . '/FilterFileFinder.php';
+require_once dirname(__DIR__) . '/lib' . '/Filesystem'.'/FilterFileFinder.php';
 $shortOpts = array('c:', 'd:', 'p:', 's:', 't:', 'u:');
 $longOpts = array(
     'config:',
@@ -212,6 +182,9 @@ function cleanDatabase(
     $cacheLength = time() - $cacheLength * 86400;
     $dateTime = gmdate('Y-m-d H:i:s', strtotime($cacheLength));
     // Get connection to DB.
+    /**
+     * @var \ADODB_mysqli $db
+     */
     $db = ADONewConnection($dsn);
     foreach ($sections as $section) {
         $sql = 'delete from `' . $prefix . 'utilXmlCache`';

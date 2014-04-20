@@ -34,6 +34,7 @@
  */
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\DBConnection;
+use Yapeal\Filesystem\FilterFileFinder;
 
 /**
  * @internal Only let this code be ran in CLI.
@@ -153,6 +154,7 @@ try {
     } catch (ADODB_Exception $e) {
         Logger::getLogger('yapeal')
               ->fatal($e);
+        exit(2);
     }
     if (count($result) == 0) {
         $mess = 'No sections were found in utilSections check database.';
@@ -166,6 +168,9 @@ try {
     foreach ($sectionList as $sec) {
         $class = 'Section' . $sec;
         try {
+            /**
+             * @var \ASection $instance
+             */
             $instance = new $class();
             $instance->pullXML();
         } catch (ADODB_Exception $e) {

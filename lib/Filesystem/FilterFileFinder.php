@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Filesystem;
+
 /**
  * Class to recursive search through a directory for files/directories that match
  * a search string.
- *
- * @package Yapeal
  */
-class FilterFileFinder extends FilterIterator
+class FilterFileFinder extends \FilterIterator
 {
     const CONTAINS = 'contains';
     /**
@@ -63,16 +63,16 @@ class FilterFileFinder extends FilterIterator
         $this->match = $match;
         $this->type = $type;
         $this->piece = $piece;
-        $flat = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path)
+        $flat = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path)
         );
         // Fix for issue 65 try 2
         if (class_exists('FilesystemIterator')) {
             // Set flags to known working settings.
-            $flags = FilesystemIterator::CURRENT_AS_FILEINFO
-                | FilesystemIterator::KEY_AS_PATHNAME
-                | FilesystemIterator::SKIP_DOTS
-                | FilesystemIterator::UNIX_PATHS;
+            $flags = \FilesystemIterator::CURRENT_AS_FILEINFO
+                | \FilesystemIterator::KEY_AS_PATHNAME
+                | \FilesystemIterator::SKIP_DOTS
+                | \FilesystemIterator::UNIX_PATHS;
             /**
              * @var \RecursiveDirectoryIterator $flat
              */

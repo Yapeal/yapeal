@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains ALimitedObject class.
+ * Contains Yapeal\ALimitedObject class.
  *
  * PHP version 5
  *
@@ -27,6 +27,10 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal;
+
+use DomainException;
+
 /**
  * Abstract class for basic object with properties
  *

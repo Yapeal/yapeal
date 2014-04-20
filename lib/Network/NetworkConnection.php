@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains YapealNetworkConnection class.
+ * Contains NetworkConnection class.
  *
  *
  * PHP version 5
@@ -28,13 +28,15 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Network;
+
 use Yapeal\Exception\YapealApiException;
 use Yapeal\Singleton;
 
 /**
  * Wrapper for API network connection.
  */
-class YapealNetworkConnection
+class NetworkConnection
 {
     /**
      * Constructor
@@ -54,8 +56,8 @@ class YapealNetworkConnection
             'Keep-Alive: 300'
         );
         $file =
-            dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ext' . DIRECTORY_SEPARATOR
-            . 'eac_httprequest' . DIRECTORY_SEPARATOR
+            dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'ext'
+            . DIRECTORY_SEPARATOR . 'eac_httprequest' . DIRECTORY_SEPARATOR
             . 'eac_httprequest.class.php';
         require_once $file;
         $this->con = Singleton::get('httpRequest');
@@ -81,19 +83,19 @@ class YapealNetworkConnection
     {
         $result = $this->con->post($url, $postList);
         if (!$this->con->success) {
-            if (Logger::getLogger('yapeal')
-                      ->isInfoEnabled()
+            if (\Logger::getLogger('yapeal')
+                       ->isInfoEnabled()
             ) {
                 $mess = $this->con->error . ' for API ' . $url;
-                Logger::getLogger('yapeal')
-                      ->info($mess);
+                \Logger::getLogger('yapeal')
+                       ->info($mess);
             }
             return false;
         }
         return $result;
     }
     /**
-     * @var curlRequest Holds API connection object.
+     * @var \curlRequest Holds API connection object.
      */
     private $con;
 }

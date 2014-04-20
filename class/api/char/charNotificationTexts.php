@@ -31,6 +31,7 @@ use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\NetworkConnection;
 
 /**
  * Class used to fetch and store char NotificationTexts API.
@@ -73,7 +74,7 @@ class charNotificationTexts extends AChar
             // If it's not cached need to try to get it.
             if (false === $result) {
                 $proxy = $this->getProxy();
-                $con = new YapealNetworkConnection();
+                $con = new NetworkConnection();
                 $ids = $this->getIds();
                 if (false === $ids) {
                     return false;

@@ -30,6 +30,7 @@
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\NetworkConnection;
 
 /**
  * Class used to fetch and store char WalletJournal API.
@@ -97,7 +98,7 @@ class charWalletJournal extends AChar
                 // If it's not cached need to try to get it.
                 if (false === $result) {
                     $proxy = $this->getProxy();
-                    $con = new YapealNetworkConnection();
+                    $con = new NetworkConnection();
                     $result = $con->retrieveXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so
                     // just return to caller.

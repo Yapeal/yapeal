@@ -27,6 +27,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal;
+
 /**
  * Interface to get record from database table by Id or when available other
  * methods. */
@@ -44,7 +46,7 @@ interface IGetBy
      *
      * @return bool Returns TRUE if item was retrieved.
      *
-     * @throws LogicException Should throw a LogicException if there is no 'id'
+     * @throws \LogicException Should throw a LogicException if there is no 'id'
      * type field that can be use in retrieving the database table.
      */
     public function getItemById($id);
@@ -60,7 +62,7 @@ interface IGetBy
      *
      * @return bool TRUE if item was retrieved else FALSE.
      *
-     * @throws LogicException Should throw a LogicException if there is no 'name'
+     * @throws \LogicException Should throw a LogicException if there is no 'name'
      * type field that can be use in retrieving the database table.
      */
     public function getItemByName($name);

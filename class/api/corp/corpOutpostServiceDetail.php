@@ -30,6 +30,7 @@
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\DBConnection;
 use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\NetworkConnection;
 
 /**
  * Class used to fetch and store corp OutpostServiceDetail API.
@@ -82,7 +83,7 @@ class corpOutpostServiceDetail extends ACorp
                 // If it's not cached need to try to get it.
                 if (false === $result) {
                     $proxy = $this->getProxy();
-                    $con = new YapealNetworkConnection();
+                    $con = new NetworkConnection();
                     $result = $con->retrieveXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so just
                     // return to caller.

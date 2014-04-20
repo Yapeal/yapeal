@@ -30,6 +30,7 @@
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
+use Yapeal\Network\NetworkConnection;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -77,7 +78,7 @@ abstract class AApiRequest
             // If XML is not cached need to try to get it from API server or proxy.
             if (false === $result) {
                 $proxy = $this->getProxy();
-                $con = new YapealNetworkConnection();
+                $con = new NetworkConnection();
                 $result = $con->retrieveXml($proxy, $this->params);
                 // FALSE means there was an error and it has already been report just
                 // need to return to caller.

@@ -27,6 +27,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\AChar;
 use Yapeal\Database\QueryBuilder;
 
 /**

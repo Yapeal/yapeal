@@ -27,6 +27,10 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Database\Section;
+
+use CachedUntil;
+use Yapeal\Database\ASection;
 use Yapeal\Database\DBConnection;
 
 /**
@@ -40,7 +44,8 @@ class SectionMaint extends ASection
      */
     public function __construct()
     {
-        $this->section = strtolower(str_replace('Section', '', __CLASS__));
+        $this->section =
+            strtolower(str_replace('Section', '', basename(__CLASS__)));
         parent::__construct();
         //$this->section = strtolower(str_replace('Section', '', __CLASS__));
         //$path = YAPEAL_CLASS . $this->section . DS;
@@ -60,13 +65,13 @@ class SectionMaint extends ASection
         $scriptCount = 0;
         $scriptSuccess = 0;
         if (count($this->scriptList) == 0) {
-            if (Logger::getLogger('yapeal')
-                      ->isInfoEnabled()
+            if (\Logger::getLogger('yapeal')
+                       ->isInfoEnabled()
             ) {
                 $mess = 'None of the allowed scripts are currently active for '
                     . $this->section;
-                Logger::getLogger('yapeal')
-                      ->info($mess);
+                \Logger::getLogger('yapeal')
+                       ->info($mess);
             }
             return false;
         }
@@ -90,17 +95,17 @@ class SectionMaint extends ASection
                         $con = DBConnection::connect(YAPEAL_DSN);
                         $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
-                            if (Logger::getLogger('yapeal')
-                                      ->isInfoEnabled()
+                            if (\Logger::getLogger('yapeal')
+                                       ->isInfoEnabled()
                             ) {
                                 $mess =
                                     'Failed to get lock for ' . $class . $hash;
-                                Logger::getLogger('yapeal')
-                                      ->info($mess);
+                                \Logger::getLogger('yapeal')
+                                       ->info($mess);
                             }
                             continue;
                         }
-                    } catch (ADODB_Exception $e) {
+                    } catch (\ADODB_Exception $e) {
                         continue;
                     }
                     // Give each script 60 seconds to finish. This should never happen but
@@ -114,20 +119,20 @@ class SectionMaint extends ASection
                 }
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
-                    if (Logger::getLogger('yapeal')
-                              ->isInfoEnabled()
+                    if (\Logger::getLogger('yapeal')
+                               ->isInfoEnabled()
                     ) {
                         $mess =
                             'Yapeal has been working very hard and needs a break';
-                        Logger::getLogger('yapeal')
-                              ->info($mess);
+                        \Logger::getLogger('yapeal')
+                               ->info($mess);
                     }
                     exit;
                 }
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->warn($e);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->warn($e);
         }
         // Only truly successful if all scripts ran successfully.
         if ($scriptCount == $scriptSuccess) {

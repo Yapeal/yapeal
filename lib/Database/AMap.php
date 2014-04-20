@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains abstract class for server section.
+ * Contains abstract class for map section.
  *
  * PHP version 5
  *
@@ -27,12 +27,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\DBConnection;
+namespace Yapeal\Database;
+
+use CachedUntil;
 
 /**
- * Abstract class for Server APIs.
+ * Abstract class for Map APIs.
  */
-abstract class AServer extends AApiRequest
+abstract class AMap extends AApiRequest
 {
     /**
      * Constructor
@@ -41,7 +43,7 @@ abstract class AServer extends AApiRequest
      *                      used in HTML POST parameters to API servers which varies depending on API
      *                      'section' being requested.
      *
-     * @throws LengthException for any missing required $params.
+     * @throws \LengthException for any missing required $params.
      */
     public function __construct(array $params)
     {
@@ -51,10 +53,10 @@ abstract class AServer extends AApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @return mixed Returns the URL for proxy as string if found else it will
      * return the default string needed to use API server directly.
      */
@@ -81,7 +83,7 @@ abstract class AServer extends AApiRequest
                 return $default;
             }
             return $proxy;
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             return $default;
         }
     }
@@ -112,9 +114,42 @@ abstract class AServer extends AApiRequest
                     return false;
                     break;
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->error($e);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->error($e);
+            return false;
+        }
+        return true;
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
+     * Method used to prepare database table(s) before parsing API XML data.
+     *
+     * If there is any need to delete records or empty tables before parsing XML
+     * and adding the new data this method should be used to do so.
+     *
+     * @throws \InvalidArgumentException
+     * @return bool Will return TRUE if table(s) were prepared correctly.
+     */
+    protected function prepareTables()
+    {
+        try {
+            $con = DBConnection::connect(YAPEAL_DSN);
+            // Empty out old data then upsert (insert) new
+            $sql = 'truncate table `';
+            $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
+            $con->Execute($sql);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->warn($e);
             return false;
         }
         return true;

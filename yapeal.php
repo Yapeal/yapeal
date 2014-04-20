@@ -133,8 +133,14 @@ try {
     /* ************************************************************************
      * Generate section list
      * ************************************************************************/
+    $sectionDir =
+        __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Database'
+        . DIRECTORY_SEPARATOR . 'Section' . DIRECTORY_SEPARATOR;
     $sectionList =
-        FilterFileFinder::getStrippedFiles(__DIR__ . '/class/', 'Section');
+        FilterFileFinder::getStrippedFiles(
+            __DIR__ . '/lib/Database/Section/',
+            'Section'
+        );
     if (count($sectionList) == 0) {
         $mess = 'No section classes were found check path setting';
         Logger::getLogger('yapeal')
@@ -148,6 +154,8 @@ try {
     };
     $sql = 'select `section`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+    $sql .= ' where isActive = 1';
+    $sql .= ' and activeAPIMask > 0';
     try {
         $con = DBConnection::connect(YAPEAL_DSN);
         $result = $con->GetCol($sql);
@@ -157,19 +165,22 @@ try {
         exit(2);
     }
     if (count($result) == 0) {
-        $mess = 'No sections were found in utilSections check database.';
+        $mess = 'No active sections were found in utilSections.';
         Logger::getLogger('yapeal')
-              ->error($mess);
+              ->info($mess);
         exit(2);
     };
     $result = array_map('ucfirst', $result);
-    $sectionList = array_intersect($sectionList, $result);
+    //$sectionList = array_intersect($sectionList, $result);
     // Now take the list of sections and call each in turn.
-    foreach ($sectionList as $sec) {
-        $class = 'Section' . $sec;
+    foreach ($result as $sec) {
+        $class = '\\Yapeal\\Database\\Section\\Section' . $sec;
+        if (!class_exists($class)) {
+            continue;
+        }
         try {
             /**
-             * @var \ASection $instance
+             * @var \Yapeal\Database\ASection $instance
              */
             $instance = new $class();
             $instance->pullXML();

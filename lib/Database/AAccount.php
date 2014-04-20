@@ -27,28 +27,11 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\DBConnection;
+namespace Yapeal\Database;
 
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-}
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    };
-    fwrite(STDERR, $mess);
-    exit(1);
-}
+use CachedUntil;
+use RegisteredKey;
+
 /**
  * Abstract class for Account APIs.
  */
@@ -61,7 +44,7 @@ abstract class AAccount extends AApiRequest
      *                      used in POST parameters to API servers which varies depending on API
      *                      'section' being requested.
      *
-     * @throws LengthException for any missing required $params.
+     * @throws \LengthException for any missing required $params.
      */
     public function __construct(array $params)
     {
@@ -71,7 +54,7 @@ abstract class AAccount extends AApiRequest
                 $mess = 'Missing required parameter $params["' . $k . '"]';
                 $mess .= ' to constructor for ' . $this->api;
                 $mess .= ' in ' . __CLASS__;
-                throw new LengthException($mess, 1);
+                throw new \LengthException($mess, 1);
             }
             switch ($v) {
                 case 'C':
@@ -80,7 +63,7 @@ abstract class AAccount extends AApiRequest
                         $mess = '$params["' . $k . '"] must be a string for '
                             . $this->api;
                         $mess .= ' in ' . __CLASS__;
-                        throw new LengthException($mess, 2);
+                        throw new \LengthException($mess, 2);
                     }
                     break;
                 case 'I':
@@ -91,7 +74,7 @@ abstract class AAccount extends AApiRequest
                         $mess = '$params["' . $k . '"] must be an integer for '
                             . $this->api;
                         $mess .= ' in ' . __CLASS__;
-                        throw new LengthException($mess, 3);
+                        throw new \LengthException($mess, 3);
                     }
                     break;
             }
@@ -103,10 +86,10 @@ abstract class AAccount extends AApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @return string Returns the URL for proxy as string if found else it will
      * return the default string needed to use API server directly.
      */
@@ -142,7 +125,7 @@ abstract class AAccount extends AApiRequest
                 return $default;
             }
             return $proxy;
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             return $default;
         }
     }
@@ -151,7 +134,7 @@ abstract class AAccount extends AApiRequest
      *
      * @param object $e Eve API exception returned.
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @return bool Returns TRUE if handled the error else FALSE.
      */
     protected function handleApiError($e)
@@ -166,14 +149,14 @@ abstract class AAccount extends AApiRequest
                 case 212: // Authentication failure (final pass).
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve key information is incorrect';
-                    Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
+                        \Logger::getLogger('yapeal')
                               ->warn($mess);
                     }
                     break;
@@ -181,21 +164,21 @@ abstract class AAccount extends AApiRequest
                     // The account isn't active deactivate key.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve account is currently suspended';
-                    Logger::getLogger('yapeal')
+                    \Logger::getLogger('yapeal')
                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
+                        \Logger::getLogger('yapeal')
                               ->warn($mess);
                     }
                     break;
                 case 222: //Key has expired. Contact key owner for access renewal.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as it needs to be renewed by owner';
-                    Logger::getLogger('yapeal')
+                    \Logger::getLogger('yapeal')
                           ->warn($mess);
                     // Deactivate for char and corp sections by expiring the key.
                     $sql =
@@ -211,7 +194,7 @@ abstract class AAccount extends AApiRequest
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
+                        \Logger::getLogger('yapeal')
                               ->warn($mess);
                     }
                     break;
@@ -231,8 +214,8 @@ abstract class AAccount extends AApiRequest
                     return false;
                     break;
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }

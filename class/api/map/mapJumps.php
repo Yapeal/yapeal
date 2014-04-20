@@ -27,6 +27,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\AMap;
+
 /**
  * Class used to fetch and store Jumps API.
  */

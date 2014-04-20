@@ -27,6 +27,10 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Database;
+
+use AccessMask;
+use Sections;
 use Yapeal\Filesystem\FilterFileFinder;
 
 /**
@@ -42,28 +46,19 @@ abstract class ASection
     public function __construct()
     {
         try {
-            $section = new Sections(strtolower($this->section), false);
-        } catch (Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->error($e);
+            $section = new \Sections(strtolower($this->section), false);
+        } catch (\Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->error($e);
             // Section does not exist in utilSections table or other error occurred.
             $this->abort = true;
             return;
         }
-        if ($section->isActive == 0) {
-            // Skip inactive sections.
-            $this->abort = true;
-            return;
-        }
         $this->mask = $section->activeAPIMask;
-        // Skip if there's no active APIs for this section.
-        if ($this->mask == 0) {
-            $this->abort = true;
-            return;
-        }
-        $this->am = new AccessMask();
-        $path = __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR
-            . $this->section . DIRECTORY_SEPARATOR;
+        $this->am = new \AccessMask();
+        $path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'class'
+            . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . $this->section
+            . DIRECTORY_SEPARATOR;
         $foundAPIs = FilterFileFinder::getStrippedFiles($path, $this->section);
         $knownAPIs = $this->am->apisToMask($foundAPIs, $this->section);
         if ($knownAPIs !== false) {
@@ -71,8 +66,8 @@ abstract class ASection
         } else {
             $this->abort = true;
             $mess = 'No known APIs found for section ' . $this->section;
-            Logger::getLogger('yapeal')
-                  ->error($mess);
+            \Logger::getLogger('yapeal')
+                   ->error($mess);
             return;
         }
     }
@@ -87,7 +82,7 @@ abstract class ASection
      */
     protected $abort = false;
     /**
-     * @var object Hold AccessMask class used to convert between mask and APIs.
+     * @var \AccessMask Hold AccessMask class used to convert between mask and APIs.
      */
     protected $am;
     /**

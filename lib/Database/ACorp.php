@@ -27,7 +27,11 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\DBConnection;
+namespace Yapeal\Database;
+
+use CachedUntil;
+use RegisteredCorporation;
+use RegisteredKey;
 
 /**
  * Abstract class for Corp APIs.
@@ -41,7 +45,7 @@ abstract class ACorp extends AApiRequest
      *                      used in HTML POST parameters to API servers which varies depending on API
      *                      'section' being requested.
      *
-     * @throws LengthException for any missing required $params.
+     * @throws \LengthException for any missing required $params.
      */
     public function __construct(array $params)
     {
@@ -52,7 +56,7 @@ abstract class ACorp extends AApiRequest
                 $mess = 'Missing required parameter $params["' . $k . '"]';
                 $mess .= ' to constructor for ' . $this->api;
                 $mess .= ' in ' . basename(__FILE__);
-                throw new LengthException($mess, 1);
+                throw new \LengthException($mess, 1);
             }
             switch ($v) {
                 case 'C':
@@ -61,7 +65,7 @@ abstract class ACorp extends AApiRequest
                         $mess = '$params["' . $k . '"] must be a string for '
                             . $this->api;
                         $mess .= ' in ' . basename(__FILE__);
-                        throw new LengthException($mess, 2);
+                        throw new \LengthException($mess, 2);
                     }
                     break;
                 case 'I':
@@ -72,7 +76,7 @@ abstract class ACorp extends AApiRequest
                         $mess = '$params["' . $k . '"] must be an integer for '
                             . $this->api;
                         $mess .= ' in ' . basename(__FILE__);
-                        throw new LengthException($mess, 3);
+                        throw new \LengthException($mess, 3);
                     }
                     break;
             }
@@ -84,7 +88,7 @@ abstract class ACorp extends AApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
      * @return mixed Returns the URL for proxy as string if found else it will
@@ -132,7 +136,7 @@ abstract class ACorp extends AApiRequest
                 return $default;
             }
             return $proxy;
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             return $default;
         }
     }
@@ -141,7 +145,7 @@ abstract class ACorp extends AApiRequest
      *
      * @param object $e Eve API exception returned.
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @return bool Returns TRUE if handled the error else FALSE.
      */
     protected function handleApiError($e)
@@ -182,8 +186,8 @@ abstract class ACorp extends AApiRequest
                         $mess = 'Deactivating corporationID: '
                             . $this->params['corporationID'];
                         $mess .= ' as their Eve API information is incorrect';
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                         // A new row for corporation will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
                         $corp = new RegisteredCorporation(
@@ -197,37 +201,37 @@ abstract class ACorp extends AApiRequest
                         if (false === $corp->store()) {
                             $mess = 'Could not deactivate corporationID: ';
                             $mess .= $this->params['corporationID'];
-                            Logger::getLogger('yapeal')
-                                  ->warn($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->warn($mess);
                         }
                     }
                     // Always deactivates key no matter the registered mode.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve API information is incorrect';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                     }
                     break;
                 case 125: // Corporation not enlisted in Factional Warfare. (Key accessMask outdated)
                     // The key access has changed deactivate API for corporation if
                     // registered mode is not 'ignored'.
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
-                        if (Logger::getLogger('yapeal')
-                                  ->isInfoEnabled()
+                        if (\Logger::getLogger('yapeal')
+                                   ->isInfoEnabled()
                         ) {
                             $mess = 'Deactivating Eve API: ' . $this->api;
                             $mess .= ' for corporation '
                                 . $this->params['corporationID'];
                             $mess .= ' as they are not enlisted in factional warfare';
-                            Logger::getLogger('yapeal')
-                                  ->info($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->info($mess);
                         }
                         // A new row for corporation will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
@@ -242,8 +246,8 @@ abstract class ACorp extends AApiRequest
                         if (false === $corp->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
                             $mess .= ' for ' . $this->params['corporationID'];
-                            Logger::getLogger('yapeal')
-                                  ->warn($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->warn($mess);
                         }
                     }
                     break;
@@ -255,15 +259,15 @@ abstract class ACorp extends AApiRequest
                 case 220: // Invalid Corporation Key. (Owner no longer CEO or director)
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as account owner no long has corporation access';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                     }
                     break;
                 case 211: // Login denied by account status.
@@ -273,8 +277,8 @@ abstract class ACorp extends AApiRequest
                         $mess = 'Deactivating corporationID: '
                             . $this->params['corporationID'];
                         $mess .= ' as their Eve account is currently suspended';
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                         // A new row for corporation will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
                         $corp = new RegisteredCorporation(
@@ -284,37 +288,37 @@ abstract class ACorp extends AApiRequest
                         if (false === $corp->store()) {
                             $mess = 'Could not deactivate corporationID: ';
                             $mess .= $this->params['corporationID'];
-                            Logger::getLogger('yapeal')
-                                  ->warn($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->warn($mess);
                         }
                     }
                     // Always deactivates key no matter the registered mode.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve account is currently suspended';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                     }
                     break;
                 case 221: // Illegal page request! (Key accessMask outdated)
                     // The key access has changed deactivate API for corporation if
                     // registered mode is not 'ignored'.
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
-                        if (Logger::getLogger('yapeal')
-                                  ->isInfoEnabled()
+                        if (\Logger::getLogger('yapeal')
+                                   ->isInfoEnabled()
                         ) {
                             $mess = 'Deactivating Eve API: ' . $this->api;
                             $mess .= ' for corporation '
                                 . $this->params['corporationID'];
                             $mess .= ' as this API is no longer allowed by owner with this key';
-                            Logger::getLogger('yapeal')
-                                  ->info($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->info($mess);
                         }
                         // A new row for corporation will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
@@ -329,30 +333,30 @@ abstract class ACorp extends AApiRequest
                         if (false === $corp->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
                             $mess .= ' for ' . $this->params['corporationID'];
-                            Logger::getLogger('yapeal')
-                                  ->warn($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->warn($mess);
                         }
                     }
                     // The key access has changed deactivate API for key.
                     $mess = 'Deactivating Eve API: ' . $this->api;
                     $mess .= ' for keyID: ' . $this->params['keyID'];
                     $mess .= ' as this API is no longer allowed by owner with this key';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->deleteActiveAPI($this->api, $this->section);
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate ' . $this->api;
                         $mess .= ' for ' . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                     }
                     break;
                 case 222: //Key has expired. Contact key owner for access renewal.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as it needs to be renewed by owner';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     // Deactivate for char and corp sections by expiring the key.
                     $sql =
                         'update `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
@@ -367,8 +371,8 @@ abstract class ACorp extends AApiRequest
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
-                        Logger::getLogger('yapeal')
-                              ->warn($mess);
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
                     }
                     break;
                 case 901: // Web site database temporarily disabled.
@@ -387,9 +391,9 @@ abstract class ACorp extends AApiRequest
                     return false;
                     break;
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->error($e);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->error($e);
             return false;
         }
         return true;

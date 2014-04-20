@@ -27,31 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Database;
+
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\NetworkConnection;
 
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-}
-/**
- * @internal Only let this code be included.
- */
-if (count(get_included_files()) < 2) {
-    $mess = basename(__FILE__)
-        . ' must be included it can not be ran directly.' . PHP_EOL;
-    if (PHP_SAPI != 'cli') {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die($mess);
-    }
-    fwrite(STDERR, $mess);
-    exit(1);
-}
 /**
  * Abstract class to hold common methods for API classes.
  */
@@ -60,7 +41,7 @@ abstract class AApiRequest
     /**
      * Used to store XML to MySQL table(s).
      *
-     * @throws LogicException
+     * @throws \LogicException
      * @return Bool Return TRUE if store was successful.
      */
     public function apiStore()
@@ -92,16 +73,16 @@ abstract class AApiRequest
                 $mess = 'Could not prepare ' . $this->section . $this->api;
                 $mess .= ' API tables to accept new data for '
                     . $this->ownerID;
-                Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                       ->warn($mess);
             }
             // Create XMLReader.
-            $this->xr = new XMLReader();
+            $this->xr = new \XMLReader();
             // Pass XML to reader.
             $this->xr->XML($result);
             // Outer structure of XML is processed here.
             while ($this->xr->read()) {
-                if ($this->xr->nodeType == XMLReader::ELEMENT
+                if ($this->xr->nodeType == \XMLReader::ELEMENT
                     && $this->xr->localName == 'result'
                 ) {
                     $result = $this->parserAPI();
@@ -113,10 +94,10 @@ abstract class AApiRequest
             // function.
             $this->handleApiError($e);
             return false;
-        } catch (ADODB_Exception $e) {
+        } catch (\ADODB_Exception $e) {
             // Catch any uncaught ADOdb exceptions here.
             $mess = 'Uncaught ADOdb exception' . PHP_EOL;
-            Logger::getLogger('yapeal')
+            \Logger::getLogger('yapeal')
                   ->warn($mess);
             return false;
         }
@@ -142,7 +123,7 @@ abstract class AApiRequest
      */
     protected $section;
     /**
-     * @var XMLReader Holds instance of XMLReader.
+     * @var \XMLReader Holds instance of XMLReader.
      */
     protected $xr;
     /**
@@ -189,7 +170,7 @@ abstract class AApiRequest
             // format string.
             if (!array_key_exists($arg_key, $arg_nums)) {
                 $mess = 'Missing argument "' . $arg_key . '"' . PHP_EOL;
-                Logger::getLogger('yapeal')
+                \Logger::getLogger('yapeal')
                       ->warn($mess);
                 return false;
             }
@@ -234,7 +215,7 @@ abstract class AApiRequest
      * API classes to be empty except for a constructor which sets $this->api and
      * calls their parent constructor.
      *
-     * @throws LogicException
+     * @throws \LogicException
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
      */
     protected function parserAPI()
@@ -250,7 +231,7 @@ abstract class AApiRequest
         try {
             while ($this->xr->read()) {
                 switch ($this->xr->nodeType) {
-                    case XMLReader::ELEMENT:
+                    case \XMLReader::ELEMENT:
                         switch ($this->xr->localName) {
                             case 'row':
                                 $row = array();
@@ -262,7 +243,7 @@ abstract class AApiRequest
                                 break;
                         };
                         break;
-                    case XMLReader::END_ELEMENT:
+                    case \XMLReader::END_ELEMENT:
                         if ($this->xr->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
@@ -274,14 +255,14 @@ abstract class AApiRequest
                         break;
                 }
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
                   ->warn($e);
             return false;
         }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        Logger::getLogger('yapeal')
+        \Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
     }

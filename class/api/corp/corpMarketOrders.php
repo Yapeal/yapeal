@@ -27,6 +27,8 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+use Yapeal\Database\ACorp;
+
 /**
  * Class used to fetch and store corp MarketOrders API.
  */

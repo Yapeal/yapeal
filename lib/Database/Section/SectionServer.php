@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Section Map class.
+ * Contains Section Server class.
  *
  * PHP version 5
  *
@@ -27,19 +27,25 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Database\Section;
+
+use CachedUntil;
+use Yapeal\Database\AApiRequest;
+use Yapeal\Database\ASection;
 use Yapeal\Database\DBConnection;
 
 /**
- * Class used to pull Eve APIs for map section.
+ * Class used to pull Eve APIs for server section.
  */
-class SectionMap extends ASection
+class SectionServer extends ASection
 {
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->section = strtolower(str_replace('Section', '', __CLASS__));
+        $this->section =
+            strtolower(str_replace('Section', '', basename(__CLASS__)));
         parent::__construct();
     }
     /**
@@ -78,17 +84,17 @@ class SectionMap extends ASection
                         $con = DBConnection::connect(YAPEAL_DSN);
                         $sql = 'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
-                            if (Logger::getLogger('yapeal')
-                                      ->isInfoEnabled()
+                            if (\Logger::getLogger('yapeal')
+                                       ->isInfoEnabled()
                             ) {
                                 $mess =
                                     'Failed to get lock for ' . $class . $hash;
-                                Logger::getLogger('yapeal')
-                                      ->info($mess);
+                                \Logger::getLogger('yapeal')
+                                       ->info($mess);
                             }
                             continue;
                         }
-                    } catch (ADODB_Exception $e) {
+                    } catch (\ADODB_Exception $e) {
                         continue;
                     }
                     // Give each API 60 seconds to finish. This should never happen but is
@@ -105,20 +111,20 @@ class SectionMap extends ASection
                 }
                 // See if Yapeal has been running for longer than 'soft' limit.
                 if (YAPEAL_MAX_EXECUTE < time()) {
-                    if (Logger::getLogger('yapeal')
-                              ->isInfoEnabled()
+                    if (\Logger::getLogger('yapeal')
+                               ->isInfoEnabled()
                     ) {
                         $mess =
                             'Yapeal has been working very hard and needs a break';
-                        Logger::getLogger('yapeal')
-                              ->info($mess);
+                        \Logger::getLogger('yapeal')
+                               ->info($mess);
                     }
                     exit;
                 }
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->warn($e);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->warn($e);
         }
         // Only truly successful if API was fetched and stored.
         if ($apiCount == $apiSuccess) {

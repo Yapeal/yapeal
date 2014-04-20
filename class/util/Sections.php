@@ -30,7 +30,6 @@
 use Yapeal\ALimitedObject;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
-use Yapeal\Filesystem\FilterFileFinder;
 use Yapeal\IGetBy;
 
 /**
@@ -57,17 +56,13 @@ class Sections extends ALimitedObject implements IGetBy
      */
     public function __construct($id = null, $create = true)
     {
-        $this->sectionList =
-            FilterFileFinder::getStrippedFiles(
-                dirname(__DIR__) . DIRECTORY_SEPARATOR,
-                'Section'
-            );
-        $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . __CLASS__;
+        $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . basename(__CLASS__);
         try {
             // Get a database connection.
             $this->con = DBConnection::connect(YAPEAL_DSN);
         } catch (ADODB_Exception $e) {
-            $mess = 'Failed to get database connection in ' . __CLASS__;
+            $mess =
+                'Failed to get database connection in ' . basename(__CLASS__);
             throw new RuntimeException($mess);
         }
         // Get a new access mask object.
@@ -203,7 +198,7 @@ class Sections extends ALimitedObject implements IGetBy
      */
     public function getItemByName($name)
     {
-        if (!in_array(ucfirst($name), $this->sectionList)) {
+        if (!in_array($name, $this->sectionList)) {
             $mess = 'Unknown section: ' . $name;
             throw new DomainException($mess);
         }
@@ -302,6 +297,13 @@ class Sections extends ALimitedObject implements IGetBy
      *
      * @var array
      */
-    private $sectionList;
+    private $sectionList = array(
+        'account',
+        'char',
+        'corp',
+        'eve',
+        'map',
+        'server'
+    );
 }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Section Char class.
+ * Contains Section Corp class.
  *
  * PHP version 5
  *
@@ -27,23 +27,29 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
+namespace Yapeal\Database\Section;
+
+use CachedUntil;
+use Yapeal\Database\AApiRequest;
+use Yapeal\Database\ASection;
 use Yapeal\Database\DBConnection;
 
 /**
- * Class used to pull Eve APIs for char section.
+ * Class used to pull Eve APIs for corp section.
  */
-class SectionChar extends ASection
+class SectionCorp extends ASection
 {
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->section = strtolower(str_replace('Section', '', __CLASS__));
+        $this->section =
+            strtolower(str_replace('Section', '', basename(__CLASS__)));
         parent::__construct();
     }
     /**
-     * Function called by Yapeal.php to start section pulling XML from servers.
+     * Function called by  Yapeal.php to start section pulling XML from servers.
      *
      * @return bool Returns TRUE if all APIs were pulled cleanly else FALSE.
      */
@@ -59,43 +65,44 @@ class SectionChar extends ASection
             $sql = $this->getSQLQuery();
             $result = $con->GetAll($sql);
             if (count($result) == 0) {
-                if (Logger::getLogger('yapeal')
-                          ->isInfoEnabled()
+                if (\Logger::getLogger('yapeal')
+                           ->isInfoEnabled()
                 ) {
-                    $mess = 'No characters for char section';
-                    Logger::getLogger('yapeal')
-                          ->info($mess);
+                    $mess = 'No corporations for corp section';
+                    \Logger::getLogger('yapeal')
+                           ->info($mess);
                 }
                 return false;
             }
             // Build name of filter based on mode.
             $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
-            $charList = array_filter($result, $filter);
-            if (empty($charList)) {
-                if (Logger::getLogger('yapeal')
-                          ->isInfoEnabled()
+            $corpList = array_filter($result, $filter);
+            if (empty($corpList)) {
+                if (\Logger::getLogger('yapeal')
+                           ->isInfoEnabled()
                 ) {
-                    $mess = 'No active characters for char section';
-                    Logger::getLogger('yapeal')
-                          ->info($mess);
+                    $mess = 'No active corporations for corp section';
+                    \Logger::getLogger('yapeal')
+                           ->info($mess);
                 }
                 return false;
             }
-            // Randomize order so no one character can starve the rest in case of
+            // Randomize order so no one corporation can starve the rest in case of
             // errors, etc.
-            if (count($charList) > 1) {
-                shuffle($charList);
+            if (count($corpList) > 1) {
+                shuffle($corpList);
             }
-            foreach ($charList as $chr) {
-                // Skip characters with no APIs.
-                if ($chr['mask'] == 0) {
+            // Ok now that we have a list of corps we can check which APIs need updated.
+            foreach ($corpList as $crp) {
+                // Skip corporations with no APIs.
+                if ($crp['mask'] == 0) {
                     continue;
                 }
-                $apis = $this->am->maskToAPIs($chr['mask'], $this->section);
+                $apis = $this->am->maskToAPIs($crp['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
-                    Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     continue;
                 }
                 // Randomize order in which APIs are tried if there is a list.
@@ -104,7 +111,7 @@ class SectionChar extends ASection
                 }
                 foreach ($apis as $api) {
                     // If the cache for this API has expired try to get update.
-                    if (CachedUntil::cacheExpired($api, $chr['characterID'])
+                    if (CachedUntil::cacheExpired($api, $crp['corporationID'])
                         === true
                     ) {
                         ++$apiCount;
@@ -112,9 +119,9 @@ class SectionChar extends ASection
                         // These are passed on to the API class instance and used as part of
                         // hash for lock.
                         $params = array(
-                            'keyID' => $chr['keyID'],
-                            'vCode' => $chr['vCode'],
-                            'characterID' => $chr['characterID']
+                            'keyID' => $crp['keyID'],
+                            'vCode' => $crp['vCode'],
+                            'corporationID' => $crp['corporationID']
                         );
                         $parameters = '';
                         foreach ($params as $k => $v) {
@@ -128,24 +135,24 @@ class SectionChar extends ASection
                             $sql =
                                 'select get_lock(' . $con->qstr($hash) . ',5)';
                             if ($con->GetOne($sql) != 1) {
-                                if (Logger::getLogger('yapeal')
-                                          ->isInfoEnabled()
+                                if (\Logger::getLogger('yapeal')
+                                           ->isInfoEnabled()
                                 ) {
                                     $mess = 'Failed to get lock for ' . $class
                                         . $hash;
-                                    Logger::getLogger('yapeal')
-                                          ->info($mess);
+                                    \Logger::getLogger('yapeal')
+                                           ->info($mess);
                                 }
                                 continue;
                             }
-                        } catch (ADODB_Exception $e) {
+                        } catch (\ADODB_Exception $e) {
                             continue;
                         }
                         // Give each API 60 seconds to finish. This should never happen but
                         // is here to catch runaways.
                         set_time_limit(60);
                         /**
-                         * @var AApiRequest $instance
+                         * @var \Yapeal\Database\AApiRequest $instance
                          */
                         $instance = new $class($params);
                         if ($instance->apiStore()) {
@@ -155,21 +162,21 @@ class SectionChar extends ASection
                     }
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
-                        if (Logger::getLogger('yapeal')
-                                  ->isInfoEnabled()
+                        if (\Logger::getLogger('yapeal')
+                                   ->isInfoEnabled()
                         ) {
                             $mess =
                                 'Yapeal has been working very hard and needs a break';
-                            Logger::getLogger('yapeal')
-                                  ->info($mess);
+                            \Logger::getLogger('yapeal')
+                                   ->info($mess);
                         }
                         exit;
                     }
                 }
             }
-        } catch (ADODB_Exception $e) {
-            Logger::getLogger('yapeal')
-                  ->warn($e);
+        } catch (\ADODB_Exception $e) {
+            \Logger::getLogger('yapeal')
+                   ->warn($e);
         }
         // Only truly successful if API was fetched and stored.
         if ($apiCount == $apiSuccess) {
@@ -186,7 +193,7 @@ class SectionChar extends ASection
     protected function getSQLQuery()
     {
         $sql =
-            'select akb.`keyID`,akb.`characterID`,urk.`vCode`,aaki.`expires`,';
+            'select akb.`keyID`,ac.`corporationID`,urk.`vCode`,aaki.`expires`,';
         switch (YAPEAL_REGISTERED_MODE) {
             case 'required':
                 $sql .= 'urc.`isActive` as "RCActive",aaki.`accessMask`,';
@@ -203,10 +210,10 @@ class SectionChar extends ASection
                     . 'accountCharacters` as ac';
                 $sql .= ' on (akb.`characterID` = ac.`characterID`)';
                 $sql .= ' join `' . YAPEAL_TABLE_PREFIX
-                    . 'utilRegisteredCharacter` as urc';
-                $sql .= ' on (akb.`characterID` = urc.`characterID`)';
+                    . 'utilRegisteredCorporation` as urc';
+                $sql .= ' on (ac.`corporationID` = urc.`corporationID`)';
                 $sql .= ' where';
-                $sql .= ' aaki.`type` in ("Account","Character")';
+                $sql .= ' aaki.`type` = "Corporation"';
                 break;
             case 'optional':
                 $sql .= 'urk.`isActive` as "RKActive",urc.`isActive` as "RCActive",';
@@ -224,10 +231,10 @@ class SectionChar extends ASection
                     . 'accountCharacters` as ac';
                 $sql .= ' on (akb.`characterID` = ac.`characterID`)';
                 $sql .= ' left join `' . YAPEAL_TABLE_PREFIX
-                    . 'utilRegisteredCharacter` as urc';
-                $sql .= ' on (akb.`characterID` = urc.`characterID`)';
+                    . 'utilRegisteredCorporation` as urc';
+                $sql .= ' on (ac.`corporationID` = urc.`corporationID`)';
                 $sql .= ' where';
-                $sql .= ' aaki.`type` in ("Account","Character")';
+                $sql .= ' aaki.`type` = "Corporation"';
                 break;
             case 'ignored':
                 $sql .= 'urk.`isActive` as "RKActive",aaki.`accessMask`,';
@@ -244,9 +251,9 @@ class SectionChar extends ASection
                     . 'accountCharacters` as ac';
                 $sql .= ' on (akb.`characterID` = ac.`characterID`)';
                 $sql .= ' where';
-                $sql .= ' aaki.`type` in ("Account","Character")';
+                $sql .= ' aaki.`type` = "Corporation"';
                 break;
-        };
+        }
         return $sql;
     }
     /**
@@ -255,7 +262,7 @@ class SectionChar extends ASection
      * This function is used to filter out non-active rows and merge all of the
      * different masks into one for each row.
      *
-     * All the settings in utilRegisteredCharacter are ignored and the ones in
+     * All the settings in utilRegisteredCorporation are ignored and the ones in
      * utilRegisteredKey used instead. If any of the optional settings in
      * utilRegisteredKey are null then returns FALSE but no error messages.
      *
@@ -296,9 +303,9 @@ class SectionChar extends ASection
      *
      * The best way to view this mode is it allows you to farther restrict the
      * settings in utilSections using the optional settings from
-     * utilRegisteredKey and utilRegisteredCharacter if you choose to. Any
-     * non-null optional settings in utilRegisteredCharacter has priority over the
-     * ones in utilRegisteredKey which are ignored in that case.
+     * utilRegisteredKey and utilRegisteredCorporation if you choose to. Any
+     * non-null optional settings in utilRegisteredCorporation has priority over
+     * the ones in utilRegisteredKey which are ignored in that case.
      *
      * @param array $row The row currently being checked.
      *
@@ -306,12 +313,12 @@ class SectionChar extends ASection
      */
     protected function optionalFilter(&$row)
     {
-        // If isActive from utilRegisteredCharacter is not empty and set to FALSE
+        // If isActive from utilRegisteredCorporation is not empty and set to FALSE
         // then return FALSE.
         if (!is_null($row['RCActive']) && $row['RCActive'] == 0) {
             return false;
-            // Else if isActive from utilRegisteredCharacter is null and isActive from
-            // utilRegisteredKey is not empty and set to FALSE then return FALSE.
+            // Else if isActive from utilRegisteredCorporation is null and isActive
+            // from utilRegisteredKey is not empty and set to FALSE then return FALSE.
         } elseif (is_null($row['RCActive']) && !is_null($row['RKActive'])
             && $row['RKActive'] == 0
         ) {
@@ -324,7 +331,7 @@ class SectionChar extends ASection
             return false;
         }
         $row['mask'] = $this->mask;
-        // Use Character mask if not empty ...
+        // Use Corporation mask if not empty ...
         if (!is_null($row['RCMask'])) {
             $row['mask'] &= $row['RCMask'];
             // else use key mask if not empty.
@@ -345,7 +352,7 @@ class SectionChar extends ASection
      *
      * The best way to view this mode is it forces you to farther restrict the
      * settings in utilSections using the optional settings from
-     * utilRegisteredCharacter. The optional settings become required with the
+     * utilRegisteredCorporation. The optional settings become required with the
      * exception of proxy which is still optional so activeAPIMask and isActive
      * can no longer be null. This mode is much like the old legacy mode of Yapeal.
      *
@@ -357,10 +364,11 @@ class SectionChar extends ASection
     {
         // isActive is not optional.
         if (is_null($row['RCActive'])) {
-            $mess = 'IsActive can not be null in utilRegisteredCharacter when';
+            $mess =
+                'IsActive can not be null in utilRegisteredCorporation when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         }
         // Deactivated.
@@ -376,10 +384,10 @@ class SectionChar extends ASection
         // activeAPIMask is not optional.
         if (is_null($row['RCMask'])) {
             $mess =
-                'activeAPIMask can not be null in utilRegisteredCharacter when';
+                'activeAPIMask can not be null in utilRegisteredCorporation when';
             $mess .= ' registered_mode = "required"';
-            Logger::getLogger('yapeal')
-                  ->warn($mess);
+            \Logger::getLogger('yapeal')
+                   ->warn($mess);
             return false;
         }
         $row['mask'] = $this->mask & $row['RCMask'];

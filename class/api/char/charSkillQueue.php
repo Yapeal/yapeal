@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 use Yapeal\Database\DBConnection;
 
 /**
  * Class used to fetch and store char SkillQueue API.
  */
-class charSkillQueue extends AChar
+class charSkillQueue extends AbstractChar
 {
     /**
      * Constructor

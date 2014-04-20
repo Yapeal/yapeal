@@ -27,7 +27,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AEve;
+use Yapeal\Database\AbstractEve;
 
 /**
  * @internal Allow viewing of the source code in web browser.
@@ -52,7 +52,7 @@ if (count(get_included_files()) < 2) {
 /**
  * Class used to fetch and store eve CharacterInfo API.
  */
-class eveCharacterInfo extends AEve
+class eveCharacterInfo extends AbstractEve
 {
     /**
      * Constructor

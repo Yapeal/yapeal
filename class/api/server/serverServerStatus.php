@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AServer;
+use Yapeal\Database\AbstractServer;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store ServerStatus API.
  */
-class serverServerStatus extends AServer
+class serverServerStatus extends AbstractServer
 {
     /**
      * Constructor

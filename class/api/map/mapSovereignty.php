@@ -27,14 +27,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AMap;
+use Yapeal\Database\AbstractMap;
 
 /**
  * Class used to fetch and store Sovereignty API.
  *
 
  */
-class mapSovereignty extends AMap
+class mapSovereignty extends AbstractMap
 {
     /**
      * Constructor

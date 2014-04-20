@@ -28,7 +28,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
@@ -37,7 +37,7 @@ use Yapeal\Network\NetworkConnection;
 /**
  * Class used to fetch and store corp StarbaseDetail API.
  */
-class corpStarbaseDetail extends ACorp
+class corpStarbaseDetail extends AbstractCorp
 {
     /**
      * Constructor

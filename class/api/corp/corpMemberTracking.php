@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\DBConnection;
 
 /**
  * Class used to fetch and store corp MemberTracking API.
  */
-class corpMemberTracking extends ACorp
+class corpMemberTracking extends AbstractCorp
 {
     /**
      * Constructor

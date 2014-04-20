@@ -27,12 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AMap;
+use Yapeal\Database\AbstractMap;
 
 /**
  * Class used to fetch and store Kills API.
  */
-class mapKills extends AMap
+class mapKills extends AbstractMap
 {
     /**
      * Constructor

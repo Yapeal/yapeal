@@ -27,12 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 
 /**
  * Class used to fetch and store corp MemberMedals API.
  */
-class corpMemberMedals extends ACorp
+class corpMemberMedals extends AbstractCorp
 {
     /**
      * Constructor

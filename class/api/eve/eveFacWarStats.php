@@ -28,14 +28,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AEve;
+use Yapeal\Database\AbstractEve;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store eve FacWarStats API.
  */
-class eveFacWarStats extends AEve
+class eveFacWarStats extends AbstractEve
 {
     /**
      * Constructor

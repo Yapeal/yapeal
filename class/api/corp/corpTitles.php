@@ -27,12 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 
 /**
  * Class used to fetch and store corp Titles API.
  */
-class corpTitles extends ACorp
+class corpTitles extends AbstractCorp
 {
     /**
      * Constructor

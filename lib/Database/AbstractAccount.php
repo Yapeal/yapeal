@@ -35,7 +35,7 @@ use RegisteredKey;
 /**
  * Abstract class for Account APIs.
  */
-abstract class AAccount extends AApiRequest
+abstract class AbstractAccount extends AbstractApiRequest
 {
     /**
      * Constructor
@@ -86,7 +86,7 @@ abstract class AAccount extends AApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AbstractApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
      * @throws \InvalidArgumentException
@@ -149,15 +149,15 @@ abstract class AAccount extends AApiRequest
                 case 212: // Authentication failure (final pass).
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve key information is incorrect';
-                \Logger::getLogger('yapeal')
-                          ->warn($mess);
+                    \Logger::getLogger('yapeal')
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
                         \Logger::getLogger('yapeal')
-                              ->warn($mess);
+                               ->warn($mess);
                     }
                     break;
                 case 211: // Login denied by account status.
@@ -165,21 +165,21 @@ abstract class AAccount extends AApiRequest
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve account is currently suspended';
                     \Logger::getLogger('yapeal')
-                          ->warn($mess);
+                           ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
                     $key->isActive = 0;
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
                         \Logger::getLogger('yapeal')
-                              ->warn($mess);
+                               ->warn($mess);
                     }
                     break;
                 case 222: //Key has expired. Contact key owner for access renewal.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as it needs to be renewed by owner';
                     \Logger::getLogger('yapeal')
-                          ->warn($mess);
+                           ->warn($mess);
                     // Deactivate for char and corp sections by expiring the key.
                     $sql =
                         'update `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
@@ -195,7 +195,7 @@ abstract class AAccount extends AApiRequest
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
                         \Logger::getLogger('yapeal')
-                              ->warn($mess);
+                               ->warn($mess);
                     }
                     break;
                 case 901: // Web site database temporarily disabled.
@@ -216,7 +216,7 @@ abstract class AAccount extends AApiRequest
             }
         } catch (\ADODB_Exception $e) {
             \Logger::getLogger('yapeal')
-                  ->warn($e);
+                   ->warn($e);
             return false;
         }
         return true;

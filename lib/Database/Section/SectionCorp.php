@@ -30,14 +30,13 @@
 namespace Yapeal\Database\Section;
 
 use CachedUntil;
-use Yapeal\Database\AApiRequest;
-use Yapeal\Database\ASection;
+use Yapeal\Database\AbstractSection;
 use Yapeal\Database\DBConnection;
 
 /**
  * Class used to pull Eve APIs for corp section.
  */
-class SectionCorp extends ASection
+class SectionCorp extends AbstractSection
 {
     /**
      * Constructor
@@ -152,7 +151,7 @@ class SectionCorp extends ASection
                         // is here to catch runaways.
                         set_time_limit(60);
                         /**
-                         * @var \Yapeal\Database\AApiRequest $instance
+                         * @var \Yapeal\Database\AbstractApiRequest $instance
                          */
                         $instance = new $class($params);
                         if ($instance->apiStore()) {

@@ -36,7 +36,7 @@ use Yapeal\Network\NetworkConnection;
 /**
  * Abstract class to hold common methods for API classes.
  */
-abstract class AApiRequest
+abstract class AbstractApiRequest
 {
     /**
      * Used to store XML to MySQL table(s).

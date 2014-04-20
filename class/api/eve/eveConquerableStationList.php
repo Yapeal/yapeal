@@ -27,14 +27,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AEve;
+use Yapeal\Database\AbstractEve;
 
 /**
  * Class used to fetch and store AllianceList API.
  *
 
  */
-class eveConquerableStationList extends AEve
+class eveConquerableStationList extends AbstractEve
 {
     /**
      * Constructor

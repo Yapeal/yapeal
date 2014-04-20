@@ -28,12 +28,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 
 /**
  * Class used to fetch and store corp FacWarStats API.
  */
-class corpFacWarStats extends ACorp
+class corpFacWarStats extends AbstractCorp
 {
     /**
      * Constructor

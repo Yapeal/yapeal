@@ -27,12 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 
 /**
  * Class used to fetch and store char Notifications API.
  */
-class charNotifications extends AChar
+class charNotifications extends AbstractChar
 {
     /**
      * Constructor

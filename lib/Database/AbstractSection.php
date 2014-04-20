@@ -38,7 +38,7 @@ use Yapeal\Filesystem\FilterFileFinder;
  *
 
  */
-abstract class ASection
+abstract class AbstractSection
 {
     /**
      * Constructor

@@ -27,7 +27,7 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\QueryBuilder;
 
 /**
@@ -54,7 +54,7 @@ if (count(get_included_files()) < 2) {
 /**
  * Class used to fetch and store corp ContainerLog API.
  */
-class corpContainerLog extends ACorp
+class corpContainerLog extends AbstractCorp
 {
     /**
      * Constructor

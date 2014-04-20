@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AAccount;
+use Yapeal\Database\AbstractAccount;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store eve SkillTree API.
  */
-class accountAccountStatus extends AAccount
+class accountAccountStatus extends AbstractAccount
 {
     /**
      * Constructor

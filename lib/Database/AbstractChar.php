@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains abstract class for corp section.
+ * Contains abstract class for char section.
  *
  * PHP version 5
  *
@@ -30,13 +30,15 @@
 namespace Yapeal\Database;
 
 use CachedUntil;
-use RegisteredCorporation;
+use RegisteredCharacter;
 use RegisteredKey;
 
 /**
- * Abstract class for Corp APIs.
+ * Abstract class for Char APIs.
+ *
+
  */
-abstract class ACorp extends AApiRequest
+abstract class AbstractChar extends AbstractApiRequest
 {
     /**
      * Constructor
@@ -49,13 +51,12 @@ abstract class ACorp extends AApiRequest
      */
     public function __construct(array $params)
     {
-        $required =
-            array('corporationID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
+        $required = array('characterID' => 'I', 'keyID' => 'I', 'vCode' => 'C');
         foreach ($required as $k => $v) {
             if (!isset($params[$k])) {
                 $mess = 'Missing required parameter $params["' . $k . '"]';
                 $mess .= ' to constructor for ' . $this->api;
-                $mess .= ' in ' . basename(__FILE__);
+                $mess .= ' in ' . __CLASS__;
                 throw new \LengthException($mess, 1);
             }
             switch ($v) {
@@ -64,7 +65,7 @@ abstract class ACorp extends AApiRequest
                     if (!is_string($params[$k])) {
                         $mess = '$params["' . $k . '"] must be a string for '
                             . $this->api;
-                        $mess .= ' in ' . basename(__FILE__);
+                        $mess .= ' in ' . __CLASS__;
                         throw new \LengthException($mess, 2);
                     }
                     break;
@@ -75,24 +76,24 @@ abstract class ACorp extends AApiRequest
                     ) {
                         $mess = '$params["' . $k . '"] must be an integer for '
                             . $this->api;
-                        $mess .= ' in ' . basename(__FILE__);
+                        $mess .= ' in ' . __CLASS__;
                         throw new \LengthException($mess, 3);
                     }
                     break;
             }
         }
-        $this->ownerID = $params['corporationID'];
+        $this->ownerID = $params['characterID'];
         $this->params = $params;
     }
     /**
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AbstractApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
+     * @throws \InvalidArgumentException
      * @return mixed Returns the URL for proxy as string if found else it will
-     * return the default string needed to use API server directly.
      */
     protected function getProxy()
     {
@@ -102,15 +103,14 @@ abstract class ACorp extends AApiRequest
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();
-            // Only use utilRegisteredCorporation when YAPEAL_REGISTERED_MODE is
+            // Only use utilRegisteredCharacter when YAPEAL_REGISTERED_MODE is
             // required or optional.
             if (YAPEAL_REGISTERED_MODE == 'required'
                 || YAPEAL_REGISTERED_MODE == 'optional'
             ) {
                 $tables[] =
-                    '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCorporation`'
-                    . ' where `corporationID`='
-                    . $this->params['corporationID'];
+                    '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredCharacter`'
+                    . ' where `characterID`=' . $this->params['characterID'];
             }
             $tables[] = '`' . YAPEAL_TABLE_PREFIX . 'utilRegisteredKey`'
                 . ' where `keyID`=' . $this->params['keyID'];
@@ -161,7 +161,7 @@ abstract class ACorp extends AApiRequest
                 case 119: // Kills exhausted: retry after {0}.
                     $cuntil = substr($e->getMessage(), -21, 20);
                     // Wait at least 10 minutes. Needed since API servers sometimes return
-                    // date/times in the past :P
+                    // times in the past :P
                     if ($cuntil < YAPEAL_START_TIME) {
                         $cuntil = YAPEAL_START_TIME;
                     }
@@ -183,24 +183,24 @@ abstract class ACorp extends AApiRequest
                 case 210: // Authentication failure.
                 case 212: // Authentication failure (final pass).
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
-                        $mess = 'Deactivating corporationID: '
-                            . $this->params['corporationID'];
+                        $mess = 'Deactivating characterID: '
+                            . $this->params['characterID'];
                         $mess .= ' as their Eve API information is incorrect';
                         \Logger::getLogger('yapeal')
                                ->warn($mess);
-                        // A new row for corporation will be created if needed. This allows
+                        // A new row for character will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
-                        $corp = new RegisteredCorporation(
-                            $this->params['corporationID']
+                        $char = new RegisteredCharacter(
+                            $this->params['characterID']
                         );
-                        $corp->isActive = 0;
-                        // If new corporation need to set required columns.
-                        if (false === $corp->recordExists()) {
-                            $corp->activeAPIMask = 0;
+                        $char->isActive = 0;
+                        // If new character need to set required columns.
+                        if (false === $char->recordExists()) {
+                            $char->activeAPIMask = 0;
                         }
-                        if (false === $corp->store()) {
-                            $mess = 'Could not deactivate corporationID: ';
-                            $mess .= $this->params['corporationID'];
+                        if (false === $char->store()) {
+                            $mess = 'Could not deactivate characterID: ';
+                            $mess .= $this->params['characterID'];
                             \Logger::getLogger('yapeal')
                                    ->warn($mess);
                         }
@@ -219,75 +219,56 @@ abstract class ACorp extends AApiRequest
                                ->warn($mess);
                     }
                     break;
-                case 125: // Corporation not enlisted in Factional Warfare. (Key accessMask outdated)
-                    // The key access has changed deactivate API for corporation if
+                case 124: // Character not enlisted in Factional Warfare. (Key accessMask outdated)
+                    // The key access has changed deactivate API for character if
                     // registered mode is not 'ignored'.
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
                         if (\Logger::getLogger('yapeal')
                                    ->isInfoEnabled()
                         ) {
                             $mess = 'Deactivating Eve API: ' . $this->api;
-                            $mess .= ' for corporation '
-                                . $this->params['corporationID'];
+                            $mess .= ' for characterID: '
+                                . $this->params['characterID'];
                             $mess .= ' as they are not enlisted in factional warfare';
                             \Logger::getLogger('yapeal')
                                    ->info($mess);
                         }
-                        // A new row for corporation will be created if needed. This allows
+                        // A new row for character will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
-                        $corp = new RegisteredCorporation(
-                            $this->params['corporationID']
+                        $char = new RegisteredCharacter(
+                            $this->params['characterID']
                         );
-                        // If new corporation need to set some required columns.
-                        if (false === $corp->recordExists()) {
-                            $corp->isActive = 1;
+                        // If new character need to set required columns.
+                        if (false === $char->recordExists()) {
+                            $char->isActive = 1;
                         }
-                        $corp->deleteActiveAPI($this->api);
-                        if (false === $corp->store()) {
+                        $char->deleteActiveAPI($this->api);
+                        if (false === $char->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
-                            $mess .= ' for ' . $this->params['corporationID'];
+                            $mess .= ' for ' . $this->params['characterID'];
                             \Logger::getLogger('yapeal')
                                    ->warn($mess);
                         }
                     }
                     break;
-                case 206: // Character must have Accountant or Junior Accountant roles.
-                case 207: // Not available for NPC corporations.
-                case 208: // Character must have Accountant, Junior Accountant, or Trader roles.
-                case 209: // Character must be a Director or CEO.
-                case 213: // Character must have Factory Manager role.
-                case 220: // Invalid Corporation Key. (Owner no longer CEO or director)
-                    $mess = 'Deactivating keyID: ' . $this->params['keyID'];
-                    $mess .= ' as account owner no long has corporation access';
-                    \Logger::getLogger('yapeal')
-                           ->warn($mess);
-                    $key = new RegisteredKey($this->params['keyID'], false);
-                    $key->isActive = 0;
-                    if (false === $key->store()) {
-                        $mess = 'Could not deactivate keyID: '
-                            . $this->params['keyID'];
-                        \Logger::getLogger('yapeal')
-                               ->warn($mess);
-                    }
-                    break;
                 case 211: // Login denied by account status.
-                    // The account is not active deactivate key and corporation too if
+                    // The account is not active deactivate key and character too if
                     // registered mode is not 'ignored'.
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
-                        $mess = 'Deactivating corporationID: '
-                            . $this->params['corporationID'];
+                        $mess = 'Deactivating characterID: '
+                            . $this->params['characterID'];
                         $mess .= ' as their Eve account is currently suspended';
                         \Logger::getLogger('yapeal')
                                ->warn($mess);
-                        // A new row for corporation will be created if needed. This allows
+                        // A new row for character will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
-                        $corp = new RegisteredCorporation(
-                            $this->params['corporationID']
+                        $char = new RegisteredCharacter(
+                            $this->params['characterID']
                         );
-                        $corp->isActive = 0;
-                        if (false === $corp->store()) {
-                            $mess = 'Could not deactivate corporationID: ';
-                            $mess .= $this->params['corporationID'];
+                        $char->isActive = 0;
+                        if (false === $char->store()) {
+                            $mess = 'Could not deactivate characterID: ';
+                            $mess .= $this->params['characterID'];
                             \Logger::getLogger('yapeal')
                                    ->warn($mess);
                         }
@@ -307,32 +288,28 @@ abstract class ACorp extends AApiRequest
                     }
                     break;
                 case 221: // Illegal page request! (Key accessMask outdated)
-                    // The key access has changed deactivate API for corporation if
+                    // The key access has changed deactivate API for character if
                     // registered mode is not 'ignored'.
                     if (YAPEAL_REGISTERED_MODE != 'ignored') {
-                        if (\Logger::getLogger('yapeal')
-                                   ->isInfoEnabled()
-                        ) {
-                            $mess = 'Deactivating Eve API: ' . $this->api;
-                            $mess .= ' for corporation '
-                                . $this->params['corporationID'];
-                            $mess .= ' as this API is no longer allowed by owner with this key';
-                            \Logger::getLogger('yapeal')
-                                   ->info($mess);
-                        }
-                        // A new row for corporation will be created if needed. This allows
+                        $mess = 'Deactivating Eve API: ' . $this->api;
+                        $mess .= ' for characterID: '
+                            . $this->params['characterID'];
+                        $mess .= ' as this API is no longer allowed by owner with this key';
+                        \Logger::getLogger('yapeal')
+                               ->warn($mess);
+                        // A new row for character will be created if needed. This allows
                         // the 'optional' registered mode to work correctly.
-                        $corp = new RegisteredCorporation(
-                            $this->params['corporationID']
+                        $char = new RegisteredCharacter(
+                            $this->params['characterID']
                         );
-                        // If new corporation need to set some required columns.
-                        if (false === $corp->recordExists()) {
-                            $corp->isActive = 1;
+                        // If new character need to set some required columns.
+                        if (false === $char->recordExists()) {
+                            $char->isActive = 1;
                         }
-                        $corp->deleteActiveAPI($this->api);
-                        if (false === $corp->store()) {
+                        $char->deleteActiveAPI($this->api);
+                        if (false === $char->store()) {
                             $mess = 'Could not deactivate ' . $this->api;
-                            $mess .= ' for ' . $this->params['corporationID'];
+                            $mess .= ' for ' . $this->params['characterID'];
                             \Logger::getLogger('yapeal')
                                    ->warn($mess);
                         }

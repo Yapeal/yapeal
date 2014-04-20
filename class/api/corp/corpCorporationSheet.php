@@ -28,7 +28,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\NetworkConnection;
@@ -36,7 +36,7 @@ use Yapeal\Network\NetworkConnection;
 /**
  * Class used to fetch and store CorporationSheet API.
  */
-class corpCorporationSheet extends ACorp
+class corpCorporationSheet extends AbstractCorp
 {
     /**
      * Constructor

@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\DBConnection;
 
 /**
  * Class used to fetch and store corp OutpostList API.
  */
-class corpOutpostList extends ACorp
+class corpOutpostList extends AbstractCorp
 {
     /**
      * Constructor

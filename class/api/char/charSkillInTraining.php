@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store CharacterSheet API.
  */
-class charSkillInTraining extends AChar
+class charSkillInTraining extends AbstractChar
 {
     /**
      * Constructor

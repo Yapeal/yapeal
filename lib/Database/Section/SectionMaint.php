@@ -30,13 +30,13 @@
 namespace Yapeal\Database\Section;
 
 use CachedUntil;
-use Yapeal\Database\ASection;
+use Yapeal\Database\AbstractSection;
 use Yapeal\Database\DBConnection;
 
 /**
  * Class used to call internal maintenance scripts in Yapeal.
  */
-class SectionMaint extends ASection
+class SectionMaint extends AbstractSection
 {
     /**
      * Constructor

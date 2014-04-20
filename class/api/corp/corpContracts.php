@@ -27,13 +27,13 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store corp StarbaseList API.
  */
-class corpContracts extends ACorp
+class corpContracts extends AbstractCorp
 {
     /**
      * Constructor

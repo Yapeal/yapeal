@@ -27,14 +27,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store char ContactList API.
  */
-class charContactList extends AChar
+class charContactList extends AbstractChar
 {
     /**
      * Constructor

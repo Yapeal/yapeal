@@ -180,7 +180,7 @@ try {
         }
         try {
             /**
-             * @var \Yapeal\Database\ASection $instance
+             * @var \Yapeal\Database\AbstractSection $instance
              */
             $instance = new $class();
             $instance->pullXML();

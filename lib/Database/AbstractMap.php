@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains abstract class for eve section.
+ * Contains abstract class for map section.
  *
  * PHP version 5
  *
@@ -32,9 +32,9 @@ namespace Yapeal\Database;
 use CachedUntil;
 
 /**
- * Abstract class for Eve APIs.
+ * Abstract class for Map APIs.
  */
-abstract class AEve extends AApiRequest
+abstract class AbstractMap extends AbstractApiRequest
 {
     /**
      * Constructor
@@ -53,7 +53,7 @@ abstract class AEve extends AApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link Yapeal\Database\AApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AbstractApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
      * @throws \InvalidArgumentException

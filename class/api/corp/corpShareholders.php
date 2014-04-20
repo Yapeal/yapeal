@@ -27,12 +27,12 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\ACorp;
+use Yapeal\Database\AbstractCorp;
 
 /**
  * Class used to fetch and store corp Shareholders API.
  */
-class corpShareholders extends ACorp
+class corpShareholders extends AbstractCorp
 {
     /**
      * Constructor

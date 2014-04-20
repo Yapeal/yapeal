@@ -27,14 +27,14 @@
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  */
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 
 /**
  * Class used to fetch and store char AssetList API.
  */
-class charAssetList extends AChar
+class charAssetList extends AbstractChar
 {
     /**
      * Constructor

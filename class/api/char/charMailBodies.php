@@ -28,7 +28,7 @@
  * @link       http://www.eveonline.com/
  */
 use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\AChar;
+use Yapeal\Database\AbstractChar;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\QueryBuilder;
 use Yapeal\Exception\YapealApiErrorException;
@@ -37,7 +37,7 @@ use Yapeal\Network\NetworkConnection;
 /**
  * Class used to fetch and store char MailBodies API.
  */
-class charMailBodies extends AChar
+class charMailBodies extends AbstractChar
 {
     /**
      * Constructor

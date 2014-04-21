@@ -29,9 +29,7 @@
  */
 namespace Yapeal\Database;
 
-use AccessMask;
-use Sections;
-use Yapeal\Filesystem\FilterFileFinder;
+use Yapeal\Database\Util\AccessMask;
 
 /**
  * Abstract class used to hold common methods needed by Section* classes.
@@ -42,34 +40,19 @@ abstract class AbstractSection
 {
     /**
      * Constructor
+     *
+     * @param \Yapeal\Database\Util\AccessMask|null $am
+     * @param int                                   $activeAPIMask
      */
-    public function __construct()
-    {
-        try {
-            $section = new \Sections(strtolower($this->section), false);
-        } catch (\Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->error($e);
-            // Section does not exist in utilSections table or other error occurred.
-            $this->abort = true;
-            return;
+    public function __construct(
+        AccessMask $am = null,
+        $activeAPIMask
+    ) {
+        if ($am === null) {
+            $am = new Util\AccessMask();
         }
-        $this->mask = $section->activeAPIMask;
-        $this->am = new \AccessMask();
-        $path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'class'
-            . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . $this->section
-            . DIRECTORY_SEPARATOR;
-        $foundAPIs = FilterFileFinder::getStrippedFiles($path, $this->section);
-        $knownAPIs = $this->am->apisToMask($foundAPIs, $this->section);
-        if ($knownAPIs !== false) {
-            $this->mask &= $knownAPIs;
-        } else {
-            $this->abort = true;
-            $mess = 'No known APIs found for section ' . $this->section;
-            \Logger::getLogger('yapeal')
-                   ->error($mess);
-            return;
-        }
+        $this->am = $am;
+        $this->mask = (int)$activeAPIMask;
     }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
@@ -78,15 +61,11 @@ abstract class AbstractSection
      */
     abstract public function pullXML();
     /**
-     * @var bool Use to signal to child that parent constructor aborted.
-     */
-    protected $abort = false;
-    /**
-     * @var \AccessMask Hold AccessMask class used to convert between mask and APIs.
+     * @var \Yapeal\Database\Util\AccessMask Hold Yapeal\Database\Util\AccessMask class used to convert between mask and APIs.
      */
     protected $am;
     /**
-     * @var array Holds the mask of APIs for this section.
+     * @var int Holds the mask of APIs for this section.
      */
     protected $mask;
     /**

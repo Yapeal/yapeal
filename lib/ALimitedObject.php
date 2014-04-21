@@ -29,8 +29,6 @@
  */
 namespace Yapeal;
 
-use DomainException;
-
 /**
  * Abstract class for basic object with properties
  *
@@ -44,14 +42,14 @@ abstract class ALimitedObject
      *
      * @return mixed Value of $name from $properties if it exists or NULL if not.
      *
-     * @throws DomainException If $name not in $this->colTypes throws a
+     * @throws \DomainException If $name not in $this->colTypes throws a
      * DomainException.
      */
     public function __get($name)
     {
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
-            throw new DomainException($mess, 1);
+            throw new \DomainException($mess, 1);
         }
         if (isset($this->properties[$name])) {
             return $this->properties[$name];
@@ -78,7 +76,7 @@ abstract class ALimitedObject
      *
      * @return bool TRUE if $name already existed.
      *
-     * @throws DomainException If $name not in $this->types throws DomainException.
+     * @throws \DomainException If $name not in $this->types throws DomainException.
      */
     public function __set($name, $value)
     {
@@ -90,7 +88,7 @@ abstract class ALimitedObject
         }
         if (!array_key_exists($name, $this->colTypes)) {
             $mess = 'Unknown field: ' . $name;
-            throw new DomainException($mess, 1);
+            throw new \DomainException($mess, 1);
         }
         if (isset($this->properties[$name])) {
             $ret = true;

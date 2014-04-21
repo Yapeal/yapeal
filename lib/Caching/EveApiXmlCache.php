@@ -69,7 +69,7 @@ class EveApiXmlCache
         $this->postParams = $postParams;
         $this->vd = new ValidateEveApiXml($api, $section);
         $this->curTime = time();
-        $ci = new \CachedInterval();
+        $ci = new \Yapeal\Database\Util\CachedInterval();
         $this->cacheInterval = (int)$ci->getInterval($api, $section);
         $this->cachePath =
             dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
@@ -108,7 +108,7 @@ class EveApiXmlCache
             'ownerID' => $this->ownerID,
             'section' => $this->section
         );
-        $cu = new \CachedUntil($data);
+        $cu = new \Yapeal\Database\Util\CachedUntil($data);
         // Update utilCachedUntil table with default short cache date/time. This
         // is changed when there is an API error that returns a different one or
         // normally is set to the new calculated date/time if there aren't any
@@ -236,7 +236,7 @@ class EveApiXmlCache
             'ownerID' => $this->ownerID,
             'section' => $this->section
         );
-        $cu = new \CachedUntil($data);
+        $cu = new \Yapeal\Database\Util\CachedUntil($data);
         $cu->cachedUntil = gmdate('Y-m-d H:i:s', $currentXML);
         $cu->store();
         $cu = null;

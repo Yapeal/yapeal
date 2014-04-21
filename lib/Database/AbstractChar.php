@@ -29,14 +29,13 @@
  */
 namespace Yapeal\Database;
 
-use CachedUntil;
-use RegisteredCharacter;
-use RegisteredKey;
+use Yapeal\Database\Util\CachedUntil;
+use Yapeal\Database\Util\RegisteredCharacter;
+use Yapeal\Database\Util\RegisteredKey;
 
 /**
  * Abstract class for Char APIs.
  *
-
  */
 abstract class AbstractChar extends AbstractApiRequest
 {
@@ -336,7 +335,8 @@ abstract class AbstractChar extends AbstractApiRequest
                            ->warn($mess);
                     // Deactivate for char and corp sections by expiring the key.
                     $sql =
-                        'update `' . YAPEAL_TABLE_PREFIX . 'accountAPIKeyInfo`';
+                        'update `' . YAPEAL_TABLE_PREFIX
+                        . 'Yapeal\Database\Account\accountAPIKeyInfo`';
                     $sql .= ' set `expires` = "' . gmdate('Y-m-d H:i:s') . '"';
                     $sql .= ' where `keyID` = ' . $this->params['keyID'];
                     // Get a database connection.

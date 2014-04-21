@@ -29,7 +29,7 @@
  */
 namespace Yapeal\Database;
 
-use CachedUntil;
+use Yapeal\Database\Util\CachedUntil;
 
 /**
  * Abstract class for Map APIs.

@@ -86,7 +86,7 @@ class OutpostServiceDetail extends AbstractCorp
                 if (false === $result) {
                     $proxy = $this->getProxy();
                     $con = new NetworkConnection();
-                    $result = $con->retrieveXml($proxy, $apiParams);
+                    $result = $con->retrieveEveApiXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so just
                     // return to caller.
                     if (false === $result) {
@@ -102,13 +102,13 @@ class OutpostServiceDetail extends AbstractCorp
                 }
                 $this->prepareTables();
                 // Create XMLReader.
-                $this->xr = new \XMLReader();
+                $this->reader = new \XMLReader();
                 // Pass XML to reader.
-                $this->xr->XML($result);
+                $this->reader->XML($result);
                 // Outer structure of XML is processed here.
-                while ($this->xr->read()) {
-                    if ($this->xr->nodeType == \XMLReader::ELEMENT
-                        && $this->xr->localName == 'result'
+                while ($this->reader->read()) {
+                    if ($this->reader->nodeType == \XMLReader::ELEMENT
+                        && $this->reader->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
                         if ($result === false) {
@@ -116,7 +116,7 @@ class OutpostServiceDetail extends AbstractCorp
                         }
                     }
                 }
-                $this->xr->close();
+                $this->reader->close();
             } catch (YapealApiErrorException $e) {
                 // Any API errors that need to be handled in some way are handled in
                 // this function.

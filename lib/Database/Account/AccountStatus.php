@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Account;
 
+use Psr\Log\LoggerInterface;
 use Yapeal\Database\AbstractAccount;
 use Yapeal\Database\QueryBuilder;
 
@@ -40,17 +41,18 @@ class AccountStatus extends AbstractAccount
     /**
      * Constructor
      *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
+     * @param array           $params Holds the required parameters like keyID, vCode, etc
+     *                                used in HTML POST parameters to API servers which varies depending on API
+     *                                'section' being requested.
+     * @param LoggerInterface $logger
      *
      * @throws \LengthException for any missing required $params.
      */
-    public function __construct(array $params)
+    public function __construct(array $params, LoggerInterface $logger)
     {
         $this->section = strtolower(basename(__DIR__));
         $this->api = basename(__CLASS__);
-        parent::__construct($params);
+        parent::__construct($params, $logger);
     }
     /**
      * Per API parser for XML.
@@ -66,25 +68,25 @@ class AccountStatus extends AbstractAccount
         $qb->setDefault('keyID', $this->params['keyID']);
         $row = array();
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'createDate':
                             case 'logonCount':
                             case 'logonMinutes':
                             case 'paidUntil':
                                 // Grab node name.
-                                $name = $this->xr->localName;
+                                $name = $this->reader->localName;
                                 // Move to text node.
-                                $this->xr->read();
-                                $row[$name] = $this->xr->value;
+                                $this->reader->read();
+                                $row[$name] = $this->reader->value;
                                 break;
                             default: // Nothing to do.
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             $qb->store();
                             $qb = null;
@@ -95,12 +97,14 @@ class AccountStatus extends AbstractAccount
                 }
             }
         } catch (\ADODB_Exception $e) {
+            $this->logger->error($e);
             \Logger::getLogger('yapeal')
                    ->error($e);
             return false;
         }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
+        $this->logger->warning($mess);
         \Logger::getLogger('yapeal')
                ->warn($mess);
         return false;

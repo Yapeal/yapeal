@@ -81,10 +81,10 @@ class AssetList extends AbstractChar
      */
     protected function nestedSet($inherit)
     {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             // Add some of the inherit values to $row and update them as needed.
                             $row = array(
@@ -93,17 +93,19 @@ class AssetList extends AbstractChar
                                 'locationID' => $inherit['locationID']
                             );
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                                 // Save any new location so children can inherit it.
-                                if ($this->xr->name == 'locationID') {
-                                    $inherit['locationID'] = $this->xr->value;
+                                if ($this->reader->name == 'locationID') {
+                                    $inherit['locationID'] =
+                                        $this->reader->value;
                                 }
                             }
                             // Move back up to element.
-                            $this->xr->moveToElement();
+                            $this->reader->moveToElement();
                             // Check if parent node.
-                            if ($this->xr->isEmptyElement != 1) {
+                            if ($this->reader->isEmptyElement != 1) {
                                 // Save parent on stack.
                                 $this->stack[] = $row;
                                 // Continue on to process children.
@@ -123,7 +125,7 @@ class AssetList extends AbstractChar
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'result':
                             // Return the final index value to parserAPI().
                             return $inherit['index'];

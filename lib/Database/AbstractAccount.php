@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database;
 
+use Psr\Log\LoggerInterface;
 use Yapeal\Database\Util\CachedUntil;
 use Yapeal\Database\Util\RegisteredKey;
 
@@ -40,14 +41,16 @@ abstract class AbstractAccount extends AbstractApiRequest
     /**
      * Constructor
      *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
+     * @param array           $params Holds the required parameters like keyID, vCode, etc
+     *                                used in POST parameters to API servers which varies
+     *                                depending on API 'section' being requested.
+     * @param LoggerInterface $logger
      *
      * @throws \LengthException for any missing required $params.
      */
-    public function __construct(array $params)
+    public function __construct(array $params, LoggerInterface $logger)
     {
+        $this->logger = $logger;
         $required = array('keyID' => 'I', 'vCode' => 'C');
         foreach ($required as $k => $v) {
             if (!isset($params[$k])) {
@@ -83,6 +86,10 @@ abstract class AbstractAccount extends AbstractApiRequest
         $this->params = $params;
     }
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    /**
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
@@ -97,7 +104,6 @@ abstract class AbstractAccount extends AbstractApiRequest
     {
         $default = 'https://api.eveonline.com/' . $this->section;
         $default .= '/' . $this->api . '.xml.aspx';
-        $sql = 'SELECT proxy FROM ';
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();
@@ -107,7 +113,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                 . ' where `section`=' . $con->qstr($this->section);
             // Look for a set proxy in each table.
             foreach ($tables as $table) {
-                $result = $con->GetOne($sql . $table);
+                $result = $con->GetOne('SELECT proxy FROM ' . $table);
                 // 4 is random and not magic. It just sounded good and is shorter than
                 // any legal URL.
                 if (strlen($result) > 4) {
@@ -149,6 +155,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                 case 212: // Authentication failure (final pass).
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve key information is incorrect';
+                    $this->logger->warning($mess);
                     \Logger::getLogger('yapeal')
                            ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
@@ -156,6 +163,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
+                        $this->logger->warning($mess);
                         \Logger::getLogger('yapeal')
                                ->warn($mess);
                     }
@@ -164,6 +172,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                     // The account isn't active deactivate key.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as the Eve account is currently suspended';
+                    $this->logger->warning($mess);
                     \Logger::getLogger('yapeal')
                            ->warn($mess);
                     $key = new RegisteredKey($this->params['keyID'], false);
@@ -171,6 +180,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
+                        $this->logger->warning($mess);
                         \Logger::getLogger('yapeal')
                                ->warn($mess);
                     }
@@ -178,6 +188,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                 case 222: //Key has expired. Contact key owner for access renewal.
                     $mess = 'Deactivating keyID: ' . $this->params['keyID'];
                     $mess .= ' as it needs to be renewed by owner';
+                    $this->logger->warning($mess);
                     \Logger::getLogger('yapeal')
                            ->warn($mess);
                     // Deactivate for char and corp sections by expiring the key.
@@ -195,6 +206,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                     if (false === $key->store()) {
                         $mess = 'Could not deactivate keyID: '
                             . $this->params['keyID'];
+                        $this->logger->warning($mess);
                         \Logger::getLogger('yapeal')
                                ->warn($mess);
                     }
@@ -216,6 +228,7 @@ abstract class AbstractAccount extends AbstractApiRequest
                     break;
             }
         } catch (\ADODB_Exception $e) {
+            $this->logger->warning($e);
             \Logger::getLogger('yapeal')
                    ->warn($e);
             return false;

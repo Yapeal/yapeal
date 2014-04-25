@@ -81,7 +81,7 @@ class CorporationSheet extends AbstractCorp
             if (false === $result) {
                 $proxy = $this->getProxy();
                 $con = new NetworkConnection();
-                $result = $con->retrieveXml($proxy, $apiParams);
+                $result = $con->retrieveEveApiXml($proxy, $apiParams);
                 // FALSE means there was an error and it has already been report so just
                 // return to caller.
                 if (false === $result) {
@@ -96,15 +96,15 @@ class CorporationSheet extends AbstractCorp
                 }
             }
             // Create XMLReader.
-            $this->xr = new \XMLReader();
+            $this->reader = new \XMLReader();
             // Pass XML to reader.
-            $this->xr->XML($result);
+            $this->reader->XML($result);
             $cuntil = '';
             // Outer structure of XML is processed here.
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'currentTime':
                                 break;
                             case 'result':
@@ -112,8 +112,8 @@ class CorporationSheet extends AbstractCorp
                                 $result = $this->parserAPI();
                                 break;
                             case 'cachedUntil':
-                                $this->xr->read();
-                                $cuntil = $this->xr->value;
+                                $this->reader->read();
+                                $cuntil = $this->reader->value;
                                 break;
                         }
                         break;
@@ -130,7 +130,7 @@ class CorporationSheet extends AbstractCorp
             );
             $cu = new CachedUntil($data);
             $cu->store();
-            $this->xr->close();
+            $this->reader->close();
             return $result;
         } catch (YapealApiErrorException $e) {
             // Any API errors that need to be handled in some way are handled in this
@@ -157,10 +157,10 @@ class CorporationSheet extends AbstractCorp
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'color1':
                         case 'color2':
                         case 'color3':
@@ -168,14 +168,14 @@ class CorporationSheet extends AbstractCorp
                         case 'shape1':
                         case 'shape2':
                         case 'shape3':
-                            $name = $this->xr->localName;
-                            $this->xr->read();
-                            $row[$name] = $this->xr->value;
+                            $name = $this->reader->localName;
+                            $this->reader->read();
+                            $row[$name] = $this->reader->value;
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'logo') {
+                    if ($this->reader->localName == 'logo') {
                         $qb->addRow($row);
                         return $qb->store();
                     }
@@ -202,10 +202,10 @@ class CorporationSheet extends AbstractCorp
         $qb->setDefault('allianceName', '');
         $row = array();
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'allianceID':
                             case 'allianceName':
                             case 'ceoID':
@@ -222,18 +222,18 @@ class CorporationSheet extends AbstractCorp
                             case 'ticker':
                             case 'url':
                                 // Grab node name.
-                                $name = $this->xr->localName;
+                                $name = $this->reader->localName;
                                 // Move to text node.
-                                $this->xr->read();
-                                $row[$name] = $this->xr->value;
+                                $this->reader->read();
+                                $row[$name] = $this->reader->value;
                                 break;
                             case 'logo':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab node name.
-                                $subTable = $this->xr->localName;
+                                $subTable = $this->reader->localName;
                                 // Check for method with same name as node.
                                 if (!is_callable(array($this, $subTable))) {
                                     $mess = 'Unknown what-to-be rowset '
@@ -247,11 +247,11 @@ class CorporationSheet extends AbstractCorp
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -265,7 +265,7 @@ class CorporationSheet extends AbstractCorp
                         }; // $this->xr->localName ...
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -301,22 +301,23 @@ class CorporationSheet extends AbstractCorp
         // Get a new query instance.
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         $qb->setDefault('ownerID', $this->ownerID);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array();
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();

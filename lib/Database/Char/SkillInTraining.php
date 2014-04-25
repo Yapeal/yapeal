@@ -75,10 +75,10 @@ class SkillInTraining extends AbstractChar
             'trainingTypeID' => 0
         );
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'skillInTraining':
                             case 'trainingDestinationSP':
                             case 'trainingEndTime':
@@ -87,23 +87,23 @@ class SkillInTraining extends AbstractChar
                             case 'trainingToLevel':
                             case 'trainingTypeID':
                                 // Grab node name.
-                                $name = $this->xr->localName;
+                                $name = $this->reader->localName;
                                 // Move to text node.
-                                $this->xr->read();
-                                $row[$name] = $this->xr->value;
+                                $this->reader->read();
+                                $row[$name] = $this->reader->value;
                                 break;
                             case 'currentTQTime':
                                 $row['offset'] =
-                                    $this->xr->getAttribute('offset');
+                                    $this->reader->getAttribute('offset');
                                 // Move to text node.
-                                $this->xr->read();
-                                $row['currentTQTime'] = $this->xr->value;
+                                $this->reader->read();
+                                $row['currentTQTime'] = $this->reader->value;
                                 break;
                             default: // Nothing to do.
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             $qb->store();
                             $qb = null;

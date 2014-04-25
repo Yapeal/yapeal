@@ -69,22 +69,22 @@ class ServerStatus extends AbstractServer
         try {
             // Add any extra (default) columns needed.
             $row = array('serverName' => 'Tranquility');
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'onlinePlayers':
-                                $this->xr->read();
-                                $row['onlinePlayers'] = $this->xr->value;
+                                $this->reader->read();
+                                $row['onlinePlayers'] = $this->reader->value;
                                 break;
                             case 'serverOpen':
-                                $this->xr->read();
-                                $row['serverOpen'] = $this->xr->value;
+                                $this->reader->read();
+                                $row['serverOpen'] = $this->reader->value;
                                 break;
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             // Insert any leftovers.
                             if (count($qb) > 0) {

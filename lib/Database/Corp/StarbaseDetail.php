@@ -91,7 +91,7 @@ class StarbaseDetail extends AbstractCorp
                 if (false === $result) {
                     $proxy = $this->getProxy();
                     $con = new NetworkConnection();
-                    $result = $con->retrieveXml($proxy, $apiParams);
+                    $result = $con->retrieveEveApiXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so just
                     // return to caller.
                     if (false === $result) {
@@ -107,13 +107,13 @@ class StarbaseDetail extends AbstractCorp
                     };
                 }
                 // Create XMLReader.
-                $this->xr = new \XMLReader();
+                $this->reader = new \XMLReader();
                 // Pass XML to reader.
-                $this->xr->XML($result);
+                $this->reader->XML($result);
                 // Outer structure of XML is processed here.
-                while ($this->xr->read()) {
-                    if ($this->xr->nodeType == \XMLReader::ELEMENT
-                        && $this->xr->localName == 'result'
+                while ($this->reader->read()) {
+                    if ($this->reader->nodeType == \XMLReader::ELEMENT
+                        && $this->reader->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
                         if ($result === false) {
@@ -121,7 +121,7 @@ class StarbaseDetail extends AbstractCorp
                         }
                     }
                 }
-                $this->xr->close();
+                $this->reader->close();
             } catch (YapealApiErrorException $e) {
                 // Any API errors that need to be handled in some way are handled in
                 // this function.
@@ -168,27 +168,27 @@ class StarbaseDetail extends AbstractCorp
     protected function combatSettings()
     {
         $row = array('posID' => $this->posID['itemID']);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'onAggression':
                         case 'onCorporationWar':
                         case 'onStandingDrop':
                         case 'onStatusDrop':
                         case 'useStandingsFrom':
                             // Save element name to use as prefix for attributes.
-                            $prefix = $this->xr->localName;
+                            $prefix = $this->reader->localName;
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$prefix . ucfirst($this->xr->name)] =
-                                    $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$prefix . ucfirst($this->reader->name)] =
+                                    $this->reader->value;
                             }
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'combatSettings') {
+                    if ($this->reader->localName == 'combatSettings') {
                         $this->combat->addRow($row);
                         return true;
                     }
@@ -210,22 +210,22 @@ class StarbaseDetail extends AbstractCorp
     protected function generalSettings()
     {
         $row = array('posID' => $this->posID['itemID']);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'allowAllianceMembers':
                         case 'allowCorporationMembers':
                         case 'deployFlags':
                         case 'usageFlags':
-                            $name = $this->xr->localName;
-                            $this->xr->read();
-                            $row[$name] = $this->xr->value;
+                            $name = $this->reader->localName;
+                            $this->reader->read();
+                            $row[$name] = $this->reader->value;
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'generalSettings') {
+                    if ($this->reader->localName == 'generalSettings') {
                         $this->general->addRow($row);
                         return true;
                     }
@@ -286,27 +286,27 @@ class StarbaseDetail extends AbstractCorp
         try {
             $ret = true;
             $row = array('posID' => $this->posID['itemID']);
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'onlineTimestamp':
                             case 'state':
                             case 'stateTimestamp':
                                 // Grab node name.
-                                $name = $this->xr->localName;
+                                $name = $this->reader->localName;
                                 // Move to text node.
-                                $this->xr->read();
-                                $row[$name] = $this->xr->value;
+                                $this->reader->read();
+                                $row[$name] = $this->reader->value;
                                 break;
                             case 'combatSettings':
                             case 'generalSettings':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab node name.
-                                $subTable = $this->xr->localName;
+                                $subTable = $this->reader->localName;
                                 // Check for method with same name as node.
                                 if (!is_callable(array($this, $subTable))) {
                                     $mess = 'Unknown what-to-be rowset '
@@ -324,11 +324,11 @@ class StarbaseDetail extends AbstractCorp
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -346,7 +346,7 @@ class StarbaseDetail extends AbstractCorp
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -453,22 +453,23 @@ class StarbaseDetail extends AbstractCorp
      */
     protected function rowset($table)
     {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array('posID' => $this->posID['itemID']);
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $this->$table->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         return true;
                     }
                     break;

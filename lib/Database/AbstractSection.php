@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database;
 
+use Psr\Log\LoggerInterface;
 use Yapeal\Database\Util\AccessMask;
 
 /**
@@ -41,17 +42,20 @@ abstract class AbstractSection
     /**
      * Constructor
      *
-     * @param \Yapeal\Database\Util\AccessMask|null $am
-     * @param int                                   $activeAPIMask
+     * @param AccessMask|null $am
+     * @param int             $activeAPIMask
+     * @param LoggerInterface $logger
      */
     public function __construct(
         AccessMask $am = null,
-        $activeAPIMask
+        $activeAPIMask,
+        LoggerInterface $logger
     ) {
         if ($am === null) {
             $am = new Util\AccessMask();
         }
         $this->am = $am;
+        $this->logger = $logger;
         $this->mask = (int)$activeAPIMask;
     }
     /**
@@ -64,6 +68,10 @@ abstract class AbstractSection
      * @var \Yapeal\Database\Util\AccessMask Hold Yapeal\Database\Util\AccessMask class used to convert between mask and APIs.
      */
     protected $am;
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
     /**
      * @var int Holds the mask of APIs for this section.
      */

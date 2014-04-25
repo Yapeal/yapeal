@@ -66,17 +66,17 @@ class FacWarStats extends AbstractEve
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         try {
             $row = array();
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'totals':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == true) {
+                                if ($this->reader->isEmptyElement == true) {
                                     break;
                                 }
                                 // Grab node name.
-                                $subTable = $this->xr->localName;
+                                $subTable = $this->reader->localName;
                                 // Check for method with same name as node.
                                 if (!is_callable(array($this, $subTable))) {
                                     $mess = 'Unknown what-to-be rowset '
@@ -90,11 +90,11 @@ class FacWarStats extends AbstractEve
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == true) {
+                                if ($this->reader->isEmptyElement == true) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -108,7 +108,7 @@ class FacWarStats extends AbstractEve
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             if ($row && is_array($row) && count($row) > 0) {
                                 $qb->addRow($row);
                             }
@@ -173,22 +173,23 @@ class FacWarStats extends AbstractEve
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(true);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array();
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
@@ -213,24 +214,24 @@ class FacWarStats extends AbstractEve
     protected function totals()
     {
         $row = array();
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'killsYesterday':
                         case 'killsLastWeek':
                         case 'killsTotal':
                         case 'victoryPointsYesterday':
                         case 'victoryPointsLastWeek':
                         case 'victoryPointsTotal':
-                            $name = $this->xr->localName;
-                            $this->xr->read();
-                            $row[$name] = $this->xr->value;
+                            $name = $this->reader->localName;
+                            $this->reader->read();
+                            $row[$name] = $this->reader->value;
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'totals') {
+                    if ($this->reader->localName == 'totals') {
                         return $row;
                     }
                     break;

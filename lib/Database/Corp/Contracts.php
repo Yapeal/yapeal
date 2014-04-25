@@ -74,30 +74,31 @@ class Contracts extends AbstractCorp
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
+                                while ($this->reader->moveToNextAttribute()) {
                                     // Allow QueryBuilder to handle NULL columns.
-                                    if (($this->xr->name == 'dateAccepted'
-                                            ||
-                                            $this->xr->name == 'dateCompleted')
-                                        && $this->xr->value == ''
+                                    if (($this->reader->name == 'dateAccepted'
+                                            || $this->reader->name
+                                            == 'dateCompleted')
+                                        && $this->reader->value == ''
                                     ) {
                                         continue;
                                     };
-                                    $row[$this->xr->name] = $this->xr->value;
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
                                 }
                                 $qb->addRow($row);
                                 break;
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             if (count($qb) > 0) {
                                 $qb->store();
                             }

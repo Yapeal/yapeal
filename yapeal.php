@@ -32,6 +32,8 @@
  * @link       http://www.eveonline.com/
  * @since      revision 561
  */
+use Monolog as ML;
+use Monolog\Handler as MLH;
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Command\LegacyUtil;
 use Yapeal\Database\DBConnection;
@@ -40,10 +42,6 @@ use Yapeal\Database\Util\CachedInterval;
 
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
-// IDE only seems to like this form for path since need for this loader is going
-// away ASAP not worrying about it.
-require_once __DIR__ . '/bin' . '/YapealAutoLoad.php';
-YapealAutoLoad::activateAutoLoad();
 // Include Composer's auto-loader for all the classes that are being moved.
 /*
  * Find auto loader from one of
@@ -59,41 +57,62 @@ YapealAutoLoad::activateAutoLoad();
 || (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
 || (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
 || die('Could not find required auto class loader. Aborting ...');
+// IDE only seems to like this form for path since need for this loader is going
+// away ASAP not worrying about it.
+require_once __DIR__ . '/bin' . '/YapealAutoLoad.php';
+YapealAutoLoad::activateAutoLoad();
 $legacyUtil = new LegacyUtil();
 $shortOpts = array('c:', 'l:');
 $longOpts = array('config:', 'log:');
 // Parser command line options first in case user just wanted to see help.
 $options = $legacyUtil->parseCommandLineOptions($shortOpts, $longOpts);
-$exit = false;
 if (isset($options['help'])) {
     $legacyUtil->usage(__FILE__, $shortOpts, $longOpts);
     exit(0);
-};
+}
 if (isset($options['version'])) {
     $legacyUtil->showVersion(__FILE__);
     exit(0);
-};
+}
 if (!empty($options['config'])) {
     $iniVars = $legacyUtil->getSettingsFromIniFile($options['config']);
 } else {
     $iniVars = $legacyUtil->getSettingsFromIniFile();
-};
+}
 if (empty($iniVars)) {
     exit(1);
-};
+}
+$loggerYapeal = new ML\Logger('yapeal');
+$loggerPhp = new ML\Logger('php');
+$handlerStreamCli = new MLH\StreamHandler('php://stderr', ML\Logger::DEBUG);
+$logFile =
+    __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'yapeal.log';
+$handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
+$handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
+$loggerYapeal->pushHandler($handlerFC);
+$loggerYapeal->pushHandler($handlerStreamCli);
+$logFile =
+    __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'php.log';
+$handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
+$handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
+$loggerPhp->pushHandler($handlerFC);
+$loggerPhp->pushHandler($handlerStreamCli);
+ML\ErrorHandler::register($loggerPhp, array(), ML\Logger::CRITICAL, false);
+$mess = 'Yapeal started';
+$loggerYapeal->info($mess);
 /**
  * Define constants and properties from settings in configuration.
  */
-if (!empty($options['log-config'])) {
-    YapealErrorHandler::setLoggingSectionProperties(
-        $iniVars['Logging'],
-        $options['log-config']
-    );
-    unset($options['config']);
-} else {
-    YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
-};
-YapealErrorHandler::setupCustomErrorAndExceptionSettings();
+//if (!empty($options['log-config'])) {
+//    YapealErrorHandler::setLoggingSectionProperties(
+//        $iniVars['Logging'],
+//        $options['log-config']
+//    );
+//    unset($options['config']);
+//} else {
+//    YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
+//};
+//YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 EveApiXmlCache::setCacheSectionProperties($iniVars['Cache']);
 DBConnection::setDatabaseSectionConstants($iniVars['Database']);
 $legacyUtil->setGeneralSectionConstants($iniVars);
@@ -119,12 +138,14 @@ try {
         $con = DBConnection::connect(YAPEAL_DSN);
         $result = $con->GetAll($sql);
     } catch (ADODB_Exception $e) {
+        $loggerYapeal->alert($e);
         Logger::getLogger('yapeal')
               ->fatal($e);
         exit(2);
     }
     if (count($result) == 0) {
         $mess = 'No active sections were found in utilSections.';
+        $loggerYapeal->addInfo($mess);
         Logger::getLogger('yapeal')
               ->info($mess);
         exit(2);
@@ -136,17 +157,22 @@ try {
         $class = '\\Yapeal\\Database\\Section\\' . ucfirst($section['section']);
         if (!class_exists($class)) {
             $mess = 'Could NOT find class: ' . $class;
+            $loggerYapeal->info($mess);
             Logger::getLogger('yapeal')
                   ->info($mess);
             continue;
         }
         try {
+            $mess = 'Calling instance of ' . $class;
+            $loggerYapeal->debug($mess);
             /**
              * @var \Yapeal\Database\AbstractSection $instance
              */
-            $instance = new $class($am, $section['activeAPIMask']);
+            $instance =
+                new $class($am, $section['activeAPIMask'], $loggerYapeal);
             $instance->pullXML();
         } catch (ADODB_Exception $e) {
+            $loggerYapeal->alert($e);
             Logger::getLogger('yapeal')
                   ->fatal($e);
         }
@@ -163,11 +189,22 @@ try {
     DBConnection::releaseAll();
 } catch (Exception $e) {
     $mess = 'Uncaught exception in ' . basename(__FILE__);
+    $loggerYapeal->alert($mess);
+    $loggerYapeal->alert($e);
     Logger::getLogger('yapeal')
           ->fatal($mess);
     Logger::getLogger('yapeal')
           ->fatal($e);
     exit(1);
 }
+$mess = 'Yapeal ended';
+$loggerYapeal->critical($mess);
 exit(0);
-
+function config()
+{
+    $dependencyContainer = new \Yapeal\Dependency\Pimple();
+    // TODO: Add network connection
+    // TODO: Add XML caching
+    // TODO: Add database connection
+    return $dependencyContainer;
+}

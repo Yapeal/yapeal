@@ -83,7 +83,7 @@ class NotificationTexts extends AbstractChar
                 };
                 // Need to add $ids to normal parameters.
                 $this->params['ids'] = implode(',', $ids);
-                $result = $con->retrieveXml($proxy, $this->params);
+                $result = $con->retrieveEveApiXml($proxy, $this->params);
                 // FALSE means there was an error and it has already been report so just
                 // return to caller.
                 if (false === $result) {
@@ -98,18 +98,18 @@ class NotificationTexts extends AbstractChar
                 };
             }
             // Create XMLReader.
-            $this->xr = new \XMLReader();
+            $this->reader = new \XMLReader();
             // Pass XML to reader.
-            $this->xr->XML($result);
+            $this->reader->XML($result);
             // Outer structure of XML is processed here.
-            while ($this->xr->read()) {
-                if ($this->xr->nodeType == \XMLReader::ELEMENT
-                    && $this->xr->localName == 'result'
+            while ($this->reader->read()) {
+                if ($this->reader->nodeType == \XMLReader::ELEMENT
+                    && $this->reader->localName == 'result'
                 ) {
                     $result = $this->parserAPI();
                 }
             }
-            $this->xr->close();
+            $this->reader->close();
             return $result;
         } catch (YapealApiErrorException $e) {
             // Any API errors that need to be handled in some way are handled in this
@@ -169,21 +169,23 @@ class NotificationTexts extends AbstractChar
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 $row = array();
                                 $row['notificationID'] =
-                                    $this->xr->getAttribute('notificationID');
-                                $row['text'] = $this->xr->readString();
+                                    $this->reader->getAttribute(
+                                        'notificationID'
+                                    );
+                                $row['text'] = $this->reader->readString();
                                 $qb->addRow($row);
                                 break;
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();

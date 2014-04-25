@@ -74,9 +74,8 @@ class OutpostList extends AbstractCorp
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             // Empty out old data then upsert (insert) new.
-            $sql = 'DELETE FROM `';
-            $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-            $sql .= ' where `ownerID`=' . $this->ownerID;
+            $sql = 'DELETE FROM `' . YAPEAL_TABLE_PREFIX . $this->section
+                . $this->api . '`' . ' where `ownerID`=' . $this->ownerID;
             $con->Execute($sql);
         } catch (\ADODB_Exception $e) {
             \Logger::getLogger('yapeal')

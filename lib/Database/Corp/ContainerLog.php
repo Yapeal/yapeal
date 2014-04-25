@@ -70,22 +70,23 @@ class ContainerLog extends AbstractCorp
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    $row[$this->xr->name] = $this->xr->value;
-                                    switch ($this->xr->name) {
+                                while ($this->reader->moveToNextAttribute()) {
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
+                                    switch ($this->reader->name) {
                                         case 'newConfiguration':
                                         case 'oldConfiguration':
                                         case 'quantity':
                                         case 'typeID':
                                             // Fix empty values with zero.
-                                            if ($this->xr->value == '') {
-                                                $row[$this->xr->name] = 0;
+                                            if ($this->reader->value == '') {
+                                                $row[$this->reader->name] = 0;
                                             }
                                             break;
                                         default: // Nothing to do.
@@ -96,7 +97,7 @@ class ContainerLog extends AbstractCorp
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();

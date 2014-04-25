@@ -60,7 +60,7 @@ class CleanCache
         $limit = strtotime('7 days ago');
         foreach ($this->sections as $section) {
             $path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'cache'
-                . DIRECTORY_SEPARATOR . $section . DS;
+                . DIRECTORY_SEPARATOR . $section . DIRECTORY_SEPARATOR;
             $files = new \DirectoryIterator($path);
             /**
              * @var \DirectoryIterator $item

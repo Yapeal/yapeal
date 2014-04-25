@@ -67,29 +67,29 @@ class CharacterSheet extends AbstractChar
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $row = array();
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'charismaBonus':
                         case 'intelligenceBonus':
                         case 'memoryBonus':
                         case 'perceptionBonus':
                         case 'willpowerBonus':
                             $row = array('ownerID' => $this->ownerID);
-                            $row['bonusName'] = $this->xr->localName;
+                            $row['bonusName'] = $this->reader->localName;
                             break;
                         case 'augmentatorName':
                         case 'augmentatorValue':
-                            $name = $this->xr->localName;
-                            $this->xr->read();
-                            $row[$name] = $this->xr->value;
+                            $name = $this->reader->localName;
+                            $this->reader->read();
+                            $row[$name] = $this->reader->value;
                             break;
                         default: // Nothing to do here.
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'charismaBonus':
                         case 'intelligenceBonus':
                         case 'memoryBonus':
@@ -125,23 +125,23 @@ class CharacterSheet extends AbstractChar
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $row = array('ownerID' => $this->ownerID);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'charisma':
                         case 'intelligence':
                         case 'memory':
                         case 'perception':
                         case 'willpower':
-                            $name = $this->xr->localName;
-                            $this->xr->read();
-                            $row[$name] = $this->xr->value;
+                            $name = $this->reader->localName;
+                            $this->reader->read();
+                            $row[$name] = $this->reader->value;
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'attributes') {
+                    if ($this->reader->localName == 'attributes') {
                         $qb->addRow($row);
                         return $qb->store();
                     }
@@ -177,10 +177,10 @@ class CharacterSheet extends AbstractChar
         $qb->setDefault('allianceName', '');
         $row = array();
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'allianceID':
                             case 'allianceName':
                             case 'ancestry':
@@ -198,26 +198,26 @@ class CharacterSheet extends AbstractChar
                             case 'name':
                             case 'race':
                                 // Grab node name.
-                                $name = $this->xr->localName;
+                                $name = $this->reader->localName;
                                 if (($name == 'allianceName'
                                         || $name == 'factionName')
-                                    && $this->xr->isEmptyElement == true
+                                    && $this->reader->isEmptyElement == true
                                 ) {
                                     $row[$name] = '';
                                 } else {
                                     // Move to text node.
-                                    $this->xr->read();
-                                    $row[$name] = $this->xr->value;
+                                    $this->reader->read();
+                                    $row[$name] = $this->reader->value;
                                 }
                                 break;
                             case 'attributes':
                             case 'attributeEnhancers':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == true) {
+                                if ($this->reader->isEmptyElement == true) {
                                     break;
                                 }
                                 // Grab node name.
-                                $subTable = $this->xr->localName;
+                                $subTable = $this->reader->localName;
                                 // Check for method with same name as node.
                                 if (!is_callable(array($this, $subTable))) {
                                     $mess = 'Unknown what-to-be rowset '
@@ -231,11 +231,11 @@ class CharacterSheet extends AbstractChar
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == true) {
+                                if ($this->reader->isEmptyElement == true) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -253,7 +253,7 @@ class CharacterSheet extends AbstractChar
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             $qb->addRow($row);
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -329,21 +329,22 @@ class CharacterSheet extends AbstractChar
         $qb->useUpsert(false);
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();
@@ -380,21 +381,22 @@ class CharacterSheet extends AbstractChar
         );
         $qb->setDefaults($defaults);
         $row = array();
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();

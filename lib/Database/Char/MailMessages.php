@@ -68,22 +68,24 @@ class MailMessages extends AbstractChar
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    if (($this->xr->name == 'toCorpOrAllianceID'
-                                            || $this->xr->name == 'toListID')
-                                        && $this->xr->value == ''
+                                while ($this->reader->moveToNextAttribute()) {
+                                    if (($this->reader->name
+                                            == 'toCorpOrAllianceID'
+                                            ||
+                                            $this->reader->name == 'toListID')
+                                        && $this->reader->value == ''
                                     ) {
-                                        $row[$this->xr->name] = 0;
+                                        $row[$this->reader->name] = 0;
                                     } else {
-                                        $row[$this->xr->name] =
-                                            $this->xr->value;
+                                        $row[$this->reader->name] =
+                                            $this->reader->value;
                                     }
                                 }
                                 $qb->addRow($row);
@@ -91,7 +93,7 @@ class MailMessages extends AbstractChar
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();

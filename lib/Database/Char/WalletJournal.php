@@ -101,7 +101,7 @@ class WalletJournal extends AbstractChar
                 if (false === $result) {
                     $proxy = $this->getProxy();
                     $con = new NetworkConnection();
-                    $result = $con->retrieveXml($proxy, $apiParams);
+                    $result = $con->retrieveEveApiXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so
                     // just return to caller.
                     if (false === $result) {
@@ -116,18 +116,18 @@ class WalletJournal extends AbstractChar
                     };
                 }
                 // Create XMLReader.
-                $this->xr = new \XMLReader();
+                $this->reader = new \XMLReader();
                 // Pass XML to reader.
-                $this->xr->XML($result);
+                $this->reader->XML($result);
                 // Outer structure of XML is processed here.
-                while ($this->xr->read()) {
-                    if ($this->xr->nodeType == \XMLReader::ELEMENT
-                        && $this->xr->localName == 'result'
+                while ($this->reader->read()) {
+                    if ($this->reader->nodeType == \XMLReader::ELEMENT
+                        && $this->reader->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
                     }
                 }
-                $this->xr->close();
+                $this->reader->close();
                 /* There are two normal conditions to end walking. They are:
                  * Got less rows than expected because there are no more to get while
                  * walking backwards.
@@ -176,34 +176,35 @@ class WalletJournal extends AbstractChar
         $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
         $qb->setDefaults($defaults);
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 /* The following assumes the date attribute exists and is not
                                  * empty and the same is true for refID. Since XML would be
                                  * invalid if ether were true they should never return bad
                                  * values.
                                  */
-                                $date = $this->xr->getAttribute('date');
+                                $date = $this->reader->getAttribute('date');
                                 // If this date is the oldest so far need to save date and refID
                                 // to use in walking.
                                 if ($date < $this->date) {
                                     $this->date = $date;
                                     $this->beforeID =
-                                        $this->xr->getAttribute('refID');
+                                        $this->reader->getAttribute('refID');
                                 }
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    $row[$this->xr->name] = $this->xr->value;
-                                    switch ($this->xr->name) {
+                                while ($this->reader->moveToNextAttribute()) {
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
+                                    switch ($this->reader->name) {
                                         case 'taxReceiverID':
                                         case 'taxAmount':
                                             // Fix blank with zero for upsert.
-                                            if ($this->xr->value === '') {
-                                                $row[$this->xr->name] = 0;
+                                            if ($this->reader->value === '') {
+                                                $row[$this->reader->name] = 0;
                                             }
                                             break;
                                         default: // Nothing to do here.
@@ -214,7 +215,7 @@ class WalletJournal extends AbstractChar
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Save row count and store rows.
                             $this->rowCount = count($qb);
                             if ($this->rowCount > 0) {

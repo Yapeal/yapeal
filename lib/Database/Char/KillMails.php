@@ -91,7 +91,7 @@ class KillMails extends AbstractChar
                 if (false === $result) {
                     $proxy = $this->getProxy();
                     $con = new NetworkConnection();
-                    $result = $con->retrieveXml($proxy, $apiParams);
+                    $result = $con->retrieveEveApiXml($proxy, $apiParams);
                     // FALSE means there was an error and it has already been report so
                     // just return to caller.
                     if (false === $result) {
@@ -106,18 +106,18 @@ class KillMails extends AbstractChar
                     };
                 }
                 // Create XMLReader.
-                $this->xr = new \XMLReader();
+                $this->reader = new \XMLReader();
                 // Pass XML to reader.
-                $this->xr->XML($result);
+                $this->reader->XML($result);
                 // Outer structure of XML is processed here.
-                while ($this->xr->read()) {
-                    if ($this->xr->nodeType == \XMLReader::ELEMENT
-                        && $this->xr->localName == 'result'
+                while ($this->reader->read()) {
+                    if ($this->reader->nodeType == \XMLReader::ELEMENT
+                        && $this->reader->localName == 'result'
                     ) {
                         $result = $this->parserAPI();
                     }
                 }
-                $this->xr->close();
+                $this->reader->close();
                 // Leave loop if already got as many entries as API servers allow.
                 if ($this->rowCount != $rowCount || $this->date < $oldest) {
                     break;
@@ -156,22 +156,23 @@ class KillMails extends AbstractChar
      */
     protected function attack()
     {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array('killID' => $this->fromID);
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $this->attackers->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         return true;
                     }
                     break;
@@ -202,10 +203,10 @@ class KillMails extends AbstractChar
      */
     protected function nestedSet($inherit)
     {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             // Add some of the inherit values to $row and update them as needed.
                             $row = array(
@@ -214,13 +215,14 @@ class KillMails extends AbstractChar
                                 'killID' => $inherit['killID']
                             );
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             // Move back up to element.
-                            $this->xr->moveToElement();
+                            $this->reader->moveToElement();
                             // Check if parent node.
-                            if ($this->xr->isEmptyElement != 1) {
+                            if ($this->reader->isEmptyElement != 1) {
                                 // Save parent on stack.
                                 $this->stack[] = $row;
                                 // Continue on to process children.
@@ -241,7 +243,7 @@ class KillMails extends AbstractChar
                     // switch $this->xr->localName ...
                     break;
                 case \XMLReader::END_ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array_pop($this->stack);
                             // Add 'rgt' and increment value.
@@ -295,48 +297,50 @@ class KillMails extends AbstractChar
         );
         $typeID = 0;
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 /* This code should only be ran for outer 'kills' rows so might
                                  * be safe to assume the attribute can't be empty but didn't.
                                  */
-                                $date = $this->xr->getAttribute('killTime');
+                                $date = $this->reader->getAttribute('killTime');
                                 // If this date is the oldest so far need to save date and
                                 // killID to use in walking.
                                 if (!empty($date) && $date < $this->date) {
                                     $this->date = $date;
                                     $this->fromID =
-                                        $this->xr->getAttribute('killID');
+                                        $this->reader->getAttribute('killID');
                                 }
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    $row[$this->xr->name] = $this->xr->value;
+                                while ($this->reader->moveToNextAttribute()) {
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
                                 }
                                 $qb->addRow($row);
                                 break;
                             case 'victim':
                                 $row = array('killID' => $this->fromID);
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
+                                while ($this->reader->moveToNextAttribute()) {
                                     // Save the ship type to use for root node of items table.
-                                    if ($this->xr->name == 'shipTypeID') {
-                                        $typeID = $this->xr->value;
+                                    if ($this->reader->name == 'shipTypeID') {
+                                        $typeID = $this->reader->value;
                                     };
-                                    $row[$this->xr->name] = $this->xr->value;
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
                                 }
                                 $this->victim->addRow($row);
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -371,7 +375,7 @@ class KillMails extends AbstractChar
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Save row count and store rows.
                             $this->rowCount = count($qb);
                             if ($this->rowCount > 0) {

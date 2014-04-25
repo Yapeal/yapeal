@@ -70,17 +70,17 @@ class ContactList extends AbstractCorp
     protected function parserAPI()
     {
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
+                                if ($this->reader->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
+                                $subTable = $this->reader->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
@@ -94,7 +94,7 @@ class ContactList extends AbstractCorp
                         }; // $this->xr->localName ...
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             return true;
                         }
                         break;
@@ -154,22 +154,23 @@ class ContactList extends AbstractCorp
         // Save some overhead for tables that are truncated or in some way emptied.
         $qb->useUpsert(false);
         $qb->setDefault('ownerID', $this->ownerID);
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array();
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();

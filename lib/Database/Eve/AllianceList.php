@@ -73,22 +73,23 @@ class AllianceList extends AbstractEve
         // Save some overhead for tables that are truncated or in some way emptied.
         $this->corporations->useUpsert(false);
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+                        switch ($this->reader->localName) {
                             case 'row':
                                 $row = array();
                                 // Grab allianceID for memberCorporation table.
                                 $allianceID =
-                                    $this->xr->getAttribute('allianceID');
+                                    $this->reader->getAttribute('allianceID');
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    $row[$this->xr->name] = $this->xr->value;
+                                while ($this->reader->moveToNextAttribute()) {
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
                                 }
                                 $qb->addRow($row);
                                 // Process member corporations.
-                                if ($this->xr->isEmptyElement != 1) {
+                                if ($this->reader->isEmptyElement != 1) {
                                     $this->rowset($allianceID);
                                 }
                                 break;
@@ -96,7 +97,7 @@ class AllianceList extends AbstractEve
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                        if ($this->reader->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -161,22 +162,23 @@ class AllianceList extends AbstractEve
      */
     protected function rowset($allianceID)
     {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
+        while ($this->reader->read()) {
+            switch ($this->reader->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
+                    switch ($this->reader->localName) {
                         case 'row':
                             $row = array('allianceID' => $allianceID);
                             // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                $row[$this->xr->name] = $this->xr->value;
+                            while ($this->reader->moveToNextAttribute()) {
+                                $row[$this->reader->name] =
+                                    $this->reader->value;
                             }
                             $this->corporations->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
+                    if ($this->reader->localName == 'rowset') {
                         return true;
                     }
                     break;

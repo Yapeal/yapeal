@@ -117,7 +117,7 @@ class ValidateEveApiXml
         if (false !== strpos($this->xml, '<!DOCTYPE html')) {
             $mess = 'API returned HTML error page.';
             $mess .= ' Check to make sure API ';
-            $mess .= $this->section . DS . $this->api;
+            $mess .= $this->section . DIRECTORY_SEPARATOR . $this->api;
             $mess .= ' is a valid API.';
             \Logger::getLogger('yapeal')
                    ->warn($mess);

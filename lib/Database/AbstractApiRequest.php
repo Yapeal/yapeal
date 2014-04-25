@@ -29,15 +29,43 @@
  */
 namespace Yapeal\Database;
 
+use Psr\Log\LoggerInterface;
+use XMLReader;
 use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Dependency\DependenceInterface;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\NetworkConnection;
+use Yapeal\Network\NetworkInterface;
 
 /**
  * Abstract class to hold common methods for API classes.
  */
 abstract class AbstractApiRequest
 {
+    /**
+     * Constructor
+     *
+     * @param DependenceInterface|null     $dependence
+     * @param EveApiXmlCache|string|null   $cache
+     * @param LoggerInterface|string|null  $logger
+     * @param NetworkInterface|string|null $network
+     * @param XMLReader|string|null        $reader
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(
+        DependenceInterface $dependence = null,
+        EveApiXmlCache $cache = null,
+        LoggerInterface $logger = null,
+        NetworkInterface $network = null,
+        XMLReader $reader = null
+    ) {
+        $this->setDependence($dependence);
+        $this->setLogger($logger);
+        $this->setCache($cache);
+        $this->setNetwork($network);
+        $this->setReader($reader);
+    }
     /**
      * Used to store XML to MySQL table(s).
      *
@@ -46,21 +74,18 @@ abstract class AbstractApiRequest
      */
     public function apiStore()
     {
-        // First get a new cache instance.
-        $cache = new EveApiXmlCache(
-            $this->api,
-            $this->section,
-            $this->ownerID,
-            $this->params
-        );
         try {
             // Get valid cached copy if there is one.
             $result = $cache->getCachedApi();
             // If XML is not cached need to try to get it from API server or proxy.
             if (false === $result) {
                 $proxy = $this->getProxy();
-                $con = new NetworkConnection();
-                $result = $con->retrieveXml($proxy, $this->params);
+                $con = new NetworkConnection(null, null, $this->logger);
+                $result = $con->retrieveEveApiXml(
+                    $this->api,
+                    $this->section,
+                    $this->params
+                );
                 // FALSE means there was an error and it has already been report just
                 // need to return to caller.
                 if (false === $result) {
@@ -74,16 +99,16 @@ abstract class AbstractApiRequest
                 $mess .= ' API tables to accept new data for '
                     . $this->ownerID;
                 \Logger::getLogger('yapeal')
-                      ->warn($mess);
+                       ->warn($mess);
             }
             // Create XMLReader.
-            $this->xr = new \XMLReader();
+            $this->reader = new XMLReader();
             // Pass XML to reader.
-            $this->xr->XML($result);
+            $this->reader->XML($result);
             // Outer structure of XML is processed here.
-            while ($this->xr->read()) {
-                if ($this->xr->nodeType == \XMLReader::ELEMENT
-                    && $this->xr->localName == 'result'
+            while ($this->reader->read()) {
+                if ($this->reader->nodeType == XMLReader::ELEMENT
+                    && $this->reader->localName == 'result'
                 ) {
                     $result = $this->parserAPI();
                 }
@@ -98,15 +123,208 @@ abstract class AbstractApiRequest
             // Catch any uncaught ADOdb exceptions here.
             $mess = 'Uncaught ADOdb exception' . PHP_EOL;
             \Logger::getLogger('yapeal')
-                  ->warn($mess);
+                   ->warn($mess);
             return false;
         }
+    }
+    /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return EveApiXmlCache
+     */
+    public function getCache()
+    {
+        if (empty($this->cache)) {
+            $mess = 'Tried to use $cache when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->cache)) {
+            $dependence = $this->getDependence();
+            $this->setCache($dependence[(string)$this->cache]);
+        }
+        if (!$this->cache instanceof EveApiXmlCache) {
+            $mess = '$cache could NOT be resolved to instance of'
+                . ' EveApiXmlCache is instead ' . gettype($this->cache);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->cache;
+    }
+    /**
+     * @throws \LogicException
+     * @return DependenceInterface
+     */
+    public function getDependence()
+    {
+        if (empty($this->dependence)) {
+            $mess = 'Tried to use $dependence when it was NOT set';
+            throw new \LogicException($mess);
+        }
+        return $this->dependence;
+    }
+    /**
+     * @throws \DomainException
+     * @throws \LogicException
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        if (empty($this->logger)) {
+            $mess = 'Tried to use $logger when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->logger)) {
+            $dependence = $this->getDependence();
+            $this->setLogger($dependence[(string)$this->logger]);
+        }
+        if (!$this->logger instanceof LoggerInterface) {
+            $mess = '$logger could NOT be resolved to instance of'
+                . ' LoggerInterface is instead ' . gettype($this->logger);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->logger;
+    }
+    /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return NetworkInterface
+     */
+    public function getNetwork()
+    {
+        if (empty($this->network)) {
+            $mess = 'Tried to use $network when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->network)) {
+            $dependence = $this->getDependence();
+            $this->setCache($dependence[(string)$this->network]);
+        }
+        if (!$this->network instanceof EveApiXmlCache) {
+            $mess = '$network could NOT be resolved to instance of'
+                . ' NetworkInterface is instead ' . gettype($this->network);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->network;
+    }
+    /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return XMLReader
+     */
+    public function getReader()
+    {
+        if (empty($this->reader)) {
+            $mess = 'Tried to use $reader when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->reader)) {
+            $dependence = $this->getDependence();
+            $this->setCache($dependence[(string)$this->reader]);
+        }
+        if (!$this->reader instanceof EveApiXmlCache) {
+            $mess = '$reader could NOT be resolved to instance of'
+                . ' XMLReader is instead ' . gettype($this->reader);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->reader;
+    }
+    /**
+     * @param EveApiXmlCache $value
+     *
+     * @return self
+     */
+    public function setCache(EveApiXmlCache $value = null)
+    {
+        if (is_string($value)) {
+            $dependence = $this->getDependence();
+            if (empty($dependence[$value])) {
+                $mess = 'Dependence container does NOT contain ' . $value;
+                throw new \DomainException($mess);
+            }
+        }
+        $this->cache = $value;
+        return $this;
+    }
+    /**
+     * @param DependenceInterface|null $value
+     *
+     * @return self
+     */
+    public function setDependence(DependenceInterface $value = null)
+    {
+        $this->dependence = $value;
+        return $this;
+    }
+    /**
+     * @param LoggerInterface $value
+     *
+     * @return self
+     */
+    public function setLogger(LoggerInterface $value = null)
+    {
+        if (is_string($value)) {
+            $dependence = $this->getDependence();
+            if (empty($dependence[$value])) {
+                $mess = 'Dependence container does NOT contain ' . $value;
+                throw new \DomainException($mess);
+            }
+        }
+        $this->logger = $value;
+        return $this;
+    }
+    /**
+     * @param NetworkInterface $value
+     *
+     * @return self
+     */
+    public function setNetwork(NetworkInterface $value = null)
+    {
+        if (is_string($value)) {
+            $dependence = $this->getDependence();
+            if (empty($dependence[$value])) {
+                $mess = 'Dependence container does NOT contain ' . $value;
+                throw new \DomainException($mess);
+            }
+        }
+        $this->network = $value;
+        return $this;
+    }
+    /**
+     * @param XMLReader $value
+     *
+     * @return self
+     */
+    public function setReader(XMLReader $value = null)
+    {
+        if (is_string($value)) {
+            $dependence = $this->getDependence();
+            if (empty($dependence[$value])) {
+                $mess = 'Dependence container does NOT contain ' . $value;
+                throw new \DomainException($mess);
+            }
+        }
+        $this->reader = $value;
+        return $this;
     }
     /**
      * @var string Holds the name of the API. Normally set in constructor of the
      * final derived instance class.
      */
     protected $api;
+    /**
+     * @var EveApiXmlCache Holds API connection.
+     */
+    protected $cache;
+    /**
+     * @var DependenceInterface
+     */
+    protected $dependence;
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    /**
+     * @var NetworkInterface
+     */
+    protected $network;
     /**
      * @var string Holds the ownerID to be used when updating cachedUntil table.
      */
@@ -118,14 +336,14 @@ abstract class AbstractApiRequest
      */
     protected $params;
     /**
+     * @var XMLReader Holds instance of XMLReader.
+     */
+    protected $reader;
+    /**
      * @var string Holds the API section name. Normally set in constructor of the
      * final derived instance class.
      */
     protected $section;
-    /**
-     * @var \XMLReader Holds instance of XMLReader.
-     */
-    protected $xr;
     /**
      * Version of sprintf for cases where named arguments are desired (php syntax)
      *
@@ -171,7 +389,7 @@ abstract class AbstractApiRequest
             if (!array_key_exists($arg_key, $arg_nums)) {
                 $mess = 'Missing argument "' . $arg_key . '"' . PHP_EOL;
                 \Logger::getLogger('yapeal')
-                      ->warn($mess);
+                       ->warn($mess);
                 return false;
             }
             // Replace the named argument with the corresponding numeric one.
@@ -183,6 +401,12 @@ abstract class AbstractApiRequest
         }
         return vsprintf($format, array_values($args));
     }
+    /**
+     * Method used to get network connection.
+     *
+     * @return NetworkConnection
+     */
+    abstract protected function getNetworkConnection();
     /**
      * Abstract per API section function that returns API proxy.
      *
@@ -229,22 +453,23 @@ abstract class AbstractApiRequest
             $qb->setDefault('ownerID', $this->ownerID);
         }
         try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
-                    case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
+            while ($this->reader->read()) {
+                switch ($this->reader->nodeType) {
+                    case XMLReader::ELEMENT:
+                        switch ($this->reader->localName) {
                             case 'row':
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    $row[$this->xr->name] = $this->xr->value;
+                                while ($this->reader->moveToNextAttribute()) {
+                                    $row[$this->reader->name] =
+                                        $this->reader->value;
                                 }
                                 $qb->addRow($row);
                                 break;
                         };
                         break;
-                    case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
+                    case XMLReader::END_ELEMENT:
+                        if ($this->reader->localName == 'result') {
                             // Insert any leftovers.
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -257,13 +482,13 @@ abstract class AbstractApiRequest
             }
         } catch (\ADODB_Exception $e) {
             \Logger::getLogger('yapeal')
-                  ->warn($e);
+                   ->warn($e);
             return false;
         }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         \Logger::getLogger('yapeal')
-              ->warn($mess);
+               ->warn($mess);
         return false;
     }
     /**

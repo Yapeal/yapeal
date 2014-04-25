@@ -98,7 +98,6 @@ abstract class AbstractCorp extends AbstractApiRequest
     {
         $default = 'https://api.eveonline.com/' . $this->section;
         $default .= '/' . $this->api . '.xml.aspx';
-        $sql = 'SELECT proxy FROM ';
         try {
             $con = DBConnection::connect(YAPEAL_DSN);
             $tables = array();
@@ -118,7 +117,7 @@ abstract class AbstractCorp extends AbstractApiRequest
                 . ' where `section`=' . $con->qstr($this->section);
             // Look for a set proxy in each table.
             foreach ($tables as $table) {
-                $result = $con->GetOne($sql . $table);
+                $result = $con->GetOne('SELECT proxy FROM ' . $table);
                 // 4 is random and not magic. It just sounded good and is shorter than
                 // any legal URL.
                 if (strlen($result) > 4) {

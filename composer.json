@@ -40,10 +40,12 @@
         "ext-xmlreader": "*",
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
-        "php": ">=5.3.2"
+        "php": ">=5.3.2",
+        "guzzle/guzzle": "~3.8",
+        "monolog/monolog": "1.9.0"
     },
     "require-dev": {
         "ext-xsl": "*",
-        "phpdocumentor/phpdocumentor": "~2.4"
+        "phpmd/phpmd": "~1.5"
     }
 }

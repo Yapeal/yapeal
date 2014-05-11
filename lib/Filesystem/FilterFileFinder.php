@@ -29,6 +29,10 @@
  */
 namespace Yapeal\Filesystem;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 /**
  * Class to recursive search through a directory for files/directories that match
  * a search string.
@@ -63,18 +67,18 @@ class FilterFileFinder extends \FilterIterator
         $this->match = $match;
         $this->type = $type;
         $this->piece = $piece;
-        $flat = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path)
+        $flat = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path)
         );
         // Fix for issue 65 try 2
         if (class_exists('FilesystemIterator')) {
             // Set flags to known working settings.
-            $flags = \FilesystemIterator::CURRENT_AS_FILEINFO
-                | \FilesystemIterator::KEY_AS_PATHNAME
-                | \FilesystemIterator::SKIP_DOTS
-                | \FilesystemIterator::UNIX_PATHS;
+            $flags = FilesystemIterator::CURRENT_AS_FILEINFO
+                | FilesystemIterator::KEY_AS_PATHNAME
+                | FilesystemIterator::SKIP_DOTS
+                | FilesystemIterator::UNIX_PATHS;
             /**
-             * @var \RecursiveDirectoryIterator $flat
+             * @var RecursiveDirectoryIterator $flat
              */
             $flat->setFlags($flags);
         }
@@ -94,13 +98,13 @@ class FilterFileFinder extends \FilterIterator
         $fileList = array();
         if (!empty($files)) {
             /**
-             * @var \RecursiveDirectoryIterator $file
+             * @var RecursiveDirectoryIterator $file
              */
             foreach ($files as $file) {
                 $fileList[] = str_replace(
                     $match,
                     '',
-                    self::pathinfo_utf($file->getPathname(), PATHINFO_FILENAME)
+                    self::pathInfoUTF($file->getPathname(), PATHINFO_FILENAME)
                 );
             }
         }
@@ -120,7 +124,7 @@ class FilterFileFinder extends \FilterIterator
      * If options is used, this function will return a string else all elements
      * are returned as an associative array.
      */
-    static public function pathinfo_utf($path, $options = 0)
+    static public function pathInfoUTF($path, $options = 0)
     {
         $path = str_replace(array("\\", "\\\\"), '/', $path);
         // Get rid of any double '/'s that might have crept in.
@@ -134,7 +138,7 @@ class FilterFileFinder extends \FilterIterator
         if (empty($basename)) {
             return false;
         };
-        $dirname = substr($path, 0, strlen($path) - strlen($basename) - 1);
+        $dirName = substr($path, 0, strlen($path) - strlen($basename) - 1);
         if (strpos($basename, '.') !== false) {
             $pieces = explode('.', $path);
             $extension = end($pieces);
@@ -149,7 +153,7 @@ class FilterFileFinder extends \FilterIterator
         }
         switch ($options) {
             case PATHINFO_DIRNAME:
-                return $dirname;
+                return $dirName;
             case PATHINFO_BASENAME:
                 return $basename;
             case PATHINFO_EXTENSION:
@@ -158,7 +162,7 @@ class FilterFileFinder extends \FilterIterator
                 return $filename;
         }
         return array(
-            'dirname' => $dirname,
+            'dirname' => $dirName,
             'basename' => $basename,
             'extension' => $extension,
             'filename' => $filename
@@ -172,22 +176,22 @@ class FilterFileFinder extends \FilterIterator
      */
     public function accept()
     {
-        $pathinfo = self::pathinfo_utf($this->current(), $this->piece);
+        $pathInfo = self::pathInfoUTF($this->current(), $this->piece);
         switch ($this->type) {
             case self::PREFIX:
-                if (0 === strpos($pathinfo, $this->match)) {
+                if (0 === strpos($pathInfo, $this->match)) {
                     return true;
                 }
                 break;
             case self::CONTAINS:
-                if (false !== strpos($pathinfo, $this->match)) {
+                if (false !== strpos($pathInfo, $this->match)) {
                     return true;
                 }
                 break;
             case self::SUFFIX:
-                $pathinfo = self::strrev_utf($pathinfo);
-                $match = self::strrev_utf($this->match);
-                if (0 === strpos($pathinfo, $match)) {
+                $pathInfo = self::strRevUTF($pathInfo);
+                $match = self::strRevUTF($this->match);
+                if (0 === strpos($pathInfo, $match)) {
                     return true;
                 }
                 break;
@@ -214,23 +218,29 @@ class FilterFileFinder extends \FilterIterator
      * UTF-8 safe string reverse that also supports HTML type numerical entities
      *
      * @param string $str              String to be reversed.
-     * @param bool   $preserve_numbers Whither to reverse numbers or not.
+     * @param bool $preserveNumbers Whither to reverse numbers or not.
      *
      * @return string Returns $str in reverse order.
      */
-    protected function strrev_utf($str, $preserve_numbers = false)
+    protected function strRevUTF($str, $preserveNumbers = false)
     {
         //split string into string-portions (1 byte characters, numerical entities or numbers)
         $parts = array();
         while ($str) {
-            if ($preserve_numbers && preg_match('/^([0-9]+)(.*)$/', $str, $m)) {
+            if ($preserveNumbers
+                && preg_match(
+                    '/^([0-9]+)(.*)$/',
+                    $str,
+                    $matches
+                )
+            ) {
                 // number-flow
-                $parts[] = $m[1];
-                $str = $m[2];
-            } elseif (preg_match('/^(\&#[0-9]+;)(.*)$/', $str, $m)) {
+                $parts[] = $matches[1];
+                $str = $matches[2];
+            } elseif (preg_match('/^(\&#[0-9]+;)(.*)$/', $str, $matches)) {
                 // numerical entity
-                $parts[] = $m[1];
-                $str = $m[2];
+                $parts[] = $matches[1];
+                $str = $matches[2];
             } else {
                 $parts[] = substr($str, 0, 1);
                 $str = substr($str, 1);

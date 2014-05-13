@@ -30,7 +30,6 @@
 namespace Yapeal\Database\Section;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Yapeal\Database\AbstractApiRequest;
 use Yapeal\Database\AbstractSection;
 use Yapeal\Database\DBConnection;
@@ -45,17 +44,18 @@ class Account extends AbstractSection
     /**
      * Constructor
      *
-     * @param AccessMask|null $am
+     * @param AccessMask|null $accessMask
      * @param int             $activeAPIMask
      * @param LoggerInterface $logger
      */
     public function __construct(
-        AccessMask $am = null,
+        AccessMask $accessMask = null,
         $activeAPIMask,
         LoggerInterface $logger
     ) {
-        $this->section = strtolower(basename(__CLASS__));
-        parent::__construct($am, $activeAPIMask, $logger);
+        $this->section =
+            strtolower(basename(str_replace('\\', '/', __CLASS__)));
+        parent::__construct($accessMask, $activeAPIMask, $logger);
     }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
@@ -104,7 +104,8 @@ class Account extends AbstractSection
                 if ($ky['mask'] == 0) {
                     continue;
                 }
-                $apis = $this->am->maskToAPIs($ky['mask'], $this->section);
+                $apis =
+                    $this->accessMask->maskToAPIs($ky['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
                     \Logger::getLogger('yapeal')

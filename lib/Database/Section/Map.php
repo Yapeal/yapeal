@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Section;
 
+use Psr\Log\LoggerInterface;
 use Yapeal\Database\AbstractApiRequest;
 use Yapeal\Database\AbstractSection;
 use Yapeal\Database\DBConnection;
@@ -43,16 +44,18 @@ class Map extends AbstractSection
     /**
      * Constructor
      *
-     * @param \Yapeal\Database\Util\AccessMask|null $am
-     * @param int                                   $activeAPIMask
+     * @param AccessMask|null $accessMask
+     * @param int             $activeAPIMask
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        AccessMask $am = null,
-        $activeAPIMask
+        AccessMask $accessMask = null,
+        $activeAPIMask,
+        LoggerInterface $logger
     ) {
         $this->section =
             strtolower(basename(str_replace('\\', '/', __CLASS__)));
-        parent::__construct($am, $activeAPIMask);
+        parent::__construct($accessMask, $activeAPIMask, $logger);
     }
     /**
      * Function called by Yapeal.php to start section pulling XML from servers.
@@ -63,7 +66,7 @@ class Map extends AbstractSection
     {
         $apiCount = 0;
         $apiSuccess = 0;
-        $apis = $this->am->maskToAPIs($this->mask, $this->section);
+        $apis = $this->accessMask->maskToAPIs($this->mask, $this->section);
         if (count($apis) == 0) {
             return false;
         }

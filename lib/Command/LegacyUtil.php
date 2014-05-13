@@ -5,7 +5,7 @@
  * PHP version 5.3
  *
  * LICENSE:
- * This file is part of 1.1.x
+ * This file is part of Yapeal
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -151,7 +151,7 @@ class LegacyUtil
                 if (is_array($value)) {
                     // If option is used multiple times use the last value.
                     $value = $value[count($value) - 1];
-                };
+                }
                 $settings[$optionsWithValuesMap[$opt]] = (string)$value;
                 continue;
             }
@@ -181,15 +181,15 @@ class LegacyUtil
     {
         if (!defined('YAPEAL_APPLICATION_AGENT')) {
             $curl = curl_version();
-            $user_agent = $section['application_agent'];
-            $user_agent .= ' Yapeal/1.1.x-alpha';
-            $user_agent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
-            $user_agent .= ' libcurl/' . $curl['version'];
-            $user_agent = trim($user_agent);
+            $userAgent = $section['application_agent'];
+            $userAgent .= ' Yapeal/1.1.x-alpha';
+            $userAgent .= ' (' . PHP_OS . ' ' . php_uname('m') . ')';
+            $userAgent .= ' libcurl/' . $curl['version'];
+            $userAgent = trim($userAgent);
             /**
              * Used as default user agent in network connections.
              */
-            define('YAPEAL_APPLICATION_AGENT', $user_agent);
+            define('YAPEAL_APPLICATION_AGENT', $userAgent);
         }
         if (!defined('YAPEAL_REGISTERED_MODE')) {
             /**

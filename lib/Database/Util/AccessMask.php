@@ -61,19 +61,23 @@ class AccessMask
                 $con = DBConnection::connect(YAPEAL_DSN);
             } catch (\ADODB_Exception $e) {
                 $mess = 'Failed to get database connection in ' . basename(
-                        __CLASS__
+                        str_replace('\\', '/', __CLASS__)
                     );
                 throw new \RuntimeException($mess);
             }
             $sql = 'select `api`,`description`,`mask`,`section`';
             $sql .=
-                ' from `' . YAPEAL_TABLE_PREFIX . 'util' . basename(__CLASS__)
+                ' from `' . YAPEAL_TABLE_PREFIX . 'util' . basename(
+                    str_replace('\\', '/', __CLASS__)
+                )
                 . '`';
             try {
                 self::$maskList = $con->GetAll($sql);
             } catch (\ADODB_Exception $e) {
                 $mess =
-                    'Failed to get data from table in ' . basename(__CLASS__);
+                    'Failed to get data from table in ' . basename(
+                        str_replace('\\', '/', __CLASS__)
+                    );
                 throw new \RuntimeException($mess);
             }
             // If the table is empty add a default for APIKeyInfo mask only.

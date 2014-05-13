@@ -50,7 +50,8 @@ class Map extends AbstractSection
         AccessMask $am = null,
         $activeAPIMask
     ) {
-        $this->section = strtolower(basename(__CLASS__));
+        $this->section =
+            strtolower(basename(str_replace('\\', '/', __CLASS__)));
         parent::__construct($am, $activeAPIMask);
     }
     /**

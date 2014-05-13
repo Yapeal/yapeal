@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredCharacter` 
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredCorporation`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilregisteredcorporation` (
+CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredCorporation` (
     `activeAPIMask`   BIGINT(20) UNSIGNED DEFAULT NULL,
     `corporationID`   BIGINT(20) UNSIGNED NOT NULL,
     `corporationName` VARCHAR(150)
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilregisteredcorporation
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredKey`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilregisteredkey` (
+CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredKey` (
     `activeAPIMask` BIGINT(20) UNSIGNED DEFAULT NULL,
     `isActive`      TINYINT(1) DEFAULT NULL,
     `keyID`         BIGINT(20) UNSIGNED NOT NULL,

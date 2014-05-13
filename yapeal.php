@@ -82,37 +82,12 @@ if (!empty($options['config'])) {
 if (empty($iniVars)) {
     exit(1);
 }
-$loggerYapeal = new ML\Logger('yapeal');
-$loggerPhp = new ML\Logger('php');
-$handlerStreamCli = new MLH\StreamHandler('php://stderr', ML\Logger::DEBUG);
-$logFile =
-    __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'yapeal.log';
-$handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
-$handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
-$loggerYapeal->pushHandler($handlerFC);
-$loggerYapeal->pushHandler($handlerStreamCli);
-$logFile =
-    __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'php.log';
-$handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
-$handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
-$loggerPhp->pushHandler($handlerFC);
-$loggerPhp->pushHandler($handlerStreamCli);
-ML\ErrorHandler::register($loggerPhp, array(), ML\Logger::CRITICAL, false);
+$loggerYapeal = initLoggers();
 $mess = 'Yapeal started';
 $loggerYapeal->info($mess);
 /**
  * Define constants and properties from settings in configuration.
  */
-//if (!empty($options['log-config'])) {
-//    YapealErrorHandler::setLoggingSectionProperties(
-//        $iniVars['Logging'],
-//        $options['log-config']
-//    );
-//    unset($options['config']);
-//} else {
-//    YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
-//};
-//YapealErrorHandler::setupCustomErrorAndExceptionSettings();
 EveApiXmlCache::setCacheSectionProperties($iniVars['Cache']);
 DBConnection::setDatabaseSectionConstants($iniVars['Database']);
 $legacyUtil->setGeneralSectionConstants($iniVars);
@@ -207,4 +182,29 @@ function config()
     // TODO: Add XML caching
     // TODO: Add database connection
     return $dependencyContainer;
+}
+
+/**
+ * @return ML\Logger
+ */
+function initLoggers()
+{
+    $loggerYapeal = new ML\Logger('yapeal');
+    $loggerPhp = new ML\Logger('php');
+    $handlerStreamCli = new MLH\StreamHandler('php://stderr', ML\Logger::DEBUG);
+    $logFile =
+        __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR
+        . 'yapeal.log';
+    $handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
+    $handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
+    $loggerYapeal->pushHandler($handlerFC);
+    $loggerYapeal->pushHandler($handlerStreamCli);
+    $logFile =
+        __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'php.log';
+    $handlerStreamFile = new MLH\StreamHandler($logFile, ML\Logger::DEBUG);
+    $handlerFC = new MLH\FingersCrossedHandler($handlerStreamFile);
+    $loggerPhp->pushHandler($handlerFC);
+    $loggerPhp->pushHandler($handlerStreamCli);
+    ML\ErrorHandler::register($loggerPhp, array(), ML\Logger::CRITICAL, false);
+    return $loggerYapeal;
 }

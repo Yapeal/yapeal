@@ -71,11 +71,10 @@ class Account extends AbstractSection
             $sql = $this->getSQLQuery();
             $result = $con->GetAll($sql);
             if (count($result) == 0) {
-                $mess = 'No keys for account section';
-                $this->logger->log(LogLevel::INFO, $mess);
                 if (\Logger::getLogger('yapeal')
                            ->isInfoEnabled()
                 ) {
+                    $mess = 'No keys for account section';
                     \Logger::getLogger('yapeal')
                            ->info($mess);
                 }
@@ -85,11 +84,10 @@ class Account extends AbstractSection
             $filter = array($this, YAPEAL_REGISTERED_MODE . 'Filter');
             $keyList = array_filter($result, $filter);
             if (empty($keyList)) {
-                $mess = 'No active keys for account section';
-                $this->logger->info($mess);
                 if (\Logger::getLogger('yapeal')
                            ->isInfoEnabled()
                 ) {
+                    $mess = 'No active keys for account section';
                     \Logger::getLogger('yapeal')
                            ->info($mess);
                 }
@@ -109,7 +107,6 @@ class Account extends AbstractSection
                 $apis = $this->am->maskToAPIs($ky['mask'], $this->section);
                 if ($apis === false) {
                     $mess = 'Problem retrieving API list using mask';
-                    $this->logger->warning($mess);
                     \Logger::getLogger('yapeal')
                            ->warn($mess);
                     continue;
@@ -121,12 +118,11 @@ class Account extends AbstractSection
                 foreach ($apis as $api) {
                     // See if Yapeal has been running for longer than 'soft' limit.
                     if (YAPEAL_MAX_EXECUTE < time()) {
-                        $mess =
-                            'Yapeal has been working very hard and needs a break';
-                        $this->logger->info($mess);
                         if (\Logger::getLogger('yapeal')
                                    ->isInfoEnabled()
                         ) {
+                            $mess =
+                                'Yapeal has been working very hard and needs a break';
                             \Logger::getLogger('yapeal')
                                    ->info($mess);
                         }
@@ -162,12 +158,11 @@ class Account extends AbstractSection
                         $sql =
                             'select get_lock(' . $con->qstr($hash) . ',5)';
                         if ($con->GetOne($sql) != 1) {
-                            $mess = 'Failed to get lock for ' . $class
-                                . $hash;
-                            $this->logger->info($mess);
                             if (\Logger::getLogger('yapeal')
                                        ->isInfoEnabled()
                             ) {
+                                $mess = 'Failed to get lock for ' . $class
+                                    . $hash;
                                 \Logger::getLogger('yapeal')
                                        ->info($mess);
                             }
@@ -179,12 +174,10 @@ class Account extends AbstractSection
                     // Give each API 60 seconds to finish. This should never happen but
                     // is here to catch runaways.
                     set_time_limit(60);
-                    $mess = 'Calling instance of ' . $class;
-                    $this->logger->debug($mess);
                     /**
                      * @var AbstractApiRequest $instance
                      */
-                    $instance = new $class($params, $this->logger);
+                    $instance = new $class($params);
                     if ($instance->apiStore()) {
                         ++$apiSuccess;
                     }

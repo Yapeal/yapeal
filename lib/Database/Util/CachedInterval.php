@@ -61,16 +61,22 @@ class CachedInterval
             $con = DBConnection::connect(YAPEAL_DSN);
         } catch (\ADODB_Exception $e) {
             $mess =
-                'Failed to get database connection in ' . basename(__CLASS__);
+                'Failed to get database connection in ' . basename(
+                    str_replace('\\', '/', __CLASS__)
+                );
             throw new \RuntimeException($mess);
         }
         $sql = 'select `api`,`interval`,`section`';
-        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'util' . basename(__CLASS__)
+        $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'util' . basename(
+                str_replace('\\', '/', __CLASS__)
+            )
             . '`';
         try {
             self::$intervalList = $con->GetAll($sql);
         } catch (\ADODB_Exception $e) {
-            $mess = 'Failed to get data from table in ' . basename(__CLASS__);
+            $mess = 'Failed to get data from table in ' . basename(
+                    str_replace('\\', '/', __CLASS__)
+                );
             throw new \RuntimeException($mess);
         }
         // If the table is empty add a default for APIKeyInfo interval only.

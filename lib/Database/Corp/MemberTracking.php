@@ -49,7 +49,7 @@ class MemberTracking extends AbstractCorp
     public function __construct(array $params)
     {
         $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(__CLASS__);
+        $this->api = basename(str_replace('\\', '/', __CLASS__));
         $params['extended'] = 1;
         parent::__construct($params);
     }

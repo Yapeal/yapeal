@@ -42,18 +42,17 @@ class APIKeyInfo extends AbstractAccount
     /**
      * Constructor
      *
-     * @param array           $params Holds the required parameters like keyID, vCode, etc
-     *                                used in POST parameters to API servers which varies depending on API
-     *                                'section' being requested.
-     * @param LoggerInterface $logger
+     * @param array $params Holds the required parameters like keyID, vCode, etc
+     *                      used in POST parameters to API servers which varies depending on API
+     *                      'section' being requested.
      *
      * @throws \LengthException for any missing required $params.
      */
-    public function __construct(array $params, LoggerInterface $logger)
+    public function __construct(array $params)
     {
         $this->section = strtolower(basename(__DIR__));
         $this->api = basename(__CLASS__);
-        parent::__construct($params, $logger);
+        parent::__construct($params);
     }
     /**
      * @var QueryBuilder Holds QueryBuilder for bridge table.
@@ -70,21 +69,19 @@ class APIKeyInfo extends AbstractAccount
      */
     protected function characters()
     {
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
+        while ($this->xr->read()) {
+            switch ($this->xr->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
+                    switch ($this->xr->localName) {
                         case 'row':
                             $row = array();
                             $bridge = array('keyID' => $this->params['keyID']);
                             // Walk through attributes and add them to row.
-                            while ($this->reader->moveToNextAttribute()) {
-                                if ($this->reader->name == 'characterID') {
-                                    $bridge['characterID'] =
-                                        $this->reader->value;
+                            while ($this->xr->moveToNextAttribute()) {
+                                if ($this->xr->name == 'characterID') {
+                                    $bridge['characterID'] = $this->xr->value;
                                 };
-                                $row[$this->reader->name] =
-                                    $this->reader->value;
+                                $row[$this->xr->name] = $this->xr->value;
                             }
                             $this->bridge->addRow($bridge);
                             $this->characters->addRow($row);
@@ -92,7 +89,7 @@ class APIKeyInfo extends AbstractAccount
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'rowset') {
+                    if ($this->xr->localName == 'rowset') {
                         return true;
                     }
                     break;
@@ -100,7 +97,6 @@ class APIKeyInfo extends AbstractAccount
         }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        $this->logger->warning($mess);
         \Logger::getLogger('yapeal')
                ->warn($mess);
         return false;
@@ -137,36 +133,34 @@ class APIKeyInfo extends AbstractAccount
         // Save some overhead for tables that are truncated or in some way emptied.
         $this->bridge->useUpsert(false);
         try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
+            while ($this->xr->read()) {
+                switch ($this->xr->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
+                        switch ($this->xr->localName) {
                             case 'key':
                                 $row = array('keyID' => $this->params['keyID']);
                                 // Walk through attributes and add them to row.
-                                while ($this->reader->moveToNextAttribute()) {
+                                while ($this->xr->moveToNextAttribute()) {
                                     // Skip empty expires values.
-                                    if ($this->reader->name == 'expires'
-                                        && $this->reader->value == ''
+                                    if ($this->xr->name == 'expires'
+                                        && $this->xr->value == ''
                                     ) {
                                         continue;
                                     };
-                                    $row[$this->reader->name] =
-                                        $this->reader->value;
+                                    $row[$this->xr->name] = $this->xr->value;
                                 }
                                 $qb->addRow($row);
                                 break;
                             case 'rowset':
                                 // Check if empty.
-                                if ($this->reader->isEmptyElement == 1) {
+                                if ($this->xr->isEmptyElement == 1) {
                                     break;
                                 }
                                 // Grab rowset name.
-                                $subTable = $this->reader->getAttribute('name');
+                                $subTable = $this->xr->getAttribute('name');
                                 if (empty($subTable)) {
                                     $mess = 'Name of rowset is missing in '
                                         . $this->api;
-                                    $this->logger->warning($mess);
                                     \Logger::getLogger('yapeal')
                                            ->warn($mess);
                                     return false;
@@ -179,7 +173,7 @@ class APIKeyInfo extends AbstractAccount
                         }
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
+                        if ($this->xr->localName == 'result') {
                             // Save row count and store rows.
                             if (count($qb) > 0) {
                                 $qb->store();
@@ -200,14 +194,12 @@ class APIKeyInfo extends AbstractAccount
                 }
             }
         } catch (\ADODB_Exception $e) {
-            $this->logger->error($e);
             \Logger::getLogger('yapeal')
                    ->error($e);
             return false;
         }
         $mess =
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        $this->logger->warning($mess);
         \Logger::getLogger('yapeal')
                ->warn($mess);
         return false;
@@ -234,7 +226,6 @@ class APIKeyInfo extends AbstractAccount
             $sql .= ' where `keyID`=' . $this->params['keyID'];
             $con->Execute($sql);
         } catch (\ADODB_Exception $e) {
-            $this->logger->warning($e);
             \Logger::getLogger('yapeal')
                    ->warn($e);
             return false;

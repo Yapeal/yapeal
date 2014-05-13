@@ -59,13 +59,17 @@ class CachedUntil extends ALimitedObject implements IGetBy
      */
     public function __construct($id = null, $create = true)
     {
-        $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . basename(__CLASS__);
+        $this->tableName = YAPEAL_TABLE_PREFIX . 'util' . basename(
+                str_replace('\\', '/', __CLASS__)
+            );
         try {
             // Get a database connection.
             $this->con = DBConnection::connect(YAPEAL_DSN);
         } catch (\ADODB_Exception $e) {
             $mess =
-                'Failed to get database connection in ' . basename(__CLASS__);
+                'Failed to get database connection in ' . basename(
+                    str_replace('\\', '/', __CLASS__)
+                );
             throw new \RuntimeException($mess);
         }
         // Get a new query builder object.
@@ -78,7 +82,9 @@ class CachedUntil extends ALimitedObject implements IGetBy
         foreach ($required as $k => $v) {
             if (!isset($id[$k])) {
                 $mess = 'Missing required parameter $id["' . $k . '"]';
-                $mess .= ' to constructor in ' . basename(__CLASS__);
+                $mess .= ' to constructor in ' . basename(
+                        str_replace('\\', '/', __CLASS__)
+                    );
                 throw new \LengthException($mess);
             }
             switch ($v) {

@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}corpKillMails` (
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}corpLogo`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}corplogo` (
+CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}corpLogo` (
     `ownerID`   BIGINT(20) UNSIGNED  NOT NULL,
     `color1`    SMALLINT(5) UNSIGNED NOT NULL,
     `color2`    SMALLINT(5) UNSIGNED NOT NULL,

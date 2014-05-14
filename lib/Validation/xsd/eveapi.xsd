@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
     <!-- Eve types -->
     <xs:simpleType name="eveBoolean">
         <xs:restriction base="xs:string">
@@ -57,10 +58,19 @@
             <xs:pattern value="(\d{4})-02-((0[1-9])|([1-2]\d))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:complexType name="eveError">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="code"
+                    use="optional"
+                    type="xs:unsignedShort"
+                    default="0"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <!-- Eve Attributes -->
     <xs:attributeGroup name="rowsetAttrs">
         <xs:attribute name="columns" use="required" type="eveColumns"/>
         <xs:attribute name="key" use="required" type="xs:NCName"/>
-        <xs:attribute name="name" use="required" type="xs:NCName"/>
     </xs:attributeGroup>
 </xs:schema>

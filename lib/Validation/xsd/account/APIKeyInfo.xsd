@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xml:lang="en-US">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    xml:lang="en-US">
     <xs:include schemaLocation="../eveapi.xsd"/>
     <xs:element name="eveapi">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="currentTime" type="eveNEDT"/>
                 <xs:choice>
-                    <xs:element name="error">
-                        <xs:complexType>
-                            <xs:simpleContent>
-                                <xs:extension base="xs:string">
-                                    <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
-                                </xs:extension>
-                            </xs:simpleContent>
-                        </xs:complexType>
-                    </xs:element>
+                    <xs:element name="error" type="eveError"/>
                     <xs:element name="result">
                         <xs:complexType>
                             <xs:sequence>
@@ -24,7 +18,10 @@
                                             <xs:element name="rowset">
                                                 <xs:complexType>
                                                     <xs:sequence>
-                                                        <xs:element minOccurs="0" maxOccurs="3" name="row" type="rowType"/>
+                                                        <xs:element minOccurs="0"
+                                                            maxOccurs="3"
+                                                            name="row"
+                                                            type="rowType"/>
                                                     </xs:sequence>
                                                     <xs:attributeGroup ref="rowsetAttrs"/>
                                                 </xs:complexType>
@@ -51,9 +48,14 @@
                                                 </xs:key>
                                             </xs:element>
                                         </xs:sequence>
-                                        <xs:attribute name="accessMask" use="required" type="eveID"/>
-                                        <xs:attribute name="expires" use="required" type="eveDT"/>
-                                        <xs:attribute name="type" use="required">
+                                        <xs:attribute name="accessMask"
+                                            use="required"
+                                            type="eveID"/>
+                                        <xs:attribute name="expires"
+                                            use="required"
+                                            type="eveDT"/>
+                                        <xs:attribute name="type"
+                                            use="required">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:enumeration value="Account"/>

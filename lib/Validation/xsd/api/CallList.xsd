@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    xml:lang="en-US">
+    <xs:include schemaLocation="../eveapi.xsd"/>
+    <xs:element name="eveapi">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="currentTime" type="eveNEDT"/>
+                <xs:choice>
+                    <xs:element name="error" type="eveError"/>
+                    <xs:element name="result">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="rowset"
+                                    type="rowset"
+                                    minOccurs="2"
+                                    maxOccurs="2"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:key name="rowsetNameKey">
+                            <xs:annotation>
+                                <xs:documentation>The name attribute on the
+                                    rowset is a key
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:selector xpath=".//rowset"/>
+                            <xs:field xpath="@name"/>
+                        </xs:key>
+                        <xs:unique name="rowsetKeyUnique">
+                            <xs:annotation>
+                                <xs:documentation>The key attribute on the
+                                    rowset MUST be unique
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:selector xpath=".//rowset"/>
+                            <xs:field xpath="@key"/>
+                        </xs:unique>
+                        <xs:unique name="rowGroupIDAndAccessMaskUnique">
+                            <xs:selector xpath=".//row"/>
+                            <xs:field xpath="@type"/>
+                            <xs:field xpath="@accessMask"/>
+                        </xs:unique>
+                    </xs:element>
+                </xs:choice>
+                <xs:element name="cachedUntil" type="eveNEDT"/>
+            </xs:sequence>
+            <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="rowset">
+            <xs:sequence>
+                <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="description"
+                            use="required"
+                            type="xs:string"/>
+                        <xs:attribute name="groupID"
+                            use="required"
+                            type="eveID"/>
+                        <xs:attribute name="name"
+                            use="required"
+                            type="xs:string"/>
+                        <xs:attribute name="accessMask"
+                            use="optional"
+                            type="eveID"/>
+                        <xs:attribute name="type"
+                            use="optional"
+                            type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        <xs:attribute name="columns" use="required" type="eveColumns"/>
+        <xs:attribute name="key" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="groupID"/>
+                    <xs:enumeration value="accessMask,type"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="name" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="callGroups"/>
+                    <xs:enumeration value="calls"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+</xs:schema>

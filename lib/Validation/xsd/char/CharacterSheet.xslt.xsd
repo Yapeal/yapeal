@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="../eveapi.xsd"/>
+    <xs:element name="eveapi" type="eveapiType"/>
+    <xs:complexType name="eveapiType">
+        <xs:sequence>
+            <xs:element type="eveNEDT" name="currentTime"/>
+            <xs:choice>
+                <xs:element type="eveError" name="error"/>
+                <xs:element type="resultType" name="result"/>
+            </xs:choice>
+            <xs:element type="eveNEDT" name="cachedUntil"/>
+        </xs:sequence>
+        <xs:attribute type="xs:unsignedByte" name="version" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element type="xs:int" name="characterID"/>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="DoB"/>
+            <xs:element type="xs:string" name="race"/>
+            <xs:element type="xs:string" name="bloodLine"/>
+            <xs:element type="xs:string" name="ancestry"/>
+            <xs:element type="xs:string" name="gender"/>
+            <xs:element type="xs:string" name="corporationName"/>
+            <xs:element type="xs:int" name="corporationID"/>
+            <xs:element type="xs:string" name="allianceName"/>
+            <xs:element type="xs:byte" name="allianceID"/>
+            <xs:element type="xs:string" name="factionName"/>
+            <xs:element type="xs:byte" name="factionID"/>
+            <xs:element type="xs:string" name="cloneName"/>
+            <xs:element type="xs:int" name="cloneSkillPoints"/>
+            <xs:element type="xs:float" name="balance"/>
+            <xs:element type="attributeEnhancersType"
+                name="attributeEnhancers"/>
+            <xs:element type="attributesType" name="attributes"/>
+            <xs:element type="skillsType" name="skills"/>
+            <xs:element type="certificatesType" name="certificates"/>
+            <xs:element type="corporationRolesType" name="corporationRoles"/>
+            <xs:element type="corporationRolesAtHQType"
+                name="corporationRolesAtHQ"/>
+            <xs:element type="corporationRolesAtBaseType"
+                name="corporationRolesAtBase"/>
+            <xs:element type="corporationRolesAtOtherType"
+                name="corporationRolesAtOther"/>
+            <xs:element type="corporationTitlesType" name="corporationTitles"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="certificatesRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:int"
+                    name="certificateID"
+                    use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="corporationRolesRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:byte" name="roleID" use="required"/>
+                <xs:attribute type="xs:string" name="roleName" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="corporationTitlesRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:byte" name="titleID" use="required"/>
+                <xs:attribute type="xs:string" name="titleName" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="skillsRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:int" name="typeID" use="required"/>
+                <xs:attribute type="xs:int" name="skillpoints" use="required"/>
+                <xs:attribute type="xs:byte" name="level" use="required"/>
+                <xs:attribute type="xs:byte" name="published" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="perceptionBonusType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="augmentatorName"/>
+            <xs:element type="xs:byte" name="augmentatorValue"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="corporationRolesAtHQType">
+        <xs:sequence>
+            <xs:element type="corporationRolesRowType"
+                name="row"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+    <xs:complexType name="corporationRolesAtOtherType">
+        <xs:sequence>
+            <xs:element type="corporationRolesRowType"
+                name="row"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="rowsetAttrs"/>
+    </xs:complexType>
+    <xs:complexType name="corporationRolesAtBaseType">
+        <xs:sequence>
+            <xs:element type="corporationRolesRowType"
+                name="row"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+    <xs:complexType name="attributeEnhancersType">
+        <xs:sequence>
+            <xs:element type="intelligenceBonusType" name="intelligenceBonus"/>
+            <xs:element type="perceptionBonusType" name="perceptionBonus"/>
+            <xs:element type="memoryBonusType" name="memoryBonus"/>
+            <xs:element type="willpowerBonusType" name="willpowerBonus"/>
+            <xs:element type="charismaBonusType" name="charismaBonus"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="corporationRolesType">
+        <xs:sequence>
+            <xs:element type="corporationRolesRowType"
+                name="row"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+    <xs:complexType name="certificatesType">
+        <xs:sequence>
+            <xs:element type="certificatesRowType" name="row" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+    <xs:complexType name="corporationTitlesType">
+        <xs:sequence>
+            <xs:element type="corporationTitlesRowType"
+                name="row"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+    <xs:complexType name="willpowerBonusType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="augmentatorName"/>
+            <xs:element type="xs:byte" name="augmentatorValue"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="attributesType">
+        <xs:sequence>
+            <xs:element type="xs:byte" name="intelligence"/>
+            <xs:element type="xs:byte" name="memory"/>
+            <xs:element type="xs:byte" name="charisma"/>
+            <xs:element type="xs:byte" name="perception"/>
+            <xs:element type="xs:byte" name="willpower"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="intelligenceBonusType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="augmentatorName"/>
+            <xs:element type="xs:byte" name="augmentatorValue"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="charismaBonusType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="augmentatorName"/>
+            <xs:element type="xs:byte" name="augmentatorValue"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="memoryBonusType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="augmentatorName"/>
+            <xs:element type="xs:byte" name="augmentatorValue"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="skillsType">
+        <xs:sequence>
+            <xs:element type="skillsRowType"
+                name="row"
+                maxOccurs="unbounded"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="key"/>
+        <xs:attribute type="xs:string" name="columns"/>
+    </xs:complexType>
+</xs:schema>

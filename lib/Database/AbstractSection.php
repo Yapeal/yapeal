@@ -42,19 +42,19 @@ abstract class AbstractSection
     /**
      * Constructor
      *
-     * @param AccessMask|null $am
+     * @param AccessMask|null $accessMask
      * @param int             $activeAPIMask
      * @param LoggerInterface $logger
      */
     public function __construct(
-        AccessMask $am = null,
+        AccessMask $accessMask = null,
         $activeAPIMask,
         LoggerInterface $logger
     ) {
-        if ($am === null) {
-            $am = new Util\AccessMask();
+        if ($accessMask === null) {
+            $accessMask = new Util\AccessMask();
         }
-        $this->am = $am;
+        $this->accessMask = $accessMask;
         $this->logger = $logger;
         $this->mask = (int)$activeAPIMask;
     }
@@ -67,7 +67,7 @@ abstract class AbstractSection
     /**
      * @var \Yapeal\Database\Util\AccessMask Hold Yapeal\Database\Util\AccessMask class used to convert between mask and APIs.
      */
-    protected $am;
+    protected $accessMask;
     /**
      * @var LoggerInterface
      */

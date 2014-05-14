@@ -1,63 +1,55 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../eveapi.xsd"/>
-    <xs:element name="eveapi">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="currentTime" type="eveNEDT"/>
-                <xs:choice>
-                    <xs:element name="error">
-                        <xs:complexType>
-                            <xs:simpleContent>
-                                <xs:extension base="xs:string">
-                                    <xs:attribute name="code" use="optional" type="xs:unsignedShort" default="0"/>
-                                </xs:extension>
-                            </xs:simpleContent>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element name="result">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element name="paidUntil" type="eveDT"/>
-                                <xs:element name="createDate" type="eveDT"/>
-                                <xs:element name="logonCount" type="xs:unsignedLong"/>
-                                <xs:element name="logonMinutes" type="xs:unsignedLong"/>
-                                <xs:element name="rowset" minOccurs="0">
-                                    <xs:complexType>
-                                        <xs:sequence>
-                                            <xs:element minOccurs="0" name="row" type="rowType"/>
-                                        </xs:sequence>
-                                        <xs:attributeGroup ref="rowsetAttrs"/>
-                                    </xs:complexType>
-                                    <xs:key name="rowIdKey">
-                                        <xs:annotation>
-                                            <xs:documentation>The attribute
-                                                named by the key attribute on
-                                                the rowset is a key for the rows
-                                            </xs:documentation>
-                                        </xs:annotation>
-                                        <xs:selector xpath=".//row"/>
-                                        <xs:field xpath="@offerID"/>
-                                    </xs:key>
-                                    <xs:key name="rowNameKey">
-                                        <xs:annotation>
-                                            <xs:documentation>Names must be
-                                                unique
-                                            </xs:documentation>
-                                        </xs:annotation>
-                                        <xs:selector xpath=".//row"/>
-                                        <xs:field xpath="@name"/>
-                                    </xs:key>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:choice>
-                <xs:element name="cachedUntil" type="eveNEDT"/>
-            </xs:sequence>
-            <xs:attribute name="version" use="required" type="xs:unsignedByte"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="eveapi" type="eveapiType"/>
+    <xs:complexType name="eveapiType">
+        <xs:sequence>
+            <xs:element type="eveNEDT" name="currentTime"/>
+            <xs:choice>
+                <xs:element type="eveError" name="error"/>
+                <xs:element type="resultType" name="result"/>
+            </xs:choice>
+            <xs:element type="eveNEDT" name="cachedUntil"/>
+        </xs:sequence>
+        <xs:attribute use="required" type="xs:unsignedByte" name="version"/>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element type="eveDT" name="paidUntil"/>
+            <xs:element type="eveDT" name="createDate"/>
+            <xs:element type="xs:unsignedLong" name="logonCount"/>
+            <xs:element type="xs:unsignedLong" name="logonMinutes"/>
+            <xs:element name="rowset" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="row" type="rowType"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+                <xs:key name="rowIdKey">
+                    <xs:annotation>
+                        <xs:documentation>The attribute
+                            named by the key attribute on
+                            the rowset is a key for the rows
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@offerID"/>
+                </xs:key>
+                <xs:key name="rowNameKey">
+                    <xs:annotation>
+                        <xs:documentation>Names must be
+                            unique
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath=".//row"/>
+                    <xs:field xpath="@name"/>
+                </xs:key>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name="rowType">
         <xs:attribute name="offerID" use="required" type="eveID"/>
         <xs:attribute name="offeredDate" use="required" type="eveDT"/>

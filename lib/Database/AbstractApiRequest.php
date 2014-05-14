@@ -76,7 +76,7 @@ abstract class AbstractApiRequest
     {
         try {
             // Get valid cached copy if there is one.
-            $result = $cache->getCachedApi();
+            $result = $this->cache->getCachedApi();
             // If XML is not cached need to try to get it from API server or proxy.
             if (false === $result) {
                 $proxy = $this->getProxy();
@@ -92,7 +92,7 @@ abstract class AbstractApiRequest
                     return false;
                 }
                 // Cache the received result.
-                $cache->cacheXml($result);
+                $this->cache->cacheXml($result);
             }
             if ($this->prepareTables() !== true) {
                 $mess = 'Could not prepare ' . $this->section . $this->api;
@@ -140,6 +140,11 @@ abstract class AbstractApiRequest
             throw new \LogicException($mess);
         } elseif (is_string($this->cache)) {
             $dependence = $this->getDependence();
+            if (empty($dependence[$this->cache])) {
+                $mess = 'Dependence container does NOT contain '
+                    . (string)$this->cache;
+                throw new \DomainException($mess);
+            }
             $this->setCache($dependence[(string)$this->cache]);
         }
         if (!$this->cache instanceof EveApiXmlCache) {
@@ -173,6 +178,14 @@ abstract class AbstractApiRequest
             throw new \LogicException($mess);
         } elseif (is_string($this->logger)) {
             $dependence = $this->getDependence();
+            if (is_string((string)$this->logger)) {
+                $dependence = $this->getDependence();
+                if (empty($dependence[(string)$this->logger])) {
+                    $mess = 'Dependence container does NOT contain '
+                        . (string)$this->logger;
+                    throw new \DomainException($mess);
+                }
+            }
             $this->setLogger($dependence[(string)$this->logger]);
         }
         if (!$this->logger instanceof LoggerInterface) {
@@ -195,6 +208,14 @@ abstract class AbstractApiRequest
             throw new \LogicException($mess);
         } elseif (is_string($this->network)) {
             $dependence = $this->getDependence();
+            if (is_string((string)$this->network)) {
+                $dependence = $this->getDependence();
+                if (empty($dependence[(string)$this->network])) {
+                    $mess = 'Dependence container does NOT contain '
+                        . (string)$this->network;
+                    throw new \DomainException($mess);
+                }
+            }
             $this->setCache($dependence[(string)$this->network]);
         }
         if (!$this->network instanceof EveApiXmlCache) {
@@ -217,6 +238,14 @@ abstract class AbstractApiRequest
             throw new \LogicException($mess);
         } elseif (is_string($this->reader)) {
             $dependence = $this->getDependence();
+            if (is_string((string)$this->reader)) {
+                $dependence = $this->getDependence();
+                if (empty($dependence[(string)$this->reader])) {
+                    $mess = 'Dependence container does NOT contain '
+                        . (string)$this->reader;
+                    throw new \DomainException($mess);
+                }
+            }
             $this->setCache($dependence[(string)$this->reader]);
         }
         if (!$this->reader instanceof EveApiXmlCache) {
@@ -227,19 +256,12 @@ abstract class AbstractApiRequest
         return $this->reader;
     }
     /**
-     * @param EveApiXmlCache $value
+     * @param EveApiXmlCache|string|null $value
      *
      * @return self
      */
-    public function setCache(EveApiXmlCache $value = null)
+    public function setCache($value = null)
     {
-        if (is_string($value)) {
-            $dependence = $this->getDependence();
-            if (empty($dependence[$value])) {
-                $mess = 'Dependence container does NOT contain ' . $value;
-                throw new \DomainException($mess);
-            }
-        }
         $this->cache = $value;
         return $this;
     }
@@ -254,53 +276,32 @@ abstract class AbstractApiRequest
         return $this;
     }
     /**
-     * @param LoggerInterface $value
+     * @param LoggerInterface|string|null $value
      *
      * @return self
      */
-    public function setLogger(LoggerInterface $value = null)
+    public function setLogger($value = null)
     {
-        if (is_string($value)) {
-            $dependence = $this->getDependence();
-            if (empty($dependence[$value])) {
-                $mess = 'Dependence container does NOT contain ' . $value;
-                throw new \DomainException($mess);
-            }
-        }
         $this->logger = $value;
         return $this;
     }
     /**
-     * @param NetworkInterface $value
+     * @param NetworkInterface|string|null $value
      *
      * @return self
      */
-    public function setNetwork(NetworkInterface $value = null)
+    public function setNetwork($value = null)
     {
-        if (is_string($value)) {
-            $dependence = $this->getDependence();
-            if (empty($dependence[$value])) {
-                $mess = 'Dependence container does NOT contain ' . $value;
-                throw new \DomainException($mess);
-            }
-        }
         $this->network = $value;
         return $this;
     }
     /**
-     * @param XMLReader $value
+     * @param XMLReader|string|null $value
      *
      * @return self
      */
-    public function setReader(XMLReader $value = null)
+    public function setReader($value = null)
     {
-        if (is_string($value)) {
-            $dependence = $this->getDependence();
-            if (empty($dependence[$value])) {
-                $mess = 'Dependence container does NOT contain ' . $value;
-                throw new \DomainException($mess);
-            }
-        }
         $this->reader = $value;
         return $this;
     }
@@ -310,7 +311,7 @@ abstract class AbstractApiRequest
      */
     protected $api;
     /**
-     * @var EveApiXmlCache Holds API connection.
+     * @var EveApiXmlCache|string Holds API connection.
      */
     protected $cache;
     /**
@@ -318,11 +319,11 @@ abstract class AbstractApiRequest
      */
     protected $dependence;
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|string|null
      */
     protected $logger;
     /**
-     * @var NetworkInterface
+     * @var NetworkInterface|string|null
      */
     protected $network;
     /**
@@ -336,7 +337,7 @@ abstract class AbstractApiRequest
      */
     protected $params;
     /**
-     * @var XMLReader Holds instance of XMLReader.
+     * @var XMLReader|string|null Holds instance of XMLReader.
      */
     protected $reader;
     /**
@@ -349,7 +350,7 @@ abstract class AbstractApiRequest
      *
      * with sprintf: sprintf('second: %2$s ; first: %1$s', '1st', '2nd');
      *
-     * with sprintfn: sprintfn('second: %second$s ; first: %first$s', array(
+     * with sprintfNamed: sprintfNamed('second: %second$s ; first: %first$s', array(
      *  'first' => '1st',
      *  'second'=> '2nd'
      * ));
@@ -364,11 +365,11 @@ abstract class AbstractApiRequest
      *
      * @return mixed Returns result of sprintf call, or FALSE on error.
      */
-    protected static function sprintfn($format, array $args = array())
+    protected static function sprintfNamed($format, array $args = array())
     {
         // Mapping of argument names to their corresponding sprintf numeric argument
         // value.
-        $arg_nums =
+        $argNums =
             array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);
         // Find the next named argument. Each search starts at the end of the
         // previous replacement.
@@ -380,33 +381,27 @@ abstract class AbstractApiRequest
                 PREG_OFFSET_CAPTURE,
                 $pos
             );
-            $pos = $arg_pos + strlen($replace)) {
-            $arg_pos = $match[0][1];
-            $arg_len = strlen($match[0][0]);
-            $arg_key = $match[1][0];
+            $pos = $argPos + strlen($replace)) {
+            $argPos = $match[0][1];
+            $argLen = strlen($match[0][0]);
+            $argKey = $match[1][0];
             // Programmer did not supply a value for the named argument found in the
             // format string.
-            if (!array_key_exists($arg_key, $arg_nums)) {
-                $mess = 'Missing argument "' . $arg_key . '"' . PHP_EOL;
+            if (!array_key_exists($argKey, $argNums)) {
+                $mess = 'Missing argument "' . $argKey . '"' . PHP_EOL;
                 \Logger::getLogger('yapeal')
                        ->warn($mess);
                 return false;
             }
             // Replace the named argument with the corresponding numeric one.
-            $replace = $arg_nums[$arg_key];
-            $format = substr_replace($format, $replace, $arg_pos, $arg_len);
+            $replace = $argNums[$argKey];
+            $format = substr_replace($format, $replace, $argPos, $argLen);
             // Skip to end of replacement for next iteration.
             // Moved this into for loop increment where it belonged.
             //$pos = $arg_pos + strlen($replace);
         }
         return vsprintf($format, array_values($args));
     }
-    /**
-     * Method used to get network connection.
-     *
-     * @return NetworkConnection
-     */
-    abstract protected function getNetworkConnection();
     /**
      * Abstract per API section function that returns API proxy.
      *
@@ -418,11 +413,11 @@ abstract class AbstractApiRequest
      *
      * Normally implemented in abstract section class that extends this class.
      *
-     * @param object $e Eve API exception returned.
+     * @param \Exception $exc Eve API exception returned.
      *
      * @return bool Returns TRUE if handled the error else FALSE.
      */
-    abstract protected function handleApiError($e);
+    abstract protected function handleApiError(\Exception $exc);
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *

@@ -88,7 +88,7 @@ abstract class AbstractCorp extends AbstractApiRequest
      * Per API section function that returns API proxy.
      *
      * For a description of how to design a format string look at the description
-     * from {@link Yapeal\Database\AbstractApiRequest::sprintfn sprintfn}. The 'section' and 'api' will
+     * from {@link Yapeal\Database\AbstractApiRequest::sprintfNamed sprintfNamed}. The 'section' and 'api' will
      * be available as well as anything included in $params for __construct().
      *
      * @return mixed Returns the URL for proxy as string if found else it will
@@ -130,7 +130,7 @@ abstract class AbstractCorp extends AbstractApiRequest
             // Need to make substitution array by adding api, section, and params.
             $subs = array('api' => $this->api, 'section' => $this->section);
             $subs = array_merge($subs, $this->params);
-            $proxy = self::sprintfn($result, $subs);
+            $proxy = self::sprintfNamed($result, $subs);
             if (false === $proxy) {
                 return $default;
             }

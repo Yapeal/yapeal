@@ -74,6 +74,13 @@ class EveApiXmlData implements EveApiXmlDataInterface
         // TODO: Implement getEveApiXml() method.
     }
     /**
+     * @return bool
+     */
+    public function hasXmlRowSet()
+    {
+        // TODO: Implement hasXmlRowSet() method.
+    }
+    /**
      * Used to set a list of arguments used when forming request to Eve Api
      * server.
      *

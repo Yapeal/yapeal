@@ -50,12 +50,14 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      */
     public function getEveApiXml();
     /**
+     * @return bool
+     */
+    public function hasXmlRowSet();
+
+    /**
      * @param string $xml
      *
      * @return self
      */
     public function setEveApiXml($xml);
-    /**
-     * @return
-     */
 }

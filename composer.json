@@ -5,7 +5,8 @@
     "license": "LGPL-3.0+",
     "autoload": {
         "psr-4": {
-            "Yapeal\\": ["lib/", "bin/", "tests/"]
+            "Yapeal\\": ["lib/", "bin/", "tests/"],
+            "Pimple\\": ["subtree/Pimple/src/"]
         }
     },
     "authors": [

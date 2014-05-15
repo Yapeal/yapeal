@@ -177,7 +177,7 @@ $loggerYapeal->critical($mess);
 exit(0);
 function config()
 {
-    $dependencyContainer = new \Yapeal\Dependency\Pimple();
+    $dependencyContainer = new \Yapeal\Dependency\PimpleContainer();
     // TODO: Add network connection
     // TODO: Add XML caching
     // TODO: Add database connection

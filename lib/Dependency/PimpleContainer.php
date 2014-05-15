@@ -9,10 +9,10 @@
  * with trying to use version 2.0.x or master from Pimple as most other projects
  * on Packagest require 1.1.x and there was no way to resolved the conflicts.
  *
- * Original way I (Michael Cummings) thought of to solve the conflict was to
+ * Original the way I (Michael Cummings) thought of to solve the conflict was to
  * just add copy of the Pimple file from version 2.0.0 into Yapeal itself but
  * did mean having to maintain it from then on and manually merging any local
- * changes with external ones from the main porject which is NOT a good long
+ * changes with external ones from the main project which is NOT a good long
  * term way to do things.
  *
  * I decided I need a better solution and after a few weeks of looking at

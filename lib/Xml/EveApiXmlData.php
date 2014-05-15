@@ -39,46 +39,78 @@ class EveApiXmlData implements EveApiXmlDataInterface
      * @param string $name
      * @param string $value
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function addEveApiArgument($name, $value)
     {
-        // TODO: Implement addEveApiArgument() method.
+        if (!is_string($name)) {
+            $mess = 'Name MUST be string but given ' . gettype($name);
+            throw new \InvalidArgumentException($mess);
+        }
+        if (!is_string($value)) {
+            $mess = 'Value MUST be string but given ' . gettype($name);
+            throw new \InvalidArgumentException($mess);
+        }
+        $this->eveApiArguments[$name] = $value;
+        return $this;
     }
     /**
      * @return string[]
      */
     public function getEveApiArguments()
     {
-        // TODO: Implement getEveApiArguments() method.
+        if (empty($this->eveApiArguments)) {
+            return array();
+        }
+        return $this->eveApiArguments;
     }
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiName()
     {
-        // TODO: Implement getEveApiName() method.
+        if (empty($this->eveApiName)) {
+            $mess = 'Tried to access Eve Api name before it was set';
+            throw new \LogicException($mess);
+        }
+        return $this->eveApiName;
     }
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiSectionName()
     {
-        // TODO: Implement getEveApiSectionName() method.
+        if (empty($this->eveApiSectionName)) {
+            $mess = 'Tried to access Eve Api section name before it was set';
+            throw new \LogicException($mess);
+        }
+        return $this->eveApiSectionName;
     }
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiXml()
     {
-        // TODO: Implement getEveApiXml() method.
+        if (empty($this->eveApiXml)) {
+            $mess = 'Tried to access Eve Api XML before it was set';
+            throw new \LogicException($mess);
+        }
+        return $this->eveApiXml;
     }
     /**
+     * @throws \LogicException
      * @return bool
      */
     public function hasXmlRowSet()
     {
-        // TODO: Implement hasXmlRowSet() method.
+        if (false !== strpos($this->getEveApiXml(), '<rowset')) {
+            return true;
+        }
+        return false;
     }
     /**
      * Used to set a list of arguments used when forming request to Eve Api
@@ -97,38 +129,64 @@ class EveApiXmlData implements EveApiXmlDataInterface
      *
      * @param string[] $values
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function setEveApiArguments(array $values)
     {
-        // TODO: Implement setEveApiArguments() method.
+        if (empty($values)) {
+            $this->eveApiArguments = array();
+            return $this;
+        }
+        foreach ($values as $name => $value) {
+            $this->addEveApiArgument($name, $value);
+        }
+        return $this;
     }
     /**
      * @param string $value
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function setEveApiName($value)
     {
-        // TODO: Implement setEveApiName() method.
+        if (!is_string($value)) {
+            $mess = 'Name MUST be string but given ' . gettype($value);
+            throw new \InvalidArgumentException($mess);
+        }
+        $this->eveApiName = $value;
+        return $this;
     }
     /**
      * @param string $value
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function setEveApiSectionName($value)
     {
-        // TODO: Implement setEveApiSectionName() method.
+        if (!is_string($value)) {
+            $mess = 'Section name MUST be string but given ' . gettype($value);
+            throw new \InvalidArgumentException($mess);
+        }
+        $this->eveApiSectionName = $value;
+        return $this;
     }
     /**
      * @param string $xml
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function setEveApiXml($xml)
     {
-        // TODO: Implement setEveApiXml() method.
+        if (!is_string($xml)) {
+            $mess = 'Xml MUST be string but given ' . gettype($xml);
+            throw new \InvalidArgumentException($mess);
+        }
+        $this->eveApiName = $xml;
+        return $this;
     }
     /**
      * @var string

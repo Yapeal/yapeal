@@ -29,6 +29,8 @@
  */
 namespace Yapeal\Dependency;
 
+use Pimple\ServiceProviderInterface;
+
 /**
  * Interface DependenceInterface
  *
@@ -48,22 +50,25 @@ interface DependenceInterface extends \ArrayAccess
      * Useful when you want to extend an existing object definition,
      * without necessarily loading that object.
      *
-     * @param string   $id       The unique identifier for the object
+     * @param string $key The unique identifier for the object
      * @param callable $callable A service definition to extend the original
      *
      * @return callable The wrapped callable
      *
-     * @throws \InvalidArgumentException if the identifier is not defined or not a service definition
+     * @throws \InvalidArgumentException If the identifier is NOT defined or NOT
+     * a service definition
      */
-    public function extend($id, $callable);
+    public function extend($key, $callable);
     /**
      * Marks a callable as being a factory service.
      *
-     * @param callable|object $callable A service definition to be used as a factory
+     * @param callable|object $callable A service definition to be used as a
+     *                                  factory
      *
      * @return callable The passed callable
      *
-     * @throws \InvalidArgumentException Service definition has to be a closure of an invokable object
+     * @throws \InvalidArgumentException Service definition has to be a closure
+     * of an invokable object
      */
     public function factory($callable);
     /**
@@ -87,11 +92,25 @@ interface DependenceInterface extends \ArrayAccess
     /**
      * Gets a parameter or the closure defining an object.
      *
-     * @param string $id The unique identifier for the parameter or object
+     * @param string $key The unique identifier for the parameter or object
      *
      * @return mixed The value of the parameter or the closure defining an object
      *
-     * @throws \InvalidArgumentException if the identifier is not defined
+     * @throws \InvalidArgumentException if the identifier is NOT defined
      */
-    public function raw($id);
+    public function raw($key);
+    /**
+     * Registers a service provider.
+     *
+     * @param ServiceProviderInterface $provider A ServiceProviderInterface
+     *                                           instance
+     * @param array                    $values   An array of values that
+     *                                           customizes the provider
+     *
+     * @return static
+     */
+    public function register(
+        ServiceProviderInterface $provider,
+        array $values = array()
+    );
 }

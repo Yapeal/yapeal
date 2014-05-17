@@ -32,10 +32,12 @@ namespace Yapeal\Xml;
  * Common interface for any class that would retrieve (file / network) the Eve
  * Api data in some way.
  */
-interface EveApiRetrieverInterface extends EveApiAwareInterface
+interface EveApiRetrieverInterface
 {
     /**
+     * @param EveApiXmlDataInterface $data
+     *
      * @return EveApiXmlDataInterface
      */
-    public function retrieveEveApi();
+    public function retrieveEveApi(EveApiXmlDataInterface $data);
 }

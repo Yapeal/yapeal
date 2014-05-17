@@ -34,6 +34,21 @@ namespace Yapeal\Xml;
 class EveApiXmlData implements EveApiXmlDataInterface
 {
     /**
+     * @param string   $eveApiName
+     * @param string   $eveApiSectionName
+     * @param string[] $eveApiArguments
+     * @param string   $eveApiXml
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(
+        $eveApiName = '',
+        $eveApiSectionName = '',
+        array $eveApiArguments = array(),
+        $eveApiXml = ''
+    ) {
+    }
+    /**
      * @return string
      */
     public function __toString()

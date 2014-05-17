@@ -37,22 +37,18 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      * @return string
      */
     public function __toString();
-
     /**
      * @return string[]
      */
     public function getEveApiArguments();
-
     /**
      * @return string
      */
     public function getEveApiName();
-
     /**
      * @return string
      */
     public function getEveApiSectionName();
-
     /**
      * @return string
      */
@@ -61,7 +57,6 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      * @return bool
      */
     public function hasXmlRowSet();
-
     /**
      * @param string $xml
      *

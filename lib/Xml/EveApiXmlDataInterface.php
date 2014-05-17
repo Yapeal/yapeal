@@ -42,24 +42,30 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      */
     public function getEveApiArguments();
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiName();
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiSectionName();
     /**
+     * @throws \LogicException
      * @return string
      */
     public function getEveApiXml();
     /**
+     * @throws \LogicException
      * @return bool
+     * @uses getEveApiXml()
      */
     public function hasXmlRowSet();
     /**
      * @param string $xml
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
     public function setEveApiXml($xml);

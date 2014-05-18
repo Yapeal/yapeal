@@ -41,12 +41,14 @@
         "ext-xmlreader": "*",
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
-        "php": ">=5.3.2",
-        "guzzle/guzzle": "~3.8",
-        "monolog/monolog": "1.9.0"
+        "php": ">=5.3.10",
+        "guzzle/guzzle": "~3.9",
+        "monolog/monolog": "~1.9"
     },
     "require-dev": {
         "ext-xsl": "*",
-        "phpmd/phpmd": "~1.5"
+        "phpmd/phpmd": "~1.5",
+        "dragonrun1/semantic-version": "master@dev",
+        "phpunit/phpunit": "~4.0"
     }
 }

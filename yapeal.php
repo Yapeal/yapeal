@@ -39,6 +39,7 @@ use Yapeal\Command\LegacyUtil;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\Util\AccessMask;
 use Yapeal\Database\Util\CachedInterval;
+use Yapeal\Dependency\PimpleContainer;
 
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
@@ -177,7 +178,7 @@ $loggerYapeal->critical($mess);
 exit(0);
 function config()
 {
-    $dependencyContainer = new \Yapeal\Dependency\PimpleContainer();
+    $dependencyContainer = new PimpleContainer();
     // TODO: Add network connection
     // TODO: Add XML caching
     // TODO: Add database connection

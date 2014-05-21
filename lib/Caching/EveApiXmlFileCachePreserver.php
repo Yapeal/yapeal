@@ -29,6 +29,8 @@
 namespace Yapeal\Caching;
 
 use Yapeal\Exception\YapealPreserverException;
+use Yapeal\Exception\YapealPreserverFileException;
+use Yapeal\Exception\YapealPreserverPathException;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
@@ -38,45 +40,63 @@ use Yapeal\Xml\EveApiXmlDataInterface;
 class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
 {
     /**
+     * @param string|null $cachePath
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($cachePath = null)
+    {
+        $this->setCachePath($cachePath);
+    }
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->handle) {
+            @flock($this->handle, LOCK_UN);
+            @fclose($this->handle);
+        }
+    }
+    /**
      * @param EveApiXmlDataInterface $data
      *
      * @throws \LogicException
-     * @throws \Yapeal\Exception\YapealPreserverException
+     * @throws YapealPreserverException
+     * @throws YapealPreserverFileException
      * @return self
      */
     public function preserveEveApi(EveApiXmlDataInterface $data)
     {
-        $cachePath = $this->getCachePath();
-        if (!is_readable($cachePath) || !is_dir($cachePath)) {
-            $mess = 'Cache path is NOT a directory or does NOT exist was given '
-                . $cachePath;
-            throw new YapealPreserverException($mess);
+        $cachePath =
+            $this->getNormalizedCachePath() . $data->getEveApiSectionName();
+        $this->checkUsableCachePath($cachePath);
+        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
+        foreach ($data->getEveApiArguments() as $key => $value) {
+            $hash .= $key . $value;
         }
-        if (!is_writable($cachePath)) {
-            $mess = 'Cache path is NOT writable was given ' . $cachePath;
-            throw new YapealPreserverException($mess);
-        }
-        $hash = $this->createHash(
-            $data->getEveApiName(),
-            $data->getEveApiSectionName(),
-            $data->getEveApiArguments()
-        );
-        $cacheFile = $cachePath . $data->getEveApiName() . $hash . '.xml';
-        $result = file_put_contents($cacheFile, $data->getEveApiXml(), LOCK_EX);
-        if ($result === false || $result = -1) {
-            $mess = 'Writing failed for ' . $cacheFile;
-            throw new YapealPreserverException($mess);
-        }
+        $hash = hash('md5', $hash);
+        // Insures retriever never see partly written file by using temp file.
+        $cacheTemp = $cachePath . '/' . $data->getEveApiName() . $hash . '.tmp';
+        $this->prepareConnection($cacheTemp)
+             ->writeXmlData($data->getEveApiXml(), $cacheTemp)
+             ->__destruct();
+        $cacheFile = $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
+        rename($cacheTemp, $cacheFile);
         return $this;
     }
     /**
      * @param string $value
      *
      * @throws \InvalidArgumentException
+     * @throws YapealPreserverPathException
      * @return self
      */
     public function setCachePath($value)
     {
+        if ($value === null) {
+            $value = dirname(dirname(__DIR__)) . '/cache/';
+        }
         if (!is_string($value)) {
             $mess = 'Cache path MUST be string but given ' . gettype($value);
             throw new \InvalidArgumentException($mess);
@@ -89,30 +109,160 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
      */
     protected $cachePath;
     /**
-     * @param string   $apiName
-     * @param string   $sectionName
-     * @param string[] $arguments
-     *
-     * @return string
+     * @var resource|false File handle
      */
-    protected function createHash($apiName, $sectionName, array $arguments)
+    protected $handle;
+    /**
+     * @param $cachePath
+     *
+     * @throws YapealPreserverPathException
+     * @return self
+     */
+    protected function checkUsableCachePath($cachePath)
     {
-        $hash = $apiName . $sectionName;
-        foreach ($arguments as $key => $value) {
-            $hash .= $key . $value;
+        if (!is_readable($cachePath)) {
+            $mess = 'Cache path is NOT readable or does NOT exist was given '
+                . $cachePath;
+            throw new YapealPreserverPathException($mess, 1);
         }
-        return hash('md5', $hash);
+        if (!is_dir($cachePath)) {
+            $mess = 'Cache path is NOT a directory was given '
+                . $cachePath;
+            throw new YapealPreserverPathException($mess, 2);
+        }
+        if (!is_writable($cachePath)) {
+            $mess = 'Cache path is NOT writable was given ' . $cachePath;
+            throw new YapealPreserverPathException($mess, 3);
+        }
+        return $this;
+    }
+    /**
+     * @param string $path
+     *
+     * @return string[]
+     * @throws YapealPreserverPathException
+     */
+    protected function cleanPartsPath($path)
+    {
+        // Drop all leading and trailing "/"s.
+        $path = trim($path, '/');
+        // Drop pointless consecutive "/"s.
+        while (false !== strpos($path, '//')) {
+            $path = str_replace('//', '/', $path);
+        }
+        $parts = array();
+        foreach (explode('/', $path) as $part) {
+            if ('.' == $part || '' == $part) {
+                continue;
+            }
+            if ('..' == $part) {
+                if (count($parts) < 1) {
+                    $mess = 'Can NOT go above root path but given ' . $path;
+                    throw new YapealPreserverPathException($mess, 1);
+                }
+                array_pop($parts);
+                continue;
+            }
+            $parts[] = $part;
+        }
+        return $parts;
+    }
+    /**
+     * @throws YapealPreserverFileException
+     * @return false|resource
+     */
+    protected function getHandle()
+    {
+        return $this->handle;
     }
     /**
      * @throws \LogicException
+     * @throws YapealPreserverPathException
      * @return string
      */
-    protected function getCachePath()
+    protected function getNormalizedCachePath()
     {
         if (empty($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new \LogicException($mess);
         }
-        return $this->cachePath;
+        $absoluteRequired = true;
+        $path = str_replace('\\', '/', $this->cachePath);
+        // Optional wrapper(s).
+        $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
+        // Optional root prefix.
+        $regExp .= '(?<root>(?:[[:alpha:]]:/|/)?)';
+        // Actual path.
+        $regExp .= '(?<path>(?:[[:print:]]*))$%';
+        $parts = array();
+        preg_match($regExp, $path, $parts);
+        $wrappers = $parts['wrappers'];
+        // vfsStream does NOT allow absolute path.
+        if ('vfs://' == substr($wrappers, -6)) {
+            $absoluteRequired = false;
+        }
+        if ($absoluteRequired && empty($parts['root'])) {
+            $mess =
+                'Path NOT absolute missing drive or root was given ' . $path;
+            throw new YapealPreserverPathException($mess, 1);
+        }
+        $root = $parts['root'];
+        $parts = $this->cleanPartsPath($parts['path']);
+        $path = $wrappers . $root . implode('/', $parts);
+        if ('/' != substr($path, -1)) {
+            $path .= '/';
+        }
+        return $path;
+    }
+    /**
+     * @param $cacheFile
+     *
+     * @throws YapealPreserverFileException
+     * @return self
+     */
+    protected function prepareConnection($cacheFile)
+    {
+        $this->handle = fopen($cacheFile, 'cb');
+        $tries = 0;
+        //Give a minute to try getting lock.
+        $timeout = time() + 10;
+        while (!flock($this->getHandle(), LOCK_EX | LOCK_NB)) {
+            if (++$tries > 10 || time() > $timeout) {
+                $this->__destruct();
+                $mess = 'Giving up could NOT get flock on ' . $cacheFile;
+                throw new YapealPreserverFileException($mess, 2);
+            }
+            // Wait 0.1 to 0.5 seconds before trying again.
+            usleep(rand(100000, 500000));
+        }
+        ftruncate($this->getHandle(), 0);
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $cacheFile
+     *
+     * @throws YapealPreserverFileException
+     * @return self
+     */
+    protected function writeXmlData($xml, $cacheFile)
+    {
+        $tries = 0;
+        //Give a minute to try writing file.
+        $timeout = time() + 60;
+        while (strlen($xml)) {
+            if (++$tries > 10 || time() > $timeout) {
+                $this->__destruct();
+                $mess = 'Giving up could NOT finish writing  ' . $cacheFile;
+                throw new YapealPreserverFileException($mess, 1);
+            }
+            $written = fwrite($this->getHandle(), $xml);
+            // Decrease $tries while making progress but NEVER $tries < 1.
+            if ($written > 0 && $tries > 0) {
+                --$tries;
+            }
+            $xml = substr($xml, $written);
+        }
+        return $this;
     }
 }

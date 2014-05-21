@@ -4,6 +4,14 @@
     processIsolation="false"
     stopOnError="true"
     stopOnFailure="true">
+    <filter>
+        <blacklist>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+            <directory>docs</directory>
+            <directory>subtree</directory>
+        </blacklist>
+    </filter>
     <logging>
         <log type="coverage-html"
             target="docs/PhpUnit/reports"

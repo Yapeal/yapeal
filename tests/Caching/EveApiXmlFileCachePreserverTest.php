@@ -51,15 +51,6 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function testDestructor()
-    {
-        $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->preserver = null;
-        $this->filesystem = null;
-    }
-    /**
-     *
-     */
     public function testPreserveEveApiThrowsLogicExceptionWhenCachePathNotSet()
     {
         $this->assertAttributeEmpty('cachePath', $this->preserver);

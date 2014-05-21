@@ -47,7 +47,7 @@
     },
     "require-dev": {
         "ext-xsl": "*",
-        "phpmd/phpmd": "~1.5",
+        "phpmd/phpmd": "~2.0",
         "dragonrun1/semantic-version": "master@dev",
         "phpunit/phpunit": "~4.0",
         "mikey179/vfsStream": "~1.2"

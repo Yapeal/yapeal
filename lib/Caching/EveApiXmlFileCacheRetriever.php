@@ -243,12 +243,12 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
     {
         $xml = '';
         $tries = 0;
-        //Give a minute to try writing file.
+        //Give a minute to try reading file.
         $timeout = time() + 60;
         while (!feof($this->getHandle())) {
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
-                $mess = 'Giving up could NOT finish writing  ' . $cacheFile;
+                $mess = 'Giving up could NOT finish reading  ' . $cacheFile;
                 throw new YapealRetrieverFileException($mess, 1);
             }
             $read = fread($this->getHandle(), 16384);

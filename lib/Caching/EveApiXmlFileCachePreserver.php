@@ -233,7 +233,7 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
             // Wait 0.1 to 0.5 seconds before trying again.
             usleep(rand(100000, 500000));
         }
-        ftruncate($this->getHandle(), 0);
+        @ftruncate($this->getHandle(), 0);
         return $this;
     }
     /**

@@ -5,8 +5,13 @@
     "license": "LGPL-3.0+",
     "autoload": {
         "psr-4": {
-            "Yapeal\\": ["lib/", "bin/", "tests/"],
+            "Yapeal\\": ["lib/", "bin/"],
             "Pimple\\": ["subtree/Pimple/src/"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yapeal\\Test\\": ["tests/"]
         }
     },
     "authors": [
@@ -39,6 +44,7 @@
         "ext-SimpleXML": "*",
         "ext-SPL": "*",
         "ext-xmlreader": "*",
+        "ext-xsl": "*",
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
         "php": ">=5.3.10",
@@ -46,10 +52,10 @@
         "monolog/monolog": "~1.9"
     },
     "require-dev": {
-        "ext-xsl": "*",
         "phpmd/phpmd": "~2.0",
         "dragonrun1/semantic-version": "master@dev",
         "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit-skeleton-generator": "2.0.*@dev",
         "mikey179/vfsStream": "~1.2"
     }
 }

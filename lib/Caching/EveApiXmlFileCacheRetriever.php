@@ -165,18 +165,6 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
         return $parts;
     }
     /**
-     * @throws \LogicException
-     * @return string
-     */
-    protected function getCachePath()
-    {
-        if (empty($this->cachePath)) {
-            $mess = 'Tried to access $cachePath before it was set';
-            throw new \LogicException($mess);
-        }
-        return $this->cachePath;
-    }
-    /**
      * @return false|resource
      */
     protected function getHandle()

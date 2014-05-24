@@ -28,7 +28,6 @@
  */
 namespace Yapeal\Caching;
 
-use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
 use Yapeal\Exception\YapealPreserverPathException;
 use Yapeal\Xml\EveApiPreserverInterface;
@@ -61,8 +60,8 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
     /**
      * @param EveApiXmlDataInterface $data
      *
+     * @throws YapealPreserverPathException
      * @throws \LogicException
-     * @throws YapealPreserverException
      * @throws YapealPreserverFileException
      * @return self
      */
@@ -86,13 +85,13 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         return $this;
     }
     /**
-     * @param string $value
+     * @param string|null $value
      *
      * @throws \InvalidArgumentException
      * @throws YapealPreserverPathException
      * @return self
      */
-    public function setCachePath($value)
+    public function setCachePath($value = null)
     {
         if ($value === null) {
             $value = dirname(dirname(__DIR__)) . '/cache/';
@@ -168,7 +167,6 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         return $parts;
     }
     /**
-     * @throws YapealPreserverFileException
      * @return false|resource
      */
     protected function getHandle()

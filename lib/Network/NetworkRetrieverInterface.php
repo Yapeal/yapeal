@@ -34,35 +34,11 @@ namespace Yapeal\Network;
 interface NetworkRetrieverInterface
 {
     /**
-     * @param array $value
-     *
-     * @return $this
-     */
-    public function setOptions($value);
-    /**
      * @param string $userAgent
+     *
+     * @retrun $this
      */
     public function setUserAgent($userAgent);
-    /**
-     * @return $client
-     */
-    public function getClient();
-    /**
-     * @param $request
-     *
-     * @return $response
-     */
-    public function sendRequest($request);
-    /**
-     * @return mixed
-     */
-    public function getOptions();
-    /**
-     * @param $plugin
-     *
-     * @return $this
-     */
-    public function addSubscriber($plugin = null);
     /**
      * @param $client
      *
@@ -74,7 +50,7 @@ interface NetworkRetrieverInterface
      * @param $urlTemplateOptions
      * @param $postData
      *
-     * @return response
+     * @return string
      */
     public function sendPost($urlTemplate, $urlTemplateOptions, $postData);
 }

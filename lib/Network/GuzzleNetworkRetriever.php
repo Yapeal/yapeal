@@ -30,7 +30,7 @@ namespace Yapeal\Network;
 
 use Guzzle\Http\Client;
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
 
 /**
@@ -48,7 +48,7 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
     /**
      * @return Client|ClientInterface
      */
-    public function getClient()
+    protected  function getClient()
     {
         /** Check if we already have a client set, else we set one */
         if (isset($this->client)) {
@@ -73,11 +73,11 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
         return $this;
     }
     /**
-     * @param $request
+     * @param $request RequestInterface
      *
-     * @return response
+     * @return Response
      */
-    public function sendRequest(request $request) //move
+    protected  function sendRequest(RequestInterface $request) //move
     {
         return $response = $request->send();
     }
@@ -86,7 +86,7 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
      *
      * @return $this
      */
-    public function setClient(ClientInterface $client)
+    public function setClient($client)
     {
         $this->client = $client;
         return $this;
@@ -111,7 +111,7 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
         );
         /**
          * Send Request to server
-         * @var $respons response
+         * @var $response Response
          */
         $response = $this->sendRequest($request);
         /**
@@ -125,7 +125,7 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
     /**
      * @return array
      */
-    public function getOptions()
+    protected  function getOptions()
     {
         if (isset($this->options)) {
             return $this->options;

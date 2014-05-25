@@ -67,7 +67,7 @@ abstract class NetworkRetrieverAbstract
      *
      * @return self
      */
-    public function setHeaders($value)
+    protected  function setHeaders($value)
     {
         $this->headers = $value;
         return $this;
@@ -75,7 +75,7 @@ abstract class NetworkRetrieverAbstract
     /**
      * @return array
      */
-    public function getHeaders()
+    protected  function getHeaders()
     {
         return $this->headers;
     }
@@ -84,7 +84,7 @@ abstract class NetworkRetrieverAbstract
      *
      * @return self
      */
-    public function setOptions($value) //move
+    protected  function setOptions($value) //move
     {
         $this->options = $value;
         return $this;

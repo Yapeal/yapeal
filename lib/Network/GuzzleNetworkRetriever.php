@@ -41,45 +41,12 @@ use Guzzle\Http\Message\Response;
 class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
     NetworkRetrieverInterface
 {
-    function __construct(clientInterface $client)
+    protected $urlTemplate;
+    protected $urlTemplateOptions;
+    protected $postData;
+    function __construct(clientInterface $client = null)
     {
         $this->client = $client;
-    }
-    /**
-     * @return Client|ClientInterface
-     */
-    protected  function getClient()
-    {
-        /** Check if we already have a client set, else we set one */
-        if (isset($this->client)) {
-            return $this->client;
-        } else {
-            $this->client = new Client();
-        }
-        /** Set user agent on client */
-        $this->client->setUserAgent($this->userAgent);
-        return $this->client;
-    }
-    /**
-     * @param $plugin
-     *
-     * @return $this
-     */
-    public function addSubscriber($plugin = null)
-    {
-        if (isset($plugin)) {
-            $this->client->addSubscriber($plugin);
-        }
-        return $this;
-    }
-    /**
-     * @param $request RequestInterface
-     *
-     * @return Response
-     */
-    protected  function sendRequest(RequestInterface $request) //move
-    {
-        return $response = $request->send();
     }
     /**
      * @param Client|ClientInterface $client
@@ -100,32 +67,65 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
      */
     public function sendPost($urlTemplate, $urlTemplateOptions, $postData)
     {
-        $request = $this->client->post(
-                                array(
-                                    $urlTemplate,
-                                    $urlTemplateOptions
-                                ),
-                                    $this->getHeaders(),
-                                    $postData,
-                                    $this->getOptions()
-        );
-        /**
-         * Send Request to server
-         * @var $response Response
-         */
-        $response = $this->sendRequest($request);
-        /**
-         * check to see if response has a status code of 200
-         */
-        if ($response->getStatusCode() == '200') {
-           return $response->getBody(true);
+        $this->urlTemplate = $urlTemplate;
+        $this->urlTemplateOptions = $urlTemplateOptions;
+        $this->postData = $postData;
+        return $this->getResponse();
+    }
+    protected function getResponse()
+    {
+        try {
+            $response = $this->sendRequest($this->getRequest());
+        } catch (Exception $e){
+            //TODO: Catch Error
         }
-        return false;
+        if ($response->getStatusCode() == '200') {
+            return $response->getBody(true);
+        }
+
+    }
+    /**
+     * @param $request RequestInterface
+     *
+     * @return Response
+     */
+    protected function sendRequest(RequestInterface $request) //move
+    {
+        return $response = $request->send();
+    }
+    protected  function getRequest()
+    {
+        $client = $this->getClient();
+        $request = $client->post(
+                          array(
+                              $this->urlTemplate,
+                              $this->urlTemplateOptions
+                          ),
+                              $this->getHeaders(),
+                              $this->postData,
+                              $this->getOptions()
+        );
+        return $request;
+    }
+    /**
+     * @return Client|ClientInterface
+     */
+    public function getClient()
+    {
+        /** Check if we already have a client set, else we set one */
+        if (isset($this->client)) {
+            return $this->client;
+        } else {
+            $this->client = new Client();
+        }
+        /** Set user agent on client */
+        $this->client->setUserAgent($this->userAgent);
+        return $this->client;
     }
     /**
      * @return array
      */
-    protected  function getOptions()
+    protected function getOptions()
     {
         if (isset($this->options)) {
             return $this->options;

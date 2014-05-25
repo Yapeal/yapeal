@@ -98,8 +98,7 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
      *
      * @return self
      */
-    public
-    function setBaseUrl(
+    public function setBaseUrl(
         $value
     ) {
         $this->baseUrl = $value;

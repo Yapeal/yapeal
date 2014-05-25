@@ -117,11 +117,11 @@ class EveApiXmlData implements EveApiXmlDataInterface
     }
     /**
      * @throws \LogicException
-     * @return string
+     * @return string|false
      */
     public function getEveApiXml()
     {
-        if (empty($this->eveApiXml)) {
+        if (!is_string($this->eveApiXml) && $this->eveApiXml !== false) {
             $mess = 'Tried to access Eve Api XML before it was set';
             throw new \LogicException($mess);
         }
@@ -200,12 +200,12 @@ class EveApiXmlData implements EveApiXmlDataInterface
         return $this;
     }
     /**
-     * @param string $xml
+     * @param string|bool $xml Only allows string or false NOT true.
      *
      * @throws \InvalidArgumentException
      * @return self
      */
-    public function setEveApiXml($xml)
+    public function setEveApiXml($xml = false)
     {
         if (!is_string($xml)) {
             $mess = 'Xml MUST be string but given ' . gettype($xml);

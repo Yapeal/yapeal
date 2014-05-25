@@ -53,7 +53,7 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
     public function getEveApiSectionName();
     /**
      * @throws \LogicException
-     * @return string
+     * @return string|false
      */
     public function getEveApiXml();
     /**
@@ -63,10 +63,10 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      */
     public function hasXmlRowSet();
     /**
-     * @param string $xml
+     * @param string|bool $xml Only allows string or false NOT true.
      *
      * @throws \InvalidArgumentException
      * @return self
      */
-    public function setEveApiXml($xml);
+    public function setEveApiXml($xml = false);
 }

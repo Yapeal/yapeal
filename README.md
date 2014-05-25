@@ -2,8 +2,8 @@
 Master: [![Build Status](https://travis-ci.org/Dragonrun1/yapeal.svg?branch=master)](https://travis-ci.org/Dragonrun1/yapeal)
 1.1.x-WIP: [![Build Status](https://travis-ci.org/Dragonrun1/yapeal.svg?branch=1.1.x-WIP)](https://travis-ci.org/Dragonrun1/yapeal)
 
-Master: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg)](https://coveralls.io/r/Dragonrun1/yapeal?branch=master)
-1.1.x-WIP: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg)](https://coveralls.io/r/Dragonrun1/yapeal?branch=1.1.x-WIP)
+Master: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg?branch=master)](https://coveralls.io/r/Dragonrun1/yapeal)
+1.1.x-WIP: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg?branch=1.1.x-WIP)](https://coveralls.io/r/Dragonrun1/yapeal)
 
 For installation instructions see the [INSTALL.md][2] file.
 

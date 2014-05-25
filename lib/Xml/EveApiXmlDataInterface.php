@@ -52,7 +52,6 @@ interface EveApiXmlDataInterface extends EveApiAwareInterface
      */
     public function getEveApiSectionName();
     /**
-     * @throws \LogicException
      * @return string|false
      */
     public function getEveApiXml();

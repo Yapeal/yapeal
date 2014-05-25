@@ -34,10 +34,10 @@ namespace Yapeal\Xml;
 class EveApiXmlData implements EveApiXmlDataInterface
 {
     /**
-     * @param string   $eveApiName
-     * @param string   $eveApiSectionName
-     * @param string[] $eveApiArguments
-     * @param string   $eveApiXml
+     * @param string      $eveApiName
+     * @param string      $eveApiSectionName
+     * @param string[]    $eveApiArguments
+     * @param bool|string $eveApiXml Only allows string or false NOT true.
      *
      * @throws \InvalidArgumentException
      */
@@ -45,8 +45,12 @@ class EveApiXmlData implements EveApiXmlDataInterface
         $eveApiName = '',
         $eveApiSectionName = '',
         array $eveApiArguments = array(),
-        $eveApiXml = ''
+        $eveApiXml = false
     ) {
+        $this->setEveApiName($eveApiName);
+        $this->setEveApiSectionName($eveApiSectionName);
+        $this->setEveApiArguments($eveApiArguments);
+        $this->setEveApiXml($eveApiXml);
     }
     /**
      * @return string
@@ -116,14 +120,12 @@ class EveApiXmlData implements EveApiXmlDataInterface
         return $this->eveApiSectionName;
     }
     /**
-     * @throws \LogicException
      * @return string|false
      */
     public function getEveApiXml()
     {
-        if (!is_string($this->eveApiXml) && $this->eveApiXml !== false) {
-            $mess = 'Tried to access Eve Api XML before it was set';
-            throw new \LogicException($mess);
+        if (empty($this->eveApiXml)) {
+            return false;
         }
         return $this->eveApiXml;
     }
@@ -207,6 +209,9 @@ class EveApiXmlData implements EveApiXmlDataInterface
      */
     public function setEveApiXml($xml = false)
     {
+        if ($xml === false) {
+            $xml = '';
+        }
         if (!is_string($xml)) {
             $mess = 'Xml MUST be string but given ' . gettype($xml);
             throw new \InvalidArgumentException($mess);

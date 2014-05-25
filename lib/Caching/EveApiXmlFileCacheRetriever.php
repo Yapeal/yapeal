@@ -29,6 +29,8 @@
 namespace Yapeal\Caching;
 
 use Yapeal\Exception\YapealRetrieverException;
+use Yapeal\Exception\YapealRetrieverFileException;
+use Yapeal\Exception\YapealRetrieverPathException;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
@@ -38,52 +40,64 @@ use Yapeal\Xml\EveApiXmlDataInterface;
 class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
 {
     /**
+     * @param string|null $cachePath
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($cachePath = null)
+    {
+        $this->setCachePath($cachePath);
+    }
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->handle) {
+            @flock($this->handle, LOCK_UN);
+            @fclose($this->handle);
+        }
+    }
+    /**
      * @param EveApiXmlDataInterface $data
      *
      * @throws \LogicException
-     * @throws \Yapeal\Exception\YapealRetrieverException
+     * @throws YapealRetrieverException
      * @return EveApiXmlDataInterface
      */
     public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
-        $hash = $this->createHash(
-            $data->getEveApiName(),
-            $data->getEveApiSectionName(),
-            $data->getEveApiArguments()
-        );
+        $cachePath =
+            $this->getNormalizedCachePath() . $data->getEveApiSectionName();
+        $this->checkUsableCachePath($cachePath);
+        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
+        foreach ($data->getEveApiArguments() as $key => $value) {
+            $hash .= $key . $value;
+        }
+        $hash = hash('md5', $hash);
         $cacheFile =
-            $this->getCachePath() . $data->getEveApiName() . $hash . '.xml';
+            $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
         if (!is_readable($cacheFile) || !is_file($cacheFile)) {
             $mess =
                 'Could NOT find accessible cache file was given ' . $cacheFile;
-            throw new YapealRetrieverException($mess);
+            throw new YapealRetrieverFileException($mess, 1);
         }
-        /**
-         * @var resource|false $handle
-         */
-        $handle = fopen($cacheFile, 'rb');
-        if ($handle === false && !flock($handle, LOCK_SH)) {
-            $mess = 'Could NOT access cache file was given ' . $cacheFile;
-            throw new YapealRetrieverException($mess);
-        }
-        $result = file_get_contents($cacheFile);
-        flock($handle, LOCK_UN);
-        fclose($handle);
-        if ($result === false || empty($result)) {
-            $mess = 'Could NOT access contents of cache file was given '
-                . $cacheFile;
-            throw new YapealRetrieverException($mess);
-        }
+        $this->prepareConnection($cacheFile);
+        $result = $this->readXmlData($cacheFile);
+        $this->__destruct();
         return $data->setEveApiXml($result);
     }
     /**
-     * @param string $value
+     * @param string|null $value
      *
      * @throws \InvalidArgumentException
      * @return self
      */
-    public function setCachePath($value)
+    public function setCachePath($value = null)
     {
+        if ($value === null) {
+            $value = dirname(dirname(__DIR__)) . '/cache/';
+        }
         if (!is_string($value)) {
             $mess = 'Cache path MUST be string but given ' . gettype($value);
             throw new \InvalidArgumentException($mess);
@@ -96,30 +110,154 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
      */
     protected $cachePath;
     /**
-     * @param string   $apiName
-     * @param string   $sectionName
-     * @param string[] $arguments
-     *
-     * @return string
+     * @var resource|false File handle
      */
-    protected function createHash($apiName, $sectionName, array $arguments)
+    protected $handle;
+    /**
+     * @param $cachePath
+     *
+     * @throws YapealRetrieverPathException
+     * @return self
+     */
+    protected function checkUsableCachePath($cachePath)
     {
-        $hash = $apiName . $sectionName;
-        foreach ($arguments as $key => $value) {
-            $hash .= $key . $value;
+        if (!is_readable($cachePath)) {
+            $mess = 'Cache path is NOT readable or does NOT exist was given '
+                . $cachePath;
+            throw new YapealRetrieverPathException($mess, 1);
         }
-        return hash('md5', $hash);
+        if (!is_dir($cachePath)) {
+            $mess = 'Cache path is NOT a directory was given '
+                . $cachePath;
+            throw new YapealRetrieverPathException($mess, 2);
+        }
+        return $this;
+    }
+    /**
+     * @param string $path
+     *
+     * @return string[]
+     * @throws YapealRetrieverPathException
+     */
+    protected function cleanPartsPath($path)
+    {
+        // Drop all leading and trailing "/"s.
+        $path = trim($path, '/');
+        // Drop pointless consecutive "/"s.
+        while (false !== strpos($path, '//')) {
+            $path = str_replace('//', '/', $path);
+        }
+        $parts = array();
+        foreach (explode('/', $path) as $part) {
+            if ('.' == $part || '' == $part) {
+                continue;
+            }
+            if ('..' == $part) {
+                if (count($parts) < 1) {
+                    $mess = 'Can NOT go above root path but given ' . $path;
+                    throw new YapealRetrieverPathException($mess, 1);
+                }
+                array_pop($parts);
+                continue;
+            }
+            $parts[] = $part;
+        }
+        return $parts;
+    }
+    /**
+     * @return false|resource
+     */
+    protected function getHandle()
+    {
+        return $this->handle;
     }
     /**
      * @throws \LogicException
+     * @throws YapealRetrieverPathException
      * @return string
      */
-    protected function getCachePath()
+    protected function getNormalizedCachePath()
     {
         if (empty($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new \LogicException($mess);
         }
-        return $this->cachePath;
+        $absoluteRequired = true;
+        $path = str_replace('\\', '/', $this->cachePath);
+        // Optional wrapper(s).
+        $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
+        // Optional root prefix.
+        $regExp .= '(?<root>(?:[[:alpha:]]:/|/)?)';
+        // Actual path.
+        $regExp .= '(?<path>(?:[[:print:]]*))$%';
+        $parts = array();
+        preg_match($regExp, $path, $parts);
+        $wrappers = $parts['wrappers'];
+        // vfsStream does NOT allow absolute path.
+        if ('vfs://' == substr($wrappers, -6)) {
+            $absoluteRequired = false;
+        }
+        if ($absoluteRequired && empty($parts['root'])) {
+            $mess =
+                'Path NOT absolute missing drive or root was given ' . $path;
+            throw new YapealRetrieverPathException($mess, 1);
+        }
+        $root = $parts['root'];
+        $parts = $this->cleanPartsPath($parts['path']);
+        $path = $wrappers . $root . implode('/', $parts);
+        if ('/' != substr($path, -1)) {
+            $path .= '/';
+        }
+        return $path;
+    }
+    /**
+     * @param $cacheFile
+     *
+     * @throws YapealRetrieverFileException
+     * @return self
+     */
+    protected function prepareConnection($cacheFile)
+    {
+        $this->handle = fopen($cacheFile, 'rb+');
+        $tries = 0;
+        //Give a minute to try getting lock.
+        $timeout = time() + 10;
+        while (!flock($this->getHandle(), LOCK_SH | LOCK_NB)) {
+            if (++$tries > 10 || time() > $timeout) {
+                $this->__destruct();
+                $mess = 'Giving up could NOT get flock on ' . $cacheFile;
+                throw new YapealRetrieverFileException($mess, 1);
+            }
+            // Wait 0.1 to 0.5 seconds before trying again.
+            usleep(rand(100000, 500000));
+        }
+        return $this;
+    }
+    /**
+     * @param string $cacheFile
+     *
+     * @throws YapealRetrieverFileException
+     * @return string
+     */
+    protected function readXmlData($cacheFile)
+    {
+        $xml = '';
+        $tries = 0;
+        //Give a minute to try reading file.
+        $timeout = time() + 60;
+        while (!feof($this->getHandle())) {
+            if (++$tries > 10 || time() > $timeout) {
+                $this->__destruct();
+                $mess = 'Giving up could NOT finish reading  ' . $cacheFile;
+                throw new YapealRetrieverFileException($mess, 1);
+            }
+            $read = fread($this->getHandle(), 16384);
+            // Decrease $tries while making progress but NEVER $tries < 1.
+            if (strlen($read) > 0 && $tries > 0) {
+                --$tries;
+            }
+            $xml .= $read;
+        }
+        return $xml;
     }
 }

@@ -23,16 +23,16 @@
     </logging>
     <testsuites>
         <testsuite name="Main">
-            <directory>tests</directory>
+            <directory>tests/Test</directory>
         </testsuite>
         <testsuite name="Cache">
-            <directory>tests/Caching</directory>
+            <directory>tests/Test/Caching</directory>
         </testsuite>
         <testsuite name="Config">
-            <directory>tests/Configuration</directory>
+            <directory>tests/Test/Configuration</directory>
         </testsuite>
         <testsuite name="Depend">
-            <directory>tests/Dependency</directory>
+            <directory>tests/Test/Dependency</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -44,15 +44,15 @@ interface NetworkRetrieverInterface
      */
     public function setUserAgent($userAgent);
     /**
-     * @return Client|ClientInterface
+     * @return $client
      */
     public function getClient();
     /**
      * @param $request
      *
-     * @return response
+     * @return $response
      */
-    public function sendRequest(request $request);
+    public function sendRequest($request);
     /**
      * @return mixed
      */
@@ -64,11 +64,11 @@ interface NetworkRetrieverInterface
      */
     public function addSubscriber($plugin = null);
     /**
-     * @param Client|ClientInterface $client
+     * @param $client
      *
      * @return $this
      */
-    public function setClient(ClientInterface $client);
+    public function setClient($client);
     /**
      * @param $urlTemplate
      * @param $urlTemplateOptions

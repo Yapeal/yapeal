@@ -31,6 +31,8 @@ namespace Yapeal\Network;
 
 /**
  * Class NetworkRetrieverAbstract
+ *
+ * @author Stephen Gulick <stephenmg12@gmail.com>
  */
 abstract class NetworkRetrieverAbstract
 {

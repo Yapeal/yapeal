@@ -28,8 +28,6 @@
  */
 namespace Yapeal\Network;
 
-use Guzzle\Http\Message;
-use Guzzle\Http\Message\Response;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
@@ -56,7 +54,6 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
      * @var
      */
     protected $networkRetriever;
-
     public function __construct(NetworkRetrieverInterface $networkRetriever)
     {
         //TODO: Implement construct()
@@ -81,32 +78,38 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
     {
         $this->EveApiXmlData = $data;
         /** @var $urlTemplateOptions array */
-        $urlTemplateOptions=array(
+        $urlTemplateOptions = array(
             'baseUrl' => $this->baseUrl,
             'EveApiSectionName' => $this->EveApiXmlData->getEveApiSectionName(),
             'EveApiName' => $this->EveApiXmlData->getEveApiName()
         );
-        /** @var $response response */
-        $response = $this->networkRetriever->sendPost($this->urlTemplate,$urlTemplateOptions, $this->EveApiXmlData->getEveApiArguments());
-        if ($response->getStatusCode() == '200') {
-            $this->EveApiXmlData->setEveApiXml($response->getBody(true));
-            return $this->EveApiXmlData;
-        }
+        /** @var $xmlString string */
+        $xmlString = $this->networkRetriever->sendPost(
+                                            $this->urlTemplate,
+                                                $urlTemplateOptions,
+                                                $this->EveApiXmlData->getEveApiArguments(
+                                                )
+        );
+        $this->EveApiXmlData->setEveApiXml($xmlString);
+        return $this->EveApiXmlData;
     }
     /**
      * @param string $value
      *
      * @return self
      */
-    public function setBaseUrl($value)
-    {
+    public
+    function setBaseUrl(
+        $value
+    ) {
         $this->baseUrl = $value;
         return $this;
     }
     /**
      * @return string
      */
-    public function getBaseUrl()
+    public
+    function getBaseUrl()
     {
         return $this->baseUrl;
     }
@@ -116,14 +119,17 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
      * @return $this
      * @throws \InvalidArgumentException
      */
-    public function setUrlTemplate(
+    public
+    function setUrlTemplate(
         $urlTemplate = 'https://{baseUrl}/{EveApiSectionName}/{EveApiName}.xml.aspx'
     ) {
-        if (is_string($urlTemplate)) {
-            $this->urlTemplate = $urlTemplate;
-            return $this;
-        } else {
-            throw new \InvalidArgumentException;
+        if (!is_string($urlTemplate)) {
+            $mess = 'Url Template must be a string but given ' . gettype(
+                    $urlTemplate
+                );
+            throw new \InvalidArgumentException($mess);
         }
+        $this->urlTemplate = $urlTemplate;
+        return $this;
     }
 }

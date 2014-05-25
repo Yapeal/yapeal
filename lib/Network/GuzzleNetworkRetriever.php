@@ -29,14 +29,22 @@
 namespace Yapeal\Network;
 
 use Guzzle\Http\Client;
+use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
+use Guzzle\Http\Message\Response;
 
 /**
  * Class GuzzleNetworkRetriever
+ *
+ * @author Stephen Gulick <stephenmg12@gmail.com>
  */
 class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
     NetworkRetrieverInterface
 {
+    function __construct(clientInterface $client)
+    {
+        $this->client = $client;
+    }
     /**
      * @return Client|ClientInterface
      */
@@ -88,7 +96,7 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
      * @param array  $urlTemplateOptions
      * @param array  $postData
      *
-     * @return request
+     * @return string
      */
     public function sendPost($urlTemplate, $urlTemplateOptions, $postData)
     {
@@ -101,7 +109,18 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
                                     $postData,
                                     $this->getOptions()
         );
-        return $request;
+        /**
+         * Send Request to server
+         * @var $respons response
+         */
+        $response = $this->sendRequest($request);
+        /**
+         * check to see if response has a status code of 200
+         */
+        if ($response->getStatusCode() == '200') {
+           return $response->getBody(true);
+        }
+        return false;
     }
     /**
      * @return array

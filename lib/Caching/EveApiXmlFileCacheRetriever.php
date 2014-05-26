@@ -28,6 +28,8 @@
  */
 namespace Yapeal\Caching;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Exception\YapealRetrieverFileException;
 use Yapeal\Exception\YapealRetrieverPathException;
@@ -37,15 +39,18 @@ use Yapeal\Xml\EveApiXmlDataInterface;
 /**
  * Class EveApiXmlFileCacheRetriever
  */
-class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
+class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
+    LoggerAwareInterface
 {
     /**
-     * @param string|null $cachePath
+     * @param LoggerInterface $logger
+     * @param string|null     $cachePath
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($cachePath = null)
+    public function __construct(LoggerInterface $logger, $cachePath = null)
     {
+        $this->setLogger($logger);
         $this->setCachePath($cachePath);
     }
     /**
@@ -61,30 +66,38 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
     /**
      * @param EveApiXmlDataInterface $data
      *
-     * @throws \LogicException
-     * @throws YapealRetrieverException
      * @return EveApiXmlDataInterface
      */
     public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
-        $cachePath =
-            $this->getNormalizedCachePath() . $data->getEveApiSectionName();
-        $this->checkUsableCachePath($cachePath);
-        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
-        foreach ($data->getEveApiArguments() as $key => $value) {
-            $hash .= $key . $value;
+        try {
+            $cachePath =
+                $this->getNormalizedCachePath() . $data->getEveApiSectionName();
+            $this->checkUsableCachePath($cachePath);
+            $hash = $data->getEveApiName() . $data->getEveApiSectionName();
+            foreach ($data->getEveApiArguments() as $key => $value) {
+                $hash .= $key . $value;
+            }
+            $hash = hash('md5', $hash);
+            $cacheFile =
+                $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
+            if (!is_readable($cacheFile) || !is_file($cacheFile)) {
+                $mess =
+                    'Could NOT find accessible cache file was given '
+                    . $cacheFile;
+                $this->getLogger()
+                     ->notice($mess);
+                return $data;
+            }
+            $this->prepareConnection($cacheFile);
+            $result = $this->readXmlData($cacheFile);
+            $this->__destruct();
+        } catch (YapealRetrieverException $exp) {
+            $mess = 'Could NOT get XML data';
+            $this->getLogger()
+                 ->info($mess, array('exception' => $exp));
+            return $data;
         }
-        $hash = hash('md5', $hash);
-        $cacheFile =
-            $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
-        if (!is_readable($cacheFile) || !is_file($cacheFile)) {
-            $mess =
-                'Could NOT find accessible cache file was given ' . $cacheFile;
-            throw new YapealRetrieverFileException($mess, 1);
-        }
-        $this->prepareConnection($cacheFile);
-        $result = $this->readXmlData($cacheFile);
-        $this->__destruct();
         return $data->setEveApiXml($result);
     }
     /**
@@ -106,6 +119,18 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
         return $this;
     }
     /**
+     * Sets a logger instance on the object
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return self
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+    /**
      * @var string
      */
     protected $cachePath;
@@ -113,6 +138,10 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
      * @var resource|false File handle
      */
     protected $handle;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
     /**
      * @param $cachePath
      *
@@ -124,12 +153,12 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
         if (!is_readable($cachePath)) {
             $mess = 'Cache path is NOT readable or does NOT exist was given '
                 . $cachePath;
-            throw new YapealRetrieverPathException($mess, 1);
+            throw new YapealRetrieverPathException($mess);
         }
         if (!is_dir($cachePath)) {
             $mess = 'Cache path is NOT a directory was given '
                 . $cachePath;
-            throw new YapealRetrieverPathException($mess, 2);
+            throw new YapealRetrieverPathException($mess);
         }
         return $this;
     }
@@ -155,7 +184,7 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
             if ('..' == $part) {
                 if (count($parts) < 1) {
                     $mess = 'Can NOT go above root path but given ' . $path;
-                    throw new YapealRetrieverPathException($mess, 1);
+                    throw new YapealRetrieverPathException($mess);
                 }
                 array_pop($parts);
                 continue;
@@ -172,7 +201,13 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
         return $this->handle;
     }
     /**
-     * @throws \LogicException
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->logger;
+    }
+    /**
      * @throws YapealRetrieverPathException
      * @return string
      */
@@ -180,7 +215,7 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
     {
         if (empty($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
-            throw new \LogicException($mess);
+            throw new YapealRetrieverPathException($mess);
         }
         $absoluteRequired = true;
         $path = str_replace('\\', '/', $this->cachePath);
@@ -226,7 +261,7 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
                 $mess = 'Giving up could NOT get flock on ' . $cacheFile;
-                throw new YapealRetrieverFileException($mess, 1);
+                throw new YapealRetrieverFileException($mess);
             }
             // Wait 0.1 to 0.5 seconds before trying again.
             usleep(rand(100000, 500000));
@@ -237,7 +272,7 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
      * @param string $cacheFile
      *
      * @throws YapealRetrieverFileException
-     * @return string
+     * @return string|false
      */
     protected function readXmlData($cacheFile)
     {
@@ -249,7 +284,7 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
                 $mess = 'Giving up could NOT finish reading  ' . $cacheFile;
-                throw new YapealRetrieverFileException($mess, 1);
+                throw new YapealRetrieverFileException($mess);
             }
             $read = fread($this->getHandle(), 16384);
             // Decrease $tries while making progress but NEVER $tries < 1.

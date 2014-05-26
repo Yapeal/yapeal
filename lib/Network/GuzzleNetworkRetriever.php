@@ -28,132 +28,83 @@
  */
 namespace Yapeal\Network;
 
-use Guzzle\Http\Client;
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlDataInterface;
 
 /**
  * Class GuzzleNetworkRetriever
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
-    NetworkRetrieverInterface
+class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
+    LoggerAwareInterface
 {
     /**
-     * @param ClientInterface $client
+     * @param LoggerInterface $logger
+     * @param ClientInterface|null $client
      */
-    function __construct(ClientInterface $client = null)
+    function __construct(
+        LoggerInterface $logger,
+        ClientInterface $client = null
+    )
     {
-        $this->client = $client;
+        $this->setLogger($logger);
+        $this->setClient($client);
     }
     /**
-     * @return Client|ClientInterface
-     */
-    public function getClient()
-    {
-        /** Check if we already have a client set, else we set one */
-        if (isset($this->client)) {
-            return $this->client;
-        } else {
-            $this->client = new Client();
-        }
-        /** Set user agent on client */
-        $this->client->setUserAgent($this->userAgent);
-        return $this->client;
-    }
-    /**
-     * @param string $urlTemplate
-     * @param array  $urlTemplateOptions
-     * @param array  $postData
+     * @param EveApiXmlDataInterface $data
      *
-     * @return string
+     * @return EveApiXmlDataInterface
      */
-    public function sendPost($urlTemplate, $urlTemplateOptions, $postData)
+    public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
-        $this->urlTemplate = $urlTemplate;
-        $this->urlTemplateOptions = $urlTemplateOptions;
-        $this->postData = $postData;
-        return $this->getResponse();
+        // TODO: Implement retrieveEveApi() method.
     }
     /**
-     * @param Client|ClientInterface $client
+     * @param ClientInterface|null $value
      *
-     * @return $this
+     * @return self
      */
-    public function setClient($client)
+    public function setClient(ClientInterface $value = null)
     {
-        $this->client = $client;
+        $this->client = $value;
         return $this;
     }
     /**
-     * @var
-     */
-    protected $postData;
-    /**
-     * @var
-     */
-    protected $urlTemplate;
-    /**
-     * @var
-     */
-    protected $urlTemplateOptions;
-    /**
-     * @return array
-     */
-    protected function getOptions()
-    {
-        if (isset($this->options)) {
-            return $this->options;
-        } else {
-            return $options = array(
-                'timeout' => 10,
-                'connect_timeout' => 30,
-                'verify' =>
-                    dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'config'
-                    . DIRECTORY_SEPARATOR . 'eveonline.crt',
-            );
-        }
-    }
-    /**
-     * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface|RequestInterface
-     */
-    protected function getRequest()
-    {
-        $client = $this->getClient();
-        $request = $client->post(
-            array(
-                $this->urlTemplate,
-                $this->urlTemplateOptions
-            ),
-            $this->getHeaders(),
-            $this->postData,
-            $this->getOptions()
-        );
-        return $request;
-    }
-    /**
-     * @return \Guzzle\Http\EntityBodyInterface|string
-     */
-    protected function getResponse()
-    {
-        try {
-            $response = $this->sendRequest($this->getRequest());
-        } catch (\Exception $e) {
-            //TODO: Catch Error
-        }
-        if ($response->getStatusCode() == '200') {
-            return $response->getBody(true);
-        }
-    }
-    /**
-     * @param $request RequestInterface
+     * Sets a logger instance on the object
      *
-     * @return Response
+     * @param LoggerInterface $logger
+     *
+     * @return self
      */
-    protected function sendRequest(RequestInterface $request)
+    public function setLogger(LoggerInterface $logger)
     {
-        return $response = $request->send();
+        $this->logger = $logger;
+        return $this;
+    }
+    /**
+     * @type ClientInterface
+     */
+    protected $client;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
+    /**
+     * @return ClientInterface
+     */
+    protected function getClient()
+    {
+        return $this->client;
+    }
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->logger;
     }
 }

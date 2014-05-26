@@ -31,6 +31,7 @@ namespace Yapeal\Network;
 use Guzzle\Http\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
@@ -55,13 +56,29 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         $this->setClient($client);
     }
     /**
+     *
+     */
+    public function __destruct()
+    {
+    }
+    /**
      * @param EveApiXmlDataInterface $data
      *
      * @return EveApiXmlDataInterface
      */
     public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
-        // TODO: Implement retrieveEveApi() method.
+        try {
+            $this->prepareConnection();
+            $result = $this->readXmlData();
+            $this->__destruct();
+        } catch (YapealRetrieverException $exp) {
+            $mess = 'Could NOT get XML data';
+            $this->getLogger()
+                 ->info($mess);
+            return $data;
+        }
+        return $data->setEveApiXml($result);
     }
     /**
      * @param ClientInterface|null $value
@@ -106,5 +123,18 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     protected function getLogger()
     {
         return $this->logger;
+    }
+    /**
+     *
+     */
+    protected function prepareConnection()
+    {
+    }
+    /**
+     * @return string
+     */
+    protected function readXmlData()
+    {
+        return '';
     }
 }

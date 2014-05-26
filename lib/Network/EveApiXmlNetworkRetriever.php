@@ -39,35 +39,20 @@ use Yapeal\Xml\EveApiXmlDataInterface;
 class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
 {
     /**
-     * @var string
+     * @param NetworkRetrieverInterface $networkRetriever
      */
-    protected $baseUrl = 'https://api.eveonline.com/';
-    /**
-     * @var EveApiXmlDataInterface
-     */
-    protected $EveApiXmlData;
-    /**
-     * @var string
-     */
-    protected $urlTemplate;
-    /**
-     * @var
-     */
-    protected $networkRetriever;
     public function __construct(NetworkRetrieverInterface $networkRetriever)
     {
         //TODO: Implement construct()
         $this->networkRetriever = $networkRetriever;
     }
     /**
-     * @param mixed $value
-     *
-     * @return self
+     * @return string
      */
-    public function setNetworkRetriever($value)
+    public
+    function getBaseUrl()
     {
-        $this->networkRetriever = $value;
-        return $this;
+        return $this->baseUrl;
     }
     /**
      * @param EveApiXmlDataInterface $data
@@ -85,10 +70,9 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
         );
         /** @var $xmlString string */
         $xmlString = $this->networkRetriever->sendPost(
-                                            $this->urlTemplate,
-                                                $urlTemplateOptions,
-                                                $this->EveApiXmlData->getEveApiArguments(
-                                                )
+            $this->urlTemplate,
+            $urlTemplateOptions,
+            $this->EveApiXmlData->getEveApiArguments()
         );
         $this->EveApiXmlData->setEveApiXml($xmlString);
         return $this->EveApiXmlData;
@@ -105,12 +89,14 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
         return $this;
     }
     /**
-     * @return string
+     * @param mixed $value
+     *
+     * @return self
      */
-    public
-    function getBaseUrl()
+    public function setNetworkRetriever($value)
     {
-        return $this->baseUrl;
+        $this->networkRetriever = $value;
+        return $this;
     }
     /**
      * @param string $urlTemplate
@@ -131,4 +117,20 @@ class EveApiXmlNetworkRetriever implements EveApiRetrieverInterface
         $this->urlTemplate = $urlTemplate;
         return $this;
     }
+    /**
+     * @var EveApiXmlDataInterface
+     */
+    protected $EveApiXmlData;
+    /**
+     * @var string
+     */
+    protected $baseUrl = 'https://api.eveonline.com/';
+    /**
+     * @var
+     */
+    protected $networkRetriever;
+    /**
+     * @var string
+     */
+    protected $urlTemplate;
 }

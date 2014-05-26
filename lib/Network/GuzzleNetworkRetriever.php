@@ -41,71 +41,12 @@ use Guzzle\Http\Message\Response;
 class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
     NetworkRetrieverInterface
 {
-    protected $urlTemplate;
-    protected $urlTemplateOptions;
-    protected $postData;
-    function __construct(clientInterface $client = null)
+    /**
+     * @param ClientInterface $client
+     */
+    function __construct(ClientInterface $client = null)
     {
         $this->client = $client;
-    }
-    /**
-     * @param Client|ClientInterface $client
-     *
-     * @return $this
-     */
-    public function setClient($client)
-    {
-        $this->client = $client;
-        return $this;
-    }
-    /**
-     * @param string $urlTemplate
-     * @param array  $urlTemplateOptions
-     * @param array  $postData
-     *
-     * @return string
-     */
-    public function sendPost($urlTemplate, $urlTemplateOptions, $postData)
-    {
-        $this->urlTemplate = $urlTemplate;
-        $this->urlTemplateOptions = $urlTemplateOptions;
-        $this->postData = $postData;
-        return $this->getResponse();
-    }
-    protected function getResponse()
-    {
-        try {
-            $response = $this->sendRequest($this->getRequest());
-        } catch (Exception $e){
-            //TODO: Catch Error
-        }
-        if ($response->getStatusCode() == '200') {
-            return $response->getBody(true);
-        }
-
-    }
-    /**
-     * @param $request RequestInterface
-     *
-     * @return Response
-     */
-    protected function sendRequest(RequestInterface $request) //move
-    {
-        return $response = $request->send();
-    }
-    protected  function getRequest()
-    {
-        $client = $this->getClient();
-        $request = $client->post(
-                          array(
-                              $this->urlTemplate,
-                              $this->urlTemplateOptions
-                          ),
-                              $this->getHeaders(),
-                              $this->postData,
-                              $this->getOptions()
-        );
-        return $request;
     }
     /**
      * @return Client|ClientInterface
@@ -123,6 +64,42 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
         return $this->client;
     }
     /**
+     * @param string $urlTemplate
+     * @param array  $urlTemplateOptions
+     * @param array  $postData
+     *
+     * @return string
+     */
+    public function sendPost($urlTemplate, $urlTemplateOptions, $postData)
+    {
+        $this->urlTemplate = $urlTemplate;
+        $this->urlTemplateOptions = $urlTemplateOptions;
+        $this->postData = $postData;
+        return $this->getResponse();
+    }
+    /**
+     * @param Client|ClientInterface $client
+     *
+     * @return $this
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+        return $this;
+    }
+    /**
+     * @var
+     */
+    protected $postData;
+    /**
+     * @var
+     */
+    protected $urlTemplate;
+    /**
+     * @var
+     */
+    protected $urlTemplateOptions;
+    /**
      * @return array
      */
     protected function getOptions()
@@ -138,5 +115,45 @@ class GuzzleNetworkRetriever extends NetworkRetrieverAbstract implements
                     . DIRECTORY_SEPARATOR . 'eveonline.crt',
             );
         }
+    }
+    /**
+     * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface|RequestInterface
+     */
+    protected function getRequest()
+    {
+        $client = $this->getClient();
+        $request = $client->post(
+            array(
+                $this->urlTemplate,
+                $this->urlTemplateOptions
+            ),
+            $this->getHeaders(),
+            $this->postData,
+            $this->getOptions()
+        );
+        return $request;
+    }
+    /**
+     * @return \Guzzle\Http\EntityBodyInterface|string
+     */
+    protected function getResponse()
+    {
+        try {
+            $response = $this->sendRequest($this->getRequest());
+        } catch (\Exception $e) {
+            //TODO: Catch Error
+        }
+        if ($response->getStatusCode() == '200') {
+            return $response->getBody(true);
+        }
+    }
+    /**
+     * @param $request RequestInterface
+     *
+     * @return Response
+     */
+    protected function sendRequest(RequestInterface $request)
+    {
+        return $response = $request->send();
     }
 }

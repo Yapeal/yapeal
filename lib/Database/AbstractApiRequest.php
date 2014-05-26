@@ -30,37 +30,38 @@
 namespace Yapeal\Database;
 
 use Psr\Log\LoggerInterface;
-use XMLReader;
-use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Caching\CacheInterface;
+use Yapeal\Dependency\DependenceAwareInterface;
 use Yapeal\Dependency\DependenceInterface;
 use Yapeal\Exception\YapealApiErrorException;
 use Yapeal\Network\NetworkConnection;
 use Yapeal\Network\NetworkInterface;
+use Yapeal\Xml\ReaderInterface;
 
 /**
  * Abstract class to hold common methods for API classes.
  */
-abstract class AbstractApiRequest
+abstract class AbstractApiRequest implements DependenceAwareInterface
 {
     /**
      * Constructor
      *
      * @param DependenceInterface|null     $dependence
-     * @param EveApiXmlCache|string|null   $cache
+     * @param CacheInterface|string|null   $cache
      * @param LoggerInterface|string|null  $logger
      * @param NetworkInterface|string|null $network
-     * @param XMLReader|string|null        $reader
+     * @param ReaderInterface|string|null $reader
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(
         DependenceInterface $dependence = null,
-        EveApiXmlCache $cache = null,
+        CacheInterface $cache = null,
         LoggerInterface $logger = null,
         NetworkInterface $network = null,
-        XMLReader $reader = null
+        ReaderInterface $reader = null
     ) {
-        $this->setDependence($dependence);
+        $this->setDependenceContainer($dependence);
         $this->setLogger($logger);
         $this->setCache($cache);
         $this->setNetwork($network);
@@ -101,14 +102,12 @@ abstract class AbstractApiRequest
                 \Logger::getLogger('yapeal')
                        ->warn($mess);
             }
-            // Create XMLReader.
-            $this->reader = new XMLReader();
-            // Pass XML to reader.
-            $this->reader->XML($result);
+            $reader = $this->getReader();
+            $reader->setXml($result);
             // Outer structure of XML is processed here.
-            while ($this->reader->read()) {
-                if ($this->reader->nodeType == XMLReader::ELEMENT
-                    && $this->reader->localName == 'result'
+            while ($reader->read()) {
+                if ($reader->getNodeType() == ReaderInterface::ELEMENT
+                    && $reader->getLocalName() == 'result'
                 ) {
                     $result = $this->parserAPI();
                 }
@@ -128,135 +127,7 @@ abstract class AbstractApiRequest
         }
     }
     /**
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @return EveApiXmlCache
-     */
-    public function getCache()
-    {
-        if (empty($this->cache)) {
-            $mess = 'Tried to use $cache when it was NOT set';
-            throw new \LogicException($mess);
-        } elseif (is_string($this->cache)) {
-            $dependence = $this->getDependence();
-            if (empty($dependence[$this->cache])) {
-                $mess = 'Dependence container does NOT contain '
-                    . (string)$this->cache;
-                throw new \DomainException($mess);
-            }
-            $this->setCache($dependence[(string)$this->cache]);
-        }
-        if (!$this->cache instanceof EveApiXmlCache) {
-            $mess = '$cache could NOT be resolved to instance of'
-                . ' EveApiXmlCache is instead ' . gettype($this->cache);
-            throw new \InvalidArgumentException($mess);
-        }
-        return $this->cache;
-    }
-    /**
-     * @throws \LogicException
-     * @return DependenceInterface
-     */
-    public function getDependence()
-    {
-        if (empty($this->dependence)) {
-            $mess = 'Tried to use $dependence when it was NOT set';
-            throw new \LogicException($mess);
-        }
-        return $this->dependence;
-    }
-    /**
-     * @throws \DomainException
-     * @throws \LogicException
-     * @return LoggerInterface
-     */
-    public function getLogger()
-    {
-        if (empty($this->logger)) {
-            $mess = 'Tried to use $logger when it was NOT set';
-            throw new \LogicException($mess);
-        } elseif (is_string($this->logger)) {
-            $dependence = $this->getDependence();
-            if (is_string((string)$this->logger)) {
-                $dependence = $this->getDependence();
-                if (empty($dependence[(string)$this->logger])) {
-                    $mess = 'Dependence container does NOT contain '
-                        . (string)$this->logger;
-                    throw new \DomainException($mess);
-                }
-            }
-            $this->setLogger($dependence[(string)$this->logger]);
-        }
-        if (!$this->logger instanceof LoggerInterface) {
-            $mess = '$logger could NOT be resolved to instance of'
-                . ' LoggerInterface is instead ' . gettype($this->logger);
-            throw new \InvalidArgumentException($mess);
-        }
-        return $this->logger;
-    }
-    /**
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @return NetworkInterface
-     */
-    public function getNetwork()
-    {
-        if (empty($this->network)) {
-            $mess = 'Tried to use $network when it was NOT set';
-            throw new \LogicException($mess);
-        } elseif (is_string($this->network)) {
-            $dependence = $this->getDependence();
-            if (is_string((string)$this->network)) {
-                $dependence = $this->getDependence();
-                if (empty($dependence[(string)$this->network])) {
-                    $mess = 'Dependence container does NOT contain '
-                        . (string)$this->network;
-                    throw new \DomainException($mess);
-                }
-            }
-            $this->setCache($dependence[(string)$this->network]);
-        }
-        if (!$this->network instanceof EveApiXmlCache) {
-            $mess = '$network could NOT be resolved to instance of'
-                . ' NetworkInterface is instead ' . gettype($this->network);
-            throw new \InvalidArgumentException($mess);
-        }
-        return $this->network;
-    }
-    /**
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @return XMLReader
-     */
-    public function getReader()
-    {
-        if (empty($this->reader)) {
-            $mess = 'Tried to use $reader when it was NOT set';
-            throw new \LogicException($mess);
-        } elseif (is_string($this->reader)) {
-            $dependence = $this->getDependence();
-            if (is_string((string)$this->reader)) {
-                $dependence = $this->getDependence();
-                if (empty($dependence[(string)$this->reader])) {
-                    $mess = 'Dependence container does NOT contain '
-                        . (string)$this->reader;
-                    throw new \DomainException($mess);
-                }
-            }
-            $this->setCache($dependence[(string)$this->reader]);
-        }
-        if (!$this->reader instanceof EveApiXmlCache) {
-            $mess = '$reader could NOT be resolved to instance of'
-                . ' XMLReader is instead ' . gettype($this->reader);
-            throw new \InvalidArgumentException($mess);
-        }
-        return $this->reader;
-    }
-    /**
-     * @param EveApiXmlCache|string|null $value
+     * @param CacheInterface|string|null $value
      *
      * @return self
      */
@@ -270,7 +141,7 @@ abstract class AbstractApiRequest
      *
      * @return self
      */
-    public function setDependence(DependenceInterface $value = null)
+    public function setDependenceContainer(DependenceInterface $value = null)
     {
         $this->dependence = $value;
         return $this;
@@ -296,7 +167,7 @@ abstract class AbstractApiRequest
         return $this;
     }
     /**
-     * @param XMLReader|string|null $value
+     * @param ReaderInterface|string|null $value
      *
      * @return self
      */
@@ -311,7 +182,7 @@ abstract class AbstractApiRequest
      */
     protected $api;
     /**
-     * @var EveApiXmlCache|string Holds API connection.
+     * @var CacheInterface|string Holds API connection.
      */
     protected $cache;
     /**
@@ -337,7 +208,7 @@ abstract class AbstractApiRequest
      */
     protected $params;
     /**
-     * @var XMLReader|string|null Holds instance of XMLReader.
+     * @var ReaderInterface|string|null Holds instance of XMLReader.
      */
     protected $reader;
     /**
@@ -403,11 +274,129 @@ abstract class AbstractApiRequest
         return vsprintf($format, array_values($args));
     }
     /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return CacheInterface
+     */
+    protected function getCache()
+    {
+        if (empty($this->cache)) {
+            $mess = 'Tried to use $cache when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->cache)) {
+            $dependence = $this->getDependenceContainer();
+            if (empty($dependence[$this->cache])) {
+                $mess = 'Dependence container does NOT contain ' . $this->cache;
+                throw new \DomainException($mess);
+            }
+            $this->cache = $dependence[$this->cache];
+        }
+        if (!$this->cache instanceof CacheInterface) {
+            $mess = '$cache could NOT be resolved to instance of'
+                . ' CacheInterface is instead ' . gettype($this->cache);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->cache;
+    }
+    /**
+     * @throws \LogicException
+     * @return DependenceInterface
+     */
+    protected function getDependenceContainer()
+    {
+        if (empty($this->dependence)) {
+            $mess = 'Tried to use $dependence when it was NOT set';
+            throw new \LogicException($mess);
+        }
+        return $this->dependence;
+    }
+    /**
+     * @throws \DomainException
+     * @throws \LogicException
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        if (empty($this->logger)) {
+            $mess = 'Tried to use $logger when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->logger)) {
+            $dependence = $this->getDependenceContainer();
+            if (empty($dependence[$this->logger])) {
+                $mess =
+                    'Dependence container does NOT contain ' . $this->logger;
+                throw new \DomainException($mess);
+            }
+            $this->logger = $dependence[$this->logger];
+        }
+        if (!$this->logger instanceof LoggerInterface) {
+            $mess = '$logger could NOT be resolved to instance of'
+                . ' LoggerInterface is instead ' . gettype($this->logger);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->logger;
+    }
+    /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return NetworkInterface
+     */
+    protected function getNetwork()
+    {
+        if (empty($this->network)) {
+            $mess = 'Tried to use $network when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->network)) {
+            $dependence = $this->getDependenceContainer();
+            if (empty($dependence[$this->network])) {
+                $mess =
+                    'Dependence container does NOT contain ' . $this->network;
+                throw new \DomainException($mess);
+            }
+            $this->network = $dependence[$this->network];
+        }
+        if (!$this->network instanceof NetworkInterface) {
+            $mess = '$network could NOT be resolved to instance of'
+                . ' NetworkInterface is instead ' . gettype($this->network);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->network;
+    }
+    /**
      * Abstract per API section function that returns API proxy.
      *
      * @return mixed Returns the URL for proxy as string if found else FALSE.
      */
     abstract protected function getProxy();
+    /**
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @return ReaderInterface
+     */
+    protected function getReader()
+    {
+        if (empty($this->reader)) {
+            $mess = 'Tried to use $reader when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->reader)) {
+            $dependence = $this->getDependenceContainer();
+            if (empty($dependence[$this->reader])) {
+                $mess =
+                    'Dependence container does NOT contain ' . $this->reader;
+                throw new \DomainException($mess);
+            }
+            $this->reader = $dependence[$this->reader];
+        }
+        if (!$this->reader instanceof ReaderInterface) {
+            $mess = '$reader could NOT be resolved to instance of'
+                . ' ReaderInterface is instead ' . gettype($this->reader);
+            throw new \InvalidArgumentException($mess);
+        }
+        return $this->reader;
+    }
     /**
      * Abstract method to handles some Eve API error codes in special ways.
      *
@@ -441,35 +430,36 @@ abstract class AbstractApiRequest
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
+        $query = new QueryBuilder($tableName, YAPEAL_DSN);
+        $reader = $this->getReader();
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert($this->needsUpsert());
+        $query->useUpsert($this->needsUpsert());
         if ($this->ownerID != 0) {
-            $qb->setDefault('ownerID', $this->ownerID);
+            $query->setDefault('ownerID', $this->ownerID);
         }
         try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
-                    case XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
+            while ($reader->read()) {
+                switch ($reader->getNodeType()) {
+                    case ReaderInterface::ELEMENT:
+                        switch ($reader->getLocalName()) {
                             case 'row':
                                 $row = array();
                                 // Walk through attributes and add them to row.
-                                while ($this->reader->moveToNextAttribute()) {
-                                    $row[$this->reader->name] =
-                                        $this->reader->value;
+                                while ($reader->moveToNextAttribute()) {
+                                    $row[$reader->getName()] =
+                                        $reader->getValue();
                                 }
-                                $qb->addRow($row);
+                                $query->addRow($row);
                                 break;
                         };
                         break;
-                    case XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
+                    case ReaderInterface::END_ELEMENT:
+                        if ($reader->getLocalName() == 'result') {
                             // Insert any leftovers.
-                            if (count($qb) > 0) {
-                                $qb->store();
+                            if (count($query) > 0) {
+                                $query->store();
                             }
-                            $qb = null;
+                            $query = null;
                             return true;
                         }
                         break;

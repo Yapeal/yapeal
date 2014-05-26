@@ -94,8 +94,6 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
         $filesystem = $this->getVfsStream();
         $this->assertAttributeEmpty('cachePath', $this->retriever);
         $this->assertTrue($filesystem->hasChild('yapealTest/cache/NotDir'));
-        $input = $filesystem->url() . '/cache';
-        $this->retriever->setCachePath($input);
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
             ->will($this->returnValue('NotDir'));
@@ -124,9 +122,12 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $input = $filesystem->url() . '/cache';
+        $result = $this->retriever->setCachePath($input)
+                                  ->retrieveEveApi($dataMock);
         $this->assertSame(
             $dataMock,
-            $this->retriever->retrieveEveApi($dataMock)
+            $result
         );
     }
     /**
@@ -184,8 +185,6 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(
             $filesystem->hasChild('yapealTest/cache/account/deniedReadable')
         );
-        $input = $filesystem->url() . '/cache';
-        $this->retriever->setCachePath($input);
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
                  ->will($this->returnValue('account'));
@@ -195,17 +194,36 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
                  ->will($this->returnValue(array('dummy' => 'amount')));
-        $this->logger->expects($this->atLeastOnce())
-                     ->method('notice')
-                     ->with(
-                         $this->stringContains(
-                             'Could NOT find accessible cache file was given '
-                         ),
-                         $this->isType('array')
-                     );
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function ($subject) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    'Could NOT find accessible cache file was given '
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $input = $filesystem->url() . '/cache';
         $this->assertSame(
             $dataMock,
-            $this->retriever->retrieveEveApi($dataMock)
+            $this->retriever->setCachePath($input)
+                            ->retrieveEveApi($dataMock)
         );
     }
     /**

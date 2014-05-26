@@ -28,11 +28,14 @@
  */
 namespace Yapeal\Network;
 
+use Guzzle\Common\Exception\GuzzleException;
 use Guzzle\Http\ClientInterface;
+use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlData;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
 /**
@@ -62,15 +65,15 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiXmlDataInterface|EveApiXmlData $data
      *
      * @return EveApiXmlDataInterface
      */
     public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
         try {
-            $this->prepareConnection();
-            $result = $this->readXmlData();
+            $result = $this->readXmlData($this->prepareConnection($data));
+            $data->setEveApiXml($result);
             $this->__destruct();
         } catch (YapealRetrieverException $exp) {
             $mess = 'Could NOT get XML data';
@@ -125,16 +128,32 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         return $this->logger;
     }
     /**
+     * @param \Yapeal\Xml\EveApiXmlData|\Yapeal\Xml\EveApiXmlDataInterface $data
      *
+     * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface
      */
-    protected function prepareConnection()
+    protected function prepareConnection(EveApiXmlDataInterface $data)
     {
+        $uri = array('/{EveApiSectionName}/{EveApiName}.xml.aspx', array('EveApiSectionName'=>$data->getEveApiSectionName(), 'EveApiName'=>$data->getEveApiName()));
+        $client = $this->getClient();
+        return $client->post($uri, NULL, $data->getEveApiArguments());
+
     }
     /**
-     * @return string
+     * @param \Guzzle\Http\Message\RequestInterface $request
+     *
+     * @return string|bool
      */
-    protected function readXmlData()
+    protected function readXmlData(RequestInterface $request)
     {
-        return '';
+        try {
+            $response = $request->send();
+        } catch (\Exception $exc) {
+            $mess = 'There was an HTTP Error '. $exc->getMessage();
+            $this->getLogger()->info($mess);
+            return false;
+        }
+        return  $response->getBody(true);
+
     }
 }

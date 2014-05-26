@@ -28,6 +28,9 @@
         <testsuite name="Cache">
             <directory>tests/Test/Caching</directory>
         </testsuite>
+		<testsuite name="Network">
+            <directory>tests/Test/Network</directory>
+        </testsuite>
         <testsuite name="Config">
             <directory>tests/Test/Configuration</directory>
         </testsuite>

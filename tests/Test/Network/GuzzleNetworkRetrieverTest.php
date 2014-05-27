@@ -26,7 +26,7 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Network;
+namespace Test\Network;
 
 use PHPUnit_Framework_MockObject_MockObject;
 use Psr\Log\LoggerInterface;

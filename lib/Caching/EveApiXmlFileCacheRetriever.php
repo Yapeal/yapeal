@@ -72,23 +72,12 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
     {
         try {
             $cachePath =
-                $this->getNormalizedCachePath() . $data->getEveApiSectionName();
+                $this->getNormalizedCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
-            $hash = $data->getEveApiName() . $data->getEveApiSectionName();
-            foreach ($data->getEveApiArguments() as $key => $value) {
-                $hash .= $key . $value;
-            }
-            $hash = hash('md5', $hash);
             $cacheFile =
-                $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
-            if (!is_readable($cacheFile) || !is_file($cacheFile)) {
-                $mess =
-                    'Could NOT find accessible cache file was given '
-                    . $cacheFile;
-                $this->getLogger()
-                     ->notice($mess);
-                return $data;
-            }
+                $cachePath . $data->getEveApiName() . $this->getHash($data)
+                . '.xml';
+            $this->checkUsableCacheFile($cacheFile);
             $this->prepareConnection($cacheFile);
             $result = $this->readXmlData($cacheFile);
             $this->__destruct();
@@ -142,6 +131,22 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
      * @type LoggerInterface
      */
     protected $logger;
+    /**
+     * @param $cacheFile
+     *
+     * @throws YapealRetrieverFileException
+     * @return self
+     */
+    protected function checkUsableCacheFile($cacheFile)
+    {
+        if (!is_readable($cacheFile) || !is_file($cacheFile)) {
+            $mess =
+                'Could NOT find accessible cache file was given '
+                . $cacheFile;
+            throw new YapealRetrieverFileException($mess);
+        }
+        return $this;
+    }
     /**
      * @param $cachePath
      *
@@ -201,6 +206,20 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
         return $this->handle;
     }
     /**
+     * @param EveApiXmlDataInterface $data
+     *
+     * @return string
+     */
+    protected function getHash(EveApiXmlDataInterface $data)
+    {
+        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
+        foreach ($data->getEveApiArguments() as $key => $value) {
+            $hash .= $key . $value;
+        }
+        $hash = hash('md5', $hash);
+        return $hash;
+    }
+    /**
      * @return LoggerInterface
      */
     protected function getLogger()
@@ -208,17 +227,20 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
         return $this->logger;
     }
     /**
+     * @param string $sectionName
+     *
      * @throws YapealRetrieverPathException
      * @return string
      */
-    protected function getNormalizedCachePath()
+    protected function getNormalizedCachePath($sectionName)
     {
         if (empty($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new YapealRetrieverPathException($mess);
         }
         $absoluteRequired = true;
-        $path = str_replace('\\', '/', $this->cachePath);
+        $cachePath = $this->cachePath . '/' . $sectionName;
+        $path = str_replace('\\', '/', $cachePath);
         // Optional wrapper(s).
         $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
         // Optional root prefix.

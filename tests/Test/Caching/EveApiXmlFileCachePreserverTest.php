@@ -32,6 +32,7 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
+use Psr\Log\LoggerInterface;
 use Yapeal\Caching\EveApiXmlFileCachePreserver;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
@@ -45,93 +46,145 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
      */
     public function setup()
     {
-        $this->preserver = new EveApiXmlFileCachePreserver('');
+        $this->logger = $this->getLoggerMock();
+        $this->preserver = new EveApiXmlFileCachePreserver($this->logger, '');
     }
     /**
      *
      */
-    public function testPreserveEveApiThrowsLogicExceptionWhenCachePathNotSet()
-    {
-        $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->setExpectedException('\LogicException');
-        $this->preserver->preserveEveApi($this->getDataMock());
-    }
-    /**
-     *
-     */
-    public function testPreserveEveApiThrowsYapealPreserverExceptionForNonDir()
+    public function testPreserveEveApiLogsErrorForNonDir()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
         $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->assertTrue(
-            $filesystem->hasChild('yapealTest/cache/NotDir')
-        );
-        $input = $filesystem->url() . '/cache';
-        $this->preserver->setCachePath($input);
+        $this->assertTrue($filesystem->hasChild('yapealTest/cache/NotDir'));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
                  ->will($this->returnValue('NotDir'));
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverException',
-            null,
-            2
-        );
-        $this->preserver->preserveEveApi($dataMock);
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT a directory was given '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $input = $filesystem->url() . '/cache';
+        $this->preserver->setCachePath($input)
+                        ->preserveEveApi($dataMock);
     }
     /**
      *
      */
-    public function testPreserveEveApiThrowsYapealPreserverExceptionForNonExistingPath(
-    )
+    public function testPreserveEveApiLogsErrorForNonExistingPath()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
         $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->assertTrue(
-            $filesystem->hasChild('yapealTest/cache')
-        );
+        $this->assertTrue($filesystem->hasChild('yapealTest/cache'));
         $input = $filesystem->url() . '/cache';
         $this->preserver->setCachePath($input);
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
                  ->will($this->returnValue('DoesNotExist'));
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverException',
-            null,
-            1
-        );
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT readable or does NOT exist was given '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
         $this->preserver->preserveEveApi($dataMock);
     }
     /**
      *
      */
-    public function testPreserveEveApiThrowsYapealPreserverExceptionForNonReadablePath(
-    )
+    public function testPreserveEveApiLogsErrorForNonReadablePath()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
         $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->assertTrue(
-            $filesystem->hasChild('yapealTest/cache')
-        );
+        $this->assertTrue($filesystem->hasChild('yapealTest/cache'));
         $input = $filesystem->url() . '/cache';
         $this->preserver->setCachePath($input);
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
                  ->will($this->returnValue('deniedRead'));
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverException',
-            null,
-            1
-        );
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT readable or does NOT exist was given '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
         $this->preserver->preserveEveApi($dataMock);
     }
     /**
      *
      */
-    public function testPreserveEveApiThrowsYapealPreserverExceptionForNonWritablePath(
-    )
+    public function testPreserveEveApiLogsErrorForNonWritablePath()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
@@ -144,18 +197,114 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
                  ->will($this->returnValue('deniedWrite'));
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverException',
-            null,
-            3
-        );
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT writable was given '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
         $this->preserver->preserveEveApi($dataMock);
     }
     /**
      *
      */
-    public function testPreserveEveApiThrowsYapealPreserverFileExceptionWhenCanNotGetLock(
-    )
+    public function testPreserveEveApiLogsErrorForRelativePath()
+    {
+        $dataMock = $this->getDataMock();
+        $this->assertAttributeEmpty('cachePath', $this->preserver);
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Path NOT absolute missing drive or root was given '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $input = 'no/root/';
+        $this->preserver->setCachePath($input)
+                        ->preserveEveApi($dataMock);
+    }
+    /**
+     *
+     */
+    public function testPreserveEveApiLogsErrorWhenCachePathNotSet()
+    {
+        $dataMock = $this->getDataMock();
+        $this->assertAttributeEmpty('cachePath', $this->preserver);
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Tried to access $cachePath before it was set'
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if ($exception->getMessage()
+                                == $message
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $this->preserver->preserveEveApi($dataMock);
+    }
+    /**
+     *
+     */
+    public function testPreserveEveApiLogsErrorWhenCanNotGetLock()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
@@ -175,15 +324,38 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
                  ->will($this->returnValue(array('dummy' => 'amount')));
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Giving up could NOT get flock on '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
         $lock =
             $filesystem->url() . '/cache/account/test' . $hash . '.tmp';
         $handle = fopen($lock, 'rb+');
         flock($handle, LOCK_EX);
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverFileException',
-            null,
-            2
-        );
         $this->preserver->preserveEveApi($dataMock);
         flock($handle, LOCK_UN);
         fclose($handle);
@@ -191,8 +363,7 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function testPreserveEveApiThrowsYapealPreserverFileExceptionWhenCanNotWriteTmp(
-    )
+    public function testPreserveEveApiLogsErrorWhenCanNotWriteTmp()
     {
         $dataMock = $this->getDataMock();
         $filesystem = $this->getVfsStream();
@@ -217,45 +388,34 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
                  ->will($this->returnValue('Not XML'));
         $filesystem->getChild($tmp)
                    ->chmod(0444);
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverFileException',
-            null,
-            1
-        );
-        $this->preserver->preserveEveApi($dataMock);
-    }
-    /**
-     *
-     */
-    public function testPreserveEveApiThrowsYapealPreserverPathExceptionForAboveRootPath(
-    )
-    {
-        $dataMock = $this->getDataMock();
-        $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverPathException',
-            null,
-            1
-        );
-        $input = '/good/gone/../../../bad/';
-        $this->preserver->setCachePath($input);
-        $this->preserver->preserveEveApi($dataMock);
-    }
-    /**
-     *
-     */
-    public function testPreserveEveApiThrowsYapealPreserverPathExceptionForRelativePath(
-    )
-    {
-        $dataMock = $this->getDataMock();
-        $this->assertAttributeEmpty('cachePath', $this->preserver);
-        $this->setExpectedException(
-            '\Yapeal\Exception\YapealPreserverPathException',
-            null,
-            1
-        );
-        $input = 'no/root/';
-        $this->preserver->setCachePath($input);
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Giving up could NOT finish writing '
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    $message
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
         $this->preserver->preserveEveApi($dataMock);
     }
     /**
@@ -327,6 +487,45 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
+    public function testRetrieveEveApiLogsErrorForAboveRootPath()
+    {
+        $dataMock = $this->getDataMock();
+        $this->assertAttributeEmpty('cachePath', $this->preserver);
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function ($subject) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if (false !== strpos(
+                                    $exception->getMessage(),
+                                    'Can NOT go above root path but given '
+                                )
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $input = '/good/gone/../../../bad/';
+        $this->assertSame(
+            $dataMock,
+            $this->preserver->setCachePath($input)
+                            ->preserveEveApi($dataMock)
+        );
+    }
+    /**
+     *
+     */
     public function testSetCachePath()
     {
         $filesystem = $this->getVfsStream();
@@ -358,6 +557,10 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expect, 'cachePath', $this->preserver);
     }
     /**
+     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
+    /**
      * @var EveApiXmlFileCachePreserver
      */
     protected $preserver;
@@ -370,6 +573,16 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
                          ->disableOriginalConstructor()
                          ->getMock();
         return $dataMock;
+    }
+    /**
+     * @return LoggerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLoggerMock()
+    {
+        $loggerMock = $this->getMockBuilder('Psr\Log\NullLogger')
+                           ->disableOriginalConstructor()
+                           ->getMock();
+        return $loggerMock;
     }
     /**
      * @throws \InvalidArgumentException

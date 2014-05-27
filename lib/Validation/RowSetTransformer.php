@@ -28,13 +28,28 @@
  */
 namespace Yapeal\Validation;
 
+use Yapeal\Dependency\DependenceAwareInterface;
+use Yapeal\Dependency\DependenceInterface;
+use Yapeal\Xml\ProcessorInterface;
+use Yapeal\Xml\ReaderInterface;
+
 /**
  * Class RowSetTransformer
  */
-class RowSetTransformer
+class RowSetTransformer implements DependenceAwareInterface
 {
     /**
-     * @param null|string|\XSLTProcessor $value
+     * @param DependenceInterface|null $depend
+     *
+     * @return self
+     */
+    public function setDependenceContainer(DependenceInterface $depend = null)
+    {
+        $this->dependenceContainer = $depend;
+        return $this;
+    }
+    /**
+     * @param null|string|ProcessorInterface $value
      *
      * @return self
      */
@@ -44,7 +59,7 @@ class RowSetTransformer
         return $this;
     }
     /**
-     * @param null|string|\XmlReader $value
+     * @param null|string|ReaderInterface $value
      *
      * @return self
      */
@@ -54,25 +69,66 @@ class RowSetTransformer
         return $this;
     }
     /**
+     * @var DependenceInterface|null
+     */
+    protected $dependenceContainer;
+    /**
      * @var \XSLTProcessor|string|null
      */
     protected $processor;
     /**
-     * @var \XmlReader|string|null
+     * @var ReaderInterface|string|null
      */
     protected $reader;
     /**
-     * @return null|string|\XSLTProcessor
+     * @throws \LogicException
+     * @return null|DependenceInterface
+     */
+    protected function getDependenceContainer()
+    {
+        if (empty($this->dependenceContainer)) {
+            $mess = 'Tried to use dependenceContainer when NOT set';
+            throw new \LogicException($mess);
+        }
+        return $this->dependenceContainer;
+    }
+    /**
+     * @throws \LogicException
+     * @return null|string|ProcessorInterface
      */
     protected function getProcessor()
     {
+        if (empty($this->processor)) {
+            $mess = 'Tried to use processor when NOT set';
+            throw new \LogicException($mess);
+        }
+        if (is_string($this->processor)) {
+        }
         return $this->processor;
     }
     /**
-     * @return null|string|\XmlReader
+     * @throws \LogicException
+     * @return null|string|ReaderInterface
      */
     protected function getReader()
     {
+        if (empty($this->reader)) {
+            $mess = 'Tried to use $reader when it was NOT set';
+            throw new \LogicException($mess);
+        } elseif (is_string($this->reader)) {
+            $dependence = $this->getDependenceContainer();
+            if (empty($dependence[$this->reader])) {
+                $mess =
+                    'Dependence container does NOT contain ' . $this->reader;
+                throw new \DomainException($mess);
+            }
+            $this->reader = $dependence[$this->reader];
+        }
+        if (!$this->reader instanceof ReaderInterface) {
+            $mess = '$reader could NOT be resolved to instance of'
+                . ' ReaderInterface is instead ' . gettype($this->reader);
+            throw new \InvalidArgumentException($mess);
+        }
         return $this->reader;
     }
 }

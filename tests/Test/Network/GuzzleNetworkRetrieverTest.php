@@ -26,28 +26,80 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Test\Network;
+namespace Yapeal\Test\Network;
 
+use Guzzle\Http\Exception\RequestException;
+use Guzzle\Http\Message\RequestInterface;
+use Guzzle\Http\Message\Response;
 use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
 use Yapeal\Network\GuzzleNetworkRetriever;
-use Guzzle\Common\Exception\GuzzleException;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
 /**
  * Class GuzzleNetworkRetrieverTest
  */
-class GuzzleNetworkRetrieverTest extends \PHPUnit_Framework_TestCase
+class GuzzleNetworkRetrieverTest extends PHPUnit_Framework_TestCase
 {
+    public function setup()
+    {
+        $this->logger = $this->getLoggerMock();
+        $this->response = $this->getResponseMock();
+        $this->request = $this->getRequestMock();
+        $this->client = $this->getClientMock($this->request);
+        $this->retriever =
+            new GuzzleNetworkRetriever($this->logger, $this->client);
+    }
+    /**
+     *
+     */
+    public function testReadXmlDataLogsErrorForUnableToReceive()
+    {
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->anything()
+            );
+        $this->request->expects($this->atLeastOnce())
+                      ->method('send')
+                      ->will(
+                          $this->throwException(new RequestException('test'))
+                      );
+        $this->client->expects($this->atLeastOnce())
+                     ->method('post')
+                     ->will($this->returnValue($this->request));
+        $dataMock = $this->getDataMock();
+        $dataMock->expects($this->atLeastOnce())
+                 ->method('getEveApiSectionName')
+                 ->will($this->returnValue('account'));
+        $dataMock->expects($this->atLeastOnce())
+                 ->method('getEveApiName')
+                 ->will($this->returnValue('test'));
+        $dataMock->expects($this->atLeastOnce())
+                 ->method('getEveApiArguments')
+                 ->will($this->returnValue(array('dummy' => 'amount')));
+        $dataMock->expects($this->atLeastOnce())
+                 ->method('setEveApiXml')
+                 ->with(false);
+        $this->retriever->retrieveEveApi($dataMock);
+    }
     /**
      *
      */
     public function testRetrieveEveApi()
     {
-        $mockResponse = $this->getResponseMock();
-        $mockRequest = $this->getRequestMock($this->returnValue($mockResponse));
-        $mockClient = $this->getClientMock($mockRequest);
-        $retriever = new GuzzleNetworkRetriever($this->getLoggerMock(), $mockClient);
+        $this->response->expects($this->atLeastOnce())
+                       ->method('getBody')
+                       ->will($this->returnValue('Not XML'));
+        $this->request->expects($this->atLeastOnce())
+                      ->method('send')
+                      ->will($this->returnValue($this->response));
+        $this->client->expects($this->atLeastOnce())
+                     ->method('post')
+                     ->will($this->returnValue($this->request));
         $dataMock = $this->getDataMock();
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiSectionName')
@@ -61,9 +113,38 @@ class GuzzleNetworkRetrieverTest extends \PHPUnit_Framework_TestCase
         $dataMock->expects($this->atLeastOnce())
                  ->method('setEveApiXml')
                  ->with('Not XML');
-        $retriever->retrieveEveApi($dataMock);
+        $this->retriever->retrieveEveApi($dataMock);
     }
-
+    /**
+     * @type \Guzzle\Http\ClientInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $client;
+    /**
+     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
+    /**
+     * @type RequestInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $request;
+    /**
+     * @type Response|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $response;
+    /**
+     * @var GuzzleNetworkRetriever
+     */
+    protected $retriever;
+    /**
+     * @throws \PHPUnit_Framework_Exception
+     * @return \Guzzle\Http\ClientInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getClientMock()
+    {
+        $mockClient = $this->getMockBuilder('\Guzzle\Http\ClientInterface')
+                           ->getMock();
+        return $mockClient;
+    }
     /**
      * @return EveApiXmlDataInterface|PHPUnit_Framework_MockObject_MockObject
      */
@@ -73,29 +154,6 @@ class GuzzleNetworkRetrieverTest extends \PHPUnit_Framework_TestCase
                          ->disableOriginalConstructor()
                          ->getMock();
         return $dataMock;
-    }
-    /**
-     * @expectedException /Exception
-     */
-    public function testReadXmlDataGuzzleException()
-    {
-        $mockRequest = $this->getRequestMock($this->throwException(new \Exception('test')));
-        $mockClient = $this->getClientMock($mockRequest);
-        $retriever = new GuzzleNetworkRetriever($this->getLoggerMock(), $mockClient);
-        $dataMock = $this->getDataMock();
-                $dataMock->expects($this->atLeastOnce())
-                         ->method('getEveApiSectionName')
-                         ->will($this->returnValue('account'));
-                $dataMock->expects($this->atLeastOnce())
-                         ->method('getEveApiName')
-                         ->will($this->returnValue('test'));
-                $dataMock->expects($this->atLeastOnce())
-                         ->method('getEveApiArguments')
-                         ->will($this->returnValue(array('dummy' => 'amount')));
-                $dataMock->expects($this->atLeastOnce())
-                         ->method('setEveApiXml')
-                         ->with(false);
-        $retriever->retrieveEveApi($dataMock);
     }
     /**
      * @return LoggerInterface|PHPUnit_Framework_MockObject_MockObject
@@ -108,43 +166,26 @@ class GuzzleNetworkRetrieverTest extends \PHPUnit_Framework_TestCase
         return $loggerMock;
     }
     /**
-     * @return PHPUnit_Framework_MockObject_MockObject
+     * @throws \PHPUnit_Framework_Exception
+     * @return RequestInterface|PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getResponseMock() {
-        $mockResponse = $this->getMockBuilder('\Guzzle\Http\Message\Response')->disableOriginalConstructor()->getMock();
-        $mockResponse->expects($this->atLeastOnce())
-                     ->method('getBody')
-                     ->will($this->returnValue('Not XML'));
-
-        return $mockResponse;
-    }
-    /**
-     * @param $mockResponse
-     *
-     * @return PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getRequestMock($mockResponse)
+    protected function getRequestMock()
     {
-        $mockRequest =$this->getMockBuilder('\Guzzle\Http\Message\RequestInterface')
-                            ->disableOriginalConstructor()
-                            ->getMock();
-        $mockRequest->expects($this->atLeastOnce())
-                    ->method('send')
-                    ->will($mockResponse);
+        $mockRequest =
+            $this->getMockBuilder('\Guzzle\Http\Message\RequestInterface')
+                 ->disableOriginalConstructor()
+                 ->getMock();
         return $mockRequest;
     }
     /**
-     * @param $mockRequest
-     *
-     * @return PHPUnit_Framework_MockObject_MockObject
+     * @throws \PHPUnit_Framework_Exception
+     * @return Response|PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getClientMock($mockRequest)
+    protected function getResponseMock()
     {
-        $mockClient = $this->getMockBuilder('\Guzzle\Http\ClientInterface')
-                           ->getMock();
-        $mockClient->expects($this->atLeastOnce())
-                   ->method('post')
-                   ->will($this->returnValue($mockRequest));
-        return $mockClient;
+        $mockResponse = $this->getMockBuilder('\Guzzle\Http\Message\Response')
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        return $mockResponse;
     }
 }

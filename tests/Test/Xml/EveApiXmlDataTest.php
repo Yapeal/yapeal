@@ -35,35 +35,40 @@ use Yapeal\Xml\EveApiXmlData;
  */
 class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
 {
+    public function testEveApiArguments()
+    {
+        $data = new EveApiXmlData();
+        $this->assertAttributeEmpty('eveApiArguments', $data);
+        $arg = array('arg1' => 'test1', 'arg2' => 'test2');
+        $data->setEveApiArguments($arg);
+        $this->assertEquals($arg, $data->getEveApiArguments());
+    }
     public function testGetEveApiName()
     {
-        $data = new EveApiXmlData('test', 'eve', array(), false);
+        $data = new EveApiXmlData('test');
+        $this->assertEquals('test', $data->getEveApiName());
         $data->setEveApiName('accountList');
         $this->assertEquals('accountList', $data->getEveApiName());
     }
     public function testGetEveApiSectionName()
     {
-        $data = new EveApiXmlData('test', 'eve', array(), false);
+        $data = new EveApiXmlData('', 'eve');
+        $this->assertEquals('eve', $data->getEveApiSectionName());
         $data->setEveApiSectionName('char');
         $this->assertEquals('char', $data->getEveApiSectionName());
     }
     public function testGetEveApiXml()
     {
-        $data = new EveApiXmlData('test', 'eve', array(), false);
-        $this->assertEquals(false, $data->getEveApiXml());
-    }
-    public function testEveApiArguments()
-    {
-        $data = new EveApiXmlData('test', 'eve', array(), false);
-        $arg=array('arg1'=>'test1', 'arg2'=>'test2');
-        $data->setEveApiArguments($arg);
-        $this->assertEquals($arg, $data->getEveApiArguments());
+        $data = new EveApiXmlData();
+        $this->assertFalse($data->getEveApiXml());
     }
     public function testHasXmlRowSet()
     {
-        $data = new EveApiXmlData('test', 'eve', array(), false);
-        $this->assertEquals(false, $data->hasXmlRowSet(), 'EveApiXmlData::hasXmlRowSet did not return false'.$data->getEveApiXml());
+        $data = new EveApiXmlData();
+        $this->assertAttributeEquals('', 'eveApiXml', $data);
         $data->setEveApiXml('<rowset>');
-        //$this->assertEquals(true, $data->hasXmlRowSet(), 'EveApiXmlData::hasXmlRowSet did not return TRUE'.$data->getEveApiXml());
+        $this->assertAttributeEquals('<rowset>', 'eveApiXml', $data);
+        $this->assertTrue($data->hasXmlRowSet());
+
     }
 }

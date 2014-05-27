@@ -216,7 +216,7 @@ class EveApiXmlData implements EveApiXmlDataInterface
             $mess = 'Xml MUST be string but given ' . gettype($xml);
             throw new \InvalidArgumentException($mess);
         }
-        $this->eveApiName = $xml;
+        $this->eveApiXml = $xml;
         return $this;
     }
     /**

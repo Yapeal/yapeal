@@ -34,7 +34,6 @@ use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlData;
 use Yapeal\Xml\EveApiXmlDataInterface;
 
 /**
@@ -64,7 +63,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
     }
     /**
-     * @param EveApiXmlDataInterface|EveApiXmlData $data
+     * @param EveApiXmlDataInterface $data
      *
      * @return EveApiXmlDataInterface
      */

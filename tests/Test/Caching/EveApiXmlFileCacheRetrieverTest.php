@@ -49,6 +49,9 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
         $this->logger = $this->getLoggerMock();
         $this->retriever = new EveApiXmlFileCacheRetriever($this->logger, '');
     }
+    /**
+     *
+     */
     public function testRetrieveEveApiLogsErrorForAboveRootPath()
     {
         $dataMock = $this->getDataMock();
@@ -103,7 +106,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT a directory was given '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -112,7 +118,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Cache path is NOT a directory was given '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -123,12 +129,8 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                 )
             );
         $input = $filesystem->url() . '/cache';
-        $result = $this->retriever->setCachePath($input)
-                                  ->retrieveEveApi($dataMock);
-        $this->assertSame(
-            $dataMock,
-            $result
-        );
+        $this->retriever->setCachePath($input)
+                        ->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -150,7 +152,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT readable or does NOT exist was given '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -159,7 +164,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Cache path is NOT readable or does NOT exist was given '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -169,10 +174,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->retrieveEveApi($dataMock)
-        );
+        $this->retriever->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -200,7 +202,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Could NOT find accessible cache file was given '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -209,7 +214,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Could NOT find accessible cache file was given '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -220,11 +225,8 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                 )
             );
         $input = $filesystem->url() . '/cache';
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->setCachePath($input)
-                            ->retrieveEveApi($dataMock)
-        );
+        $this->retriever->setCachePath($input)
+                        ->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -246,7 +248,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Cache path is NOT readable or does NOT exist was given '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -255,7 +260,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Cache path is NOT readable or does NOT exist was given '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -265,10 +270,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->retrieveEveApi($dataMock)
-        );
+        $this->retriever->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -283,7 +285,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Path NOT absolute missing drive or root was given '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -292,7 +297,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Path NOT absolute missing drive or root was given '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -303,11 +308,8 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                 )
             );
         $input = 'no/root/';
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->setCachePath($input)
-                            ->retrieveEveApi($dataMock)
-        );
+        $this->retriever->setCachePath($input)
+                        ->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -316,32 +318,33 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
     {
         $dataMock = $this->getDataMock();
         $this->assertAttributeEmpty('cachePath', $this->retriever);
-        $this->logger->expects($this->atLeastOnce())
-                     ->method('info')
-                     ->with(
-                         'Could NOT get XML data',
-                         $this->callback(
-                             function ($subject) {
-                                 /**
-                                  * @type array $subject
-                                  */
-                                 if (isset($subject['exception'])) {
-                                     /** @type \Exception $exception */
-                                     $exception = $subject['exception'];
-                                     if ($exception->getMessage()
-                                         == 'Tried to access $cachePath before it was set'
-                                     ) {
-                                         return true;
-                                     }
-                                 }
-                                 return false;
-                             }
-                         )
-                     );
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->retrieveEveApi($dataMock)
-        );
+        $this->logger
+            ->expects($this->atLeastOnce())
+            ->method('info')
+            ->with(
+                'Could NOT get XML data',
+                $this->callback(
+                    function (
+                        $subject,
+                        $message = 'Tried to access $cachePath before it was set'
+                    ) {
+                        /**
+                         * @type array $subject
+                         */
+                        if (isset($subject['exception'])) {
+                            /** @type \Exception $exception */
+                            $exception = $subject['exception'];
+                            if ($exception->getMessage()
+                                == $message
+                            ) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                )
+            );
+        $this->retriever->retrieveEveApi($dataMock);
     }
     /**
      *
@@ -370,7 +373,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             ->with(
                 'Could NOT get XML data',
                 $this->callback(
-                    function ($subject) {
+                    function (
+                        $subject,
+                        $message = 'Giving up could NOT get flock on '
+                    ) {
                         /**
                          * @type array $subject
                          */
@@ -379,7 +385,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                             $exception = $subject['exception'];
                             if (false !== strpos(
                                     $exception->getMessage(),
-                                    'Giving up could NOT get flock on '
+                                    $message
                                 )
                             ) {
                                 return true;
@@ -393,10 +399,9 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
             $filesystem->url() . '/cache/account/test' . $hash . '.xml';
         $handle = fopen($lock, 'ab+');
         flock($handle, LOCK_EX);
-        $result = $this->retriever->retrieveEveApi($dataMock);
+        $this->retriever->retrieveEveApi($dataMock);
         flock($handle, LOCK_UN);
         fclose($handle);
-        $this->assertSame($dataMock, $result);
     }
     /**
      *

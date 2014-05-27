@@ -28,6 +28,8 @@
  */
 namespace Yapeal\Caching;
 
+use Psr\Log\LoggerInterface;
+use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
 use Yapeal\Exception\YapealPreserverPathException;
 use Yapeal\Xml\EveApiPreserverInterface;
@@ -39,12 +41,14 @@ use Yapeal\Xml\EveApiXmlDataInterface;
 class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
 {
     /**
-     * @param string|null $cachePath
+     * @param LoggerInterface $logger
+     * @param string|null     $cachePath
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($cachePath = null)
+    public function __construct(LoggerInterface $logger, $cachePath = null)
     {
+        $this->setLogger($logger);
         $this->setCachePath($cachePath);
     }
     /**
@@ -67,20 +71,23 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
      */
     public function preserveEveApi(EveApiXmlDataInterface $data)
     {
-        $cachePath =
-            $this->getNormalizedCachePath() . $data->getEveApiSectionName();
-        $this->checkUsableCachePath($cachePath);
-        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
-        foreach ($data->getEveApiArguments() as $key => $value) {
-            $hash .= $key . $value;
+        try {
+            $cachePath =
+                $this->getNormalizedCachePath($data->getEveApiSectionName());
+            $this->checkUsableCachePath($cachePath);
+            $hash = $this->getHash($data);
+            // Insures retriever never see partly written file by using temp file.
+            $cacheTemp = $cachePath . $data->getEveApiName() . $hash . '.tmp';
+            $this->prepareConnection($cacheTemp)
+                 ->writeXmlData($data->getEveApiXml(), $cacheTemp)
+                 ->__destruct();
+        } catch (YapealPreserverException $exp) {
+            $mess = 'Could NOT get XML data';
+            $this->getLogger()
+                 ->info($mess, array('exception' => $exp));
+            return $data;
         }
-        $hash = hash('md5', $hash);
-        // Insures retriever never see partly written file by using temp file.
-        $cacheTemp = $cachePath . '/' . $data->getEveApiName() . $hash . '.tmp';
-        $this->prepareConnection($cacheTemp)
-             ->writeXmlData($data->getEveApiXml(), $cacheTemp)
-             ->__destruct();
-        $cacheFile = $cachePath . '/' . $data->getEveApiName() . $hash . '.xml';
+        $cacheFile = $cachePath . $data->getEveApiName() . $hash . '.xml';
         rename($cacheTemp, $cacheFile);
         return $this;
     }
@@ -88,7 +95,6 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
      * @param string|null $value
      *
      * @throws \InvalidArgumentException
-     * @throws YapealPreserverPathException
      * @return self
      */
     public function setCachePath($value = null)
@@ -104,6 +110,18 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         return $this;
     }
     /**
+     * Sets a logger instance on the object
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return self
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+    /**
      * @var string
      */
     protected $cachePath;
@@ -111,6 +129,10 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
      * @var resource|false File handle
      */
     protected $handle;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
     /**
      * @param $cachePath
      *
@@ -174,18 +196,42 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         return $this->handle;
     }
     /**
+     * @param EveApiXmlDataInterface $data
+     *
+     * @return string
+     */
+    protected function getHash(EveApiXmlDataInterface $data)
+    {
+        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
+        foreach ($data->getEveApiArguments() as $key => $value) {
+            $hash .= $key . $value;
+        }
+        $hash = hash('md5', $hash);
+        return $hash;
+    }
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->logger;
+    }
+    /**
+     * @param string $sectionName
+     *
      * @throws \LogicException
      * @throws YapealPreserverPathException
      * @return string
      */
-    protected function getNormalizedCachePath()
+    protected function getNormalizedCachePath($sectionName)
     {
         if (empty($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
-            throw new \LogicException($mess);
+            throw new YapealPreserverPathException($mess);
         }
         $absoluteRequired = true;
-        $path = str_replace('\\', '/', $this->cachePath);
+        $cachePath = $this->cachePath . '/' . $sectionName;
+        $path = str_replace('\\', '/', $cachePath);
         // Optional wrapper(s).
         $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
         // Optional root prefix.
@@ -202,7 +248,7 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         if ($absoluteRequired && empty($parts['root'])) {
             $mess =
                 'Path NOT absolute missing drive or root was given ' . $path;
-            throw new YapealPreserverPathException($mess, 1);
+            throw new YapealPreserverPathException($mess);
         }
         $root = $parts['root'];
         $parts = $this->cleanPartsPath($parts['path']);
@@ -228,7 +274,7 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
                 $mess = 'Giving up could NOT get flock on ' . $cacheFile;
-                throw new YapealPreserverFileException($mess, 2);
+                throw new YapealPreserverFileException($mess);
             }
             // Wait 0.1 to 0.5 seconds before trying again.
             usleep(rand(100000, 500000));
@@ -252,7 +298,7 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
                 $mess = 'Giving up could NOT finish writing  ' . $cacheFile;
-                throw new YapealPreserverFileException($mess, 1);
+                throw new YapealPreserverFileException($mess);
             }
             $written = fwrite($this->getHandle(), $xml);
             // Decrease $tries while making progress but NEVER $tries < 1.

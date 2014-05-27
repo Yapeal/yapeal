@@ -28,12 +28,11 @@
  */
 namespace Yapeal\Network;
 
-use Guzzle\Common\Exception\GuzzleException;
 use Guzzle\Http\ClientInterface;
+use Guzzle\Http\Exception\RequestException;
 use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlData;
 use Yapeal\Xml\EveApiXmlDataInterface;
@@ -71,16 +70,9 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
      */
     public function retrieveEveApi(EveApiXmlDataInterface $data)
     {
-        try {
-            $result = $this->readXmlData($this->prepareConnection($data));
-            $data->setEveApiXml($result);
-            $this->__destruct();
-        } catch (YapealRetrieverException $exp) {
-            $mess = 'Could NOT get XML data';
-            $this->getLogger()
-                 ->info($mess);
-            return $data;
-        }
+        $result = $this->readXmlData($this->prepareConnection($data));
+        $data->setEveApiXml($result);
+        $this->__destruct();
         return $data->setEveApiXml($result);
     }
     /**
@@ -134,10 +126,15 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
      */
     protected function prepareConnection(EveApiXmlDataInterface $data)
     {
-        $uri = array('/{EveApiSectionName}/{EveApiName}.xml.aspx', array('EveApiSectionName'=>$data->getEveApiSectionName(), 'EveApiName'=>$data->getEveApiName()));
+        $uri = array(
+            '/{EveApiSectionName}/{EveApiName}.xml.aspx',
+            array(
+                'EveApiSectionName' => $data->getEveApiSectionName(),
+                'EveApiName' => $data->getEveApiName()
+            )
+        );
         $client = $this->getClient();
-        return $client->post($uri, NULL, $data->getEveApiArguments());
-
+        return $client->post($uri, null, $data->getEveApiArguments());
     }
     /**
      * @param \Guzzle\Http\Message\RequestInterface $request
@@ -148,12 +145,12 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
         try {
             $response = $request->send();
-        } catch (\Exception $exc) {
-            $mess = 'There was an HTTP Error '. $exc->getMessage();
-            $this->getLogger()->info($mess);
+        } catch (RequestException $exp) {
+            $mess = 'Could NOT get XML data';
+            $this->getLogger()
+                 ->info($mess, array('exception' => $exp));
             return false;
         }
-        return  $response->getBody(true);
-
+        return $response->getBody(true);
     }
 }

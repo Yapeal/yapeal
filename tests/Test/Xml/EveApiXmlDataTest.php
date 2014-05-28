@@ -32,17 +32,51 @@ use Yapeal\Xml\EveApiXmlData;
 
 /**
  * Class EveApiXmlDataTest
+ *
+ * @property EveApiXmlData EveApiXmlData
  */
 class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     *
+     */
+    public function setUp()
+    {
+        $this->EveApiXmlData = new EveApiXmlData();
+    }
+    /**
+     *
+     */
     public function testEveApiArguments()
     {
-        $data = new EveApiXmlData();
-        $this->assertAttributeEmpty('eveApiArguments', $data);
+        $this->assertAttributeEmpty('eveApiArguments', $this->EveApiXmlData);
+        $arg = array();
+        $this->assertEquals($arg, $this->EveApiXmlData->getEveApiArguments());
         $arg = array('arg1' => 'test1', 'arg2' => 'test2');
-        $data->setEveApiArguments($arg);
-        $this->assertEquals($arg, $data->getEveApiArguments());
+        $this->EveApiXmlData->setEveApiArguments($arg);
+        $this->assertEquals($arg, $this->EveApiXmlData->getEveApiArguments());
     }
+    /**
+     *
+     */
+    public function testAddEveApiArgumentExceptionValue()
+    {
+        $test = (int)20;
+        $this->setExpectedException('InvalidArgumentException');
+        $this->EveApiXmlData->addEveApiArgument('test', $test);
+    }
+    /**
+     *
+     */
+    public function testAddEveApiArgumentExceptionName()
+    {
+        $test = (int)20;
+        $this->setExpectedException('InvalidArgumentException');
+        $this->EveApiXmlData->addEveApiArgument($test, 'test');
+    }
+    /**
+     *
+     */
     public function testGetEveApiName()
     {
         $data = new EveApiXmlData('test');
@@ -50,6 +84,17 @@ class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
         $data->setEveApiName('accountList');
         $this->assertEquals('accountList', $data->getEveApiName());
     }
+    /**
+     *
+     */
+    public function testGetEveApiNameException()
+    {
+        $this->setExpectedException('LogicException');
+        $this->EveApiXmlData->getEveApiName();
+    }
+    /**
+     *
+     */
     public function testGetEveApiSectionName()
     {
         $data = new EveApiXmlData('', 'eve');
@@ -57,18 +102,71 @@ class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
         $data->setEveApiSectionName('char');
         $this->assertEquals('char', $data->getEveApiSectionName());
     }
+    /**
+     *
+     */
+    public function testGetEveApiSectionNameException()
+    {
+        $this->setExpectedException('LogicException');
+        $this->EveApiXmlData->getEveApiSectionName();
+    }
+    /**
+     *
+     */
     public function testGetEveApiXml()
     {
-        $data = new EveApiXmlData();
-        $this->assertFalse($data->getEveApiXml());
+        $this->assertFalse($this->EveApiXmlData->getEveApiXml());
     }
+    /**
+     *
+     */
     public function testHasXmlRowSet()
     {
-        $data = new EveApiXmlData();
-        $this->assertAttributeEquals('', 'eveApiXml', $data);
-        $data->setEveApiXml('<rowset>');
-        $this->assertAttributeEquals('<rowset>', 'eveApiXml', $data);
-        $this->assertTrue($data->hasXmlRowSet());
-
+        $this->assertAttributeEquals('', 'eveApiXml', $this->EveApiXmlData);
+        $this->assertFalse($this->EveApiXmlData->hasXmlRowSet());
+        $this->EveApiXmlData->setEveApiXml('<rowset>');
+        $this->assertAttributeEquals(
+             '<rowset>',
+                 'eveApiXml',
+                 $this->EveApiXmlData
+        );
+        $this->assertTrue($this->EveApiXmlData->hasXmlRowSet());
+    }
+    /**
+     *
+     */
+    public function testToString()
+    {
+        $this->assertAttributeEquals('', 'eveApiXml', $this->EveApiXmlData);
+        //$this->assertEquals('', (string) $this->EveApiXmlData);
+        $data = new EveApiXmlData('', 'eve', array(), 'test');
+        $this->assertEquals('test', $data);
+    }
+    /**
+     *
+     */
+    public function testSetEveApiNameException()
+    {
+        $test = (int)20;
+        $this->setExpectedException('InvalidArgumentException');
+        $this->EveApiXmlData->setEveApiName($test);
+    }
+    /**
+     *
+     */
+    public function testSetEveApiSectionNameException()
+    {
+        $test = (int)20;
+        $this->setExpectedException('InvalidArgumentException');
+        $this->EveApiXmlData->setEveApiSectionName($test);
+    }
+    /**
+     *
+     */
+    public function testSetEveApiXmlException()
+    {
+        $test = (int)20;
+        $this->setExpectedException('InvalidArgumentException');
+        $this->EveApiXmlData->setEveApiXml($test);
     }
 }

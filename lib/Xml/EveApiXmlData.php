@@ -57,11 +57,7 @@ class EveApiXmlData implements EveApiXmlDataInterface
      */
     public function __toString()
     {
-        try {
-            return $this->getEveApiXml();
-        } catch (\LogicException $exc) {
-            return '';
-        }
+        return $this->eveApiXml;
     }
     /**
      * Used to add item to arguments list.

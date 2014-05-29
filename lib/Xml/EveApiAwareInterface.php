@@ -37,7 +37,7 @@ interface EveApiAwareInterface
      * Used to add item to arguments list.
      *
      * @param string $name
-     * @param string $value
+     * @param mixed  $value
      *
      * @return self
      */

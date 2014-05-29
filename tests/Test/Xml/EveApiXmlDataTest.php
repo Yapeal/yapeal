@@ -55,15 +55,6 @@ class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function testAddEveApiArgumentExceptionValue()
-    {
-        $test = (int)20;
-        $this->setExpectedException('InvalidArgumentException');
-        $this->data->addEveApiArgument('test', $test);
-    }
-    /**
-     *
-     */
     public function testEveApiArguments()
     {
         $this->assertAttributeEmpty('eveApiArguments', $this->data);

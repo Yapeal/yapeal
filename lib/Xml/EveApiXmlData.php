@@ -63,7 +63,7 @@ class EveApiXmlData implements EveApiXmlDataInterface
      * Used to add item to arguments list.
      *
      * @param string $name
-     * @param string $value
+     * @param mixed  $value
      *
      * @throws \InvalidArgumentException
      * @return self
@@ -74,11 +74,7 @@ class EveApiXmlData implements EveApiXmlDataInterface
             $mess = 'Name MUST be string but given ' . gettype($name);
             throw new \InvalidArgumentException($mess);
         }
-        if (!is_string($value)) {
-            $mess = 'Value MUST be string but given ' . gettype($name);
-            throw new \InvalidArgumentException($mess);
-        }
-        $this->eveApiArguments[$name] = $value;
+        $this->eveApiArguments[$name] = (string)$value;
         return $this;
     }
     /**
@@ -216,7 +212,7 @@ class EveApiXmlData implements EveApiXmlDataInterface
         return $this;
     }
     /**
-     * @var string
+     * @type string[]
      */
     protected $eveApiArguments;
     /**

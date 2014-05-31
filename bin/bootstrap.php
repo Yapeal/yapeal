@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * Contains Yapeal Console.
@@ -29,11 +28,20 @@
  */
 namespace Yapeal;
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
-use Symfony\Component\Console\Application;
-use Yapeal\Console\Command\EveApiRetriever;
+/*
+* Find auto loader from one of
+* vendor/bin/
+* OR ./
+* OR bin/
+* OR lib/PhpEOL/
+* OR vendor/PhpEOL/PhpEOL/bin/
+*/
+use Yapeal\Dependency\PimpleContainer;
 
-$cwd = getcwd();
-$application = new Application('Yapeal Console', '0.0.1');
-$application->add(new EveApiRetriever('Network:Catcher', $cwd));
-$application->run();
+(@include_once dirname(__DIR__) . '/autoload.php')
+|| (@include_once __DIR__ . '/vendor/autoload.php')
+|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
+|| die('Could not find required auto class loader. Aborting ...');
+$container = new PimpleContainer();

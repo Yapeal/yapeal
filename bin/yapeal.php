@@ -30,10 +30,3 @@
 namespace Yapeal;
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
-use Symfony\Component\Console\Application;
-use Yapeal\Console\Command\EveApiRetriever;
-
-$cwd = getcwd();
-$application = new Application('Yapeal Console', '0.0.1');
-$application->add(new EveApiRetriever('Network:Catcher', $cwd));
-$application->run();

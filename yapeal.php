@@ -32,6 +32,9 @@
  * @link       http://www.eveonline.com/
  * @since      revision 561
  */
+
+require_once __DIR__ . '/bin/bootstrap.php';
+
 use Monolog as ML;
 use Monolog\Handler as MLH;
 use Yapeal\Caching\EveApiXmlCache;
@@ -44,20 +47,6 @@ use Yapeal\Dependency\PimpleContainer;
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
 // Include Composer's auto-loader for all the classes that are being moved.
-/*
- * Find auto loader from one of
- * vendor/bin/
- * OR ./
- * OR bin/
- * OR lib/Yapeal/
- * OR vendor/yapeal/yapeal/bin/
- */
-(@include_once dirname(__DIR__) . '/autoload.php')
-|| (@include_once __DIR__ . '/vendor/autoload.php')
-|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
-|| die('Could not find required auto class loader. Aborting ...');
 // IDE only seems to like this form for path since need for this loader is going
 // away ASAP not worrying about it.
 require_once __DIR__ . '/bin' . '/YapealAutoLoad.php';

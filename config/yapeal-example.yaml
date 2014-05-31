@@ -1,0 +1,12 @@
+---
+Yapeal:
+    parameters:
+        logger.class: "Monolog\Monolog"
+        logger.name: "yapeal"
+    services:
+      logger:
+        class: %logger.class%
+        arguments:
+            - %logger.name%
+            -
+...

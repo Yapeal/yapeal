@@ -17,33 +17,26 @@ CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}accountAPIKeyInfo` (
     `keyID`      BIGINT(20) UNSIGNED NOT NULL,
     `accessMask` BIGINT(20) UNSIGNED NOT NULL,
     `expires`    DATETIME            NOT NULL DEFAULT '2038-01-19 03:14:07',
-    `type`       ENUM('Account', 'Character', 'Corporation')
-                 CHARACTER SET ascii NOT NULL,
+    `type` ENUM('Account', 'Character', 'Corporation') NOT NULL,
     PRIMARY KEY (`keyID`)
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
+    DEFAULT CHARSET =ascii;
 ALTER TABLE `{database}`.`{table_prefix}accountAPIKeyInfo` ADD INDEX `accountAPIKeyInfo1`  (`type`);
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}accountCharacters`;
 CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}accountCharacters` (
-    `characterID`     BIGINT(20) UNSIGNED     NOT NULL,
-    `characterName`   VARCHAR(255)
-                      COLLATE utf8_unicode_ci NOT NULL,
-    `corporationID`   BIGINT(20) UNSIGNED     NOT NULL,
-    `corporationName` VARCHAR(255)
-                      COLLATE utf8_unicode_ci NOT NULL,
-    `allianceID`      BIGINT(20) UNSIGNED     NOT NULL,
-    `allianceName`    VARCHAR(255)
-                      COLLATE utf8_unicode_ci NOT NULL,
-    `factionID`       BIGINT(20) UNSIGNED     NOT NULL,
-    `factionName`     VARCHAR(255)
-                      COLLATE utf8_unicode_ci NOT NULL,
+    `characterID`     BIGINT(20) UNSIGNED NOT NULL,
+    `characterName`   CHAR(24)            NOT NULL,
+    `corporationID`   BIGINT(20) UNSIGNED NOT NULL,
+    `corporationName` CHAR(50)            NOT NULL,
+    `allianceID`      BIGINT(20) UNSIGNED NOT NULL,
+    `allianceName`    CHAR(50)            NOT NULL,
+    `factionID`       BIGINT(20) UNSIGNED NOT NULL,
+    `factionName`     CHAR(24)            NOT NULL,
     PRIMARY KEY (`characterID`)
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
+    DEFAULT CHARSET =ascii;
 ALTER TABLE `{database}`.`{table_prefix}accountCharacters` ADD INDEX `accountCharacters1`  (`corporationID`);
 DROP TABLE IF EXISTS `{database}`.`{table_prefix}accountKeyBridge`;
 CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}accountKeyBridge` (
@@ -51,7 +44,5 @@ CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}accountKeyBridge` (
     `characterID` BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY (`keyID`, `characterID`)
 )
-    ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
+    ENGINE =InnoDB;
 ALTER TABLE `{database}`.`{table_prefix}accountKeyBridge` ADD UNIQUE INDEX `accountKeyBridge1`  (`characterID`, `keyID`);

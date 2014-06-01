@@ -72,6 +72,15 @@ class corpMemberTracking extends ACorp
         $this->api = str_replace($this->section, '', __CLASS__);
         $params['extended'] = 1;
         parent::__construct($params);
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
     }// function __construct
     /**
      * Method used to prepare database table(s) before parsing API XML data.

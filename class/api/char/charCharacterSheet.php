@@ -72,7 +72,7 @@ class charCharacterSheet extends AChar
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Used to store XML to CharacterSheet's attributeEnhancers table.
      *
@@ -130,7 +130,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }// function __construct
     /**
      * Handles attributes table.
      *
@@ -173,6 +173,15 @@ class charCharacterSheet extends AChar
             'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
         Logger::getLogger('yapeal')
               ->warn($mess);
+        return false;
+    }// function parserAPI
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
         return false;
     }// function attributes
     /**

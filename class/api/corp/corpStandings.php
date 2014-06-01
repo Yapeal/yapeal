@@ -72,7 +72,16 @@ class corpStandings extends ACorp
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
     /**
      * Per API parser for XML.
      *
@@ -124,7 +133,7 @@ class corpStandings extends ACorp
               ->warn($mess);
         return false;
     }// function parserAPI
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -155,7 +164,7 @@ class corpStandings extends ACorp
         }; // foreach $tables ...
         return true;
     }// function rowset
-/**
+    /**
      * Used to store XML to rowset tables.
      *
      * @param string $table Name of the table for this rowset.

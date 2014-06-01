@@ -197,7 +197,7 @@ class corpWalletTransactions extends ACorp
         /**
      * @var string Holds the date from each row in turn to use when walking.
      */
-    protected $date;// function __construct
+    protected $date;
         /**
      * Parsers the XML from API.
      *
@@ -211,6 +211,8 @@ class corpWalletTransactions extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         // Set any column defaults needed.
         $defaults = array(
             'accountKey' => $this->account,

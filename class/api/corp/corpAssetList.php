@@ -184,7 +184,7 @@ class corpAssetList extends ACorp
         // Get a new query instance.
         $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->qb->useUpsert(false);
+        $this->qb->useUpsert($this->needsUpsert());
         // Set any column defaults needed.
         $this->qb->setDefault('ownerID', $this->ownerID);
         $this->qb->setDefault('rawQuantity', 0);

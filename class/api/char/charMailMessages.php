@@ -85,6 +85,8 @@ class charMailMessages extends AChar
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         // Set any column defaults needed.
         $qb->setDefault('ownerID', $this->ownerID);
         try {

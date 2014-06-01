@@ -276,28 +276,28 @@ class corpStarbaseDetail extends ACorp
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefaults($defaults);
         // Get a new query instance.
         $this->combat = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->combat->useUpsert(false);
+        $this->combat->useUpsert($this->needsUpsert());
         $this->combat->setDefaults($defaults);
         // Get a new query instance.
         $this->fuel = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->fuel->useUpsert(false);
+        $this->fuel->useUpsert($this->needsUpsert());
         $this->fuel->setDefaults($defaults);
         // Get a new query instance.
         $this->general = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->general->useUpsert(false);
+        $this->general->useUpsert($this->needsUpsert());
         $this->general->setDefaults($defaults);
         try {
             $ret = true;

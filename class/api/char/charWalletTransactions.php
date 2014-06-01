@@ -194,6 +194,8 @@ class charWalletTransactions extends AChar
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance with autoStore off.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         // Set any column defaults needed.
         $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
         $qb->setDefaults($defaults);
@@ -252,6 +254,5 @@ class charWalletTransactions extends AChar
               ->warn($mess);
         return false;
     }
-    // function parserAPI
 }
 

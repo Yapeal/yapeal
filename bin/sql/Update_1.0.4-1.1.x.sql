@@ -1,20 +1,21 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilAccessMask`;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilCachedInterval`;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilSections`;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilEveApi`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilEveApi` (
-    `api`      CHAR(32)            NOT NULL,
-    `interval` INT(10) UNSIGNED    NOT NULL,
-    `isActive` TINYINT(1)          NOT NULL,
-    `mask`     BIGINT(20) UNSIGNED NOT NULL,
-    `section`  CHAR(8)             NOT NULL,
-    PRIMARY KEY (`api`, `section`)
+SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
+SET SESSION TIME_ZONE = '+00:00';
+SET NAMES UTF8;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilAccessMask";
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedInterval";
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilSections";
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
+    "api"      CHAR(32)            NOT NULL,
+    "interval" INT(10) UNSIGNED    NOT NULL,
+    "isActive" TINYINT(1)          NOT NULL,
+    "mask"     BIGINT(20) UNSIGNED NOT NULL,
+    "section"  CHAR(8)             NOT NULL,
+    PRIMARY KEY ("api", "section")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-INSERT INTO `{database}`.`{table_prefix}utilEveApi` (`section`, `api`, `mask`, `interval`, `isActive`)
+INSERT INTO "{database}"."{table_prefix}utilEveApi" ("section", "api", "mask", "interval", "isActive")
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
     ('account', 'APIKeyInfo', 1, 300, 1),

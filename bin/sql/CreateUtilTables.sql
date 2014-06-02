@@ -1,27 +1,28 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilCachedUntil`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilCachedUntil` (
-    `ownerID`     BIGINT(20) UNSIGNED NOT NULL,
-    `api`     CHAR(32) NOT NULL,
-    `cachedUntil` DATETIME            NOT NULL,
-    `section` CHAR(8)  NOT NULL,
-    PRIMARY KEY (`ownerID`, `api`)
+SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
+SET SESSION TIME_ZONE = '+00:00';
+SET NAMES UTF8;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
+    "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
+    "api"         CHAR(32)            NOT NULL,
+    "cachedUntil" DATETIME            NOT NULL,
+    "section"     CHAR(8)             NOT NULL,
+    PRIMARY KEY ("ownerID", "api")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilEveApi`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilEveApi` (
-    `api`      CHAR(32)            NOT NULL,
-    `interval` INT(10) UNSIGNED    NOT NULL,
-    `isActive` TINYINT(1)          NOT NULL,
-    `mask`     BIGINT(20) UNSIGNED NOT NULL,
-    `section`  CHAR(8)             NOT NULL,
-    PRIMARY KEY (`api`, `section`)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
+    "api"      CHAR(32)            NOT NULL,
+    "interval" INT(10) UNSIGNED    NOT NULL,
+    "isActive" TINYINT(1)          NOT NULL,
+    "mask"     BIGINT(20) UNSIGNED NOT NULL,
+    "section"  CHAR(8)             NOT NULL,
+    PRIMARY KEY ("api", "section")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-INSERT INTO `{database}`.`{table_prefix}utilEveApi` (`section`, `api`, `mask`, `interval`, `isActive`)
+INSERT INTO "{database}"."{table_prefix}utilEveApi" ("section", "api", "mask", "interval", "isActive")
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
     ('account', 'APIKeyInfo', 1, 300, 1),
@@ -94,79 +95,79 @@ VALUES
     ('map', 'Kills', 4, 3600, 1),
     ('map', 'Sovereignty', 8, 3600, 1),
     ('server', 'ServerStatus', 1, 180, 1);
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredCharacter`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredCharacter` (
-    `activeAPIMask` BIGINT(20) UNSIGNED DEFAULT NULL,
-    `characterID`   BIGINT(20) UNSIGNED NOT NULL,
-    `characterName` CHAR(24)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredCharacter";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCharacter" (
+    "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
+    "characterID"   BIGINT(20) UNSIGNED NOT NULL,
+    "characterName" CHAR(24)
                     COLLATE utf8_unicode_ci DEFAULT NULL,
-    `isActive`      TINYINT(1) DEFAULT NULL,
-    `proxy`         VARCHAR(255)
+    "isActive"      TINYINT(1) DEFAULT NULL,
+    "proxy"         VARCHAR(255)
                     COLLATE utf8_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`characterID`)
+    PRIMARY KEY ("characterID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredCorporation`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredCorporation` (
-    `activeAPIMask`   BIGINT(20) UNSIGNED DEFAULT NULL,
-    `corporationID`   BIGINT(20) UNSIGNED NOT NULL,
-    `corporationName` CHAR(50)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredCorporation";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCorporation" (
+    "activeAPIMask"   BIGINT(20) UNSIGNED DEFAULT NULL,
+    "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
+    "corporationName" CHAR(50)
                       COLLATE utf8_unicode_ci DEFAULT NULL,
-    `isActive`        TINYINT(1) DEFAULT NULL,
-    `proxy`           VARCHAR(255)
+    "isActive"        TINYINT(1) DEFAULT NULL,
+    "proxy"           VARCHAR(255)
                       COLLATE utf8_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`corporationID`)
+    PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredKey`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredKey` (
-    `activeAPIMask` BIGINT(20) UNSIGNED DEFAULT NULL,
-    `isActive`      TINYINT(1) DEFAULT NULL,
-    `keyID`         BIGINT(20) UNSIGNED NOT NULL,
-    `proxy`         VARCHAR(255) DEFAULT NULL,
-    `vCode`         VARCHAR(64)         NOT NULL,
-    PRIMARY KEY (`keyID`)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
+    "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
+    "isActive"      TINYINT(1) DEFAULT NULL,
+    "keyID"         BIGINT(20) UNSIGNED NOT NULL,
+    "proxy"         VARCHAR(255) DEFAULT NULL,
+    "vCode"         VARCHAR(64)         NOT NULL,
+    PRIMARY KEY ("keyID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-INSERT INTO `{database}`.`{table_prefix}utilRegisteredKey` (`activeAPIMask`, `isActive`, `keyID`, `proxy`, `vCode`)
+INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask", "isActive", "keyID", "proxy", "vCode")
 VALUES
     (8388608, 1, 1156, NULL, 'abc123');
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilRegisteredUploader`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilRegisteredUploader` (
-    `isActive`            TINYINT(1) DEFAULT NULL,
-    `key`                 VARCHAR(255) DEFAULT NULL,
-    `ownerID`             BIGINT(20) UNSIGNED NOT NULL,
-    `uploadDestinationID` BIGINT(20) UNSIGNED NOT NULL,
-    PRIMARY KEY (`ownerID`, `uploadDestinationID`)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredUploader";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredUploader" (
+    "isActive"            TINYINT(1) DEFAULT NULL,
+    "key"                 VARCHAR(255) DEFAULT NULL,
+    "ownerID"             BIGINT(20) UNSIGNED NOT NULL,
+    "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
+    PRIMARY KEY ("ownerID", "uploadDestinationID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilUploadDestination`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilUploadDestination` (
-    `isActive`            TINYINT(1) DEFAULT NULL,
-    `name`                VARCHAR(25) DEFAULT NULL,
-    `uploadDestinationID` BIGINT(20) UNSIGNED NOT NULL,
-    `url`                 VARCHAR(255) DEFAULT NULL,
-    PRIMARY KEY (`uploadDestinationID`)
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilUploadDestination";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilUploadDestination" (
+    "isActive"            TINYINT(1) DEFAULT NULL,
+    "name"                VARCHAR(25) DEFAULT NULL,
+    "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
+    "url"                 VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY ("uploadDestinationID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8;
-DROP TABLE IF EXISTS `{database}`.`{table_prefix}utilXmlCache`;
-CREATE TABLE IF NOT EXISTS `{database}`.`{table_prefix}utilXmlCache` (
-    `hash`     CHAR(40)  NOT NULL,
-    `api`      CHAR(32)  NOT NULL,
-    `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `section`  CHAR(8)   NOT NULL,
-    `xml`      LONGTEXT
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilXmlCache";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilXmlCache" (
+    "hash"     CHAR(40)  NOT NULL,
+    "api"      CHAR(32)  NOT NULL,
+    "modified" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    "section"  CHAR(8)   NOT NULL,
+    "xml"      LONGTEXT
                COLLATE utf8_unicode_ci,
-    PRIMARY KEY (`hash`)
+    PRIMARY KEY ("hash")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-ALTER TABLE `{database}`.`{table_prefix}utilXmlCache` ADD INDEX `utilXmlCache1`  (`section`);
-ALTER TABLE `{database}`.`{table_prefix}utilXmlCache` ADD INDEX `utilXmlCache2`  (`api`);
+ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache1" ("section");
+ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache2" ("api");

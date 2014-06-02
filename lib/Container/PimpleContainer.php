@@ -42,7 +42,7 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Dependency;
+namespace Yapeal\Container;
 
 use Pimple\Container;
 
@@ -52,6 +52,6 @@ use Pimple\Container;
  * @author Michael Cummings <mgcummings@yahoo.com>
  * @since  1.1.x-WIP
  */
-class PimpleContainer extends Container implements DependenceInterface
+class PimpleContainer extends Container implements ContainerInterface
 {
 }

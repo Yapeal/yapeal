@@ -28,9 +28,90 @@
  */
 namespace Yapeal;
 
+use PDO;
+use Yapeal\Container\ContainerInterface;
+use Yapeal\Container\WiringInterface;
+
 /**
  * Class Yapeal
  */
-class Yapeal
+class Yapeal implements WiringInterface
 {
+    /**
+     * @param ContainerInterface $dic
+     */
+    public function __construct(ContainerInterface $dic)
+    {
+        $this->setDic($dic);
+        $this->wire($this->getDic());
+    }
+    /**
+     * Starts Eve API processing
+     */
+    public function run()
+    {
+    }
+    /**
+     * @param ContainerInterface $value
+     *
+     * @return self
+     */
+    public function setDic(ContainerInterface $value)
+    {
+        $this->dic = $value;
+        return $this;
+    }
+    /**
+     * @param ContainerInterface $dic
+     */
+    public function wire(ContainerInterface $dic)
+    {
+        $dic['Yapeal.Database.Connection'] = function ($dic) {
+            if (empty($dic['Yapeal.Database.hostName'])) {
+                $dic['Yapeal.Database.hostName'] = 'localhost';
+            }
+            if (empty($dic['Yapeal.Database.userName'])) {
+                $dic['Yapeal.Database.userName'] = 'YapealUser';
+            }
+            if (empty($dic['Yapeal.Database.password'])) {
+                $dic['Yapeal.Database.password'] = 'secret';
+            }
+            $dsn = 'mysql:host=' . $dic['Yapeal.Database.hostName']
+                . ';charset=utf8';
+            if (!empty($dic['Yapeal.Database.port'])) {
+                $dsn .= ';port=' . $dic['Yapeal.Database.port'];
+            }
+            $database = new PDO(
+                $dsn,
+                $dic['Yapeal.Database.userName'],
+                $dic['Yapeal.Database.password']
+            );
+            $database->exec("set session sql_mode='ANSI,TRADITIONAL'");
+            $database->exec(
+                'set session transaction isolation level serializable'
+            );
+            $database->exec("set session time_zone='+00:00'");
+            $database->exec('set names utf8');
+            return $database;
+        };
+    }
+    /**
+     * @var ContainerInterface
+     */
+    protected $dic;
+    /**
+     * @return array
+     */
+    protected function getActiveEveApiList()
+    {
+        $list = array();
+        return $list;
+    }
+    /**
+     * @return ContainerInterface
+     */
+    protected function getDic()
+    {
+        return $this->dic;
+    }
 }

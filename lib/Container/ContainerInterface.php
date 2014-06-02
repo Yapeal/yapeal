@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains DependenceInterface Interface.
+ * Contains ContainerInterface Interface.
  *
  * PHP version 5.3
  *
@@ -27,22 +27,20 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Dependency;
-
-use Pimple\ServiceProviderInterface;
+namespace Yapeal\Container;
 
 /**
- * Interface DependenceInterface
+ * Interface ContainerInterface
  *
  * Abstracts out the interface used in Pimple 2.0.0 which is a little different
  * than what was used in Pimple 1.0.x. Most noticeable change is by default it
  * makes only one instance of the object vs in the old where it acted more like
  * a factory giving you new instances each time. The old functionally is
- * available by using DependenceInterface::factory() if still needed.
+ * available by using ContainerInterface::factory() if still needed.
  *
  * @since 2.0.0-alpha5
  */
-interface DependenceInterface extends \ArrayAccess
+interface ContainerInterface extends \ArrayAccess
 {
     /**
      * Extends an object definition.
@@ -99,18 +97,4 @@ interface DependenceInterface extends \ArrayAccess
      * @throws \InvalidArgumentException if the identifier is NOT defined
      */
     public function raw($key);
-    /**
-     * Registers a service provider.
-     *
-     * @param ServiceProviderInterface $provider A ServiceProviderInterface
-     *                                           instance
-     * @param array                    $values   An array of values that
-     *                                           customizes the provider
-     *
-     * @return static
-     */
-    public function register(
-        ServiceProviderInterface $provider,
-        array $values = array()
-    );
 }

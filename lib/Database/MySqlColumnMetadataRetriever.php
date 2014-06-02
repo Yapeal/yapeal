@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains DependenceAwareInterface Interface.
+ * Contains MySqlColumnMetadataRetriever class.
  *
  * PHP version 5.3
  *
@@ -26,17 +26,44 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Dependency;
+namespace Yapeal\Database;
 
 /**
- * Interface DependenceAwareInterface
+ * Class MySqlColumnMetadataRetriever
  */
-interface DependenceAwareInterface
+class MySqlColumnMetadataRetriever
 {
     /**
-     * @param DependenceInterface|null $depend
+     * @param MetadataInterface $database
+     * @param string            $tableName
+     */
+    public function __construct(MetadataInterface $database, $tableName)
+    {
+    }
+    /**
+     * @param string $value
      *
+     * @throws \InvalidArgumentException
      * @return self
      */
-    public function setDependenceContainer(DependenceInterface $depend = null);
+    public function setTableName($value)
+    {
+        if (!is_string($value)) {
+            $mess = 'Table name MUST be string but given ' . gettype($value);
+            throw new \InvalidArgumentException($mess);
+        }
+        $this->tableName = $value;
+        return $this;
+    }
+    /**
+     * @type string
+     */
+    protected $tableName;
+    /**
+     * @return string
+     */
+    protected function getTableName()
+    {
+        return $this->tableName;
+    }
 }

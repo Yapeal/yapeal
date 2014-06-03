@@ -61,7 +61,7 @@ class ContactList extends AbstractChar
     protected function needsUpsert()
     {
         return false;
-    }// function parserAPI
+    }
     /**
      * Per API parser for XML.
      *

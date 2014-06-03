@@ -200,16 +200,7 @@ abstract class AbstractApiRequest
      */
     abstract protected function handleApiError($e);
     /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
-     */
-    protected function needsUpsert()
-    {
-        return true;
-    }
-    /**
-     * Method used to determine if Need to use upsert or insert for API.
+     * Method used to determine if needs to use upsert or insert for API.
      *
      * @return bool
      */

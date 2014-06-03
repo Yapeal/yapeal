@@ -56,7 +56,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpOutpostServiceDetail extends ACorp
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -148,7 +148,16 @@ class corpOutpostServiceDetail extends ACorp
             }
         }; // foreach $posList ...
         return $ret;
-    }// function __construct
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
     /**
      * Get per corp list of outposts from corpOutpostList.
      *
@@ -180,7 +189,7 @@ class corpOutpostServiceDetail extends ACorp
         };
         return $list;
     }// function apiStore
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML

@@ -172,6 +172,8 @@ class corpCorporationSheet extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . 'Logo';
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
         while ($this->xr->read()) {
@@ -216,6 +218,8 @@ class corpCorporationSheet extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('allianceName', '');
         $row = array();
         try {
@@ -317,6 +321,8 @@ class corpCorporationSheet extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->ownerID);
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
@@ -350,6 +356,5 @@ class corpCorporationSheet extends ACorp
               ->warn($mess);
         return false;
     }
-    // function rowset
 }
 

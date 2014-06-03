@@ -71,7 +71,7 @@ class serverServerStatus extends AServer
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Simple <rowset> per API parser for XML.
      *
@@ -86,6 +86,8 @@ class serverServerStatus extends AServer
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         try {
             // Add any extra (default) columns needed.
             $row = array('serverName' => 'Tranquility');
@@ -128,6 +130,5 @@ class serverServerStatus extends AServer
               ->warn($mess);
         return false;
     }
-    // function parserAPI
 }
 

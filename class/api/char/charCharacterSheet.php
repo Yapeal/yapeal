@@ -72,7 +72,7 @@ class charCharacterSheet extends AChar
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
     /**
      * Used to store XML to CharacterSheet's attributeEnhancers table.
      *
@@ -85,7 +85,7 @@ class charCharacterSheet extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $row = array();
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
@@ -130,7 +130,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Handles attributes table.
      *
@@ -143,7 +143,7 @@ class charCharacterSheet extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $row = array('ownerID' => $this->ownerID);
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
@@ -174,7 +174,16 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function attributes
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
     /**
      * Per API parser for XML.
      *
@@ -185,6 +194,8 @@ class charCharacterSheet extends AChar
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('allianceName', '');
         $row = array();
         try {
@@ -337,7 +348,7 @@ class charCharacterSheet extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->ownerID);
         $row = array();
         while ($this->xr->read()) {
@@ -383,7 +394,7 @@ class charCharacterSheet extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $defaults = array(
             'level' => 0,
             'ownerID' => $this->ownerID,

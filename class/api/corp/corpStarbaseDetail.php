@@ -56,7 +56,7 @@ if (count(get_included_files()) < 2) {
  */
 class corpStarbaseDetail extends ACorp
 {
-/**
+    /**
      * Constructor
      *
      * @param array $params Holds the required parameters like keyID, vCode, etc
@@ -72,7 +72,7 @@ class corpStarbaseDetail extends ACorp
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
     }
-/**
+    /**
      * Used to store XML to MySQL table(s).
      *
      * @return Bool Return TRUE if store was successful.
@@ -176,7 +176,7 @@ class corpStarbaseDetail extends ACorp
         }; // foreach $posList ...
         return $ret;
     }
-/**
+    /**
      * Used to store XML to StarbaseDetail CombatSettings table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -218,7 +218,7 @@ class corpStarbaseDetail extends ACorp
               ->warn($mess);
         return false;
     }
-/**
+    /**
      * Used to store XML to StarbaseDetail GeneralSettings table.
      *
      * @return Bool Return TRUE if store was successful.
@@ -256,6 +256,15 @@ class corpStarbaseDetail extends ACorp
         return false;
     }
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -267,28 +276,28 @@ class corpStarbaseDetail extends ACorp
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefaults($defaults);
         // Get a new query instance.
         $this->combat = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'CombatSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->combat->useUpsert(false);
+        $this->combat->useUpsert($this->needsUpsert());
         $this->combat->setDefaults($defaults);
         // Get a new query instance.
         $this->fuel = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Fuel', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->fuel->useUpsert(false);
+        $this->fuel->useUpsert($this->needsUpsert());
         $this->fuel->setDefaults($defaults);
         // Get a new query instance.
         $this->general = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'GeneralSettings', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->general->useUpsert(false);
+        $this->general->useUpsert($this->needsUpsert());
         $this->general->setDefaults($defaults);
         try {
             $ret = true;
@@ -419,7 +428,7 @@ class corpStarbaseDetail extends ACorp
         };
         return $list;
     }// function apiStore
-        /**
+    /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
      * If there is any need to delete records or empty tables before parsing XML
@@ -487,18 +496,18 @@ class corpStarbaseDetail extends ACorp
               ->warn($mess);
         return false;
     }// function combatSettings
-        /**
+    /**
      * @var YapealQueryBuilder Query instance for combatSettings table.
      */
-    private $combat;// function generalSettings
+    private $combat;
         /**
      * @var YapealQueryBuilder Query instance for fuel table.
      */
-    private $fuel;// function rowset
+    private $fuel;
         /**
      * @var YapealQueryBuilder Query instance for generalSettings table.
      */
-    private $general;// function posList
+    private $general;
     /**
      * @var integer Holds current POS ID.
      */

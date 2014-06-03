@@ -73,6 +73,15 @@ class charAssetList extends AChar
         parent::__construct($params);
     }
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
      * Navigates XML and build nested sets to be added to table.
      *
      * The function adds addition columns to preserve the parent child
@@ -176,7 +185,7 @@ class charAssetList extends AChar
         // Get a new query instance.
         $this->qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->qb->useUpsert(false);
+        $this->qb->useUpsert($this->needsUpsert());
         // Set any column defaults needed.
         $this->qb->setDefault('ownerID', $this->ownerID);
         $this->qb->setDefault('rawQuantity', 0);
@@ -208,7 +217,7 @@ class charAssetList extends AChar
             return false;
         }
         return true;
-    }// function __construct
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -232,16 +241,15 @@ class charAssetList extends AChar
             return false;
         }
         return true;
-    }// function parserAPI
+    }
     /**
      * @var YapealQueryBuilder Holds queryBuilder instance.
      */
-    private $qb; // function nestedSet
+    private $qb;
     /**
      * @var array Holds a stack of parent nodes until after their children are
      * processed.
      */
     private $stack = array();
-    // function prepareTables
 }
 

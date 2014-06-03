@@ -73,7 +73,16 @@ class charStandings extends AChar
         $this->section = strtolower(substr(get_parent_class($this), 1));
         $this->api = str_replace($this->section, '', __CLASS__);
         parent::__construct($params);
-    }// function __construct
+    }
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
     /**
      * Per API parser for XML.
      *
@@ -169,7 +178,7 @@ class charStandings extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->params['characterID']);
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
@@ -203,6 +212,5 @@ class charStandings extends AChar
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

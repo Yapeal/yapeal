@@ -119,7 +119,16 @@ class accountAPIKeyInfo extends AAccount
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }
+    }// function parserAPI
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function prepareTables
     /**
      * Per API parser for XML.
      *
@@ -131,7 +140,7 @@ class accountAPIKeyInfo extends AAccount
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         // Get a new query instance for Characters.
         $this->characters = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Characters', YAPEAL_DSN
@@ -141,7 +150,7 @@ class accountAPIKeyInfo extends AAccount
             YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->bridge->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         try {
             while ($this->xr->read()) {
                 switch ($this->xr->nodeType) {
@@ -244,3 +253,4 @@ class accountAPIKeyInfo extends AAccount
         return true;
     }
 }
+

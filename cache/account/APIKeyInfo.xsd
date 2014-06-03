@@ -99,5 +99,9 @@
         <xs:attribute name="characterName" use="required" type="xs:string"/>
         <xs:attribute name="corporationID" use="required" type="eveID"/>
         <xs:attribute name="corporationName" use="required" type="xs:string"/>
+        <xs:attribute name="allianceID" use="required" type="eveID"/>
+        <xs:attribute name="allianceName" use="required" type="xs:string"/>
+        <xs:attribute name="factionID" use="required" type="eveID"/>
+        <xs:attribute name="factionName" use="required" type="xs:string"/>
     </xs:complexType>
 </xs:schema>

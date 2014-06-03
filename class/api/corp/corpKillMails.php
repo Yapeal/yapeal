@@ -304,19 +304,27 @@ class corpKillMails extends ACorp
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         // Get a new query instance for attackers.
         $this->attackers = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Attackers', YAPEAL_DSN
         );
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $this->attackers->useUpsert($this->needsUpsert());
         // Get a new query instance for items.
         $this->items = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Items', YAPEAL_DSN
         );
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $this->attackers->useUpsert($this->needsUpsert());
         $this->items->setDefault('singleton', 0);
         // Get a new query instance for victim.
         $this->victim = new YapealQueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Victim', YAPEAL_DSN
         );
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $this->attackers->useUpsert($this->needsUpsert());
         $typeID = 0;
         try {
             while ($this->xr->read()) {

@@ -74,6 +74,15 @@ class charContactList extends AChar
         parent::__construct($params);
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function parserAPI
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -122,7 +131,7 @@ class charContactList extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -150,7 +159,7 @@ class charContactList extends AChar
             }
         }; // foreach $tables ...
         return true;
-    }// function rowset
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -164,7 +173,7 @@ class charContactList extends AChar
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->ownerID);
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
@@ -198,6 +207,5 @@ class charContactList extends AChar
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

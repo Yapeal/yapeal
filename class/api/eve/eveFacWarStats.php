@@ -74,6 +74,15 @@ class eveFacWarStats extends AEve
         parent::__construct($params);
     }// function __construct
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
      * API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsered correctly, FALSE if not.
@@ -83,6 +92,8 @@ class eveFacWarStats extends AEve
         $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
+        // Save some overhead for tables that are truncated or in some way emptied.
+        $qb->useUpsert($this->needsUpsert());
         try {
             $row = array();
             while ($this->xr->read()) {
@@ -151,7 +162,7 @@ class eveFacWarStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
         /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -162,7 +173,7 @@ class eveFacWarStats extends AEve
      */
     protected function prepareTables()
     {
-        $tables = array('FactionWars', 'FacWarStats');
+        $tables = array('FactionWars', 'FacWarStats', 'Factions');
         foreach ($tables as $table) {
             try {
                 $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -175,9 +186,9 @@ class eveFacWarStats extends AEve
                       ->warn($e);
                 return false;
             }
-        }; // foreach $tables ...
+        };
         return true;
-    }// function attributes
+    }
     /**
      * Used to store XML to rowset tables.
      *
@@ -191,7 +202,7 @@ class eveFacWarStats extends AEve
         // Get a new query instance.
         $qb = new YapealQueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(true);
+        $qb->useUpsert($this->needsUpsert());
         while ($this->xr->read()) {
             switch ($this->xr->nodeType) {
                 case XMLReader::ELEMENT:
@@ -223,7 +234,7 @@ class eveFacWarStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
 /**
      * Handles totals from XML Note.
      *
@@ -262,6 +273,5 @@ class eveFacWarStats extends AEve
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

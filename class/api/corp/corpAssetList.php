@@ -244,7 +244,7 @@ class corpAssetList extends ACorp
     /**
      * @var YapealQueryBuilder Holds queryBuilder instance.
      */
-    private $qb; // function nestedSet
+    private $qb;
     /**
      * @var array Holds a stack of parent nodes until after their children are
      * processed.

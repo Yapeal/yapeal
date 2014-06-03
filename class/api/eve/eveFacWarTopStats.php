@@ -129,7 +129,7 @@ class eveFacWarTopStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function attributes
+    }
     /**
      * API parser for XML.
      *

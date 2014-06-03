@@ -162,7 +162,7 @@ class eveFacWarStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
         /**
      * Method used to prepare database table(s) before parsing API XML data.
      *
@@ -173,7 +173,7 @@ class eveFacWarStats extends AEve
      */
     protected function prepareTables()
     {
-        $tables = array('FactionWars', 'FacWarStats');
+        $tables = array('FactionWars', 'FacWarStats', 'Factions');
         foreach ($tables as $table) {
             try {
                 $con = YapealDBConnection::connect(YAPEAL_DSN);
@@ -234,7 +234,7 @@ class eveFacWarStats extends AEve
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
 /**
      * Handles totals from XML Note.
      *
@@ -273,6 +273,5 @@ class eveFacWarStats extends AEve
               ->warn($mess);
         return false;
     }
-    // function prepareTables
 }
 

@@ -80,7 +80,7 @@ class corpOutpostList extends ACorp
     protected function needsUpsert()
     {
         return false;
-    }// function __construct
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *

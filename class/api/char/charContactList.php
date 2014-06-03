@@ -131,7 +131,7 @@ class charContactList extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function rowset
+    }
     /**
      * Method used to prepare database table(s) before parsing API XML data.
      *

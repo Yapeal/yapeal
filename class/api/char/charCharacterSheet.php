@@ -130,7 +130,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function __construct
+    }
     /**
      * Handles attributes table.
      *
@@ -174,7 +174,7 @@ class charCharacterSheet extends AChar
         Logger::getLogger('yapeal')
               ->warn($mess);
         return false;
-    }// function parserAPI
+    }
     /**
      * Method used to determine if Need to use upsert or insert for API.
      *

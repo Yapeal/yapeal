@@ -1,4 +1,4 @@
-#!/usr/bin/php -Cq
+#!/usr/bin/env php
 <?php
 /**
  * Used to get information from Eve-online API and store in database.
@@ -28,80 +28,59 @@
  * @author     Michael Cummings <mgcummings@yahoo.com>
  * @copyright  Copyright (c) 2008-2014, Michael Cummings
  * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @package    Yapeal
  * @link       http://code.google.com/p/yapeal/
  * @link       http://www.eveonline.com/
  * @since      revision 561
  */
-/**
- * @internal Allow viewing of the source code in web browser.
- */
-if (isset($_REQUEST['viewSource'])) {
-    highlight_file(__FILE__);
-    exit();
-};
-/**
- * @internal Only let this code be ran in CLI.
- */
-if (PHP_SAPI != 'cli') {
-    header('HTTP/1.0 403 Forbidden', true, 403);
-    $mess = basename(__FILE__) . ' only works with CLI version of PHP but tried'
-        . ' to run it using ' . PHP_SAPI . ' instead.' . PHP_EOL;
-    die($mess);
-};
-/**
- * @internal Only let this code be ran directly.
- */
-$included = get_included_files();
-if (count($included) > 1 || $included[0] != __FILE__) {
-    $mess = basename(__FILE__)
-        . ' must be called directly and can not be included.' . PHP_EOL;
-    fwrite(STDERR, $mess);
-    exit(1);
-};
+use Yapeal\Caching\EveApiXmlCache;
+use Yapeal\Command\LegacyUtil;
+use Yapeal\Database\DBConnection;
+use Yapeal\Database\Util\AccessMask;
+use Yapeal\Database\Util\CachedInterval;
+
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');
-/**
- * Define short name for directory separator which always uses unix '/'.
+// IDE only seems to like this form for path since need for this loader is going
+// away ASAP not worrying about it.
+require_once __DIR__ . '/bin' . '/YapealAutoLoad.php';
+YapealAutoLoad::activateAutoLoad();
+// Include Composer's auto-loader for all the classes that are being moved.
+/*
+ * Find auto loader from one of
+ * vendor/bin/
+ * OR ./
+ * OR bin/
+ * OR lib/Yapeal/
+ * OR vendor/yapeal/yapeal/bin/
  */
-define('DS', '/');
-// Check if the base path for Yapeal has been set in the environment.
-$dir = @getenv('YAPEAL_BASE');
-if ($dir === false) {
-    // Used to overcome path issues caused by how script is ran.
-    $dir = str_replace('\\', DS, dirname(__FILE__)) . DS;
-};
-// Get path constants so they can be used.
-require_once $dir . 'inc' . DS . 'common_paths.php';
-require_once YAPEAL_BASE . 'revision.php';
-require_once YAPEAL_INC . 'parseCommandLineOptions.php';
-require_once YAPEAL_INC . 'getSettingsFromIniFile.php';
-require_once YAPEAL_INC . 'usage.php';
-require_once YAPEAL_INC . 'showVersion.php';
-require_once YAPEAL_INC . 'setGeneralSectionConstants.php';
+(@include_once dirname(__DIR__) . '/autoload.php')
+|| (@include_once __DIR__ . '/vendor/autoload.php')
+|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
+|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
+|| die('Could not find required auto class loader. Aborting ...');
+$legacyUtil = new LegacyUtil();
 $shortOpts = array('c:', 'l:');
 $longOpts = array('config:', 'log:');
 // Parser command line options first in case user just wanted to see help.
-$options = parseCommandLineOptions($shortOpts, $longOpts);
+$options = $legacyUtil->parseCommandLineOptions($shortOpts, $longOpts);
 $exit = false;
 if (isset($options['help'])) {
-    usage(__FILE__, $shortOpts, $longOpts);
+    $legacyUtil->usage(__FILE__, $shortOpts, $longOpts);
     exit(0);
 };
 if (isset($options['version'])) {
-    showVersion(__FILE__);
+    $legacyUtil->showVersion(__FILE__);
     exit(0);
 };
 if (!empty($options['config'])) {
-    $iniVars = getSettingsFromIniFile($options['config']);
+    $iniVars = $legacyUtil->getSettingsFromIniFile($options['config']);
 } else {
-    $iniVars = getSettingsFromIniFile();
+    $iniVars = $legacyUtil->getSettingsFromIniFile();
 };
 if (empty($iniVars)) {
     exit(1);
 };
-require_once YAPEAL_CLASS . 'YapealAutoLoad.php';
-YapealAutoLoad::activateAutoLoad();
 /**
  * Define constants and properties from settings in configuration.
  */
@@ -115,9 +94,9 @@ if (!empty($options['log-config'])) {
     YapealErrorHandler::setLoggingSectionProperties($iniVars['Logging']);
 };
 YapealErrorHandler::setupCustomErrorAndExceptionSettings();
-YapealApiCache::setCacheSectionProperties($iniVars['Cache']);
-YapealDBConnection::setDatabaseSectionConstants($iniVars['Database']);
-setGeneralSectionConstants($iniVars);
+EveApiXmlCache::setCacheSectionProperties($iniVars['Cache']);
+DBConnection::setDatabaseSectionConstants($iniVars['Database']);
+$legacyUtil->setGeneralSectionConstants($iniVars);
 unset($iniVars);
 try {
     /**
@@ -132,40 +111,40 @@ try {
     /* ************************************************************************
      * Generate section list
      * ************************************************************************/
-    $sectionList = FilterFileFinder::getStrippedFiles(YAPEAL_CLASS, 'Section');
-    if (count($sectionList) == 0) {
-        $mess = 'No section classes were found check path setting';
-        Logger::getLogger('yapeal')
-              ->error($mess);
-        exit(2);
-    };
-    //$sectionList = array_map('strtolower', $sectionList);
-    // Randomize order in which API sections are tried if there is a list.
-    if (count($sectionList) > 1) {
-        shuffle($sectionList);
-    };
-    $sql = 'select `section`';
+    $sql = 'select `activeAPIMask`,`section`';
     $sql .= ' from `' . YAPEAL_TABLE_PREFIX . 'utilSections`';
+    $sql .= ' where isActive = 1';
+    $sql .= ' and activeAPIMask > 0';
     try {
-        $con = YapealDBConnection::connect(YAPEAL_DSN);
-        $result = $con->GetCol($sql);
+        $con = DBConnection::connect(YAPEAL_DSN);
+        $result = $con->GetAll($sql);
     } catch (ADODB_Exception $e) {
         Logger::getLogger('yapeal')
               ->fatal($e);
+        exit(2);
     }
     if (count($result) == 0) {
-        $mess = 'No sections were found in utilSections check database.';
+        $mess = 'No active sections were found in utilSections.';
         Logger::getLogger('yapeal')
-              ->error($mess);
+              ->info($mess);
         exit(2);
     };
-    $result = array_map('ucfirst', $result);
-    $sectionList = array_intersect($sectionList, $result);
+    shuffle($result);
+    $am = new AccessMask();
     // Now take the list of sections and call each in turn.
-    foreach ($sectionList as $sec) {
-        $class = 'Section' . $sec;
+    foreach ($result as $section) {
+        $class = '\\Yapeal\\Database\\Section\\' . ucfirst($section['section']);
+        if (!class_exists($class)) {
+            $mess = 'Could NOT find class: ' . $class;
+            Logger::getLogger('yapeal')
+                  ->info($mess);
+            continue;
+        }
         try {
-            $instance = new $class();
+            /**
+             * @var \Yapeal\Database\AbstractSection $instance
+             */
+            $instance = new $class($am, $section['activeAPIMask']);
             $instance->pullXML();
         } catch (ADODB_Exception $e) {
             Logger::getLogger('yapeal')
@@ -174,14 +153,14 @@ try {
         // Going to sleep for a tenth of a second to let DB time to flush etc
         // between sections.
         usleep(100000);
-    }; // foreach $section ...
+    }
     /* ************************************************************************
      * Final admin stuff
      * ************************************************************************/
     // Reset cache intervals
     CachedInterval::resetAll();
     // Release all the ADOdb connections.
-    YapealDBConnection::releaseAll();
+    DBConnection::releaseAll();
 } catch (Exception $e) {
     $mess = 'Uncaught exception in ' . basename(__FILE__);
     Logger::getLogger('yapeal')

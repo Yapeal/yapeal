@@ -3,6 +3,11 @@
     "description": "Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online API data and place it into a database.",
     "keywords": ["curl", "database", "Eve", "Eve-Online", "mysql", "mysqli", "ADOdb", "REST", "RESTful"],
     "license": "LGPL-3.0+",
+    "autoload": {
+        "psr-4": {
+            "Yapeal\\": ["lib/", "bin/", "tests/"]
+        }
+    },
     "authors": [
         {
             "name": "Michael Cummings",

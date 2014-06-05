@@ -141,6 +141,17 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveErrorList" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}eveEmploymentHistory";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveEmploymentHistory" (
+    "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
+    "recordID"      BIGINT(20) UNSIGNED NOT NULL,
+    "corporationID" BIGINT(20) UNSIGNED NOT NULL,
+    "startDate"     DATETIME            NOT NULL,
+    PRIMARY KEY ("ownerID", "recordID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
+#ALTER TABLE "{database}"."{table_prefix}eveEmploymentHistory" ADD INDEX "eveEmploymentHistory1"  ("corporationID");
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactions" (
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,

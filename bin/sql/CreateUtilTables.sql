@@ -1,6 +1,7 @@
 SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
 SET SESSION TIME_ZONE = '+00:00';
 SET NAMES UTF8;
+SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("section", "api", "mask", "interval", "isActive")
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
@@ -95,6 +97,7 @@ VALUES
     ('map', 'Kills', 4, 3600, 1),
     ('map', 'Sovereignty', 8, 3600, 1),
     ('server', 'ServerStatus', 1, 180, 1);
+COMMIT;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredCharacter";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCharacter" (
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,

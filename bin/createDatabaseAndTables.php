@@ -89,7 +89,7 @@ foreach ($required as $setting) {
 }
 if (!empty($mess)) {
     fwrite(STDERR, $mess);
-    exit(2);
+    exit(1);
 }
 $mysqli = new mysqli(
     $options['host'], $options['username'], $options['password'], ''
@@ -113,15 +113,16 @@ $fileNames = array(
 $templates = array(';', '{database}', '{table_prefix}');
 $replacements = array('', $options['database'], $options['table_prefix']);
 foreach ($fileNames as $file) {
-    $file = __DIR__ . '/sql/Create' . $file . '.sql';
+    fwrite(STDOUT, $file . PHP_EOL);
+    $file = str_replace('\\', '/', __DIR__) . '/sql/Create' . $file . '.sql';
     if (!is_file($file)) {
         $mess = 'Could not find SQL file ' . $file . PHP_EOL;
         fwrite(STDERR, $mess);
-        continue;
+        exit(2);
     }
     $sqlStatements = file_get_contents($file);
     if (false === $sqlStatements) {
-        $mess = 'Could not get contents of SQL file ' . $file;
+        $mess = 'Could not get contents of SQL file ' . $file . PHP_EOL;
         fwrite(STDERR, $mess);
         exit(2);
     }
@@ -136,15 +137,17 @@ foreach ($fileNames as $file) {
             continue;
         }
         if ($mysqli->query($sql) === false) {
-            $mess = 'The following SQL statement failed on statement: ' . $line
-                . PHP_EOL
-                . $sql . PHP_EOL
-                . '(' . $mysqli->errno . ') ' . $mysqli->error . PHP_EOL;
+            $mess =
+                PHP_EOL . 'The following SQL statement failed on statement: '
+                . $line . PHP_EOL . $sql . PHP_EOL . '(' . $mysqli->errno . ') '
+                . $mysqli->error . PHP_EOL;
             fwrite(STDERR, $mess);
             $mysqli->close();
             exit(2);
         }
+        fwrite(STDOUT, '.');
     }
+    fwrite(STDOUT, PHP_EOL);
 }
 $mysqli->close();
 $mess =

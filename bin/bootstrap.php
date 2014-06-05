@@ -36,7 +36,7 @@ namespace Yapeal;
 * OR lib/PhpEOL/
 * OR vendor/PhpEOL/PhpEOL/bin/
 */
-use Yapeal\Dependency\PimpleContainer;
+use Yapeal\Container\PimpleContainer;
 
 (@include_once dirname(__DIR__) . '/autoload.php')
 || (@include_once __DIR__ . '/vendor/autoload.php')

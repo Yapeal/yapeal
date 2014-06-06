@@ -1,12 +1,33 @@
 ---
 Yapeal:
-    parameters:
-        logger.class: "Monolog\Monolog"
-        logger.name: "yapeal"
-    services:
-      logger:
-        class: %logger.class%
-        arguments:
-            - %logger.name%
-            -
+    Database:
+        class: \PDO
+        database: yapeal
+        hostName: localhost
+        password: secret
+        platform: mysql
+        # (Optional) Only needed if using http connection.
+        # port: ""
+        tablePrefix: ''
+        userName: YapealUser
+    Log:
+        channel: yapeal
+        class: Monolog\Logger
+        dirName: '{Yapeal.dirName}'
+        fileName: yapeal.log
+        # Threshold that should trigger logging.
+        # Recommended default for development NOTICE or INFO
+        # Recommended default for production WARNING or ERROR
+        threshold: WARNING
+    Error:
+        channel: php
+        class: Monolog\ErrorHandler
+        dirName: '{Yapeal.dirName}'
+        fileName: yapeal.log
+        # Threshold that should trigger logging.
+        # Recommended default for development ERROR or WARNING
+        # Recommended default for production CRITICAL
+        threshold: CRITICAL
+        # (Optional) Defaults to another instance of Yapeal.Log.class
+        # loggerClass: Monolog\Logger
 ...

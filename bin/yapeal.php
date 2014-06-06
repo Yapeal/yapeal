@@ -29,4 +29,12 @@
  */
 namespace Yapeal;
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once __DIR__ . '/bootstrap.php';
+use Yapeal\Container\PimpleContainer;
+
+/**
+ * @var PimpleContainer $container
+ */
+$yapeal = new Yapeal($container);
+$result = $yapeal->run();
+exit($result);

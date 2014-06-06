@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains MetadataInterface Interface.
+ * Contains APIKeyInfo class.
  *
  * PHP version 5.3
  *
@@ -26,11 +26,17 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Database;
+namespace Yapeal\Database\Account;
 
 /**
- * Interface MetadataInterface
+ * Class APIKeyInfo
  */
-interface MetadataInterface
+class APIKeyInfo
 {
+    /**
+     *
+     */
+    public function __construct()
+    {
+    }
 }

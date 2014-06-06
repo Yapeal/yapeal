@@ -39,10 +39,10 @@ use Monolog as ML;
 use Monolog\Handler as MLH;
 use Yapeal\Caching\EveApiXmlCache;
 use Yapeal\Command\LegacyUtil;
+use Yapeal\Container\PimpleContainer;
 use Yapeal\Database\DBConnection;
 use Yapeal\Database\Util\AccessMask;
 use Yapeal\Database\Util\CachedInterval;
-use Yapeal\Dependency\PimpleContainer;
 
 // Set the default timezone to GMT.
 date_default_timezone_set('GMT');

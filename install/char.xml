@@ -938,6 +938,9 @@
             <NOTNULL/>
             <UNSIGNED/>
         </field>
+        <field name="`senderName`" type="C" size="255">
+            <NOTNULL/>
+        </field>
         <field name="`sentDate`" type="T">
             <NOTNULL/>
         </field>

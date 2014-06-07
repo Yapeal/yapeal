@@ -90,6 +90,20 @@
         <field name="`corporationName`" type="C" size="255">
             <NOTNULL/>
         </field>
+        <field name="`allianceID`" type="I8" size="20">
+            <NOTNULL/>
+            <UNSIGNED/>
+        </field>
+        <field name="`allianceName`" type="C" size="255">
+            <NOTNULL/>
+        </field>
+        <field name="`factionID`" type="I8" size="20">
+            <NOTNULL/>
+            <UNSIGNED/>
+        </field>
+        <field name="`factionName`" type="C" size="255">
+            <NOTNULL/>
+        </field>
         <index name="`accountCharacters1`">
             <col>`corporationID`</col>
         </index>

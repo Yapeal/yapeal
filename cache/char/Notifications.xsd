@@ -55,6 +55,7 @@
         <xs:attribute name="notificationID" use="required" type="eveID"/>
         <xs:attribute name="read" use="required" type="eveBoolean"/>
         <xs:attribute name="senderID" use="required" type="eveID"/>
+        <xs:attribute name="senderName" use="required" type="xs:string"/>
         <xs:attribute name="sentDate" use="required" type="eveDT"/>
         <xs:attribute name="typeID" use="required" type="xs:unsignedByte"/>
     </xs:complexType>

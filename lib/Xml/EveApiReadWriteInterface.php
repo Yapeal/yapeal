@@ -1,11 +1,11 @@
 <?php
 /**
- * Contains EveApiRetrieverInterface Interface.
+ * Contains EveApiReadWriteInterface Interface.
  *
  * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yapeal
+ * This file is part of 1.1.x-WIP
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -29,15 +29,9 @@
 namespace Yapeal\Xml;
 
 /**
- * Common interface for any class that would retrieve (file / network) the Eve
- * Api data in some way.
+ * Interface EveApiReadWriteInterface
  */
-interface EveApiRetrieverInterface
+interface EveApiReadWriteInterface extends EveApiReadInterface,
+    EveApiWriteInterface
 {
-    /**
-     * @param EveApiXmlModifyInterface $data
-     *
-     * @return EveApiXmlModifyInterface
-     */
-    public function retrieveEveApi(EveApiXmlModifyInterface $data);
 }

@@ -1,11 +1,11 @@
 <?php
 /**
- * Contains EveApiXmlDataInterface Interface.
+ * Contains EveApiXmlModifyInterface Interface.
  *
  * PHP version 5.3
  *
  * LICENSE:
- * This file is part of 1.1.x
+ * This file is part of 1.1.x-WIP
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -23,44 +23,16 @@
  * available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
- * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author  Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Xml;
 
 /**
- * Interface EveApiXmlDataInterface
+ * Interface EveApiXmlModifyInterface
  */
-interface EveApiXmlDataInterface extends EveApiAwareInterface
+interface EveApiXmlModifyInterface extends EveApiReadInterface
 {
-    /**
-     * @return string
-     */
-    public function __toString();
-    /**
-     * @return string[]
-     */
-    public function getEveApiArguments();
-    /**
-     * @throws \LogicException
-     * @return string
-     */
-    public function getEveApiName();
-    /**
-     * @throws \LogicException
-     * @return string
-     */
-    public function getEveApiSectionName();
-    /**
-     * @return string|false
-     */
-    public function getEveApiXml();
-    /**
-     * @throws \LogicException
-     * @return bool
-     * @uses getEveApiXml()
-     */
-    public function hasXmlRowSet();
     /**
      * @param string|bool $xml Only allows string or false NOT true.
      *

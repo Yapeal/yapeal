@@ -35,9 +35,9 @@ namespace Yapeal\Xml;
 interface EveApiPreserverInterface
 {
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiReadInterface $data
      *
      * @return self
      */
-    public function preserveEveApi(EveApiXmlDataInterface $data);
+    public function preserveEveApi(EveApiReadInterface $data);
 }

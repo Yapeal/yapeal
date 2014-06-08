@@ -33,8 +33,9 @@ use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Exception\YapealRetrieverFileException;
 use Yapeal\Exception\YapealRetrieverPathException;
+use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class EveApiXmlFileCacheRetriever
@@ -64,11 +65,11 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
         }
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiXmlModifyInterface $data
      *
-     * @return EveApiXmlDataInterface
+     * @return EveApiXmlModifyInterface
      */
-    public function retrieveEveApi(EveApiXmlDataInterface $data)
+    public function retrieveEveApi(EveApiXmlModifyInterface $data)
     {
         try {
             $cachePath =
@@ -206,11 +207,11 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
         return $this->handle;
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiReadInterface $data
      *
      * @return string
      */
-    protected function getHash(EveApiXmlDataInterface $data)
+    protected function getHash(EveApiReadInterface $data)
     {
         $hash = $data->getEveApiName() . $data->getEveApiSectionName();
         foreach ($data->getEveApiArguments() as $key => $value) {

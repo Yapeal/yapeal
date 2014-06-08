@@ -33,7 +33,7 @@ use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
 use Yapeal\Exception\YapealPreserverPathException;
 use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiReadInterface;
 
 /**
  * Class EveApiXmlFileCachePreserver
@@ -62,14 +62,14 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         }
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiReadInterface $data
      *
      * @throws YapealPreserverPathException
      * @throws \LogicException
      * @throws YapealPreserverFileException
      * @return self
      */
-    public function preserveEveApi(EveApiXmlDataInterface $data)
+    public function preserveEveApi(EveApiReadInterface $data)
     {
         try {
             $cachePath =
@@ -196,11 +196,11 @@ class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
         return $this->handle;
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiReadInterface $data
      *
      * @return string
      */
-    protected function getHash(EveApiXmlDataInterface $data)
+    protected function getHash(EveApiReadInterface $data)
     {
         $hash = $data->getEveApiName() . $data->getEveApiSectionName();
         foreach ($data->getEveApiArguments() as $key => $value) {

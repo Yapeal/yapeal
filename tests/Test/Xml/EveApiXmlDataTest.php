@@ -29,7 +29,6 @@
 namespace Yapeal\Test\Xml;
 
 use Yapeal\Xml\EveApiXmlData;
-use Yapeal\Xml\EveApiXmlDataInterface;
 
 /**
  * Class EveApiXmlDataTest
@@ -160,7 +159,7 @@ class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $result);
     }
     /**
-     * @type EveApiXmlDataInterface
+     * @type EveApiXmlData
      */
     protected $data;
 }

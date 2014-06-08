@@ -1,11 +1,11 @@
 <?php
 /**
- * Contains EveApiAwareInterface Interface.
+ * Contains EveApiModifyInterface Interface.
  *
  * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yapeal
+ * This file is part of 1.1.x-WIP
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -29,9 +29,9 @@
 namespace Yapeal\Xml;
 
 /**
- * Interface EveApiAwareInterface
+ * Interface EveApiModifyInterface
  */
-interface EveApiAwareInterface
+interface EveApiWriteInterface
 {
     /**
      * Used to add item to arguments list.
@@ -74,4 +74,11 @@ interface EveApiAwareInterface
      * @return self
      */
     public function setEveApiSectionName($value);
+    /**
+     * @param string|bool $xml Only allows string or false NOT true.
+     *
+     * @throws \InvalidArgumentException
+     * @return self
+     */
+    public function setEveApiXml($xml = false);
 }

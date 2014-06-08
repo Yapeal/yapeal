@@ -33,8 +33,9 @@ use Guzzle\Http\Exception\RequestException;
 use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class GuzzleNetworkRetriever
@@ -63,11 +64,11 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
     }
     /**
-     * @param EveApiXmlDataInterface $data
+     * @param EveApiXmlModifyInterface $data
      *
-     * @return EveApiXmlDataInterface
+     * @return EveApiXmlModifyInterface
      */
-    public function retrieveEveApi(EveApiXmlDataInterface $data)
+    public function retrieveEveApi(EveApiXmlModifyInterface $data)
     {
         $result = $this->readXmlData($this->prepareConnection($data));
         $data->setEveApiXml($result);
@@ -119,11 +120,11 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         return $this->logger;
     }
     /**
-     * @param \Yapeal\Xml\EveApiXmlData|\Yapeal\Xml\EveApiXmlDataInterface $data
+     * @param EveApiReadInterface $data
      *
      * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface
      */
-    protected function prepareConnection(EveApiXmlDataInterface $data)
+    protected function prepareConnection(EveApiReadInterface $data)
     {
         $uri = array(
             '/{EveApiSectionName}/{EveApiName}.xml.aspx',

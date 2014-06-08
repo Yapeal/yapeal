@@ -34,7 +34,7 @@ use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
 use Yapeal\Caching\EveApiXmlFileCachePreserver;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiReadInterface;
 
 /**
  * Class EveApiXmlFileCachePreserverTest
@@ -565,7 +565,7 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
      */
     protected $preserver;
     /**
-     * @return EveApiXmlDataInterface|PHPUnit_Framework_MockObject_MockObject
+     * @return EveApiReadInterface|PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDataMock()
     {

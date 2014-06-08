@@ -35,7 +35,7 @@ use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
 use Yapeal\Network\GuzzleNetworkRetriever;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class GuzzleNetworkRetrieverTest
@@ -146,7 +146,7 @@ class GuzzleNetworkRetrieverTest extends PHPUnit_Framework_TestCase
         return $mockClient;
     }
     /**
-     * @return EveApiXmlDataInterface|PHPUnit_Framework_MockObject_MockObject
+     * @return EveApiXmlModifyInterface|PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDataMock()
     {

@@ -28,6 +28,7 @@
  */
 namespace Yapeal;
 
+use Guzzle\Http\Client;
 use Monolog\ErrorHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\GroupHandler;
@@ -38,7 +39,15 @@ use PDOStatement;
 use Psr\Log\LoggerInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
+use Yapeal\Database\Account\APIKeyInfo;
+use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Xml\EveApiXmlData;
+use Yapeal\Xml\FileCacheRetriever;
+use Yapeal\Xml\GroupRetriever;
+use Yapeal\Xml\GuzzleNetworkRetriever;
+use Yapeal\Xml\NullPreserver;
+use Yapeal\Xml\NullRetriever;
 
 /**
  * Class Yapeal
@@ -59,7 +68,7 @@ class Yapeal implements WiringInterface
      * @return int Returns 0 if everything was fine else something >= 1 for any
      * errors.
      */
-    public function run()
+    public function autoMagic()
     {
         $dic = $this->getDic();
         $dic['Yapeal.Error.Logger'];
@@ -67,35 +76,43 @@ class Yapeal implements WiringInterface
          * @var LoggerInterface $logger
          */
         $logger = $dic['Yapeal.Log.Logger'];
-        $logger->error('I am NOT an error!!!');
+        $logger->info('Let the magic begin!');
         try {
             /**
              * @var PDO $pdo
              */
             $pdo = $dic['Yapeal.Database.Connection'];
-            $sql = sprintf(
-                'SELECT * FROM "%1$s"."%2$sutilEveApi" WHERE "isActive"=1 ORDER BY RAND()',
-                $dic['Yapeal.Database.database'],
-                $dic['Yapeal.Database.tablePrefix']
-            );
+            /**
+             * @var CommonSqlQueries $csq
+             */
+            $csq = $dic['Yapeal.Database.CommonQueries'];
+            $sql = $csq->getActiveApis();
+            $logger->debug($sql);
             /**
              * @var PDOStatement $smt
              */
             $stmt = $pdo->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (empty($result)) {
-                $mess = 'No active Eve APIs will exist now';
-                $logger->error($mess);
+                $logger->warning('No active Eve APIs will exist now');
                 return 1;
             }
             foreach ($result as $record) {
-                $class = 'Yapeal\\Database\\' . $record['section'] . '\\'
+                $className = 'Yapeal\\Database\\' . $record['section'] . '\\'
                     . $record['api'];
-                if (class_exists($class)) {
-                    print 'Yes the class exists was given ' . $class . PHP_EOL;
-                } else {
-                    print 'Class not found ' . $class . PHP_EOL;
+                if (!class_exists($className)) {
+                    $logger->info('Class not found ' . $className);
+                    continue;
                 }
+                /**
+                 * @var APIKeyInfo $class
+                 */
+                $class = new $className($pdo, $logger, $csq);
+                $class->autoMagic(
+                    new EveApiXmlData($record['api'], $record['section']),
+                    new NullRetriever(),
+                    new NullPreserver()
+                );
             }
         } catch (\PDOException $exc) {
             $mess = 'Could not access utilEveApi table';
@@ -116,16 +133,23 @@ class Yapeal implements WiringInterface
     }
     /**
      * @param ContainerInterface $dic
+     *
+     * @throws YapealDatabaseException
      */
     public function wire(ContainerInterface $dic)
     {
-        if (empty($dic['Yapeal.dirName'])) {
-            $dic['Yapeal.dirName'] =
+        if (empty($dic['Yapeal.cwd'])) {
+            $dic['Yapeal.cwd'] = str_replace('\\', '/', dirname(__DIR__)) . '/';
+        }
+        if (empty($dic['Yapeal.baseDir'])) {
+            $dic['Yapeal.baseDir'] =
                 str_replace('\\', '/', dirname(__DIR__)) . '/';
         }
         $this->wireErrorLogger($dic);
         $this->wireLogLogger($dic);
         $this->wireDatabase($dic);
+        $this->wireCommonSqlQueries($dic);
+        $this->wireRetriever($dic);
     }
     /**
      * @var ContainerInterface
@@ -149,46 +173,48 @@ class Yapeal implements WiringInterface
     /**
      * @param ContainerInterface $dic
      */
+    private function wireCommonSqlQueries(ContainerInterface $dic)
+    {
+        if (isset($dic['Yapeal.Database.CommonQueries'])) {
+            return;
+        }
+        $dic['Yapeal.Database.CommonQueries'] = function ($dic) {
+            return new CommonSqlQueries(
+                $dic['Yapeal.Database.database'],
+                $dic['Yapeal.Database.tablePrefix']
+            );
+        };
+    }
+    /**
+     * @param ContainerInterface $dic
+     *
+     * @throws YapealDatabaseException
+     */
     private function wireDatabase(ContainerInterface $dic)
     {
         if (isset($dic['Yapeal.Database.Connection'])) {
             return;
         }
+        $defaults = array(
+            'Yapeal.Database.platform' => 'mysql',
+            'Yapeal.Database.class' => 'PDO',
+            'Yapeal.Database.hostName' => 'localhost',
+            'Yapeal.Database.database' => 'yapeal',
+            'Yapeal.Database.password' => 'secret',
+            'Yapeal.Database.tablePrefix' => '',
+            'Yapeal.Database.userName' => 'YapealUser'
+        );
+        foreach ($defaults as $setting => $default) {
+            if (empty($dic[$setting])) {
+                $dic[$setting] = $default;
+            }
+        }
+        if ($dic['Yapeal.Database.platform'] != 'mysql') {
+            $mess = 'Unknown platform was given '
+                . $dic['Yapeal.Database.platform'];
+            throw new YapealDatabaseException($mess);
+        }
         $dic['Yapeal.Database.Connection'] = function ($dic) {
-            if (empty($dic['Yapeal.Database.platform'])) {
-                $dic['Yapeal.Database.platform'] = 'mysql';
-            }
-            if ($dic['Yapeal.Database.platform'] != 'mysql') {
-                $mess = 'Unknown platform was given '
-                    . $dic['Yapeal.Database.platform'];
-                throw new YapealDatabaseException($mess);
-            }
-            /**
-             * @param $dic
-             */
-            function wireDatabaseSettings(&$dic)
-            {
-                if (empty($dic['Yapeal.Database.class'])) {
-                    $dic['Yapeal.Database.class'] = 'PDO';
-                }
-                if (empty($dic['Yapeal.Database.hostName'])) {
-                    $dic['Yapeal.Database.hostName'] = 'localhost';
-                }
-                if (empty($dic['Yapeal.Database.database'])) {
-                    $dic['Yapeal.Database.database'] = 'yapeal';
-                }
-                if (empty($dic['Yapeal.Database.password'])) {
-                    $dic['Yapeal.Database.password'] = 'secret';
-                }
-                if (empty($dic['Yapeal.Database.tablePrefix'])) {
-                    $dic['Yapeal.Database.tablePrefix'] = '';
-                }
-                if (empty($dic['Yapeal.Database.userName'])) {
-                    $dic['Yapeal.Database.userName'] = 'YapealUser';
-                }
-            }
-
-            wireDatabaseSettings($dic);
             $dsn = $dic['Yapeal.Database.platform'] . ':host='
                 . $dic['Yapeal.Database.hostName']
                 . ';charset=utf8';
@@ -221,6 +247,25 @@ class Yapeal implements WiringInterface
         if (isset($dic['Yapeal.Error.Logger'])) {
             return;
         }
+        $defaults = array(
+            'Yapeal.Error.class' => 'Monolog\\ErrorHandler',
+            'Yapeal.Error.channel' => 'php',
+            'Yapeal.Error.fileName' => 'yapeal.log',
+            'Yapeal.Error.logDir' => $dic['Yapeal.baseDir'] . 'log/',
+            'Yapeal.Error.threshold' => 500
+        );
+        foreach ($defaults as $setting => $default) {
+            if (empty($dic[$setting])) {
+                $dic[$setting] = $default;
+            }
+        }
+        if (empty($dic['Yapeal.Error.loggerName'])) {
+            $loggerName = 'Monolog\\Logger';
+            if (isset($dic['Yapeal.Log.class'])) {
+                $loggerName = $dic['Yapeal.Log.class'];
+            }
+            $dic['Yapeal.Error.loggerName'] = $loggerName;
+        }
         /**
          * @param $dic
          *
@@ -229,75 +274,41 @@ class Yapeal implements WiringInterface
          */
         $dic['Yapeal.Error.Logger'] = function ($dic) {
             /**
-             * @param $dic
-             */
-            function wireErrorSettings(&$dic)
-            {
-                if (empty($dic['Yapeal.Error.class'])) {
-                    $dic['Yapeal.Error.class'] = 'Monolog\\ErrorHandler';
-                }
-                if (empty($dic['Yapeal.Error.channel'])) {
-                    $dic['Yapeal.Error.channel'] = 'php';
-                }
-                if (empty($dic['Yapeal.Error.dirName'])) {
-                    $dic['Yapeal.Error.dirName'] =
-                        $dic['Yapeal.dirName'] . 'log/';
-                }
-                if (empty($dic['Yapeal.Error.fileName'])) {
-                    $dic['Yapeal.Error.fileName'] = 'yapeal.log';
-                }
-            }
-
-            wireErrorSettings($dic);
-            $loggerName = 'Monolog\\Logger';
-            if (isset($dic['Yapeal.Error.loggerName'])) {
-                $loggerName = $dic['Yapeal.Error.loggerName'];
-            } elseif (isset($dic['Yapeal.Log.class'])) {
-                $loggerName = $dic['Yapeal.Log.class'];
-            }
-            /**
              * @var LoggerInterface $logger
              */
-            $logger = new $loggerName($dic['Yapeal.Error.channel']);
-            if (is_a($logger, 'Monolog\\Logger')) {
-                $group = array();
-                $threshold = 'Logger::CRITICAL';
-                if (isset($dic['Yapeal.Error.threshold'])) {
-                    $threshold = 'Logger::' . $dic['Yapeal.Error.threshold'];
-                }
-                /**
-                 * @var Logger $logger
-                 */
-                if (PHP_SAPI == 'cli') {
-                    $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
-                }
-                $group[] = new StreamHandler(
-                    $dic['Yapeal.Error.dirName']
-                    . $dic['Yapeal.Error.fileName'],
-                    Logger::DEBUG
-                );
-                $logger->pushHandler(
-                    new FingersCrossedHandler(
-                        new GroupHandler($group),
-                        constant($threshold),
-                        25
-                    )
-                );
-                /**
-                 * @var ErrorHandler $error
-                 */
-                $error = $dic['Yapeal.Error.class'];
-                $error::register(
-                    $logger,
-                    array(),
-                    constant($threshold),
-                    false
-                );
-                return $error;
-            } else {
-                $mess = 'Could NOT register error/exception handler';
-                throw new \RuntimeException($mess);
+            $logger = new $dic['Yapeal.Error.loggerName'](
+                $dic['Yapeal.Error.channel']
+            );
+            $group = array();
+            /**
+             * @var Logger $logger
+             */
+            if (PHP_SAPI == 'cli') {
+                $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
             }
+            $group[] = new StreamHandler(
+                $dic['Yapeal.Error.logDir']
+                . $dic['Yapeal.Error.fileName'],
+                Logger::DEBUG
+            );
+            $logger->pushHandler(
+                new FingersCrossedHandler(
+                    new GroupHandler($group),
+                    $dic['Yapeal.Error.threshold'],
+                    25
+                )
+            );
+            /**
+             * @var ErrorHandler $error
+             */
+            $error = $dic['Yapeal.Error.class'];
+            $error::register(
+                $logger,
+                array(),
+                $dic['Yapeal.Error.threshold'],
+                false
+            );
+            return $error;
         };
     }
     /**
@@ -308,46 +319,81 @@ class Yapeal implements WiringInterface
         if (isset($dic['Yapeal.Log.Logger'])) {
             return;
         }
+        $defaults = array(
+            'Yapeal.Log.class' => 'Monolog\\Logger',
+            'Yapeal.Log.channel' => 'yapeal',
+            'Yapeal.Log.logDir' => $dic['Yapeal.baseDir'] . 'log/',
+            'Yapeal.Log.fileName' => 'yapeal.log',
+            'Yapeal.Log.threshold' => 300
+        );
+        foreach ($defaults as $setting => $default) {
+            if (empty($dic[$setting])) {
+                $dic[$setting] = $default;
+            }
+        }
         $dic['Yapeal.Log.Logger'] = function ($dic) {
-            if (empty($dic['Yapeal.Log.class'])) {
-                $dic['Yapeal.Log.class'] = 'Monolog\\Logger';
-            }
-            if (empty($dic['Yapeal.Log.channel'])) {
-                $dic['Yapeal.Log.channel'] = 'yapeal';
-            }
-            if (empty($dic['Yapeal.Log.dirName'])) {
-                $dic['Yapeal.Log.dirName'] = $dic['Yapeal.dirName'] . 'log/';
-            }
-            if (empty($dic['Yapeal.Log.fileName'])) {
-                $dic['Yapeal.Log.fileName'] = 'yapeal.log';
-            }
-            $threshold = 'Logger::WARNING';
-            if (isset($dic['Yapeal.Log.threshold'])) {
-                $threshold = 'Logger::' . $dic['Yapeal.Log.threshold'];
-            }
             /**
              * @var LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
-            if (is_a($logger, 'Monolog\\Logger')) {
-                $group = array();
-                /**
-                 * @var Logger $logger
-                 */
-                if (PHP_SAPI == 'cli') {
-                    $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
-                }
-                $group[] = new StreamHandler(
-                    $dic['Yapeal.Log.dirName'] . $dic['Yapeal.Log.fileName'],
-                    Logger::DEBUG
-                );
-                $logger->pushHandler(
-                    new FingersCrossedHandler(
-                        new GroupHandler($group), constant($threshold), 25
-                    )
-                );
+            $group = array();
+            /**
+             * @var Logger $logger
+             */
+            if (PHP_SAPI == 'cli') {
+                $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
             }
+            $group[] = new StreamHandler(
+                $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
+                Logger::DEBUG
+            );
+            $logger->pushHandler(
+                new FingersCrossedHandler(
+                    new GroupHandler($group), $dic['Yapeal.Log.threshold'], 25
+                )
+            );
             return $logger;
+        };
+    }
+    /**
+     * @param ContainerInterface $dic
+     */
+    private function wireRetriever(ContainerInterface $dic)
+    {
+        if (isset($dic['Yapeal.Xml.Retriever'])) {
+            return;
+        }
+        $dic['Yapeal.Xml.Retriever'] = function ($dic) {
+            $headers = array(
+                'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
+                    . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
+                    . 'q=0.6,*/*;q=0.5',
+                'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
+                'Accept-Encoding' => 'gzip',
+                'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
+                'Connection' => 'Keep-Alive',
+                'Keep-Alive' => '300'
+            );
+            $defaults = array(
+                'headers' => $headers,
+                'timeout' => 10,
+                'connect_timeout' => 30,
+                'verify' => $dic['Yapeal.baseDir'] . 'config/eveonline.crt',
+            );
+            $retrievers = array(
+                new FileCacheRetriever(
+                    $dic['Yapeal.Log.Logger'],
+                    $dic['Yapeal.baseDir'] . 'cache/'
+                ),
+                new GuzzleNetworkRetriever(
+                    $dic['Yapeal.Log.Logger'],
+                    new Client(
+                        'https://api.eveonline.com',
+                        array('defaults' => $defaults)
+                    )
+                )
+            );
+            return new GroupRetriever($dic['Yapeal.Log.Logger'], $retrievers);
         };
     }
 }

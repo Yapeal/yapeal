@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Processor class.
+ * Contains NullPreserver class.
  *
  * PHP version 5.3
  *
@@ -28,29 +28,19 @@
  */
 namespace Yapeal\Xml;
 
-use DOMDocument;
-use SimpleXMLElement;
-
 /**
- * Class Processor is simple wrapper around XSLTProcessor to allow use of
- * interface and easier unit testing.
+ * Class NullPreserver
  */
-class Processor extends \XSLTProcessor implements ProcessorInterface
+class NullPreserver implements EveApiPreserverInterface
 {
     /**
-     * Transform to XML
+     * @param EveApiReadInterface $data
      *
-     * Added because docs show only accepts DOMDocument but will also accept
-     * SimpleXMLElement which was tested in PHP 5.3, 5.4, and 5.5.
-     *
-     * @param SimpleXMLElement|DOMDocument $doc The transformed document
-     *
-     * @return string The result of the transformation as a string or __FALSE__
-     * on error.
-     * @link http://php.net/manual/en/xsltprocessor.transformtoxml.php
+     * @return self
      */
-    public function transformToXml($doc)
+    public function preserveEveApi(EveApiReadInterface $data)
     {
-        parent::transformToXml($doc);
+        $data->getEveApiXml();
+        return $this;
     }
 }

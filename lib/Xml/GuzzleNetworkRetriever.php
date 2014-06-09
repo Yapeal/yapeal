@@ -26,16 +26,13 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Network;
+namespace Yapeal\Xml;
 
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Exception\RequestException;
 use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Yapeal\Xml\EveApiReadInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class GuzzleNetworkRetriever
@@ -66,9 +63,9 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     /**
      * @param EveApiXmlModifyInterface $data
      *
-     * @return EveApiXmlModifyInterface
+     * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface $data)
+    public function retrieveEveApi(EveApiXmlModifyInterface &$data)
     {
         $result = $this->readXmlData($this->prepareConnection($data));
         $data->setEveApiXml($result);

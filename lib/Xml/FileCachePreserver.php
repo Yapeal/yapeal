@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EveApiXmlFileCachePreserver class.
+ * Contains FileCachePreserver class.
  *
  * PHP version 5.3
  *
@@ -26,19 +26,17 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Caching;
+namespace Yapeal\Xml;
 
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
 use Yapeal\Exception\YapealPreserverPathException;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadInterface;
 
 /**
- * Class EveApiXmlFileCachePreserver
+ * Class FileCachePreserver
  */
-class EveApiXmlFileCachePreserver implements EveApiPreserverInterface
+class FileCachePreserver implements EveApiPreserverInterface
 {
     /**
      * @param LoggerInterface $logger

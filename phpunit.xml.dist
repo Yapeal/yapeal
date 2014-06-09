@@ -22,20 +22,11 @@
         <log type="testdox-text" target="docs/PhpUnit/reports/testdox.txt"/>
     </logging>
     <testsuites>
-        <testsuite name="Main">
+        <testsuite name="All">
             <directory>tests/Test</directory>
         </testsuite>
-        <testsuite name="Cache">
-            <directory>tests/Test/Caching</directory>
-        </testsuite>
-		<testsuite name="Network">
-            <directory>tests/Test/Network</directory>
-        </testsuite>
-        <testsuite name="Config">
-            <directory>tests/Test/Configuration</directory>
-        </testsuite>
-        <testsuite name="Depend">
-            <directory>tests/Test/Dependency</directory>
+        <testsuite name="Xml">
+            <directory>tests/Test/Xml</directory>
         </testsuite>
     </testsuites>
 </phpunit>

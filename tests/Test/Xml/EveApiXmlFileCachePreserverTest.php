@@ -33,8 +33,8 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
-use Yapeal\Caching\EveApiXmlFileCachePreserver;
 use Yapeal\Xml\EveApiReadInterface;
+use Yapeal\Xml\FileCachePreserver;
 
 /**
  * Class EveApiXmlFileCachePreserverTest
@@ -47,7 +47,7 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
     public function setup()
     {
         $this->logger = $this->getLoggerMock();
-        $this->preserver = new EveApiXmlFileCachePreserver($this->logger, '');
+        $this->preserver = new FileCachePreserver($this->logger, '');
     }
     /**
      *
@@ -561,7 +561,7 @@ class EveApiXmlFileCachePreserverTest extends PHPUnit_Framework_TestCase
      */
     protected $logger;
     /**
-     * @var EveApiXmlFileCachePreserver
+     * @var FileCachePreserver
      */
     protected $preserver;
     /**

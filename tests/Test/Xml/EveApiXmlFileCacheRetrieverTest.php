@@ -26,15 +26,15 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Test\Caching;
+namespace Yapeal\Test\Xml;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
-use Yapeal\Caching\EveApiXmlFileCacheRetriever;
 use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Xml\FileCacheRetriever;
 
 /**
  * Class EveApiXmlFileCacheRetrieverTest
@@ -47,7 +47,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
     public function setup()
     {
         $this->logger = $this->getLoggerMock();
-        $this->retriever = new EveApiXmlFileCacheRetriever($this->logger, '');
+        $this->retriever = new FileCacheRetriever($this->logger, '');
     }
     /**
      *
@@ -55,6 +55,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
     public function testRetrieveEveApiLogsErrorForAboveRootPath()
     {
         $dataMock = $this->getDataMock();
+        $before = $dataMock->getEveApiXml();
         $this->assertAttributeEmpty('cachePath', $this->retriever);
         $this->logger
             ->expects($this->atLeastOnce())
@@ -82,11 +83,10 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                 )
             );
         $input = '/good/gone/../../../bad/';
-        $this->assertSame(
-            $dataMock,
-            $this->retriever->setCachePath($input)
-                            ->retrieveEveApi($dataMock)
-        );
+        $this->retriever->setCachePath($input)
+                        ->retrieveEveApi($dataMock);
+        $this->assertAttributeEquals($input, 'cachePath', $this->retriever);
+        $this->assertSame($before, $dataMock->getEveApiXml());
     }
     /**
      *
@@ -493,7 +493,7 @@ class EveApiXmlFileCacheRetrieverTest extends PHPUnit_Framework_TestCase
      */
     protected $logger;
     /**
-     * @type EveApiXmlFileCacheRetriever
+     * @type FileCacheRetriever
      */
     protected $retriever;
     /**

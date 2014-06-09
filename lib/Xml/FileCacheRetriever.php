@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EveApiXmlFileCacheRetriever class.
+ * Contains FileCacheRetriever class.
  *
  * PHP version 5.3
  *
@@ -26,21 +26,18 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Caching;
+namespace Yapeal\Xml;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Exception\YapealRetrieverFileException;
 use Yapeal\Exception\YapealRetrieverPathException;
-use Yapeal\Xml\EveApiReadInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class EveApiXmlFileCacheRetriever
+ * Class FileCacheRetriever
  */
-class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
+class FileCacheRetriever implements EveApiRetrieverInterface,
     LoggerAwareInterface
 {
     /**
@@ -67,9 +64,9 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
     /**
      * @param EveApiXmlModifyInterface $data
      *
-     * @return EveApiXmlModifyInterface
+     * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface $data)
+    public function retrieveEveApi(EveApiXmlModifyInterface &$data)
     {
         try {
             $cachePath =
@@ -86,9 +83,10 @@ class EveApiXmlFileCacheRetriever implements EveApiRetrieverInterface,
             $mess = 'Could NOT get XML data';
             $this->getLogger()
                  ->info($mess, array('exception' => $exp));
-            return $data;
+            return $this;
         }
-        return $data->setEveApiXml($result);
+        $data->setEveApiXml($result);
+        return $this;
     }
     /**
      * @param string|null $value

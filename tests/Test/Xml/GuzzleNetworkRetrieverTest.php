@@ -26,7 +26,7 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Test\Network;
+namespace Yapeal\Test\Xml;
 
 use Guzzle\Http\Exception\RequestException;
 use Guzzle\Http\Message\RequestInterface;
@@ -34,8 +34,8 @@ use Guzzle\Http\Message\Response;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
-use Yapeal\Network\GuzzleNetworkRetriever;
 use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Xml\GuzzleNetworkRetriever;
 
 /**
  * Class GuzzleNetworkRetrieverTest

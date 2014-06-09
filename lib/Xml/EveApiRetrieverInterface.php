@@ -37,7 +37,7 @@ interface EveApiRetrieverInterface
     /**
      * @param EveApiXmlModifyInterface $data
      *
-     * @return EveApiXmlModifyInterface
+     * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface $data);
+    public function retrieveEveApi(EveApiXmlModifyInterface &$data);
 }

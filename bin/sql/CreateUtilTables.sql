@@ -105,8 +105,6 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCharacter" 
     "characterName" CHAR(24)
                     COLLATE utf8_unicode_ci DEFAULT NULL,
     "isActive"      TINYINT(1) DEFAULT NULL,
-    "proxy"         VARCHAR(255)
-                    COLLATE utf8_unicode_ci DEFAULT NULL,
     PRIMARY KEY ("characterID")
 )
     ENGINE =InnoDB
@@ -119,8 +117,6 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCorporation
     "corporationName" CHAR(50)
                       COLLATE utf8_unicode_ci DEFAULT NULL,
     "isActive"        TINYINT(1) DEFAULT NULL,
-    "proxy"           VARCHAR(255)
-                      COLLATE utf8_unicode_ci DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB
@@ -131,7 +127,6 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
     "isActive"      TINYINT(1) DEFAULT NULL,
     "keyID"         BIGINT(20) UNSIGNED NOT NULL,
-    "proxy"         VARCHAR(255) DEFAULT NULL,
     "vCode"         VARCHAR(64)         NOT NULL,
     PRIMARY KEY ("keyID")
 )

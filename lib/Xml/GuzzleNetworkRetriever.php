@@ -67,10 +67,15 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
      */
     public function retrieveEveApi(EveApiXmlModifyInterface &$data)
     {
+        $mess = 'Started network retrieve for ' . $data->getEveApiSectionName()
+            . '\\' . $data->getEveApiName();
+        $this->getLogger()
+             ->debug($mess);
         $result = $this->readXmlData($this->prepareConnection($data));
+        //$this->getLogger()->debug($result);
         $data->setEveApiXml($result);
         $this->__destruct();
-        return $data->setEveApiXml($result);
+        return $this;
     }
     /**
      * @param ClientInterface|null $value
@@ -145,7 +150,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         } catch (RequestException $exp) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                 ->info($mess, array('exception' => $exp));
+                ->debug($mess, array('exception' => $exp));
             return false;
         }
         return $response->getBody(true);

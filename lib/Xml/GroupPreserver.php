@@ -40,7 +40,7 @@ class GroupPreserver implements EveApiPreserverInterface, LoggerAwareInterface
      * @param EveApiPreserverInterface[] $preserverList
      * @param LoggerInterface            $logger
      */
-    public function __construct(array $preserverList, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, array $preserverList)
     {
         $this->setPreserverList($preserverList);
         $this->setLogger($logger);

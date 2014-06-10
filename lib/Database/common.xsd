@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified" xml:lang="en-US">
+    <xs:element name="eveapi">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="eveNEDTType" name="currentTime"/>
+                <xs:choice>
+                    <xs:element type="eveErrorType" name="error"/>
+                    <xs:element type="resultType" name="result"/>
+                </xs:choice>
+                <xs:element type="eveNEDTType" name="cachedUntil"/>
+            </xs:sequence>
+            <xs:attribute type="xs:unsignedByte" name="version"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- Eve types -->
+    <xs:simpleType name="eveBooleanType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="True"/>
+            <xs:enumeration value="False"/>
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+            <xs:enumeration value="TRUE"/>
+            <xs:enumeration value="FALSE"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveColumnsType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[a-zA-Z]\w*"/>
+            <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*,\s?[a-zA-Z]\w*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveDTType">
+        <xs:annotation>
+            <xs:documentation>Date/time that can be empty.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value=""/>
+            <xs:pattern
+                value="(\d{4})-((0[13578])|10|12)-((0[1-9])|([1-2]\d)|30|31)(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+            <xs:pattern
+                value="(\d{4})-((0[469])|11)-((0[1-9])|([1-2]\d)|30)(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+            <xs:pattern
+                value="(\d{4})-02-((0[1-9])|([1-2]\d))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveIDType">
+        <xs:restriction base="xs:long">
+            <xs:minInclusive value="0" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveIDNegativeType">
+        <xs:restriction base="xs:long">
+            <xs:minInclusive value="-1" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveISKType">
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="17" fixed="true"/>
+            <xs:fractionDigits value="2" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveNEDTType">
+        <xs:annotation>
+            <xs:documentation>Date/time that can NOT be empty.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern
+                value="(\d{4})-((0[13578])|10|12)-((0[1-9])|([1-2]\d)|30|31)(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+            <xs:pattern
+                value="(\d{4})-((0[469])|11)-((0[1-9])|([1-2]\d)|30)(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+            <xs:pattern
+                value="(\d{4})-02-((0[1-9])|([1-2]\d))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="eveErrorType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="code" use="optional" type="xs:unsignedShort"
+                    default="0"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <!-- Eve Attributes -->
+    <xs:attributeGroup name="charAttrs">
+        <xs:attribute type="eveIDType" name="characterID" use="required"/>
+        <xs:attribute type="xs:string" name="characterName" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="acfAttrs">
+        <xs:attribute type="eveIDType" name="allianceID" use="required"/>
+        <xs:attribute type="xs:string" name="allianceName" use="required"/>
+        <xs:attribute type="eveIDType" name="corporationID" use="required"/>
+        <xs:attribute type="xs:string" name="corporationName" use="required"/>
+        <xs:attribute type="eveIDType" name="factionID" use="required"/>
+        <xs:attribute type="xs:string" name="factionName" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="rowsetAttrs">
+        <xs:attribute name="columns" use="required" type="eveColumnsType"/>
+        <xs:attribute name="key" use="required" type="xs:NCName"/>
+    </xs:attributeGroup>
+</xs:schema>

@@ -28,10 +28,12 @@
  */
 namespace Yapeal\Database\Account;
 
+use DOMDocument;
 use PDO;
-use PDOStatement;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use SimpleXMLElement;
+use XSLTProcessor;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
@@ -57,7 +59,7 @@ class APIKeyInfo implements LoggerAwareInterface
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setSectionName(
-            strtolower(basename(str_replace('\\', '/', __DIR__)))
+            basename(str_replace('\\', '/', __DIR__))
         );
         $this->setApiName(basename(str_replace('\\', '/', __CLASS__)));
         $this->csq = $csq;
@@ -77,25 +79,16 @@ class APIKeyInfo implements LoggerAwareInterface
                  'Starting autoMagic for ' . $this->getSectionName() . '\\'
                  . $this->getApiName()
              );
-        /**
-         * @var PDO $pdo
-         */
         $pdo = $this->getPdo();
-        /**
-         * @var CommonSqlQueries $csq
-         */
         $csq = $this->getCsq();
         $sql = $csq->getActiveRegisteredKeys();
         $this->getLogger()
              ->debug($sql);
-        /**
-         * @var PDOStatement $smt
-         */
         $stmt = $pdo->query($sql);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($result)) {
             $this->getLogger()
-                 ->notice('No active registered keys');
+                ->info('No active registered keys');
             return;
         }
         /**
@@ -115,6 +108,7 @@ class APIKeyInfo implements LoggerAwareInterface
                      ->debug($mess);
                 continue;
             }
+            $this->transformRowset($data);
             if ($this->isInvalid($data)) {
                 $mess = 'Data retrieved is invalid for registered key '
                     . $key['keyID'];
@@ -124,6 +118,7 @@ class APIKeyInfo implements LoggerAwareInterface
                 $preserver->preserveEveApi($data);
                 continue;
             }
+            $preserver->preserveEveApi($data);
         }
         print 'I ran!!!' . PHP_EOL;
     }
@@ -198,6 +193,39 @@ class APIKeyInfo implements LoggerAwareInterface
      */
     protected $sectionName;
     /**
+     * @var string
+     */
+    protected $xsl = <<<XSL
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
+    /**
      * @return string
      */
     protected function getApiName()
@@ -233,14 +261,50 @@ class APIKeyInfo implements LoggerAwareInterface
         return $this->sectionName;
     }
     /**
+     * @return string
+     */
+    protected function getXsl()
+    {
+        return $this->xsl;
+    }
+    /**
      * @param EveApiReadInterface $data
      *
      * @return bool
      */
-    protected function isInvalid(EveApiReadInterface $data)
+    protected function isInvalid(EveApiReadInterface &$data)
     {
-        //TODO Finish XSD validator
-        $data->getEveApiXml();
+        $this->getLogger()
+             ->debug('Started XSD validating');
+        $oldErrors = libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadXML($data->getEveApiXml());
+        $schema = str_replace('\\', '/', __DIR__) . '/' . $this->getApiName()
+            . '.xsd';
+        if ($dom->schemaValidate($schema)) {
+            libxml_use_internal_errors($oldErrors);
+            return false;
+        }
+        $logger = $this->getLogger();
+        foreach (libxml_get_errors() as $error) {
+            $logger->debug($error->message);
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($oldErrors);
         return true;
+    }
+    /**
+     * @param EveApiXmlModifyInterface $data
+     *
+     * @return self
+     */
+    protected function transformRowset(EveApiXmlModifyInterface &$data)
+    {
+        $xslt = new XSLTProcessor();
+        $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
+        $data->setEveApiXml(
+            $xslt->transformToXml(new SimpleXMLElement($data->getEveApiXml()))
+        );
+        return $this;
     }
 }

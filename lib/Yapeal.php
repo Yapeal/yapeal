@@ -43,11 +43,11 @@ use Yapeal\Database\Account\APIKeyInfo;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Xml\EveApiXmlData;
+use Yapeal\Xml\FileCachePreserver;
 use Yapeal\Xml\FileCacheRetriever;
+use Yapeal\Xml\GroupPreserver;
 use Yapeal\Xml\GroupRetriever;
 use Yapeal\Xml\GuzzleNetworkRetriever;
-use Yapeal\Xml\NullPreserver;
-use Yapeal\Xml\NullRetriever;
 
 /**
  * Class Yapeal
@@ -98,7 +98,8 @@ class Yapeal implements WiringInterface
                 return 1;
             }
             foreach ($result as $record) {
-                $className = 'Yapeal\\Database\\' . $record['section'] . '\\'
+                $className =
+                    'Yapeal\\Database\\' . ucfirst($record['section']) . '\\'
                     . $record['api'];
                 if (!class_exists($className)) {
                     $logger->info('Class not found ' . $className);
@@ -110,8 +111,8 @@ class Yapeal implements WiringInterface
                 $class = new $className($pdo, $logger, $csq);
                 $class->autoMagic(
                     new EveApiXmlData($record['api'], $record['section']),
-                    new NullRetriever(),
-                    new NullPreserver()
+                    $dic['Yapeal.Xml.Retriever'],
+                    $dic['Yapeal.Xml.Preserver']
                 );
             }
         } catch (\PDOException $exc) {
@@ -150,6 +151,7 @@ class Yapeal implements WiringInterface
         $this->wireDatabase($dic);
         $this->wireCommonSqlQueries($dic);
         $this->wireRetriever($dic);
+        $this->wirePreserver($dic);
     }
     /**
      * @var ContainerInterface
@@ -284,12 +286,12 @@ class Yapeal implements WiringInterface
              * @var Logger $logger
              */
             if (PHP_SAPI == 'cli') {
-                $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
+                $group[] = new StreamHandler('php://stderr', 100);
             }
             $group[] = new StreamHandler(
                 $dic['Yapeal.Error.logDir']
                 . $dic['Yapeal.Error.fileName'],
-                Logger::DEBUG
+                100
             );
             $logger->pushHandler(
                 new FingersCrossedHandler(
@@ -324,7 +326,7 @@ class Yapeal implements WiringInterface
             'Yapeal.Log.channel' => 'yapeal',
             'Yapeal.Log.logDir' => $dic['Yapeal.baseDir'] . 'log/',
             'Yapeal.Log.fileName' => 'yapeal.log',
-            'Yapeal.Log.threshold' => 300
+            'Yapeal.Log.threshold' => 100
         );
         foreach ($defaults as $setting => $default) {
             if (empty($dic[$setting])) {
@@ -341,11 +343,11 @@ class Yapeal implements WiringInterface
              * @var Logger $logger
              */
             if (PHP_SAPI == 'cli') {
-                $group[] = new StreamHandler('php://stderr', Logger::DEBUG);
+                $group[] = new StreamHandler('php://stderr', 100);
             }
             $group[] = new StreamHandler(
                 $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
-                Logger::DEBUG
+                100
             );
             $logger->pushHandler(
                 new FingersCrossedHandler(
@@ -353,6 +355,24 @@ class Yapeal implements WiringInterface
                 )
             );
             return $logger;
+        };
+    }
+    /**
+     * @param ContainerInterface $dic
+     */
+    private function wirePreserver(ContainerInterface $dic)
+    {
+        if (isset($dic['Yapeal.Xml.Preserver'])) {
+            return;
+        }
+        $dic['Yapeal.Xml.Preserver'] = function ($dic) {
+            $preservers = array(
+                new FileCachePreserver(
+                    $dic['Yapeal.Log.Logger'],
+                    $dic['Yapeal.baseDir'] . 'cache/'
+                )
+            );
+            return new GroupPreserver($dic['Yapeal.Log.Logger'], $preservers);
         };
     }
     /**

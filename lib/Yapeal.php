@@ -99,8 +99,9 @@ class Yapeal implements WiringInterface
             }
             foreach ($result as $record) {
                 $className =
-                    'Yapeal\\Database\\' . ucfirst($record['section']) . '\\'
-                    . $record['api'];
+                    'Yapeal\\Database\\' . ucfirst($record['sectionName'])
+                    . '\\'
+                    . $record['apiName'];
                 if (!class_exists($className)) {
                     $logger->info('Class not found ' . $className);
                     continue;
@@ -110,9 +111,12 @@ class Yapeal implements WiringInterface
                  */
                 $class = new $className($pdo, $logger, $csq);
                 $class->autoMagic(
-                    new EveApiXmlData($record['api'], $record['section']),
+                    new EveApiXmlData(
+                        $record['apiName'], $record['sectionName']
+                    ),
                     $dic['Yapeal.Xml.Retriever'],
-                    $dic['Yapeal.Xml.Preserver']
+                    $dic['Yapeal.Xml.Preserver'],
+                    (int)$record['interval']
                 );
             }
         } catch (\PDOException $exc) {

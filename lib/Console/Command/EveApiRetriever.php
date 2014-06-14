@@ -38,12 +38,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yapeal\Caching\EveApiXmlFileCachePreserver;
-use Yapeal\Network\GuzzleNetworkRetriever;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlData;
-use Yapeal\Xml\EveApiXmlDataInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Xml\FileCachePreserver;
+use Yapeal\Xml\GuzzleNetworkRetriever;
 
 /**
  * Class EveApiRetriever
@@ -194,7 +194,7 @@ EOF;
             $posts
         );
         $retriever = $this->getNetworkRetriever();
-        $data = $retriever->retrieveEveApi($data);
+        $retriever->retrieveEveApi($data);
         $preserver = $this->getCachingPreserver();
         $preserver->preserveEveApi($data);
         $output->writeln('I ran!!!');
@@ -204,7 +204,7 @@ EOF;
      */
     protected function getCachingPreserver()
     {
-        return new EveApiXmlFileCachePreserver(
+        return new FileCachePreserver(
             $this->getLogger(),
             $this->getCwd() . DIRECTORY_SEPARATOR . 'cache'
         );
@@ -269,7 +269,7 @@ EOF;
      * @param string   $sectionName
      * @param string[] $posts
      *
-     * @return EveApiXmlDataInterface
+     * @return EveApiXmlModifyInterface
      */
     protected function getXmlData($apiName, $sectionName, $posts)
     {

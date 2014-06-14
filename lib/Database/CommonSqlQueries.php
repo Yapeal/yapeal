@@ -65,11 +65,48 @@ class CommonSqlQueries
         );
     }
     /**
-     * @var string
+     * @param string[] $columnNameList
+     *
+     * @return string
      */
-    private $databaseName;
+    public function getUpsertEnd(array $columnNameList)
+    {
+        $updates = array();
+        foreach ($columnNameList as $column) {
+            $updates[] = '"' . $column . '"=values("' . $column . '")';
+        }
+        $updates = implode(',', $updates);
+        return ' on duplicate key update ' . $updates;
+    }
+    /**
+     * @param string   $tableName
+     * @param string[] $columnNameList
+     *
+     * @return string
+     */
+    public function getUpsertStart($tableName, array $columnNameList)
+    {
+        $upsertStart =
+            'insert into "{database}"."{table_prefix}' . $tableName . '" ('
+            . implode(',', $columnNameList) . ') values ';
+        return $upsertStart;
+    }
+    /**
+     * @return string
+     */
+    public function getUtilCachedUntilUpsert()
+    {
+        $columnNameList =
+            array('apiName', 'cachedUntil', 'ownerID', 'sectionName');
+        return $this->getUpsertStart('utilCachedUntil', $columnNameList)
+        . '(?,?,?,?)' . $this->getUpsertEnd($columnNameList);
+    }
     /**
      * @var string
      */
-    private $tablePrefix;
+    protected $databaseName;
+    /**
+     * @var string
+     */
+    protected $tablePrefix;
 }

@@ -28,15 +28,12 @@
  */
 namespace Yapeal\Database\Account;
 
-use DOMDocument;
 use PDO;
+use PDOException;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use SimpleXMLElement;
-use XSLTProcessor;
-use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlModifyInterface;
@@ -44,62 +41,51 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 /**
  * Class APIKeyInfo
  */
-class APIKeyInfo implements LoggerAwareInterface
+class APIKeyInfo extends AbstractCommonEveApi implements LoggerAwareInterface
 {
     /**
-     * @param PDO              $pdo
-     * @param LoggerInterface  $logger
-     * @param CommonSqlQueries $csq
-     */
-    public function __construct(
-        PDO $pdo,
-        LoggerInterface $logger,
-        CommonSqlQueries $csq
-    ) {
-        $this->setPdo($pdo);
-        $this->setLogger($logger);
-        $this->setSectionName(
-            basename(str_replace('\\', '/', __DIR__))
-        );
-        $this->setApiName(basename(str_replace('\\', '/', __CLASS__)));
-        $this->csq = $csq;
-    }
-    /**
      * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retriever
-     * @param EveApiPreserverInterface $preserver
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retriever,
-        EveApiPreserverInterface $preserver
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
     ) {
         $this->getLogger()
              ->info(
-                 'Starting autoMagic for ' . $this->getSectionName() . '\\'
-                 . $this->getApiName()
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
              );
-        $pdo = $this->getPdo();
-        $csq = $this->getCsq();
-        $sql = $csq->getActiveRegisteredKeys();
-        $this->getLogger()
-             ->debug($sql);
-        $stmt = $pdo->query($sql);
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($result)) {
+        $activeKeys = $this->getActiveKeys();
+        if (empty($activeKeys)) {
             $this->getLogger()
-                ->info('No active registered keys');
+                ->info('No active registered keys found');
             return;
         }
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
-        $data->setEveApiSectionName($this->getSectionName())
+        $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName());
-        foreach ($result as $key) {
+        foreach ($activeKeys as $key) {
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $key['keyID']
+            )
+            ) {
+                continue;
+            }
             $data->setEveApiArguments($key)
                  ->setEveApiXml();
-            $retriever->retrieveEveApi($data);
+            $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess =
                     'Could NOT retrieve Eve Api data for registered key '
@@ -115,196 +101,80 @@ class APIKeyInfo implements LoggerAwareInterface
                 $this->getLogger()
                      ->warning($mess);
                 $data->setEveApiName('Invalid' . $this->getApiName());
-                $preserver->preserveEveApi($data);
+                $preservers->preserveEveApi($data);
                 continue;
             }
-            $preserver->preserveEveApi($data);
+            $preservers->preserveEveApi($data);
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+            $columnDefaults = array(
+                'keyID' => $key['keyID'],
+                'accessMask' => null,
+                'expires' => '2038-01-19 03:14:07',
+                'type' => null
+            );
+            $preserver->setTableName('accountAPIKeyInfo')
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($data->getEveApiXml(), '//key');
+            $columnDefaults = array(
+                'characterID' => null,
+                'characterName' => null,
+                'corporationID' => null,
+                'corporationName' => null,
+                'allianceID' => null,
+                'allianceName' => null,
+                'factionID' => null,
+                'factionName' => null
+            );
+            $preserver->setTableName('accountCharacters')
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($data->getEveApiXml(), '//row');
+//            $columnDefaults =
+//                array('keyID' => $key['keyID'], 'characterID' => null);
+            $this->updateCachedUntil($data, $interval, $key['keyID']);
         }
-        print 'I ran!!!' . PHP_EOL;
     }
     /**
-     * @param string $value
-     *
-     * @return self
+     * @return array
      */
-    public function setApiName($value)
+    protected function getActiveKeys()
     {
-        $this->apiName = $value;
-        return $this;
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredKeys();
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT select from utilRegisteredKeys';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
     }
-    /**
-     * @param CommonSqlQueries $value
-     *
-     * @return self
-     */
-    public function setCsq($value)
-    {
-        $this->csq = $value;
-        return $this;
-    }
-    /**
-     * @param LoggerInterface $value
-     *
-     * @return self
-     */
-    public function setLogger(LoggerInterface $value)
-    {
-        $this->logger = $value;
-        return $this;
-    }
-    /**
-     * @param PDO $value
-     *
-     * @return self
-     */
-    public function setPdo(PDO $value)
-    {
-        $this->pdo = $value;
-        return $this;
-    }
-    /**
-     * @param string $value
-     *
-     * @return self
-     */
-    public function setSectionName($value)
-    {
-        $this->sectionName = $value;
-        return $this;
-    }
-    /**
-     * @var string
-     */
-    protected $apiName;
-    /**
-     * @var CommonSqlQueries
-     */
-    protected $csq;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-    /**
-     * @var PDO
-     */
-    protected $pdo;
-    /**
-     * @var string
-     */
-    protected $sectionName;
-    /**
-     * @var string
-     */
-    protected $xsl = <<<XSL
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
     /**
      * @return string
      */
     protected function getApiName()
     {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
         return $this->apiName;
-    }
-    /**
-     * @return CommonSqlQueries
-     */
-    protected function getCsq()
-    {
-        return $this->csq;
-    }
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-    /**
-     * @return PDO
-     */
-    protected function getPdo()
-    {
-        return $this->pdo;
     }
     /**
      * @return string
      */
     protected function getSectionName()
     {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
         return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getXsl()
-    {
-        return $this->xsl;
-    }
-    /**
-     * @param EveApiReadInterface $data
-     *
-     * @return bool
-     */
-    protected function isInvalid(EveApiReadInterface &$data)
-    {
-        $this->getLogger()
-             ->debug('Started XSD validating');
-        $oldErrors = libxml_use_internal_errors(true);
-        $dom = new DOMDocument();
-        $dom->loadXML($data->getEveApiXml());
-        $schema = str_replace('\\', '/', __DIR__) . '/' . $this->getApiName()
-            . '.xsd';
-        if ($dom->schemaValidate($schema)) {
-            libxml_use_internal_errors($oldErrors);
-            return false;
-        }
-        $logger = $this->getLogger();
-        foreach (libxml_get_errors() as $error) {
-            $logger->debug($error->message);
-        }
-        libxml_clear_errors();
-        libxml_use_internal_errors($oldErrors);
-        return true;
-    }
-    /**
-     * @param EveApiXmlModifyInterface $data
-     *
-     * @return self
-     */
-    protected function transformRowset(EveApiXmlModifyInterface &$data)
-    {
-        $xslt = new XSLTProcessor();
-        $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
-        $data->setEveApiXml(
-            $xslt->transformToXml(new SimpleXMLElement($data->getEveApiXml()))
-        );
-        return $this;
     }
 }

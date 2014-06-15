@@ -5,7 +5,7 @@ SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
     "apiName"     CHAR(32)            NOT NULL,
-    "cachedUntil" DATETIME            NOT NULL,
+    "expires" DATETIME NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName", "ownerID")
@@ -28,6 +28,7 @@ INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName", "apiName", "
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
     ('account', 'APIKeyInfo', 1, 300, 1),
+    ('api', 'CallList', 1, 86400, 1),
     ('char', 'AccountBalance', 1, 900, 1),
     ('char', 'AssetList', 2, 21600, 1),
     ('char', 'CalendarEventAttendees', 4, 3600, 1),

@@ -28,8 +28,10 @@
  */
 namespace Yapeal\Xml;
 
+use Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use SimpleXMLElement;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Exception\YapealRetrieverFileException;
 use Yapeal\Exception\YapealRetrieverPathException;
@@ -70,7 +72,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     {
         $mess =
             'Started filesystem retrieve for ' . $data->getEveApiSectionName()
-            . '\\' . $data->getEveApiName();
+            . '/' . $data->getEveApiName();
         $this->getLogger()
              ->debug($mess);
         try {
@@ -84,6 +86,13 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
             $this->prepareConnection($cacheFile);
             $result = $this->readXmlData($cacheFile);
             $this->__destruct();
+            if ($this->isExpired($result)) {
+                $mess = sprintf('Deleting expired cache file %1$s', $cacheFile);
+                $this->getLogger()
+                     ->debug($mess);
+                @unlink($cacheFile);
+                return $this;
+            }
         } catch (YapealRetrieverException $exp) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
@@ -271,6 +280,28 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
             $path .= '/';
         }
         return $path;
+    }
+    /**
+     * @param string $xml
+     *
+     * @return bool
+     */
+    protected function isExpired($xml)
+    {
+        try {
+            $simple = new SimpleXMLElement($xml);
+            if (strtotime($simple->currentTime . '+00:00') <= time()) {
+                $this->getLogger()
+                     ->debug('Cached XML has expired');
+                return true;
+            }
+        } catch (Exception $exc) {
+            $mess = 'Could NOT check for expired time';
+            $this->getLogger()
+                 ->notice($mess, array('exception' => $exc));
+            return true;
+        }
+        return false;
     }
     /**
      * @param $cacheFile

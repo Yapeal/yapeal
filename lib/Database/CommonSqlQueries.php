@@ -65,31 +65,52 @@ class CommonSqlQueries
         );
     }
     /**
-     * @param string[] $columnNameList
+     * @param string $tableName
+     * @param array  $columnNameList
+     * @param string $rowCount
      *
      * @return string
      */
-    public function getUpsertEnd(array $columnNameList)
+    public function getUpsert($tableName, array $columnNameList, $rowCount)
     {
+        $columns = implode('","', $columnNameList);
+        $rowPrototype =
+            '(' . implode(',', array_fill(0, count($columnNameList), '?'))
+            . ')';
+        $rows = implode(',', array_fill(0, $rowCount, $rowPrototype));
         $updates = array();
         foreach ($columnNameList as $column) {
             $updates[] = '"' . $column . '"=values("' . $column . '")';
         }
         $updates = implode(',', $updates);
-        return ' on duplicate key update ' . $updates;
+        $sql = sprintf(
+            'INSERT INTO "%1$s"."%2$s%3$s" ("%4$s") VALUES %5$s ON DUPLICATE KEY UPDATE %6$s',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName,
+            $columns,
+            $rows,
+            $updates
+        );
+        return $sql;
     }
     /**
-     * @param string   $tableName
-     * @param string[] $columnNameList
+     * @param string $apiName
+     * @param string $sectionName
+     * @param string $ownerID
      *
      * @return string
      */
-    public function getUpsertStart($tableName, array $columnNameList)
+    public function getUtilCachedUntilExpires($apiName, $sectionName, $ownerID)
     {
-        $upsertStart =
-            'insert into "{database}"."{table_prefix}' . $tableName . '" ('
-            . implode(',', $columnNameList) . ') values ';
-        return $upsertStart;
+        return sprintf(
+            'SELECT "expires" FROM "%1$s"."%2$sutilCachedUntil" WHERE "apiName" = \'%3$s\' AND "sectionName" = \'%4$s\' AND "ownerID" = %5$s',
+            $this->databaseName,
+            $this->tablePrefix,
+            $apiName,
+            $sectionName,
+            $ownerID
+        );
     }
     /**
      * @return string
@@ -97,9 +118,8 @@ class CommonSqlQueries
     public function getUtilCachedUntilUpsert()
     {
         $columnNameList =
-            array('apiName', 'cachedUntil', 'ownerID', 'sectionName');
-        return $this->getUpsertStart('utilCachedUntil', $columnNameList)
-        . '(?,?,?,?)' . $this->getUpsertEnd($columnNameList);
+            array('apiName', 'expires', 'ownerID', 'sectionName');
+        return $this->getUpsert('utilCachedUntil', $columnNameList, 1);
     }
     /**
      * @var string

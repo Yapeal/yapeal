@@ -29,13 +29,15 @@
 namespace Yapeal\Database;
 
 use PDO;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 
 /**
  * Class AttributesDatabasePreserver
  */
-class AttributesDatabasePreserver implements DatabasePreserverInterface
+class AttributesDatabasePreserver implements
+    DatabasePreserverInterface, LoggerAwareInterface
 {
     /**
      * @param PDO              $pdo
@@ -173,7 +175,19 @@ class AttributesDatabasePreserver implements DatabasePreserverInterface
         if (empty($row)) {
             return $this;
         }
-        $this->upsertRows[] = array_replace($this->getColumnDefaults(), $row);
+        $defaults = $this->getColumnDefaults();
+        // Fill-in any missing columns like ownerID.
+        $newRow = array_replace($defaults, $row);
+        // Replace empty values with any existing defaults.
+        foreach ($defaults as $key => $value) {
+            if (is_null($value)) {
+                continue;
+            }
+            if (strlen($newRow[$key]) == 0) {
+                $newRow[$key] = $value;
+            }
+        }
+        $this->upsertRows[] = $newRow;
         if (++$this->rowCount >= $this->maxRowCount) {
             $this->flush();
         }
@@ -204,6 +218,8 @@ class AttributesDatabasePreserver implements DatabasePreserverInterface
             return $this;
         }
         $data = $this->flattenArray($this->upsertRows);
+        //$this->getLogger()
+        //     ->debug(implode(',', $data));
         $this->upsertRows = array();
         $mess = sprintf(
             'Have %1$s row(s) to upsert into %2$s table',
@@ -212,16 +228,21 @@ class AttributesDatabasePreserver implements DatabasePreserverInterface
         );
         $this->getLogger()
              ->debug($mess);
-        $sql = $this->getUpsertStart() . implode(
-                ',',
-                array_fill(0, $this->rowCount, $this->getRowPrototype())
-            ) . $this->getUpsertEnd();
+        $sql = $this->getCsq()
+                    ->getUpsert(
+                        $this->getTableName(),
+                        $this->getColumnNameList(),
+                        $this->rowCount
+                    );
+        $mess = preg_replace('/(,\(\?(,\?)*\))*/', '', $sql);
+        $this->getLogger()
+             ->debug($mess);
         $this->rowCount = 0;
         $pdo = $this->getPdo();
         try {
             $pdo->beginTransaction();
-            $statement = $pdo->prepare($sql);
-            $statement->execute($data);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($data);
             $pdo->commit();
         } catch (\PDOException $exc) {
             $mess = sprintf(
@@ -272,48 +293,8 @@ class AttributesDatabasePreserver implements DatabasePreserverInterface
     /**
      * @return string
      */
-    protected function getRowPrototype()
-    {
-        if (empty($this->rowPrototype)) {
-            $this->setRowPrototype(count($this->getColumnDefaults()));
-        }
-        return $this->rowPrototype;
-    }
-    /**
-     * @return string
-     */
     protected function getTableName()
     {
         return $this->tableName;
-    }
-    /**
-     * @return string
-     */
-    protected function getUpsertEnd()
-    {
-        return $this->getCsq()
-                    ->getUpsertEnd($this->getColumnNameList());
-    }
-    /**
-     * @return string
-     */
-    protected function getUpsertStart()
-    {
-        return $this->getCsq()
-                    ->getUpsertStart(
-                        $this->getTableName(),
-                        $this->getColumnNameList()
-                    );
-    }
-    /**
-     * @param int $columnCount
-     *
-     * @return self
-     */
-    protected function setRowPrototype($columnCount)
-    {
-        $this->rowPrototype =
-            '(' . implode(',', array_fill(0, $columnCount, '?')) . ')';
-        return $this;
     }
 }

@@ -103,6 +103,7 @@ if (mysqli_connect_error()) {
 $fileNames = array(
     'Database',
     'AccountTables',
+    'ApiTables',
     'CharTables',
     'CorpTables',
     'EveTables',

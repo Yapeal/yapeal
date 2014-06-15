@@ -70,9 +70,11 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     public function retrieveEveApi(EveApiXmlModifyInterface &$data)
     {
-        $mess =
-            'Started filesystem retrieve for ' . $data->getEveApiSectionName()
-            . '/' . $data->getEveApiName();
+        $mess = sprintf(
+            'Started filesystem retrieve for %1$s/%2$s',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName()
+        );
         $this->getLogger()
              ->debug($mess);
         try {
@@ -93,10 +95,10 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
                 @unlink($cacheFile);
                 return $this;
             }
-        } catch (YapealRetrieverException $exp) {
+        } catch (YapealRetrieverException $exc) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                ->debug($mess, array('exception' => $exp));
+                ->debug($mess, array('exception' => $exc));
             return $this;
         }
         //$this->getLogger()->debug($result);

@@ -27,10 +27,9 @@
             <xs:enumeration value="0"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="eveColumnsType">
+    <xs:simpleType name="eveListType">
         <xs:restriction base="xs:normalizedString">
-            <xs:pattern value="[a-zA-Z]\w*"/>
-            <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*,\s?[a-zA-Z]\w*"/>
+            <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eveDTType">
@@ -99,7 +98,7 @@
         <xs:attribute type="xs:string" name="factionName" use="required"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="rowsetAttrs">
-        <xs:attribute name="columns" use="required" type="eveColumnsType"/>
-        <xs:attribute name="key" use="required" type="xs:NCName"/>
+        <xs:attribute name="columns" use="required" type="eveListType"/>
+        <xs:attribute name="key" use="required" type="eveListType"/>
     </xs:attributeGroup>
 </xs:schema>

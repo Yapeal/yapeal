@@ -1324,7 +1324,9 @@
         <query platform="mysql">ALTER TABLE `%%PcharAttackers` MODIFY `finalBlow` BOOLEAN NOT NULL</query>
     </sql>
     <sql prefixmethod="MANUAL">
-        <query platform="mysql">ALTER TABLE `%%PcharContactList` MODIFY `inWatchlist` BOOLEAN NOT NULL</query>
+        <query platform="mysql">ALTER TABLE `%%PcharContactList` MODIFY
+            `inWatchlist` BOOLEAN DEFAULT 0
+        </query>
     </sql>
     <sql prefixmethod="MANUAL">
         <query platform="mysql">ALTER TABLE `%%PcharContracts` MODIFY `forCorp` BOOLEAN NOT NULL</query>

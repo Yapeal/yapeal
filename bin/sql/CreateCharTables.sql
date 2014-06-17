@@ -173,6 +173,30 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContracts" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}charContractItems";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContractItems" (
+    "contractID"  BIGINT(20) UNSIGNED NOT NULL,
+    "included"    TINYINT(1) UNSIGNED NOT NULL,
+    "quantity"    BIGINT(20) UNSIGNED NOT NULL,
+    "rawQuantity" TINYINT(1),
+    "recordID"    BIGINT(20) UNSIGNED NOT NULL,
+    "singleton"   TINYINT(1) UNSIGNED NOT NULL,
+    "typeID"      BIGINT(20) UNSIGNED NOT NULL,
+    PRIMARY KEY ("contractID", "recordID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}charContractBids";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContractBids" (
+    "amount"     DECIMAL(17, 2)      NOT NULL,
+    "bidID"      BIGINT(20) UNSIGNED NOT NULL,
+    "bidderID"   BIGINT(20) UNSIGNED NOT NULL,
+    "contractID" BIGINT(20) UNSIGNED NOT NULL,
+    "dateBid"    DATETIME            NOT NULL,
+    PRIMARY KEY ("contractID", "bidID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charCorporateContactList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,

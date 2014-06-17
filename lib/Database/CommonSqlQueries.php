@@ -54,6 +54,34 @@ class CommonSqlQueries
         );
     }
     /**
+     * @param int $mask
+     *
+     * @return string
+     */
+    public function getActiveRegisteredCharacters($mask)
+    {
+        $sql = <<<'SQL'
+SELECT ac."characterID",urk."keyID",urk."vCode",urk."activeAPIMask",aaki."accessMask"
+ FROM "%1$s"."%2$saccountKeyBridge" AS akb
+ JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
+ ON (akb."keyID" = aaki."keyID")
+ JOIN "%1$s"."%2$sutilRegisteredKey" AS urk
+ ON (akb."keyID" = urk."keyID")
+ JOIN "%1$s"."%2$saccountCharacters" AS ac
+ ON (akb."characterID" = ac."characterID")
+ WHERE
+  aaki."type" IN ('Account','Character')
+  AND urk."isActive"=1
+  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+SQL;
+        return sprintf(
+            str_replace(array("\n", "\r\n"), '', $sql),
+            $this->databaseName,
+            $this->tablePrefix,
+            $mask
+        );
+    }
+    /**
      * @return string
      */
     public function getActiveRegisteredKeys()

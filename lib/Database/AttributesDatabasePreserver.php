@@ -29,6 +29,7 @@
 namespace Yapeal\Database;
 
 use PDO;
+use PDOException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -234,24 +235,27 @@ class AttributesDatabasePreserver implements
                         $this->getColumnNameList(),
                         $this->rowCount
                     );
-        $mess = preg_replace('/(,\(\?(,\?)*\))*/', '', $sql);
+        $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
         $this->getLogger()
              ->debug($mess);
         $this->rowCount = 0;
-        $pdo = $this->getPdo();
         try {
-            $pdo->beginTransaction();
-            $stmt = $pdo->prepare($sql);
+            $this->getPdo()
+                 ->beginTransaction();
+            $stmt = $this->getPdo()
+                         ->prepare($sql);
             $stmt->execute($data);
-            $pdo->commit();
-        } catch (\PDOException $exc) {
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
             $mess = sprintf(
                 'Failed to upsert row(s) into %1$s table',
                 $this->getTableName()
             );
             $this->getLogger()
                  ->warning($mess, array('exception' => $exc));
-            $pdo->rollBack();
+            $this->getPdo()
+                 ->rollBack();
         }
         return $this;
     }

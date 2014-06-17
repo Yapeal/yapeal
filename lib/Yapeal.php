@@ -94,7 +94,7 @@ class Yapeal implements WiringInterface
             $stmt = $pdo->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (empty($result)) {
-                $logger->warning('No active Eve APIs will exist now');
+                $logger->warning('No active Eve APIs found will exist now');
                 return 1;
             }
             foreach ($result as $record) {

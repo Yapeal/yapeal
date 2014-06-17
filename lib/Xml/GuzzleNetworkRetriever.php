@@ -68,7 +68,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     public function retrieveEveApi(EveApiXmlModifyInterface &$data)
     {
         $mess = sprintf(
-            'Started filesystem retrieve for %1$s/%2$s',
+            'Started network retrieve for %1$s/%2$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName()
         );

@@ -99,30 +99,6 @@ VALUES
     ('map', 'Sovereignty', 8, 3600, 1),
     ('server', 'ServerStatus', 1, 180, 1);
 COMMIT;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredCharacter";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCharacter" (
-    "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24)
-                    COLLATE utf8_unicode_ci DEFAULT NULL,
-    "isActive"      TINYINT(1) DEFAULT NULL,
-    PRIMARY KEY ("characterID")
-)
-    ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredCorporation";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredCorporation" (
-    "activeAPIMask"   BIGINT(20) UNSIGNED DEFAULT NULL,
-    "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
-    "corporationName" CHAR(50)
-                      COLLATE utf8_unicode_ci DEFAULT NULL,
-    "isActive"        TINYINT(1) DEFAULT NULL,
-    PRIMARY KEY ("corporationID")
-)
-    ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,

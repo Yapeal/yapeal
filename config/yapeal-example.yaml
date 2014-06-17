@@ -13,21 +13,25 @@ Yapeal:
     Log:
         channel: yapeal
         class: Monolog\Logger
-        dirName: '{Yapeal.dirName}'
+        logDir: '{Yapeal.baseDir}log/'
         fileName: yapeal.log
         # Threshold that should trigger logging.
+        # Allowed values:
+        # 100(DEBUG), 200(INFO), 250(NOTICE), 300(WARNING), 400(ERROR),
+        # 500(CRITICAL), 550(ALERT), 600(EMERGENCY)
         # Recommended default for development NOTICE or INFO
         # Recommended default for production WARNING or ERROR
-        threshold: WARNING
+        threshold: 300
     Error:
         channel: php
         class: Monolog\ErrorHandler
-        dirName: '{Yapeal.dirName}'
+        logDir: '{Yapeal.baseDir}log/'
         fileName: yapeal.log
         # Threshold that should trigger logging.
+        # See Yapeal.Log.threshold for allowed values
         # Recommended default for development ERROR or WARNING
         # Recommended default for production CRITICAL
-        threshold: CRITICAL
+        threshold: 500
         # (Optional) Defaults to another instance of Yapeal.Log.class
         # loggerClass: Monolog\Logger
 ...

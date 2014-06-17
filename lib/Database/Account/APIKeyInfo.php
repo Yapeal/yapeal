@@ -30,9 +30,10 @@ namespace Yapeal\Database\Account;
 
 use PDO;
 use PDOException;
-use Psr\Log\LoggerAwareInterface;
+use SimpleXMLIterator;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -41,7 +42,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 /**
  * Class APIKeyInfo
  */
-class APIKeyInfo extends AbstractCommonEveApi implements LoggerAwareInterface
+class APIKeyInfo extends AbstractCommonEveApi
 {
     /**
      * @param EveApiReadWriteInterface $data
@@ -110,30 +111,13 @@ class APIKeyInfo extends AbstractCommonEveApi implements LoggerAwareInterface
                 $this->getLogger(),
                 $this->getCsq()
             );
-            $columnDefaults = array(
-                'keyID' => $key['keyID'],
-                'accessMask' => null,
-                'expires' => '2038-01-19 03:14:07',
-                'type' => null
+            $this->preserveToCharacters($preserver, $data->getEveApiXml());
+            $this->preserveToAPIKeyInfo(
+                $preserver,
+                $data->getEveApiXml(),
+                $key['keyID']
             );
-            $preserver->setTableName('accountAPIKeyInfo')
-                      ->setColumnDefaults($columnDefaults)
-                      ->preserveData($data->getEveApiXml(), '//key');
-            $columnDefaults = array(
-                'characterID' => null,
-                'characterName' => null,
-                'corporationID' => null,
-                'corporationName' => null,
-                'allianceID' => null,
-                'allianceName' => null,
-                'factionID' => null,
-                'factionName' => null
-            );
-            $preserver->setTableName('accountCharacters')
-                      ->setColumnDefaults($columnDefaults)
-                      ->preserveData($data->getEveApiXml(), '//row');
-//            $columnDefaults =
-//                array('keyID' => $key['keyID'], 'characterID' => null);
+            $this->preserveToKeyBridge($data->getEveApiXml(), $key['keyID']);
             $this->updateCachedUntil($data, $interval, $key['keyID']);
         }
     }
@@ -176,5 +160,91 @@ class APIKeyInfo extends AbstractCommonEveApi implements LoggerAwareInterface
             $this->sectionName = basename(str_replace('\\', '/', __DIR__));
         }
         return $this->sectionName;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $key
+     *
+     * @return self
+     */
+    protected function preserveToAPIKeyInfo(
+        DatabasePreserverInterface $preserver,
+        &$xml,
+        $key
+    ) {
+        $columnDefaults = array(
+            'keyID' => $key,
+            'accessMask' => null,
+            'expires' => '2038-01-19 03:14:07',
+            'type' => null
+        );
+        $preserver->setTableName('accountAPIKeyInfo')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//key');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     */
+    protected function preserveToCharacters(
+        DatabasePreserverInterface $preserver,
+        &$xml
+    ) {
+        $columnDefaults = array(
+            'characterID' => null,
+            'characterName' => null,
+            'corporationID' => null,
+            'corporationName' => null,
+            'allianceID' => null,
+            'allianceName' => null,
+            'factionID' => null,
+            'factionName' => null
+        );
+        $preserver->setTableName('accountCharacters')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//row');
+    }
+    /**
+     * @param string $xml
+     * @param string $key
+     *
+     * @return self
+     */
+    protected function preserveToKeyBridge(
+        &$xml,
+        $key
+    ) {
+        $simple = new SimpleXMLIterator($xml);
+        $chars = $simple->xpath('//row');
+        $rows = array();
+        foreach ($chars as $aRow) {
+            $rows[] = $key;
+            $rows[] = $aRow['characterID'];
+        }
+        $sql = $this->getCsq()
+                    ->getUpsert(
+                        'accountKeyBridge',
+                        array('keyID', 'characterID'),
+                        count($chars)
+                    );
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $stmt = $this->getPdo()
+                         ->prepare($sql);
+            $stmt->execute($rows);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = 'Failed to upsert row(s) into accountKeyBridge table';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
     }
 }

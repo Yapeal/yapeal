@@ -27,10 +27,11 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Api;
+namespace Yapeal\Database\Eve;
 
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -55,12 +56,12 @@ class ErrorList extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
@@ -68,8 +69,8 @@ class ErrorList extends AbstractCommonEveApi
              ->setEveApiName($this->getApiName())
              ->setEveApiXml();
         if ($this->cacheNotExpired(
-                 $this->getApiName(),
-                     $this->getSectionName()
+            $this->getApiName(),
+            $this->getSectionName()
         )
         ) {
             return;
@@ -104,13 +105,7 @@ class ErrorList extends AbstractCommonEveApi
             $this->getLogger(),
             $this->getCsq()
         );
-        $columnDefaults = array(
-            'errorCode' => null,
-            'errorText' => null
-        );
-        $preserver->setTableName('eveErrorList')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($data->getEveApiXml());
+        $this->preserveToErrorList($preserver, $data->getEveApiXml());
         $this->updateCachedUntil($data, $interval, '0');
     }
     /**
@@ -132,5 +127,21 @@ class ErrorList extends AbstractCommonEveApi
             $this->sectionName = basename(str_replace('\\', '/', __DIR__));
         }
         return $this->sectionName;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     */
+    protected function preserveToErrorList(
+        DatabasePreserverInterface $preserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'errorCode' => null,
+            'errorText' => null
+        );
+        $preserver->setTableName('eveErrorList')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml);
     }
 }

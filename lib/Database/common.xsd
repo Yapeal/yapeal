@@ -32,6 +32,12 @@
             <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="eveIDListType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value=""/>
+            <xs:pattern value="[0-9]+(,\s?[0-9]+)*"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="eveDTType">
         <xs:annotation>
             <xs:documentation>Date/time that can be empty.</xs:documentation>

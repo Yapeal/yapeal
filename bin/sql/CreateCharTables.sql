@@ -360,7 +360,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charMailMessages" (
     "senderID"           BIGINT(20) UNSIGNED NOT NULL,
     "senderName"         CHAR(50) DEFAULT NULL,
     "sentDate"           DATETIME            NOT NULL,
-    "title"              CHAR(50) DEFAULT NULL,
+    "title" CHAR(255) DEFAULT NULL,
     "toCharacterIDs"     TEXT,
     "toCorpOrAllianceID" BIGINT(20) UNSIGNED DEFAULT '0',
     "toListID"           TEXT,

@@ -209,5 +209,5 @@ class MarketOrders extends AbstractCommonEveApi
     /**
      * @var int $mask
      */
-    private $mask = 2048;
+    private $mask = 4096;
 }

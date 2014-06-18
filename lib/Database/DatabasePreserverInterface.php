@@ -39,7 +39,7 @@ interface DatabasePreserverInterface
      *
      * @return self
      */
-    public function preserveData($xml, $xPath);
+    public function preserveData($xml, $xPath = '//row');
     /**
      * @param string[] $columnDefaults
      *

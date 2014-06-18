@@ -64,18 +64,18 @@ class APIKeyInfo extends AbstractCommonEveApi
                      $this->getApiName()
                  )
              );
-        $activeKeys = $this->getActiveKeys();
-        if (empty($activeKeys)) {
+        $active = $this->getActiveKeys();
+        if (empty($active)) {
             $this->getLogger()
                 ->info('No active registered keys found');
             return;
         }
-        /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
-         */
-        $data->setEveApiSectionName(strtolower($this->getSectionName()))
-             ->setEveApiName($this->getApiName());
-        foreach ($activeKeys as $key) {
+        foreach ($active as $key) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
                 $this->getApiName(),
                 $this->getSectionName(),
@@ -88,17 +88,24 @@ class APIKeyInfo extends AbstractCommonEveApi
                  ->setEveApiXml();
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
-                $mess =
-                    'Could NOT retrieve Eve Api data for registered key '
-                    . $key['keyID'];
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $key['keyID']
+                );
                 $this->getLogger()
                      ->debug($mess);
                 continue;
             }
             $this->transformRowset($data);
             if ($this->isInvalid($data)) {
-                $mess = 'Data retrieved is invalid for registered key '
-                    . $key['keyID'];
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $key['keyID']
+                );
                 $this->getLogger()
                      ->warning($mess);
                 $data->setEveApiName('Invalid' . $this->getApiName());
@@ -164,17 +171,17 @@ class APIKeyInfo extends AbstractCommonEveApi
     /**
      * @param DatabasePreserverInterface $preserver
      * @param string                     $xml
-     * @param string                     $key
+     * @param string                     $ownerID
      *
      * @return self
      */
     protected function preserveToAPIKeyInfo(
         DatabasePreserverInterface $preserver,
-        &$xml,
-        $key
+        $xml,
+        $ownerID
     ) {
         $columnDefaults = array(
-            'keyID' => $key,
+            'keyID' => $ownerID,
             'accessMask' => null,
             'expires' => '2038-01-19 03:14:07',
             'type' => null
@@ -190,7 +197,7 @@ class APIKeyInfo extends AbstractCommonEveApi
      */
     protected function preserveToCharacters(
         DatabasePreserverInterface $preserver,
-        &$xml
+        $xml
     ) {
         $columnDefaults = array(
             'characterID' => null,
@@ -208,19 +215,19 @@ class APIKeyInfo extends AbstractCommonEveApi
     }
     /**
      * @param string $xml
-     * @param string $key
+     * @param string $ownerID
      *
      * @return self
      */
     protected function preserveToKeyBridge(
-        &$xml,
-        $key
+        $xml,
+        $ownerID
     ) {
         $simple = new SimpleXMLIterator($xml);
         $chars = $simple->xpath('//row');
         $rows = array();
         foreach ($chars as $aRow) {
-            $rows[] = $key;
+            $rows[] = $ownerID;
             $rows[] = $aRow['characterID'];
         }
         $sql = $this->getCsq()

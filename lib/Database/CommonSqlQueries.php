@@ -61,7 +61,7 @@ class CommonSqlQueries
     public function getActiveRegisteredCharacters($mask)
     {
         $sql = <<<'SQL'
-SELECT ac."characterID",urk."keyID",urk."vCode",urk."activeAPIMask",aaki."accessMask"
+SELECT ac."characterID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
  ON (akb."keyID" = aaki."keyID")

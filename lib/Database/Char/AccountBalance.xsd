@@ -13,13 +13,15 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="accountsType" name="accounts"/>
+            <xs:element name="accounts">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="rowType" name="row" minOccurs="0"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="accountsType">
-        <xs:sequence>
-            <xs:element type="rowType" name="row"/>
-        </xs:sequence>
-        <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
 </xs:schema>

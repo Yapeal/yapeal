@@ -15,15 +15,15 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="contactNotificationsType"
-                name="contactNotifications"/>
+            <xs:element name="contactNotifications">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="rowType" name="row" minOccurs="0"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="contactNotificationsType">
-        <xs:sequence>
-            <xs:element type="rowType" name="row" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
 </xs:schema>

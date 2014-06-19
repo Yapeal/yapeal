@@ -199,5 +199,5 @@ class Research extends AbstractCommonEveApi
     /**
      * @var int $mask
      */
-    private $mask = 2048;
+    private $mask = 65536;
 }

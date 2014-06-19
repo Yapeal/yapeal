@@ -431,9 +431,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillInTraining" (
     "ownerID"               BIGINT(20) UNSIGNED NOT NULL,
     "skillInTraining"       TINYINT(1) UNSIGNED NOT NULL,
     "trainingDestinationSP" BIGINT(20) UNSIGNED NOT NULL,
-    "trainingEndTime"       DATETIME DEFAULT NULL,
+    "trainingEndTime"   DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
     "trainingStartSP"       BIGINT(20) UNSIGNED NOT NULL,
-    "trainingStartTime"     DATETIME DEFAULT NULL,
+    "trainingStartTime" DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
     "trainingToLevel"       TINYINT(1) UNSIGNED NOT NULL,
     "trainingTypeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
@@ -442,12 +442,12 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillInTraining" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charSkillQueue";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillQueue" (
     "endSP"         BIGINT(20) UNSIGNED NOT NULL,
-    "endTime"       DATETIME            NOT NULL,
+    "endTime"   DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
     "level"         TINYINT(1) UNSIGNED NOT NULL,
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "queuePosition" TINYINT(2) UNSIGNED NOT NULL,
     "startSP"       BIGINT(20) UNSIGNED NOT NULL,
-    "startTime" DATETIME DEFAULT NULL,
+    "startTime" DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
     "typeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "queuePosition")
 )

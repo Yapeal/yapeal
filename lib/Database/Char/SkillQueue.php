@@ -190,8 +190,8 @@ class SkillQueue extends AbstractCommonEveApi
             'level' => null,
             'startSP' => null,
             'endSP' => null,
-            'startTime' => null,
-            'endTime' => null
+            'startTime' => '1972-01-01 00:00:01',
+            'endTime' => '1972-01-01 00:00:01'
         );
         $preserver->setTableName('charSkillQueue')
                   ->setColumnDefaults($columnDefaults)

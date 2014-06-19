@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charWalletTransactions" (
     "price"                DECIMAL(17, 2)       NOT NULL,
     "quantity"             BIGINT(20) UNSIGNED  NOT NULL,
     "stationID"            BIGINT(20) UNSIGNED DEFAULT NULL,
-    "stationName"          CHAR(50) DEFAULT NULL,
+    "stationName" CHAR(255) DEFAULT NULL,
     "transactionDateTime"  DATETIME             NOT NULL,
     "transactionFor"       CHAR(12)             NOT NULL DEFAULT 'corporation',
     "transactionID"        BIGINT(20) UNSIGNED  NOT NULL,

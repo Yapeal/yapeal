@@ -525,7 +525,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charWalletJournal" (
     "reason"        TEXT
                     COLLATE utf8_unicode_ci,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
-    "refTypeID"     INT(3) UNSIGNED      NOT NULL,
+    "refTypeID" SMALLINT(5) UNSIGNED NOT NULL,
     "taxAmount"     DECIMAL(17, 2)       NOT NULL,
     "taxReceiverID" BIGINT(20) UNSIGNED DEFAULT '0',
     "owner1TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,

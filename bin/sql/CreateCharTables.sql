@@ -447,7 +447,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillQueue" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "queuePosition" TINYINT(2) UNSIGNED NOT NULL,
     "startSP"       BIGINT(20) UNSIGNED NOT NULL,
-    "startTime"     DATETIME            NOT NULL,
+    "startTime" DATETIME DEFAULT NULL,
     "typeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "queuePosition")
 )

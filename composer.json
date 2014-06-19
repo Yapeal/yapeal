@@ -50,7 +50,8 @@
         "php": ">=5.3.10",
         "guzzle/guzzle": "~3.9",
         "monolog/monolog": "~1.9",
-        "symfony/console": "~2.5"
+        "symfony/console": "~2.5",
+        "symfony/yaml": "~2.5"
     },
     "require-dev": {
         "dragonrun1/semantic-version": "master@dev",

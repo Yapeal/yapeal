@@ -19,4 +19,5 @@ xdebug/
 docs/
 .idea/
 config/yapeal.ini
+config/yapeal.yaml
 ext/

@@ -106,9 +106,7 @@ class Yapeal implements WiringInterface
              */
             $class = new $className($pdo, $logger, $csq);
             $class->autoMagic(
-                new EveApiXmlData(
-                    $record['apiName'], $record['sectionName']
-                ),
+                new EveApiXmlData(),
                 $dic['Yapeal.Xml.Retriever'],
                 $dic['Yapeal.Xml.Preserver'],
                 (int)$record['interval']

@@ -37,11 +37,16 @@ use Monolog\Logger;
 use PDO;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Parser;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Database\Account\APIKeyInfo;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiXmlData;
 use Yapeal\Xml\FileCachePreserver;
 use Yapeal\Xml\FileCacheRetriever;
@@ -150,6 +155,8 @@ class Yapeal implements WiringInterface
             $dic['Yapeal.baseDir'] =
                 str_replace('\\', '/', dirname(__DIR__)) . '/';
         }
+        $this->wireConfiguration($dic);
+        $dic['Yapeal.Config.Parser'];
         $this->wireErrorLogger($dic);
         $this->wireLogLogger($dic);
         $this->wireDatabase($dic);
@@ -189,6 +196,73 @@ class Yapeal implements WiringInterface
                 $dic['Yapeal.Database.database'],
                 $dic['Yapeal.Database.tablePrefix']
             );
+        };
+    }
+    /**
+     * @param ContainerInterface $dic
+     */
+    private function wireConfiguration(ContainerInterface $dic)
+    {
+        if (isset($dic['Yapeal.Config.Parser'])) {
+            return;
+        }
+        $defaults = array(
+            'Yapeal.Config.class' => 'Symfony\\Component\\Yaml\\Parser',
+            'Yapeal.Config.configDir' => $dic['Yapeal.baseDir'] . 'config/',
+            'Yapeal.Config.fileName' => 'yapeal.yaml'
+        );
+        foreach ($defaults as $setting => $default) {
+            if (empty($dic[$setting])) {
+                $dic[$setting] = $default;
+            }
+        }
+        $dic['Yapeal.Config.Parser'] = function ($dic) {
+            $configFile = $dic['Yapeal.Config.configDir']
+                . $dic['Yapeal.Config.fileName'];
+            if (!is_readable($configFile) || !is_file($configFile)) {
+                $mess = sprintf(
+                    'Configuration file %1$s is NOT accessible',
+                    $configFile
+                );
+                throw new YapealException($mess);
+            }
+            /**
+             * @var Parser $parser
+             */
+            $parser = new $dic['Yapeal.Config.class'];
+            try {
+                $config = file_get_contents($configFile);
+                $config =
+                    $parser->parse($config, true, false);
+            } catch (ParseException $exc) {
+                $mess = sprintf(
+                    'Unable to parse the YAML configuration file %2$s.'
+                    . ' The error message was %1$s',
+                    $exc->getMessage(),
+                    $configFile
+                );
+                throw new YapealException($mess, 0, $exc);
+            }
+            $rItIt = new RecursiveIteratorIterator(
+                new RecursiveArrayIterator($config)
+            );
+            foreach ($rItIt as $leafValue) {
+                $keys = array();
+                foreach (range(0, $rItIt->getDepth()) as $depth) {
+                    $keys[] = $rItIt->getSubIterator($depth)
+                                    ->key();
+                }
+                $key = implode('.', $keys);
+                if (!isset($dic[$key])) {
+                    $value = str_replace(
+                        array('{Yapeal.baseDir}', '{Yapeal.cwd}'),
+                        array($dic['Yapeal.baseDir'], $dic['Yapeal.cwd']),
+                        $leafValue
+                    );
+                    $dic[$key] = $value;
+                }
+            }
+            return $parser;
         };
     }
     /**
@@ -254,6 +328,7 @@ class Yapeal implements WiringInterface
             return;
         }
         $defaults = array(
+            'Yapeal.Error.bufferSize' => 25,
             'Yapeal.Error.class' => 'Monolog\\ErrorHandler',
             'Yapeal.Error.channel' => 'php',
             'Yapeal.Error.fileName' => 'yapeal.log',
@@ -301,7 +376,7 @@ class Yapeal implements WiringInterface
                 new FingersCrossedHandler(
                     new GroupHandler($group),
                     $dic['Yapeal.Error.threshold'],
-                    25
+                    $dic['Yapeal.Error.bufferSize']
                 )
             );
             /**
@@ -326,11 +401,12 @@ class Yapeal implements WiringInterface
             return;
         }
         $defaults = array(
+            'Yapeal.Log.bufferSize' => 25,
             'Yapeal.Log.class' => 'Monolog\\Logger',
             'Yapeal.Log.channel' => 'yapeal',
             'Yapeal.Log.logDir' => $dic['Yapeal.baseDir'] . 'log/',
             'Yapeal.Log.fileName' => 'yapeal.log',
-            'Yapeal.Log.threshold' => 100
+            'Yapeal.Log.threshold' => 300
         );
         foreach ($defaults as $setting => $default) {
             if (empty($dic[$setting])) {
@@ -355,7 +431,9 @@ class Yapeal implements WiringInterface
             );
             $logger->pushHandler(
                 new FingersCrossedHandler(
-                    new GroupHandler($group), $dic['Yapeal.Log.threshold'], 25
+                    new GroupHandler($group),
+                    $dic['Yapeal.Log.threshold'],
+                    $dic['Yapeal.Log.bufferSize']
                 )
             );
             return $logger;

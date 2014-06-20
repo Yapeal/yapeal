@@ -11,6 +11,11 @@ Yapeal:
         tablePrefix: ''
         userName: YapealUser
     Log:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        bufferSize: 25
         channel: yapeal
         class: Monolog\Logger
         logDir: '{Yapeal.baseDir}log/'
@@ -23,6 +28,11 @@ Yapeal:
         # Recommended default for production WARNING or ERROR
         threshold: 300
     Error:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        bufferSize: 25
         channel: php
         class: Monolog\ErrorHandler
         logDir: '{Yapeal.baseDir}log/'

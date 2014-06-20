@@ -1,5 +1,6 @@
 language: php
 install:
+  composer selfupdate
   composer install
 matrix:
   allow_failures:

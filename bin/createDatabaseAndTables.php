@@ -32,23 +32,7 @@
 // away ASAP not worrying about it.
 use Yapeal\Command\LegacyUtil;
 
-require_once __DIR__ . '/YapealAutoLoad.php';
-YapealAutoLoad::activateAutoLoad();
-// Include Composer's auto-loader for all the classes that are being moved.
-/*
- * Find auto loader from one of
- * vendor/bin/
- * OR ./
- * OR bin/
- * OR lib/Yapeal/
- * OR vendor/yapeal/yapeal/bin/
- */
-(@include_once dirname(__DIR__) . '/autoload.php')
-|| (@include_once __DIR__ . '/vendor/autoload.php')
-|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
-|| die('Could not find required auto class loader. Aborting ...');
+require_once __DIR__ . '/bootstrap.php';
 $legacyUtil = new LegacyUtil();
 $shortOpts = array('c:', 'd:', 'p:', 's:', 't:', 'u:');
 $longOpts = array(

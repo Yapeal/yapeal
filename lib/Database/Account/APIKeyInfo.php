@@ -57,7 +57,7 @@ class APIKeyInfo extends AbstractCommonEveApi
         $interval
     ) {
         $this->getLogger()
-             ->info(
+            ->debug(
                  sprintf(
                      'Starting autoMagic for %1$s/%2$s',
                      $this->getSectionName(),
@@ -95,7 +95,7 @@ class APIKeyInfo extends AbstractCommonEveApi
                     $key['keyID']
                 );
                 $this->getLogger()
-                     ->debug($mess);
+                    ->notice($mess);
                 continue;
             }
             $this->transformRowset($data);
@@ -237,7 +237,7 @@ class APIKeyInfo extends AbstractCommonEveApi
                         count($chars)
                     );
         $this->getLogger()
-             ->debug($sql);
+            ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();

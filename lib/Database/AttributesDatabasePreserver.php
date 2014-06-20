@@ -219,8 +219,6 @@ class AttributesDatabasePreserver implements
             return $this;
         }
         $data = $this->flattenArray($this->upsertRows);
-        //$this->getLogger()
-        //     ->debug(implode(',', $data));
         $this->upsertRows = array();
         $mess = sprintf(
             'Have %1$s row(s) to upsert into %2$s table',
@@ -228,7 +226,7 @@ class AttributesDatabasePreserver implements
             $this->getTableName()
         );
         $this->getLogger()
-             ->debug($mess);
+            ->info($mess);
         $sql = $this->getCsq()
                     ->getUpsert(
                         $this->getTableName(),
@@ -237,7 +235,7 @@ class AttributesDatabasePreserver implements
                     );
         $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
         $this->getLogger()
-             ->debug($mess);
+            ->info($mess);
         $this->rowCount = 0;
         try {
             $this->getPdo()

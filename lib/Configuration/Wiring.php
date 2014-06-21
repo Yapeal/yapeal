@@ -122,15 +122,11 @@ class Wiring
                     $keys[] = $rItIt->getSubIterator($depth)
                                     ->key();
                 }
-                $key = implode('.', $keys);
-                if (!isset($dic[$key])) {
-                    $value = str_replace(
-                        array('{Yapeal.baseDir}', '{Yapeal.cwd}'),
-                        array($dic['Yapeal.baseDir'], $dic['Yapeal.cwd']),
-                        $leafValue
-                    );
-                    $dic[$key] = $value;
-                }
+                $dic[implode('.', $keys)] = str_replace(
+                    array('{Yapeal.baseDir}', '{Yapeal.cwd}'),
+                    array($dic['Yapeal.baseDir'], $dic['Yapeal.cwd']),
+                    $leafValue
+                );
             }
             return $parser;
         };

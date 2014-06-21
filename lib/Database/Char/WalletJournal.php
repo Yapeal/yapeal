@@ -114,13 +114,7 @@ class WalletJournal extends AbstractCommonEveApi
                 continue;
             }
             $preservers->preserveEveApi($data);
-            $preserver = new AttributesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-            $this->preserverToWalletJournal(
-                $preserver,
+            $this->preserve(
                 $data->getEveApiXml(),
                 $char['characterID'],
                 $char['accountKey']
@@ -173,6 +167,35 @@ class WalletJournal extends AbstractCommonEveApi
             $this->sectionName = basename(str_replace('\\', '/', __DIR__));
         }
         return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param string                     $accountKey
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        $accountKey,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        $this->preserverToWalletJournal(
+            $preserver,
+            $xml,
+            $ownerID,
+            $accountKey
+        );
+        return $this;
     }
     /**
      * @param DatabasePreserverInterface $preserver

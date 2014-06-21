@@ -3,15 +3,15 @@ SET SESSION TIME_ZONE = '+00:00';
 SET NAMES UTF8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}mapFacWarSystems";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapFacWarSystems" (
-    "contested"             TINYINT(1)          NOT NULL,
+    "contested"             ENUM('False', 'True') NOT NULL,
     "occupyingFactionID"    BIGINT(20) UNSIGNED DEFAULT NULL,
     "occupyingFactionName"  CHAR(24) DEFAULT NULL,
     "owningFactionID"       BIGINT(20) UNSIGNED DEFAULT NULL,
     "owningFactionName"     CHAR(24) DEFAULT NULL,
-    "solarSystemID"         BIGINT(20) UNSIGNED NOT NULL,
-    "solarSystemName"       CHAR(24)            NOT NULL,
-    "victoryPoints"         BIGINT(20) UNSIGNED NOT NULL,
-    "victoryPointThreshold" BIGINT(20) UNSIGNED NOT NULL,
+    "solarSystemID"         BIGINT(20) UNSIGNED   NOT NULL,
+    "solarSystemName"       CHAR(24)              NOT NULL,
+    "victoryPoints"         BIGINT(20) UNSIGNED   NOT NULL,
+    "victoryPointThreshold" BIGINT(20) UNSIGNED   NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
     ENGINE =InnoDB

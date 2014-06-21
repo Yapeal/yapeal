@@ -27,6 +27,7 @@
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
+            <xs:element type="eveNEDTType" name="dateTime"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

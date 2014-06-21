@@ -7,7 +7,7 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="solarSystemID"/>
-                <xs:attribute type="xs:unsignedByte" name="shipJumps"/>
+                <xs:attribute type="xs:unsignedLong" name="shipJumps"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -24,6 +24,7 @@
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
+            <xs:element type="eveNEDTType" name="dateTime"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

@@ -9,8 +9,13 @@
                 <xs:attribute type="eveIDType" name="solarSystemID"/>
                 <xs:attribute type="xs:string" name="solarSystemName"/>
                 <xs:attribute type="eveIDType" name="occupyingFactionID"/>
+                <xs:attribute type="eveIDType" name="owningFactionID"/>
                 <xs:attribute type="xs:string" name="occupyingFactionName"/>
+                <xs:attribute type="xs:string" name="owningFactionName"/>
                 <xs:attribute type="eveBooleanType" name="contested"/>
+                <xs:attribute type="xs:unsignedLong" name="victoryPoints"/>
+                <xs:attribute type="xs:unsignedLong"
+                    name="victoryPointThreshold"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -27,6 +32,7 @@
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
+            <xs:element type="eveNEDTType" name="dateTime"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

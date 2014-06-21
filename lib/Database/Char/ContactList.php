@@ -112,23 +112,7 @@ class ContactList extends AbstractCommonEveApi
                 continue;
             }
             $preservers->preserveEveApi($data);
-            $preserver = new AttributesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-            $this->preserverToContactList(
-                $preserver,
-                $data->getEveApiXml(),
-                $char['characterID']
-            );
-            $this->preserverToCorporateContactList(
-                $preserver,
-                $data->getEveApiXml(),
-                $char['characterID']
-            );
-            $this->preserverToAllianceContactList(
-                $preserver,
+            $this->preserve(
                 $data->getEveApiXml(),
                 $char['characterID']
             );
@@ -180,6 +164,30 @@ class ContactList extends AbstractCommonEveApi
             $this->sectionName = basename(str_replace('\\', '/', __DIR__));
         }
         return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        $this->preserverToContactList($preserver, $xml, $ownerID);
+        $this->preserverToCorporateContactList($preserver, $xml, $ownerID);
+        $this->preserverToAllianceContactList($preserver, $xml, $ownerID);
+        return $this;
     }
     /**
      * @param DatabasePreserverInterface $preserver

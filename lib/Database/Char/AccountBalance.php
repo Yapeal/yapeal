@@ -69,6 +69,11 @@ class AccountBalance extends AbstractCommonEveApi
                  ->info('No active characters found');
             return;
         }
+        $preserver = new AttributesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
         foreach ($active as $char) {
             /**
              * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
@@ -114,7 +119,8 @@ class AccountBalance extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             $this->preserve(
                 $data->getEveApiXml(),
-                $char['characterID']
+                $char['characterID'],
+                $preserver
             );
             $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
@@ -202,7 +208,7 @@ class AccountBalance extends AbstractCommonEveApi
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'accountID' => null,
-            'accountKey' => null,
+            'accountKey' => 1000,
             'balance' => null
         );
         $preserver->setTableName('charAccountBalance')

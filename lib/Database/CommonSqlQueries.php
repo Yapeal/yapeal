@@ -82,6 +82,34 @@ SQL;
         );
     }
     /**
+     * @param int $mask
+     *
+     * @return string
+     */
+    public function getActiveRegisteredCorporations($mask)
+    {
+        $sql = <<<'SQL'
+SELECT ac."corporationID",urk."keyID",urk."vCode"
+ FROM "%1$s"."%2$saccountKeyBridge" AS akb
+ JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
+ ON (akb."keyID" = aaki."keyID")
+ JOIN "%1$s"."%2$sutilRegisteredKey" AS urk
+ ON (akb."keyID" = urk."keyID")
+ JOIN "%1$s"."%2$saccountCharacters" AS ac
+ ON (akb."characterID" = ac."characterID")
+ WHERE
+  aaki."type" = 'Corporation'
+  AND urk."isActive"=1
+  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+SQL;
+        return sprintf(
+            str_replace(array("\n", "\r\n"), '', $sql),
+            $this->databaseName,
+            $this->tablePrefix,
+            $mask
+        );
+    }
+    /**
      * @return string
      */
     public function getActiveRegisteredKeys()

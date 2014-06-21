@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveConquerableStationList
     "corporationName" CHAR(50) DEFAULT NULL,
     "solarSystemID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     "stationID"       BIGINT(20) UNSIGNED NOT NULL,
-    "stationName"     CHAR(50) DEFAULT NULL,
+    "stationName" CHAR(255) DEFAULT NULL,
     "stationTypeID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     PRIMARY KEY ("stationID")
 )

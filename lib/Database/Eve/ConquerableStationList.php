@@ -27,7 +27,7 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Map;
+namespace Yapeal\Database\Eve;
 
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
@@ -40,7 +40,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 /**
  * Class CallList
  */
-class Kills extends AbstractCommonEveApi
+class ConquerableStationList extends AbstractCommonEveApi
 {
     /**
      * @param EveApiReadWriteInterface $data
@@ -105,18 +105,11 @@ class Kills extends AbstractCommonEveApi
             $this->getLogger(),
             $this->getCsq()
         );
-        $this->preserveToKills($preserver, $data->getEveApiXml());
+        $this->preserveToConquerableStationList(
+             $preserver,
+                 $data->getEveApiXml()
+        );
         $this->updateCachedUntil($data, $interval, '0');
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
     }
     /**
      * @return string
@@ -129,20 +122,32 @@ class Kills extends AbstractCommonEveApi
         return $this->sectionName;
     }
     /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
      * @param DatabasePreserverInterface $preserver
      * @param string                     $xml
      */
-    protected function preserveToKills(
+    protected function preserveToConquerableStationList(
         DatabasePreserverInterface $preserver,
         $xml
     ) {
         $columnDefaults = array(
+            'stationID' => null,
+            'stationName' => null,
             'solarSystemID' => null,
-            'shipKills' => null,
-            'factionKills' => null,
-            'podKills' => null
+            'stationTypeID' => null,
+            'corporationID' => null,
+            'corporationName' => null
         );
-        $preserver->setTableName('mapKills')
+        $preserver->setTableName('eveConquerableStationList')
                   ->setColumnDefaults($columnDefaults)
                   ->preserveData($xml);
     }

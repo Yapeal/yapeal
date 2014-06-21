@@ -27,7 +27,7 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Eve;
+namespace Yapeal\Database\Map;
 
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
@@ -40,7 +40,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 /**
  * Class CallList
  */
-class Kills extends AbstractCommonEveApi
+class Sovereignty extends AbstractCommonEveApi
 {
     /**
      * @param EveApiReadWriteInterface $data

@@ -140,8 +140,12 @@ class FacWarSystems extends AbstractCommonEveApi
             'solarSystemID' => null,
             'solarSystemName' => null,
             'occupyingFactionID' => null,
+            'owningFactionID' => null,
             'occupyingFactionName' => null,
-            'contested' => null
+            'owningFactionName' => null,
+            'contested' => null,
+            'victoryPoints' => null,
+            'victoryPointThreshold' => null
         );
         $preserver->setTableName('mapFacWarSystems')
                   ->setColumnDefaults($columnDefaults)

@@ -246,7 +246,7 @@ XSL;
         $dom->loadXML($data->getEveApiXml());
         $schema = sprintf(
             str_replace('\\', '/', __DIR__) . '/%1$s/%2$s.xsd',
-            $data->getEveApiSectionName(),
+            ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName()
         );
         if ($dom->schemaValidate($schema)) {

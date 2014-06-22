@@ -40,14 +40,14 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class AccountBalance
+ * Class MemberTrackingExtended
  */
-class MemberTracking extends AbstractCommonEveApi
+class MemberTrackingExtended extends AbstractCommonEveApi
 {
     /**
      * @var int $mask
      */
-    private $mask = 2048;
+    private $mask = 3355443;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -84,7 +84,7 @@ class MemberTracking extends AbstractCommonEveApi
              * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
              */
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
+                ->setEveApiName('MemberTracking');
             if ($this->cacheNotExpired(
                      $this->getApiName(),
                          $this->getSectionName(),
@@ -196,7 +196,7 @@ class MemberTracking extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToMemberTracking($preserver, $xml, $ownerID, $key);
+        $this->preserverToMemberTracking($preserver, $xml, $ownerID);
         return $this;
     }
     /**

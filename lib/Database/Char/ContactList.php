@@ -210,7 +210,7 @@ class ContactList extends AbstractCommonEveApi
         );
         $preserver->setTableName('charAllianceContactList')
                   ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+            ->preserveData($xml, '//allianceContactList/row');
         return $this;
     }
     /**
@@ -235,7 +235,7 @@ class ContactList extends AbstractCommonEveApi
         );
         $preserver->setTableName('charContactList')
                   ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+            ->preserveData($xml, '//contactList/row');
         return $this;
     }
     /**
@@ -259,7 +259,7 @@ class ContactList extends AbstractCommonEveApi
         );
         $preserver->setTableName('charCorporateContactList')
                   ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+            ->preserveData($xml, '//corporateContactList/row');
         return $this;
     }
     /**

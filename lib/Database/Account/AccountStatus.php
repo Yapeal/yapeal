@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains ContactList class.
+ * Contains AccountStatus class.
  *
  * PHP version 5.3
  *
@@ -26,22 +26,22 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Database\Char;
+namespace Yapeal\Database\Account;
 
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\ValuesDatabasePreserver;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class ContactList
+ * Class AccountStatus
  */
-class ContactList extends AbstractCommonEveApi
+class AccountStatus extends AbstractCommonEveApi
 {
     /**
      * @param EveApiReadWriteInterface $data
@@ -56,20 +56,25 @@ class ContactList extends AbstractCommonEveApi
         $interval
     ) {
         $this->getLogger()
-             ->info(
+             ->debug(
                  sprintf(
                      'Starting autoMagic for %1$s/%2$s',
                      $this->getSectionName(),
                      $this->getApiName()
                  )
              );
-        $active = $this->getActiveCharacters();
+        $active = $this->getActiveKeys();
         if (empty($active)) {
             $this->getLogger()
-                 ->info('No active characters found');
+                 ->info('No active registered keys found');
             return;
         }
-        foreach ($active as $char) {
+        $preserver = new ValuesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
+        foreach ($active as $key) {
             /**
              * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
              */
@@ -78,12 +83,12 @@ class ContactList extends AbstractCommonEveApi
             if ($this->cacheNotExpired(
                 $this->getApiName(),
                 $this->getSectionName(),
-                $char['characterID']
+                $key['keyID']
             )
             ) {
                 continue;
             }
-            $data->setEveApiArguments($char)
+            $data->setEveApiArguments($key)
                  ->setEveApiXml();
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
@@ -91,10 +96,10 @@ class ContactList extends AbstractCommonEveApi
                     'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
                     strtolower($this->getSectionName()),
                     $this->getApiName(),
-                    $char['characterID']
+                    $key['keyID']
                 );
                 $this->getLogger()
-                     ->debug($mess);
+                     ->notice($mess);
                 continue;
             }
             $this->transformRowset($data);
@@ -103,7 +108,7 @@ class ContactList extends AbstractCommonEveApi
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
                     strtolower($this->getSectionName()),
                     $this->getApiName(),
-                    $char['characterID']
+                    $key['keyID']
                 );
                 $this->getLogger()
                      ->warning($mess);
@@ -114,17 +119,19 @@ class ContactList extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             $this->preserve(
                 $data->getEveApiXml(),
-                $char['characterID']
+                $key['keyID'],
+                $preserver
             );
-            $this->updateCachedUntil($data, $interval, $char['characterID']);
+            $this->updateCachedUntil($data, $interval, $key['keyID']);
         }
     }
     /**
      * @return array
      */
-    protected function getActiveCharacters()
+    protected function getActiveKeys()
     {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredAccountStatus();
         $this->getLogger()
              ->debug($sql);
         try {
@@ -132,7 +139,7 @@ class ContactList extends AbstractCommonEveApi
                          ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
+            $mess = 'Could NOT select from utilRegisteredKeys';
             $this->getLogger()
                  ->warning($mess, array('exception' => $exc));
             return array();
@@ -147,13 +154,6 @@ class ContactList extends AbstractCommonEveApi
             $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
         return $this->apiName;
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
     }
     /**
      * @return string
@@ -178,15 +178,13 @@ class ContactList extends AbstractCommonEveApi
         DatabasePreserverInterface $preserver = null
     ) {
         if (is_null($preserver)) {
-            $preserver = new AttributesDatabasePreserver(
+            $preserver = new ValuesDatabasePreserver(
                 $this->getPdo(),
                 $this->getLogger(),
                 $this->getCsq()
             );
         }
-        $this->preserverToContactList($preserver, $xml, $ownerID);
-        $this->preserverToCorporateContactList($preserver, $xml, $ownerID);
-        $this->preserverToAllianceContactList($preserver, $xml, $ownerID);
+        $this->preserveToAccountStatus($preserver, $xml, $ownerID);
         return $this;
     }
     /**
@@ -196,74 +194,21 @@ class ContactList extends AbstractCommonEveApi
      *
      * @return self
      */
-    protected function preserverToAllianceContactList(
+    protected function preserveToAccountStatus(
         DatabasePreserverInterface $preserver,
         $xml,
         $ownerID
     ) {
         $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'contactID' => null,
-            'contactName' => null,
-            'contactTypeID' => null,
-            'standing' => null
+            'keyID' => $ownerID,
+            'createDate' => null,
+            'logonCount' => null,
+            'logonMinutes' => null,
+            'paidUntil' => null
         );
-        $preserver->setTableName('charAllianceContactList')
+        $preserver->setTableName('accountAccountStatus')
                   ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//allianceContactList/row');
+                  ->preserveData($xml);
         return $this;
     }
-    /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToContactList(
-        DatabasePreserverInterface $preserver,
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'contactID' => null,
-            'contactName' => null,
-            'contactTypeID' => null,
-            'inWatchlist' => '0',
-            'standing' => null
-        );
-        $preserver->setTableName('charContactList')
-                  ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//contactList/row');
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToCorporateContactList(
-        DatabasePreserverInterface $preserver,
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'contactID' => null,
-            'contactName' => null,
-            'contactTypeID' => null,
-            'standing' => null
-        );
-        $preserver->setTableName('charCorporateContactList')
-                  ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//corporateContactList/row');
-        return $this;
-    }
-    /**
-     * @var int $mask
-     */
-    private $mask = 16;
 }

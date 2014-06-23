@@ -54,6 +54,27 @@ class CommonSqlQueries
         );
     }
     /**
+     * @return string
+     */
+    public function getActiveRegisteredAccountStatus()
+    {
+        $sql = <<<'SQL'
+SELECT urk."keyID",urk."vCode"
+ FROM "%1$s"."%2$sutilRegisteredKey" AS urk
+ JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
+ ON (urk."keyID" = aaki."keyID")
+ WHERE
+ aaki."type" IN ('Account','Character')
+ AND urk."isActive"=1
+ AND (urk."activeAPIMask" & aaki."accessMask" & 33554432) <> 0
+SQL;
+        return sprintf(
+            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "isActive"=1',
+            $this->databaseName,
+            $this->tablePrefix
+        );
+    }
+    /**
      * @param int $mask
      *
      * @return string
@@ -70,9 +91,9 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  JOIN "%1$s"."%2$saccountCharacters" AS ac
  ON (akb."characterID" = ac."characterID")
  WHERE
-  aaki."type" IN ('Account','Character')
-  AND urk."isActive"=1
-  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ aaki."type" IN ('Account','Character')
+ AND urk."isActive"=1
+ AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
             str_replace(array("\n", "\r\n"), '', $sql),
@@ -98,9 +119,9 @@ SELECT ac."corporationID",urk."keyID",urk."vCode"
  JOIN "%1$s"."%2$saccountCharacters" AS ac
  ON (akb."characterID" = ac."characterID")
  WHERE
-  aaki."type" = 'Corporation'
-  AND urk."isActive"=1
-  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ aaki."type" = 'Corporation'
+ AND urk."isActive"=1
+ AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
             str_replace(array("\n", "\r\n"), '', $sql),

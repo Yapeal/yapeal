@@ -73,11 +73,12 @@ class ValuesDatabasePreserver implements
         $simple = new SimpleXMLIterator($xml);
         $row = array();
         $columns = $simple->xpath($xPath);
+        $columnList = $this->getColumnNameList();
         /**
          * @var SimpleXMLIterator $column
          */
         foreach ($columns as $column) {
-            if ($column->hasChildren()) {
+            if (!in_array($column->getName(), $columnList)) {
                 break;
             }
             $this->getLogger()

@@ -61,10 +61,10 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAttackers" (
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charAttributeEnhancers";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAttributeEnhancers" (
-    "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
     "augmentatorName"  CHAR(50)            NOT NULL,
     "augmentatorValue" TINYINT(2) UNSIGNED NOT NULL,
-    "bonusName"        CHAR(24)            NOT NULL,
+    "bonusName" CHAR(20)            NOT NULL,
+    "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "bonusName")
 )
     ENGINE =InnoDB

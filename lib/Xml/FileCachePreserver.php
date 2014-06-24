@@ -73,7 +73,7 @@ class FileCachePreserver implements EveApiPreserverInterface
             $cachePath =
                 $this->getNormalizedCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
-            $hash = $this->getHash($data);
+            $hash = $data->getHash();
             // Insures retriever never see partly written file by using temp file.
             $cacheTemp = $cachePath . $data->getEveApiName() . $hash . '.tmp';
             $this->prepareConnection($cacheTemp)
@@ -192,20 +192,6 @@ class FileCachePreserver implements EveApiPreserverInterface
     protected function getHandle()
     {
         return $this->handle;
-    }
-    /**
-     * @param EveApiReadInterface $data
-     *
-     * @return string
-     */
-    protected function getHash(EveApiReadInterface $data)
-    {
-        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
-        foreach ($data->getEveApiArguments() as $key => $value) {
-            $hash .= $key . $value;
-        }
-        $hash = hash('md5', $hash);
-        return $hash;
     }
     /**
      * @return LoggerInterface

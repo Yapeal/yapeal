@@ -124,14 +124,15 @@ class EveApiXmlData implements EveApiReadWriteInterface,
     }
     /**
      * @throws \LogicException
-     * @return bool
+     * @return string
      */
-    public function hasXmlRowSet()
+    public function getHash()
     {
-        if (false !== strpos($this->getEveApiXml(), '<rowset')) {
-            return true;
+        $hash = $this->getEveApiName() . $this->getEveApiSectionName();
+        foreach ($this->getEveApiArguments() as $key => $value) {
+            $hash .= $key . $value;
         }
-        return false;
+        return hash('md5', $hash);
     }
     /**
      * Used to set a list of arguments used when forming request to Eve Api

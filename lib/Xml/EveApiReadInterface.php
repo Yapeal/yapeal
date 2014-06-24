@@ -56,9 +56,7 @@ interface EveApiReadInterface
      */
     public function getEveApiXml();
     /**
-     * @throws \LogicException
-     * @return bool
-     * @uses getEveApiXml()
+     * @return string
      */
-    public function hasXmlRowSet();
+    public function getHash();
 }

@@ -82,8 +82,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
                 $this->getNormalizedCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
             $cacheFile =
-                $cachePath . $data->getEveApiName() . $this->getHash($data)
-                . '.xml';
+                $cachePath . $data->getEveApiName() . $data->getHash() . '.xml';
             $this->checkUsableCacheFile($cacheFile);
             $this->prepareConnection($cacheFile);
             $result = $this->readXmlData($cacheFile);
@@ -220,20 +219,6 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     protected function getHandle()
     {
         return $this->handle;
-    }
-    /**
-     * @param EveApiReadInterface $data
-     *
-     * @return string
-     */
-    protected function getHash(EveApiReadInterface $data)
-    {
-        $hash = $data->getEveApiName() . $data->getEveApiSectionName();
-        foreach ($data->getEveApiArguments() as $key => $value) {
-            $hash .= $key . $value;
-        }
-        $hash = hash('md5', $hash);
-        return $hash;
     }
     /**
      * @return LoggerInterface

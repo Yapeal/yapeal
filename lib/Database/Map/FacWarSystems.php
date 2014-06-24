@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Map;
 
+use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
@@ -56,12 +57,12 @@ class FacWarSystems extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
@@ -69,10 +70,13 @@ class FacWarSystems extends AbstractCommonEveApi
              ->setEveApiName($this->getApiName())
              ->setEveApiXml();
         if ($this->cacheNotExpired(
-                 $this->getApiName(),
-                     $this->getSectionName()
+            $this->getApiName(),
+            $this->getSectionName()
         )
         ) {
+            return;
+        }
+        if (!$this->gotApiLock($data)) {
             return;
         }
         $retrievers->retrieveEveApi($data);
@@ -86,7 +90,7 @@ class FacWarSystems extends AbstractCommonEveApi
                  ->debug($mess);
             return;
         }
-        $this->transformRowset($data);
+        $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -111,22 +115,22 @@ class FacWarSystems extends AbstractCommonEveApi
     /**
      * @return string
      */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
     protected function getApiName()
     {
         if (empty($this->apiName)) {
             $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
         return $this->apiName;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param DatabasePreserverInterface $preserver
@@ -147,8 +151,24 @@ class FacWarSystems extends AbstractCommonEveApi
             'victoryPoints' => null,
             'victoryPointThreshold' => null
         );
-        $preserver->setTableName('mapFacWarSystems')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $preserver->setTableName('mapFacWarSystems')
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($xml);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
     }
 }

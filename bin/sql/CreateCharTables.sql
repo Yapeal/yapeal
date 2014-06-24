@@ -63,8 +63,8 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charAttributeEnhancers";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAttributeEnhancers" (
     "augmentatorName"  CHAR(50)            NOT NULL,
     "augmentatorValue" TINYINT(2) UNSIGNED NOT NULL,
-    "bonusName" CHAR(20)            NOT NULL,
-    "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
+    "bonusName"        CHAR(20)            NOT NULL,
+    "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "bonusName")
 )
     ENGINE =InnoDB
@@ -360,7 +360,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charMailMessages" (
     "senderID"           BIGINT(20) UNSIGNED NOT NULL,
     "senderName"         CHAR(50) DEFAULT NULL,
     "sentDate"           DATETIME            NOT NULL,
-    "title" CHAR(255) DEFAULT NULL,
+    "title"              CHAR(255) DEFAULT NULL,
     "toCharacterIDs"     TEXT,
     "toCorpOrAllianceID" BIGINT(20) UNSIGNED DEFAULT '0',
     "toListID"           TEXT,
@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charNotifications" (
     "notificationID" BIGINT(20) UNSIGNED  NOT NULL,
     "read"           TINYINT(1)           NOT NULL,
     "senderID"       BIGINT(20) UNSIGNED  NOT NULL,
-    "senderName" CHAR(50) DEFAULT NULL,
+    "senderName"     CHAR(50) DEFAULT NULL,
     "sentDate"       DATETIME             NOT NULL,
     "typeID"         SMALLINT(5) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "notificationID")
@@ -431,9 +431,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillInTraining" (
     "ownerID"               BIGINT(20) UNSIGNED NOT NULL,
     "skillInTraining"       TINYINT(1) UNSIGNED NOT NULL,
     "trainingDestinationSP" BIGINT(20) UNSIGNED NOT NULL,
-    "trainingEndTime"   DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
+    "trainingEndTime"       DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "trainingStartSP"       BIGINT(20) UNSIGNED NOT NULL,
-    "trainingStartTime" DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
+    "trainingStartTime"     DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "trainingToLevel"       TINYINT(1) UNSIGNED NOT NULL,
     "trainingTypeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
@@ -442,12 +442,12 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillInTraining" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charSkillQueue";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charSkillQueue" (
     "endSP"         BIGINT(20) UNSIGNED NOT NULL,
-    "endTime"   DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
+    "endTime"       DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "level"         TINYINT(1) UNSIGNED NOT NULL,
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "queuePosition" TINYINT(2) UNSIGNED NOT NULL,
     "startSP"       BIGINT(20) UNSIGNED NOT NULL,
-    "startTime" DATETIME NOT NULL DEFAULT '1970-01-01 00:00:01',
+    "startTime"     DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "typeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "queuePosition")
 )
@@ -525,7 +525,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charWalletJournal" (
     "reason"        TEXT
                     COLLATE utf8_unicode_ci,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
-    "refTypeID" SMALLINT(5) UNSIGNED NOT NULL,
+    "refTypeID"     SMALLINT(5) UNSIGNED NOT NULL,
     "taxAmount"     DECIMAL(17, 2)       NOT NULL,
     "taxReceiverID" BIGINT(20) UNSIGNED DEFAULT '0',
     "owner1TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charWalletTransactions" (
     "price"                DECIMAL(17, 2)       NOT NULL,
     "quantity"             BIGINT(20) UNSIGNED  NOT NULL,
     "stationID"            BIGINT(20) UNSIGNED DEFAULT NULL,
-    "stationName" CHAR(255) DEFAULT NULL,
+    "stationName"          CHAR(255) DEFAULT NULL,
     "transactionDateTime"  DATETIME             NOT NULL,
     "transactionFor"       CHAR(12)             NOT NULL DEFAULT 'corporation',
     "transactionID"        BIGINT(20) UNSIGNED  NOT NULL,

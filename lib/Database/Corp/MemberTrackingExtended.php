@@ -45,10 +45,6 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 class MemberTrackingExtended extends AbstractCommonEveApi
 {
     /**
-     * @var int $mask
-     */
-    private $mask = 3355443;
-    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
@@ -62,12 +58,12 @@ class MemberTrackingExtended extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCorporations();
         if (empty($active)) {
             $this->getLogger()
@@ -86,9 +82,9 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                 ->setEveApiName('MemberTracking');
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $corp['corporationID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $corp['corporationID']
             )
             ) {
                 continue;
@@ -96,6 +92,9 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             $corp['extended'] = 1;
             $data->setEveApiArguments($corp)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -108,7 +107,7 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s division %4$s is invalid',
@@ -124,32 +123,12 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             }
             $preservers->preserveEveApi($data);
             $this->preserve(
-                 $data->getEveApiXml(),
-                     $corp['corporationID'],
-                     $preserver
+                $data->getEveApiXml(),
+                $corp['corporationID'],
+                $preserver
             );
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
     }
     /**
      * @return array
@@ -171,11 +150,31 @@ class MemberTrackingExtended extends AbstractCommonEveApi
         }
     }
     /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
      * @return int
      */
     protected function getMask()
     {
         return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param string                     $xml
@@ -196,7 +195,23 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToMemberTracking($preserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToMemberTracking($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**
@@ -234,4 +249,8 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                   ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    private $mask = 3355443;
 }

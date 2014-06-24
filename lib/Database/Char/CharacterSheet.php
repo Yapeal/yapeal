@@ -96,6 +96,9 @@ class CharacterSheet extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -108,7 +111,7 @@ class CharacterSheet extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -252,16 +255,41 @@ XSL;
                 $this->getCsq()
             );
         }
-        $this->preserverToCharacterSheet($vPreserver, $xml, $ownerID);
-        $this->preserverToAttributeEnhancers($aPreserver, $xml, $ownerID);
-        $this->preserverToAttributes($vPreserver, $xml, $ownerID);
-        $this->preserverToSkills($aPreserver, $xml, $ownerID);
-        $this->preserverToCertificates($aPreserver, $xml, $ownerID);
-        $this->preserverTocorporationRoles($aPreserver, $xml, $ownerID);
-        $this->preserverTocorporationRolesAtHQ($aPreserver, $xml, $ownerID);
-        $this->preserverTocorporationRolesAtBase($aPreserver, $xml, $ownerID);
-        $this->preserverTocorporationRolesAtOther($aPreserver, $xml, $ownerID);
-        $this->preserverToCorporationTitles($aPreserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToCharacterSheet($vPreserver, $xml, $ownerID);
+            $this->preserverToAttributeEnhancers($aPreserver, $xml, $ownerID);
+            $this->preserverToAttributes($vPreserver, $xml, $ownerID);
+            $this->preserverToSkills($aPreserver, $xml, $ownerID);
+            $this->preserverToCertificates($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRoles($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRolesAtHQ($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRolesAtBase(
+                $aPreserver,
+                $xml,
+                $ownerID
+            );
+            $this->preserverTocorporationRolesAtOther(
+                $aPreserver,
+                $xml,
+                $ownerID
+            );
+            $this->preserverToCorporationTitles($aPreserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

@@ -93,6 +93,9 @@ class AccountBalance extends AbstractCommonEveApi
                 $corp['accountKey'] = $key;
                 $data->setEveApiArguments($corp)
                      ->setEveApiXml();
+                if (!$this->gotApiLock($data)) {
+                    continue;
+                }
                 $retrievers->retrieveEveApi($data);
                 if ($data->getEveApiXml() === false) {
                     $mess = sprintf(
@@ -106,7 +109,7 @@ class AccountBalance extends AbstractCommonEveApi
                          ->debug($mess);
                     continue 2;
                 }
-                $this->transformRowset($data);
+                $this->xsltTransform($data);
                 if ($this->isInvalid($data)) {
                     $mess = sprintf(
                         'The data retrieved from Eve API %1$s/%2$s for %3$s division %4$s is invalid',
@@ -199,7 +202,23 @@ class AccountBalance extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToAccountBalance($preserver, $xml, $ownerID, $key);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToAccountBalance($preserver, $xml, $ownerID, $key);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

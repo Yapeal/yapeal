@@ -28,8 +28,10 @@
  */
 namespace Yapeal\Database\Api;
 
+use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -73,6 +75,9 @@ class CallList extends AbstractCommonEveApi
         ) {
             return;
         }
+        if (!$this->gotApiLock($data)) {
+            return;
+        }
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -84,7 +89,7 @@ class CallList extends AbstractCommonEveApi
                  ->debug($mess);
             return;
         }
-        $this->transformRowset($data);
+        $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -103,24 +108,7 @@ class CallList extends AbstractCommonEveApi
             $this->getLogger(),
             $this->getCsq()
         );
-        $columnDefaults = array(
-            'description' => null,
-            'groupID' => null,
-            'name' => null
-        );
-        $preserver->setTableName('apiCallGroups')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($data->getEveApiXml(), '//callGroups/row');
-        $columnDefaults = array(
-            'accessMask' => null,
-            'description' => null,
-            'groupID' => null,
-            'name' => null,
-            'type' => null
-        );
-        $preserver->setTableName('apiCalls')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($data->getEveApiXml(), '//calls/row');
+        $this->preserve($data->getEveApiXml(), $preserver);
         $this->updateCachedUntil($data, $interval, '0');
     }
     /**
@@ -142,5 +130,82 @@ class CallList extends AbstractCommonEveApi
             $this->sectionName = basename(str_replace('\\', '/', __DIR__));
         }
         return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToCallGroups($preserver, $xml);
+            $this->preserveToCalls($preserver, $xml);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     *
+     * @return self
+     */
+    protected function preserveToCallGroups(
+        DatabasePreserverInterface $preserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'description' => null,
+            'groupID' => null,
+            'name' => null
+        );
+        $preserver->setTableName('apiCallGroups')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//callGroups/row');
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     *
+     * @return self
+     */
+    protected function preserveToCalls(
+        DatabasePreserverInterface $preserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'accessMask' => null,
+            'description' => null,
+            'groupID' => null,
+            'name' => null,
+            'type' => null
+        );
+        $preserver->setTableName('apiCalls')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//calls/row');
     }
 }

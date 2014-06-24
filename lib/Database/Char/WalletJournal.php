@@ -87,6 +87,9 @@ class WalletJournal extends AbstractCommonEveApi
             $char['rowCount'] = '2560';
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -99,7 +102,7 @@ class WalletJournal extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -189,12 +192,28 @@ class WalletJournal extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToWalletJournal(
-            $preserver,
-            $xml,
-            $ownerID,
-            $accountKey
-        );
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToWalletJournal(
+                $preserver,
+                $xml,
+                $ownerID,
+                $accountKey
+            );
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

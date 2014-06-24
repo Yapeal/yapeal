@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Eve;
 
+use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
@@ -75,6 +76,9 @@ class ErrorList extends AbstractCommonEveApi
         ) {
             return;
         }
+        if (!$this->gotApiLock($data)) {
+            return;
+        }
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -86,7 +90,7 @@ class ErrorList extends AbstractCommonEveApi
                  ->debug($mess);
             return;
         }
-        $this->transformRowset($data);
+        $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -140,8 +144,24 @@ class ErrorList extends AbstractCommonEveApi
             'errorCode' => null,
             'errorText' => null
         );
-        $preserver->setTableName('eveErrorList')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $preserver->setTableName('eveErrorList')
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($xml);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
     }
 }

@@ -85,6 +85,9 @@ class ContactList extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -97,7 +100,7 @@ class ContactList extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -184,9 +187,26 @@ class ContactList extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToContactList($preserver, $xml, $ownerID);
-        $this->preserverToCorporateContactList($preserver, $xml, $ownerID);
-        $this->preserverToAllianceContactList($preserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToContactList($preserver, $xml, $ownerID);
+            $this->preserverToCorporateContactList($preserver, $xml, $ownerID);
+            $this->preserverToAllianceContactList($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

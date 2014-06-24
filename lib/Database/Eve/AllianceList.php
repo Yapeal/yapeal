@@ -64,14 +64,14 @@ class AllianceList extends AbstractEve
         // Get a new query instance.
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         // Get a new query instance.
         $this->corporations = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'MemberCorporations',
             YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->corporations->useUpsert(false);
+        $this->corporations->useUpsert($this->needsUpsert());
         try {
             while ($this->reader->read()) {
                 switch ($this->reader->nodeType) {

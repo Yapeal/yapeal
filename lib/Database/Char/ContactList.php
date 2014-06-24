@@ -54,6 +54,15 @@ class ContactList extends AbstractChar
         parent::__construct($params);
     }
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }
+    /**
      * Per API parser for XML.
      *
      * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
@@ -144,7 +153,7 @@ class ContactList extends AbstractChar
         // Get a new query instance.
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         $qb->setDefault('ownerID', $this->ownerID);
         if ($table == 'contactList') {
             $qb->setDefault('inWatchlist', 0);

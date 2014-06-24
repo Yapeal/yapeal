@@ -55,6 +55,15 @@ class FacWarTopStats extends AbstractEve
         parent::__construct($params);
     }
     /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function parserAPI
+    /**
      * Handles totals from XML Note.
      *
      * @param string $table Name of the table to parse.
@@ -63,17 +72,17 @@ class FacWarTopStats extends AbstractEve
      */
     protected function parseSubTable($table)
     {
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
+        while ($this->xr->read()) {
+            switch ($this->xr->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
+                    switch ($this->xr->localName) {
                         case 'rowset':
                             // Check if empty.
-                            if ($this->reader->isEmptyElement == true) {
+                            if ($this->xr->isEmptyElement == true) {
                                 break;
                             }
                             // Grab rowset name.
-                            $subTable = $this->reader->getAttribute('name');
+                            $subTable = $this->xr->getAttribute('name');
                             if (empty($subTable)) {
                                 $mess = 'Name of rowset is missing in '
                                     . $this->api;
@@ -86,7 +95,7 @@ class FacWarTopStats extends AbstractEve
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    switch ($this->reader->localName) {
+                    switch ($this->xr->localName) {
                         case 'characters':
                         case 'corporations':
                         case 'factions':
@@ -111,29 +120,27 @@ class FacWarTopStats extends AbstractEve
     {
         $tableName = YAPEAL_TABLE_PREFIX . $this->section;
         try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
+            while ($this->xr->read()) {
+                switch ($this->xr->nodeType) {
                     case \XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
+                        switch ($this->xr->localName) {
                             case 'characters':
                             case 'corporations':
                             case 'factions':
                                 // Check if empty.
-                                if ($this->reader->isEmptyElement == true) {
+                                if ($this->xr->isEmptyElement == true) {
                                     break;
                                 }
                                 // Parse node into its own table.
                                 $this->parseSubTable(
-                                    $tableName . ucfirst(
-                                        $this->reader->localName
-                                    )
+                                    $tableName . ucfirst($this->xr->localName)
                                 );
                                 break;
                             default: // Nothing to do here.
                         }; // $this->xr->localName ...
                         break;
                     case \XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
+                        if ($this->xr->localName == 'result') {
                             return true;
                         }
                         break;
@@ -209,24 +216,23 @@ class FacWarTopStats extends AbstractEve
         // Get a new query instance.
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
+        $qb->useUpsert($this->needsUpsert());
+        while ($this->xr->read()) {
+            switch ($this->xr->nodeType) {
                 case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
+                    switch ($this->xr->localName) {
                         case 'row':
                             $row = array();
                             // Walk through attributes and add them to row.
-                            while ($this->reader->moveToNextAttribute()) {
-                                $row[$this->reader->name] =
-                                    $this->reader->value;
+                            while ($this->xr->moveToNextAttribute()) {
+                                $row[$this->xr->name] = $this->xr->value;
                             }
                             $qb->addRow($row);
                             break;
                     }
                     break;
                 case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'rowset') {
+                    if ($this->xr->localName == 'rowset') {
                         // Insert any leftovers.
                         if (count($qb) > 0) {
                             $qb->store();

@@ -109,7 +109,16 @@ class APIKeyInfo extends AbstractAccount
     protected function needsUpsert()
     {
         return false;
-    }
+    }// function parserAPI
+    /**
+     * Method used to determine if Need to use upsert or insert for API.
+     *
+     * @return bool
+     */
+    protected function needsUpsert()
+    {
+        return false;
+    }// function prepareTables
     /**
      * Per API parser for XML.
      *
@@ -121,7 +130,7 @@ class APIKeyInfo extends AbstractAccount
         // Get a new query instance.
         $qb = new QueryBuilder($tableName, YAPEAL_DSN);
         // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         // Get a new query instance for Characters.
         $this->characters = new QueryBuilder(
             YAPEAL_TABLE_PREFIX . $this->section . 'Characters', YAPEAL_DSN
@@ -131,7 +140,7 @@ class APIKeyInfo extends AbstractAccount
             YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN
         );
         // Save some overhead for tables that are truncated or in some way emptied.
-        $this->bridge->useUpsert(false);
+        $qb->useUpsert($this->needsUpsert());
         try {
             while ($this->xr->read()) {
                 switch ($this->xr->nodeType) {

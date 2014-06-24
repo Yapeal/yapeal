@@ -5,7 +5,7 @@ SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
     "apiName"     CHAR(32)            NOT NULL,
-    "expires" DATETIME NOT NULL,
+    "expires"     DATETIME            NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName", "ownerID")

@@ -236,6 +236,32 @@ XSL;
      *
      * @return bool
      */
+    protected function gotApiLock(EveApiReadInterface &$data)
+    {
+        $sql = $this->getCsq()
+                    ->getApiLock($data->getHash());
+        $this->getLogger()
+             ->info($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return (bool)$stmt->fetchColumn();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Could NOT get lock for %1$s/%2$s',
+                $data->getEveApiSectionName(),
+                $data->getEveApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return false;
+        }
+    }
+    /**
+     * @param EveApiReadInterface $data
+     *
+     * @return bool
+     */
     protected function isInvalid(EveApiReadInterface &$data)
     {
         $this->getLogger()

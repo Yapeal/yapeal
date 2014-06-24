@@ -142,6 +142,15 @@ SQL;
         );
     }
     /**
+     * @param string $hash
+     *
+     * @return string
+     */
+    public function getApiLock($hash)
+    {
+        return sprintf('select get_lock(\'%1$s\',5)', $hash);
+    }
+    /**
      * @param string $tableName
      * @param array  $columnNameList
      * @param string $rowCount

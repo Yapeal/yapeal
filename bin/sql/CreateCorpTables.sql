@@ -348,7 +348,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberTracking" (
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
     "grantableRoles" CHAR(64) DEFAULT NULL,
-    "location" CHAR(255) DEFAULT NULL,
+    "location"       CHAR(255) DEFAULT NULL,
     "locationID"     BIGINT(20) UNSIGNED DEFAULT NULL,
     "logoffDateTime" DATETIME DEFAULT NULL,
     "logonDateTime"  DATETIME DEFAULT NULL,

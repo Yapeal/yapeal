@@ -91,6 +91,9 @@ class APIKeyInfo extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($key)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -185,9 +188,26 @@ class APIKeyInfo extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserveToAPIKeyInfo($preserver, $xml, $ownerID);
-        $this->preserveToCharacters($preserver, $xml);
-        $this->preserveToKeyBridge($xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToAPIKeyInfo($preserver, $xml, $ownerID);
+            $this->preserveToCharacters($preserver, $xml);
+            $this->preserveToKeyBridge($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**
@@ -260,20 +280,8 @@ class APIKeyInfo extends AbstractCommonEveApi
                     );
         $this->getLogger()
             ->info($sql);
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $stmt = $this->getPdo()
-                         ->prepare($sql);
-            $stmt->execute($rows);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = 'Failed to upsert row(s) into accountKeyBridge table';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
+        $stmt = $this->getPdo()
+                     ->prepare($sql);
+        $stmt->execute($rows);
     }
 }

@@ -90,6 +90,9 @@ class AccountStatus extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($key)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -183,7 +186,22 @@ class AccountStatus extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserveToAccountStatus($preserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToAccountStatus($preserver, $xml, $ownerID);
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

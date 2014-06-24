@@ -85,6 +85,9 @@ class Research extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -184,7 +187,23 @@ class Research extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToResearch($preserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToResearch($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

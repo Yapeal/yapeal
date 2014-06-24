@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Eve;
 
+use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
@@ -56,12 +57,12 @@ class ConquerableStationList extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
@@ -69,10 +70,13 @@ class ConquerableStationList extends AbstractCommonEveApi
              ->setEveApiName($this->getApiName())
              ->setEveApiXml();
         if ($this->cacheNotExpired(
-                 $this->getApiName(),
-                     $this->getSectionName()
+            $this->getApiName(),
+            $this->getSectionName()
         )
         ) {
+            return;
+        }
+        if (!$this->gotApiLock($data)) {
             return;
         }
         $retrievers->retrieveEveApi($data);
@@ -106,8 +110,8 @@ class ConquerableStationList extends AbstractCommonEveApi
             $this->getCsq()
         );
         $this->preserveToConquerableStationList(
-             $preserver,
-                 $data->getEveApiXml()
+            $preserver,
+            $data->getEveApiXml()
         );
         $this->updateCachedUntil($data, $interval, '0');
     }
@@ -147,8 +151,24 @@ class ConquerableStationList extends AbstractCommonEveApi
             'corporationID' => null,
             'corporationName' => null
         );
-        $preserver->setTableName('eveConquerableStationList')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $preserver->setTableName('eveConquerableStationList')
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($xml);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
     }
 }

@@ -87,6 +87,9 @@ class WalletTransactions extends AbstractCommonEveApi
             $char['rowCount'] = '2560';
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -189,12 +192,28 @@ class WalletTransactions extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToWalletTransactions(
-            $preserver,
-            $xml,
-            $ownerID,
-            $accountKey
-        );
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToWalletTransactions(
+                $preserver,
+                $xml,
+                $ownerID,
+                $accountKey
+            );
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

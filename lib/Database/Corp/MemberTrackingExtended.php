@@ -58,12 +58,12 @@ class MemberTrackingExtended extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCorporations();
         if (empty($active)) {
             $this->getLogger()
@@ -82,9 +82,9 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                 ->setEveApiName('MemberTracking');
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $corp['corporationID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $corp['corporationID']
             )
             ) {
                 continue;
@@ -92,6 +92,9 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             $corp['extended'] = 1;
             $data->setEveApiArguments($corp)
                  ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
             $retrievers->retrieveEveApi($data);
             if ($data->getEveApiXml() === false) {
                 $mess = sprintf(
@@ -120,9 +123,9 @@ class MemberTrackingExtended extends AbstractCommonEveApi
             }
             $preservers->preserveEveApi($data);
             $this->preserve(
-                 $data->getEveApiXml(),
-                     $corp['corporationID'],
-                     $preserver
+                $data->getEveApiXml(),
+                $corp['corporationID'],
+                $preserver
             );
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
@@ -192,7 +195,23 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToMemberTracking($preserver, $xml, $ownerID);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToMemberTracking($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
         return $this;
     }
     /**

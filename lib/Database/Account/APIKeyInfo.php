@@ -103,7 +103,7 @@ class APIKeyInfo extends AbstractCommonEveApi
                     ->notice($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',

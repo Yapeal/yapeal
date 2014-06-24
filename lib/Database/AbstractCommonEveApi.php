@@ -262,20 +262,6 @@ XSL;
         return true;
     }
     /**
-     * @param EveApiXmlModifyInterface $data
-     *
-     * @return self
-     */
-    protected function transformRowset(EveApiXmlModifyInterface &$data)
-    {
-        $xslt = new XSLTProcessor();
-        $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
-        $data->setEveApiXml(
-            $xslt->transformToXml(new SimpleXMLElement($data->getEveApiXml()))
-        );
-        return $this;
-    }
-    /**
      * @param EveApiReadInterface $data
      * @param int                 $interval
      * @param string              $ownerID
@@ -307,5 +293,19 @@ XSL;
         } catch (PDOException $exc) {
             $pdo->rollBack();
         }
+    }
+    /**
+     * @param EveApiXmlModifyInterface $data
+     *
+     * @return self
+     */
+    protected function xsltTransform(EveApiXmlModifyInterface &$data)
+    {
+        $xslt = new XSLTProcessor();
+        $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
+        $data->setEveApiXml(
+            $xslt->transformToXml(new SimpleXMLElement($data->getEveApiXml()))
+        );
+        return $this;
     }
 }

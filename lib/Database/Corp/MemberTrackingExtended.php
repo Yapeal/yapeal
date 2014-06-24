@@ -45,10 +45,6 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 class MemberTrackingExtended extends AbstractCommonEveApi
 {
     /**
-     * @var int $mask
-     */
-    private $mask = 3355443;
-    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
@@ -108,7 +104,7 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s division %4$s is invalid',
@@ -132,26 +128,6 @@ class MemberTrackingExtended extends AbstractCommonEveApi
         }
     }
     /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
      * @return array
      */
     protected function getActiveCorporations()
@@ -171,11 +147,31 @@ class MemberTrackingExtended extends AbstractCommonEveApi
         }
     }
     /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
      * @return int
      */
     protected function getMask()
     {
         return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param string                     $xml
@@ -234,4 +230,8 @@ class MemberTrackingExtended extends AbstractCommonEveApi
                   ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    private $mask = 3355443;
 }

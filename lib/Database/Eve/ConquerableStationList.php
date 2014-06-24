@@ -86,7 +86,7 @@ class ConquerableStationList extends AbstractCommonEveApi
                  ->debug($mess);
             return;
         }
-        $this->transformRowset($data);
+        $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -114,22 +114,22 @@ class ConquerableStationList extends AbstractCommonEveApi
     /**
      * @return string
      */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
     protected function getApiName()
     {
         if (empty($this->apiName)) {
             $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
         return $this->apiName;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param DatabasePreserverInterface $preserver

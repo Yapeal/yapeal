@@ -84,7 +84,7 @@ class CallList extends AbstractCommonEveApi
                  ->debug($mess);
             return;
         }
-        $this->transformRowset($data);
+        $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',

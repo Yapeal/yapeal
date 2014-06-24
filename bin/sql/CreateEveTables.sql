@@ -13,6 +13,29 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharacterInfo";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
+    "characterID"       BIGINT(20) UNSIGNED NOT NULL,
+	"name"              CHAR(24)            NOT NULL,
+	"race"              CHAR(8)             NOT NULL,
+	"bloodLine"         CHAR(24)            NOT NULL,
+	"accountBalance"    DECIMAL(17, 2)      NOT NULL,
+	"skillPoints"       BIGINT(20) UNSIGNED NOT NULL,
+	"shipName"          CHAR(50) DEFAULT '',
+	"shipTypeID"        BIGINT(20) UNSIGNED DEFAULT '0',
+	"shipTypeName"      CHAR(50) DEFAULT '',
+	"corporationID"     BIGINT(20) UNSIGNED NOT NULL,
+	"corporationName"   CHAR(50)            NOT NULL,
+	"corporationDate"   DATETIME            NOT NULL,
+	"allianceID"        BIGINT(20) UNSIGNED DEFAULT '0',
+    "allianceName"      CHAR(50) DEFAULT '',
+	"allianceDate"      DATETIME            NOT NULL,
+    "lastKnownLocation" CHAR(255)            NOT NULL,
+    "securityStatus"    CHAR(20)       NOT NULL,
+    PRIMARY KEY ("characterID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,

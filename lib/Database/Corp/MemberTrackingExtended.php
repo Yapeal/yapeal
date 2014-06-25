@@ -218,7 +218,8 @@ class MemberTrackingExtended extends AbstractCommonEveApi
      * @param DatabasePreserverInterface $preserver
      * @param string                     $xml
      * @param string                     $ownerID
-     * @param int                        $key
+     *
+     * @internal param int $key
      *
      * @return self
      */

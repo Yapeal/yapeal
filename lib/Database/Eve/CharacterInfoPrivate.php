@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains CharacterSheet class.
+ * Contains CharacterInfo class.
  *
  * PHP version 5.3
  *
@@ -27,7 +27,7 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Char;
+namespace Yapeal\Database\Eve;
 
 use PDO;
 use PDOException;
@@ -41,9 +41,9 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class CharacterInfoExtended
+ * Class CharacterInfoPrivate
  */
-class CharacterInfoExtended extends AbstractCommonEveApi
+class CharacterInfoPrivate extends AbstractCommonEveApi
 {
     /**
      * @param EveApiReadWriteInterface $data
@@ -86,7 +86,7 @@ class CharacterInfoExtended extends AbstractCommonEveApi
              * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
              */
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
+                ->setEveApiName('CharacterInfo');
             if ($this->cacheNotExpired(
                      $this->getApiName(),
                          $this->getSectionName(),
@@ -109,7 +109,7 @@ class CharacterInfoExtended extends AbstractCommonEveApi
                      ->debug($mess);
                 continue;
             }
-            $this->transformRowset($data);
+            $this->xsltTransform($data);
             if ($this->isInvalid($data)) {
                 $mess = sprintf(
                     'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -251,13 +251,16 @@ class CharacterInfoExtended extends AbstractCommonEveApi
             'bloodline' => null,
             'accountBalance' => 0,
             'skillPoints' => 0,
+            'nextTrainingEnds' => '1979-01-01 00:00:00',
             'shipName' => '',
             'shipTypeID' => 0,
             'shipTypeName' => '',
             'corporationID' => null,
+            'corporation' => null,
             'corporationDate' => null,
-            'allianceID' => null,
-            'allianceDate' => null,
+            'allianceID' => 0,
+            'alliance' => '',
+            'allianceDate' => '1979-01-01 00:00:00',
             'lastKnownLocation' => '',
             'securityStatus' => 0
         );

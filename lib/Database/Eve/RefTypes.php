@@ -109,7 +109,7 @@ class RefTypes extends AbstractCommonEveApi
             $this->getLogger(),
             $this->getCsq()
         );
-        $this->preserveToErrorList($preserver, $data->getEveApiXml());
+        $this->preserveToRefTypes($preserver, $data->getEveApiXml());
         $this->updateCachedUntil($data, $interval, '0');
     }
     /**
@@ -136,7 +136,7 @@ class RefTypes extends AbstractCommonEveApi
      * @param DatabasePreserverInterface $preserver
      * @param string                     $xml
      */
-    protected function preserveToErrorList(
+    protected function preserveToRefTypes(
         DatabasePreserverInterface $preserver,
         $xml
     ) {
@@ -144,10 +144,17 @@ class RefTypes extends AbstractCommonEveApi
             'refTypeID' => null,
             'refTypeName' => null
         );
+        $tableName = 'eveRefTypes';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('eveRefTypes')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

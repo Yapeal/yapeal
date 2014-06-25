@@ -32,6 +32,7 @@ use PDO;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
+use SimpleXMLIterator;
 
 /**
  * Class AttributesDatabasePreserver
@@ -69,15 +70,34 @@ class AttributesDatabasePreserver implements
         $xml,
         $xPath = '//row'
     ) {
-        $simple = new SimpleXMLElement($xml);
-        foreach ($simple->xpath($xPath) as $aRow) {
-            $row = array();
-            foreach ($aRow->attributes() as $key => $value) {
-                $row[$key] = (string)$value;
-            }
-            $this->addRow($row);
+        $simple = new SimpleXMLIterator($xml);
+        $rows = $simple->xpath($xPath);
+        if (count($rows) == 0) {
+            return $this;
         }
-        $this->flush();
+        $defaults = $this->getColumnDefaults();
+        $cOr = 0;
+        $columns = array();
+        /**
+         * @var SimpleXMLElement $row
+         */
+        foreach ($rows as $row) {
+            // Replace empty values with any existing defaults.
+            foreach ($defaults as $key => $value) {
+                if (is_null($value) || strlen($row[$key]) != 0) {
+                    $columns[] = (string)$row[$key];
+                    continue;
+                }
+                $columns[] = (string)$value;
+            }
+            if (++$cOr > $this->maxRowCount) {
+                $this->flush($columns, $cOr);
+                $columns = array();
+                $cOr = 0;
+            }
+        }
+        $this->flush($columns, $cOr);
+        return $this;
     }
     /**
      * @param string[] $columnDefaults
@@ -150,78 +170,22 @@ class AttributesDatabasePreserver implements
      */
     protected $pdo;
     /**
-     * @var int $rowCount
-     */
-    protected $rowCount = 0;
-    /**
-     * @var string $rowPrototype
-     */
-    protected $rowPrototype;
-    /**
      * @var string $tableName
      */
     protected $tableName;
     /**
-     * @var array $upsertRows ;
-     */
-    protected $upsertRows;
-    /**
-     * @param array $row
+     * @param string[] $columns
+     * @param int      $cOr
      *
+     * @throws \Exception
+     * @throws \PDOException
      * @return self
      */
-    protected function addRow(array $row)
+    protected function flush($columns, $cOr)
     {
-        if (empty($row)) {
-            return $this;
-        }
-        $defaults = $this->getColumnDefaults();
-        // Fill-in any missing columns like ownerID.
-        $newRow = array_replace($defaults, $row);
-        // Replace empty values with any existing defaults.
-        foreach ($defaults as $key => $value) {
-            if (is_null($value)) {
-                continue;
-            }
-            if (strlen($newRow[$key]) == 0) {
-                $newRow[$key] = $value;
-            }
-        }
-        $this->upsertRows[] = $newRow;
-        if (++$this->rowCount >= $this->maxRowCount) {
-            $this->flush();
-        }
-        return $this;
-    }
-    /**
-     * @param array $array
-     *
-     * @return array
-     */
-    protected function flattenArray(array $array)
-    {
-        $return = array();
-        array_walk_recursive(
-            $array,
-            function ($arr) use (&$return) {
-                $return[] = $arr;
-            }
-        );
-        return $return;
-    }
-    /**
-     * @return self
-     */
-    protected function flush()
-    {
-        if ($this->rowCount == 0) {
-            return $this;
-        }
-        $data = $this->flattenArray($this->upsertRows);
-        $this->upsertRows = array();
         $mess = sprintf(
             'Have %1$s row(s) to upsert into %2$s table',
-            $this->rowCount,
+            $cOr,
             $this->getTableName()
         );
         $this->getLogger()
@@ -230,15 +194,17 @@ class AttributesDatabasePreserver implements
                     ->getUpsert(
                         $this->getTableName(),
                         $this->getColumnNameList(),
-                        $this->rowCount
+                        $cOr
                     );
         $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
         $this->getLogger()
             ->info($mess);
-        $this->rowCount = 0;
+        $mess = implode(',', $columns);
+        $this->getLogger()
+             ->debug(substr($mess, 0, 255));
         $stmt = $this->getPdo()
                      ->prepare($sql);
-        $stmt->execute($data);
+        $stmt->execute($columns);
         return $this;
     }
     /**

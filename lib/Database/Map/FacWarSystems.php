@@ -151,10 +151,17 @@ class FacWarSystems extends AbstractCommonEveApi
             'victoryPoints' => null,
             'victoryPointThreshold' => null
         );
+        $tableName = 'mapFacWarSystems';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('mapFacWarSystems')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

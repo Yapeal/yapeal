@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Map;
 
+use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
@@ -146,10 +147,17 @@ class Sovereignty extends AbstractCommonEveApi
             'factionID' => null,
             'solarSystemName' => null
         );
+        $tableName = 'mapSovereignty';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('mapSovereignty')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

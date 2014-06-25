@@ -3,13 +3,7 @@
 composer.phar
 junk*.php
 test.php
-cache/account/*.xml
-cache/ADOdb/*.sql
-cache/char/*.xml
-cache/corp/*.xml
-cache/eve/*.xml
-cache/map/*.xml
-cache/server/*.xml
+cache/
 config/yapeal.ini
 log/*.log
 export/

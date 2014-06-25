@@ -152,6 +152,36 @@ SQL;
     }
     /**
      * @param string $tableName
+     *
+     * @return string
+     */
+    public function getDeleteFromTable($tableName)
+    {
+        return sprintf(
+            'DELETE FROM "%1$s"."%2$s%3$s"',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName
+        );
+    }
+    /**
+     * @param string $tableName
+     * @param string $ownerID
+     *
+     * @return string
+     */
+    public function getDeleteFromTableWithOwnerID($tableName, $ownerID)
+    {
+        return sprintf(
+            'DELETE FROM "%1$s"."%2$s%3$s" WHERE "ownerID"= \'%4$s\'',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName,
+            $ownerID
+        );
+    }
+    /**
+     * @param string $tableName
      * @param array  $columnNameList
      * @param string $rowCount
      *

@@ -144,10 +144,17 @@ class ErrorList extends AbstractCommonEveApi
             'errorCode' => null,
             'errorText' => null
         );
+        $tableName = 'eveErrorList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('eveErrorList')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

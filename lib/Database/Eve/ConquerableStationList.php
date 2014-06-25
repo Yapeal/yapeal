@@ -151,10 +151,17 @@ class ConquerableStationList extends AbstractCommonEveApi
             'corporationID' => null,
             'corporationName' => null
         );
+        $tableName = 'eveConquerableStationList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('eveConquerableStationList')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

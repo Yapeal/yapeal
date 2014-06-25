@@ -144,10 +144,17 @@ class Jumps extends AbstractCommonEveApi
             'solarSystemID' => null,
             'shipJumps' => null
         );
+        $tableName = 'mapJumps';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $preserver->setTableName('mapJumps')
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
                       ->setColumnDefaults($columnDefaults)
                       ->preserveData($xml);
             $this->getPdo()

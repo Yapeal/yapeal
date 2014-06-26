@@ -80,8 +80,8 @@ class ValuesDatabasePreserver implements
             if (!in_array($column->getName(), $columnList)) {
                 break;
             }
-            $this->getLogger()
-                 ->debug($column->getName() . ' => ' . (string)$column);
+//            $this->getLogger()
+//                 ->debug($column->getName() . ' => ' . (string)$column);
             $row[$column->getName()] = (string)$column;
         }
         $this->addRow($row);

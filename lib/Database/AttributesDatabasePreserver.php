@@ -199,9 +199,9 @@ class AttributesDatabasePreserver implements
         $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
         $this->getLogger()
             ->info($mess);
-        $mess = implode(',', $columns);
-        $this->getLogger()
-             ->debug(substr($mess, 0, 255));
+//        $mess = implode(',', $columns);
+//        $this->getLogger()
+//             ->debug(substr($mess, 0, 255));
         $stmt = $this->getPdo()
                      ->prepare($sql);
         $stmt->execute($columns);

@@ -310,7 +310,14 @@ XSL;
             'bonusName' => null,
             'ownerID' => $ownerID
         );
-        $aPreserver->setTableName('charAttributeEnhancers')
+        $tableName = 'charAttributeEnhancers';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//attributeEnhancers/row');
         return $this;
@@ -356,7 +363,14 @@ XSL;
             'ownerID' => $ownerID,
             'certificateID' => null
         );
-        $aPreserver->setTableName('charCertificates')
+        $tableName = 'charCertificates';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//certificates/row');
         return $this;
@@ -413,7 +427,14 @@ XSL;
             'roleID' => null,
             'roleName' => null
         );
-        $aPreserver->setTableName('charCorporationRoles')
+        $tableName = 'charCorporationRoles';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//corporationRoles/row');
         return $this;
@@ -435,7 +456,14 @@ XSL;
             'roleID' => null,
             'roleName' => null
         );
-        $aPreserver->setTableName('charCorporationRolesAtBase')
+        $tableName = 'charCorporationRolesAtBase';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//corporationRolesAtBase/row');
         return $this;
@@ -457,7 +485,14 @@ XSL;
             'roleID' => null,
             'roleName' => null
         );
-        $aPreserver->setTableName('charCorporationRolesAtHQ')
+        $tableName = 'charCorporationRolesAtHQ';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//corporationRolesAtHQ/row');
         return $this;
@@ -479,7 +514,14 @@ XSL;
             'roleID' => null,
             'roleName' => null
         );
-        $aPreserver->setTableName('charCorporationRolesAtOther')
+        $tableName = 'charCorporationRolesAtOther';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//corporationRolesAtOther/row');
         return $this;
@@ -501,7 +543,14 @@ XSL;
             'titleID' => null,
             'titleName' => null
         );
-        $aPreserver->setTableName('charCorporationTitles')
+        $tableName = 'charCorporationTitles';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//corporationTitles/row');
         return $this;
@@ -525,7 +574,14 @@ XSL;
             'skillpoints' => null,
             'typeID' => null
         );
-        $aPreserver->setTableName('charSkills')
+        $tableName = 'charSkills';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//skills/row');
         return $this;

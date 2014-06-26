@@ -228,7 +228,14 @@ class ContactList extends AbstractCommonEveApi
             'contactTypeID' => null,
             'standing' => null
         );
-        $preserver->setTableName('charAllianceContactList')
+        $tableName = 'charAllianceContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
                   ->setColumnDefaults($columnDefaults)
             ->preserveData($xml, '//allianceContactList/row');
         return $this;
@@ -253,7 +260,14 @@ class ContactList extends AbstractCommonEveApi
             'inWatchlist' => '0',
             'standing' => null
         );
-        $preserver->setTableName('charContactList')
+        $tableName = 'charContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
                   ->setColumnDefaults($columnDefaults)
             ->preserveData($xml, '//contactList/row');
         return $this;
@@ -277,7 +291,14 @@ class ContactList extends AbstractCommonEveApi
             'contactTypeID' => null,
             'standing' => null
         );
-        $preserver->setTableName('charCorporateContactList')
+        $tableName = 'charCorporateContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
                   ->setColumnDefaults($columnDefaults)
             ->preserveData($xml, '//corporateContactList/row');
         return $this;

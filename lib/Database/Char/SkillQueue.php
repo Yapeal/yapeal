@@ -228,7 +228,14 @@ class SkillQueue extends AbstractCommonEveApi
             'startTime' => '1972-01-01 00:00:01',
             'endTime' => '1972-01-01 00:00:01'
         );
-        $preserver->setTableName('charSkillQueue')
+        $tableName = 'charSkillQueue';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
                   ->setColumnDefaults($columnDefaults)
                   ->preserveData($xml);
         return $this;

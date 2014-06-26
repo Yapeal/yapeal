@@ -59,12 +59,12 @@ class CharacterInfoPrivate extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->info(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCharacters();
         if (empty($active)) {
             $this->getLogger()
@@ -88,9 +88,9 @@ class CharacterInfoPrivate extends AbstractCommonEveApi
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                 ->setEveApiName('CharacterInfo');
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $char['characterID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
             )
             ) {
                 continue;
@@ -125,10 +125,10 @@ class CharacterInfoPrivate extends AbstractCommonEveApi
             }
             $preservers->preserveEveApi($data);
             $this->preserve(
-                 $data->getEveApiXml(),
-                     $char['characterID'],
-                     $aPreserver,
-                     $vPreserver
+                $data->getEveApiXml(),
+                $char['characterID'],
+                $aPreserver,
+                $vPreserver
             );
             $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
@@ -207,8 +207,60 @@ class CharacterInfoPrivate extends AbstractCommonEveApi
                 $this->getCsq()
             );
         }
-        $this->preserverToEmploymentHistory($vPreserver, $xml, $ownerID);
-        $this->preserverToCharacterInfo($aPreserver, $xml);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToCharacterInfo($vPreserver, $xml);
+            $this->preserverToEmploymentHistory($aPreserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $vPreserver
+     * @param string                     $xml
+     *
+     * @return self
+     */
+    protected function preserverToCharacterInfo(
+        DatabasePreserverInterface $vPreserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'characterID' => null,
+            'characterName' => null,
+            'race' => null,
+            'bloodline' => null,
+            'accountBalance' => '0',
+            'skillPoints' => '0',
+            'nextTrainingEnds' => '1970-01-01 00:00:01',
+            'shipName' => '',
+            'shipTypeID' => '0',
+            'shipTypeName' => '',
+            'corporationID' => null,
+            'corporation' => null,
+            'corporationDate' => null,
+            'allianceID' => '0',
+            'alliance' => '',
+            'allianceDate' => '1970-01-01 00:00:01',
+            'lastKnownLocation' => '',
+            'securityStatus' => '0'
+        );
+        $vPreserver->setTableName('eveCharacterInfo')
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml);
         return $this;
     }
     /**
@@ -232,41 +284,6 @@ class CharacterInfoPrivate extends AbstractCommonEveApi
         $aPreserver->setTableName('eveEmploymentHistory')
                    ->setColumnDefaults($columnDefaults)
                    ->preserveData($xml, '//employmentHistory/row');
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $vPreserver
-     * @param string                     $xml
-     *
-     * @return self
-     */
-    protected function preserverToCharacterInfo(
-        DatabasePreserverInterface $vPreserver,
-        $xml
-    ) {
-        $columnDefaults = array(
-            'characterID' => null,
-            'characterName' => null,
-            'race' => null,
-            'bloodline' => null,
-            'accountBalance' => 0,
-            'skillPoints' => 0,
-            'nextTrainingEnds' => '1979-01-01 00:00:00',
-            'shipName' => '',
-            'shipTypeID' => 0,
-            'shipTypeName' => '',
-            'corporationID' => null,
-            'corporation' => null,
-            'corporationDate' => null,
-            'allianceID' => 0,
-            'alliance' => '',
-            'allianceDate' => '1979-01-01 00:00:00',
-            'lastKnownLocation' => '',
-            'securityStatus' => 0
-        );
-        $vPreserver->setTableName('eveCharacterInfo')
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml);
         return $this;
     }
     /**

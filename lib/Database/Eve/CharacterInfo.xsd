@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="employmentHistoryRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="recordID" use="required"/>
+                <xs:attribute type="eveIDType" name="corporationID"
+                    use="required"/>
+                <xs:attribute type="eveNEDTType" name="startDate"
+                    use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element type="eveIDType" name="characterID"/>
+            <xs:element type="xs:string" name="characterName"/>
+            <xs:element type="xs:string" name="race"/>
+            <xs:element type="xs:string" name="bloodline"/>
+            <xs:element type="eveISKType" name="accountBalance" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="skillPoints" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveNEDTType" name="nextTrainingEnds" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:string" name="shipName" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveIDType" name="shipTypeID" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:string" name="shipTypeName" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveIDType" name="corporationID"/>
+            <xs:element type="xs:string" name="corporation"/>
+            <xs:element type="eveNEDTType" name="corporationDate"/>
+            <xs:element type="eveIDType" name="allianceID" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:string" name="alliance" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveNEDTType" name="allianceDate" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:string" name="lastKnownLocation" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:decimal" name="securityStatus"/>
+            <xs:element name="employmentHistory" maxOccurs="1" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="employmentHistoryRowType" name="row"
+                            maxOccurs="unbounded" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

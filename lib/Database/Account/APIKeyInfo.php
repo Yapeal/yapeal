@@ -2,244 +2,286 @@
 /**
  * Contains APIKeyInfo class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Database\Account;
 
-use Psr\Log\LoggerInterface;
-use Yapeal\Database\AbstractAccount;
-use Yapeal\Database\DBConnection;
-use Yapeal\Database\QueryBuilder;
+use PDO;
+use PDOException;
+use SimpleXMLIterator;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store account APIKeyInfo API.
+ * Class APIKeyInfo
  */
-class APIKeyInfo extends AbstractAccount
+class APIKeyInfo extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
-    {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(__CLASS__);
-        parent::__construct($params);
-    }
-    /**
-     * @var QueryBuilder Holds QueryBuilder for bridge table.
-     */
-    protected $bridge;
-    /**
-     * @var QueryBuilder Holds QueryBuilder for characters table.
-     */
-    protected $characters;
-    /**
-     * Used to store XML to characters table.
-     *
-     * @return Bool Return TRUE if store was successful.
-     */
-    protected function characters()
-    {
-        while ($this->xr->read()) {
-            switch ($this->xr->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->xr->localName) {
-                        case 'row':
-                            $row = array();
-                            $bridge = array('keyID' => $this->params['keyID']);
-                            // Walk through attributes and add them to row.
-                            while ($this->xr->moveToNextAttribute()) {
-                                if ($this->xr->name == 'characterID') {
-                                    $bridge['characterID'] = $this->xr->value;
-                                };
-                                $row[$this->xr->name] = $this->xr->value;
-                            }
-                            $this->bridge->addRow($bridge);
-                            $this->characters->addRow($row);
-                            break;
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    if ($this->xr->localName == 'rowset') {
-                        return true;
-                    }
-                    break;
-            }
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+            ->debug(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        $active = $this->getActiveKeys();
+        if (empty($active)) {
+            $this->getLogger()
+                ->info('No active registered keys found');
+            return;
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
-    }
-    /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
-     */
-    protected function needsUpsert()
-    {
-        return false;
-    }// function parserAPI
-    /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
-     */
-    protected function needsUpsert()
-    {
-        return false;
-    }// function prepareTables
-    /**
-     * Per API parser for XML.
-     *
-     * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
-     */
-    protected function parserAPI()
-    {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert($this->needsUpsert());
-        // Get a new query instance for Characters.
-        $this->characters = new QueryBuilder(
-            YAPEAL_TABLE_PREFIX . $this->section . 'Characters', YAPEAL_DSN
+        $preserver = new AttributesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
         );
-        // Get a new query instance for KeyBridge.
-        $this->bridge = new QueryBuilder(
-            YAPEAL_TABLE_PREFIX . $this->section . 'KeyBridge', YAPEAL_DSN
-        );
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert($this->needsUpsert());
-        try {
-            while ($this->xr->read()) {
-                switch ($this->xr->nodeType) {
-                    case \XMLReader::ELEMENT:
-                        switch ($this->xr->localName) {
-                            case 'key':
-                                $row = array('keyID' => $this->params['keyID']);
-                                // Walk through attributes and add them to row.
-                                while ($this->xr->moveToNextAttribute()) {
-                                    // Skip empty expires values.
-                                    if ($this->xr->name == 'expires'
-                                        && $this->xr->value == ''
-                                    ) {
-                                        continue;
-                                    };
-                                    $row[$this->xr->name] = $this->xr->value;
-                                }
-                                $qb->addRow($row);
-                                break;
-                            case 'rowset':
-                                // Check if empty.
-                                if ($this->xr->isEmptyElement == 1) {
-                                    break;
-                                }
-                                // Grab rowset name.
-                                $subTable = $this->xr->getAttribute('name');
-                                if (empty($subTable)) {
-                                    $mess = 'Name of rowset is missing in '
-                                        . $this->api;
-                                    \Logger::getLogger('yapeal')
-                                           ->warn($mess);
-                                    return false;
-                                };
-                                if ($subTable == 'characters') {
-                                    $this->characters();
-                                }
-                                break;
-                            default: // Nothing to do here.
-                        }
-                        break;
-                    case \XMLReader::END_ELEMENT:
-                        if ($this->xr->localName == 'result') {
-                            // Save row count and store rows.
-                            if (count($qb) > 0) {
-                                $qb->store();
-                            }
-                            $qb = null;
-                            // Store rows.
-                            if (count($this->characters) > 0) {
-                                $this->characters->store();
-                            }
-                            $this->characters = null;
-                            if (count($this->bridge) > 0) {
-                                $this->bridge->store();
-                            }
-                            $this->bridge = null;
-                            return true;
-                        }
-                        break;
-                }
+        foreach ($active as $key) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $key['keyID']
+            )
+            ) {
+                continue;
             }
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->error($e);
-            return false;
+            $data->setEveApiArguments($key)
+                 ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
+            $retrievers->retrieveEveApi($data);
+            if ($data->getEveApiXml() === false) {
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $key['keyID']
+                );
+                $this->getLogger()
+                    ->notice($mess);
+                continue;
+            }
+            $this->xsltTransform($data);
+            if ($this->isInvalid($data)) {
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $key['keyID']
+                );
+                $this->getLogger()
+                     ->warning($mess);
+                $data->setEveApiName('Invalid' . $this->getApiName());
+                $preservers->preserveEveApi($data);
+                continue;
+            }
+            $preservers->preserveEveApi($data);
+            $this->preserve(
+                $data->getEveApiXml(),
+                $key['keyID'],
+                $preserver
+            );
+            $this->updateCachedUntil($data, $interval, $key['keyID']);
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
     }
     /**
-     * Method used to prepare database table(s) before parsing API XML data.
-     *
-     * If there is any need to delete records or empty tables before parsing XML
-     * and adding the new data this method should be used to do so.
-     *
-     * @return bool Will return TRUE if table(s) were prepared correctly.
+     * @return array
      */
-    protected function prepareTables()
+    protected function getActiveKeys()
     {
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredKeys();
+        $this->getLogger()
+             ->debug($sql);
         try {
-            $con = DBConnection::connect(YAPEAL_DSN);
-            // Empty out old data then upsert (insert) new.
-            $sql = 'DELETE FROM `';
-            $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-            $sql .= ' where `keyID`=' . $this->params['keyID'];
-            $con->Execute($sql);
-            $sql = 'DELETE FROM `';
-            $sql .= YAPEAL_TABLE_PREFIX . 'accountKeyBridge`';
-            $sql .= ' where `keyID`=' . $this->params['keyID'];
-            $con->Execute($sql);
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->warn($e);
-            return false;
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT select from utilRegisteredKeys';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
         }
-        return true;
+    }
+    /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToAPIKeyInfo($preserver, $xml, $ownerID);
+            $this->preserveToCharacters($preserver, $xml);
+            $this->preserveToKeyBridge($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserveToAPIKeyInfo(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'keyID' => $ownerID,
+            'accessMask' => null,
+            'expires' => '2038-01-19 03:14:07',
+            'type' => null
+        );
+        $preserver->setTableName('accountAPIKeyInfo')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//key');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     */
+    protected function preserveToCharacters(
+        DatabasePreserverInterface $preserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'characterID' => null,
+            'characterName' => null,
+            'corporationID' => null,
+            'corporationName' => null,
+            'allianceID' => null,
+            'allianceName' => null,
+            'factionID' => null,
+            'factionName' => null
+        );
+        $preserver->setTableName('accountCharacters')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml, '//row');
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
+     */
+    protected function preserveToKeyBridge(
+        $xml,
+        $ownerID
+    ) {
+        $simple = new SimpleXMLIterator($xml);
+        $chars = $simple->xpath('//row');
+        $rows = array();
+        foreach ($chars as $aRow) {
+            $rows[] = $ownerID;
+            $rows[] = $aRow['characterID'];
+        }
+        $sql = $this->getCsq()
+                    ->getUpsert(
+                        'accountKeyBridge',
+                        array('keyID', 'characterID'),
+                        count($chars)
+                    );
+        $this->getLogger()
+            ->info($sql);
+        $stmt = $this->getPdo()
+                     ->prepare($sql);
+        $stmt->execute($rows);
     }
 }
-

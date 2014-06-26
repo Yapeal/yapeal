@@ -1,54 +1,174 @@
 <?php
 /**
- * Contains Jumps class.
+ * Contains CallList class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
 namespace Yapeal\Database\Map;
 
-use Yapeal\Database\AbstractMap;
+use PDOException;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store Jumps API.
+ * Class CallList
  */
-class Jumps extends AbstractMap
+class Jumps extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         */
+        $data->setEveApiSectionName(strtolower($this->getSectionName()))
+             ->setEveApiName($this->getApiName())
+             ->setEveApiXml();
+        if ($this->cacheNotExpired(
+            $this->getApiName(),
+            $this->getSectionName()
+        )
+        ) {
+            return;
+        }
+        if (!$this->gotApiLock($data)) {
+            return;
+        }
+        $retrievers->retrieveEveApi($data);
+        if ($data->getEveApiXml() === false) {
+            $mess = sprintf(
+                'Could NOT retrieve Eve Api data for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->debug($mess);
+            return;
+        }
+        $this->xsltTransform($data);
+        if ($this->isInvalid($data)) {
+            $mess = sprintf(
+                'Data retrieved is invalid for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            $data->setEveApiName('Invalid' . $this->getApiName());
+            $preservers->preserveEveApi($data);
+            return;
+        }
+        $preservers->preserveEveApi($data);
+        $preserver = new AttributesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
+        $this->preserveToJumps($preserver, $data->getEveApiXml());
+        $this->updateCachedUntil($data, $interval, '0');
+    }
+    /**
+     * @return string
+     */
+    protected function getApiName()
     {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(str_replace('\\', '/', __CLASS__));
-        parent::__construct($params);
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     */
+    protected function preserveToJumps(
+        DatabasePreserverInterface $preserver,
+        $xml
+    ) {
+        $columnDefaults = array(
+            'solarSystemID' => null,
+            'shipJumps' => null
+        );
+        $tableName = 'mapJumps';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->getPdo()
+                 ->exec($sql);
+            $preserver->setTableName($tableName)
+                      ->setColumnDefaults($columnDefaults)
+                      ->preserveData($xml);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
     }
 }

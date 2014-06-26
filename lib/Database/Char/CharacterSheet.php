@@ -2,416 +2,592 @@
 /**
  * Contains CharacterSheet class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Database\Char;
 
-use Yapeal\Database\AbstractChar;
-use Yapeal\Database\DBConnection;
-use Yapeal\Database\QueryBuilder;
+use PDO;
+use PDOException;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\ValuesDatabasePreserver;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store CharacterSheet API.
+ * Class CharacterSheet
  */
-class CharacterSheet extends AbstractChar
+class CharacterSheet extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
-    {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(str_replace('\\', '/', __CLASS__));
-        parent::__construct($params);
-    }
-    /**
-     * Used to store XML to CharacterSheet's attributeEnhancers table.
-     *
-     * @return Bool Return TRUE if store was successful.
-     */
-    protected function attributeEnhancers()
-    {
-        $tableName =
-            YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
-        $row = array();
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'charismaBonus':
-                        case 'intelligenceBonus':
-                        case 'memoryBonus':
-                        case 'perceptionBonus':
-                        case 'willpowerBonus':
-                            $row = array('ownerID' => $this->ownerID);
-                            $row['bonusName'] = $this->reader->localName;
-                            break;
-                        case 'augmentatorName':
-                        case 'augmentatorValue':
-                            $name = $this->reader->localName;
-                            $this->reader->read();
-                            $row[$name] = $this->reader->value;
-                            break;
-                        default: // Nothing to do here.
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'charismaBonus':
-                        case 'intelligenceBonus':
-                        case 'memoryBonus':
-                        case 'perceptionBonus':
-                        case 'willpowerBonus':
-                            $qb->addRow($row);
-                            break;
-                        case 'attributeEnhancers':
-                            return $qb->store();
-                        default: // Nothing to do here.
-                    }
-                    break;
-                default: // Nothing to do here.
-            }
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
-    }
-    /**
-     * Handles attributes table.
-     *
-     * @return bool Returns TRUE if data stored to database table.
-     */
-    protected function attributes()
-    {
-        $tableName =
-            YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
-        $row = array('ownerID' => $this->ownerID);
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'charisma':
-                        case 'intelligence':
-                        case 'memory':
-                        case 'perception':
-                        case 'willpower':
-                            $name = $this->reader->localName;
-                            $this->reader->read();
-                            $row[$name] = $this->reader->value;
-                            break;
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'attributes') {
-                        $qb->addRow($row);
-                        return $qb->store();
-                    }
-                    break;
-                default: // Nothing to do here.
+        $aPreserver = new AttributesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
+        $vPreserver = new ValuesDatabasePreserver(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
+        foreach ($active as $char) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
             }
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
+            $retrievers->retrieveEveApi($data);
+            if ($data->getEveApiXml() === false) {
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->debug($mess);
+                continue;
+            }
+            $this->xsltTransform($data);
+            if ($this->isInvalid($data)) {
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->warning($mess);
+                $data->setEveApiName('Invalid' . $this->getApiName());
+                $preservers->preserveEveApi($data);
+                continue;
+            }
+            $preservers->preserveEveApi($data);
+            $this->preserve(
+                $data->getEveApiXml(),
+                $char['characterID'],
+                $aPreserver,
+                $vPreserver
+            );
+            $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
     }
     /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
+     * @var string
      */
-    protected function needsUpsert()
-    {
-        return false;
-    }
+    protected $xsl = <<<XSL
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="attributeEnhancers">
+        <xsl:element name="{name(.)}">
+            <xsl:attribute name="key">bonusName</xsl:attribute>
+            <xsl:attribute name="columns">augmentatorValue,augmentatorName,bonusName</xsl:attribute>
+            <xsl:apply-templates/>
+        </xsl:element>
+    </xsl:template>
+    <xsl:template match="perceptionBonus|memoryBonus|willpowerBonus|intelligenceBonus|charismaBonus">
+        <row bonusName="{name(.)}">
+        <xsl:attribute name="augmentatorName"><xsl:value-of select="./augmentatorName"/></xsl:attribute>
+        <xsl:attribute name="augmentatorValue"><xsl:value-of select="./augmentatorValue"/></xsl:attribute>
+        </row>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
     /**
-     * Per API parser for XML.
-     *
-     * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
+     * @return array
      */
-    protected function parserAPI()
+    protected function getActiveCharacters()
     {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        $qb->setDefault('allianceName', '');
-        $row = array();
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
         try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
-                    case \XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
-                            case 'allianceID':
-                            case 'allianceName':
-                            case 'ancestry':
-                            case 'balance':
-                            case 'bloodLine':
-                            case 'characterID':
-                            case 'cloneName':
-                            case 'cloneSkillPoints':
-                            case 'corporationID':
-                            case 'corporationName':
-                            case 'DoB':
-                            case 'factionID':
-                            case 'factionName':
-                            case 'gender':
-                            case 'name':
-                            case 'race':
-                                // Grab node name.
-                                $name = $this->reader->localName;
-                                if (($name == 'allianceName'
-                                        || $name == 'factionName')
-                                    && $this->reader->isEmptyElement == true
-                                ) {
-                                    $row[$name] = '';
-                                } else {
-                                    // Move to text node.
-                                    $this->reader->read();
-                                    $row[$name] = $this->reader->value;
-                                }
-                                break;
-                            case 'attributes':
-                            case 'attributeEnhancers':
-                                // Check if empty.
-                                if ($this->reader->isEmptyElement == true) {
-                                    break;
-                                }
-                                // Grab node name.
-                                $subTable = $this->reader->localName;
-                                // Check for method with same name as node.
-                                if (!is_callable(array($this, $subTable))) {
-                                    $mess = 'Unknown what-to-be rowset '
-                                        . $subTable;
-                                    $mess .= ' found in ' . $this->api;
-                                    \Logger::getLogger('yapeal')
-                                           ->warn($mess);
-                                    return false;
-                                }
-                                $this->$subTable();
-                                break;
-                            case 'rowset':
-                                // Check if empty.
-                                if ($this->reader->isEmptyElement == true) {
-                                    break;
-                                }
-                                // Grab rowset name.
-                                $subTable = $this->reader->getAttribute('name');
-                                if (empty($subTable)) {
-                                    $mess = 'Name of rowset is missing in '
-                                        . $this->api;
-                                    \Logger::getLogger('yapeal')
-                                           ->warn($mess);
-                                    return false;
-                                }
-                                if ($subTable == 'skills') {
-                                    $this->$subTable();
-                                } else {
-                                    $this->rowset($subTable);
-                                }
-                                break;
-                            default: // Nothing to do here.
-                        }
-                        break;
-                    case \XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
-                            $qb->addRow($row);
-                            if (count($qb) > 0) {
-                                $qb->store();
-                            }
-                            $qb = null;
-                            return true;
-                        }
-                        break;
-                    default: // Nothing to do.
-                }
-            }
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->error($e);
-            return false;
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
     }
     /**
-     * Method used to prepare database table(s) before parsing API XML data.
-     *
-     * If there is any need to delete records or empty tables before parsing XML
-     * and adding the new data this method should be used to do so.
-     *
-     * @return bool Will return TRUE if table(s) were prepared correctly.
+     * @return string
      */
-    protected function prepareTables()
+    protected function getApiName()
     {
-        $tables = array(
-            'Attributes',
-            'AttributeEnhancers',
-            'Certificates',
-            'CorporationRoles',
-            'CorporationRolesAtBase',
-            'CorporationRolesAtHQ',
-            'CorporationRolesAtOther',
-            'CorporationTitles',
-            'Skills'
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param DatabasePreserverInterface $aPreserver
+     * @param DatabasePreserverInterface $vPreserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        DatabasePreserverInterface $aPreserver = null,
+        DatabasePreserverInterface $vPreserver = null
+    ) {
+        if (is_null($aPreserver)) {
+            $aPreserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        if (is_null($vPreserver)) {
+            $vPreserver = new ValuesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToCharacterSheet($vPreserver, $xml, $ownerID);
+            $this->preserverToAttributeEnhancers($aPreserver, $xml, $ownerID);
+            $this->preserverToAttributes($vPreserver, $xml, $ownerID);
+            $this->preserverToSkills($aPreserver, $xml, $ownerID);
+            $this->preserverToCertificates($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRoles($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRolesAtHQ($aPreserver, $xml, $ownerID);
+            $this->preserverTocorporationRolesAtBase(
+                $aPreserver,
+                $xml,
+                $ownerID
+            );
+            $this->preserverTocorporationRolesAtOther(
+                $aPreserver,
+                $xml,
+                $ownerID
+            );
+            $this->preserverToCorporationTitles($aPreserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToAttributeEnhancers(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'augmentatorName' => null,
+            'augmentatorValue' => null,
+            'bonusName' => null,
+            'ownerID' => $ownerID
         );
-        foreach ($tables as $table) {
-            try {
-                $con = DBConnection::connect(YAPEAL_DSN);
-                // Empty out old data then upsert (insert) new.
-                $sql = 'DELETE FROM `';
-                $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
-                $sql .= ' where `ownerID`=' . $this->ownerID;
-                $con->Execute($sql);
-            } catch (\ADODB_Exception $e) {
-                \Logger::getLogger('yapeal')
-                       ->warn($e);
-                return false;
-            }
-        }
-        return true;
+        $tableName = 'charAttributeEnhancers';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//attributeEnhancers/row');
+        return $this;
     }
     /**
-     * Used to store XML to rowset tables.
+     * @param DatabasePreserverInterface $vPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
      *
-     * @param string $table Name of the table for this rowset.
-     *
-     * @return Bool Return TRUE if store was successful.
+     * @return self
      */
-    protected function rowset($table)
-    {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
-        $qb->setDefault('ownerID', $this->ownerID);
-        $row = array();
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'row':
-                            // Walk through attributes and add them to row.
-                            while ($this->reader->moveToNextAttribute()) {
-                                $row[$this->reader->name] =
-                                    $this->reader->value;
-                            }
-                            $qb->addRow($row);
-                            break;
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'rowset') {
-                        // Insert any leftovers.
-                        if (count($qb) > 0) {
-                            $qb->store();
-                        }
-                        $qb = null;
-                        return true;
-                    }
-                    break;
-            }
-        }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
-    }
-    /**
-     * Used to store XML to CharacterSheet's skills table.
-     *
-     * @return Bool Return TRUE if store was successful.
-     */
-    protected function skills()
-    {
-        $tableName =
-            YAPEAL_TABLE_PREFIX . $this->section . ucfirst(__FUNCTION__);
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert(false);
-        $defaults = array(
-            'level' => 0,
-            'ownerID' => $this->ownerID,
-            'published' => 1
+    protected function preserverToAttributes(
+        DatabasePreserverInterface $vPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'charisma' => null,
+            'intelligence' => null,
+            'memory' => null,
+            'ownerID' => $ownerID,
+            'perception' => null,
+            'willpower' => null
         );
-        $qb->setDefaults($defaults);
-        $row = array();
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'row':
-                            // Walk through attributes and add them to row.
-                            while ($this->reader->moveToNextAttribute()) {
-                                $row[$this->reader->name] =
-                                    $this->reader->value;
-                            }
-                            $qb->addRow($row);
-                            break;
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'rowset') {
-                        // Insert any leftovers.
-                        if (count($qb) > 0) {
-                            $qb->store();
-                        }
-                        $qb = null;
-                        return true;
-                    }
-                    break;
-            }
-        }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
+        $vPreserver->setTableName('charAttributes')
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//attributes/*');
+        return $this;
     }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCertificates(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'certificateID' => null
+        );
+        $tableName = 'charCertificates';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//certificates/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $vPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCharacterSheet(
+        DatabasePreserverInterface $vPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'allianceID' => '0',
+            'allianceName' => null,
+            'ancestry' => null,
+            'balance' => null,
+            'bloodLine' => null,
+            'characterID' => $ownerID,
+            'cloneName' => null,
+            'cloneSkillPoints' => null,
+            'corporationID' => null,
+            'corporationName' => null,
+            'DoB' => null,
+            'factionID' => '0',
+            'factionName' => null,
+            'gender' => null,
+            'name' => null,
+            'race' => null
+        );
+        $vPreserver->setTableName('charCharacterSheet')
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml);
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporationRoles(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'roleID' => null,
+            'roleName' => null
+        );
+        $tableName = 'charCorporationRoles';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//corporationRoles/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporationRolesAtBase(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'roleID' => null,
+            'roleName' => null
+        );
+        $tableName = 'charCorporationRolesAtBase';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//corporationRolesAtBase/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporationRolesAtHQ(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'roleID' => null,
+            'roleName' => null
+        );
+        $tableName = 'charCorporationRolesAtHQ';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//corporationRolesAtHQ/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporationRolesAtOther(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'roleID' => null,
+            'roleName' => null
+        );
+        $tableName = 'charCorporationRolesAtOther';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//corporationRolesAtOther/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporationTitles(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'titleID' => null,
+            'titleName' => null
+        );
+        $tableName = 'charCorporationTitles';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//corporationTitles/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $aPreserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToSkills(
+        DatabasePreserverInterface $aPreserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'level' => null,
+            'ownerID' => $ownerID,
+            'published' => null,
+            'skillpoints' => null,
+            'typeID' => null
+        );
+        $tableName = 'charSkills';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $aPreserver->setTableName($tableName)
+                   ->setColumnDefaults($columnDefaults)
+                   ->preserveData($xml, '//skills/row');
+        return $this;
+    }
+    /**
+     * @var int $mask
+     */
+    private $mask = 8;
 }
-

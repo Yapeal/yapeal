@@ -1,0 +1,47 @@
+---
+Yapeal:
+    Database:
+        class: \PDO
+        database: yapeal
+        hostName: localhost
+        password: secret
+        platform: mysql
+        # (Optional) Only needed if using http connection.
+        # port: ""
+        tablePrefix: ''
+        userName: YapealUser
+    Log:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        bufferSize: 25
+        channel: yapeal
+        class: Monolog\Logger
+        logDir: '{Yapeal.baseDir}log/'
+        fileName: yapeal.log
+        # Threshold that should trigger logging.
+        # Allowed values:
+        # 100(DEBUG), 200(INFO), 250(NOTICE), 300(WARNING), 400(ERROR),
+        # 500(CRITICAL), 550(ALERT), 600(EMERGENCY)
+        # Recommended default for development NOTICE or INFO
+        # Recommended default for production WARNING or ERROR
+        threshold: 300
+    Error:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        bufferSize: 25
+        channel: php
+        class: Monolog\ErrorHandler
+        logDir: '{Yapeal.baseDir}log/'
+        fileName: yapeal.log
+        # Threshold that should trigger logging.
+        # See Yapeal.Log.threshold for allowed values
+        # Recommended default for development ERROR or WARNING
+        # Recommended default for production CRITICAL
+        threshold: 500
+        # (Optional) Defaults to another instance of Yapeal.Log.class
+        # loggerClass: Monolog\Logger
+...

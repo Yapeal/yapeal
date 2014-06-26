@@ -2,239 +2,259 @@
 /**
  * Contains WalletTransactions class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Database\Char;
 
-use Yapeal\Caching\EveApiXmlCache;
-use Yapeal\Database\AbstractChar;
-use Yapeal\Database\QueryBuilder;
-use Yapeal\Exception\YapealApiErrorException;
-use Yapeal\Network\NetworkConnection;
+use PDO;
+use PDOException;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store char WalletTransactions API.
+ * Class WalletTransactions
  */
-class WalletTransactions extends AbstractChar
+class WalletTransactions extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
-    {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(str_replace('\\', '/', __CLASS__));
-        parent::__construct($params);
-    }
-    /**
-     * Used to store XML to MySQL table(s).
-     *
-     * @return Bool Return TRUE if store was successful.
-     */
-    public function apiStore()
-    {
-        /* This counter is used to insure do ... while can't become infinite loop.
-         * Using 1000 means at most last 255794 rows can be retrieved. That works
-         * out to over 355 entries per hour over the maximum 30 days allowed by
-         * the API servers. If you have a corp or char with more than that please
-         * contact me for addition help with Yapeal.
-         */
-        $counter = 1000;
-        $this->date = gmdate('Y-m-d H:i:s', strtotime('1 hour'));
-        $this->beforeID = '0';
-        $rowCount = 250;
-        $first = true;
-        // Need to add extra stuff to normal parameters to make walking work.
-        $apiParams = $this->params;
-        try {
-            do {
-                // Give each API 60 seconds to finish. This should never happen but is
-                // here to catch runaways.
-                set_time_limit(60);
-                /* Not going to assume here that API servers figure oldest allowed
-                 * entry based on a saved time from first pull but instead use current
-                 * time. The few seconds of difference shouldn't cause any missed data
-                 * and is safer than assuming.
-                 */
-                $oldest = gmdate('Y-m-d H:i:s', strtotime('30 days ago'));
-                // Added the accountKey to params.
-                $apiParams['accountKey'] = 1000;
-                // This tells API server how many rows we want.
-                $apiParams['rowCount'] = $rowCount;
-                // First get a new cache instance.
-                $cache = new EveApiXmlCache(
-                    $this->api, $this->section, $this->ownerID,
-                    $apiParams
-                );
-                // See if there is a valid cached copy of the API XML.
-                $result = $cache->getCachedApi();
-                // If it's not cached need to try to get it.
-                if (false === $result) {
-                    $proxy = $this->getProxy();
-                    $con = new NetworkConnection();
-                    $result = $con->retrieveEveApiXml($proxy, $apiParams);
-                    // FALSE means there was an error and it has already been report so
-                    // just return to caller.
-                    if (false === $result) {
-                        return false;
-                    };
-                    // Cache the received XML.
-                    $cache->cacheXml($result);
-                    // Check if XML is valid.
-                    if (false === $cache->isValid()) {
-                        // No use going any farther if the XML isn't valid.
-                        return false;
-                    };
-                }
-                // Create XMLReader.
-                $this->reader = new \XMLReader();
-                // Pass XML to reader.
-                $this->reader->XML($result);
-                // Outer structure of XML is processed here.
-                while ($this->reader->read()) {
-                    if ($this->reader->nodeType == \XMLReader::ELEMENT
-                        && $this->reader->localName == 'result'
-                    ) {
-                        $result = $this->parserAPI();
-                    }
-                }
-                $this->reader->close();
-                /* There are two normal conditions to end walking. They are:
-                 * Got less rows than expected because there are no more to get while
-                 * walking backwards.
-                 * The oldest row we got is oldest API allows us to get.
-                 */
-                if (($first === false && $this->rowCount != $rowCount)
-                    || $this->date < $oldest
-                ) {
-                    // Have to break while.
-                    break;
-                };
-                // This tells API server where to start from when walking backwards.
-                $apiParams['fromID'] = $this->beforeID;
-                $first = false;
-            } while ($counter--);
-        } catch (YapealApiErrorException $e) {
-            // Any API errors that need to be handled in some way are handled in this
-            // function.
-            $this->handleApiError($e);
-            return false;
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
         }
-        return $result;
-    }
-    /**
-     * @var string Holds the refID from each row in turn to use when walking.
-     */
-    protected $beforeID;
-    /**
-     * @var string Holds the date from each row in turn to use when walking.
-     */
-    protected $date;
-    /**
-     * @var integer Hold row count used in walking.
-     */
-    protected $rowCount;
-    /**
-     * Parsers the XML from API.
-     *
-     * Most common API style is a simple <rowset>. Transactions are a little more
-     * complex because of need to do walking back for older records.
-     *
-     * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
-     */
-    protected function parserAPI()
-    {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . $this->api;
-        // Get a new query instance with autoStore off.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Set any column defaults needed.
-        $defaults = array('accountKey' => 1000, 'ownerID' => $this->ownerID);
-        $qb->setDefaults($defaults);
-        try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
-                    case \XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
-                            case 'row':
-                                /* The following assumes the transactionDateTime attribute
-                                 * exists and is not empty and the same is true for
-                                 * transactionID. Since XML would be invalid if ether were true
-                                 * they should never return bad values.
-                                 */
-                                $date = $this->reader->getAttribute(
-                                    'transactionDateTime'
-                                );
-                                // If this date is the oldest so far need to save
-                                // transactionDateTime and transactionID to use in walking.
-                                if ($date < $this->date) {
-                                    $this->date = $date;
-                                    $this->beforeID =
-                                        $this->reader->getAttribute(
-                                            'transactionID'
-                                        );
-                                }
-                                $row = array();
-                                // Walk through attributes and add them to row.
-                                while ($this->reader->moveToNextAttribute()) {
-                                    $row[$this->reader->name] =
-                                        $this->reader->value;
-                                }
-                                $qb->addRow($row);
-                                break;
-                        }
-                        break;
-                    case \XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
-                            // Save row count and store rows.
-                            $this->rowCount = count($qb);
-                            if ($this->rowCount > 0) {
-                                $qb->store();
-                            }
-                            $qb = null;
-                            return true;
-                        }
-                        break;
-                }
+        foreach ($active as $char) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
             }
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->error($e);
-            return false;
+            $char['accountKey'] = '1000';
+            $char['rowCount'] = '2560';
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
+            $retrievers->retrieveEveApi($data);
+            if ($data->getEveApiXml() === false) {
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->debug($mess);
+                continue;
+            }
+            $this->xsltTransform($data);
+            if ($this->isInvalid($data)) {
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->warning($mess);
+                $data->setEveApiName('Invalid' . $this->getApiName());
+                $preservers->preserveEveApi($data);
+                continue;
+            }
+            $preservers->preserveEveApi($data);
+            $this->preserve(
+                $data->getEveApiXml(),
+                $char['characterID'],
+                $char['accountKey']
+            );
+            $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
     }
+    /**
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param string                     $accountKey
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        $accountKey,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToWalletTransactions(
+                $preserver,
+                $xml,
+                $ownerID,
+                $accountKey
+            );
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param string                     $accountKey
+     *
+     * @return self
+     */
+    protected function preserverToWalletTransactions(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID,
+        $accountKey
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'accountKey' => $accountKey,
+            'clientID' => null,
+            'clientName' => null,
+            'clientTypeID' => null,
+            'journalTransactionID' => null,
+            'price' => null,
+            'quantity' => null,
+            'stationID' => null,
+            'stationName' => null,
+            'transactionDateTime' => null,
+            'transactionFor' => null,
+            'transactionID' => null,
+            'transactionType' => null,
+            'typeID' => null,
+            'typeName' => null
+        );
+        $preserver->setTableName('charWalletTransactions')
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml);
+        return $this;
+    }
+    /**
+     * @var int $mask
+     */
+    private $mask = 2097152;
 }
-

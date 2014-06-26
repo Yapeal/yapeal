@@ -2,88 +2,246 @@
 /**
  * Contains SkillQueue class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Database\Char;
 
-use Yapeal\Database\AbstractChar;
-use Yapeal\Database\DBConnection;
+use PDO;
+use PDOException;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store char SkillQueue API.
+ * Class SkillQueue
  */
-class SkillQueue extends AbstractChar
+class SkillQueue extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
-    {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(str_replace('\\', '/', __CLASS__));
-        parent::__construct($params);
-    }
-    /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
-     */
-    protected function needsUpsert()
-    {
-        return false;
-    }
-    /**
-     * Method used to prepare database table(s) before parsing API XML data.
-     *
-     * If there is any need to delete records or empty tables before parsing XML
-     * and adding the new data this method should be used to do so.
-     *
-     * @return bool Will return TRUE if table(s) were prepared correctly.
-     */
-    protected function prepareTables()
-    {
-        try {
-            $con = DBConnection::connect(YAPEAL_DSN);
-            // Empty out old data then upsert (insert) new.
-            $sql = 'DELETE FROM `';
-            $sql .= YAPEAL_TABLE_PREFIX . $this->section . $this->api . '`';
-            $sql .= ' where `ownerID`=' . $this->ownerID;
-            $con->Execute($sql);
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->warn($e);
-            return false;
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
         }
-        return true;
+        foreach ($active as $char) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
+            }
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
+            $retrievers->retrieveEveApi($data);
+            if ($data->getEveApiXml() === false) {
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->debug($mess);
+                continue;
+            }
+            $this->xsltTransform($data);
+            if ($this->isInvalid($data)) {
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->warning($mess);
+                $data->setEveApiName('Invalid' . $this->getApiName());
+                $preservers->preserveEveApi($data);
+                continue;
+            }
+            $preservers->preserveEveApi($data);
+            $this->preserve(
+                $data->getEveApiXml(),
+                $char['characterID']
+            );
+            $this->updateCachedUntil($data, $interval, $char['characterID']);
+        }
     }
+    /**
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToSkillQueue($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToSkillQueue(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'queuePosition' => null,
+            'typeID' => null,
+            'level' => null,
+            'startSP' => null,
+            'endSP' => null,
+            'startTime' => '1972-01-01 00:00:01',
+            'endTime' => '1972-01-01 00:00:01'
+        );
+        $tableName = 'charSkillQueue';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
+                  ->setColumnDefaults($columnDefaults)
+                  ->preserveData($xml);
+        return $this;
+    }
+    /**
+     * @var int $mask
+     */
+    private $mask = 262144;
 }
-

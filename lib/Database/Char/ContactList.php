@@ -2,194 +2,309 @@
 /**
  * Contains ContactList class.
  *
- * PHP version 5
+ * PHP version 5.3
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of 1.1.x-WIP
+ * Copyright (C) 2014 Michael Cummings
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
- * @author     Michael Cummings <mgcummings@yahoo.com>
- * @copyright  Copyright (c) 2008-2014, Michael Cummings
- * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @link       http://code.google.com/p/yapeal/
- * @link       http://www.eveonline.com/
+ * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
+ * available in the GNU-GPL.md file.
+ *
+ * @copyright 2014 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Database\Char;
 
-use Yapeal\Database\AbstractChar;
-use Yapeal\Database\DBConnection;
-use Yapeal\Database\QueryBuilder;
+use PDO;
+use PDOException;
+use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\AttributesDatabasePreserver;
+use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
- * Class used to fetch and store char ContactList API.
+ * Class ContactList
  */
-class ContactList extends AbstractChar
+class ContactList extends AbstractCommonEveApi
 {
     /**
-     * Constructor
-     *
-     * @param array $params Holds the required parameters like keyID, vCode, etc
-     *                      used in HTML POST parameters to API servers which varies depending on API
-     *                      'section' being requested.
-     *
-     * @throws \LengthException for any missing required $params.
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      */
-    public function __construct(array $params)
-    {
-        $this->section = strtolower(basename(__DIR__));
-        $this->api = basename(str_replace('\\', '/', __CLASS__));
-        parent::__construct($params);
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
+        }
+        foreach ($active as $char) {
+            /**
+             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             */
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
+            }
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            if (!$this->gotApiLock($data)) {
+                continue;
+            }
+            $retrievers->retrieveEveApi($data);
+            if ($data->getEveApiXml() === false) {
+                $mess = sprintf(
+                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->debug($mess);
+                continue;
+            }
+            $this->xsltTransform($data);
+            if ($this->isInvalid($data)) {
+                $mess = sprintf(
+                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                    strtolower($this->getSectionName()),
+                    $this->getApiName(),
+                    $char['characterID']
+                );
+                $this->getLogger()
+                     ->warning($mess);
+                $data->setEveApiName('Invalid' . $this->getApiName());
+                $preservers->preserveEveApi($data);
+                continue;
+            }
+            $preservers->preserveEveApi($data);
+            $this->preserve(
+                $data->getEveApiXml(),
+                $char['characterID']
+            );
+            $this->updateCachedUntil($data, $interval, $char['characterID']);
+        }
     }
     /**
-     * Method used to determine if Need to use upsert or insert for API.
-     *
-     * @return bool
+     * @return array
      */
-    protected function needsUpsert()
+    protected function getActiveCharacters()
     {
-        return false;
-    }
-    /**
-     * Per API parser for XML.
-     *
-     * @return bool Returns TRUE if XML was parsed correctly, FALSE if not.
-     */
-    protected function parserAPI()
-    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
         try {
-            while ($this->reader->read()) {
-                switch ($this->reader->nodeType) {
-                    case \XMLReader::ELEMENT:
-                        switch ($this->reader->localName) {
-                            case 'rowset':
-                                // Check if empty.
-                                if ($this->reader->isEmptyElement == 1) {
-                                    break;
-                                }
-                                // Grab rowset name.
-                                $subTable = $this->reader->getAttribute('name');
-                                if (empty($subTable)) {
-                                    $mess = 'Name of rowset is missing in '
-                                        . $this->api;
-                                    \Logger::getLogger('yapeal')
-                                           ->warn($mess);
-                                    return false;
-                                }
-                                $this->rowset($subTable);
-                                break;
-                            default: // Nothing to do here.
-                        }
-                        break;
-                    case \XMLReader::END_ELEMENT:
-                        if ($this->reader->localName == 'result') {
-                            return true;
-                        }
-                        break;
-                    default: // Nothing to do.
-                }
-            }
-        } catch (\ADODB_Exception $e) {
-            \Logger::getLogger('yapeal')
-                   ->error($e);
-            return false;
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
         }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
     }
     /**
-     * Method used to prepare database table(s) before parsing API XML data.
-     *
-     * If there is any need to delete records or empty tables before parsing XML
-     * and adding the new data this method should be used to do so.
-     *
-     * @return bool Will return TRUE if table(s) were prepared correctly.
+     * @return string
      */
-    protected function prepareTables()
+    protected function getApiName()
     {
-        $tables =
-            array('AllianceContactList', $this->api, 'CorporateContactList');
-        foreach ($tables as $table) {
-            try {
-                $con = DBConnection::connect(YAPEAL_DSN);
-                // Empty out old data then upsert (insert) new.
-                $sql = 'DELETE FROM `';
-                $sql .= YAPEAL_TABLE_PREFIX . $this->section . $table . '`';
-                $sql .= ' where `ownerID`=' . $this->ownerID;
-                $con->Execute($sql);
-            } catch (\ADODB_Exception $e) {
-                \Logger::getLogger('yapeal')
-                       ->warn($e);
-                return false;
-            }
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
-        return true;
+        return $this->apiName;
     }
     /**
-     * Used to store XML to rowset tables.
-     *
-     * @param string $table Name of the table for this rowset.
-     *
-     * @return Bool Return TRUE if store was successful.
+     * @return int
      */
-    protected function rowset($table)
+    protected function getMask()
     {
-        $tableName = YAPEAL_TABLE_PREFIX . $this->section . ucfirst($table);
-        // Get a new query instance.
-        $qb = new QueryBuilder($tableName, YAPEAL_DSN);
-        // Save some overhead for tables that are truncated or in some way emptied.
-        $qb->useUpsert($this->needsUpsert());
-        $qb->setDefault('ownerID', $this->ownerID);
-        if ($table == 'contactList') {
-            $qb->setDefault('inWatchlist', 0);
-        }
-        while ($this->reader->read()) {
-            switch ($this->reader->nodeType) {
-                case \XMLReader::ELEMENT:
-                    switch ($this->reader->localName) {
-                        case 'row':
-                            $row = array();
-                            // Walk through attributes and add them to row.
-                            while ($this->reader->moveToNextAttribute()) {
-                                $row[$this->reader->name] =
-                                    $this->reader->value;
-                            }
-                            $qb->addRow($row);
-                            break;
-                    }
-                    break;
-                case \XMLReader::END_ELEMENT:
-                    if ($this->reader->localName == 'rowset') {
-                        // Insert any leftovers.
-                        if (count($qb) > 0) {
-                            $qb->store();
-                        }
-                        $qb = null;
-                        return true;
-                    }
-                    break;
-            }
-        }
-        $mess =
-            'Function ' . __FUNCTION__ . ' did not exit correctly' . PHP_EOL;
-        \Logger::getLogger('yapeal')
-               ->warn($mess);
-        return false;
+        return $this->mask;
     }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @param string                     $xml
+     * @param string                     $ownerID
+     * @param DatabasePreserverInterface $preserver
+     *
+     * @return self
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        DatabasePreserverInterface $preserver = null
+    ) {
+        if (is_null($preserver)) {
+            $preserver = new AttributesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserverToContactList($preserver, $xml, $ownerID);
+            $this->preserverToCorporateContactList($preserver, $xml, $ownerID);
+            $this->preserverToAllianceContactList($preserver, $xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+        }
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToAllianceContactList(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'contactID' => null,
+            'contactName' => null,
+            'contactTypeID' => null,
+            'standing' => null
+        );
+        $tableName = 'charAllianceContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
+                  ->setColumnDefaults($columnDefaults)
+            ->preserveData($xml, '//allianceContactList/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToContactList(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'contactID' => null,
+            'contactName' => null,
+            'contactTypeID' => null,
+            'inWatchlist' => '0',
+            'standing' => null
+        );
+        $tableName = 'charContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
+                  ->setColumnDefaults($columnDefaults)
+            ->preserveData($xml, '//contactList/row');
+        return $this;
+    }
+    /**
+     * @param DatabasePreserverInterface $preserver
+     * @param string                     $xml
+     * @param string                     $ownerID
+     *
+     * @return self
+     */
+    protected function preserverToCorporateContactList(
+        DatabasePreserverInterface $preserver,
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'contactID' => null,
+            'contactName' => null,
+            'contactTypeID' => null,
+            'standing' => null
+        );
+        $tableName = 'charCorporateContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $preserver->setTableName($tableName)
+                  ->setColumnDefaults($columnDefaults)
+            ->preserveData($xml, '//corporateContactList/row');
+        return $this;
+    }
+    /**
+     * @var int $mask
+     */
+    private $mask = 16;
 }
-

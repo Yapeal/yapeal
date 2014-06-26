@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="rowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveNEDTType" name="date"/>
+                <xs:attribute type="eveIDType" name="refID"/>
+                <xs:attribute type="xs:unsignedShort" name="refTypeID"/>
+                <xs:attribute type="eveIDType" name="owner1TypeID"/>
+                <xs:attribute type="eveIDType" name="ownerID1"/>
+                <xs:attribute type="xs:string" name="ownerName1"/>
+                <xs:attribute type="eveIDType" name="owner2TypeID"/>
+                <xs:attribute type="eveIDType" name="ownerID2"/>
+                <xs:attribute type="xs:string" name="ownerName2"/>
+                <xs:attribute type="eveIDType" name="argID1"/>
+                <xs:attribute type="xs:string" name="argName1"/>
+                <xs:attribute type="eveISKType" name="amount"/>
+                <xs:attribute type="eveISKType" name="balance"/>
+                <xs:attribute type="xs:string" name="reason"/>
+                <xs:attribute type="xs:string" name="taxReceiverID"/>
+                <xs:attribute type="xs:string" name="taxAmount"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element name="transactions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="rowType" name="row" minOccurs="0"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

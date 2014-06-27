@@ -7,7 +7,7 @@ Yapeal:
         password: secret
         platform: mysql
         # (Optional) Only needed if using http connection.
-        # port: ""
+        # port: ''
         tablePrefix: ''
         userName: YapealUser
     Log:

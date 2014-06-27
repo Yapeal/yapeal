@@ -68,11 +68,7 @@ SELECT urk."keyID",urk."vCode"
  AND urk."isActive"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & 33554432) <> 0
 SQL;
-        return sprintf(
-            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "isActive"=1',
-            $this->databaseName,
-            $this->tablePrefix
-        );
+        return sprintf($sql, $this->databaseName, $this->tablePrefix);
     }
     /**
      * @param int $mask

@@ -30,103 +30,12 @@ namespace Yapeal\Database\Account;
 
 use PDO;
 use PDOException;
-use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\DatabasePreserverInterface;
-use Yapeal\Database\ValuesDatabasePreserver;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AccountStatus
  */
-class AccountStatus extends AbstractCommonEveApi
+class AccountStatus extends AbstractAccountSection
 {
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        $active = $this->getActiveKeys();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active registered keys found');
-            return;
-        }
-        $preserver = new ValuesDatabasePreserver(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
-        );
-        foreach ($active as $key) {
-            /**
-             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
-             */
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $key['keyID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($key)
-                 ->setEveApiXml();
-            if (!$this->gotApiLock($data)) {
-                continue;
-            }
-            $retrievers->retrieveEveApi($data);
-            if ($data->getEveApiXml() === false) {
-                $mess = sprintf(
-                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $key['keyID']
-                );
-                $this->getLogger()
-                     ->notice($mess);
-                continue;
-            }
-            if ($this->isInvalid($data)) {
-                $mess = sprintf(
-                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $key['keyID']
-                );
-                $this->getLogger()
-                     ->warning($mess);
-                $data->setEveApiName('Invalid' . $this->getApiName());
-                $preservers->preserveEveApi($data);
-                continue;
-            }
-            $preservers->preserveEveApi($data);
-            $this->preserve(
-                $data->getEveApiXml(),
-                $key['keyID'],
-                $preserver
-            );
-            $this->updateCachedUntil($data, $interval, $key['keyID']);
-        }
-    }
     /**
      * @return array
      */
@@ -158,38 +67,21 @@ class AccountStatus extends AbstractCommonEveApi
         return $this->apiName;
     }
     /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
      * @param string                     $xml
      * @param string                     $ownerID
-     * @param DatabasePreserverInterface $preserver
      *
      * @return self
      */
     protected function preserve(
         $xml,
-        $ownerID,
-        DatabasePreserverInterface $preserver = null
+        $ownerID
     ) {
-        if (is_null($preserver)) {
-            $preserver = new ValuesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserveToAccountStatus($preserver, $xml, $ownerID);
+            $this->preserveToAccountStatus($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
         } catch (PDOException $exc) {
             $mess = sprintf(
                 'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
@@ -205,14 +97,12 @@ class AccountStatus extends AbstractCommonEveApi
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
     protected function preserveToAccountStatus(
-        DatabasePreserverInterface $preserver,
         $xml,
         $ownerID
     ) {
@@ -223,9 +113,10 @@ class AccountStatus extends AbstractCommonEveApi
             'logonMinutes' => null,
             'paidUntil' => null
         );
-        $preserver->setTableName('accountAccountStatus')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+        $this->getValuesDatabasePreserver()
+             ->setTableName('accountAccountStatus')
+             ->setColumnDefaults($columnDefaults)
+             ->preserveData($xml);
         return $this;
     }
 }

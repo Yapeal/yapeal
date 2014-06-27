@@ -200,6 +200,21 @@ XSL;
      */
     abstract protected function getApiName();
     /**
+     * @return DatabasePreserverInterface
+     */
+    protected function getAttributesDatabasePreserver()
+    {
+        if (empty($this->attributesDatabasePreserver)) {
+            $this->attributesDatabasePreserver =
+                new AttributesDatabasePreserver(
+                    $this->getPdo(),
+                    $this->getLogger(),
+                    $this->getCsq()
+                );
+        }
+        return $this->attributesDatabasePreserver;
+    }
+    /**
      * @return CommonSqlQueries
      */
     protected function getCsq()
@@ -224,6 +239,20 @@ XSL;
      * @return string
      */
     abstract protected function getSectionName();
+    /**
+     * @return DatabasePreserverInterface
+     */
+    protected function getValuesDatabasePreserver()
+    {
+        if (empty($this->valuesDatabasePreserver)) {
+            $this->valuesDatabasePreserver = new ValuesDatabasePreserver(
+                $this->getPdo(),
+                $this->getLogger(),
+                $this->getCsq()
+            );
+        }
+        return $this->valuesDatabasePreserver;
+    }
     /**
      * @return string
      */
@@ -334,4 +363,12 @@ XSL;
         );
         return $this;
     }
+    /**
+     * @var DatabasePreserverInterface $attributesDatabasePreserver
+     */
+    private $attributesDatabasePreserver;
+    /**
+     * @var DatabasePreserverInterface $valuesDatabasePreserver
+     */
+    private $valuesDatabasePreserver;
 }

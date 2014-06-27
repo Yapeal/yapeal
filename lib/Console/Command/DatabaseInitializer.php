@@ -238,7 +238,7 @@ HELP;
      */
     protected function getDbCon(array $options, OutputInterface $output)
     {
-        $mysqli = new mysqli(
+        $mysqli = @new mysqli(
             $options['hostName'], $options['userName'], $options['password'], ''
         );
         if (mysqli_connect_error()) {

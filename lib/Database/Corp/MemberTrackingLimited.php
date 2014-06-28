@@ -33,19 +33,10 @@ use PDOException;
 use Yapeal\Database\Char\AbstractCorpSection;
 
 /**
- * Class MemberTrackingExtended
+ * Class MemberTrackingLimited
  */
-class MemberTrackingExtended extends AbstractCorpSection
+class MemberTrackingLimited extends AbstractCorpSection
 {
-    /**
-     * @return array
-     */
-    protected function getActiveCorporations()
-    {
-        $corp = parent::getActiveCorporations();
-        $corp['extended'] = 1;
-        return $corp;
-    }
     /**
      * @return string
      */
@@ -54,8 +45,8 @@ class MemberTrackingExtended extends AbstractCorpSection
         return 'MemberTracking';
     }
     /**
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
@@ -83,8 +74,8 @@ class MemberTrackingExtended extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @internal param int $key
      *
@@ -120,5 +111,5 @@ class MemberTrackingExtended extends AbstractCorpSection
     /**
      * @var int $mask
      */
-    protected $mask = 3355443;
+    protected $mask = 2048;
 }

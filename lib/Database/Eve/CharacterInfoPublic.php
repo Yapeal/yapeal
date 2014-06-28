@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains CharacterInfoPrivate class.
+ * Contains CharacterInfoPublic class.
  *
  * PHP version 5.3
  *
@@ -33,14 +33,14 @@ use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
 
 /**
- * Class CharacterInfoPrivate
+ * Class CharacterInfoPublic
  */
-class CharacterInfoPrivate extends AbstractCharSection
+class CharacterInfoPublic extends AbstractCharSection
 {
     /**
      * @var int $mask
      */
-    protected $mask = 16777216;
+    protected $mask = 8388608;
     /**
      * @param string $xml
      * @param string $ownerID

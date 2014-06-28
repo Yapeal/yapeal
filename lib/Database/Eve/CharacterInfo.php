@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains CharacterInfoPrivate class.
+ * Contains CharacterInfo class.
  *
  * PHP version 5.3
  *
@@ -31,16 +31,58 @@ namespace Yapeal\Database\Eve;
 
 use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
- * Class CharacterInfoPrivate
+ * Class CharacterInfo
  */
-class CharacterInfoPrivate extends AbstractCharSection
+class CharacterInfo extends AbstractCharSection
 {
     /**
      * @var int $mask
      */
     protected $mask = 16777216;
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
+     */
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->debug(
+             sprintf(
+                 'AutoMagic for %1$s/%2$s is not allowed',
+                 $this->getSectionName(),
+                 $this->getApiName()
+             )
+            );
+        return;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @return string
+     */
+    protected function getApiName()
+    {
+        return 'CharacterInfo';
+    }
     /**
      * @param string $xml
      * @param string $ownerID
@@ -127,22 +169,5 @@ class CharacterInfoPrivate extends AbstractCharSection
              ->setColumnDefaults($columnDefaults)
              ->preserveData($xml, '//employmentHistory/row');
         return $this;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'CharacterInfo';
     }
 }

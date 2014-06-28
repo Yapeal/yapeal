@@ -43,6 +43,10 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 abstract class AbstractCharSection extends AbstractCommonEveApi
 {
     /**
+     * @var int $mask
+     */
+    protected $mask;
+    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
@@ -86,6 +90,42 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             }
             $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -141,42 +181,6 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @return array
-     */
-    protected function getActiveCharacters()
-    {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
      * @param string $xml
      * @param string $ownerID
      *
@@ -186,8 +190,4 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         $xml,
         $ownerID
     );
-    /**
-     * @var int $mask
-     */
-    protected $mask;
 }

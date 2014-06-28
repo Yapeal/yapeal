@@ -30,7 +30,6 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\Char\AbstractCorpSection;
 
 /**
  * Class MemberTrackingExtended
@@ -54,8 +53,8 @@ class MemberTrackingExtended extends AbstractCorpSection
         return 'MemberTracking';
     }
     /**
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
@@ -83,8 +82,8 @@ class MemberTrackingExtended extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @internal param int $key
      *

@@ -27,7 +27,7 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Char;
+namespace Yapeal\Database\Corp;
 
 use PDO;
 use PDOException;

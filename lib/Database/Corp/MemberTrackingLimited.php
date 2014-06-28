@@ -30,7 +30,6 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\Char\AbstractCorpSection;
 
 /**
  * Class MemberTrackingLimited

@@ -47,11 +47,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
     /**
      * @var int
      */
-    private $mask;
+    protected $mask;
     /**
      * @var int
      */
-    private $maxKeyRange;
+    protected $maxKeyRange;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -72,43 +72,53 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                  $this->getApiName()
              )
             );
-        $active = $this->getActiveCorporations();
+        $active = $this->getActiveKeys();
         if (empty($active)) {
             $this->getLogger()
                  ->info('No active registered corporations found');
             return;
         }
-        foreach ($active as $corp) {
+        foreach ($active as $key) {
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
+            if ($this->getSectionName() == 'Char') {
+                $ownerID = $key['characterID'];
+            } else {
+                $ownerID = $key['corporationID'];
+            }
             if ($this->cacheNotExpired(
                      $this->getApiName(),
                          $this->getSectionName(),
-                         $corp['corporationID']
+                         $ownerID
             )
             ) {
                 continue;
             }
-            foreach (range(1000, $this->getMaxKeyRange()) as $key) {
-                $data->addEveApiArgument('accountKey', $key);
+            foreach (range(1000, $this->getMaxKeyRange()) as $account) {
+                $data->addEveApiArgument('accountKey', $account);
                 if (strpos($this->getApiName(), 'wallet')) {
                     $data->addEveApiArgument('rowCount', '2560');
                 }
-                $data->setEveApiArguments($corp)
+                $data->setEveApiArguments($key)
                      ->setEveApiXml();
                 if (!$this->oneShot($data, $retrievers, $preservers)) {
                     continue;
                 }
             }
-            $this->updateCachedUntil($data, $interval, $corp['corporationID']);
+            $this->updateCachedUntil($data, $interval, $ownerID);
         }
     }
     /**
      * @return array
      */
-    protected function getActiveCorporations()
+    protected function getActiveKeys()
     {
-        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        if ($this->getSectionName() == 'Char') {
+            $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        } else {
+            $sql =
+                $this->csq->getActiveRegisteredCorporations($this->getMask());
+        }
         $this->getLogger()
              ->debug($sql);
         try {
@@ -123,10 +133,14 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
     }
     /**
+     * @throws \LogicException
      * @return int
      */
     protected function getMask()
     {
+        if (is_null($this->mask)) {
+            throw new \LogicException('Trying to use mask when NOT set');
+        }
         return $this->mask;
     }
     /**
@@ -151,9 +165,13 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $corp = $data->getEveApiArguments();
-        $corpID = $corp['corporationID'];
-        $accountKey = $corp['accountKey'];
+        $key = $data->getEveApiArguments();
+        if ($this->getSectionName() == 'Char') {
+            $ownerID = $key['characterID'];
+        } else {
+            $ownerID = $key['corporationID'];
+        }
+        $accountKey = $key['accountKey'];
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
@@ -163,7 +181,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
                 strtolower($this->getSectionName()),
                 $this->getApiName(),
-                $corpID
+                $ownerID
             );
             $this->getLogger()
                  ->notice($mess);
@@ -175,7 +193,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
                 strtolower($this->getSectionName()),
                 $this->getApiName(),
-                $corpID
+                $ownerID
             );
             $this->getLogger()
                  ->warning($mess);
@@ -186,7 +204,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         $preservers->preserveEveApi($data);
         $this->preserve(
              $data->getEveApiXml(),
-                 $corpID,
+                 $ownerID,
                  $accountKey
         );
         return true;

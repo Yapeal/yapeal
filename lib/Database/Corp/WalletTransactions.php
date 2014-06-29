@@ -40,11 +40,11 @@ class WalletTransactions extends AbstractAccountKey
     /**
      * @var int $mask
      */
-    private $mask = 2097152;
+    protected $mask = 2097152;
     /**
      * @var int
      */
-    private $maxKeyRange = 1006;
+    protected $maxKeyRange = 1006;
     /**
      * @return string
      */

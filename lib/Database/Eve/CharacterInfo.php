@@ -43,7 +43,7 @@ class CharacterInfo extends AbstractCharSection
     /**
      * @var int $mask
      */
-    private $mask = 0;
+    protected $mask = 0;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers

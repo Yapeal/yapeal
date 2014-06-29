@@ -43,10 +43,6 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 abstract class AbstractCorpSection extends AbstractCommonEveApi
 {
     /**
-     * @var int $mask
-     */
-    protected $mask;
-    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers

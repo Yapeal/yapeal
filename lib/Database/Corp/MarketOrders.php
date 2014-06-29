@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains CharacterInfoPrivate class.
+ * Contains MarketOrders class.
  *
  * PHP version 5.3
  *
@@ -27,20 +27,19 @@
  * @author    Michael Cummings <mgcummings@yahoo.com>
  * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Eve;
+namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\Char\AbstractCharSection;
 
 /**
- * Class CharacterInfoPrivate
+ * Class MarketOrders
  */
-class CharacterInfoPrivate extends AbstractCharSection
+class MarketOrders extends AbstractCorpSection
 {
     /**
      * @var int $mask
      */
-    private $mask = 16777216;
+    protected $mask = 4096;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -54,8 +53,7 @@ class CharacterInfoPrivate extends AbstractCharSection
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserverToCharacterInfo($xml);
-            $this->preserverToEmploymentHistory($xml, $ownerID);
+            $this->preserverToMarketOrders($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -74,75 +72,46 @@ class CharacterInfoPrivate extends AbstractCharSection
     }
     /**
      * @param string $xml
-     *
-     * @return self
-     */
-    protected function preserverToCharacterInfo(
-        $xml
-    ) {
-        $columnDefaults = array(
-            'characterID' => null,
-            'characterName' => null,
-            'race' => null,
-            'bloodline' => null,
-            'accountBalance' => '0',
-            'skillPoints' => '0',
-            'nextTrainingEnds' => '1970-01-01 00:00:01',
-            'shipName' => '',
-            'shipTypeID' => '0',
-            'shipTypeName' => '',
-            'corporationID' => null,
-            'corporation' => null,
-            'corporationDate' => null,
-            'allianceID' => '0',
-            'alliance' => '',
-            'allianceDate' => '1970-01-01 00:00:01',
-            'lastKnownLocation' => '',
-            'securityStatus' => '0'
-        );
-        $this->getValuesDatabasePreserver()
-             ->setTableName('eveCharacterInfo')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
-        return $this;
-    }
-    /**
-     * @param string $xml
      * @param string $ownerID
      *
      * @return self
      */
-    protected function preserverToEmploymentHistory(
+    protected function preserverToMarketOrders(
         $xml,
         $ownerID
     ) {
         $columnDefaults = array(
-            'recordID' => null,
-            'corporationID' => null,
-            'startDate' => null,
-            'ownerID' => $ownerID
+            'ownerID' => $ownerID,
+            'orderID' => null,
+            'charID' => null,
+            'stationID' => null,
+            'volEntered' => null,
+            'volRemaining' => null,
+            'minVolume' => null,
+            'orderState' => null,
+            'typeID' => null,
+            'range' => null,
+            'accountKey' => null,
+            'duration' => null,
+            'escrow' => null,
+            'price' => null,
+            'bid' => null,
+            'issued' => null
         );
         $this->getAttributesDatabasePreserver()
-             ->setTableName('eveEmploymentHistory')
+             ->setTableName('corpMarketOrders')
              ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//employmentHistory/row');
+             ->preserveData($xml);
         return $this;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
     }
     /**
      * @return string
      */
     protected function getApiName()
     {
-        return 'CharacterInfo';
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
     }
 }

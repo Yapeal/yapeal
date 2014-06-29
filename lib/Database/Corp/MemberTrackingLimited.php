@@ -110,5 +110,5 @@ class MemberTrackingLimited extends AbstractCorpSection
     /**
      * @var int $mask
      */
-    protected $mask = 2048;
+    private $mask = 2048;
 }

@@ -40,7 +40,7 @@ class CharacterInfoPublic extends AbstractCharSection
     /**
      * @var int $mask
      */
-    protected $mask = 8388608;
+    private $mask = 8388608;
     /**
      * @param string $xml
      * @param string $ownerID

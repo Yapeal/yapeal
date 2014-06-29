@@ -179,6 +179,7 @@ class ServerStatus extends AbstractCommonEveApi
         $xml
     ) {
         $columnDefaults = array(
+            'serverName' => 'Tranquility',
             'serverOpen' => 'False',
             'onlinePlayers' => '0'
         );

@@ -30,19 +30,21 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Database\AbstractAccountKey;
 
 /**
  * Class WalletTransactions
  */
-class WalletTransactions extends AbstractCorpSection
+class WalletTransactions extends AbstractAccountKey
 {
     /**
      * @var int $mask
      */
-    protected $mask = 2097152;
+    private $mask = 2097152;
+    /**
+     * @var int
+     */
+    private $maxKeyRange = 1006;
     /**
      * @return string
      */
@@ -89,6 +91,16 @@ class WalletTransactions extends AbstractCorpSection
         return $this;
     }
     /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
+    }
+    /**
      * @param string $xml
      * @param string $ownerID
      * @param string $accountKey
@@ -123,24 +135,5 @@ class WalletTransactions extends AbstractCorpSection
              ->setColumnDefaults($columnDefaults)
              ->preserveData($xml);
         return $this;
-    }
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     *
-     * @return bool
-     */
-    public function oneShot(
-        EveApiReadWriteInterface &$data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
-    ) {
-        $accountKeys = range(1000, 1006);
-        foreach ($accountKeys as $key) {
-            $data->addEveApiArgument('accountKey', $key);
-            $data->addEveApiArgument('rowCount', '2540');
-            parent::oneShot($data, $retrievers, $preservers);
-        }
     }
 }

@@ -45,14 +45,6 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 abstract class AbstractAccountKey extends AbstractCommonEveApi
 {
     /**
-     * @var int
-     */
-    protected $mask;
-    /**
-     * @var int
-     */
-    protected $maxKeyRange;
-    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
@@ -72,83 +64,47 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                  $this->getApiName()
              )
             );
-        $active = $this->getActiveKeys();
+        if ($this->getSectionName() == 'Char') {
+            $active = $this->getActiveCharacters();
+            $ownerID = 'characterID';
+        } else {
+            $active = $this->getActiveCorporations();
+            $ownerID = 'corporationID';
+        }
         if (empty($active)) {
+            $mess = sprintf(
+                'No active registered keys found for %1$s/%2$s',
+                $this->getSectionName(),
+                $this->getApiName()
+            );
             $this->getLogger()
-                 ->info('No active registered corporations found');
+                ->info($mess);
             return;
         }
-        foreach ($active as $key) {
+        foreach ($active as $activeKey) {
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
-            if ($this->getSectionName() == 'Char') {
-                $ownerID = $key['characterID'];
-            } else {
-                $ownerID = $key['corporationID'];
-            }
             if ($this->cacheNotExpired(
                      $this->getApiName(),
                          $this->getSectionName(),
-                         $ownerID
+                         $activeKey[$ownerID]
             )
             ) {
                 continue;
             }
-            foreach (range(1000, $this->getMaxKeyRange()) as $account) {
-                $data->addEveApiArgument('accountKey', $account);
+            foreach (range(1000, $this->getMaxKeyRange()) as $accountKey) {
+                $activeKey['accountKey'] = $accountKey;
                 if (strpos($this->getApiName(), 'wallet')) {
                     $data->addEveApiArgument('rowCount', '2560');
                 }
-                $data->setEveApiArguments($key)
+                $data->setEveApiArguments($activeKey)
                      ->setEveApiXml();
                 if (!$this->oneShot($data, $retrievers, $preservers)) {
                     continue;
                 }
             }
-            $this->updateCachedUntil($data, $interval, $ownerID);
+            $this->updateCachedUntil($data, $interval, $activeKey[$ownerID]);
         }
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveKeys()
-    {
-        if ($this->getSectionName() == 'Char') {
-            $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
-        } else {
-            $sql =
-                $this->csq->getActiveRegisteredCorporations($this->getMask());
-        }
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active corporations';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @throws \LogicException
-     * @return int
-     */
-    protected function getMask()
-    {
-        if (is_null($this->mask)) {
-            throw new \LogicException('Trying to use mask when NOT set');
-        }
-        return $this->mask;
-    }
-    /**
-     * @return int
-     */
-    protected function getMaxKeyRange()
-    {
-        return $this->maxKeyRange;
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -165,23 +121,24 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $key = $data->getEveApiArguments();
+        $arguments = $data->getEveApiArguments();
         if ($this->getSectionName() == 'Char') {
-            $ownerID = $key['characterID'];
+            $ownerID = $arguments['characterID'];
         } else {
-            $ownerID = $key['corporationID'];
+            $ownerID = $arguments['corporationID'];
         }
-        $accountKey = $key['accountKey'];
+        $accountKey = $arguments['accountKey'];
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
-                'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s on account %4$s',
                 strtolower($this->getSectionName()),
                 $this->getApiName(),
-                $ownerID
+                $ownerID,
+                $accountKey
             );
             $this->getLogger()
                  ->notice($mess);
@@ -190,10 +147,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
-                'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                'The data retrieved from Eve API %1$s/%2$s for %3$s on account %4$s is invalid',
                 strtolower($this->getSectionName()),
                 $this->getApiName(),
-                $ownerID
+                $ownerID,
+                $accountKey
             );
             $this->getLogger()
                  ->warning($mess);
@@ -210,6 +168,58 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return true;
     }
     /**
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return array
+     */
+    protected function getActiveCorporations()
+    {
+        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active corporations';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
+    }
+    /**
+     * @return int
+     */
+    protected function getMaxKeyRange()
+    {
+        return $this->maxKeyRange;
+    }
+    /**
      * @param string $xml
      * @param string $ownerID
      * @param int    $accountKey
@@ -219,6 +229,14 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
     abstract protected function preserve(
         $xml,
         $ownerID,
-        $accountKey = 1000
+        $accountKey
     );
+    /**
+     * @var int
+     */
+    private $mask;
+    /**
+     * @var int
+     */
+    private $maxKeyRange;
 }

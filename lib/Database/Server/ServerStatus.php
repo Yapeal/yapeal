@@ -56,35 +56,27 @@ class ServerStatus extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName());
         if ($this->cacheNotExpired(
-                 $this->getApiName(),
-                     $this->getSectionName()
+            $this->getApiName(),
+            $this->getSectionName(),
+            0
         )
         ) {
             return;
         }
+        $data->setEveApiXml();
         if (!$this->oneShot($data, $retrievers, $preservers)) {
             return;
         }
         $this->updateCachedUntil($data, $interval, 0);
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -130,16 +122,29 @@ class ServerStatus extends AbstractCommonEveApi
         }
         $preservers->preserveEveApi($data);
         $this->preserve(
-             $data->getEveApiXml()
+            $data->getEveApiXml()
         );
         return true;
     }
+    /**
+     * @return string
+     */
     protected function getApiName()
     {
         if (empty($this->apiName)) {
             $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
         return $this->apiName;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param string $xml
@@ -153,7 +158,7 @@ class ServerStatus extends AbstractCommonEveApi
             $this->getPdo()
                  ->beginTransaction();
             $this->preserverToServerStatus(
-                 $xml
+                $xml
             );
             $this->getPdo()
                  ->commit();
@@ -180,8 +185,8 @@ class ServerStatus extends AbstractCommonEveApi
     ) {
         $columnDefaults = array(
             'serverName' => 'Tranquility',
-            'serverOpen' => 'False',
-            'onlinePlayers' => '0'
+            'serverOpen' => null,
+            'onlinePlayers' => null
         );
         $this->getValuesDatabasePreserver()
              ->setTableName('serverServerStatus')

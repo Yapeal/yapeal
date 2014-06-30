@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Xml\EveApiPreserverInterface;
@@ -58,12 +59,12 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         if ($this->getSectionName() == 'Char') {
             $active = $this->getActiveCharacters();
             $ownerID = 'characterID';
@@ -82,17 +83,17 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             return;
         }
         foreach ($active as $activeKey) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $activeKey[$ownerID]
+                $this->getApiName(),
+                $this->getSectionName(),
+                $activeKey[$ownerID]
             )
             ) {
                 continue;
             }
             foreach (range(1000, $this->getMaxKeyRange()) as $accountKey) {
+                $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                     ->setEveApiName($this->getApiName());
                 $activeKey['accountKey'] = $accountKey;
                 if (strpos($this->getApiName(), 'wallet')) {
                     $data->addEveApiArgument('rowCount', '2560');
@@ -100,7 +101,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 $data->setEveApiArguments($activeKey)
                      ->setEveApiXml();
                 if (!$this->oneShot($data, $retrievers, $preservers)) {
-                    continue;
+                    continue 2;
                 }
             }
             $this->updateCachedUntil($data, $interval, $activeKey[$ownerID]);
@@ -161,12 +162,20 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
         $preservers->preserveEveApi($data);
         $this->preserve(
-             $data->getEveApiXml(),
-                 $ownerID,
-                 $accountKey
+            $data->getEveApiXml(),
+            $ownerID,
+            $accountKey
         );
         return true;
     }
+    /**
+     * @var int
+     */
+    protected $mask;
+    /**
+     * @var int
+     */
+    protected $maxKeyRange;
     /**
      * @return array
      */
@@ -206,10 +215,15 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
     }
     /**
+     * @throws LogicException
      * @return int
      */
     protected function getMask()
     {
+        if (is_null($this->mask)) {
+            $mess = 'Tried to use mask when it was NOT set';
+            throw new LogicException($mess);
+        }
         return $this->mask;
     }
     /**
@@ -231,12 +245,4 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         $ownerID,
         $accountKey
     );
-    /**
-     * @var int
-     */
-    private $mask;
-    /**
-     * @var int
-     */
-    private $maxKeyRange;
 }

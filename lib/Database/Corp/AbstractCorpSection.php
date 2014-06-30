@@ -39,15 +39,9 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCorpSection
- *
- * @property-read string $mask
  */
 abstract class AbstractCorpSection extends AbstractCommonEveApi
 {
-    /**
-     * @var $mask
-     */
-    protected $mask;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -62,12 +56,12 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCorporations();
         if (empty($active)) {
             $this->getLogger()
@@ -78,9 +72,9 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $corp['corporationID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $corp['corporationID']
             )
             ) {
                 continue;
@@ -92,42 +86,6 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
             }
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveCorporations()
-    {
-        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active corporations';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -177,10 +135,50 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         }
         $preservers->preserveEveApi($data);
         $this->preserve(
-             $data->getEveApiXml(),
-                 $corpID
+            $data->getEveApiXml(),
+            $corpID
         );
         return true;
+    }
+    /**
+     * @var int $mask
+     */
+    protected $mask;
+    /**
+     * @return array
+     */
+    protected function getActiveCorporations()
+    {
+        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active corporations';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        if (empty($this->sectionName)) {
+            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
+        }
+        return $this->sectionName;
     }
     /**
      * @param string $xml

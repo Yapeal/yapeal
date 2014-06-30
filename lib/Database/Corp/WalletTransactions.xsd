@@ -6,6 +6,8 @@
     <xs:complexType name="rowType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="characterID"/>
+                <xs:attribute type="xs:string" name="characterName"/>
                 <xs:attribute type="eveIDType" name="clientID"/>
                 <xs:attribute type="xs:string" name="clientName"/>
                 <xs:attribute type="eveIDType" name="clientTypeID"/>

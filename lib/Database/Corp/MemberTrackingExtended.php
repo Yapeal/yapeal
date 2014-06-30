@@ -30,6 +30,9 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class MemberTrackingExtended
@@ -37,14 +40,24 @@ use PDOException;
 class MemberTrackingExtended extends AbstractCorpSection
 {
     /**
-     * @return array
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @return bool
      */
-    protected function getActiveCorporations()
-    {
-        $corp = parent::getActiveCorporations();
-        $corp['extended'] = 1;
-        return $corp;
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        $data->addEveApiArgument('extended', '1');
+        return parent::oneShot($data, $retrievers, $preservers);
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 33554432;
     /**
      * @return string
      */
@@ -101,8 +114,8 @@ class MemberTrackingExtended extends AbstractCorpSection
             'baseID' => null,
             'base' => null,
             'title' => null,
-            'logonDateTime' => null,
-            'logoffDateTime' => null,
+            'logonDateTime' => '1970-01-01 00:00:01',
+            'logoffDateTime' => '1970-01-01 00:00:01',
             'locationID' => null,
             'location' => null,
             'shipTypeID' => null,
@@ -116,8 +129,4 @@ class MemberTrackingExtended extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 3355443;
 }

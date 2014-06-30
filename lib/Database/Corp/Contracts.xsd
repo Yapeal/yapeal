@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified"
-    elementFormDefault="qualified"
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="rowType">
@@ -13,21 +12,45 @@
                 <xs:attribute type="eveIDType" name="acceptorID"/>
                 <xs:attribute type="eveIDType" name="startStationID"/>
                 <xs:attribute type="eveIDType" name="endStationID"/>
-                <xs:attribute type="xs:string" name="type"/>
-                <xs:attribute type="xs:string" name="status"/>
+                <xs:attribute name="type">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="Auction"/>
+                            <xs:enumeration value="Courier"/>
+                            <xs:enumeration value="ItemExchange"/>
+                            <xs:enumeration value="Loan"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="status">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="Completed"/>
+                            <xs:enumeration value="CompletedByContractor"/>
+                            <xs:enumeration value="CompletedByIssuer"/>
+                            <xs:enumeration value="Cancelled"/>
+                            <xs:enumeration value="Deleted"/>
+                            <xs:enumeration value="Failed"/>
+                            <xs:enumeration value="InProgress"/>
+                            <xs:enumeration value="Outstanding"/>
+                            <xs:enumeration value="Rejected"/>
+                            <xs:enumeration value="Reversed"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
                 <xs:attribute type="xs:string" name="title"/>
-                <xs:attribute type="xs:int" name="forCorp"/>
+                <xs:attribute type="eveBooleanType" name="forCorp"/>
                 <xs:attribute type="xs:string" name="availability"/>
-                <xs:attribute type="eveNEDTType" name="dateIssued"/>
-                <xs:attribute type="eveNEDTType" name="dateExpired"/>
-                <xs:attribute type="eveNEDTType" name="dateAccepted"/>
-                <xs:attribute type="xs:int" name="numDays"/>
-                <xs:attribute type="eveNEDTType" name="dateComplted"/>
-                <xs:attribute type="xs:float" name="price"/>
-                <xs:attribute type="xs:float" name="reward"/>
-                <xs:attribute type="xs:float" name="collateral"/>
-                <xs:attribute type="xs:float" name="buyout"/>
-                <xs:attribute type="xs:float" name="volume"/>
+                <xs:attribute type="eveDTType" name="dateIssued"/>
+                <xs:attribute type="eveDTType" name="dateExpired"/>
+                <xs:attribute type="eveDTType" name="dateAccepted"/>
+                <xs:attribute type="xs:unsignedInt" name="numDays"/>
+                <xs:attribute type="eveDTType" name="dateCompleted"/>
+                <xs:attribute type="eveISKType" name="price"/>
+                <xs:attribute type="eveISKType" name="reward"/>
+                <xs:attribute type="eveISKType" name="collateral"/>
+                <xs:attribute type="eveISKType" name="buyout"/>
+                <xs:attribute type="eveISKType" name="volume"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -36,9 +59,7 @@
             <xs:element name="contractList">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="rowType"
-                            name="row"
-                            minOccurs="0"
+                        <xs:element type="rowType" name="row" minOccurs="0"
                             maxOccurs="unbounded"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>

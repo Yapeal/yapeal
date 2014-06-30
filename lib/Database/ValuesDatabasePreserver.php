@@ -80,8 +80,8 @@ class ValuesDatabasePreserver implements
             if (!in_array($column->getName(), $columnList)) {
                 break;
             }
-//            $this->getLogger()
-//                 ->debug($column->getName() . ' => ' . (string)$column);
+            $this->getLogger()
+                 ->debug($column->getName() . ' => ' . (string)$column);
             $row[$column->getName()] = (string)$column;
         }
         $this->addRow($row);
@@ -244,6 +244,9 @@ class ValuesDatabasePreserver implements
         $this->getLogger()
              ->info($mess);
         $this->rowCount = 0;
+        $mess = implode(',', $data);
+        $this->getLogger()
+             ->debug(substr($mess, 0, 255));
         $stmt = $this->getPdo()
                      ->prepare($sql);
         $stmt->execute($data);

@@ -37,6 +37,10 @@ use PDOException;
 class Contracts extends AbstractCorpSection
 {
     /**
+     * @var int $mask
+     */
+    protected $mask = 8388608;
+    /**
      * @return string
      */
     protected function getApiName()
@@ -101,11 +105,11 @@ class Contracts extends AbstractCorpSection
             'title' => null,
             'forCorp' => null,
             'availability' => null,
-            'dateIssued' => null,
-            'dateExpired' => null,
-            'dateAccepted' => null,
+            'dateIssued' => '1970-01-01 00:00:01',
+            'dateExpired' => '1970-01-01 00:00:01',
+            'dateAccepted' => '1970-01-01 00:00:01',
             'numDays' => null,
-            'dateCompleted' => null,
+            'dateCompleted' => '1970-01-01 00:00:01',
             'price' => null,
             'reward' => null,
             'collateral' => null,
@@ -113,13 +117,9 @@ class Contracts extends AbstractCorpSection
             'volume' => null
         );
         $this->getAttributesDatabasePreserver()
-             ->setTableName('corpCorporateContactList')
+            ->setTableName('corpContracts')
              ->setColumnDefaults($columnDefaults)
              ->preserveData($xml);
         return $this;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 8388608;
 }

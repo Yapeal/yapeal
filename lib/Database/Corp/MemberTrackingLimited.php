@@ -37,6 +37,10 @@ use PDOException;
 class MemberTrackingLimited extends AbstractCorpSection
 {
     /**
+     * @var int $mask
+     */
+    protected $mask = 2048;
+    /**
      * @return string
      */
     protected function getApiName()
@@ -92,8 +96,8 @@ class MemberTrackingLimited extends AbstractCorpSection
             'baseID' => null,
             'base' => null,
             'title' => null,
-            'logonDateTime' => null,
-            'logoffDateTime' => null,
+            'logonDateTime' => '1970-01-01 00:00:01',
+            'logoffDateTime' => '1970-01-01 00:00:01',
             'locationID' => null,
             'location' => null,
             'shipTypeID' => null,
@@ -107,8 +111,4 @@ class MemberTrackingLimited extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 2048;
 }

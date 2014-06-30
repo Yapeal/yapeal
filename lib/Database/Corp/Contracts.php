@@ -113,8 +113,8 @@ class Contracts extends AbstractCorpSection
             'volume' => null
         );
         $this->getAttributesDatabasePreserver()
-             ->setTableName('corpCorporateContactList')
-             ->setColumnDefaults($columnDefaults)
+            ->setTableName('corpContracts')
+            ->setColumnDefaults($columnDefaults)
              ->preserveData($xml);
         return $this;
     }

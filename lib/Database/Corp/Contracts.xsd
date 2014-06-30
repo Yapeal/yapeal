@@ -20,14 +20,14 @@
                 <xs:attribute type="xs:string" name="availability"/>
                 <xs:attribute type="eveNEDTType" name="dateIssued"/>
                 <xs:attribute type="eveNEDTType" name="dateExpired"/>
-                <xs:attribute type="eveNEDTType" name="dateAccepted"/>
+                <xs:attribute type="eveDTType" name="dateAccepted"/>
                 <xs:attribute type="xs:int" name="numDays"/>
-                <xs:attribute type="eveNEDTType" name="dateComplted"/>
-                <xs:attribute type="xs:float" name="price"/>
-                <xs:attribute type="xs:float" name="reward"/>
-                <xs:attribute type="xs:float" name="collateral"/>
-                <xs:attribute type="xs:float" name="buyout"/>
-                <xs:attribute type="xs:float" name="volume"/>
+                <xs:attribute type="eveDTType" name="dateCompleted"/>
+                <xs:attribute type="eveISKType" name="price"/>
+                <xs:attribute type="eveISKType" name="reward"/>
+                <xs:attribute type="eveISKType" name="collateral"/>
+                <xs:attribute type="eveISKType" name="buyout"/>
+                <xs:attribute type="eveISKType" name="volume"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

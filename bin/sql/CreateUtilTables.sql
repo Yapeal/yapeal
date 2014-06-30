@@ -27,7 +27,6 @@ START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName", "apiName", "mask", "interval", "isActive")
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
-    ('account', 'APIKeyInfo', 1, 300, 1),
     ('api', 'CallList', 1, 86400, 1),
     ('char', 'AccountBalance', 1, 900, 1),
     ('char', 'AssetList', 2, 21600, 1),

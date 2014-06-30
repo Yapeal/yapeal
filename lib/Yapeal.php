@@ -29,11 +29,13 @@
 namespace Yapeal;
 
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
 use Yapeal\Configuration\Wiring;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
+use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\Account\APIKeyInfo;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
@@ -82,11 +84,19 @@ class Yapeal implements WiringInterface
              */
             $stmt = $pdo->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $exc) {
+        } catch (PDOException $exc) {
             $mess = 'Could not access utilEveApi table';
             $logger->error($mess, array('exception' => $exc));
             return 1;
         }
+        // Always check APIKeyInfo.
+        $class = new APIKeyInfo($pdo, $logger, $csq);
+        $class->autoMagic(
+            new EveApiXmlData(),
+            $dic['Yapeal.Xml.Retriever'],
+            $dic['Yapeal.Xml.Preserver'],
+            300
+        );
         if (empty($result)) {
             $logger->warning('Exiting no active Eve APIs found');
             return 1;
@@ -102,7 +112,7 @@ class Yapeal implements WiringInterface
                 continue;
             }
             /**
-             * @var APIKeyInfo $class
+             * @var AbstractCommonEveApi $class
              */
             $class = new $className($pdo, $logger, $csq);
             $class->autoMagic(

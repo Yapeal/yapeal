@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains MemberTrackingExtended class.
+ * Contains MemberTrackingLimited class.
  *
  * PHP version 5.3
  *

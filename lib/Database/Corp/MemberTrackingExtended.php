@@ -30,6 +30,9 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class MemberTrackingExtended
@@ -37,13 +40,19 @@ use PDOException;
 class MemberTrackingExtended extends AbstractCorpSection
 {
     /**
-     * @return array
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @return bool
      */
-    protected function getActiveCorporations()
-    {
-        $corp = parent::getActiveCorporations();
-        $corp['extended'] = 1;
-        return $corp;
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        $data->addEveApiArgument('extended', '1');
+        return parent::oneShot($data, $retrievers, $preservers);
     }
     /**
      * @return string

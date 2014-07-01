@@ -154,7 +154,7 @@ SQL;
     public function getActiveStarbaseTowers($corpID)
     {
         $sql = <<<'SQL'
-SELECT "itemID" FROM "%1$s"."%2$corpStarbaseList" WHERE "ownerID"=%3$s
+SELECT "itemID" FROM "%1$s"."%2$scorpStarbaseList" WHERE "ownerID"=%3$s
 SQL;
         return sprintf(
             str_replace(array("\n", "\r\n"), '', $sql),

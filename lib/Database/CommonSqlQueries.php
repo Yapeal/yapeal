@@ -147,6 +147,23 @@ SQL;
         return sprintf('select get_lock(\'%1$s\',5)', $hash);
     }
     /**
+     * @param int $corpID
+     *
+     * @return string
+     */
+    public function getActiveStarbaseTowers($corpID)
+    {
+        $sql = <<<'SQL'
+SELECT "itemID" FROM "%1$s"."%2$corpStarbaseList" WHERE "ownerID"=%3$s
+SQL;
+        return sprintf(
+            str_replace(array("\n", "\r\n"), '', $sql),
+            $this->databaseName,
+            $this->tablePrefix,
+            $corpID
+        );
+    }
+    /**
      * @param string $tableName
      *
      * @return string

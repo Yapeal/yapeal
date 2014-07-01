@@ -31,7 +31,7 @@ namespace Yapeal\Database;
 use DOMDocument;
 use PDO;
 use PDOException;
-use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use XSLTProcessor;
@@ -44,8 +44,9 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements LoggerAwareInterface
+abstract class AbstractCommonEveApi
 {
+    use LoggerAwareTrait
     /**
      * @param PDO              $pdo
      * @param LoggerInterface  $logger
@@ -83,16 +84,6 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
         return $this;
     }
     /**
-     * @param LoggerInterface $value
-     *
-     * @return self
-     */
-    public function setLogger(LoggerInterface $value)
-    {
-        $this->logger = $value;
-        return $this;
-    }
-    /**
      * @param PDO $value
      *
      * @return self
@@ -111,10 +102,6 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
      */
     protected $csq;
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-    /**
      * @var PDO
      */
     protected $pdo;
@@ -125,7 +112,7 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
     /**
      * @var string
      */
-    protected $xsl = <<<XSL
+    protected $xsl = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
         version="1.0"

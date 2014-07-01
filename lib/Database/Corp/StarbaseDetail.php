@@ -179,7 +179,7 @@ XSL;
                          ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active corporations';
+            $mess = 'Could NOT get a list of towers';
             $this->getLogger()
                  ->warning($mess, array('exception' => $exc));
             return array();
@@ -200,7 +200,18 @@ XSL;
         try {
             $this->getPdo()
                  ->beginTransaction();
+            $this->preserverToStarbaseDetail($xml, $ownerID, $itemID);
             $this->preserverToStarbaseDetailFuel($xml, $ownerID, $itemID);
+            $this->preserverToStarbaseDetailCombatSettings(
+                 $xml,
+                     $ownerID,
+                     $itemID
+            );
+            $this->preserverToStarbaseDetailGeneralSettings(
+                 $xml,
+                     $ownerID,
+                     $itemID
+            );
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {

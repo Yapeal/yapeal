@@ -35,6 +35,7 @@ use Yapeal\Database\ApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class MemberTrackingExtended
@@ -56,58 +57,103 @@ class StarbaseDetail extends AbstractCorpSection
     ) {
         $this->getLogger()
              ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
+             sprintf(
+                 'Starting autoMagic for %1$s/%2$s',
+                 $this->getSectionName(),
+                 $this->getApiName()
+             )
+            );
         /**
          * Update Starbase List
          */
         $class =
-            new StarbaseList(
-                $this->getPdo(), $this->getLogger(), $this->getCsq()
-            );
+            new StarbaseList($this->getPdo(), $this->getLogger(), $this->getCsq(
+            ));
         $class->autoMagic(
-            $data,
-            $retrievers,
-            $preservers,
-            $interval
+              $data,
+                  $retrievers,
+                  $preservers,
+                  $interval
         );
         $active = $this->getActiveTowers();
         if (empty($active)) {
             $this->getLogger()
-                 ->info('No active towers found');
+                 ->info('No active registered corporations found');
             return;
         }
         foreach ($active as $corp) {
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $corp['corporationID']
+                     $this->getApiName(),
+                         $this->getSectionName(),
+                         $corp['corporationID']
             )
             ) {
                 continue;
             }
             $data->setEveApiArguments($corp)
                  ->setEveApiXml();
-            $towers = $this->getActiveTowers();
-            if (empty($towers)) {
-                $this->getLogger()
-                     ->info('No Starbase Towers found');
-                return;
-            }
-            foreach ($towers as $tower) {
-                $data->addEveApiArgument('itemID', $tower['itemID']);
-                if (!$this->oneShot($data, $retrievers, $preservers)) {
-                    continue;
-                }
+            if (!$this->oneShot($data, $retrievers, $preservers)) {
+                continue;
             }
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        if (!$this->gotApiLock($data)) {
+            return false;
+        }
+        $corp = $data->getEveApiArguments();
+        $corpID = $corp['corporationID'];
+        $posID = $corp['itemID'];
+        /**
+         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         */
+        $retrievers->retrieveEveApi($data);
+        if ($data->getEveApiXml() === false) {
+            $mess = sprintf(
+                'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $corpID
+            );
+            $this->getLogger()
+                 ->notice($mess);
+            return false;
+        }
+        $this->xsltTransform($data);
+        if ($this->isInvalid($data)) {
+            $mess = sprintf(
+                'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $corpID
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            $data->setEveApiName('Invalid' . $this->getApiName());
+            $preservers->preserveEveApi($data);
+            return false;
+        }
+        $preservers->preserveEveApi($data);
+        $this->preserve(
+             $data->getEveApiXml(),
+                 $corpID,
+                 $posID
+        );
+        return true;
     }
     /**
      * @var int $mask
@@ -143,14 +189,26 @@ class StarbaseDetail extends AbstractCorpSection
               <xsl:element name="{name(.)}">
                   <xsl:attribute name="key">ownerID,posID</xsl:attribute>
                   <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
-              <xsl:element name="row">
-                  <xsl:attribute name="onAggressionEnabled"><xsl:value-of select="onAggression/@enabled"/></xsl:attribute>
-                  <xsl:attribute name="onCorporationWarEnabled"><xsl:value-of select="onCorporationWar/@enabled"/></xsl:attribute>
-                  <xsl:attribute name="onStandingDropStanding"><xsl:value-of select="onStandingDrop/@standing"/></xsl:attribute>
-                  <xsl:attribute name="onStatusDropEnabled"><xsl:value-of select="onStatusDrop/@enabled"/></xsl:attribute>
-                  <xsl:attribute name="onStatusDropStanding"><xsl:value-of select="onStatusDrop/@standing"/></xsl:attribute>
-                  <xsl:attribute name="useStandingsFromOwnerID"><xsl:value-of select="useStandingsFrom/@ownerID"/></xsl:attribute>
-              </xsl:element>
+                  <xsl:element name="row">
+                      <xsl:attribute name="onAggressionEnabled">
+                          <xsl:value-of select="onAggression/@enabled"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="onCorporationWarEnabled">
+                          <xsl:value-of select="onCorporationWar/@enabled"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="onStandingDropStanding">
+                          <xsl:value-of select="onStandingDrop/@standing"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="onStatusDropEnabled">
+                          <xsl:value-of select="onStatusDrop/@enabled"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="onStatusDropStanding">
+                          <xsl:value-of select="onStatusDrop/@standing"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="useStandingsFromOwnerID">
+                          <xsl:value-of select="useStandingsFrom/@ownerID"/>
+                      </xsl:attribute>
+                  </xsl:element>
               </xsl:element>
                    <xsl:apply-templates/>
           </xsl:template>

@@ -126,7 +126,7 @@ XSL;
                   $preservers,
                   $interval
         );
-        $active = $this->getActiveCorporations();
+        $active = $this->getTowers();
         if (empty($active)) {
             $this->getLogger()
                  ->info('No active registered corporations found');
@@ -145,17 +145,8 @@ XSL;
             }
             $data->setEveApiArguments($corp)
                  ->setEveApiXml();
-            $towers = $this->getTowers($corp['corporationID']);
-            if (empty($towers)) {
-                $this->getLogger()
-                     ->info('No Starbase Towers found');
+            if (!$this->oneShot($data, $retrievers, $preservers)) {
                 continue;
-            }
-            foreach ($towers as $tower) {
-                $data->addEveApiArgument('itemID', $tower['itemID']);
-                if (!$this->oneShot($data, $retrievers, $preservers)) {
-                    continue;
-                }
             }
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
@@ -225,9 +216,9 @@ XSL;
         }
         return $this->apiName;
     }
-    protected function getTowers($corpID = 0)
+    protected function getTowers()
     {
-        $sql = $this->csq->getActiveStarbaseTowers($corpID);
+        $sql = $this->csq->getActiveStarbaseTowers($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {

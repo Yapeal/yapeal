@@ -147,20 +147,33 @@ SQL;
         return sprintf('select get_lock(\'%1$s\',5)', $hash);
     }
     /**
-     * @param int $corpID
+     * @param int $mask
      *
      * @return string
      */
-    public function getActiveStarbaseTowers($corpID)
+    public function getActiveStarbaseTowers($mask)
     {
         $sql = <<<'SQL'
-SELECT "itemID" FROM "%1$s"."%2$scorpStarbaseList" WHERE "ownerID"=%3$s
+SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
+ FROM "%1$s"."%2$saccountKeyBridge" AS akb
+ JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
+ ON (akb."keyID" = aaki."keyID")
+ JOIN "%1$s"."%2$sutilRegisteredKey" AS urk
+ ON (akb."keyID" = urk."keyID")
+ JOIN "%1$s"."%2$saccountCharacters" AS ac
+ ON (akb."characterID" = ac."characterID")
+ JOIN "%1$s"."%2$scorpStarbaseList" AS sl
+ ON (ac."corporationID" = sl."ownerID")
+ WHERE
+ aaki."type" = 'Corporation'
+ AND urk."isActive"=1
+ AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
             str_replace(array("\n", "\r\n"), '', $sql),
             $this->databaseName,
             $this->tablePrefix,
-            $corpID
+            $mask
         );
     }
     /**

@@ -296,9 +296,9 @@ XSL;
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'posID' => $posID,
-            'onlineTimestamp' => null,
-            'state' => null,
-            'stateTimestamp' => null
+            'onlineTimestamp' => '1970-01-01 00:00:01',
+            'state' => '0',
+            'stateTimestamp' => '1970-01-01 00:00:01'
         );
         $this->getvaluesDatabasePreserver()
              ->setTableName('corpStarbaseDetail')
@@ -321,12 +321,12 @@ XSL;
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'posID' => $posID,
-            'onAggressionEnabled' => null,
-            'onCorporationWarEnabled' => null,
-            'onStandingDropStanding' => null,
-            'onStatusDropEnabled' => null,
-            'onStatusDropStanding' => null,
-            'useStandingsFromOwnerID' => null,
+            'onAggressionEnabled' => '0',
+            'onCorporationWarEnabled' => '0',
+            'onStandingDropStanding' => '0',
+            'onStatusDropEnabled' => '0',
+            'onStatusDropStanding' => '0',
+            'useStandingsFromOwnerID' => '0',
         );
         $this->getAttributesDatabasePreserver()
              ->setTableName('corpCombatSettings')
@@ -349,8 +349,8 @@ XSL;
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'posID' => $posID,
-            'typeID' => null,
-            'quantity' => null
+            'typeID' => '0',
+            'quantity' => '0'
         );
         $this->getValuesDatabasePreserver()
              ->setTableName('corpFuel')
@@ -373,10 +373,10 @@ XSL;
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'posID' => $posID,
-            'usageFlags' => null,
-            'deployFlags' => null,
-            'allowCorporationMembers' => null,
-            'allowAllianceMembers' => null
+            'usageFlags' => '0',
+            'deployFlags' => '0',
+            'allowCorporationMembers' => '0',
+            'allowAllianceMembers' => '0'
         );
         $this->getAttributesDatabasePreserver()
              ->setTableName('corpCombatSettings')

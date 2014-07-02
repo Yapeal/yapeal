@@ -79,26 +79,26 @@ class StarbaseDetail extends AbstractCorpSection
         $active = $this->getActiveTowers();
         if (empty($active)) {
             $this->getLogger()
-                 ->info('No active registered corporations found');
+                ->info('No active Starbases found');
             return;
         }
-        foreach ($active as $corp) {
+        foreach ($active as $tower) {
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
                 $this->getApiName(),
                 $this->getSectionName(),
-                $corp['corporationID']
+                $tower['corporationID']
             )
             ) {
                 continue;
             }
-            $data->setEveApiArguments($corp)
+            $data->setEveApiArguments($tower)
                  ->setEveApiXml();
             if (!$this->oneShot($data, $retrievers, $preservers)) {
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $corp['corporationID']);
+            $this->updateCachedUntil($data, $interval, $tower['corporationID']);
         }
     }
     /**
@@ -118,7 +118,7 @@ class StarbaseDetail extends AbstractCorpSection
         }
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
-        $posID = $corp['itemID'];
+        $itemID = $corp['itemID'];
         /**
          * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
          */
@@ -152,7 +152,7 @@ class StarbaseDetail extends AbstractCorpSection
         $this->preserve(
             $data->getEveApiXml(),
             $corpID,
-            $posID
+            $itemID
         );
         return true;
     }
@@ -167,6 +167,7 @@ class StarbaseDetail extends AbstractCorpSection
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" version="1.0" encoding="utf-8"
         omit-xml-declaration="no" standalone="no" indent="yes"/>
+    <xsl:strip-space elements="combatSettings onAggression onCorporationWar onStandingDrop useStandingsFrom"/>
     <xsl:template match="rowset">
         <xsl:choose>
             <xsl:when test="@name">
@@ -184,10 +185,8 @@ class StarbaseDetail extends AbstractCorpSection
     </xsl:template>
     <xsl:template match="combatSettings">
         <xsl:element name="{name(.)}">
-            <xsl:attribute name="key">ownerID,posID</xsl:attribute>
-            <xsl:attribute name="columns">
-                onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID
-            </xsl:attribute>
+            <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
+            <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
             <xsl:element name="row">
                 <xsl:attribute name="onAggressionEnabled">
                     <xsl:value-of select="onAggression/@enabled"/>
@@ -284,18 +283,18 @@ XSL;
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param        $posID
+     * @param        $itemID
      *
      * @return self
      */
     protected function preserverToStarbaseDetail(
         $xml,
         $ownerID,
-        $posID
+        $itemID
     ) {
         $columnDefaults = array(
             'ownerID' => $ownerID,
-            'posID' => $posID,
+            'itemID' => $itemID,
             'onlineTimestamp' => '1970-01-01 00:00:01',
             'state' => '0',
             'stateTimestamp' => '1970-01-01 00:00:01'
@@ -309,18 +308,18 @@ XSL;
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param        $posID
+     * @param        $itemID
      *
      * @return self
      */
     protected function preserverToStarbaseDetailCombatSettings(
         $xml,
         $ownerID,
-        $posID
+        $itemID
     ) {
         $columnDefaults = array(
             'ownerID' => $ownerID,
-            'posID' => $posID,
+            'itemID' => $itemID,
             'onAggressionEnabled' => '0',
             'onCorporationWarEnabled' => '0',
             'onStandingDropStanding' => '0',
@@ -331,48 +330,48 @@ XSL;
         $this->getAttributesDatabasePreserver()
              ->setTableName('corpCombatSettings')
              ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+            ->preserveData($xml, '//combatSettings/row');
         return $this;
     }
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param        $posID
+     * @param        $itemID
      *
      * @return self
      */
     protected function preserverToStarbaseDetailFuel(
         $xml,
         $ownerID,
-        $posID
+        $itemID
     ) {
         $columnDefaults = array(
             'ownerID' => $ownerID,
-            'posID' => $posID,
+            'itemID' => $itemID,
             'typeID' => '0',
             'quantity' => '0'
         );
-        $this->getValuesDatabasePreserver()
+        $this->getAttributesDatabasePreserver()
              ->setTableName('corpFuel')
              ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+             ->preserveData($xml, '//fuel/row');
         return $this;
     }
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param        $posID
+     * @param        $itemID
      *
      * @return self
      */
     protected function preserverToStarbaseDetailGeneralSettings(
         $xml,
         $ownerID,
-        $posID
+        $itemID
     ) {
         $columnDefaults = array(
             'ownerID' => $ownerID,
-            'posID' => $posID,
+            'itemID' => $itemID,
             'usageFlags' => '0',
             'deployFlags' => '0',
             'allowCorporationMembers' => '0',
@@ -381,7 +380,7 @@ XSL;
         $this->getAttributesDatabasePreserver()
              ->setTableName('corpCombatSettings')
              ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+            ->preserveData($xml, '//generalSettings/row');
         return $this;
     }
 }

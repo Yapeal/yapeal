@@ -177,6 +177,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      */
     protected $maxKeyRange;
     /**
+     * @throws \LogicException
      * @return array
      */
     protected function getActiveCharacters()
@@ -196,6 +197,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
     }
     /**
+     * @throws \LogicException
      * @return array
      */
     protected function getActiveCorporations()

@@ -30,22 +30,14 @@ namespace Yapeal\Database\Account;
 
 use PDOException;
 use SimpleXMLIterator;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class APIKeyInfo
  */
 class APIKeyInfo extends AbstractAccountSection
 {
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
+    use ApiNameTrait;
     /**
      * @param string $xml
      * @param string $ownerID

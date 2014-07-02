@@ -31,6 +31,8 @@ namespace Yapeal\Database\Server;
 
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\SectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -42,6 +44,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class ServerStatus extends AbstractCommonEveApi
 {
+    use ApiNameTrait, SectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -125,26 +128,6 @@ class ServerStatus extends AbstractCommonEveApi
             $data->getEveApiXml()
         );
         return true;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
     }
     /**
      * @param string $xml

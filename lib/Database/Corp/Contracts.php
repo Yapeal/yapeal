@@ -30,26 +30,18 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class Contracts
  */
 class Contracts extends AbstractCorpSection
 {
+    use ApiNameTrait;
     /**
      * @var int $mask
      */
     protected $mask = 8388608;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
     /**
      * @param string $xml
      * @param string $ownerID

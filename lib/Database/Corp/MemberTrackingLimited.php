@@ -30,23 +30,18 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class MemberTrackingLimited
  */
 class MemberTrackingLimited extends AbstractCorpSection
 {
+    use ApiNameTrait;
     /**
      * @var int $mask
      */
     protected $mask = 2048;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'MemberTracking';
-    }
     /**
      * @param string $xml
      * @param string $ownerID

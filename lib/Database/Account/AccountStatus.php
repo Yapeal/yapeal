@@ -30,12 +30,14 @@ namespace Yapeal\Database\Account;
 
 use PDO;
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class AccountStatus
  */
 class AccountStatus extends AbstractAccountSection
 {
+    use ApiNameTrait;
     /**
      * @return array
      */
@@ -57,18 +59,8 @@ class AccountStatus extends AbstractAccountSection
         }
     }
     /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */

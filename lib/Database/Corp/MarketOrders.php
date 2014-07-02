@@ -30,12 +30,14 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class MarketOrders
  */
 class MarketOrders extends AbstractCorpSection
 {
+    use ApiNameTrait;
     /**
      * @var int $mask
      */
@@ -103,15 +105,5 @@ class MarketOrders extends AbstractCorpSection
              ->setColumnDefaults($columnDefaults)
              ->preserveData($xml);
         return $this;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
     }
 }

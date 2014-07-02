@@ -46,7 +46,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractCommonEveApi
 {
-    use LoggerAwareTrait
+    use LoggerAwareTrait;
     /**
      * @param PDO              $pdo
      * @param LoggerInterface  $logger
@@ -94,10 +94,6 @@ abstract class AbstractCommonEveApi
         return $this;
     }
     /**
-     * @var string
-     */
-    protected $apiName;
-    /**
      * @var CommonSqlQueries
      */
     protected $csq;
@@ -105,10 +101,6 @@ abstract class AbstractCommonEveApi
      * @var PDO
      */
     protected $pdo;
-    /**
-     * @var string
-     */
-    protected $sectionName;
     /**
      * @var string
      */

@@ -31,6 +31,7 @@ namespace Yapeal\Database\Account;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\SectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -41,6 +42,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractAccountSection extends AbstractCommonEveApi
 {
+    use SectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -158,16 +160,6 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
                  ->warning($mess, array('exception' => $exc));
             return array();
         }
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
     }
     /**
      * @param string $xml

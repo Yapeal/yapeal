@@ -31,6 +31,7 @@ namespace Yapeal\Database\Corp;
 
 use PDO;
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -40,14 +41,82 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class StarbaseDetail extends AbstractCorpSection
 {
+    use ApiNameTrait;
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
+     */
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->debug(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * Update Starbase List
+         */
+        $class =
+            new StarbaseList(
+                $this->getPdo(), $this->getLogger(), $this->getCsq()
+            );
+        $class->autoMagic(
+            $data,
+            $retrievers,
+            $preservers,
+            $interval
+        );
+        $active = $this->getActiveTowers();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active towers found');
+            return;
+        }
+        foreach ($active as $corp) {
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $corp['corporationID']
+            )
+            ) {
+                continue;
+            }
+            $data->setEveApiArguments($corp)
+                 ->setEveApiXml();
+            $towers = $this->getActiveTowers();
+            if (empty($towers)) {
+                $this->getLogger()
+                     ->info('No Starbase Towers found');
+                return;
+            }
+            foreach ($towers as $tower) {
+                $data->addEveApiArgument('itemID', $tower['itemID']);
+                if (!$this->oneShot($data, $retrievers, $preservers)) {
+                    continue;
+                }
+            }
+            $this->updateCachedUntil($data, $interval, $corp['corporationID']);
+        }
+    }
     /**
      * @var int $mask
      */
-    protected $mask = 3355443;
+    protected $mask = 131072;
     /**
      * @var string
      */
-    protected $xsl = <<<XSL
+    protected $xsl = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
           <xsl:output method="xml"
               version="1.0"
@@ -74,14 +143,14 @@ class StarbaseDetail extends AbstractCorpSection
               <xsl:element name="{name(.)}">
                   <xsl:attribute name="key">ownerID,posID</xsl:attribute>
                   <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
-              <row>
+              <xsl:element name="row">
                   <xsl:attribute name="onAggressionEnabled"><xsl:value-of select="onAggression/@enabled"/></xsl:attribute>
                   <xsl:attribute name="onCorporationWarEnabled"><xsl:value-of select="onCorporationWar/@enabled"/></xsl:attribute>
                   <xsl:attribute name="onStandingDropStanding"><xsl:value-of select="onStandingDrop/@standing"/></xsl:attribute>
                   <xsl:attribute name="onStatusDropEnabled"><xsl:value-of select="onStatusDrop/@enabled"/></xsl:attribute>
                   <xsl:attribute name="onStatusDropStanding"><xsl:value-of select="onStatusDrop/@standing"/></xsl:attribute>
                   <xsl:attribute name="useStandingsFromOwnerID"><xsl:value-of select="useStandingsFrom/@ownerID"/></xsl:attribute>
-              </row>
+              </xsl:element>
               </xsl:element>
                    <xsl:apply-templates/>
           </xsl:template>
@@ -94,84 +163,11 @@ class StarbaseDetail extends AbstractCorpSection
       </xsl:transform>
 XSL;
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
+     * @return array
      */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
-        /**
-         * Update Starbase List
-         */
-        $class =
-            new StarbaseList($this->getPdo(), $this->getLogger(), $this->getCsq(
-            ));
-        $class->autoMagic(
-              $data,
-                  $retrievers,
-                  $preservers,
-                  $interval
-        );
-        $active = $this->getActiveCorporations();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active registered corporations found');
-            return;
-        }
-        foreach ($active as $corp) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $corp['corporationID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($corp)
-                 ->setEveApiXml();
-            $towers = $this->getTowers($corp['corporationID']);
-            if (empty($towers)) {
-                $this->getLogger()
-                     ->info('No Starbase Towers found');
-                return;
-            }
-            foreach ($towers as $tower) {
-                $data->addEveApiArgument('itemID', $tower['itemID']);
-                if (!$this->oneShot($data, $retrievers, $preservers)) {
-                    continue;
-                }
-            }
-            $this->updateCachedUntil($data, $interval, $corp['corporationID']);
-        }
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
+    protected function getActiveTowers()
     {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    protected function getTowers($corpID = 0)
-    {
-        $sql = $this->csq->getActiveStarbaseTowers($corpID);
+        $sql = $this->csq->getActiveStarbaseTowers($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {
@@ -203,14 +199,14 @@ XSL;
             $this->preserverToStarbaseDetail($xml, $ownerID, $itemID);
             $this->preserverToStarbaseDetailFuel($xml, $ownerID, $itemID);
             $this->preserverToStarbaseDetailCombatSettings(
-                 $xml,
-                     $ownerID,
-                     $itemID
+                $xml,
+                $ownerID,
+                $itemID
             );
             $this->preserverToStarbaseDetailGeneralSettings(
-                 $xml,
-                     $ownerID,
-                     $itemID
+                $xml,
+                $ownerID,
+                $itemID
             );
             $this->getPdo()
                  ->commit();
@@ -225,30 +221,6 @@ XSL;
             $this->getPdo()
                  ->rollBack();
         }
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $posID
-     *
-     * @return self
-     */
-    protected function preserverToStarbaseDetailFuel(
-        $xml,
-        $ownerID,
-        $posID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'posID' => $posID,
-            'typeID' => null,
-            'quantity' => null
-        );
-        $this->getValuesDatabasePreserver()
-             ->setTableName('corpFuel')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
         return $this;
     }
     /**
@@ -300,6 +272,30 @@ XSL;
         );
         $this->getAttributesDatabasePreserver()
              ->setTableName('corpCombatSettings')
+             ->setColumnDefaults($columnDefaults)
+             ->preserveData($xml);
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     * @param        $posID
+     *
+     * @return self
+     */
+    protected function preserverToStarbaseDetailFuel(
+        $xml,
+        $ownerID,
+        $posID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'posID' => $posID,
+            'typeID' => null,
+            'quantity' => null
+        );
+        $this->getValuesDatabasePreserver()
+             ->setTableName('corpFuel')
              ->setColumnDefaults($columnDefaults)
              ->preserveData($xml);
         return $this;

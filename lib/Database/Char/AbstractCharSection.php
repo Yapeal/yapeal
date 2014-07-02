@@ -32,6 +32,7 @@ namespace Yapeal\Database\Char;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\SectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -44,10 +45,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractCharSection extends AbstractCommonEveApi
 {
-    /**
-     * @var $mask
-     */
-    protected $mask;
+    use SectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -62,12 +60,12 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCharacters();
         if (empty($active)) {
             $this->getLogger()
@@ -78,9 +76,9 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $char['characterID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
             )
             ) {
                 continue;
@@ -92,42 +90,6 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             }
             $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveCharacters()
-    {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -177,10 +139,40 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         }
         $preservers->preserveEveApi($data);
         $this->preserve(
-             $data->getEveApiXml(),
-                 $charID
+            $data->getEveApiXml(),
+            $charID
         );
         return true;
+    }
+    /**
+     * @var $mask
+     */
+    protected $mask;
+    /**
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
     }
     /**
      * @param string $xml

@@ -30,22 +30,18 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class ContactList
  */
 class ContactList extends AbstractCorpSection
 {
+    use ApiNameTrait;
     /**
-     * @return string
+     * @var int $mask
      */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
+    protected $mask = 16;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -84,30 +80,6 @@ class ContactList extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToCorporateContactList(
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'contactID' => null,
-            'contactName' => null,
-            'standing' => null
-        );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpCorporateContactList')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//corporateContactList/row');
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @internal param int $key
-     *
-     * @return self
-     */
     protected function preserverToAllianceContactList(
         $xml,
         $ownerID
@@ -119,13 +91,33 @@ class ContactList extends AbstractCorpSection
             'standing' => null
         );
         $this->getAttributesDatabasePreserver()
-             ->setTableName('corpAllianceContactList')
+            ->setTableName('corpAllianceContactList')
              ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//allianceContactList/row');
+            ->preserveData($xml, '//allianceContactList/row');
         return $this;
     }
     /**
-     * @var int $mask
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @internal param int $key
+     *
+     * @return self
      */
-    protected $mask = 16;
+    protected function preserverToCorporateContactList(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'contactID' => null,
+            'contactName' => null,
+            'standing' => null
+        );
+        $this->getAttributesDatabasePreserver()
+            ->setTableName('corpCorporateContactList')
+             ->setColumnDefaults($columnDefaults)
+            ->preserveData($xml, '//corporateContactList/row');
+        return $this;
+    }
 }

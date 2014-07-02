@@ -30,22 +30,18 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 
 /**
  * Class StarbaseList
  */
 class StarbaseList extends AbstractCorpSection
 {
+    use ApiNameTrait;
     /**
-     * @return string
+     * @var int $mask
      */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
+    protected $mask = 524288;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -104,8 +100,4 @@ class StarbaseList extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 524288;
 }

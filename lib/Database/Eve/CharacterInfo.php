@@ -30,7 +30,9 @@
 namespace Yapeal\Database\Eve;
 
 use PDOException;
+use Yapeal\Database\ApiNameTrait;
 use Yapeal\Database\Char\AbstractCharSection;
+use Yapeal\Database\SectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -40,10 +42,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class CharacterInfo extends AbstractCharSection
 {
-    /**
-     * @var int $mask
-     */
-    protected $mask = 0;
+    use ApiNameTrait, SectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -58,31 +57,18 @@ class CharacterInfo extends AbstractCharSection
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'AutoMagic for %1$s/%2$s is not allowed',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'AutoMagic for %1$s/%2$s is not allowed',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         return;
     }
     /**
-     * @return string
+     * @var int $mask
      */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'CharacterInfo';
-    }
+    protected $mask = 0;
     /**
      * @param string $xml
      * @param string $ownerID

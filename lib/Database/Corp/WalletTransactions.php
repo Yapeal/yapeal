@@ -31,12 +31,15 @@ namespace Yapeal\Database\Corp;
 
 use PDOException;
 use Yapeal\Database\AbstractAccountKey;
+use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\SectionNameTrait;
 
 /**
  * Class WalletTransactions
  */
 class WalletTransactions extends AbstractAccountKey
 {
+    use ApiNameTrait, SectionNameTrait;
     /**
      * @var int $mask
      */
@@ -45,16 +48,6 @@ class WalletTransactions extends AbstractAccountKey
      * @var int
      */
     protected $maxKeyRange = 1006;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
     /**
      * @param string $xml
      * @param string $ownerID
@@ -71,9 +64,9 @@ class WalletTransactions extends AbstractAccountKey
             $this->getPdo()
                  ->beginTransaction();
             $this->preserverToWalletTransactions(
-                 $xml,
-                     $ownerID,
-                     $accountKey
+                $xml,
+                $ownerID,
+                $accountKey
             );
             $this->getPdo()
                  ->commit();
@@ -89,16 +82,6 @@ class WalletTransactions extends AbstractAccountKey
                  ->rollBack();
         }
         return $this;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
     }
     /**
      * @param string $xml

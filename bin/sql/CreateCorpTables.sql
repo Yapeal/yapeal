@@ -74,14 +74,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendee
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCombatSettings";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCombatSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED    NOT NULL,
-    "posID"                   BIGINT(20) UNSIGNED    NOT NULL,
+    "itemID" BIGINT(20) UNSIGNED NOT NULL,
     "onAggressionEnabled"     TINYINT(1)             NOT NULL,
     "onCorporationWarEnabled" TINYINT(1)             NOT NULL,
     "onStandingDropStanding"  DECIMAL(5, 2) UNSIGNED NOT NULL,
     "onStatusDropEnabled"     TINYINT(1)             NOT NULL,
     "onStatusDropStanding"    DECIMAL(5, 2) UNSIGNED NOT NULL,
     "useStandingsFromOwnerID" BIGINT(20) UNSIGNED    NOT NULL,
-    PRIMARY KEY ("ownerID", "posID")
+    PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpContainerLog";
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactList"
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCorporationSheet";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
-    "allianceName"    CHAR(50) DEFAULT NULL,
+    "allianceName"    CHAR(50)                DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED    NOT NULL,
     "ceoName"         CHAR(24)               NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED    NOT NULL,
@@ -200,21 +200,21 @@ ALTER TABLE "{database}"."{table_prefix}corpFacWarStats" ADD INDEX "corpFacWarSt
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFuel";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFuel" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
-    "posID"    BIGINT(20) UNSIGNED NOT NULL,
+    "itemID" BIGINT(20) UNSIGNED NOT NULL,
     "typeID"   BIGINT(20) UNSIGNED NOT NULL,
     "quantity" BIGINT(20) UNSIGNED NOT NULL,
-    PRIMARY KEY ("ownerID", "posID", "typeID")
+    PRIMARY KEY ("ownerID", "itemID", "typeID")
 )
     ENGINE =InnoDB;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpGeneralSettings";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpGeneralSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED  NOT NULL,
-    "posID"                   BIGINT(20) UNSIGNED  NOT NULL,
+    "itemID" BIGINT(20) UNSIGNED NOT NULL,
     "allowAllianceMembers"    TINYINT(1)           NOT NULL,
     "allowCorporationMembers" TINYINT(1)           NOT NULL,
     "deployFlags"             SMALLINT(5) UNSIGNED NOT NULL,
     "usageFlags"              SMALLINT(5) UNSIGNED NOT NULL,
-    PRIMARY KEY ("ownerID", "posID")
+    PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpIndustryJobs";
@@ -344,18 +344,18 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberMedals" (
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMemberTracking";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberTracking" (
-    "base"           CHAR(50) DEFAULT NULL,
+    "base"           CHAR(50)   DEFAULT NULL,
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
-    "grantableRoles" CHAR(64) DEFAULT NULL,
-    "location"       CHAR(255) DEFAULT NULL,
+    "grantableRoles" CHAR(64)   DEFAULT NULL,
+    "location"       CHAR(255)  DEFAULT NULL,
     "locationID"     BIGINT(20) UNSIGNED DEFAULT NULL,
-    "logoffDateTime" DATETIME DEFAULT NULL,
-    "logonDateTime"  DATETIME DEFAULT NULL,
+    "logoffDateTime" DATETIME   DEFAULT NULL,
+    "logonDateTime"  DATETIME   DEFAULT NULL,
     "name"           CHAR(24)            NOT NULL,
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
-    "roles"          CHAR(64) DEFAULT NULL,
-    "shipType"       CHAR(50) DEFAULT NULL,
+    "roles"          CHAR(64)   DEFAULT NULL,
+    "shipType"       CHAR(50)   DEFAULT NULL,
     "shipTypeID"     BIGINT(20) DEFAULT NULL,
     "startDateTime"  DATETIME            NOT NULL,
     "title"          TEXT
@@ -427,11 +427,11 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromNPCCorpo
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStarbaseDetail";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseDetail" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
-    "posID"           BIGINT(20) UNSIGNED NOT NULL,
+    "itemID" BIGINT(20) UNSIGNED NOT NULL,
     "onlineTimestamp" DATETIME            NOT NULL,
     "state"           TINYINT(2) UNSIGNED NOT NULL,
     "stateTimestamp"  DATETIME            NOT NULL,
-    PRIMARY KEY ("ownerID", "posID")
+    PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStarbaseList";
@@ -482,13 +482,13 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
     "accountKey"   SMALLINT(4) UNSIGNED NOT NULL,
     "amount"       DECIMAL(17, 2)       NOT NULL,
     "argID1"       BIGINT(20) UNSIGNED DEFAULT NULL,
-    "argName1"     CHAR(50) DEFAULT NULL,
+    "argName1"   CHAR(50) DEFAULT NULL,
     "balance"      DECIMAL(17, 2)       NOT NULL,
     "date"         DATETIME             NOT NULL,
     "ownerID1"     BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerID2"     BIGINT(20) UNSIGNED DEFAULT NULL,
-    "ownerName1"   CHAR(50) DEFAULT NULL,
-    "ownerName2"   CHAR(50) DEFAULT NULL,
+    "ownerName1" CHAR(50) DEFAULT NULL,
+    "ownerName2" CHAR(50) DEFAULT NULL,
     "reason"       TEXT
                    COLLATE utf8_unicode_ci,
     "refID"        BIGINT(20) UNSIGNED  NOT NULL,
@@ -503,16 +503,16 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletTransactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"           SMALLINT(4) UNSIGNED NOT NULL,
-    "characterID"          BIGINT(20) UNSIGNED DEFAULT NULL,
-    "characterName"        CHAR(24) DEFAULT NULL,
-    "clientID"             BIGINT(20) UNSIGNED DEFAULT NULL,
-    "clientName"           CHAR(50) DEFAULT NULL,
-    "clientTypeID"         BIGINT(20) UNSIGNED DEFAULT NULL,
+    "characterID"   BIGINT(20) UNSIGNED DEFAULT NULL,
+    "characterName" CHAR(24)            DEFAULT NULL,
+    "clientID"      BIGINT(20) UNSIGNED DEFAULT NULL,
+    "clientName"    CHAR(50)            DEFAULT NULL,
+    "clientTypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
     "journalTransactionID" BIGINT(20) UNSIGNED  NOT NULL,
     "price"                DECIMAL(17, 2)       NOT NULL,
     "quantity"             BIGINT(20) UNSIGNED  NOT NULL,
-    "stationID"            BIGINT(20) UNSIGNED DEFAULT NULL,
-    "stationName"          CHAR(50) DEFAULT NULL,
+    "stationID"     BIGINT(20) UNSIGNED DEFAULT NULL,
+    "stationName"   CHAR(50)            DEFAULT NULL,
     "transactionDateTime"  DATETIME             NOT NULL,
     "transactionFor"       CHAR(12)             NOT NULL DEFAULT 'corporation',
     "transactionID"        BIGINT(20) UNSIGNED  NOT NULL,

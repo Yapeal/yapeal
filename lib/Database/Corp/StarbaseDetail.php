@@ -57,23 +57,24 @@ class StarbaseDetail extends AbstractCorpSection
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         /**
          * Update Starbase List
          */
         $class =
-            new StarbaseList($this->getPdo(), $this->getLogger(), $this->getCsq(
-            ));
+            new StarbaseList(
+                $this->getPdo(), $this->getLogger(), $this->getCsq()
+            );
         $class->autoMagic(
-              $data,
-                  $retrievers,
-                  $preservers,
-                  $interval
+            $data,
+            $retrievers,
+            $preservers,
+            $interval
         );
         $active = $this->getActiveTowers();
         if (empty($active)) {
@@ -85,9 +86,9 @@ class StarbaseDetail extends AbstractCorpSection
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $corp['corporationID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $corp['corporationID']
             )
             ) {
                 continue;
@@ -149,9 +150,9 @@ class StarbaseDetail extends AbstractCorpSection
         }
         $preservers->preserveEveApi($data);
         $this->preserve(
-             $data->getEveApiXml(),
-                 $corpID,
-                 $posID
+            $data->getEveApiXml(),
+            $corpID,
+            $posID
         );
         return true;
     }
@@ -164,61 +165,60 @@ class StarbaseDetail extends AbstractCorpSection
      */
     protected $xsl = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-          <xsl:output method="xml"
-              version="1.0"
-              encoding="utf-8"
-              omit-xml-declaration="no"
-              standalone="no"
-              indent="yes"/>
-          <xsl:template match="rowset">
-              <xsl:choose>
-                  <xsl:when test="@name">
-                      <xsl:element name="{@name}">
-                          <xsl:copy-of select="@key"/>
-                          <xsl:copy-of select="@columns"/>
-                          <xsl:apply-templates/>
-                      </xsl:element>
-                  </xsl:when>
-                  <xsl:otherwise>
-                      <xsl:copy-of select="."/>
-                      <xsl:apply-templates/>
-                  </xsl:otherwise>
-              </xsl:choose>
-          </xsl:template>
-          <xsl:template match="combatSettings">
-              <xsl:element name="{name(.)}">
-                  <xsl:attribute name="key">ownerID,posID</xsl:attribute>
-                  <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
-                  <xsl:element name="row">
-                      <xsl:attribute name="onAggressionEnabled">
-                          <xsl:value-of select="onAggression/@enabled"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="onCorporationWarEnabled">
-                          <xsl:value-of select="onCorporationWar/@enabled"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="onStandingDropStanding">
-                          <xsl:value-of select="onStandingDrop/@standing"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="onStatusDropEnabled">
-                          <xsl:value-of select="onStatusDrop/@enabled"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="onStatusDropStanding">
-                          <xsl:value-of select="onStatusDrop/@standing"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="useStandingsFromOwnerID">
-                          <xsl:value-of select="useStandingsFrom/@ownerID"/>
-                      </xsl:attribute>
-                  </xsl:element>
-              </xsl:element>
-                   <xsl:apply-templates/>
-          </xsl:template>
-          <xsl:template match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
-          <xsl:template match="@*|node()">
-              <xsl:copy>
-                  <xsl:apply-templates select="@*|node()"/>
-              </xsl:copy>
-          </xsl:template>
-      </xsl:transform>
+    <xsl:output method="xml" version="1.0" encoding="utf-8"
+        omit-xml-declaration="no" standalone="no" indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="combatSettings">
+        <xsl:element name="{name(.)}">
+            <xsl:attribute name="key">ownerID,posID</xsl:attribute>
+            <xsl:attribute name="columns">
+                onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID
+            </xsl:attribute>
+            <xsl:element name="row">
+                <xsl:attribute name="onAggressionEnabled">
+                    <xsl:value-of select="onAggression/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onCorporationWarEnabled">
+                    <xsl:value-of select="onCorporationWar/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStandingDropStanding">
+                    <xsl:value-of select="onStandingDrop/@standing"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStatusDropEnabled">
+                    <xsl:value-of select="onStatusDrop/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStatusDropStanding">
+                    <xsl:value-of select="onStatusDrop/@standing"/>
+                </xsl:attribute>
+                <xsl:attribute name="useStandingsFromOwnerID">
+                    <xsl:value-of select="useStandingsFrom/@ownerID"/>
+                </xsl:attribute>
+            </xsl:element>
+        </xsl:element>
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template
+        match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
 XSL;
     /**
      * @return array

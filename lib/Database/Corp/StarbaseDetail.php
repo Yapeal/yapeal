@@ -34,6 +34,7 @@ use PDOException;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class MemberTrackingExtended
@@ -148,7 +149,7 @@ XSL;
             if (empty($towers)) {
                 $this->getLogger()
                      ->info('No Starbase Towers found');
-                return;
+                continue;
             }
             foreach ($towers as $tower) {
                 $data->addEveApiArgument('itemID', $tower['itemID']);
@@ -158,6 +159,61 @@ XSL;
             }
             $this->updateCachedUntil($data, $interval, $corp['corporationID']);
         }
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        if (!$this->gotApiLock($data)) {
+            return false;
+        }
+        $corp = $data->getEveApiArguments();
+        $corpID = $corp['corporationID'];
+        $posID = $corp['itemID'];
+        /**
+         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         */
+        $retrievers->retrieveEveApi($data);
+        if ($data->getEveApiXml() === false) {
+            $mess = sprintf(
+                'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $corpID
+            );
+            $this->getLogger()
+                 ->notice($mess);
+            return false;
+        }
+        $this->xsltTransform($data);
+        if ($this->isInvalid($data)) {
+            $mess = sprintf(
+                'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $corpID
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            $data->setEveApiName('Invalid' . $this->getApiName());
+            $preservers->preserveEveApi($data);
+            return false;
+        }
+        $preservers->preserveEveApi($data);
+        $this->preserve(
+             $data->getEveApiXml(),
+                 $corpID,
+                 $posID
+        );
+        return true;
     }
     /**
      * @return string

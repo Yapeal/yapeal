@@ -46,7 +46,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractCommonEveApi
 {
-    use LoggerAwareTrait;
+    use LoggerAwareTrait, EveApiToolsTrait;
     /**
      * @param PDO              $pdo
      * @param LoggerInterface  $logger
@@ -73,34 +73,6 @@ abstract class AbstractCommonEveApi
         EveApiPreserverInterface $preservers,
         $interval
     );
-    /**
-     * @param CommonSqlQueries $value
-     *
-     * @return self
-     */
-    public function setCsq($value)
-    {
-        $this->csq = $value;
-        return $this;
-    }
-    /**
-     * @param PDO $value
-     *
-     * @return self
-     */
-    public function setPdo(PDO $value)
-    {
-        $this->pdo = $value;
-        return $this;
-    }
-    /**
-     * @var CommonSqlQueries
-     */
-    protected $csq;
-    /**
-     * @var PDO
-     */
-    protected $pdo;
     /**
      * @var string
      */
@@ -192,27 +164,6 @@ XSL;
                 );
         }
         return $this->attributesDatabasePreserver;
-    }
-    /**
-     * @return CommonSqlQueries
-     */
-    protected function getCsq()
-    {
-        return $this->csq;
-    }
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-    /**
-     * @return PDO
-     */
-    protected function getPdo()
-    {
-        return $this->pdo;
     }
     /**
      * @return string

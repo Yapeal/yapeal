@@ -31,8 +31,7 @@ namespace Yapeal\Xml;
 /**
  * Class EveApiXmlData
  */
-class EveApiXmlData implements EveApiReadWriteInterface,
-    EveApiXmlModifyInterface
+class EveApiXmlData implements EveApiReadWriteInterface
 {
     /**
      * @param string      $eveApiName

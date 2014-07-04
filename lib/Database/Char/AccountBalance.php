@@ -136,7 +136,8 @@ class AccountBalance extends AbstractCommonEveApi
      */
     protected function getActiveCharacters()
     {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCharacters($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {

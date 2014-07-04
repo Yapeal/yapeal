@@ -151,7 +151,8 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
      */
     protected function getActiveCorporations()
     {
-        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCorporations($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {

@@ -69,7 +69,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         $active = $this->getActiveCharacters();
         if (empty($active)) {
             $this->getLogger()
-                 ->info('No active registered keys found');
+                ->info('No active characters found');
             return;
         }
         foreach ($active as $char) {
@@ -153,7 +153,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
      */
     protected function getActiveCharacters()
     {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCharacters($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {

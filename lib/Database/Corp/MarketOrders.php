@@ -30,18 +30,14 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class MarketOrders
  */
 class MarketOrders extends AbstractCorpSection
 {
-    use ApiNameTrait;
-    /**
-     * @var int $mask
-     */
-    protected $mask = 4096;
+    use EveApiNameTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -106,4 +102,8 @@ class MarketOrders extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 4096;
 }

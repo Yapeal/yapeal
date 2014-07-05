@@ -31,18 +31,14 @@ namespace Yapeal\Database\Eve;
 
 use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class CharacterInfoPublic
  */
 class CharacterInfoPublic extends AbstractCharSection
 {
-    use SectionNameTrait;
-    /**
-     * @var int $mask
-     */
-    protected $mask = 8388608;
+    use EveSectionNameTrait;
     /**
      * @return string
      */
@@ -137,4 +133,8 @@ class CharacterInfoPublic extends AbstractCharSection
              ->preserveData($xml, '//employmentHistory/row');
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 8388608;
 }

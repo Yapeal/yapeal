@@ -30,14 +30,15 @@ namespace Yapeal\Database\Account;
 
 use PDO;
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\ValuesDatabasePreserverTrait;
 
 /**
  * Class AccountStatus
  */
 class AccountStatus extends AbstractAccountSection
 {
-    use ApiNameTrait;
+    use EveApiNameTrait, ValuesDatabasePreserverTrait;
     /**
      * @return array
      */
@@ -105,10 +106,7 @@ class AccountStatus extends AbstractAccountSection
             'logonMinutes' => null,
             'paidUntil' => null
         );
-        $this->getValuesDatabasePreserver()
-             ->setTableName('accountAccountStatus')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->preserveData($xml, $columnDefaults, 'accountAccountStatus');
         return $this;
     }
 }

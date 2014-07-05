@@ -31,9 +31,9 @@ namespace Yapeal\Database\Corp;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\ApiNameTrait;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -44,7 +44,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class AccountBalance extends AbstractCommonEveApi
 {
-    use ApiNameTrait;
+    use EveApiNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -78,7 +78,7 @@ class AccountBalance extends AbstractCommonEveApi
         );
         foreach ($active as $corp) {
             /**
-             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             * @var EveApiReadWriteInterface $data
              */
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());

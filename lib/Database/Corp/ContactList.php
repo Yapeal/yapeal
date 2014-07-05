@@ -30,18 +30,14 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class ContactList
  */
 class ContactList extends AbstractCorpSection
 {
-    use ApiNameTrait;
-    /**
-     * @var int $mask
-     */
-    protected $mask = 16;
+    use EveApiNameTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -120,4 +116,8 @@ class ContactList extends AbstractCorpSection
             ->preserveData($xml, '//corporateContactList/row');
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 16;
 }

@@ -28,6 +28,7 @@
  */
 namespace Yapeal\Database;
 
+use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
 
@@ -57,6 +58,42 @@ trait EveApiToolsTrait
         return $this;
     }
     /**
+     * @throws LogicException
+     * @return CommonSqlQueries
+     */
+    protected function getCsq()
+    {
+        if (empty($this->csq)) {
+            $mess = 'Tried to use csq before it was set';
+            throw new LogicException($mess);
+        }
+        return $this->csq;
+    }
+    /**
+     * @throws LogicException
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        if (empty($this->logger)) {
+            $mess = 'Tried to use logger before it was set';
+            throw new LogicException($mess);
+        }
+        return $this->logger;
+    }
+    /**
+     * @throws LogicException
+     * @return PDO
+     */
+    protected function getPdo()
+    {
+        if (empty($this->pdo)) {
+            $mess = 'Tried to use pdo before it was set';
+            throw new LogicException($mess);
+        }
+        return $this->pdo;
+    }
+    /**
      * @var CommonSqlQueries
      */
     protected $csq;
@@ -64,25 +101,4 @@ trait EveApiToolsTrait
      * @var PDO
      */
     protected $pdo;
-    /**
-     * @return CommonSqlQueries
-     */
-    protected function getCsq()
-    {
-        return $this->csq;
-    }
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-    /**
-     * @return PDO
-     */
-    protected function getPdo()
-    {
-        return $this->pdo;
-    }
 }

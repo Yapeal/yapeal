@@ -30,14 +30,15 @@ namespace Yapeal\Database\Account;
 
 use PDOException;
 use SimpleXMLIterator;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class APIKeyInfo
  */
 class APIKeyInfo extends AbstractAccountSection
 {
-    use ApiNameTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -86,10 +87,12 @@ class APIKeyInfo extends AbstractAccountSection
             'expires' => '2038-01-19 03:14:07',
             'type' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('accountAPIKeyInfo')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//key');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'accountAPIKeyInfo',
+            '//key'
+        );
         return $this;
     }
     /**
@@ -108,10 +111,11 @@ class APIKeyInfo extends AbstractAccountSection
             'factionID' => null,
             'factionName' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('accountCharacters')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'accountCharacters'
+        );
     }
     /**
      * @param string $xml
@@ -123,8 +127,7 @@ class APIKeyInfo extends AbstractAccountSection
         $xml,
         $ownerID
     ) {
-        $simple = new SimpleXMLIterator($xml);
-        $chars = $simple->xpath('//row');
+        $chars = (new SimpleXMLIterator($xml))->xpath('//row');
         $rows = array();
         foreach ($chars as $aRow) {
             $rows[] = $ownerID;

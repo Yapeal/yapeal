@@ -29,26 +29,28 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCorpSection
  */
 abstract class AbstractCorpSection extends AbstractCommonEveApi
 {
-    use SectionNameTrait;
+    use EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -94,6 +96,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -107,7 +110,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -143,10 +146,17 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @var int $mask
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
      */
-    protected $mask;
+    abstract protected function preserve(
+        $xml,
+        $ownerID
+    );
     /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveCorporations()
@@ -174,13 +184,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         return $this->mask;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
+     * @var int $mask
      */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
+    protected $mask;
 }

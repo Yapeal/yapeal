@@ -30,18 +30,14 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class StarbaseList
  */
 class StarbaseList extends AbstractCorpSection
 {
-    use ApiNameTrait;
-    /**
-     * @var int $mask
-     */
-    protected $mask = 524288;
+    use EveApiNameTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -100,4 +96,8 @@ class StarbaseList extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 524288;
 }

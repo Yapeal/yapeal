@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains ApiNameTrait Trait.
+ * Contains EveSectionNameTrait Trait.
  *
  * PHP version 5.4
  *
@@ -29,22 +29,23 @@
 namespace Yapeal\Database;
 
 /**
- * Trait ApiNameTrait
+ * Trait EveSectionNameTrait
  */
-trait ApiNameTrait
+trait EveSectionNameTrait
 {
     /**
      * @return string
      */
-    protected function getApiName()
+    protected function getSectionName()
     {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        if (empty($this->sectionName)) {
+            $this->sectionName =
+                basename(dirname(str_replace('\\', '/', __CLASS__)));
         }
-        return $this->apiName;
+        return $this->sectionName;
     }
     /**
      * @var string
      */
-    private $apiName;
+    private $sectionName;
 }

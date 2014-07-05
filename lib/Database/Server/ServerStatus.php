@@ -31,8 +31,8 @@ namespace Yapeal\Database\Server;
 
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\ApiNameTrait;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -44,7 +44,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class ServerStatus extends AbstractCommonEveApi
 {
-    use ApiNameTrait, SectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -97,7 +97,7 @@ class ServerStatus extends AbstractCommonEveApi
             return false;
         }
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {

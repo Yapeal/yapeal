@@ -30,9 +30,9 @@
 namespace Yapeal\Database\Eve;
 
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
 use Yapeal\Database\Char\AbstractCharSection;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -42,7 +42,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class CharacterInfo extends AbstractCharSection
 {
-    use ApiNameTrait, SectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -65,10 +65,6 @@ class CharacterInfo extends AbstractCharSection
              );
         return;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 0;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -156,4 +152,8 @@ class CharacterInfo extends AbstractCharSection
              ->preserveData($xml, '//employmentHistory/row');
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 0;
 }

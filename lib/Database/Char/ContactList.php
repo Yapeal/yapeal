@@ -31,10 +31,10 @@ namespace Yapeal\Database\Char;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\ApiNameTrait;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -45,7 +45,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class ContactList extends AbstractCommonEveApi
 {
-    use ApiNameTrait, SectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -74,7 +74,7 @@ class ContactList extends AbstractCommonEveApi
         }
         foreach ($active as $char) {
             /**
-             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             * @var EveApiReadWriteInterface $data
              */
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());

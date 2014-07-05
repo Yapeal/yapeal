@@ -35,7 +35,6 @@ use PDOException;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractAccountKey
@@ -50,6 +49,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -112,6 +113,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -130,7 +132,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
         $accountKey = $arguments['accountKey'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -169,13 +171,17 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @var int
+     * @param string $xml
+     * @param string $ownerID
+     * @param int    $accountKey
+     *
+     * @return self
      */
-    protected $mask;
-    /**
-     * @var int
-     */
-    protected $maxKeyRange;
+    abstract protected function preserve(
+        $xml,
+        $ownerID,
+        $accountKey
+    );
     /**
      * @throws \LogicException
      * @return array
@@ -238,15 +244,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return $this->maxKeyRange;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param int    $accountKey
-     *
-     * @return self
+     * @var int
      */
-    abstract protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey
-    );
+    protected $mask;
+    /**
+     * @var int
+     */
+    protected $maxKeyRange;
 }

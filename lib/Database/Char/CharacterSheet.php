@@ -31,10 +31,10 @@ namespace Yapeal\Database\Char;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\ApiNameTrait;
 use Yapeal\Database\AttributesDatabasePreserver;
 use Yapeal\Database\DatabasePreserverInterface;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Database\ValuesDatabasePreserver;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -46,7 +46,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class CharacterSheet extends AbstractCommonEveApi
 {
-    use ApiNameTrait, SectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -85,7 +85,7 @@ class CharacterSheet extends AbstractCommonEveApi
         );
         foreach ($active as $char) {
             /**
-             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+             * @var EveApiReadWriteInterface $data
              */
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
@@ -138,52 +138,6 @@ class CharacterSheet extends AbstractCommonEveApi
             $this->updateCachedUntil($data, $interval, $char['characterID']);
         }
     }
-    /**
-     * @var string
-     */
-    protected $xsl = <<<XSL
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="attributeEnhancers">
-        <xsl:element name="{name(.)}">
-            <xsl:attribute name="key">bonusName</xsl:attribute>
-            <xsl:attribute name="columns">augmentatorValue,augmentatorName,bonusName</xsl:attribute>
-            <xsl:apply-templates/>
-        </xsl:element>
-    </xsl:template>
-    <xsl:template match="perceptionBonus|memoryBonus|willpowerBonus|intelligenceBonus|charismaBonus">
-        <row bonusName="{name(.)}">
-        <xsl:attribute name="augmentatorName"><xsl:value-of select="./augmentatorName"/></xsl:attribute>
-        <xsl:attribute name="augmentatorValue"><xsl:value-of select="./augmentatorValue"/></xsl:attribute>
-        </row>
-    </xsl:template>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
     /**
      * @return array
      */
@@ -570,6 +524,52 @@ XSL;
                    ->preserveData($xml, '//skills/row');
         return $this;
     }
+    /**
+     * @var string
+     */
+    protected $xsl = <<<XSL
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="attributeEnhancers">
+        <xsl:element name="{name(.)}">
+            <xsl:attribute name="key">bonusName</xsl:attribute>
+            <xsl:attribute name="columns">augmentatorValue,augmentatorName,bonusName</xsl:attribute>
+            <xsl:apply-templates/>
+        </xsl:element>
+    </xsl:template>
+    <xsl:template match="perceptionBonus|memoryBonus|willpowerBonus|intelligenceBonus|charismaBonus">
+        <row bonusName="{name(.)}">
+        <xsl:attribute name="augmentatorName"><xsl:value-of select="./augmentatorName"/></xsl:attribute>
+        <xsl:attribute name="augmentatorValue"><xsl:value-of select="./augmentatorValue"/></xsl:attribute>
+        </row>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
     /**
      * @var int $mask
      */

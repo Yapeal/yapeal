@@ -30,7 +30,7 @@
 namespace Yapeal\Database\Corp;
 
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -40,7 +40,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class MemberTrackingExtended extends AbstractCorpSection
 {
-    use ApiNameTrait;
+    use EveApiNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -56,10 +56,6 @@ class MemberTrackingExtended extends AbstractCorpSection
         $data->addEveApiArgument('extended', '1');
         return parent::oneShot($data, $retrievers, $preservers);
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 33554432;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -124,4 +120,8 @@ class MemberTrackingExtended extends AbstractCorpSection
              ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 33554432;
 }

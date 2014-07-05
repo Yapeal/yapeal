@@ -31,7 +31,7 @@ namespace Yapeal\Database\Corp;
 
 use PDO;
 use PDOException;
-use Yapeal\Database\ApiNameTrait;
+use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -42,7 +42,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class StarbaseDetail extends AbstractCorpSection
 {
-    use ApiNameTrait;
+    use EveApiNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -120,7 +120,7 @@ class StarbaseDetail extends AbstractCorpSection
         $corpID = $corp['corporationID'];
         $itemID = $corp['itemID'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -156,69 +156,6 @@ class StarbaseDetail extends AbstractCorpSection
         );
         return true;
     }
-    /**
-     * @var int $mask
-     */
-    protected $mask = 131072;
-    /**
-     * @var string
-     */
-    protected $xsl = <<<'XSL'
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml" version="1.0" encoding="utf-8"
-        omit-xml-declaration="no" standalone="no" indent="yes"/>
-    <xsl:strip-space elements="combatSettings onAggression onCorporationWar onStandingDrop useStandingsFrom"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="combatSettings">
-        <xsl:element name="{name(.)}">
-            <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
-            <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
-            <xsl:element name="row">
-                <xsl:attribute name="onAggressionEnabled">
-                    <xsl:value-of select="onAggression/@enabled"/>
-                </xsl:attribute>
-                <xsl:attribute name="onCorporationWarEnabled">
-                    <xsl:value-of select="onCorporationWar/@enabled"/>
-                </xsl:attribute>
-                <xsl:attribute name="onStandingDropStanding">
-                    <xsl:value-of select="onStandingDrop/@standing"/>
-                </xsl:attribute>
-                <xsl:attribute name="onStatusDropEnabled">
-                    <xsl:value-of select="onStatusDrop/@enabled"/>
-                </xsl:attribute>
-                <xsl:attribute name="onStatusDropStanding">
-                    <xsl:value-of select="onStatusDrop/@standing"/>
-                </xsl:attribute>
-                <xsl:attribute name="useStandingsFromOwnerID">
-                    <xsl:value-of select="useStandingsFrom/@ownerID"/>
-                </xsl:attribute>
-            </xsl:element>
-        </xsl:element>
-        <xsl:apply-templates/>
-    </xsl:template>
-    <xsl:template
-        match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
     /**
      * @return array
      */
@@ -383,4 +320,67 @@ XSL;
             ->preserveData($xml, '//generalSettings/row');
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 131072;
+    /**
+     * @var string
+     */
+    protected $xsl = <<<'XSL'
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml" version="1.0" encoding="utf-8"
+        omit-xml-declaration="no" standalone="no" indent="yes"/>
+    <xsl:strip-space elements="combatSettings onAggression onCorporationWar onStandingDrop useStandingsFrom"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="combatSettings">
+        <xsl:element name="{name(.)}">
+            <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
+            <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
+            <xsl:element name="row">
+                <xsl:attribute name="onAggressionEnabled">
+                    <xsl:value-of select="onAggression/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onCorporationWarEnabled">
+                    <xsl:value-of select="onCorporationWar/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStandingDropStanding">
+                    <xsl:value-of select="onStandingDrop/@standing"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStatusDropEnabled">
+                    <xsl:value-of select="onStatusDrop/@enabled"/>
+                </xsl:attribute>
+                <xsl:attribute name="onStatusDropStanding">
+                    <xsl:value-of select="onStatusDrop/@standing"/>
+                </xsl:attribute>
+                <xsl:attribute name="useStandingsFromOwnerID">
+                    <xsl:value-of select="useStandingsFrom/@ownerID"/>
+                </xsl:attribute>
+            </xsl:element>
+        </xsl:element>
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template
+        match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
 }

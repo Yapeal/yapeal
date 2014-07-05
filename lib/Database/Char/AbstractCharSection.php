@@ -32,7 +32,7 @@ namespace Yapeal\Database\Char;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -45,7 +45,7 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractCharSection extends AbstractCommonEveApi
 {
-    use SectionNameTrait;
+    use EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -109,7 +109,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         $char = $data->getEveApiArguments();
         $charID = $char['characterID'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -145,9 +145,15 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @var $mask
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
      */
-    protected $mask;
+    abstract protected function preserve(
+        $xml,
+        $ownerID
+    );
     /**
      * @return array
      */
@@ -176,13 +182,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         return $this->mask;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
+     * @var $mask
      */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
+    protected $mask;
 }

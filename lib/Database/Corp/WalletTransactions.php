@@ -31,23 +31,15 @@ namespace Yapeal\Database\Corp;
 
 use PDOException;
 use Yapeal\Database\AbstractAccountKey;
-use Yapeal\Database\ApiNameTrait;
-use Yapeal\Database\SectionNameTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class WalletTransactions
  */
 class WalletTransactions extends AbstractAccountKey
 {
-    use ApiNameTrait, SectionNameTrait;
-    /**
-     * @var int $mask
-     */
-    protected $mask = 2097152;
-    /**
-     * @var int
-     */
-    protected $maxKeyRange = 1006;
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -119,4 +111,12 @@ class WalletTransactions extends AbstractAccountKey
              ->preserveData($xml);
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 2097152;
+    /**
+     * @var int
+     */
+    protected $maxKeyRange = 1006;
 }

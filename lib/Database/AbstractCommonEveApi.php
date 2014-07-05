@@ -29,22 +29,20 @@
 namespace Yapeal\Database;
 
 use DOMDocument;
+use LogicException;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use XSLTProcessor;
-use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi
+abstract class AbstractCommonEveApi implements EveApiDatabaseInterface
 {
     use LoggerAwareTrait, EveApiToolsTrait;
     /**
@@ -62,55 +60,19 @@ abstract class AbstractCommonEveApi
         $this->setCsq($csq);
     }
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
+     * @return string
      */
-    abstract public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    );
+    abstract protected function getApiName();
     /**
-     * @var string
+     * @return string
      */
-    protected $xsl = <<<'XSL'
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
+    abstract protected function getSectionName();
     /**
      * @param string $apiName
      * @param string $sectionName
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return bool
      */
     protected function cacheNotExpired($apiName, $sectionName, $ownerID = '0')
@@ -147,10 +109,7 @@ XSL;
         return true;
     }
     /**
-     * @return string
-     */
-    abstract protected function getApiName();
-    /**
+     * @throws LogicException
      * @return DatabasePreserverInterface
      */
     protected function getAttributesDatabasePreserver()
@@ -166,10 +125,7 @@ XSL;
         return $this->attributesDatabasePreserver;
     }
     /**
-     * @return string
-     */
-    abstract protected function getSectionName();
-    /**
+     * @throws LogicException
      * @return DatabasePreserverInterface
      */
     protected function getValuesDatabasePreserver()
@@ -193,6 +149,7 @@ XSL;
     /**
      * @param EveApiReadInterface $data
      *
+     * @throws LogicException
      * @return bool
      */
     protected function gotApiLock(EveApiReadInterface &$data)
@@ -219,6 +176,7 @@ XSL;
     /**
      * @param EveApiReadInterface $data
      *
+     * @throws LogicException
      * @return bool
      */
     protected function isInvalid(EveApiReadInterface &$data)
@@ -250,6 +208,8 @@ XSL;
      * @param EveApiReadInterface $data
      * @param int                 $interval
      * @param string              $ownerID
+     *
+     * @throws LogicException
      */
     protected function updateCachedUntil(
         EveApiReadInterface $data,
@@ -280,11 +240,11 @@ XSL;
         }
     }
     /**
-     * @param EveApiXmlModifyInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @return self
      */
-    protected function xsltTransform(EveApiXmlModifyInterface &$data)
+    protected function xsltTransform(EveApiReadWriteInterface &$data)
     {
         $xslt = new XSLTProcessor();
         $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
@@ -293,6 +253,39 @@ XSL;
         );
         return $this;
     }
+    /**
+     * @var string
+     */
+    protected $xsl = <<<'XSL'
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
     /**
      * @var DatabasePreserverInterface $attributesDatabasePreserver
      */

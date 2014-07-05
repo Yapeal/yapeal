@@ -264,7 +264,7 @@ class Wiring
                 $logger,
                 array(),
                 $dic['Yapeal.Error.threshold'],
-                false
+                $dic['Yapeal.Error.threshold']
             );
             return $error;
         };

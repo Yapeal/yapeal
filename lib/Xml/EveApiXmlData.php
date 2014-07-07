@@ -28,6 +28,9 @@
  */
 namespace Yapeal\Xml;
 
+use InvalidArgumentException;
+use LogicException;
+
 /**
  * Class EveApiXmlData
  */
@@ -39,7 +42,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      * @param string[]    $eveApiArguments
      * @param bool|string $eveApiXml Only allows string or false NOT true.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(
         $eveApiName = '',
@@ -65,17 +68,31 @@ class EveApiXmlData implements EveApiReadWriteInterface
      * @param string $name
      * @param mixed  $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function addEveApiArgument($name, $value)
     {
         if (!is_string($name)) {
             $mess = 'Name MUST be string but given ' . gettype($name);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->eveApiArguments[$name] = (string)$value;
         return $this;
+    }
+    /**
+     * @param string $name
+     *
+     * @throws InvalidArgumentException
+     * @return string|null
+     */
+    public function getEveApiArgument($name)
+    {
+        if (!is_string($name)) {
+            $mess = 'Name MUST be string but given ' . gettype($name);
+            throw new InvalidArgumentException($mess);
+        }
+        return $this->eveApiArguments[$name];
     }
     /**
      * @return string[]
@@ -88,26 +105,26 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiArguments;
     }
     /**
-     * @throws \LogicException
+     * @throws LogicException
      * @return string
      */
     public function getEveApiName()
     {
         if (empty($this->eveApiName)) {
             $mess = 'Tried to access Eve Api name before it was set';
-            throw new \LogicException($mess);
+            throw new LogicException($mess);
         }
         return $this->eveApiName;
     }
     /**
-     * @throws \LogicException
+     * @throws LogicException
      * @return string
      */
     public function getEveApiSectionName()
     {
         if (empty($this->eveApiSectionName)) {
             $mess = 'Tried to access Eve Api section name before it was set';
-            throw new \LogicException($mess);
+            throw new LogicException($mess);
         }
         return $this->eveApiSectionName;
     }
@@ -122,7 +139,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiXml;
     }
     /**
-     * @throws \LogicException
+     * @throws LogicException
      * @return string
      */
     public function getHash()
@@ -150,7 +167,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      *
      * @param string[] $values
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setEveApiArguments(array $values)
@@ -167,14 +184,14 @@ class EveApiXmlData implements EveApiReadWriteInterface
     /**
      * @param string $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setEveApiName($value)
     {
         if (!is_string($value)) {
             $mess = 'Name MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->eveApiName = $value;
         return $this;
@@ -182,14 +199,14 @@ class EveApiXmlData implements EveApiReadWriteInterface
     /**
      * @param string $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setEveApiSectionName($value)
     {
         if (!is_string($value)) {
             $mess = 'Section name MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->eveApiSectionName = $value;
         return $this;
@@ -197,7 +214,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
     /**
      * @param string|bool $xml Only allows string or false NOT true.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setEveApiXml($xml = false)
@@ -207,7 +224,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         }
         if (!is_string($xml)) {
             $mess = 'Xml MUST be string but given ' . gettype($xml);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->eveApiXml = $xml;
         return $this;

@@ -28,6 +28,7 @@
  */
 namespace Yapeal\Database\Account;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\EveApiNameTrait;
@@ -40,6 +41,7 @@ class AccountStatus extends AbstractAccountSection
 {
     use EveApiNameTrait, ValuesDatabasePreserverTrait;
     /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveKeys()
@@ -63,6 +65,7 @@ class AccountStatus extends AbstractAccountSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -106,7 +109,11 @@ class AccountStatus extends AbstractAccountSection
             'logonMinutes' => null,
             'paidUntil' => null
         );
-        $this->preserveData($xml, $columnDefaults, 'accountAccountStatus');
+        $this->valuesPreserveData(
+            $xml,
+            $columnDefaults,
+            'accountAccountStatus'
+        );
         return $this;
     }
 }

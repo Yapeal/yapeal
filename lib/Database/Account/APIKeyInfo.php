@@ -28,6 +28,7 @@
  */
 namespace Yapeal\Database\Account;
 
+use LogicException;
 use PDOException;
 use SimpleXMLIterator;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
@@ -43,6 +44,7 @@ class APIKeyInfo extends AbstractAccountSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -121,6 +123,7 @@ class APIKeyInfo extends AbstractAccountSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserveToKeyBridge(

@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Char;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
@@ -36,7 +37,6 @@ use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCharSection
@@ -51,6 +51,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -96,6 +98,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -106,8 +109,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $char = $data->getEveApiArguments();
-        $charID = $char['characterID'];
+        $charID = $data->getEveApiArgument('characterID');
         /**
          * @var EveApiReadWriteInterface $data
          */
@@ -138,23 +140,13 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
-        $this->preserve(
-            $data->getEveApiXml(),
-            $charID
-        );
+        if (!$this->preserve($data->getEveApiXml(), $charID)) {
+            return false;
+        }
         return true;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
-    /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveCharacters()
@@ -180,6 +172,39 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
     protected function getMask()
     {
         return $this->mask;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function preserve(
+        $xml,
+        $ownerID
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
     }
     /**
      * @var $mask

@@ -58,6 +58,48 @@ trait EveApiToolsTrait
         return $this;
     }
     /**
+     * @param string[] $columns
+     * @param string[] $columnNames
+     * @param string   $tableName
+     * @param int      $rowCount
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function flush(
+        array $columns,
+        array $columnNames,
+        $tableName,
+        $rowCount = 1
+    ) {
+        if (empty($columns)) {
+            return $this;
+        }
+        $mess = sprintf(
+            'Have %1$s row(s) to upsert into %2$s table',
+            $rowCount,
+            $tableName
+        );
+        $this->getLogger()
+             ->info($mess);
+        $sql = $this->getCsq()
+                    ->getUpsert(
+                        $tableName,
+                        $columnNames,
+                        $rowCount
+                    );
+        $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
+        $this->getLogger()
+             ->info($mess);
+        $mess = implode(',', $columns);
+        $this->getLogger()
+             ->debug(substr($mess, 0, 255));
+        $stmt = $this->getPdo()
+                     ->prepare($sql);
+        $stmt->execute($columns);
+        return $this;
+    }
+    /**
      * @throws LogicException
      * @return CommonSqlQueries
      */

@@ -28,192 +28,39 @@
  */
 namespace Yapeal\Database\Char;
 
-use PDO;
+use LogicException;
 use PDOException;
-use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\AttributesDatabasePreserver;
-use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
-use Yapeal\Database\EveSectionNameTrait;
-use Yapeal\Database\ValuesDatabasePreserver;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Database\ValuesDatabasePreserverTrait;
 
 /**
  * Class CharacterSheet
  */
-class CharacterSheet extends AbstractCommonEveApi
+class CharacterSheet extends AbstractCharSection
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait, ValuesDatabasePreserverTrait;
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->info(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        $active = $this->getActiveCharacters();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active characters found');
-            return;
-        }
-        $aPreserver = new AttributesDatabasePreserver(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
-        );
-        $vPreserver = new ValuesDatabasePreserver(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
-        );
-        foreach ($active as $char) {
-            /**
-             * @var EveApiReadWriteInterface $data
-             */
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $char['characterID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($char)
-                 ->setEveApiXml();
-            if (!$this->gotApiLock($data)) {
-                continue;
-            }
-            $retrievers->retrieveEveApi($data);
-            if ($data->getEveApiXml() === false) {
-                $mess = sprintf(
-                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $char['characterID']
-                );
-                $this->getLogger()
-                     ->debug($mess);
-                continue;
-            }
-            $this->xsltTransform($data);
-            if ($this->isInvalid($data)) {
-                $mess = sprintf(
-                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $char['characterID']
-                );
-                $this->getLogger()
-                     ->warning($mess);
-                $data->setEveApiName('Invalid' . $this->getApiName());
-                $preservers->preserveEveApi($data);
-                continue;
-            }
-            $preservers->preserveEveApi($data);
-            $this->preserve(
-                $data->getEveApiXml(),
-                $char['characterID'],
-                $aPreserver,
-                $vPreserver
-            );
-            $this->updateCachedUntil($data, $interval, $char['characterID']);
-        }
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveCharacters()
-    {
-        $sql = $this->getCsq()
-                    ->getActiveRegisteredCharacters($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
-    }
-    /**
-     * @param string                     $xml
-     * @param string                     $ownerID
-     * @param DatabasePreserverInterface $aPreserver
-     * @param DatabasePreserverInterface $vPreserver
+     * @param string $xml
+     * @param string $ownerID
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
     protected function preserve(
         $xml,
-        $ownerID,
-        DatabasePreserverInterface $aPreserver = null,
-        DatabasePreserverInterface $vPreserver = null
+        $ownerID
     ) {
-        if (is_null($aPreserver)) {
-            $aPreserver = new AttributesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
-        if (is_null($vPreserver)) {
-            $vPreserver = new ValuesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserverToCharacterSheet($vPreserver, $xml, $ownerID);
-            $this->preserverToAttributeEnhancers($aPreserver, $xml, $ownerID);
-            $this->preserverToAttributes($vPreserver, $xml, $ownerID);
-            $this->preserverToSkills($aPreserver, $xml, $ownerID);
-            $this->preserverToCertificates($aPreserver, $xml, $ownerID);
-            $this->preserverTocorporationRoles($aPreserver, $xml, $ownerID);
-            $this->preserverTocorporationRolesAtHQ($aPreserver, $xml, $ownerID);
-            $this->preserverTocorporationRolesAtBase(
-                $aPreserver,
-                $xml,
-                $ownerID
-            );
-            $this->preserverTocorporationRolesAtOther(
-                $aPreserver,
-                $xml,
-                $ownerID
-            );
-            $this->preserverToCorporationTitles($aPreserver, $xml, $ownerID);
+            $this->preserverToCharacterSheet($xml, $ownerID)
+                 ->preserverToAttributeEnhancers($xml, $ownerID)
+                 ->preserverToAttributes($xml, $ownerID)
+                 ->preserverToSkills($xml, $ownerID)
+                 ->preserverToCertificates($xml, $ownerID)
+                 ->preserverToCorporationRoles($xml, $ownerID)
+                 ->preserverToCorporationTitles($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -227,18 +74,18 @@ class CharacterSheet extends AbstractCommonEveApi
                  ->warning($mess, array('exception' => $exc));
             $this->getPdo()
                  ->rollBack();
+            return false;
         }
-        return $this;
+        return true;
     }
     /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToAttributeEnhancers(
-        DatabasePreserverInterface $aPreserver,
         $xml,
         $ownerID
     ) {
@@ -255,20 +102,21 @@ class CharacterSheet extends AbstractCommonEveApi
              ->info($sql);
         $this->getPdo()
              ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//attributeEnhancers/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//attributeEnhancers/row'
+        );
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $vPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
     protected function preserverToAttributes(
-        DatabasePreserverInterface $vPreserver,
         $xml,
         $ownerID
     ) {
@@ -280,20 +128,22 @@ class CharacterSheet extends AbstractCommonEveApi
             'perception' => null,
             'willpower' => null
         );
-        $vPreserver->setTableName('charAttributes')
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//attributes/*');
+        $this->valuesPreserveData(
+            $xml,
+            $columnDefaults,
+            'charAttributes',
+            '//attributes/*'
+        );
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToCertificates(
-        DatabasePreserverInterface $aPreserver,
         $xml,
         $ownerID
     ) {
@@ -308,20 +158,21 @@ class CharacterSheet extends AbstractCommonEveApi
              ->info($sql);
         $this->getPdo()
              ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//certificates/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//certificates/row'
+        );
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $vPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
     protected function preserverToCharacterSheet(
-        DatabasePreserverInterface $vPreserver,
         $xml,
         $ownerID
     ) {
@@ -343,20 +194,22 @@ class CharacterSheet extends AbstractCommonEveApi
             'name' => null,
             'race' => null
         );
-        $vPreserver->setTableName('charCharacterSheet')
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml);
+        $this->valuesPreserveData(
+            $xml,
+            $columnDefaults,
+            'charCharacterSheet',
+            '//attributes/*'
+        );
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToCorporationRoles(
-        DatabasePreserverInterface $aPreserver,
         $xml,
         $ownerID
     ) {
@@ -365,114 +218,32 @@ class CharacterSheet extends AbstractCommonEveApi
             'roleID' => null,
             'roleName' => null
         );
-        $tableName = 'charCorporationRoles';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//corporationRoles/row');
+        $tableSuffixes = ['', 'AtBase', 'AtHQ', 'AtOther'];
+        foreach ($tableSuffixes as $suffix) {
+            $tableName = 'charCorporationRoles' . $suffix;
+            $sql = $this->getCsq()
+                        ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+            $this->getLogger()
+                 ->info($sql);
+            $this->getPdo()
+                 ->exec($sql);
+            $this->attributePreserveData(
+                $xml,
+                $columnDefaults,
+                $tableName,
+                '//corporationRoles' . $suffix . '/row'
+            );
+        };
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
-     * @return self
-     */
-    protected function preserverToCorporationRolesAtBase(
-        DatabasePreserverInterface $aPreserver,
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'roleID' => null,
-            'roleName' => null
-        );
-        $tableName = 'charCorporationRolesAtBase';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//corporationRolesAtBase/row');
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToCorporationRolesAtHQ(
-        DatabasePreserverInterface $aPreserver,
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'roleID' => null,
-            'roleName' => null
-        );
-        $tableName = 'charCorporationRolesAtHQ';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//corporationRolesAtHQ/row');
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToCorporationRolesAtOther(
-        DatabasePreserverInterface $aPreserver,
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'roleID' => null,
-            'roleName' => null
-        );
-        $tableName = 'charCorporationRolesAtOther';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//corporationRolesAtOther/row');
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToCorporationTitles(
-        DatabasePreserverInterface $aPreserver,
         $xml,
         $ownerID
     ) {
@@ -488,20 +259,22 @@ class CharacterSheet extends AbstractCommonEveApi
              ->info($sql);
         $this->getPdo()
              ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//corporationTitles/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//corporationTitles/row'
+        );
         return $this;
     }
     /**
-     * @param DatabasePreserverInterface $aPreserver
-     * @param string                     $xml
-     * @param string                     $ownerID
+     * @param string $xml
+     * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToSkills(
-        DatabasePreserverInterface $aPreserver,
         $xml,
         $ownerID
     ) {
@@ -519,15 +292,22 @@ class CharacterSheet extends AbstractCommonEveApi
              ->info($sql);
         $this->getPdo()
              ->exec($sql);
-        $aPreserver->setTableName($tableName)
-                   ->setColumnDefaults($columnDefaults)
-                   ->preserveData($xml, '//skills/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//skills/row'
+        );
         return $this;
     }
     /**
+     * @var int $mask
+     */
+    protected $mask = 8;
+    /**
      * @var string
      */
-    protected $xsl = <<<XSL
+    protected $xsl = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
         version="1.0"
@@ -570,8 +350,4 @@ class CharacterSheet extends AbstractCommonEveApi
     </xsl:template>
 </xsl:transform>
 XSL;
-    /**
-     * @var int $mask
-     */
-    private $mask = 8;
 }

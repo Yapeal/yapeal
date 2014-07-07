@@ -28,6 +28,7 @@
  */
 namespace Yapeal\Database\Char;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
@@ -38,7 +39,6 @@ use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AccountBalance
@@ -51,6 +51,8 @@ class AccountBalance extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -132,6 +134,22 @@ class AccountBalance extends AbstractCommonEveApi
         }
     }
     /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        // TODO: Implement oneShot() method.
+    }
+    /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveCharacters()
@@ -163,6 +181,7 @@ class AccountBalance extends AbstractCommonEveApi
      * @param string                     $ownerID
      * @param DatabasePreserverInterface $preserver
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(

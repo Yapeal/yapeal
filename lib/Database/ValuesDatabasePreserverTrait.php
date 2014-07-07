@@ -28,6 +28,8 @@
  */
 namespace Yapeal\Database;
 
+use LogicException;
+use Psr\Log\LoggerInterface;
 use SimpleXMLIterator;
 
 /**
@@ -35,7 +37,6 @@ use SimpleXMLIterator;
  */
 trait ValuesDatabasePreserverTrait
 {
-    use DatabasePreserverTrait;
     /**
      * @param string $xml
      * @param array  $columnDefaults
@@ -71,4 +72,23 @@ trait ValuesDatabasePreserverTrait
             $tableName
         );
     }
+    /**
+     * @param string[] $columns
+     * @param string[] $columnNames
+     * @param string   $tableName
+     * @param int      $rowCount
+     *
+     * @return self
+     */
+    abstract protected function flush(
+        array $columns,
+        array $columnNames,
+        $tableName,
+        $rowCount = 1
+    );
+    /**
+     * @throws LogicException
+     * @return LoggerInterface
+     */
+    abstract protected function getLogger();
 }

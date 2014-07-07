@@ -32,6 +32,7 @@ use DOMDocument;
 use LogicException;
 use PDO;
 use PDOException;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -42,7 +43,8 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements EveApiDatabaseInterface
+abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
+    LoggerAwareInterface
 {
     use LoggerAwareTrait, EveApiToolsTrait;
     /**

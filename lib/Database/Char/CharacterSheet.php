@@ -197,8 +197,7 @@ class CharacterSheet extends AbstractCharSection
         $this->valuesPreserveData(
             $xml,
             $columnDefaults,
-            'charCharacterSheet',
-            '//attributes/*'
+            'charCharacterSheet'
         );
         return $this;
     }

@@ -37,8 +37,10 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use XSLTProcessor;
+use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class AbstractCommonEveApi
@@ -60,6 +62,90 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setCsq($csq);
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
+     *
+     * @throws LogicException
+     */
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * @var EveApiReadWriteInterface $data
+         */
+        $data->setEveApiSectionName(strtolower($this->getSectionName()))
+             ->setEveApiName($this->getApiName())
+             ->setEveApiXml();
+        if ($this->cacheNotExpired(
+            $this->getApiName(),
+            $this->getSectionName()
+        )
+        ) {
+            return;
+        }
+        if (!$this->oneShot($data, $retrievers, $preservers)) {
+            return;
+        }
+        $this->updateCachedUntil($data, $interval, '0');
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        if (!$this->gotApiLock($data)) {
+            return false;
+        }
+        $retrievers->retrieveEveApi($data);
+        if ($data->getEveApiXml() === false) {
+            $mess = sprintf(
+                'Could NOT retrieve Eve Api data for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->debug($mess);
+            return false;
+        }
+        $this->xsltTransform($data);
+        if ($this->isInvalid($data)) {
+            $mess = sprintf(
+                'Data retrieved is invalid for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            $data->setEveApiName('Invalid' . $this->getApiName());
+            $preservers->preserveEveApi($data);
+            return false;
+        }
+        $preservers->preserveEveApi($data);
+        $method = 'preserveTo' . $this->getApiName();
+        return $this->$method($data->getEveApiXml());
     }
     /**
      * @return string

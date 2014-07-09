@@ -28,28 +28,29 @@
  */
 namespace Yapeal\Database\Api;
 
+use LogicException;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\AttributesDatabasePreserver;
-use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class CallList
  */
 class CallList extends AbstractCommonEveApi
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -78,8 +79,26 @@ class CallList extends AbstractCommonEveApi
         ) {
             return;
         }
-        if (!$this->gotApiLock($data)) {
+        if (!$this->oneShot($data, $retrievers, $preservers)) {
             return;
+        }
+        $this->updateCachedUntil($data, $interval, '0');
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        if (!$this->gotApiLock($data)) {
+            return false;
         }
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -90,7 +109,7 @@ class CallList extends AbstractCommonEveApi
             );
             $this->getLogger()
                  ->debug($mess);
-            return;
+            return false;
         }
         $this->xsltTransform($data);
         if ($this->isInvalid($data)) {
@@ -103,39 +122,25 @@ class CallList extends AbstractCommonEveApi
                  ->warning($mess);
             $data->setEveApiName('Invalid' . $this->getApiName());
             $preservers->preserveEveApi($data);
-            return;
+            return false;
         }
         $preservers->preserveEveApi($data);
-        $preserver = new AttributesDatabasePreserver(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
-        );
-        $this->preserve($data->getEveApiXml(), $preserver);
-        $this->updateCachedUntil($data, $interval, '0');
+        return $this->preserve($data->getEveApiXml());
     }
     /**
-     * @param string                     $xml
-     * @param DatabasePreserverInterface $preserver
+     * @param string $xml
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
     protected function preserve(
-        $xml,
-        DatabasePreserverInterface $preserver = null
+        $xml
     ) {
-        if (is_null($preserver)) {
-            $preserver = new AttributesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserveToCallGroups($preserver, $xml);
-            $this->preserveToCalls($preserver, $xml);
+            $this->preserveToCallGroups($xml);
+            $this->preserveToCalls($xml);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -148,17 +153,17 @@ class CallList extends AbstractCommonEveApi
                  ->warning($mess, array('exception' => $exc));
             $this->getPdo()
                  ->rollBack();
+            return false;
         }
-        return $this;
+        return true;
     }
     /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
+     * @param string $xml
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserveToCallGroups(
-        DatabasePreserverInterface $preserver,
         $xml
     ) {
         $columnDefaults = array(
@@ -166,18 +171,28 @@ class CallList extends AbstractCommonEveApi
             'groupID' => null,
             'name' => null
         );
-        $preserver->setTableName('apiCallGroups')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml, '//callGroups/row');
+        $tableName = 'apiCallGroups';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//callGroups/row'
+        );
+        return $this;
     }
     /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
+     * @param string $xml
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserveToCalls(
-        DatabasePreserverInterface $preserver,
         $xml
     ) {
         $columnDefaults = array(
@@ -187,8 +202,19 @@ class CallList extends AbstractCommonEveApi
             'name' => null,
             'type' => null
         );
-        $preserver->setTableName('apiCalls')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml, '//calls/row');
+        $tableName = 'apiCalls';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//calls/row'
+        );
+        return $this;
     }
 }

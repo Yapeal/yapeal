@@ -29,98 +29,26 @@
  */
 namespace Yapeal\Database\Eve;
 
+use LogicException;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\AttributesDatabasePreserver;
-use Yapeal\Database\DatabasePreserverInterface;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class CallList
  */
 class ErrorList extends AbstractCommonEveApi
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->info(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        /**
-         * @var EveApiReadWriteInterface $data
-         */
-        $data->setEveApiSectionName(strtolower($this->getSectionName()))
-             ->setEveApiName($this->getApiName())
-             ->setEveApiXml();
-        if ($this->cacheNotExpired(
-            $this->getApiName(),
-            $this->getSectionName()
-        )
-        ) {
-            return;
-        }
-        if (!$this->gotApiLock($data)) {
-            return;
-        }
-        $retrievers->retrieveEveApi($data);
-        if ($data->getEveApiXml() === false) {
-            $mess = sprintf(
-                'Could NOT retrieve Eve Api data for %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->debug($mess);
-            return;
-        }
-        $this->xsltTransform($data);
-        if ($this->isInvalid($data)) {
-            $mess = sprintf(
-                'Data retrieved is invalid for %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess);
-            $data->setEveApiName('Invalid' . $this->getApiName());
-            $preservers->preserveEveApi($data);
-            return;
-        }
-        $preservers->preserveEveApi($data);
-        $preserver = new AttributesDatabasePreserver(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
-        );
-        $this->preserveToErrorList($preserver, $data->getEveApiXml());
-        $this->updateCachedUntil($data, $interval, '0');
-    }
-    /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
+     * @param string $xml
+     *
+     * @throws LogicException
+     * @return bool
      */
     protected function preserveToErrorList(
-        DatabasePreserverInterface $preserver,
         $xml
     ) {
         $columnDefaults = array(
@@ -137,9 +65,7 @@ class ErrorList extends AbstractCommonEveApi
                  ->beginTransaction();
             $this->getPdo()
                  ->exec($sql);
-            $preserver->setTableName($tableName)
-                      ->setColumnDefaults($columnDefaults)
-                      ->preserveData($xml);
+            $this->attributePreserveData($xml, $columnDefaults, $tableName);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -152,6 +78,8 @@ class ErrorList extends AbstractCommonEveApi
                  ->warning($mess, array('exception' => $exc));
             $this->getPdo()
                  ->rollBack();
+            return false;
         }
+        return true;
     }
 }

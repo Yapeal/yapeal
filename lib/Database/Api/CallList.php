@@ -48,46 +48,6 @@ class CallList extends AbstractCommonEveApi
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     *
-     * @throws LogicException
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->info(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        /**
-         * @var EveApiReadWriteInterface $data
-         */
-        $data->setEveApiSectionName(strtolower($this->getSectionName()))
-             ->setEveApiName($this->getApiName())
-             ->setEveApiXml();
-        if ($this->cacheNotExpired(
-            $this->getApiName(),
-            $this->getSectionName()
-        )
-        ) {
-            return;
-        }
-        if (!$this->oneShot($data, $retrievers, $preservers)) {
-            return;
-        }
-        $this->updateCachedUntil($data, $interval, '0');
-    }
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
      *
      * @throws LogicException
      * @return bool

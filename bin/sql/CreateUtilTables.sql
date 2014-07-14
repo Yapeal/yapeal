@@ -96,7 +96,7 @@ VALUES
     ('map', 'Jumps', 2, 3600, 1),
     ('map', 'Kills', 4, 3600, 1),
     ('map', 'Sovereignty', 8, 3600, 1),
-    ('server', 'ServerStatus', 1, 180, 1);
+    ('server', 'ServerStatus', 1, 300, 1);
 COMMIT;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (

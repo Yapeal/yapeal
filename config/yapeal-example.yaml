@@ -66,15 +66,15 @@ Yapeal:
         # http://www.php-fig.org/psr/psr-3/
         class: Monolog\Logger
 
-        # Directory where log file will be stored.
-        # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
-        # inside the directory where Yapeal was installed.
-        logDir: '{Yapeal.baseDir}log/'
-
         # Name of the log file to be used.
         # The default 'yapeal.log' will be found in the logDir.
         # For example: /where/installed/yapeal/log/yapeal.log
         fileName: yapeal.log
+
+        # Directory where log file will be stored.
+        # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
+        # inside the directory where Yapeal was installed.
+        logDir: '{Yapeal.baseDir}log/'
 
         # Threshold that should trigger logging.
         # Allowed values:
@@ -97,19 +97,29 @@ Yapeal:
 
         class: Monolog\ErrorHandler
 
+        # Same as the Yapeal.Log.fileName setting but for errors.
+        fileName: yapeal.log
+
         # See Yapeal.Log.logDir for full description as this setting is used in
         # the same way but for error level logging.
         logDir: '{Yapeal.baseDir}log/'
 
-        # Same as the Yapeal.Log.fileName setting but for errors.
-        fileName: yapeal.log
+        # (Optional) Defaults to another instance of Yapeal.Log.class
+        # loggerClass: Monolog\Logger
 
         # Threshold that should trigger logging.
         # See Yapeal.Log.threshold for allowed values.
-        # Recommended default for development ERROR or WARNING
-        # Recommended default for production ERROR or CRITICAL
+        # Recommended default is 1-2 levels above Yapeal.Log.threshold but
+        # capped no higher than 500(CRITICAL)
         threshold: 400
 
-        # (Optional) Defaults to another instance of Yapeal.Log.class
-        # loggerClass: Monolog\Logger
+    # Some network related settings mostly having to do with Eve API server
+    # connection.
+    Network:
+        # Which API server to connect to. Currently only live (Tranquility) and
+        # the test server (Singularity).
+        # Default for production: https://api.eveonline.com
+        # Default for test server: https://api.testeveonline.com
+        baseUrl: 'https://api.eveonline.com'
+
 ...

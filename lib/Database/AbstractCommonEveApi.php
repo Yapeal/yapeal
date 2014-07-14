@@ -90,6 +90,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
          */
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName())
+            ->setEveApiArguments(array())
              ->setEveApiXml();
         if ($this->cacheNotExpired(
             $this->getApiName(),
@@ -262,6 +263,61 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         }
     }
     /**
+     * @param EveApiReadWriteInterface $data
+     * @param int                      $interval
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function isEveApiXmlError(
+        EveApiReadWriteInterface &$data,
+        &$interval
+    ) {
+        if (strpos($data->getEveApiXml(), '<error') === false) {
+            return false;
+        }
+        $simple = new SimpleXMLElement($data->getEveApiXml());
+        if (!isset($simple->error)) {
+            return false;
+        }
+        $code = (int)$simple->error['code'];
+        $mess = sprintf(
+            'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',
+            strtolower($this->getSectionName()),
+            $this->getApiName(),
+            $code,
+            (string)$simple->error
+        );
+        if (strpos($mess, 'retry after') !== false) {
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = strtotime(substr($mess, -19) . '+00:00') - time();
+        } elseif ($code < 200) {
+            $this->getLogger()
+                 ->warning($mess);
+        } elseif ($code > 199 && $code < 300) { // API key errors.
+            $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
+            $this->getLogger()
+                 ->error($mess);
+            $interval = 86400;
+        } elseif ($code > 500 && $code < 903) { // API server internal errors.
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = 300;
+        } elseif ($code > 903
+            && $code < 905
+        ) { // Major application or Yapeal error.
+            $this->getLogger()
+                 ->alert($mess);
+            $interval = 86400;
+        } else {
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = 300;
+        }
+        return true;
+    }
+    /**
      * @param EveApiReadInterface $data
      *
      * @throws LogicException
@@ -308,6 +364,9 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $sql = $this->getCsq()
                     ->getUtilCachedUntilUpsert();
         $pdo = $this->getPdo();
+        if (!isset($simple->currentTime)) {
+            return;
+        }
         $dateTime = gmdate(
             'Y-m-d H:i:s',
             strtotime($simple->currentTime . '+00:00') + $interval

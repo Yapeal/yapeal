@@ -138,15 +138,6 @@ SQL;
         );
     }
     /**
-     * @param string $hash
-     *
-     * @return string
-     */
-    public function getApiLock($hash)
-    {
-        return sprintf('select get_lock(\'%1$s\',5)', $hash);
-    }
-    /**
      * @param int $mask
      *
      * @return string
@@ -175,6 +166,15 @@ SQL;
             $this->tablePrefix,
             $mask
         );
+    }
+    /**
+     * @param string $hash
+     *
+     * @return string
+     */
+    public function getApiLock($hash)
+    {
+        return sprintf('select get_lock(\'%1$s\',5)', $hash);
     }
     /**
      * @param string $tableName

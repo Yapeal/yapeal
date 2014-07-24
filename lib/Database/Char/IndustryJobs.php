@@ -28,8 +28,12 @@
  */
 namespace Yapeal\Database\Char;
 
+use LogicException;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class IndustryJobs
@@ -37,6 +41,66 @@ use Yapeal\Database\EveApiNameTrait;
 class IndustryJobs extends AbstractCharSection
 {
     use EveApiNameTrait, AttributesDatabasePreserverTrait;
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
+     *
+     * @throws LogicException
+     */
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    ) {
+        $this->getLogger()
+             ->debug(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * Update Industry Jobs History
+         */
+        $class =
+            new IndustryJobsHistory(
+                $this->getPdo(), $this->getLogger(), $this->getCsq()
+            );
+        $class->autoMagic(
+            $data,
+            $retrievers,
+            $preservers,
+            $interval
+        );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
+        }
+        foreach ($active as $char) {
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
+            }
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            if (!$this->oneShot($data, $retrievers, $preservers)) {
+                continue;
+            }
+            $this->updateCachedUntil($data, $interval, $char['characterID']);
+        }
+    }
     /**
      * @param string $xml
      * @param string $ownerID

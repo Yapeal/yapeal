@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpGeneralSettings" (
 )
     ENGINE =InnoDB;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpIndustryJobs";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charIndustryJobs" (
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
     "activityID"           TINYINT(2) UNSIGNED NOT NULL,
     "blueprintID"          BIGINT(20) UNSIGNED NOT NULL,

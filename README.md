@@ -1,29 +1,23 @@
-# YAPEAL (Yet Another PHP Eve Api Library) #
+YAPEAL (Yet Another PHP Eve Api Library)
+========================================
 
-For manual installation instructions from archives (zip, tar.bz2) or
-[Mercurial][1] see the [INSTALL.md][2] file.
+Master: [![Build Status](https://travis-ci.org/Dragonrun1/yapeal.svg?branch=master)](https://travis-ci.org/Dragonrun1/yapeal)
+1.1.x-WIP: [![Build Status](https://travis-ci.org/Dragonrun1/yapeal.svg?branch=1.1.x-WIP)](https://travis-ci.org/Dragonrun1/yapeal)
 
-For more information on configuring, setup, or troubleshooting Yapeal check out
-the project Wiki at <http://sourceforge.net/p/yapeal/wiki/Home/> especially the
-new starter guide at <http://sourceforge.net/p/yapeal/wiki/StarterGuide/>. In
-the starter guide you should find a lot of information to help you with getting
-started using Yapeal. Another resource is the Yapeal thread on Eve Online forums
-which you'll find at
-<http://forums.eveonline.com/default.aspx?g=posts&t=7540>.
+Master: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg?branch=master)](https://coveralls.io/r/Dragonrun1/yapeal?branch=master)
+1.1.x-WIP: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg?branch=1.1.x-WIP)](https://coveralls.io/r/Dragonrun1/yapeal?branch=1.1.x-WIP)
 
-For documentation on the internal works of the library check out the files in
-<http://sourceforge.net/projects/yapeal/files/docs/>
+## Installing
+
+Installation instructions can be found in [INSTALL.md](INSTALL.md) and
+configuration instructions in [CONFIG.md](CONFIG.md).
 
 For additional information about any changes see the commit messages in the
-repository and the [CHANGELOG.md][3] file.
+repository.
 
-Licensing requirements can be found in [COPYING.md][4] and
-[COPYING-LESSER.md][5].
+## Licensing
+
+Licensing information can be found in [COPYING.md](COPYING.md) and
+[COPYING-LESSER.md](COPYING-LESSER.md).
 
 Thanks for using Yapeal, Dragonaire
-
-[1]: http://mercurial.selenic.com/ "Mercurial"
-[2]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/INSTALL.md "INSTALL.md"
-[3]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/CHANGELOG.md "CHANGELOG.md"
-[4]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING.md "COPY.md"
-[5]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING-LESSER.md "COPY-LESSER.md"

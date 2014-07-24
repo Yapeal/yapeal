@@ -1,0 +1,125 @@
+---
+Yapeal:
+    # Settings in the 'Database' section will normal be the only ones that need
+    # changed by most users.
+    Database:
+        class: \PDO
+
+        # Name of the database (schema) Yapeal will use for tables.
+        # Note that the database user will need create and drop access to this
+        # database and it's tables during install.
+        # default 'yapeal'
+        database: yapeal
+
+        # Host name of computer where database server is.
+        # Should never need to be changed from default of 'localhost' except if
+        # the system Yapeal is running on is different from that of the database.
+        hostName: localhost
+
+        # Password for the user used to connect with database.
+        # The default of 'secret' should be changed in production (Internet
+        # accessible) systems.
+        password: secret
+
+        # Platform of the database server being used.
+        # Cuurently Yapeal only supports using the default 'mysql' but future
+        # versions may allow additional platforms.
+        platform: mysql
+
+        # Port to use for a remote database connection.
+        # (Optional) Only needed if using http connection.
+        # port: ''
+
+        # Prefix to add to all database table names.
+        # This default to an empty string and will have no effect on the table
+        # names in Yapeal.
+        # This setting is mostly used when you want or need to share a single
+        # database between Yapeal and rest of your application.
+        tablePrefix: ''
+
+        # User name used to access the database.
+        # The default of 'YapealUser' should be changed in production (Internet
+        # accessible) systems.
+        # This user will need create and drop access to both the database and
+        # it's tables during install. After the database and tables are created
+        # the user will only need normal insert, update, delete, and select
+        # access to the tables.
+        userName: YapealUser
+
+    # Care should be taken when making changes to the 'Log' section as mistakes
+    # here could cause Yapeal not to run correctly and also have no way to
+    # let the user know.
+    Log:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        # The default of 25 seems to work well and should not be changed.
+        bufferSize: 25
+
+        # See Monolog at https://github.com/Seldaek/monolog for more details
+        # about how this setting is used.
+        channel: yapeal
+
+        # Yapeal by default uses Monolog but it can be changed to use any logger
+        # that follows PSR-3. YOu can find more information about PSR-3 at
+        # http://www.php-fig.org/psr/psr-3/
+        class: Monolog\Logger
+
+        # Name of the log file to be used.
+        # The default 'yapeal.log' will be found in the logDir.
+        # For example: /where/installed/yapeal/log/yapeal.log
+        fileName: yapeal.log
+
+        # Directory where log file will be stored.
+        # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
+        # inside the directory where Yapeal was installed.
+        logDir: '{Yapeal.baseDir}log/'
+
+        # Threshold that should trigger logging.
+        # Allowed values:
+        # 100(DEBUG), 200(INFO), 250(NOTICE), 300(WARNING), 400(ERROR),
+        # 500(CRITICAL), 550(ALERT), 600(EMERGENCY)
+        # Recommended default for development NOTICE or INFO
+        # Recommended default for production WARNING or ERROR
+        threshold: 300
+
+    # Changes to all settings in the 'Error' section should only be done if
+    # directed to by a developer for debugging. Incorrect changes to these
+    # settings could prevent fatal programming errors from being logged.
+    Error:
+        # See Yapeal.Log.bufferSize for full description as this setting is used
+        # in the same way but for error level logging.
+        bufferSize: 25
+
+        # See Yapeal.Log.channel for more information.
+        channel: php
+
+        class: Monolog\ErrorHandler
+
+        # Same as the Yapeal.Log.fileName setting but for errors.
+        fileName: yapeal.log
+
+        # See Yapeal.Log.logDir for full description as this setting is used in
+        # the same way but for error level logging.
+        logDir: '{Yapeal.baseDir}log/'
+
+        # (Optional) Defaults to another instance of Yapeal.Log.class
+        # loggerClass: Monolog\Logger
+
+        # Threshold that should trigger logging.
+        # See Yapeal.Log.threshold for allowed values.
+        # Recommended default is 1-2 levels above Yapeal.Log.threshold but
+        # capped no higher than 500(CRITICAL)
+        threshold: 400
+
+    # Some network related settings mostly having to do with Eve API server
+    # connection.
+    Network:
+        # Which API server to connect to. Currently only live (Tranquility) and
+        # the test server (Singularity).
+        # Default for production: https://api.eveonline.com
+        # Default for test server: https://api.testeveonline.com
+        baseUrl: 'https://api.eveonline.com'
+
+...

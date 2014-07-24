@@ -146,16 +146,6 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
-    /**
      * @throws LogicException
      * @return array
      */
@@ -182,6 +172,39 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
     protected function getMask()
     {
         return $this->mask;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function preserve(
+        $xml,
+        $ownerID
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
     }
     /**
      * @var int $mask

@@ -124,13 +124,12 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $arguments = $data->getEveApiArguments();
         if ($this->getSectionName() == 'Char') {
-            $ownerID = $arguments['characterID'];
+            $ownerID = $data->getEveApiArgument('characterID');
         } else {
-            $ownerID = $arguments['corporationID'];
+            $ownerID = $data->getEveApiArgument('corporationID');
         }
-        $accountKey = $arguments['accountKey'];
+        $accountKey = $data->getEveApiArgument('accountKey');
         /**
          * @var EveApiReadWriteInterface $data
          */
@@ -170,18 +169,6 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         );
         return true;
     }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param int    $accountKey
-     *
-     * @return self
-     */
-    abstract protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey
-    );
     /**
      * @throws \LogicException
      * @return array
@@ -237,18 +224,59 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return $this->mask;
     }
     /**
+     * @throws LogicException
      * @return int
      */
     protected function getMaxKeyRange()
     {
+        if (is_null($this->maxKeyRange)) {
+            $mess = 'Tried to use max key range when it was NOT set';
+            throw new LogicException($mess);
+        }
         return $this->maxKeyRange;
     }
     /**
-     * @var int
+     * @param string $xml
+     * @param string $ownerID
+     * @param string $accountKey
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function preserve(
+        $xml,
+        $ownerID,
+        $accountKey
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID, $accountKey);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s on account %4$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID,
+                $accountKey
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @var int $mask
      */
     protected $mask;
     /**
-     * @var int
+     * @var int $maxKeyRange
      */
     protected $maxKeyRange;
 }

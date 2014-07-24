@@ -17,7 +17,7 @@ If you are using Composer in your own project then add require line for Yapeal
 to your `composer.json` file like any other package:
 
 ```
-require: "yapeal/yapeal": "dev-1.1.x-WIP"
+require: "yapeal/yapeal": "master"
 ```
 
 And do an update in Composer on command line:

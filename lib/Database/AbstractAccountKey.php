@@ -35,7 +35,6 @@ use PDOException;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractAccountKey
@@ -50,6 +49,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -112,6 +113,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -122,15 +124,14 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $arguments = $data->getEveApiArguments();
         if ($this->getSectionName() == 'Char') {
-            $ownerID = $arguments['characterID'];
+            $ownerID = $data->getEveApiArgument('characterID');
         } else {
-            $ownerID = $arguments['corporationID'];
+            $ownerID = $data->getEveApiArgument('corporationID');
         }
-        $accountKey = $arguments['accountKey'];
+        $accountKey = $data->getEveApiArgument('accountKey');
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -169,19 +170,13 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @var int
-     */
-    protected $mask;
-    /**
-     * @var int
-     */
-    protected $maxKeyRange;
-    /**
+     * @throws \LogicException
      * @return array
      */
     protected function getActiveCharacters()
     {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCharacters($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {
@@ -196,11 +191,13 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         }
     }
     /**
+     * @throws \LogicException
      * @return array
      */
     protected function getActiveCorporations()
     {
-        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCorporations($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {
@@ -227,22 +224,59 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return $this->mask;
     }
     /**
+     * @throws LogicException
      * @return int
      */
     protected function getMaxKeyRange()
     {
+        if (is_null($this->maxKeyRange)) {
+            $mess = 'Tried to use max key range when it was NOT set';
+            throw new LogicException($mess);
+        }
         return $this->maxKeyRange;
     }
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param int    $accountKey
+     * @param string $accountKey
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
-    abstract protected function preserve(
+    protected function preserve(
         $xml,
         $ownerID,
         $accountKey
-    );
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID, $accountKey);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s on account %4$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID,
+                $accountKey
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @var int $mask
+     */
+    protected $mask;
+    /**
+     * @var int $maxKeyRange
+     */
+    protected $maxKeyRange;
 }

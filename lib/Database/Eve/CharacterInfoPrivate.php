@@ -31,16 +31,21 @@ namespace Yapeal\Database\Eve;
 
 use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
+use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class CharacterInfoPrivate
  */
 class CharacterInfoPrivate extends AbstractCharSection
 {
+    use EveSectionNameTrait;
     /**
-     * @var int $mask
+     * @return string
      */
-    protected $mask = 16777216;
+    protected function getApiName()
+    {
+        return 'CharacterInfo';
+    }
     /**
      * @param string $xml
      * @param string $ownerID
@@ -129,20 +134,7 @@ class CharacterInfoPrivate extends AbstractCharSection
         return $this;
     }
     /**
-     * @return string
+     * @var int $mask
      */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'CharacterInfo';
-    }
+    protected $mask = 16777216;
 }

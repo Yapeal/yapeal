@@ -89,10 +89,11 @@ class Yapeal implements WiringInterface
             $logger->error($mess, array('exception' => $exc));
             return 1;
         }
+        $data = new EveApiXmlData();
         // Always check APIKeyInfo.
         $class = new APIKeyInfo($pdo, $logger, $csq);
         $class->autoMagic(
-            new EveApiXmlData(),
+            $data,
             $dic['Yapeal.Xml.Retriever'],
             $dic['Yapeal.Xml.Preserver'],
             300
@@ -116,7 +117,7 @@ class Yapeal implements WiringInterface
              */
             $class = new $className($pdo, $logger, $csq);
             $class->autoMagic(
-                new EveApiXmlData(),
+                $data,
                 $dic['Yapeal.Xml.Retriever'],
                 $dic['Yapeal.Xml.Preserver'],
                 (int)$record['interval']

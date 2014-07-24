@@ -29,12 +29,12 @@
  */
 namespace Yapeal\Database\Server;
 
+use LogicException;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\Database\ValuesDatabasePreserverTrait;
 
 /**
  * Class ServerStatus
@@ -42,123 +42,35 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 class ServerStatus extends AbstractCommonEveApi
 {
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        $data->setEveApiSectionName(strtolower($this->getSectionName()))
-             ->setEveApiName($this->getApiName());
-        if ($this->cacheNotExpired(
-            $this->getApiName(),
-            $this->getSectionName(),
-            0
-        )
-        ) {
-            return;
-        }
-        $data->setEveApiXml();
-        if (!$this->oneShot($data, $retrievers, $preservers)) {
-            return;
-        }
-        $this->updateCachedUntil($data, $interval, 0);
-    }
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     *
-     * @return bool
-     */
-    public function oneShot(
-        EveApiReadWriteInterface &$data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
-    ) {
-        if (!$this->gotApiLock($data)) {
-            return false;
-        }
-        /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
-         */
-        $retrievers->retrieveEveApi($data);
-        if ($data->getEveApiXml() === false) {
-            $mess = sprintf(
-                'Could NOT retrieve Eve Api data for %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->notice($mess);
-            return false;
-        }
-        $this->xsltTransform($data);
-        if ($this->isInvalid($data)) {
-            $mess = sprintf(
-                'Data retrieved is invalid for %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess);
-            $data->setEveApiName('Invalid' . $this->getApiName());
-            $preservers->preserveEveApi($data);
-            return false;
-        }
-        $preservers->preserveEveApi($data);
-        $this->preserve(
-            $data->getEveApiXml()
-        );
-        return true;
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
+    use EveApiNameTrait, EveSectionNameTrait, ValuesDatabasePreserverTrait;
     /**
      * @param string $xml
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
-    protected function preserve(
+    protected function preserveToServerStatus(
         $xml
     ) {
+        $columnDefaults = array(
+            'serverName' => 'Tranquility',
+            'serverOpen' => null,
+            'onlinePlayers' => null
+        );
+        $tableName = 'serverServerStatus';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserverToServerStatus(
-                $xml
+            $this->getPdo()
+                 ->exec($sql);
+            $this->valuesPreserveData(
+                $xml,
+                $columnDefaults,
+                'serverServerStatus'
             );
             $this->getPdo()
                  ->commit();
@@ -172,26 +84,8 @@ class ServerStatus extends AbstractCommonEveApi
                  ->warning($mess, array('exception' => $exc));
             $this->getPdo()
                  ->rollBack();
+            return false;
         }
-        return $this;
-    }
-    /**
-     * @param string $xml
-     *
-     * @return self
-     */
-    protected function preserverToServerStatus(
-        $xml
-    ) {
-        $columnDefaults = array(
-            'serverName' => 'Tranquility',
-            'serverOpen' => null,
-            'onlinePlayers' => null
-        );
-        $this->getValuesDatabasePreserver()
-             ->setTableName('serverServerStatus')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
-        return $this;
+        return true;
     }
 }

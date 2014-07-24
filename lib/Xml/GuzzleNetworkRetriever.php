@@ -61,11 +61,11 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
     }
     /**
-     * @param EveApiXmlModifyInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface &$data)
+    public function retrieveEveApi(EveApiReadWriteInterface &$data)
     {
         $mess = sprintf(
             'Started network retrieve for %1$s/%2$s',

@@ -28,197 +28,23 @@
  */
 namespace Yapeal\Database\Char;
 
-use PDO;
-use PDOException;
-use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\AttributesDatabasePreserver;
-use Yapeal\Database\DatabasePreserverInterface;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class Notifications
  */
-class Notifications extends AbstractCommonEveApi
+class Notifications extends AbstractCharSection
 {
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->info(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        $active = $this->getActiveCharacters();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active characters found');
-            return;
-        }
-        foreach ($active as $char) {
-            /**
-             * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
-             */
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $char['characterID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($char)
-                 ->setEveApiXml();
-            if (!$this->gotApiLock($data)) {
-                continue;
-            }
-            $retrievers->retrieveEveApi($data);
-            if ($data->getEveApiXml() === false) {
-                $mess = sprintf(
-                    'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $char['characterID']
-                );
-                $this->getLogger()
-                     ->debug($mess);
-                continue;
-            }
-            $this->xsltTransform($data);
-            if ($this->isInvalid($data)) {
-                $mess = sprintf(
-                    'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
-                    strtolower($this->getSectionName()),
-                    $this->getApiName(),
-                    $char['characterID']
-                );
-                $this->getLogger()
-                     ->warning($mess);
-                $data->setEveApiName('Invalid' . $this->getApiName());
-                $preservers->preserveEveApi($data);
-                continue;
-            }
-            $preservers->preserveEveApi($data);
-            $this->preserve(
-                $data->getEveApiXml(),
-                $char['characterID']
-            );
-            $this->updateCachedUntil($data, $interval, $char['characterID']);
-        }
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveCharacters()
-    {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @param string                     $xml
-     * @param string                     $ownerID
-     * @param DatabasePreserverInterface $preserver
+     * @param string $xml
+     * @param string $ownerID
      *
      * @return self
      */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        DatabasePreserverInterface $preserver = null
-    ) {
-        if (is_null($preserver)) {
-            $preserver = new AttributesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToNotifications($preserver, $xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
-                $ownerID
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
-    /**
-     * @param DatabasePreserverInterface $preserver
-     * @param string                     $xml
-     * @param string                     $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToNotifications(
-        DatabasePreserverInterface $preserver,
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToNotifications($xml, $ownerID)
+    {
         $columnDefaults = array(
             'ownerID' => $ownerID,
             'notificationID' => null,
@@ -228,13 +54,15 @@ class Notifications extends AbstractCommonEveApi
             'sentDate' => null,
             'read' => null
         );
-        $preserver->setTableName('charNotifications')
-                  ->setColumnDefaults($columnDefaults)
-                  ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'charNotifications'
+        );
         return $this;
     }
     /**
      * @var int $mask
      */
-    private $mask = 16384;
+    protected $mask = 16384;
 }

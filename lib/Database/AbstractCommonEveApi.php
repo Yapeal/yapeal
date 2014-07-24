@@ -29,8 +29,10 @@
 namespace Yapeal\Database;
 
 use DOMDocument;
+use LogicException;
 use PDO;
 use PDOException;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -39,14 +41,14 @@ use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi
+abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
+    LoggerAwareInterface
 {
-    use LoggerAwareTrait
+    use LoggerAwareTrait, EveApiToolsTrait;
     /**
      * @param PDO              $pdo
      * @param LoggerInterface  $logger
@@ -66,87 +68,100 @@ abstract class AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
-    abstract public function autoMagic(
+    public function autoMagic(
         EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    );
-    /**
-     * @param CommonSqlQueries $value
-     *
-     * @return self
-     */
-    public function setCsq($value)
-    {
-        $this->csq = $value;
-        return $this;
+    ) {
+        $this->getLogger()
+             ->info(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * @var EveApiReadWriteInterface $data
+         */
+        $data->setEveApiSectionName(strtolower($this->getSectionName()))
+             ->setEveApiName($this->getApiName())
+            ->setEveApiArguments(array())
+             ->setEveApiXml();
+        if ($this->cacheNotExpired(
+            $this->getApiName(),
+            $this->getSectionName()
+        )
+        ) {
+            return;
+        }
+        if (!$this->oneShot($data, $retrievers, $preservers)) {
+            return;
+        }
+        $this->updateCachedUntil($data, $interval, '0');
     }
     /**
-     * @param PDO $value
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
-    public function setPdo(PDO $value)
-    {
-        $this->pdo = $value;
-        return $this;
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        if (!$this->gotApiLock($data)) {
+            return false;
+        }
+        $retrievers->retrieveEveApi($data);
+        if ($data->getEveApiXml() === false) {
+            $mess = sprintf(
+                'Could NOT retrieve Eve Api data for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->debug($mess);
+            return false;
+        }
+        $this->xsltTransform($data);
+        if ($this->isInvalid($data)) {
+            $mess = sprintf(
+                'Data retrieved is invalid for %1$s/%2$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName()
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            $data->setEveApiName('Invalid' . $this->getApiName());
+            $preservers->preserveEveApi($data);
+            return false;
+        }
+        $preservers->preserveEveApi($data);
+        $method = 'preserveTo' . $this->getApiName();
+        return $this->$method($data->getEveApiXml());
     }
     /**
-     * @var string
+     * @return string
      */
-    protected $apiName;
+    abstract protected function getApiName();
     /**
-     * @var CommonSqlQueries
+     * @return string
      */
-    protected $csq;
-    /**
-     * @var PDO
-     */
-    protected $pdo;
-    /**
-     * @var string
-     */
-    protected $sectionName;
-    /**
-     * @var string
-     */
-    protected $xsl = <<<'XSL'
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
+    abstract protected function getSectionName();
     /**
      * @param string $apiName
      * @param string $sectionName
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return bool
      */
     protected function cacheNotExpired($apiName, $sectionName, $ownerID = '0')
@@ -183,10 +198,7 @@ XSL;
         return true;
     }
     /**
-     * @return string
-     */
-    abstract protected function getApiName();
-    /**
+     * @throws LogicException
      * @return DatabasePreserverInterface
      */
     protected function getAttributesDatabasePreserver()
@@ -202,31 +214,7 @@ XSL;
         return $this->attributesDatabasePreserver;
     }
     /**
-     * @return CommonSqlQueries
-     */
-    protected function getCsq()
-    {
-        return $this->csq;
-    }
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-    /**
-     * @return PDO
-     */
-    protected function getPdo()
-    {
-        return $this->pdo;
-    }
-    /**
-     * @return string
-     */
-    abstract protected function getSectionName();
-    /**
+     * @throws LogicException
      * @return DatabasePreserverInterface
      */
     protected function getValuesDatabasePreserver()
@@ -250,6 +238,7 @@ XSL;
     /**
      * @param EveApiReadInterface $data
      *
+     * @throws LogicException
      * @return bool
      */
     protected function gotApiLock(EveApiReadInterface &$data)
@@ -274,8 +263,64 @@ XSL;
         }
     }
     /**
+     * @param EveApiReadWriteInterface $data
+     * @param int                      $interval
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function isEveApiXmlError(
+        EveApiReadWriteInterface &$data,
+        &$interval
+    ) {
+        if (strpos($data->getEveApiXml(), '<error') === false) {
+            return false;
+        }
+        $simple = new SimpleXMLElement($data->getEveApiXml());
+        if (!isset($simple->error)) {
+            return false;
+        }
+        $code = (int)$simple->error['code'];
+        $mess = sprintf(
+            'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',
+            strtolower($this->getSectionName()),
+            $this->getApiName(),
+            $code,
+            (string)$simple->error
+        );
+        if (strpos($mess, 'retry after') !== false) {
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = strtotime(substr($mess, -19) . '+00:00') - time();
+        } elseif ($code < 200) {
+            $this->getLogger()
+                 ->warning($mess);
+        } elseif ($code > 199 && $code < 300) { // API key errors.
+            $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
+            $this->getLogger()
+                 ->error($mess);
+            $interval = 86400;
+        } elseif ($code > 500 && $code < 903) { // API server internal errors.
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = 300;
+        } elseif ($code > 903
+            && $code < 905
+        ) { // Major application or Yapeal error.
+            $this->getLogger()
+                 ->alert($mess);
+            $interval = 86400;
+        } else {
+            $this->getLogger()
+                 ->warning($mess);
+            $interval = 300;
+        }
+        return true;
+    }
+    /**
      * @param EveApiReadInterface $data
      *
+     * @throws LogicException
      * @return bool
      */
     protected function isInvalid(EveApiReadInterface &$data)
@@ -307,6 +352,8 @@ XSL;
      * @param EveApiReadInterface $data
      * @param int                 $interval
      * @param string              $ownerID
+     *
+     * @throws LogicException
      */
     protected function updateCachedUntil(
         EveApiReadInterface $data,
@@ -317,6 +364,9 @@ XSL;
         $sql = $this->getCsq()
                     ->getUtilCachedUntilUpsert();
         $pdo = $this->getPdo();
+        if (!isset($simple->currentTime)) {
+            return;
+        }
         $dateTime = gmdate(
             'Y-m-d H:i:s',
             strtotime($simple->currentTime . '+00:00') + $interval
@@ -337,11 +387,11 @@ XSL;
         }
     }
     /**
-     * @param EveApiXmlModifyInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @return self
      */
-    protected function xsltTransform(EveApiXmlModifyInterface &$data)
+    protected function xsltTransform(EveApiReadWriteInterface &$data)
     {
         $xslt = new XSLTProcessor();
         $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
@@ -350,6 +400,39 @@ XSL;
         );
         return $this;
     }
+    /**
+     * @var string
+     */
+    protected $xsl = <<<'XSL'
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
     /**
      * @var DatabasePreserverInterface $attributesDatabasePreserver
      */

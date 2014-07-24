@@ -29,58 +29,21 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
+use LogicException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class StarbaseList
  */
 class StarbaseList extends AbstractCorpSection
 {
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
      *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToStarbaseList($xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @internal param int $key
-     *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToStarbaseList(
@@ -98,10 +61,14 @@ class StarbaseList extends AbstractCorpSection
             'onlineTimestamp' => null,
             'standingOwnerID' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpStarbaseList')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $tableName = 'corpStarbaseList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData($xml, $columnDefaults, $tableName);
         return $this;
     }
     /**

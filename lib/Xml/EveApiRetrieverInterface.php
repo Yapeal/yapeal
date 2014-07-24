@@ -35,9 +35,9 @@ namespace Yapeal\Xml;
 interface EveApiRetrieverInterface
 {
     /**
-     * @param EveApiXmlModifyInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface &$data);
+    public function retrieveEveApi(EveApiReadWriteInterface &$data);
 }

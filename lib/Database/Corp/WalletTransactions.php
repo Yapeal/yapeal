@@ -29,77 +29,17 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
 use Yapeal\Database\AbstractAccountKey;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class WalletTransactions
  */
 class WalletTransactions extends AbstractAccountKey
 {
-    /**
-     * @var int $mask
-     */
-    protected $mask = 2097152;
-    /**
-     * @var int
-     */
-    protected $maxKeyRange = 1006;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param string $accountKey
-     *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey = null
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToWalletTransactions(
-                 $xml,
-                     $ownerID,
-                     $accountKey
-            );
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -130,10 +70,19 @@ class WalletTransactions extends AbstractAccountKey
             'typeID' => null,
             'typeName' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('charWalletTransactions')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpWalletTransactions'
+        );
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 2097152;
+    /**
+     * @var int $maxKeyRange
+     */
+    protected $maxKeyRange = 1006;
 }

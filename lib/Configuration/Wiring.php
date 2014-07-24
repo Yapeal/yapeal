@@ -200,7 +200,8 @@ class Wiring
             'Yapeal.Log.channel' => 'yapeal',
             'Yapeal.Log.logDir' => $this->dic['Yapeal.baseDir'] . 'log/',
             'Yapeal.Log.fileName' => 'yapeal.log',
-            'Yapeal.Log.threshold' => 300
+            'Yapeal.Log.threshold' => 300,
+            'Yapeal.Network.baseUrl' => 'https://api.eveonline.com'
         );
         foreach ($defaults as $setting => $default) {
             if (empty($this->dic[$setting])) {
@@ -264,7 +265,7 @@ class Wiring
                 $logger,
                 array(),
                 $dic['Yapeal.Error.threshold'],
-                false
+                $dic['Yapeal.Error.threshold']
             );
             return $error;
         };
@@ -357,7 +358,7 @@ class Wiring
                 new GuzzleNetworkRetriever(
                     $dic['Yapeal.Log.Logger'],
                     new Client(
-                        'https://api.eveonline.com',
+                        $dic['Yapeal.Network.baseUrl'],
                         array('defaults' => $defaults)
                     )
                 )

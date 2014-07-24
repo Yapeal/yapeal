@@ -28,24 +28,28 @@
  */
 namespace Yapeal\Database\Account;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractAccountSection
  */
 abstract class AbstractAccountSection extends AbstractCommonEveApi
 {
+    use EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -91,6 +95,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -104,7 +109,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         $keyID = $data->getEveApiArguments();
         $keyID = $keyID['keyID'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -140,6 +145,17 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         return true;
     }
     /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
+     */
+    abstract protected function preserve(
+        $xml,
+        $ownerID
+    );
+    /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveKeys()
@@ -159,24 +175,4 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
             return array();
         }
     }
-    /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
 }

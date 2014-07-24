@@ -64,11 +64,11 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         }
     }
     /**
-     * @param EveApiXmlModifyInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiXmlModifyInterface &$data)
+    public function retrieveEveApi(EveApiReadWriteInterface &$data)
     {
         $mess = sprintf(
             'Started filesystem retrieve for %1$s/%2$s',
@@ -134,18 +134,6 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         $this->logger = $logger;
         return $this;
     }
-    /**
-     * @var string
-     */
-    protected $cachePath;
-    /**
-     * @var resource|false File handle
-     */
-    protected $handle;
-    /**
-     * @type LoggerInterface
-     */
-    protected $logger;
     /**
      * @param $cacheFile
      *
@@ -242,12 +230,9 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         $absoluteRequired = true;
         $cachePath = $this->cachePath . '/' . $sectionName;
         $path = str_replace('\\', '/', $cachePath);
-        // Optional wrapper(s).
-        $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
-        // Optional root prefix.
-        $regExp .= '(?<root>(?:[[:alpha:]]:/|/)?)';
-        // Actual path.
-        $regExp .= '(?<path>(?:[[:print:]]*))$%';
+        // Optional wrapper(s), Optional root prefix, Actual path.
+        $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)'
+            . '(?<root>(?:[[:alpha:]]:/|/)?)' . '(?<path>(?:[[:print:]]*))$%';
         $parts = array();
         preg_match($regExp, $path, $parts);
         $wrappers = $parts['wrappers'];
@@ -277,7 +262,8 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     {
         try {
             $simple = new SimpleXMLElement($xml);
-            if (strtotime($simple->currentTime . '+00:00') <= time()) {
+            // At minimum use cached XML for 5 minutes (300 secs).
+            if (strtotime($simple->currentTime . '+00:00') + 300 <= time()) {
                 $this->getLogger()
                      ->debug('Cached XML has expired');
                 return true;
@@ -340,4 +326,16 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         }
         return $xml;
     }
+    /**
+     * @var string
+     */
+    protected $cachePath;
+    /**
+     * @var resource|false File handle
+     */
+    protected $handle;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
 }

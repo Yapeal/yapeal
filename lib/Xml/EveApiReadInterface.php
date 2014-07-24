@@ -37,6 +37,13 @@ interface EveApiReadInterface
      * @return string
      */
     public function __toString();
+
+    /**
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public function getEveApiArgument($name);
     /**
      * @return string[]
      */

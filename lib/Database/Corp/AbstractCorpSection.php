@@ -29,24 +29,28 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCorpSection
  */
 abstract class AbstractCorpSection extends AbstractCommonEveApi
 {
+    use EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -92,6 +96,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -105,7 +110,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -141,15 +146,13 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         return true;
     }
     /**
-     * @var int $mask
-     */
-    protected $mask;
-    /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveCorporations()
     {
-        $sql = $this->csq->getActiveRegisteredCorporations($this->getMask());
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCorporations($this->getMask());
         $this->getLogger()
              ->debug($sql);
         try {
@@ -171,23 +174,40 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         return $this->mask;
     }
     /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
      * @param string $xml
      * @param string $ownerID
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
-    abstract protected function preserve(
+    protected function preserve(
         $xml,
         $ownerID
-    );
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @var int $mask
+     */
+    protected $mask;
 }

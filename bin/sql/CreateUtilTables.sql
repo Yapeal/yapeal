@@ -37,6 +37,7 @@ VALUES
     ('char', 'Contracts', 67108864, 900, 1),
     ('char', 'FacWarStats', 64, 3600, 1),
     ('char', 'IndustryJobs', 128, 900, 1),
+    ('char', 'IndustryJobsHistory', 128, 21600, 1),
     ('char', 'KillMails', 256, 1800, 1),
     ('char', 'Locations', 134217728, 3600, 1),
     ('char', 'MailBodies', 512, 1800, 1),
@@ -59,8 +60,10 @@ VALUES
     ('corp', 'ContainerLog', 32, 3600, 1),
     ('corp', 'Contracts', 8388608, 900, 1),
     ('corp', 'CorporationSheet', 8, 21600, 1),
+    ('corp', 'Facilities', 64, 3600, 1),
     ('corp', 'FacWarStats', 64, 3600, 1),
     ('corp', 'IndustryJobs', 128, 900, 1),
+    ('corp', 'IndustryJobsHistory', 128, 21600, 1),
     ('corp', 'KillMails', 256, 1800, 1),
     ('corp', 'Locations', 16777216, 3600, 1),
     ('corp', 'MarketOrders', 4096, 3600, 1),
@@ -96,7 +99,7 @@ VALUES
     ('map', 'Jumps', 2, 3600, 1),
     ('map', 'Kills', 4, 3600, 1),
     ('map', 'Sovereignty', 8, 3600, 1),
-    ('server', 'ServerStatus', 1, 180, 1);
+    ('server', 'ServerStatus', 1, 300, 1);
 COMMIT;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (

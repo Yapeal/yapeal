@@ -1,8 +1,8 @@
 <?php
 /**
- * Contains EveApiXmlModifyInterface Interface.
+ * Contains EveApiNameTrait Trait.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
  * This file is part of 1.1.x-WIP
@@ -23,21 +23,28 @@
  * available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
- * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @author  Michael Cummings <mgcummings@yahoo.com>
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Xml;
+namespace Yapeal\Database;
 
 /**
- * Interface EveApiXmlModifyInterface
+ * Trait EveApiNameTrait
  */
-interface EveApiXmlModifyInterface extends EveApiReadInterface
+trait EveApiNameTrait
 {
     /**
-     * @param string|bool $xml Only allows string or false NOT true.
-     *
-     * @throws \InvalidArgumentException
-     * @return self
+     * @return string
      */
-    public function setEveApiXml($xml = false);
+    protected function getApiName()
+    {
+        if (empty($this->apiName)) {
+            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
+        }
+        return $this->apiName;
+    }
+    /**
+     * @var string
+     */
+    private $apiName;
 }

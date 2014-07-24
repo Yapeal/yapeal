@@ -29,53 +29,15 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class MemberTrackingLimited
  */
 class MemberTrackingLimited extends AbstractCorpSection
 {
-    /**
-     * @var int $mask
-     */
-    protected $mask = 2048;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'MemberTracking';
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToMemberTracking($xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -84,7 +46,7 @@ class MemberTrackingLimited extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToMemberTracking(
+    protected function preserverToMemberTrackingLimited(
         $xml,
         $ownerID
     ) {
@@ -105,10 +67,15 @@ class MemberTrackingLimited extends AbstractCorpSection
             'roles' => null,
             'grantableRoles' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpMemberTracking')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpMemberTracking'
+        );
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 2048;
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="eveapi" type="eveapiType"/>
+    <xs:complexType name="rowType" mixed="true">
+        <xs:sequence>
+            <xs:element type="rowsetType" name="rowset" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:long" name="itemID" use="required"/>
+        <xs:attribute type="xs:int" name="locationID" use="optional"/>
+        <xs:attribute type="xs:int" name="typeID" use="required"/>
+        <xs:attribute type="xs:int" name="quantity" use="optional"/>
+        <xs:attribute type="xs:byte" name="flag" use="optional"/>
+        <xs:attribute type="xs:byte" name="singleton" use="optional"/>
+        <xs:attribute type="xs:byte" name="rawQuantity" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="eveapiType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="currentTime"/>
+            <xs:element type="resultType" name="result"/>
+            <xs:element type="xs:string" name="cachedUntil"/>
+        </xs:sequence>
+        <xs:attribute type="xs:byte" name="version"/>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element type="rowsetType" name="rowset"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="rowsetType">
+        <xs:sequence>
+            <xs:element type="rowType" name="row" maxOccurs="unbounded"
+                minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="key" use="optional"/>
+        <xs:attribute type="xs:string" name="columns" use="optional"/>
+    </xs:complexType>
+</xs:schema>

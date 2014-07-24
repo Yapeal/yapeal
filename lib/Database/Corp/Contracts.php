@@ -29,56 +29,15 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
 /**
  * Class Contracts
  */
 class Contracts extends AbstractCorpSection
 {
-    /**
-     * @var int $mask
-     */
-    protected $mask = 8388608;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        if (empty($this->apiName)) {
-            $this->apiName = basename(str_replace('\\', '/', __CLASS__));
-        }
-        return $this->apiName;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToContracts($xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -116,10 +75,11 @@ class Contracts extends AbstractCorpSection
             'buyout' => null,
             'volume' => null
         );
-        $this->getAttributesDatabasePreserver()
-            ->setTableName('corpContracts')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData($xml, $columnDefaults, 'corpContracts');
         return $this;
     }
+    /**
+     * @var int $mask
+     */
+    protected $mask = 8388608;
 }

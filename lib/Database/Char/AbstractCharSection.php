@@ -29,13 +29,14 @@
  */
 namespace Yapeal\Database\Char;
 
+use LogicException;
 use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
+use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class AbstractCharSection
@@ -44,15 +45,14 @@ use Yapeal\Xml\EveApiXmlModifyInterface;
  */
 abstract class AbstractCharSection extends AbstractCommonEveApi
 {
-    /**
-     * @var $mask
-     */
-    protected $mask;
+    use EveSectionNameTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -62,25 +62,25 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
     ) {
         $this->getLogger()
              ->debug(
-             sprintf(
-                 'Starting autoMagic for %1$s/%2$s',
-                 $this->getSectionName(),
-                 $this->getApiName()
-             )
-            );
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
         $active = $this->getActiveCharacters();
         if (empty($active)) {
             $this->getLogger()
-                 ->info('No active registered keys found');
+                ->info('No active characters found');
             return;
         }
         foreach ($active as $char) {
             $data->setEveApiSectionName(strtolower($this->getSectionName()))
                  ->setEveApiName($this->getApiName());
             if ($this->cacheNotExpired(
-                     $this->getApiName(),
-                         $this->getSectionName(),
-                         $char['characterID']
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
             )
             ) {
                 continue;
@@ -94,46 +94,11 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         }
     }
     /**
-     * @return string
-     */
-    protected function getSectionName()
-    {
-        if (empty($this->sectionName)) {
-            $this->sectionName = basename(str_replace('\\', '/', __DIR__));
-        }
-        return $this->sectionName;
-    }
-    /**
-     * @return array
-     */
-    protected function getActiveCharacters()
-    {
-        $sql = $this->csq->getActiveRegisteredCharacters($this->getMask());
-        $this->getLogger()
-             ->debug($sql);
-        try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active characters';
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
-        }
-    }
-    /**
-     * @return int
-     */
-    protected function getMask()
-    {
-        return $this->mask;
-    }
-    /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -144,10 +109,9 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $char = $data->getEveApiArguments();
-        $charID = $char['characterID'];
+        $charID = $data->getEveApiArgument('characterID');
         /**
-         * @var EveApiReadWriteInterface|EveApiXmlModifyInterface $data
+         * @var EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
@@ -176,20 +140,74 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
-        $this->preserve(
-             $data->getEveApiXml(),
-                 $charID
-        );
+        if (!$this->preserve($data->getEveApiXml(), $charID)) {
+            return false;
+        }
         return true;
+    }
+    /**
+     * @throws LogicException
+     * @return array
+     */
+    protected function getActiveCharacters()
+    {
+        $sql = $this->getCsq()
+                    ->getActiveRegisteredCharacters($this->getMask());
+        $this->getLogger()
+             ->debug($sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $exc) {
+            $mess = 'Could NOT get a list of active characters';
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            return array();
+        }
+    }
+    /**
+     * @return int
+     */
+    protected function getMask()
+    {
+        return $this->mask;
     }
     /**
      * @param string $xml
      * @param string $ownerID
      *
-     * @return self
+     * @throws LogicException
+     * @return bool
      */
-    abstract protected function preserve(
+    protected function preserve(
         $xml,
         $ownerID
-    );
+    ) {
+        $pTo = 'preserverTo' . $this->getApiName();
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->$pTo($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getLogger()
+                 ->warning($mess, array('exception' => $exc));
+            $this->getPdo()
+                 ->rollBack();
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @var $mask
+     */
+    protected $mask;
 }

@@ -29,8 +29,8 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
 use Yapeal\Database\AbstractAccountKey;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
 
@@ -39,42 +39,7 @@ use Yapeal\Database\EveSectionNameTrait;
  */
 class WalletTransactions extends AbstractAccountKey
 {
-    use EveApiNameTrait, EveSectionNameTrait;
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param string $accountKey
-     *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey = null
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToWalletTransactions(
-                $xml,
-                $ownerID,
-                $accountKey
-            );
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -105,10 +70,11 @@ class WalletTransactions extends AbstractAccountKey
             'typeID' => null,
             'typeName' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('charWalletTransactions')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpWalletTransactions'
+        );
         return $this;
     }
     /**
@@ -116,7 +82,7 @@ class WalletTransactions extends AbstractAccountKey
      */
     protected $mask = 2097152;
     /**
-     * @var int
+     * @var int $maxKeyRange
      */
     protected $maxKeyRange = 1006;
 }

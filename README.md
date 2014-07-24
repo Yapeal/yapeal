@@ -23,6 +23,6 @@ Licensing requirements can be found in [COPYING.md][4] and
 
 Thanks for using Yapeal, Dragonaire
 
-[2]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/INSTALL.md "INSTALL.md"
-[4]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING.md "COPY.md"
-[5]: http://github.com/Dragonrun1/yapeal/blob/1.0.x/COPYING-LESSER.md "COPY-LESSER.md"
+[2]: http://github.com/Dragonrun1/yapeal/blob/1.1.x/INSTALL.md "INSTALL.md"
+[4]: http://github.com/Dragonrun1/yapeal/blob/1.1.x/COPYING.md "COPY.md"
+[5]: http://github.com/Dragonrun1/yapeal/blob/1.1.x/COPYING-LESSER.md "COPY-LESSER.md"

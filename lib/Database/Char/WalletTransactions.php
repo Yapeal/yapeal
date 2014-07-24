@@ -28,108 +28,17 @@
  */
 namespace Yapeal\Database\Char;
 
-use LogicException;
-use PDOException;
+use Yapeal\Database\AbstractAccountKey;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
+use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class WalletTransactions
  */
-class WalletTransactions extends AbstractCharSection
+class WalletTransactions extends AbstractAccountKey
 {
-    use EveApiNameTrait, AttributesDatabasePreserverTrait;
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     *
-     * @throws LogicException
-     * @return bool
-     */
-    public function oneShot(
-        EveApiReadWriteInterface &$data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
-    ) {
-        $data->addEveApiArgument('accountKey', '1000');
-        $data->addEveApiArgument('rowCount', '2560');
-        if (!$this->gotApiLock($data)) {
-            return false;
-        }
-        $charID = $data->getEveApiArgument('characterID');
-        /**
-         * @var EveApiReadWriteInterface $data
-         */
-        $retrievers->retrieveEveApi($data);
-        if ($data->getEveApiXml() === false) {
-            $mess = sprintf(
-                'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
-                $charID
-            );
-            $this->getLogger()
-                 ->notice($mess);
-            return false;
-        }
-        $this->xsltTransform($data);
-        if ($this->isInvalid($data)) {
-            $mess = sprintf(
-                'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
-                $charID
-            );
-            $this->getLogger()
-                ->warning($mess);
-            $data->setEveApiName('Invalid' . $this->getApiName());
-            $preservers->preserveEveApi($data);
-            return false;
-        }
-        $preservers->preserveEveApi($data);
-        if (!$this->preserve($data->getEveApiXml(), $charID, '1000')) {
-            return false;
-        }
-        return true;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param string $accountKey
-     *
-     * @throws LogicException
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToWalletTransactions($xml, $ownerID, $accountKey);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
-                $ownerID
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-            return false;
-        }
-        return true;
-    }
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -170,5 +79,9 @@ class WalletTransactions extends AbstractCharSection
     /**
      * @var int $mask
      */
-    protected $mask = 2097152;
+    protected $mask = 4194304;
+    /**
+     * @var int $maxKeyRange
+     */
+    protected $maxKeyRange = 1000;
 }

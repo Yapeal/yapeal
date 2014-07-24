@@ -29,7 +29,7 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -40,7 +40,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class MemberTrackingExtended extends AbstractCorpSection
 {
-    use EveApiNameTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -60,40 +60,11 @@ class MemberTrackingExtended extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToMemberTracking($xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName()
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
      * @internal param int $key
      *
      * @return self
      */
-    protected function preserverToMemberTracking(
+    protected function preserverToMemberTrackingExtended(
         $xml,
         $ownerID
     ) {
@@ -114,10 +85,11 @@ class MemberTrackingExtended extends AbstractCorpSection
             'roles' => null,
             'grantableRoles' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpMemberTracking')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpMemberTracking'
+        );
         return $this;
     }
     /**

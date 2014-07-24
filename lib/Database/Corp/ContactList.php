@@ -29,7 +29,9 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 
 /**
@@ -37,11 +39,12 @@ use Yapeal\Database\EveApiNameTrait;
  */
 class ContactList extends AbstractCorpSection
 {
-    use EveApiNameTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -72,6 +75,7 @@ class ContactList extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @internal param int $key
      *
      * @return self
@@ -86,16 +90,26 @@ class ContactList extends AbstractCorpSection
             'contactName' => null,
             'standing' => null
         );
-        $this->getAttributesDatabasePreserver()
-            ->setTableName('corpAllianceContactList')
-             ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//allianceContactList/row');
+        $tableName = 'corpAllianceContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//allianceContactList/row'
+        );
         return $this;
     }
     /**
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @internal param int $key
      *
      * @return self
@@ -110,10 +124,19 @@ class ContactList extends AbstractCorpSection
             'contactName' => null,
             'standing' => null
         );
-        $this->getAttributesDatabasePreserver()
-            ->setTableName('corpCorporateContactList')
-             ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//corporateContactList/row');
+        $tableName = 'corpCorporateContactList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//corporateContactList/row'
+        );
         return $this;
     }
     /**

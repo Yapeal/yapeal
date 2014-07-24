@@ -29,25 +29,29 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use PDO;
 use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Database\ValuesDatabasePreserverTrait;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 
 /**
  * Class MemberTrackingExtended
  */
 class StarbaseDetail extends AbstractCorpSection
 {
-    use EveApiNameTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait, ValuesDatabasePreserverTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -106,6 +110,7 @@ class StarbaseDetail extends AbstractCorpSection
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      *
+     * @throws LogicException
      * @return bool
      */
     public function oneShot(
@@ -116,9 +121,8 @@ class StarbaseDetail extends AbstractCorpSection
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $corp = $data->getEveApiArguments();
-        $corpID = $corp['corporationID'];
-        $itemID = $corp['itemID'];
+        $corpID = $data->getEveApiArgument('corporationID');
+        $itemID = $data->getEveApiArgument('itemID');
         /**
          * @var EveApiReadWriteInterface $data
          */
@@ -149,14 +153,11 @@ class StarbaseDetail extends AbstractCorpSection
             return false;
         }
         $preservers->preserveEveApi($data);
-        $this->preserve(
-            $data->getEveApiXml(),
-            $corpID,
-            $itemID
-        );
+        $this->preserve($data->getEveApiXml(), $corpID, $itemID);
         return true;
     }
     /**
+     * @throws LogicException
      * @return array
      */
     protected function getActiveTowers()
@@ -180,6 +181,7 @@ class StarbaseDetail extends AbstractCorpSection
      * @param string $ownerID
      * @param null   $itemID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -191,17 +193,9 @@ class StarbaseDetail extends AbstractCorpSection
             $this->getPdo()
                  ->beginTransaction();
             $this->preserverToStarbaseDetail($xml, $ownerID, $itemID);
-            $this->preserverToStarbaseDetailFuel($xml, $ownerID, $itemID);
-            $this->preserverToStarbaseDetailCombatSettings(
-                $xml,
-                $ownerID,
-                $itemID
-            );
-            $this->preserverToStarbaseDetailGeneralSettings(
-                $xml,
-                $ownerID,
-                $itemID
-            );
+            $this->preserverToFuel($xml, $ownerID, $itemID);
+            $this->preserverToCombatSettings($xml, $ownerID, $itemID);
+            $this->preserverToGeneralSettings($xml, $ownerID, $itemID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -224,32 +218,7 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToStarbaseDetail(
-        $xml,
-        $ownerID,
-        $itemID
-    ) {
-        $columnDefaults = array(
-            'ownerID' => $ownerID,
-            'itemID' => $itemID,
-            'onlineTimestamp' => '1970-01-01 00:00:01',
-            'state' => '0',
-            'stateTimestamp' => '1970-01-01 00:00:01'
-        );
-        $this->getvaluesDatabasePreserver()
-             ->setTableName('corpStarbaseDetail')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $itemID
-     *
-     * @return self
-     */
-    protected function preserverToStarbaseDetailCombatSettings(
+    protected function preserverToCombatSettings(
         $xml,
         $ownerID,
         $itemID
@@ -264,10 +233,12 @@ class StarbaseDetail extends AbstractCorpSection
             'onStatusDropStanding' => '0',
             'useStandingsFromOwnerID' => '0',
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpCombatSettings')
-             ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//combatSettings/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpCombatSettings',
+            '//combatSettings/row'
+        );
         return $this;
     }
     /**
@@ -277,7 +248,7 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToStarbaseDetailFuel(
+    protected function preserverToFuel(
         $xml,
         $ownerID,
         $itemID
@@ -288,10 +259,12 @@ class StarbaseDetail extends AbstractCorpSection
             'typeID' => '0',
             'quantity' => '0'
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpFuel')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//fuel/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpFuel',
+            '//fuel/row'
+        );
         return $this;
     }
     /**
@@ -301,7 +274,7 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToStarbaseDetailGeneralSettings(
+    protected function preserverToGeneralSettings(
         $xml,
         $ownerID,
         $itemID
@@ -314,10 +287,34 @@ class StarbaseDetail extends AbstractCorpSection
             'allowCorporationMembers' => '0',
             'allowAllianceMembers' => '0'
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpCombatSettings')
-             ->setColumnDefaults($columnDefaults)
-            ->preserveData($xml, '//generalSettings/row');
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpGeneralSettings',
+            '//generalSettings/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     * @param        $itemID
+     *
+     * @return self
+     */
+    protected function preserverToStarbaseDetail(
+        $xml,
+        $ownerID,
+        $itemID
+    ) {
+        $columnDefaults = array(
+            'ownerID' => $ownerID,
+            'itemID' => $itemID,
+            'onlineTimestamp' => '1970-01-01 00:00:01',
+            'state' => '0',
+            'stateTimestamp' => '1970-01-01 00:00:01'
+        );
+        $this->valuesPreserveData($xml, $columnDefaults, 'corpStarbaseDetail');
         return $this;
     }
     /**

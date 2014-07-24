@@ -29,7 +29,7 @@
  */
 namespace Yapeal\Database\Corp;
 
-use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 
 /**
@@ -37,37 +37,7 @@ use Yapeal\Database\EveApiNameTrait;
  */
 class MarketOrders extends AbstractCorpSection
 {
-    use EveApiNameTrait;
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
-        try {
-            $this->getPdo()
-                 ->beginTransaction();
-            $this->preserverToMarketOrders($xml, $ownerID);
-            $this->getPdo()
-                 ->commit();
-        } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
-                $ownerID
-            );
-            $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            $this->getPdo()
-                 ->rollBack();
-        }
-        return $this;
-    }
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
@@ -96,10 +66,11 @@ class MarketOrders extends AbstractCorpSection
             'bid' => null,
             'issued' => null
         );
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('corpMarketOrders')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'corpMarketOrders'
+        );
         return $this;
     }
     /**

@@ -1,21 +1,6 @@
 # TODO #
 
-Things that need done to fix database code.
-
-- ADOdb must died of course.
-- Re-write using PDO instead.
-
-## PDO conversion ##
-
-Things needed to replace ADOdb:
-
-- Metadata queries to get column names, defaults etc using information_schema
-tables.
-- Make Interface and wrapper for PDO that include just the special queries that
-Yapeal uses.
-- Come up with list of common queries that Yapeal will need.
-
-## API Implementation (32 of 80) ##
+## API Implementation (37 of 82) ##
 
 ### Accounts (2 of 3)
 
@@ -24,9 +9,9 @@ Yapeal uses.
 |-----------------------|-------------|
 | Account/AccountStatus | yes         |
 | Account/APIKeyInfo    | yes         |
-| Account/Characters    | no          |
+| Account/Characters    | yes         |
 
-### Character (12 of 31)
+### Character (14 of 32)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
@@ -40,7 +25,8 @@ Yapeal uses.
 | Char/ContractItems          | no          |
 | Char/ContractBids           | no          |
 | Char/FacWarStats            | no          |
-| Char/IndustryJobs           | no          |
+| Char/IndustryJobs           | yes         |
+| Char/IndustryJobsHistory    | yes         |
 | Char/KillMails              | no          |
 | Char/Locations              | no          |
 | Char/MailBodies             | no          |
@@ -62,7 +48,7 @@ Yapeal uses.
 | Char/WalletJournal          | yes         |
 | Char/WalletTransactions     | yes         |
 
-### Corporation (8 of 27)
+### Corporation (11 of 28)
 
 | Endpoint                  | Implemented                |
 |---------------------------|----------------------------|
@@ -75,7 +61,8 @@ Yapeal uses.
 | Corp/Contracts            | yes                        |
 | Corp/CorporationSheet     | no                         |
 | Corp/FacWarStats          | no                         |
-| Corp/IndustryJobs         | no                         |
+| Corp/IndustryJobs         | yes                        |
+| Corp/IndustryJobsHistory  | yes                        |
 | Corp/KillMails            | no                         |
 | Corp/Locations            | no                         |
 | Corp/MarketOrders         | yes                        |
@@ -91,14 +78,14 @@ Yapeal uses.
 | Corp/StarbaseList         | yes                        |
 | Corp/StarbaseDetail       | yes                        |
 | Corp/Titles               | no                         |
-| Corp/WalletJournal        | no                         |
+| Corp/WalletJournal        | yes                        |
 | Corp/WalletTransactions   | yes                        |
 
 ### Eve (4 of 13)
 
 | Endpoint                   | Implemented |
 |----------------------------|-------------|
-| EVE/AllianceList           | no          |
+| EVE/AllianceList           | yes         |
 | EVE/CertificateTree        | no          |
 | EVE/CharacterAffiliation   | no          |
 | EVE/CharacterID            | no          |

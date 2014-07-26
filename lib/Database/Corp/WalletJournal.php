@@ -74,7 +74,7 @@ class WalletJournal extends AbstractAccountKey
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'charWalletJournal'
+            'corpWalletJournal'
         );
         return $this;
     }

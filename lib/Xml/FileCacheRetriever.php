@@ -1,34 +1,28 @@
 <?php
 /**
  * Contains FileCacheRetriever class.
- *
  * PHP version 5.3
- *
  * LICENSE:
  * This file is part of 1.1.x-WIP
  * Copyright (C) 2014 Michael Cummings
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+ * General Public License for more details. You should have received a copy of
+ * the GNU Lesser General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
- *
- * @copyright 2014 Michael Cummings
+*@copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Xml;
 
-use Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -97,7 +91,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         } catch (YapealRetrieverException $exc) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                ->debug($mess, array('exception' => $exc));
+                 ->debug($mess, array('exception' => $exc));
             return $this;
         }
         //$this->getLogger()->debug($result);
@@ -260,18 +254,48 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     protected function isExpired($xml)
     {
-        try {
-            $simple = new SimpleXMLElement($xml);
-            // At minimum use cached XML for 5 minutes (300 secs).
-            if (strtotime($simple->currentTime . '+00:00') + 300 <= time()) {
-                $this->getLogger()
-                     ->debug('Cached XML has expired');
-                return true;
-            }
-        } catch (Exception $exc) {
-            $mess = 'Could NOT check for expired time';
+        $simple = new SimpleXMLElement($xml);
+        if (!isset($simple->currentTime)) {
+            $mess = 'Xml file missing required currentTime element';
             $this->getLogger()
-                 ->notice($mess, array('exception' => $exc));
+                 ->notice($mess);
+            return true;
+        }
+        if (!isset($simple->cachedUntil)) {
+            $mess = 'Xml file missing required cachedUntil element';
+            $this->getLogger()
+                 ->notice($mess);
+            return true;
+        }
+        $now = time();
+        $current = strtotime($simple->currentTime . '+00:00');
+        $until = strtotime($simple->cachedUntil . '+00:00');
+        // At minimum use cached XML for 5 minutes (300 secs).
+        if (($current + 300) <= $now) {
+            return false;
+        }
+        if ($until <= $current) {
+            $mess = sprintf(
+                'CachedUntil is invalid was given %1$s and currentTime is %2$s',
+                $simple->cachedUntil,
+                $simple->currentTime
+            );
+            $this->getLogger()
+                 ->warning($mess);
+            return true;
+        }
+        // Now plus a day.
+        if ($until > ($now + 86400)) {
+            $mess = sprintf(
+                'CachedUntil is excessively long was given %1$s and currentTime is %2$s',
+                $simple->cachedUntil,
+                $simple->currentTime
+            );
+            $this->getLogger()
+                 ->notice($mess);
+            return true;
+        }
+        if ($until >= $now) {
             return true;
         }
         return false;

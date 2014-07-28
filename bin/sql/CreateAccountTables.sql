@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountCharacters" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)            NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"     CHAR(24)            NOT NULL,
+    "factionName"     CHAR(50)            NOT NULL,
     PRIMARY KEY ("characterID")
 )
     ENGINE =InnoDB

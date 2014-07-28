@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveEmploymentHistory" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactions" (
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"            CHAR(24) DEFAULT NULL,
+    "factionName"            CHAR(50) DEFAULT NULL,
     "killsYesterday"         BIGINT(20) UNSIGNED NOT NULL,
     "killsLastWeek"          BIGINT(20) UNSIGNED NOT NULL,
     "killsTotal"             BIGINT(20) UNSIGNED NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactions" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
-    "factionName" CHAR(24) DEFAULT NULL,
+    "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek"
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
-    "factionName" CHAR(24) DEFAULT NULL,
+    "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
-    "factionName" CHAR(24) DEFAULT NULL,
+    "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"   CHAR(24) DEFAULT NULL,
+    "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsL
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsTotal";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsTotal" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"   CHAR(24) DEFAULT NULL,
+    "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsT
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"   CHAR(24) DEFAULT NULL,
+    "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
@@ -249,9 +249,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsY
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionWars";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionWars" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
-    "factionName" CHAR(24) DEFAULT NULL,
+    "factionName" CHAR(50) DEFAULT NULL,
     "againstID"   BIGINT(20) UNSIGNED NOT NULL,
-    "againstName" CHAR(24) DEFAULT NULL
+    "againstName" CHAR(50) DEFAULT NULL
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;

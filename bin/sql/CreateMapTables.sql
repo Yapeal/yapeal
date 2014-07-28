@@ -5,11 +5,11 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}mapFacWarSystems";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapFacWarSystems" (
     "contested"             ENUM('False', 'True') NOT NULL,
     "occupyingFactionID"    BIGINT(20) UNSIGNED DEFAULT NULL,
-    "occupyingFactionName"  CHAR(24)            DEFAULT NULL,
+    "occupyingFactionName"  CHAR(50)            DEFAULT NULL,
     "owningFactionID"       BIGINT(20) UNSIGNED DEFAULT NULL,
-    "owningFactionName"     CHAR(24)            DEFAULT NULL,
+    "owningFactionName"     CHAR(50)            DEFAULT NULL,
     "solarSystemID"         BIGINT(20) UNSIGNED   NOT NULL,
-    "solarSystemName"       CHAR(24)              NOT NULL,
+    "solarSystemName"       CHAR(50)              NOT NULL,
     "victoryPoints"         BIGINT(20) UNSIGNED   NOT NULL,
     "victoryPointThreshold" BIGINT(20) UNSIGNED   NOT NULL,
     PRIMARY KEY ("solarSystemID")
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapSovereignty" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
     "solarSystemID"   BIGINT(20) UNSIGNED NOT NULL,
-    "solarSystemName" CHAR(24)            NOT NULL,
+    "solarSystemName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
     ENGINE =InnoDB

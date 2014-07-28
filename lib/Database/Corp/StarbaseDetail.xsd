@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified"
-    elementFormDefault="qualified"
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="fuelRowType">
@@ -12,67 +11,65 @@
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="combatSettingsRowType">
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute type="eveIDType"
-                        name="onAggressionEnabled"
-                        use="required"/>
-                    <xs:attribute type="eveIDType"
-                        name="onCorporationWarEnabled"
-                        use="required"/>
-                    <xs:attribute type="xs:float"
-                        name="onStandingDropStanding"
-                        use="required"/>
-                    <xs:attribute type="eveIDType"
-                        name="onStatusDropEnabled"
-                        use="required"/>
-                    <xs:attribute type="xs:float"
-                        name="onStatusDropStanding"
-                        use="required"/>
-                    <xs:attribute type="eveIDType"
-                        name="useStandingsFromOwnerID"
-                        use="required"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="onAggressionEnabled"
+                    use="required"/>
+                <xs:attribute type="eveIDType" name="onCorporationWarEnabled"
+                    use="required"/>
+                <xs:attribute type="xs:float" name="onStandingDropStanding"
+                    use="required"/>
+                <xs:attribute type="eveIDType" name="onStatusDropEnabled"
+                    use="required"/>
+                <xs:attribute type="xs:float" name="onStatusDropStanding"
+                    use="required"/>
+                <xs:attribute type="eveIDType" name="useStandingsFromOwnerID"
+                    use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="generalSettingsRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveBooleanType" name="allowAllianceMembers"
+                    use="required"/>
+                <xs:attribute type="eveBooleanType"
+                    name="allowCorporationMembers" use="required"/>
+                <xs:attribute type="xs:unsignedLong" name="deployFlags"
+                    use="required"/>
+                <xs:attribute type="xs:unsignedLong" name="usageFlags"
+                    use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
             <xs:element type="eveIDType" name="state"/>
             <xs:element type="eveNEDTType" name="stateTimestamp"/>
             <xs:element type="eveNEDTType" name="onlineTimestamp"/>
-        <xs:element name="generalSettings">
-                       <xs:complexType>
-                              <xs:sequence>
-                                  <xs:element type="eveIDType"
-                                      name="usageFlags"/>
-                                  <xs:element type="eveIDType"
-                                      name="deployFlags"/>
-                                  <xs:element type="eveIDType"
-                                      name="allowCorporationMembers"/>
-                                  <xs:element type="eveIDType"
-                                      name="allowAllianceMembers"/>
-                              </xs:sequence>
-                          </xs:complexType>
-                   </xs:element>
+            <xs:element name="generalSettings" maxOccurs="1" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="generalSettingsRowType" name="row"
+                            maxOccurs="1" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="combatSettings" maxOccurs="1" minOccurs="0">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element type="combatSettingsRowType"
-                                        name="row"
-                                        maxOccurs="unbounded"
-                                        minOccurs="0"/>
-                                </xs:sequence>
-                                <xs:attributeGroup ref="rowsetAttrs"/>
-                            </xs:complexType>
-                        </xs:element>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="combatSettingsRowType" name="row"
+                            maxOccurs="unbounded" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="fuel" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="fuelRowType"
-                            name="row"
-                            maxOccurs="unbounded"
-                            minOccurs="0"/>
+                        <xs:element type="fuelRowType" name="row"
+                            maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

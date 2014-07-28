@@ -328,7 +328,7 @@ class StarbaseDetail extends AbstractCorpSection
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" version="1.0" encoding="utf-8"
         omit-xml-declaration="no" standalone="no" indent="yes"/>
-    <xsl:strip-space elements="combatSettings onAggression onCorporationWar onStandingDrop useStandingsFrom"/>
+    <xsl:strip-space elements="usageFlags deployFlags allowCorporationMembers allowAllianceMembers combatSettings onAggression onCorporationWar onStandingDrop useStandingsFrom"/>
     <xsl:template match="rowset">
         <xsl:choose>
             <xsl:when test="@name">
@@ -371,6 +371,28 @@ class StarbaseDetail extends AbstractCorpSection
         </xsl:element>
         <xsl:apply-templates/>
     </xsl:template>
+    <xsl:template match="generalSettings">
+        <xsl:element name="{name(.)}">
+            <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
+            <xsl:attribute name="columns">usageFlags,deployFlags,allowCorporationMembers,allowAllianceMembers</xsl:attribute>
+            <xsl:element name="row">
+                <xsl:attribute name="allowAllianceMembers">
+                    <xsl:value-of select="allowAllianceMembers"/>
+                </xsl:attribute>
+                <xsl:attribute name="allowCorporationMembers">
+                    <xsl:value-of select="allowCorporationMembers"/>
+                </xsl:attribute>
+                <xsl:attribute name="deployFlags">
+                    <xsl:value-of select="deployFlags"/>
+                </xsl:attribute>
+                <xsl:attribute name="usageFlags">
+                    <xsl:value-of select="usageFlags"/>
+                </xsl:attribute>
+            </xsl:element>
+        </xsl:element>
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template match="usageFlags|deployFlags|allowCorporationMembers|allowAllianceMembers"/>
     <xsl:template
         match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
     <xsl:template match="@*|node()">

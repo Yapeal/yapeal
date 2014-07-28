@@ -31,6 +31,9 @@ namespace Yapeal\Database\Corp;
 
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class MemberTrackingLimited
@@ -38,6 +41,21 @@ use Yapeal\Database\EveApiNameTrait;
 class MemberTrackingLimited extends AbstractCorpSection
 {
     use EveApiNameTrait, AttributesDatabasePreserverTrait;
+    /**
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     *
+     * @return bool
+     */
+    public function oneShot(
+        EveApiReadWriteInterface &$data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers
+    ) {
+        $data->setEveApiName('MemberTracking');
+        return parent::oneShot($data, $retrievers, $preservers);
+    }
     /**
      * @param string $xml
      * @param string $ownerID

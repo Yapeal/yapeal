@@ -53,6 +53,7 @@ class MemberTrackingExtended extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers
     ) {
+        $data->setEveApiName('MemberTracking');
         $data->addEveApiArgument('extended', '1');
         return parent::oneShot($data, $retrievers, $preservers);
     }

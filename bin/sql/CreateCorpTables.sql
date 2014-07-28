@@ -45,14 +45,14 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAttackers";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
-    "allianceName"    CHAR(50) DEFAULT NULL,
+    "allianceName"    CHAR(50)                     DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName"   CHAR(24) DEFAULT NULL,
+    "characterName"   CHAR(24)                     DEFAULT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
-    "corporationName" CHAR(50) DEFAULT NULL,
+    "corporationName" CHAR(50)                     DEFAULT NULL,
     "damageDone"      BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"     CHAR(50) NOT NULL,
+    "factionName"     CHAR(50)            NOT NULL,
     "finalBlow"       TINYINT(1)          NOT NULL,
     "securityStatus"  DOUBLE              NOT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendee
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCombatSettings";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCombatSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED    NOT NULL,
-    "itemID" BIGINT(20) UNSIGNED NOT NULL,
+    "itemID"                  BIGINT(20) UNSIGNED    NOT NULL,
     "onAggressionEnabled"     TINYINT(1)             NOT NULL,
     "onCorporationWarEnabled" TINYINT(1)             NOT NULL,
     "onStandingDropStanding"  DECIMAL(5, 2) UNSIGNED NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactList"
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCorporationSheet";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
-    "allianceName"    CHAR(50)                DEFAULT NULL,
+    "allianceName"    CHAR(50)                        DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED    NOT NULL,
     "ceoName"         CHAR(24)               NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED    NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "taxRate"         DECIMAL(5, 2) UNSIGNED NOT NULL,
     "ticker"          CHAR(5)                NOT NULL,
     "url"             VARCHAR(255)
-                      COLLATE utf8_unicode_ci DEFAULT NULL,
+                      COLLATE utf8_unicode_ci         DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB
@@ -182,7 +182,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacWarStats";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
-    "factionName" CHAR(50) NOT NULL,
+    "factionName"            CHAR(50)            NOT NULL,
     "enlisted"               DATETIME            NOT NULL,
     "currentRank"            BIGINT(20) UNSIGNED NOT NULL,
     "highestRank"            BIGINT(20) UNSIGNED NOT NULL,
@@ -200,7 +200,7 @@ ALTER TABLE "{database}"."{table_prefix}corpFacWarStats" ADD INDEX "corpFacWarSt
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFuel";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFuel" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
-    "itemID" BIGINT(20) UNSIGNED NOT NULL,
+    "itemID"   BIGINT(20) UNSIGNED NOT NULL,
     "typeID"   BIGINT(20) UNSIGNED NOT NULL,
     "quantity" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "itemID", "typeID")
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFuel" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpGeneralSettings";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpGeneralSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED  NOT NULL,
-    "itemID" BIGINT(20) UNSIGNED NOT NULL,
+    "itemID"                  BIGINT(20) UNSIGNED  NOT NULL,
     "allowAllianceMembers"    TINYINT(1)           NOT NULL,
     "allowCorporationMembers" TINYINT(1)           NOT NULL,
     "deployFlags"             SMALLINT(5) UNSIGNED NOT NULL,
@@ -340,19 +340,19 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberMedals" (
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMemberTracking";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberTracking" (
-    "base"           CHAR(50)   DEFAULT NULL,
+    "base"           CHAR(50)            DEFAULT NULL,
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
-    "grantableRoles" CHAR(64)   DEFAULT NULL,
-    "location"       CHAR(255)  DEFAULT NULL,
+    "grantableRoles" CHAR(64)            DEFAULT NULL,
+    "location"       CHAR(255)           DEFAULT NULL,
     "locationID"     BIGINT(20) UNSIGNED DEFAULT NULL,
-    "logoffDateTime" DATETIME   DEFAULT NULL,
-    "logonDateTime"  DATETIME   DEFAULT NULL,
+    "logoffDateTime" DATETIME            DEFAULT NULL,
+    "logonDateTime"  DATETIME            DEFAULT NULL,
     "name"           CHAR(24)            NOT NULL,
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
-    "roles"          CHAR(64)   DEFAULT NULL,
-    "shipType"       CHAR(50)   DEFAULT NULL,
-    "shipTypeID"     BIGINT(20) DEFAULT NULL,
+    "roles"          CHAR(64)            DEFAULT NULL,
+    "shipType"       CHAR(50)            DEFAULT NULL,
+    "shipTypeID"     BIGINT(20)          DEFAULT NULL,
     "startDateTime"  DATETIME            NOT NULL,
     "title"          TEXT
                      COLLATE utf8_unicode_ci,
@@ -404,7 +404,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromFactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
-    "fromName" CHAR(50) NOT NULL,
+    "fromName" CHAR(50)            NOT NULL,
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromNPCCorpo
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStarbaseDetail";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseDetail" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
-    "itemID" BIGINT(20) UNSIGNED NOT NULL,
+    "itemID"          BIGINT(20) UNSIGNED NOT NULL,
     "onlineTimestamp" DATETIME            NOT NULL,
     "state"           TINYINT(2) UNSIGNED NOT NULL,
     "stateTimestamp"  DATETIME            NOT NULL,
@@ -448,14 +448,14 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpVictim";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
-    "allianceName"    CHAR(50) DEFAULT NULL,
+    "allianceName"    CHAR(50)                     DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName"   CHAR(24) DEFAULT NULL,
+    "characterName"   CHAR(24)                     DEFAULT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
-    "corporationName" CHAR(50) DEFAULT NULL,
+    "corporationName" CHAR(50)                     DEFAULT NULL,
     "damageTaken"     BIGINT(20) UNSIGNED NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
-    "factionName"     CHAR(50) NOT NULL,
+    "factionName"     CHAR(50)            NOT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "characterID")
 )
@@ -501,16 +501,16 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletTransactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"           SMALLINT(4) UNSIGNED NOT NULL,
-    "characterID"   BIGINT(20) UNSIGNED DEFAULT NULL,
-    "characterName" CHAR(24)            DEFAULT NULL,
-    "clientID"      BIGINT(20) UNSIGNED DEFAULT NULL,
-    "clientName"    CHAR(50)            DEFAULT NULL,
-    "clientTypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
+    "characterID"          BIGINT(20) UNSIGNED           DEFAULT NULL,
+    "characterName"        CHAR(24)                      DEFAULT NULL,
+    "clientID"             BIGINT(20) UNSIGNED           DEFAULT NULL,
+    "clientName"           CHAR(50)                      DEFAULT NULL,
+    "clientTypeID"         BIGINT(20) UNSIGNED           DEFAULT NULL,
     "journalTransactionID" BIGINT(20) UNSIGNED  NOT NULL,
     "price"                DECIMAL(17, 2)       NOT NULL,
     "quantity"             BIGINT(20) UNSIGNED  NOT NULL,
-    "stationID"     BIGINT(20) UNSIGNED DEFAULT NULL,
-    "stationName"   CHAR(50)            DEFAULT NULL,
+    "stationID"            BIGINT(20) UNSIGNED           DEFAULT NULL,
+    "stationName"          CHAR(50)                      DEFAULT NULL,
     "transactionDateTime"  DATETIME             NOT NULL,
     "transactionFor"       CHAR(12)             NOT NULL DEFAULT 'corporation',
     "transactionID"        BIGINT(20) UNSIGNED  NOT NULL,

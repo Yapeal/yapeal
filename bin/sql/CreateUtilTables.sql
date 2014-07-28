@@ -104,7 +104,7 @@ COMMIT;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "isActive"      TINYINT(1) DEFAULT NULL,
+    "isActive"      TINYINT(1)          DEFAULT NULL,
     "keyID"         BIGINT(20) UNSIGNED NOT NULL,
     "vCode"         VARCHAR(64)         NOT NULL,
     PRIMARY KEY ("keyID")
@@ -116,7 +116,7 @@ VALUES
     (8388608, 1, 1156, 'abc123');
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredUploader";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredUploader" (
-    "isActive"            TINYINT(1) DEFAULT NULL,
+    "isActive"            TINYINT(1)   DEFAULT NULL,
     "key"                 VARCHAR(255) DEFAULT NULL,
     "ownerID"             BIGINT(20) UNSIGNED NOT NULL,
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
@@ -126,8 +126,8 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredUploader" (
     DEFAULT CHARSET =utf8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilUploadDestination";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilUploadDestination" (
-    "isActive"            TINYINT(1) DEFAULT NULL,
-    "name"                VARCHAR(25) DEFAULT NULL,
+    "isActive"            TINYINT(1)   DEFAULT NULL,
+    "name"                VARCHAR(25)  DEFAULT NULL,
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
     "url"                 VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("uploadDestinationID")

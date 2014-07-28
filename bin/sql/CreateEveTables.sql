@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
     "allianceID"     BIGINT(20) UNSIGNED NOT NULL,
     "executorCorpID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "memberCount"    BIGINT(20) UNSIGNED DEFAULT NULL,
-    "name"           CHAR(50) DEFAULT NULL,
-    "shortName"      CHAR(5) DEFAULT NULL,
-    "startDate"      DATETIME DEFAULT NULL,
+    "name"           CHAR(50)            DEFAULT NULL,
+    "shortName"      CHAR(5)             DEFAULT NULL,
+    "startDate"      DATETIME            DEFAULT NULL,
     PRIMARY KEY ("allianceID")
 )
     ENGINE =InnoDB
@@ -22,14 +22,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
     "accountBalance"    DECIMAL(17, 2)      NOT NULL,
     "skillPoints"       BIGINT(20) UNSIGNED NOT NULL,
     "nextTrainingEnds"  DATETIME            NOT NULL,
-    "shipName"          CHAR(50) DEFAULT '',
+    "shipName"          CHAR(50)            DEFAULT '',
     "shipTypeID"        BIGINT(20) UNSIGNED DEFAULT '0',
-    "shipTypeName"      CHAR(50) DEFAULT '',
+    "shipTypeName"      CHAR(50)            DEFAULT '',
     "corporationID"     BIGINT(20) UNSIGNED NOT NULL,
     "corporation"       CHAR(50)            NOT NULL,
     "corporationDate"   DATETIME            NOT NULL,
     "allianceID"        BIGINT(20) UNSIGNED DEFAULT '0',
-    "alliance"          CHAR(50) DEFAULT '',
+    "alliance"          CHAR(50)            DEFAULT '',
     "allianceDate"      DATETIME            NOT NULL,
     "lastKnownLocation" CHAR(255)           NOT NULL,
     "securityStatus"    CHAR(20)            NOT NULL,
@@ -94,10 +94,10 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveConquerableStationList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveConquerableStationList" (
     "corporationID"   BIGINT(20) UNSIGNED DEFAULT NULL,
-    "corporationName" CHAR(50) DEFAULT NULL,
+    "corporationName" CHAR(50)            DEFAULT NULL,
     "solarSystemID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     "stationID"       BIGINT(20) UNSIGNED NOT NULL,
-    "stationName"     CHAR(255) DEFAULT NULL,
+    "stationName"     CHAR(255)           DEFAULT NULL,
     "stationTypeID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     PRIMARY KEY ("stationID")
 )

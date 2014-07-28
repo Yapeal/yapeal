@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAttackers" (
     "corporationName" CHAR(50) DEFAULT NULL,
     "damageDone"      BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"     CHAR(24) DEFAULT NULL,
+    "factionName"     CHAR(50) DEFAULT NULL,
     "finalBlow"       TINYINT(1)          NOT NULL,
     "securityStatus"  DOUBLE              NOT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charCharacterSheet" (
     "corporationID"    BIGINT(20) UNSIGNED NOT NULL,
     "corporationName"  CHAR(50)            NOT NULL,
     "factionID"        BIGINT(20) UNSIGNED DEFAULT '0',
-    "factionName"  CHAR(24) DEFAULT '',
+    "factionName"  CHAR(50) DEFAULT '',
     "DoB"              DATETIME            NOT NULL,
     "gender"           CHAR(6)             NOT NULL,
     "name"             CHAR(24)            NOT NULL,
@@ -257,7 +257,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charFacWarStats";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"            CHAR(24)            NOT NULL,
+    "factionName" CHAR(50) NOT NULL,
     "enlisted"               DATETIME            NOT NULL,
     "currentRank"            BIGINT(20) UNSIGNED NOT NULL,
     "highestRank"            BIGINT(20) UNSIGNED NOT NULL,
@@ -472,7 +472,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charStandingsFromFactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
-    "fromName" CHAR(24)            NOT NULL,
+    "fromName" CHAR(50) NOT NULL,
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
@@ -499,7 +499,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charVictim" (
     "corporationName" CHAR(50) DEFAULT NULL,
     "damageTaken"     BIGINT(20) UNSIGNED NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"     CHAR(24) DEFAULT NULL,
+    "factionName" CHAR(50) DEFAULT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "characterID")
 )

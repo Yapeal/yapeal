@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
     "corporationName" CHAR(50) DEFAULT NULL,
     "damageDone"      BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"     CHAR(24)            NOT NULL,
+    "factionName"     CHAR(50) NOT NULL,
     "finalBlow"       TINYINT(1)          NOT NULL,
     "securityStatus"  DOUBLE              NOT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -182,7 +182,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacWarStats";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
-    "factionName"            CHAR(24)            NOT NULL,
+    "factionName" CHAR(50) NOT NULL,
     "enlisted"               DATETIME            NOT NULL,
     "currentRank"            BIGINT(20) UNSIGNED NOT NULL,
     "highestRank"            BIGINT(20) UNSIGNED NOT NULL,
@@ -404,7 +404,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromFactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
-    "fromName" CHAR(24)            NOT NULL,
+    "fromName" CHAR(50) NOT NULL,
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
     "corporationName" CHAR(50) DEFAULT NULL,
     "damageTaken"     BIGINT(20) UNSIGNED NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
-    "factionName"     CHAR(24)            NOT NULL,
+    "factionName"     CHAR(50) NOT NULL,
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "characterID")
 )

@@ -19,7 +19,10 @@
                 "lib/",
                 "bin/"
             ],
-            "Pimple\\": ["subtree/Pimple/src/"]
+            "Pimple\\": [
+                "subtree/Pimple/src/",
+                "subtree/Pimple/src/Pimple/"
+            ]
         }
     },
     "autoload-dev": {

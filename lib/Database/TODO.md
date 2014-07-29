@@ -9,9 +9,9 @@
 |-----------------------|-------------|
 | Account/AccountStatus | yes         |
 | Account/APIKeyInfo    | yes         |
-| Account/Characters    | yes         |
+| Account/Characters    | yes via APIKeyInfo |
 
-### Character (14 of 32)
+### Character (15 of 32)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
@@ -43,12 +43,12 @@
 | Char/Research               | yes         |
 | Char/SkillInTraining        | no          |
 | Char/SkillQueue             | yes         |
-| Char/Standings              | no          |
+| Char/Standings              | yes         |
 | Char/UpcomingCalendarEvents | no          |
 | Char/WalletJournal          | yes         |
 | Char/WalletTransactions     | yes         |
 
-### Corporation (11 of 28)
+### Corporation (12 of 28)
 
 | Endpoint                  | Implemented                |
 |---------------------------|----------------------------|
@@ -74,7 +74,7 @@
 | Corp/OutpostList          | no                         |
 | Corp/OutpostServiceDetail | no                         |
 | Corp/Shareholders         | no                         |
-| Corp/Standings            | no                         |
+| Corp/Standings            | yes                        |
 | Corp/StarbaseList         | yes                        |
 | Corp/StarbaseDetail       | yes                        |
 | Corp/Titles               | no                         |

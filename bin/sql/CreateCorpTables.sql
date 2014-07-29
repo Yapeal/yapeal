@@ -132,8 +132,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContracts" (
     PRIMARY KEY ("ownerID", "contractID")
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =utf8
-    COLLATE =utf8_unicode_ci;
+    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCorporateContactList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,

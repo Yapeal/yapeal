@@ -11,7 +11,7 @@
 | Account/APIKeyInfo    | yes         |
 | Account/Characters    | yes via APIKeyInfo |
 
-### Character (15 of 32)
+### Character (16 of 32)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
@@ -21,7 +21,7 @@
 | Char/CharacterSheet         | yes         |
 | Char/ContactList            | yes         |
 | Char/ContactNotifications   | yes         |
-| Char/Contracts              | no          |
+| Char/Contracts              | yes         |
 | Char/ContractItems          | no          |
 | Char/ContractBids           | no          |
 | Char/FacWarStats            | no          |

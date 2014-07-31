@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPoi
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveErrorList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveErrorList" (
-    "errorCode" SMALLINT(3) UNSIGNED NOT NULL,
+  "errorCode" SMALLINT(4) UNSIGNED NOT NULL,
     "errorText" TEXT,
     PRIMARY KEY ("errorCode")
 )

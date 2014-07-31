@@ -46,44 +46,6 @@ Yapeal:
         # access to the tables.
         userName: YapealUser
 
-    # Care should be taken when making changes to the 'Log' section as mistakes
-    # here could cause Yapeal not to run correctly and also have no way to
-    # let the user know.
-    Log:
-        # This setting is used in the FingersCrossedHandlier that is used by the
-        # normal Monolog\ErrorHandlier.
-        # How many entries should be buffered at most, beyond that the oldest
-        # items are removed from the buffer.
-        # The default of 25 seems to work well and should not be changed.
-        bufferSize: 25
-
-        # See Monolog at https://github.com/Seldaek/monolog for more details
-        # about how this setting is used.
-        channel: yapeal
-
-        # Yapeal by default uses Monolog but it can be changed to use any logger
-        # that follows PSR-3. YOu can find more information about PSR-3 at
-        # http://www.php-fig.org/psr/psr-3/
-        class: Monolog\Logger
-
-        # Name of the log file to be used.
-        # The default 'yapeal.log' will be found in the logDir.
-        # For example: /where/installed/yapeal/log/yapeal.log
-        fileName: yapeal.log
-
-        # Directory where log file will be stored.
-        # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
-        # inside the directory where Yapeal was installed.
-        logDir: '{Yapeal.baseDir}log/'
-
-        # Threshold that should trigger logging.
-        # Allowed values:
-        # 100(DEBUG), 200(INFO), 250(NOTICE), 300(WARNING), 400(ERROR),
-        # 500(CRITICAL), 550(ALERT), 600(EMERGENCY)
-        # Recommended default for development NOTICE or INFO
-        # Recommended default for production WARNING or ERROR
-        threshold: 300
-
     # Changes to all settings in the 'Error' section should only be done if
     # directed to by a developer for debugging. Incorrect changes to these
     # settings could prevent fatal programming errors from being logged.
@@ -112,6 +74,44 @@ Yapeal:
         # Recommended default is 1-2 levels above Yapeal.Log.threshold but
         # capped no higher than 500(CRITICAL)
         threshold: 400
+
+    # Care should be taken when making changes to the 'Log' section as mistakes
+    # here could cause Yapeal not to run correctly and also have no way to
+    # let the user know.
+    Log:
+        # This setting is used in the FingersCrossedHandlier that is used by the
+        # normal Monolog\ErrorHandlier.
+        # How many entries should be buffered at most, beyond that the oldest
+        # items are removed from the buffer.
+        # The default of 25 seems to work well and should not be changed.
+        bufferSize: 25
+
+        # See Monolog at https://github.com/Seldaek/monolog for more details
+        # about how this setting is used.
+        channel: yapeal
+
+        # Yapeal by default uses Monolog but it can be changed to use any logger
+        # that follows PSR-3. You can find more information about PSR-3 at
+        # http://www.php-fig.org/psr/psr-3/
+        class: Monolog\Logger
+
+        # Name of the log file to be used.
+        # The default 'yapeal.log' will be found in the logDir.
+        # For example: /where/installed/yapeal/log/yapeal.log
+        fileName: yapeal.log
+
+        # Directory where log file will be stored.
+        # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
+        # inside the directory where Yapeal was installed.
+        logDir: '{Yapeal.baseDir}log/'
+
+        # Threshold that should trigger logging.
+        # Allowed values:
+        # 100(DEBUG), 200(INFO), 250(NOTICE), 300(WARNING), 400(ERROR),
+        # 500(CRITICAL), 550(ALERT), 600(EMERGENCY)
+        # Recommended default for development NOTICE or INFO
+        # Recommended default for production WARNING or ERROR
+        threshold: 300
 
     # Some network related settings mostly having to do with Eve API server
     # connection.

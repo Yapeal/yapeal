@@ -36,5 +36,4 @@ use Yapeal\Container\PimpleContainer;
  * @var PimpleContainer $container
  */
 $yapeal = new Yapeal($container);
-$result = $yapeal->autoMagic();
-exit($result);
+exit($yapeal->autoMagic());

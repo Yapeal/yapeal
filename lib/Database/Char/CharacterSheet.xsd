@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="attributeEnhancersRowType">
         <xs:simpleContent>
@@ -90,10 +91,14 @@
             <xs:element type="xs:string" name="gender"/>
             <xs:element type="xs:string" name="corporationName"/>
             <xs:element type="eveIDType" name="corporationID"/>
-            <xs:element type="xs:string" name="allianceName"/>
-            <xs:element type="eveIDType" name="allianceID"/>
-            <xs:element type="xs:string" name="factionName"/>
-            <xs:element type="eveIDType" name="factionID"/>
+            <xs:element type="xs:string" name="allianceName" minOccurs="0"
+                        maxOccurs="1"/>
+            <xs:element type="eveIDType" name="allianceID" minOccurs="0"
+                        maxOccurs="1"/>
+            <xs:element type="xs:string" name="factionName" minOccurs="0"
+                        maxOccurs="1"/>
+            <xs:element type="eveIDType" name="factionID" minOccurs="0"
+                        maxOccurs="1"/>
             <xs:element type="xs:string" name="cloneName"/>
             <xs:element type="xs:unsignedInt" name="cloneSkillPoints"/>
             <xs:element type="eveISKType" name="balance"/>

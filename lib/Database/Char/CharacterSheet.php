@@ -71,7 +71,7 @@ class CharacterSheet extends AbstractCharSection
                 $ownerID
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;
@@ -89,12 +89,12 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'augmentatorName' => null,
             'augmentatorValue' => null,
             'bonusName' => null,
             'ownerID' => $ownerID
-        );
+        ];
         $tableName = 'charAttributeEnhancers';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
@@ -120,14 +120,14 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'charisma' => null,
             'intelligence' => null,
             'memory' => null,
             'ownerID' => $ownerID,
             'perception' => null,
             'willpower' => null
-        );
+        ];
         $this->valuesPreserveData(
             $xml,
             $columnDefaults,
@@ -147,10 +147,10 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'certificateID' => null
-        );
+        ];
         $tableName = 'charCertificates';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
@@ -176,7 +176,7 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'allianceID' => '0',
             'allianceName' => null,
             'ancestry' => null,
@@ -193,7 +193,7 @@ class CharacterSheet extends AbstractCharSection
             'gender' => null,
             'name' => null,
             'race' => null
-        );
+        ];
         $this->valuesPreserveData(
             $xml,
             $columnDefaults,
@@ -212,11 +212,11 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'roleID' => null,
             'roleName' => null
-        );
+        ];
         $tableSuffixes = ['', 'AtBase', 'AtHQ', 'AtOther'];
         foreach ($tableSuffixes as $suffix) {
             $tableName = 'charCorporationRoles' . $suffix;
@@ -246,11 +246,11 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'titleID' => null,
             'titleName' => null
-        );
+        ];
         $tableName = 'charCorporationTitles';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
@@ -277,13 +277,13 @@ class CharacterSheet extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'level' => null,
             'ownerID' => $ownerID,
             'published' => null,
             'skillpoints' => null,
             'typeID' => null
-        );
+        ];
         $tableName = 'charSkills';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);

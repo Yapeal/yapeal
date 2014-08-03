@@ -92,7 +92,7 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
-            str_replace(array("\n", "\r\n"), '', $sql),
+            str_replace(["\n", "\r\n"], '', $sql),
             $this->databaseName,
             $this->tablePrefix,
             $mask
@@ -120,7 +120,7 @@ SELECT ac."corporationID",urk."keyID",urk."vCode"
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
-            str_replace(array("\n", "\r\n"), '', $sql),
+            str_replace(["\n", "\r\n"], '', $sql),
             $this->databaseName,
             $this->tablePrefix,
             $mask
@@ -161,7 +161,7 @@ SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
-            str_replace(array("\n", "\r\n"), '', $sql),
+            str_replace(["\n", "\r\n"], '', $sql),
             $this->databaseName,
             $this->tablePrefix,
             $mask
@@ -220,7 +220,7 @@ SQL;
             '(' . implode(',', array_fill(0, count($columnNameList), '?'))
             . ')';
         $rows = implode(',', array_fill(0, $rowCount, $rowPrototype));
-        $updates = array();
+        $updates = [];
         foreach ($columnNameList as $column) {
             $updates[] = '"' . $column . '"=values("' . $column . '")';
         }
@@ -259,8 +259,7 @@ SQL;
      */
     public function getUtilCachedUntilUpsert()
     {
-        $columnNameList =
-            array('apiName', 'expires', 'ownerID', 'sectionName');
+        $columnNameList = ['apiName', 'expires', 'ownerID', 'sectionName'];
         return $this->getUpsert('utilCachedUntil', $columnNameList, 1);
     }
     /**

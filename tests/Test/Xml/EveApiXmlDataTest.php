@@ -109,21 +109,6 @@ class EveApiXmlDataTest extends \PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function testHasXmlRowSet()
-    {
-        $this->assertAttributeEquals('', 'eveApiXml', $this->data);
-        $this->assertFalse($this->data->hasXmlRowSet());
-        $this->data->setEveApiXml('<rowset>');
-        $this->assertAttributeEquals(
-             '<rowset>',
-                 'eveApiXml',
-             $this->data
-        );
-        $this->assertTrue($this->data->hasXmlRowSet());
-    }
-    /**
-     *
-     */
     public function testSetEveApiNameException()
     {
         $test = (int)20;

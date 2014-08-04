@@ -93,7 +93,6 @@ trait EveApiToolsTrait
             $first += 3;
             $last = strpos($sql, ' ON ', $first);
             $mess = substr($sql, 0, $first) . '...' . substr($sql, $last);
-            //$mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
         } else {
             $mess = $sql;
         }

@@ -88,7 +88,15 @@ trait EveApiToolsTrait
                         $columnNames,
                         $rowCount
                     );
-        $mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
+        $first = strpos($sql, '?),');
+        if ($first !== false) {
+            $first += 3;
+            $last = strpos($sql, ' ON ', $first);
+            $mess = substr($sql, 0, $first) . '...' . substr($sql, $last);
+            //$mess = preg_replace('/(,\(\?(?:,\?)*\))+/', ',...', $sql);
+        } else {
+            $mess = $sql;
+        }
         $this->getLogger()
              ->info($mess);
         $mess = implode(',', $columns);

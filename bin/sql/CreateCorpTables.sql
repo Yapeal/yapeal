@@ -61,6 +61,22 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}corpBlueprints";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpBlueprints" (
+    "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
+    "itemID"             BIGINT(20) UNSIGNED NOT NULL,
+    "locationID"         BIGINT(20) UNSIGNED NOT NULL,
+    "typeID"             BIGINT(20) UNSIGNED NOT NULL,
+    "typeName"           CHAR(255)           NOT NULL,
+    "flagID"             BIGINT(20) UNSIGNED NOT NULL,
+    "quantity"           BIGINT(20)          NOT NULL,
+    "timeEfficiency"     TINYINT(3) UNSIGNED NOT NULL,
+    "materialEfficiency" TINYINT(3) UNSIGNED NOT NULL,
+    "runs"               BIGINT(20)          NOT NULL,
+    PRIMARY KEY ("ownerID", "itemID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,

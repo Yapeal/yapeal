@@ -11,12 +11,13 @@
 | Account/APIKeyInfo    | yes         |
 | Account/Characters    | yes via APIKeyInfo |
 
-### Character (16 of 32)
+### Character (17 of 33)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
 | Char/AccountBalance         | yes         |
 | Char/AssetList              | no          |
+| Char/Blueprints             | yes         |
 | Char/CalendarEventAttendees | no          |
 | Char/CharacterSheet         | yes         |
 | Char/ContactList            | yes         |
@@ -48,12 +49,13 @@
 | Char/WalletJournal          | yes         |
 | Char/WalletTransactions     | yes         |
 
-### Corporation (12 of 28)
+### Corporation (13 of 29)
 
 | Endpoint                  | Implemented                |
 |---------------------------|----------------------------|
 | Corp/AccountBalance       | yes                        |
 | Corp/AssetList            | no                         |
+| Corp/Blueprints           | yes                        |
 | Corp/ContactList          | yes                        |
 | Corp/ContainerLog         | no                         |
 | Corp/ContractBids         | no                         |

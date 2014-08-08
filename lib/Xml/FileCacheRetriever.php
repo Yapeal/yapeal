@@ -17,7 +17,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
-*@copyright 2014 Michael Cummings
+ * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -271,9 +271,11 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         $current = strtotime($simple->currentTime . '+00:00');
         $until = strtotime($simple->cachedUntil . '+00:00');
         // At minimum use cached XML for 5 minutes (300 secs).
-        if (($current + 300) <= $now) {
+        if (($now - $current) <= 300) {
             return false;
         }
+        // Catch and log APIs with bad CachedUntil times so CCP can be told and
+        // get them fixed.
         if ($until <= $current) {
             $mess = sprintf(
                 'CachedUntil is invalid was given %1$s and currentTime is %2$s',
@@ -295,7 +297,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
                  ->notice($mess);
             return true;
         }
-        if ($until >= $now) {
+        if ($until <= $now) {
             return true;
         }
         return false;

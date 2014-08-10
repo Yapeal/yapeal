@@ -2,7 +2,7 @@
 /**
  * Contains GuzzleNetworkRetriever class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
  * This file is part of yapeal
@@ -103,14 +103,6 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         return $this;
     }
     /**
-     * @type ClientInterface
-     */
-    protected $client;
-    /**
-     * @type LoggerInterface
-     */
-    protected $logger;
-    /**
      * @return ClientInterface
      */
     protected function getClient()
@@ -158,4 +150,12 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         }
         return $response->getBody(true);
     }
+    /**
+     * @type ClientInterface
+     */
+    protected $client;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
 }

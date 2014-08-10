@@ -2,10 +2,11 @@
 /**
  * Contains DatabaseInitializer class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -74,10 +75,6 @@ class DatabaseInitializer extends Command
         $this->cwd = $value;
         return $this;
     }
-    /**
-     * @type string
-     */
-    protected $cwd;
     /**
      * Configures the current command.
      */
@@ -175,18 +172,18 @@ HELP;
             $configFile =
                 $this->getNormalizedPath($options['configFile']);
         }
-        $config = array();
+        $config = [];
         if ($this->isAccessibleConfigFile($configFile, $output)) {
             $mess = sprintf(
                 'Using configuration file %1$s for settings',
                 $configFile
             );
             $output->writeln($mess);
-            $config = $this->getConfigFileSettings($configFile);
-            $config = $config['Yapeal']['Database'];
+            $config =
+                $this->getConfigFileSettings($configFile)['Yapeal']['Database'];
         }
         $config = array_replace(
-            array('tablePrefix' => ''),
+            ['tablePrefix' => ''],
             $config
         );
         foreach ($options as $key => $value) {
@@ -194,8 +191,8 @@ HELP;
                 $config[$key] = $value;
             }
         }
-        $required = array('database', 'hostName', 'password', 'userName');
-        $mess = array();
+        $required = ['database', 'hostName', 'password', 'userName'];
+        $mess = [];
         foreach ($required as $setting) {
             if (empty($config[$setting])) {
                 $mess[] =
@@ -293,7 +290,7 @@ HELP;
         $options,
         OutputInterface $output
     ) {
-        $fileNames = array(
+        $fileNames = [
             'Database',
             'AccountTables',
             'ApiTables',
@@ -304,10 +301,10 @@ HELP;
             'ServerTables',
             'UtilTables',
             'CustomTables'
-        );
-        $templates = array(';', '{database}', '{table_prefix}');
+        ];
+        $templates = [';', '{database}', '{table_prefix}'];
         $replacements =
-            array('', $options['database'], $options['tablePrefix']);
+            ['', $options['database'], $options['tablePrefix']];
         foreach ($fileNames as $fileName) {
             $file = $this->getCwd() . '/bin/sql/Create' . $fileName . '.sql';
             if (!is_file($file)) {
@@ -360,4 +357,8 @@ HELP;
             $output->writeln('');
         }
     }
+    /**
+     * @type string
+     */
+    protected $cwd;
 }

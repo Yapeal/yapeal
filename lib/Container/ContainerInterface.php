@@ -2,7 +2,7 @@
 /**
  * Contains ContainerInterface Interface.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online

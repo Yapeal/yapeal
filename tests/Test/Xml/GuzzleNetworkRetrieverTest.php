@@ -2,7 +2,7 @@
 /**
  * Contains GuzzleNetworkRetrieverTest class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
  * This file is part of yapeal
@@ -116,26 +116,6 @@ class GuzzleNetworkRetrieverTest extends PHPUnit_Framework_TestCase
         $this->retriever->retrieveEveApi($dataMock);
     }
     /**
-     * @type \Guzzle\Http\ClientInterface|PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $client;
-    /**
-     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $logger;
-    /**
-     * @type RequestInterface|PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $request;
-    /**
-     * @type Response|PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $response;
-    /**
-     * @var GuzzleNetworkRetriever
-     */
-    protected $retriever;
-    /**
      * @throws \PHPUnit_Framework_Exception
      * @return \Guzzle\Http\ClientInterface|PHPUnit_Framework_MockObject_MockObject
      */
@@ -188,4 +168,24 @@ class GuzzleNetworkRetrieverTest extends PHPUnit_Framework_TestCase
                              ->getMock();
         return $mockResponse;
     }
+    /**
+     * @type \Guzzle\Http\ClientInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $client;
+    /**
+     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
+    /**
+     * @type RequestInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $request;
+    /**
+     * @type Response|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $response;
+    /**
+     * @var GuzzleNetworkRetriever
+     */
+    protected $retriever;
 }

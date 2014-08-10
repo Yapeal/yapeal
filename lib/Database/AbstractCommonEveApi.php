@@ -2,10 +2,11 @@
 /**
  * Contains AbstractCommonEveApi class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -36,6 +37,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
+use tidy;
 use XSLTProcessor;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
@@ -149,14 +151,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return $this->$method($data->getEveApiXml());
     }
     /**
-     * @return string
-     */
-    abstract protected function getApiName();
-    /**
-     * @return string
-     */
-    abstract protected function getSectionName();
-    /**
      * @param string $apiName
      * @param string $sectionName
      * @param string $ownerID
@@ -198,6 +192,10 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return true;
     }
     /**
+     * @return string
+     */
+    abstract protected function getApiName();
+    /**
      * @throws LogicException
      * @return DatabasePreserverInterface
      */
@@ -213,6 +211,10 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         }
         return $this->attributesDatabasePreserver;
     }
+    /**
+     * @return string
+     */
+    abstract protected function getSectionName();
     /**
      * @throws LogicException
      * @return DatabasePreserverInterface
@@ -395,8 +397,23 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     {
         $xslt = new XSLTProcessor();
         $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
+        $config = [
+            'indent' => true,
+            'indent-spaces' => 2,
+            'output-xml' => true,
+            'input-xml' => true,
+            'wrap' => '1000'
+        ];
+        // Tidy
+        $tidy = new tidy();
         $data->setEveApiXml(
-            $xslt->transformToXml(new SimpleXMLElement($data->getEveApiXml()))
+            $tidy->repairString(
+                $xslt->transformToXml(
+                    new SimpleXMLElement($data->getEveApiXml())
+                ),
+                $config,
+                'utf8'
+            )
         );
         return $this;
     }

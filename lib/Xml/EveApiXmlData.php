@@ -2,7 +2,7 @@
 /**
  * Contains EveApiXmlData class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
  * This file is part of 1.1.x

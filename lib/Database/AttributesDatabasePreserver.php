@@ -2,10 +2,11 @@
 /**
  * Contains AttributesDatabasePreserver Class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -150,30 +151,6 @@ class AttributesDatabasePreserver implements
         return $this;
     }
     /**
-     * @var string[] $columnDefaults
-     */
-    protected $columnDefaults;
-    /**
-     * @var CommonSqlQueries
-     */
-    protected $csq;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-    /**
-     * @var int
-     */
-    protected $maxRowCount = 1000;
-    /**
-     * @var PDO
-     */
-    protected $pdo;
-    /**
-     * @var string $tableName
-     */
-    protected $tableName;
-    /**
      * @param string[] $columns
      * @param int      $cOr
      *
@@ -249,4 +226,28 @@ class AttributesDatabasePreserver implements
     {
         return $this->tableName;
     }
+    /**
+     * @var string[] $columnDefaults
+     */
+    protected $columnDefaults;
+    /**
+     * @var CommonSqlQueries
+     */
+    protected $csq;
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    /**
+     * @var int
+     */
+    protected $maxRowCount = 1000;
+    /**
+     * @var PDO
+     */
+    protected $pdo;
+    /**
+     * @var string $tableName
+     */
+    protected $tableName;
 }

@@ -2,10 +2,11 @@
 /**
  * Contains GroupPreserver class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -85,14 +86,6 @@ class GroupPreserver implements EveApiPreserverInterface, LoggerAwareInterface
         return $this;
     }
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-    /**
-     * @var EveApiPreserverInterface[]
-     */
-    protected $preserverList;
-    /**
      * @return LoggerInterface
      */
     protected function getLogger()
@@ -106,4 +99,12 @@ class GroupPreserver implements EveApiPreserverInterface, LoggerAwareInterface
     {
         return $this->preserverList;
     }
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    /**
+     * @var EveApiPreserverInterface[]
+     */
+    protected $preserverList;
 }

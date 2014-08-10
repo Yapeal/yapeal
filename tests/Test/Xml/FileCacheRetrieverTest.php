@@ -2,10 +2,11 @@
 /**
  * Contains FileCacheRetrieverTest class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -489,14 +490,6 @@ class FileCacheRetrieverTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expect, 'cachePath', $this->retriever);
     }
     /**
-     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $logger;
-    /**
-     * @type FileCacheRetriever
-     */
-    protected $retriever;
-    /**
      * @return EveApiXmlModifyInterface|PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDataMock()
@@ -542,4 +535,12 @@ class FileCacheRetrieverTest extends PHPUnit_Framework_TestCase
                    ->chmod(0333);
         return $filesystem;
     }
+    /**
+     * @type LoggerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
+    /**
+     * @type FileCacheRetriever
+     */
+    protected $retriever;
 }

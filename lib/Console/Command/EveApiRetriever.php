@@ -2,10 +2,11 @@
 /**
  * Contains EveApiRetriever class.
  *
- * PHP version 5.3
+ * PHP version 5.4
  *
  * LICENSE:
- * This file is part of 1.1.x-WIP
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
+ * API data and place it into a database.
  * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
@@ -29,6 +30,7 @@
 namespace Yapeal\Console\Command;
 
 use Guzzle\Http\Client;
+use InvalidArgumentException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerAwareInterface;
@@ -39,9 +41,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlData;
-use Yapeal\Xml\EveApiXmlModifyInterface;
 use Yapeal\Xml\FileCachePreserver;
 use Yapeal\Xml\GuzzleNetworkRetriever;
 
@@ -54,7 +56,7 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
      * @param string|null $name
      * @param string      $cwd
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \LogicException
      */
     public function __construct($name = null, $cwd)
@@ -69,14 +71,14 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
     /**
      * @param string $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setCwd($value)
     {
         if (!is_string($value)) {
             $mess = 'Cwd MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->cwd = $value;
         return $this;
@@ -92,14 +94,6 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
     {
         $this->logger = $logger;
     }
-    /**
-     * @type string
-     */
-    protected $cwd;
-    /**
-     * @type LoggerInterface
-     */
-    protected $logger;
     /**
      * Configures the current command.
      */
@@ -119,26 +113,8 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
             'post',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Optional list of additional POST parameter(s) to send to server.',
-            array()
+            []
         );
-//        $this->addOption(
-//            'keyID',
-//            null,
-//            InputOption::VALUE_REQUIRED,
-//            'The ID of the Customizable API Key for authentication.'
-//        );
-//        $this->addOption(
-//            'ownerID',
-//            null,
-//            InputOption::VALUE_REQUIRED,
-//            'The ID of character/corporation requesting the data for APIs that require it.'
-//        );
-//        $this->addOption(
-//            'vCode',
-//            null,
-//            InputOption::VALUE_REQUIRED,
-//            'The user defined or CCP generated Verification Code for the Customizable API Key.'
-//        );
         $this->addOption(
             'directory',
             'd',
@@ -181,7 +157,7 @@ EOF;
     ) {
         $posts = $input->getArgument('post');
         if (!empty($posts)) {
-            $arguments = array();
+            $arguments = [];
             foreach ($posts as $post) {
                 list($key, $value) = explode('=', $post);
                 $arguments[$key] = $value;
@@ -214,7 +190,7 @@ EOF;
      */
     protected function getClient()
     {
-        $headers = array(
+        $headers = [
             'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
                 . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;'
                 . 'q=0.5',
@@ -223,18 +199,18 @@ EOF;
             'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
             'Connection' => 'Keep-Alive',
             'Keep-Alive' => '300'
-        );
-        $defaults = array(
+        ];
+        $defaults = [
             'headers' => $headers,
             'timeout' => 10,
             'connect_timeout' => 30,
             'verify' =>
                 dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'config'
                 . DIRECTORY_SEPARATOR . 'eveonline.crt',
-        );
+        ];
         return new Client(
             'https://api.eveonline.com',
-            array('defaults' => $defaults)
+            ['defaults' => $defaults]
         );
     }
     /**
@@ -250,8 +226,8 @@ EOF;
     protected function getLogger()
     {
         if (empty($this->logger)) {
-            $handlerStreamCli = new StreamHandler('php://stderr');
-            $this->logger = new Logger('console', array($handlerStreamCli));
+            $this->logger =
+                new Logger('console', [new StreamHandler('php://stderr')]);
         }
         return $this->logger;
     }
@@ -269,10 +245,18 @@ EOF;
      * @param string   $sectionName
      * @param string[] $posts
      *
-     * @return EveApiXmlModifyInterface
+     * @return EveApiReadWriteInterface
      */
     protected function getXmlData($apiName, $sectionName, $posts)
     {
         return new EveApiXmlData($apiName, $sectionName, $posts);
     }
+    /**
+     * @type string
+     */
+    protected $cwd;
+    /**
+     * @type LoggerInterface
+     */
+    protected $logger;
 }

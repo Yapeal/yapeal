@@ -3,7 +3,7 @@
  * This file is a simple wrapper for Pimple so Yapeal is future proofed against
  * changes to it's API.
  *
- * PHP 5.3
+ * PHP version 5.4
  *
  * This is a wrapper / adapter to Pimple. Ran into many problems in composer etc
  * with trying to use version 2.0.x or master from Pimple as most other projects

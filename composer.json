@@ -59,6 +59,7 @@
         "ext-Reflection": "*",
         "ext-SimpleXML": "*",
         "ext-SPL": "*",
+        "ext-tidy": "*",
         "ext-xmlreader": "*",
         "ext-xsl": "*",
         "lib-curl": ">=7.15.0",

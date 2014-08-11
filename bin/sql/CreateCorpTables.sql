@@ -193,6 +193,22 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpDivisions" (
     PRIMARY KEY ("ownerID", "accountKey")
 )
     ENGINE =InnoDB;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacilities";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacilities" (
+    "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
+    "facilityID"       BIGINT(20) UNSIGNED NOT NULL,
+    "typeID"           BIGINT(20) UNSIGNED NOT NULL,
+    "typeName"         CHAR(255)           NOT NULL,
+    "solarSystemID"    BIGINT(20) UNSIGNED NOT NULL,
+    "solarSystemName"  CHAR(255)           NOT NULL,
+    "regionID"         BIGINT(20) UNSIGNED NOT NULL,
+    "regionName"       CHAR(255)           NOT NULL,
+    "starbaseModifier" DECIMAL(17, 2)      NOT NULL,
+    "tax"              DECIMAL(17, 2)      NOT NULL,
+    PRIMARY KEY ("ownerID", "facilityID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacWarStats";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,

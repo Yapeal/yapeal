@@ -62,7 +62,7 @@ VALUES
     ('corp', 'ContainerLog', 32, 3600, 1),
     ('corp', 'Contracts', 8388608, 900, 1),
     ('corp', 'CorporationSheet', 8, 21600, 1),
-    ('corp', 'Facilities', 64, 3600, 1),
+    ('corp', 'Facilities', 64, 900, 1),
     ('corp', 'FacWarStats', 64, 3600, 1),
     ('corp', 'IndustryJobs', 128, 900, 1),
     ('corp', 'IndustryJobsHistory', 128, 21600, 1),

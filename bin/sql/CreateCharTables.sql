@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAttackers" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName"   CHAR(24)                     DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50)                     DEFAULT NULL,
     "damageDone"      BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charCalendarEventAttendees";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24)            NOT NULL,
+    "characterName" CHAR(50) NOT NULL,
     "response"      CHAR(10)            NOT NULL,
     PRIMARY KEY ("ownerID", "characterID")
 )
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charCharacterSheet" (
     "factionName"      CHAR(50)            DEFAULT '',
     "DoB"              DATETIME            NOT NULL,
     "gender"           CHAR(6)             NOT NULL,
-    "name"             CHAR(24)            NOT NULL,
+    "name" CHAR(50) NOT NULL,
     "race"             CHAR(8)             NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -478,7 +478,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charStandingsFromAgents";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
-    "fromName" CHAR(24)            NOT NULL,
+    "fromName" CHAR(50) NOT NULL,
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
@@ -510,7 +510,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charVictim" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50) DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName"   CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "damageTaken"     BIGINT(20) UNSIGNED NOT NULL,

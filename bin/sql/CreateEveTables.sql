@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharacterInfo";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
     "characterID"       BIGINT(20) UNSIGNED NOT NULL,
-    "characterName"     CHAR(24)            NOT NULL,
+    "characterName" CHAR(50) NOT NULL,
     "race"              CHAR(8)             NOT NULL,
     "bloodline"         CHAR(24)            NOT NULL,
     "accountBalance"    DECIMAL(17, 2)      NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWee
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal" 
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterday";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterd
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsTotal";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(24) DEFAULT NULL,
+    "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPoi
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveErrorList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveErrorList" (
-  "errorCode" SMALLINT(4) UNSIGNED NOT NULL,
+    "errorCode" SMALLINT(4) UNSIGNED NOT NULL,
     "errorText" TEXT,
     PRIMARY KEY ("errorCode")
 )

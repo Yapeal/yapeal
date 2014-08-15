@@ -175,7 +175,7 @@ SQL;
      */
     public function getApiLock($hash)
     {
-        return sprintf('select get_lock(\'%1$s\',5)', $hash);
+        return sprintf('SELECT GET_LOCK(\'%1$s\',5)', $hash);
     }
     /**
      * @param string $tableName
@@ -223,7 +223,7 @@ SQL;
         $rows = implode(',', array_fill(0, $rowCount, $rowPrototype));
         $updates = [];
         foreach ($columnNameList as $column) {
-            $updates[] = '"' . $column . '"=values("' . $column . '")';
+            $updates[] = '"' . $column . '"=VALUES("' . $column . '")';
         }
         $updates = implode(',', $updates);
         $sql = sprintf(
@@ -246,8 +246,16 @@ SQL;
      */
     public function getUtilCachedUntilExpires($apiName, $sectionName, $ownerID)
     {
+        $sql = <<<'SQL'
+SELECT "expires"
+ FROM "%1$s"."%2$sutilCachedUntil"
+ WHERE
+ "apiName" = '%3$s'
+ AND "sectionName" = '%4$s'
+ AND "ownerID" = %5$s
+SQL;
         return sprintf(
-            'SELECT "expires" FROM "%1$s"."%2$sutilCachedUntil" WHERE "apiName" = \'%3$s\' AND "sectionName" = \'%4$s\' AND "ownerID" = %5$s',
+            str_replace(["\n", "\r\n"], '', $sql),
             $this->databaseName,
             $this->tablePrefix,
             $apiName,
@@ -260,8 +268,11 @@ SQL;
      */
     public function getUtilCachedUntilUpsert()
     {
-        $columnNameList = ['apiName', 'expires', 'ownerID', 'sectionName'];
-        return $this->getUpsert('utilCachedUntil', $columnNameList, 1);
+        return $this->getUpsert(
+            'utilCachedUntil',
+            ['apiName', 'expires', 'ownerID', 'sectionName'],
+            1
+        );
     }
     /**
      * @var string

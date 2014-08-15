@@ -1,123 +1,124 @@
 # TODO #
 
-## API Implementation (37 of 82) ##
+## API Implementation (45 of 85) ##
 
-### Accounts (2 of 3)
+### Account (3 of 3)
 
 
 | Endpoint              | Implemented |
 |-----------------------|-------------|
-| Account/AccountStatus | yes         |
-| Account/APIKeyInfo    | yes         |
-| Account/Characters    | yes via APIKeyInfo |
+| account/AccountStatus | yes         |
+| account/APIKeyInfo    | yes         |
+| account/Characters    | yes via APIKeyInfo |
 
 ### Character (17 of 33)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
-| Char/AccountBalance         | yes         |
-| Char/AssetList              | no          |
-| Char/Blueprints             | yes         |
-| Char/CalendarEventAttendees | no          |
-| Char/CharacterSheet         | yes         |
-| Char/ContactList            | yes         |
-| Char/ContactNotifications   | yes         |
-| Char/Contracts              | yes         |
-| Char/ContractItems          | no          |
-| Char/ContractBids           | no          |
-| Char/FacWarStats            | no          |
-| Char/IndustryJobs           | yes         |
-| Char/IndustryJobsHistory    | yes         |
-| Char/KillMails              | no          |
-| Char/Locations              | no          |
-| Char/MailBodies             | no          |
-| Char/MailingLists           | yes         |
-| Char/MailMessages           | yes         |
-| Char/MarketOrders           | yes         |
-| Char/Medals                 | no          |
-| Char/Notifications          | yes         |
-| Char/NotificationTexts      | no          |
-| Char/PlanetaryColonies      | no          |
-| Char/PlanetaryPins          | no          |
-| Char/PlanetaryRoutes        | no          |
-| Char/PlanetaryLinks         | no          |
-| Char/Research               | yes         |
-| Char/SkillInTraining        | no          |
-| Char/SkillQueue             | yes         |
-| Char/Standings              | yes         |
-| Char/UpcomingCalendarEvents | no          |
-| Char/WalletJournal          | yes         |
-| Char/WalletTransactions     | yes         |
+| char/AccountBalance         | yes         |
+| char/AssetList              | no          |
+| char/Blueprints             | yes         |
+| char/CalendarEventAttendees | no          |
+| char/CharacterSheet         | yes         |
+| char/ContactList            | yes         |
+| char/ContactNotifications   | yes         |
+| char/Contracts              | yes         |
+| char/ContractItems          | no          |
+| char/ContractBids           | no          |
+| char/FacWarStats            | no          |
+| char/IndustryJobs           | yes         |
+| char/IndustryJobsHistory    | yes         |
+| char/KillMails              | no          |
+| char/Locations              | no          |
+| char/MailBodies             | no          |
+| char/MailingLists           | yes         |
+| char/MailMessages           | yes         |
+| char/MarketOrders           | yes         |
+| char/Medals                 | no          |
+| char/Notifications          | yes         |
+| char/NotificationTexts      | no          |
+| char/PlanetaryColonies      | no          |
+| char/PlanetaryPins          | no          |
+| char/PlanetaryRoutes        | no          |
+| char/PlanetaryLinks         | no          |
+| char/Research               | yes         |
+| char/SkillInTraining        | no          |
+| char/SkillQueue             | yes         |
+| char/Standings              | yes         |
+| char/UpcomingCalendarEvents | no          |
+| char/WalletJournal          | yes         |
+| char/WalletTransactions     | yes         |
 
-### Corporation (13 of 29)
+### Corporation (14 of 30)
 
 | Endpoint                  | Implemented                |
 |---------------------------|----------------------------|
-| Corp/AccountBalance       | yes                        |
-| Corp/AssetList            | no                         |
-| Corp/Blueprints           | yes                        |
-| Corp/ContactList          | yes                        |
-| Corp/ContainerLog         | no                         |
-| Corp/ContractBids         | no                         |
-| Corp/ContractItems        | no                         |
-| Corp/Contracts            | yes                        |
-| Corp/CorporationSheet     | no                         |
-| Corp/FacWarStats          | no                         |
-| Corp/IndustryJobs         | yes                        |
-| Corp/IndustryJobsHistory  | yes                        |
-| Corp/KillMails            | no                         |
-| Corp/Locations            | no                         |
-| Corp/MarketOrders         | yes                        |
-| Corp/Medals               | no                         |
-| Corp/MemberMedals         | no                         |
-| Corp/MemberSecurity       | no                         |
-| Corp/MemberSecurityLog    | no                         |
-| Corp/MemberTracking       | yes (limited and extended) |
-| Corp/OutpostList          | no                         |
-| Corp/OutpostServiceDetail | no                         |
-| Corp/Shareholders         | no                         |
-| Corp/Standings            | yes                        |
-| Corp/StarbaseList         | yes                        |
-| Corp/StarbaseDetail       | yes                        |
-| Corp/Titles               | no                         |
-| Corp/WalletJournal        | yes                        |
-| Corp/WalletTransactions   | yes                        |
+| corp/AccountBalance       | yes                        |
+| corp/AssetList            | no                         |
+| corp/Blueprints           | yes                        |
+| corp/ContactList          | yes                        |
+| corp/ContainerLog         | no                         |
+| corp/ContractBids         | no                         |
+| corp/ContractItems        | no                         |
+| corp/Contracts            | yes                        |
+| corp/CorporationSheet     | no                         |
+| corp/Facilities           | yes                        |
+| corp/FacWarStats          | no                         |
+| corp/IndustryJobs         | yes                        |
+| corp/IndustryJobsHistory  | yes                        |
+| corp/KillMails            | no                         |
+| corp/Locations            | no                         |
+| corp/MarketOrders         | yes                        |
+| corp/Medals               | no                         |
+| corp/MemberMedals         | no                         |
+| corp/MemberSecurity       | no                         |
+| corp/MemberSecurityLog    | no                         |
+| corp/MemberTracking       | yes (limited and extended) |
+| corp/OutpostList          | no                         |
+| corp/OutpostServiceDetail | no                         |
+| corp/Shareholders         | no                         |
+| corp/Standings            | yes                        |
+| corp/StarbaseList         | yes                        |
+| corp/StarbaseDetail       | yes                        |
+| corp/Titles               | no                         |
+| corp/WalletJournal        | yes                        |
+| corp/WalletTransactions   | yes                        |
 
-### Eve (4 of 13)
+### Eve (5 of 13)
 
 | Endpoint                   | Implemented |
 |----------------------------|-------------|
-| EVE/AllianceList           | yes         |
-| EVE/CertificateTree        | no          |
-| EVE/CharacterAffiliation   | no          |
-| EVE/CharacterID            | no          |
-| EVE/CharacterInfo          | yes (public & private)      |
-| EVE/CharacterName          | no          |
-| EVE/ConquerableStationList | yes         |
-| EVE/ErrorList              | yes         |
-| EVE/FacWarStats            | no          |
-| EVE/FacWarTopStats         | no          |
-| EVE/RefTypes               | yes         |
-| EVE/SkillTree              | no          |
-| EVE/TypeName               | no          |
+| eve/AllianceList           | yes         |
+| eve/CertificateTree        | no          |
+| eve/CharacterAffiliation   | no          |
+| eve/CharacterID            | no          |
+| eve/CharacterInfo          | yes (public & private)      |
+| eve/CharacterName          | no          |
+| eve/ConquerableStationList | yes         |
+| eve/ErrorList              | yes         |
+| eve/FacWarStats            | no          |
+| eve/FacWarTopStats         | no          |
+| eve/RefTypes               | yes         |
+| eve/SkillTree              | no          |
+| eve/TypeName               | no          |
 
 ### Map (4 of 4)
 
 | Endpoint          | Implemented |
 |-------------------|-------------|
-| Map/FacWarSystems | yes         |
-| Map/Jumps         | yes         |
-| Map/Kills         | yes         |
-| Map/Sovereignty   | yes         |
+| map/FacWarSystems | yes         |
+| map/Jumps         | yes         |
+| map/Kills         | yes         |
+| map/Sovereignty   | yes         |
 
 ### Server (1 of 1)
 
 | Endpoint            | Implemented |
 |---------------------|-------------|
-| Server/ServerStatus | yes         |
+| server/ServerStatus | yes         |
 
 ### API (1 of 1)
 
 | Endpoint     | Implemented |
 |--------------|-------------|
-| API/CallList | yes         |
+| api/CallList | yes         |

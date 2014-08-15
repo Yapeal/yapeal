@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(50) DEFAULT NULL,
+    "characterName"   CHAR(50)                     DEFAULT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50)                     DEFAULT NULL,
     "damageDone"      BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(50) NOT NULL,
+    "characterName" CHAR(50)            NOT NULL,
     "response"      CHAR(10)            NOT NULL,
     PRIMARY KEY ("ownerID", "characterID")
 )
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContainerLog" (
     "ownerID"          BIGINT(20) UNSIGNED  NOT NULL,
     "action"           CHAR(24)             NOT NULL,
     "actorID"          BIGINT(20) UNSIGNED  NOT NULL,
-    "actorName" CHAR(50) NOT NULL,
+    "actorName"        CHAR(50)             NOT NULL,
     "flag"             SMALLINT(5) UNSIGNED NOT NULL,
     "itemID"           BIGINT(20) UNSIGNED  NOT NULL,
     "itemTypeID"       BIGINT(20) UNSIGNED  NOT NULL,
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "memberLimit"     SMALLINT(5)            NOT NULL DEFAULT '0',
     "shares"          BIGINT(20) UNSIGNED    NOT NULL,
     "stationID"       BIGINT(20) UNSIGNED    NOT NULL,
-    "stationName" CHAR(255) NOT NULL,
+    "stationName"     CHAR(255)              NOT NULL,
     "taxRate"         DECIMAL(5, 2) UNSIGNED NOT NULL,
     "ticker"          CHAR(5)                NOT NULL,
     "url"             VARCHAR(255)
@@ -425,7 +425,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromAgents";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
-    "fromName" CHAR(50) NOT NULL,
+    "fromName" CHAR(50)            NOT NULL,
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
@@ -481,7 +481,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(50) DEFAULT NULL,
+    "characterName"   CHAR(50)                     DEFAULT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50)                     DEFAULT NULL,
     "damageTaken"     BIGINT(20) UNSIGNED NOT NULL,
@@ -533,7 +533,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"           SMALLINT(4) UNSIGNED NOT NULL,
     "characterID"          BIGINT(20) UNSIGNED           DEFAULT NULL,
-    "characterName" CHAR(50) DEFAULT NULL,
+    "characterName"        CHAR(50)                      DEFAULT NULL,
     "clientID"             BIGINT(20) UNSIGNED           DEFAULT NULL,
     "clientName"           CHAR(50)                      DEFAULT NULL,
     "clientTypeID"         BIGINT(20) UNSIGNED           DEFAULT NULL,
@@ -547,7 +547,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
     "transactionID"        BIGINT(20) UNSIGNED  NOT NULL,
     "transactionType"      CHAR(4)              NOT NULL DEFAULT 'sell',
     "typeID"               BIGINT(20) UNSIGNED  NOT NULL,
-    "typeName"             CHAR(50)             NOT NULL,
+    "typeName"             CHAR(255)            NOT NULL,
     PRIMARY KEY ("ownerID", "accountKey", "transactionID")
 )
     ENGINE =InnoDB

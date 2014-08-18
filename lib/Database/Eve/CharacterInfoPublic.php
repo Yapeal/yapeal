@@ -125,6 +125,7 @@ class CharacterInfoPublic extends AbstractCharSection
         $columnDefaults = array(
             'recordID' => null,
             'corporationID' => null,
+            'corporationName' => null,
             'startDate' => null,
             'ownerID' => $ownerID
         );

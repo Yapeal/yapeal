@@ -75,8 +75,12 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         $this->getLogger()
              ->debug($mess);
         $result = $this->readXmlData($this->prepareConnection($data));
-        //$this->getLogger()->debug($result);
-        $data->setEveApiXml($result);
+        $data->setEveApiXml(
+            $this->addYapealProcessingInstructionToXml(
+                $result,
+                $data->getEveApiArguments()
+            )
+        );
         $this->__destruct();
         return $this;
     }
@@ -103,6 +107,33 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         return $this;
     }
     /**
+     * @param string   $xml
+     * @param string[] $arguments
+     *
+     * @return string
+     */
+    protected function addYapealProcessingInstructionToXml(
+        $xml,
+        array $arguments
+    ) {
+        if ($xml === false) {
+            return $xml;
+        }
+        if (isset($arguments['vCode'])) {
+            $arguments['vCode'] = substr($arguments['vCode'], 0, 8) . '...';
+        }
+        $json = json_encode($arguments);
+        return str_replace(
+            ["encoding='UTF-8'?>\r\n", "encoding='UTF-8'?>\n"],
+            [
+                "encoding='UTF-8'?>\r\n<?yapeal.parameters.json " . $json
+                . "?>\r\n",
+                "encoding='UTF-8'?>\n<?yapeal.parameters.json " . $json . "?>\n"
+            ],
+            $xml
+        );
+    }
+    /**
      * @return ClientInterface
      */
     protected function getClient()
@@ -123,13 +154,13 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
      */
     protected function prepareConnection(EveApiReadInterface $data)
     {
-        $uri = array(
+        $uri = [
             '/{EveApiSectionName}/{EveApiName}.xml.aspx',
-            array(
+            [
                 'EveApiSectionName' => $data->getEveApiSectionName(),
                 'EveApiName' => $data->getEveApiName()
-            )
-        );
+            ]
+        ];
         $client = $this->getClient();
         return $client->post($uri, null, $data->getEveApiArguments());
     }
@@ -145,7 +176,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         } catch (RequestException $exc) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                ->debug($mess, array('exception' => $exc));
+                ->debug($mess, ['exception' => $exc]);
             return false;
         }
         return $response->getBody(true);

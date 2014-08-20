@@ -139,11 +139,12 @@ SQL;
         );
     }
     /**
-     * @param int $mask
+     * @param int    $mask
+     * @param string $ownerID
      *
      * @return string
      */
-    public function getActiveStarbaseTowers($mask)
+    public function getActiveStarbaseTowers($mask, $ownerID)
     {
         $sql = <<<'SQL'
 SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
@@ -159,13 +160,15 @@ SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  WHERE
  aaki."type" = 'Corporation'
  AND urk."isActive"=1
+ AND sl."ownerID"=%4$s
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
         return sprintf(
             str_replace(["\n", "\r\n"], '', $sql),
             $this->databaseName,
             $this->tablePrefix,
-            $mask
+            $mask,
+            $ownerID
         );
     }
     /**

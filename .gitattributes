@@ -9,7 +9,6 @@
 # Declare files that will always have CRLF line endings on checkout.
 *.ini text eol=crlf
 *.md text eol=crlf
-*.sql text eol=crlf
 *.txt text eol=crlf
 *.yaml text eol=crlf
 LICENSE text eol=crlf
@@ -20,6 +19,7 @@ README text eol=crlf
 *.json text eol=lf
 *.pem text eol=lf
 *.php text eol=lf
+*.sql text eol=lf
 *.xml text eol=lf
 *.xsd text eol=lf
 *.xsl text eol=lf

@@ -29,3 +29,6 @@ ON DUPLICATE KEY UPDATE
     "interval"    = VALUES("interval"),
     "isActive"    = VALUES("isActive");
 COMMIT;
+ALTER TABLE "{database}"."{table_prefix}eveEmploymentHistory"
+ADD COLUMN "corporationName" CHAR(50) NULL DEFAULT NULL
+AFTER "corporationID";

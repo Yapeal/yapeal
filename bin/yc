@@ -33,10 +33,16 @@ namespace Yapeal;
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 use Symfony\Component\Console\Application;
 use Yapeal\Console\Command\DatabaseInitializer;
+use Yapeal\Console\Command\DatabaseUpdater;
 use Yapeal\Console\Command\EveApiRetriever;
+use Yapeal\Container\PimpleContainer;
 
 $cwd = str_replace('\\', '/', getcwd());
 $application = new Application('Yapeal Console', '0.0.1');
 $application->add(new EveApiRetriever('Network:Cache', $cwd));
 $application->add(new DatabaseInitializer('Database:Init', $cwd));
+/**
+ * @type PimpleContainer $container
+ */
+$application->add(new DatabaseUpdater('Database:Update', $cwd, $container));
 $application->run();

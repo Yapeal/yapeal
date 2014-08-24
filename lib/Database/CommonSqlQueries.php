@@ -278,6 +278,24 @@ SQL;
         );
     }
     /**
+     * @return string
+     */
+    public function getUtilCurrentDatabaseVersion()
+    {
+        return sprintf(
+            'SELECT "version" FROM "%1$s"."%2$sutilDatabaseVersion"',
+            $this->databaseName,
+            $this->tablePrefix
+        );
+    }
+    /**
+     * @return string
+     */
+    public function getUtilCurrentDatabaseVersionUpdate()
+    {
+        return $this->getUpsert('utilDatabaseVersion', ['version'], 1);
+    }
+    /**
      * @var string
      */
     protected $databaseName;

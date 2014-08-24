@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveRefTypes" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveTypeName";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveTypeName" (
     "typeID"   SMALLINT(5) UNSIGNED NOT NULL,
-    "typeName" CHAR(255) DEFAULT NULL,
+    "typeName" CHAR(255) NOT NULL,
     PRIMARY KEY ("typeID")
 )
     ENGINE =InnoDB

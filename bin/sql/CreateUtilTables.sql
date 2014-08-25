@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilDatabaseVersion";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
+    "version" CHAR(12) NOT NULL,
+    PRIMARY KEY ("version")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
+INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
+VALUES
+    ('197001010001');
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,

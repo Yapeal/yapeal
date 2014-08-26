@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="employmentHistoryRowType">
         <xs:simpleContent>
@@ -8,6 +9,8 @@
                 <xs:attribute type="eveIDType" name="recordID" use="required"/>
                 <xs:attribute type="eveIDType" name="corporationID"
                     use="required"/>
+                <xs:attribute type="xs:string" name="corporationName"
+                              use="required"/>
                 <xs:attribute type="eveNEDTType" name="startDate"
                     use="required"/>
             </xs:extension>

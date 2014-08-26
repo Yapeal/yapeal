@@ -30,6 +30,7 @@
  */
 namespace Yapeal\Database\Eve;
 
+use LogicException;
 use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
 use Yapeal\Database\EveApiNameTrait;
@@ -49,6 +50,8 @@ class CharacterInfo extends AbstractCharSection
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @throws LogicException
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -70,6 +73,7 @@ class CharacterInfo extends AbstractCharSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -91,7 +95,7 @@ class CharacterInfo extends AbstractCharSection
                 $ownerID
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
         }
@@ -105,7 +109,7 @@ class CharacterInfo extends AbstractCharSection
     protected function preserverToCharacterInfo(
         $xml
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'characterID' => null,
             'characterName' => null,
             'race' => null,
@@ -124,7 +128,7 @@ class CharacterInfo extends AbstractCharSection
             'allianceDate' => '1970-01-01 00:00:01',
             'lastKnownLocation' => '',
             'securityStatus' => '0'
-        );
+        ];
         $this->getValuesDatabasePreserver()
              ->setTableName('eveCharacterInfo')
              ->setColumnDefaults($columnDefaults)
@@ -141,13 +145,13 @@ class CharacterInfo extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'recordID' => null,
             'corporationID' => null,
             'corporationName' => null,
             'startDate' => null,
             'ownerID' => $ownerID
-        );
+        ];
         $this->getAttributesDatabasePreserver()
              ->setTableName('eveEmploymentHistory')
              ->setColumnDefaults($columnDefaults)

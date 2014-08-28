@@ -172,14 +172,15 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContracts" (
     "endStationID"   BIGINT(20) UNSIGNED  NOT NULL,
     "type"           CHAR(15)             NOT NULL,
     "status"         CHAR(24)             NOT NULL,
-    "title"          CHAR(50) DEFAULT NULL,
+    "title"         CHAR(255)
+                    COLLATE utf8_unicode_ci DEFAULT NULL,
     "forCorp"        TINYINT(1)           NOT NULL,
     "availability"   CHAR(8)              NOT NULL,
     "dateIssued"     DATETIME             NOT NULL,
     "dateExpired"    DATETIME             NOT NULL,
-    "dateAccepted"   DATETIME DEFAULT NULL,
+    "dateAccepted"  DATETIME                DEFAULT NULL,
     "numDays"        SMALLINT(3) UNSIGNED NOT NULL,
-    "dateCompleted"  DATETIME DEFAULT NULL,
+    "dateCompleted" DATETIME                DEFAULT NULL,
     "price"          DECIMAL(17, 2)       NOT NULL,
     "reward"         DECIMAL(17, 2)       NOT NULL,
     "collateral"     DECIMAL(17, 2)       NOT NULL,
@@ -268,7 +269,8 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charCorporationTitles" (
     PRIMARY KEY ("ownerID", "titleID")
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =ascii;
+    DEFAULT CHARSET =utf8
+    COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charFacWarStats";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
@@ -285,7 +287,8 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charFacWarStats" (
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
 )
-    ENGINE =InnoDB;
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}charFacWarStats" ADD INDEX "charFacWarStats1"  ("factionID");
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charIndustryJobs";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charIndustryJobs" (
@@ -348,8 +351,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charKillMails" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charMailBodies";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charMailBodies" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
-    "body"      TEXT
-                COLLATE utf8_unicode_ci,
+    "body" TEXT,
     "messageID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "messageID")
 )
@@ -370,13 +372,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charMailMessages" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
     "messageID"          BIGINT(20) UNSIGNED NOT NULL,
     "senderID"           BIGINT(20) UNSIGNED NOT NULL,
-    "senderName"         CHAR(50)            DEFAULT NULL,
+    "senderName"         CHAR(50)                DEFAULT NULL,
     "sentDate"           DATETIME            NOT NULL,
-    "title"              CHAR(255)           DEFAULT NULL,
+    "title"              CHAR(255)
+                         COLLATE utf8_unicode_ci DEFAULT NULL,
     "toCharacterIDs"     TEXT,
-    "toCorpOrAllianceID" BIGINT(20) UNSIGNED DEFAULT '0',
+    "toCorpOrAllianceID" BIGINT(20) UNSIGNED     DEFAULT '0',
     "toListID"           TEXT,
-    "senderTypeID"       BIGINT(20) UNSIGNED DEFAULT NULL,
+    "senderTypeID"       BIGINT(20) UNSIGNED     DEFAULT NULL,
     PRIMARY KEY ("ownerID", "messageID")
 )
     ENGINE =InnoDB
@@ -418,8 +421,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charNotificationTexts";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charNotificationTexts" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED NOT NULL,
-    "text"           TEXT
-                     COLLATE utf8_unicode_ci,
+    "text" TEXT,
     PRIMARY KEY ("ownerID", "notificationID")
 )
     ENGINE =InnoDB

@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpIndustryJobs" (
     "endDate"              DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "facilityID"           BIGINT(20) UNSIGNED NOT NULL,
     "installerID"          BIGINT(20) UNSIGNED NOT NULL,
-    "installerName" CHAR(50) DEFAULT NULL,
+    "installerName"        CHAR(50)                     DEFAULT NULL,
     "jobID"                BIGINT(20) UNSIGNED NOT NULL,
     "licensedRuns"         BIGINT(20) UNSIGNED NOT NULL,
     "outputLocationID"     BIGINT(20) UNSIGNED NOT NULL,

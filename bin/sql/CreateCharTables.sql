@@ -172,15 +172,15 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContracts" (
     "endStationID"   BIGINT(20) UNSIGNED  NOT NULL,
     "type"           CHAR(15)             NOT NULL,
     "status"         CHAR(24)             NOT NULL,
-    "title"         CHAR(255)
-                    COLLATE utf8_unicode_ci DEFAULT NULL,
+    "title"          CHAR(255)
+                     COLLATE utf8_unicode_ci DEFAULT NULL,
     "forCorp"        TINYINT(1)           NOT NULL,
     "availability"   CHAR(8)              NOT NULL,
     "dateIssued"     DATETIME             NOT NULL,
     "dateExpired"    DATETIME             NOT NULL,
-    "dateAccepted"  DATETIME                DEFAULT NULL,
+    "dateAccepted"   DATETIME                DEFAULT NULL,
     "numDays"        SMALLINT(3) UNSIGNED NOT NULL,
-    "dateCompleted" DATETIME                DEFAULT NULL,
+    "dateCompleted"  DATETIME                DEFAULT NULL,
     "price"          DECIMAL(17, 2)       NOT NULL,
     "reward"         DECIMAL(17, 2)       NOT NULL,
     "collateral"     DECIMAL(17, 2)       NOT NULL,
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charIndustryJobs" (
     "endDate"              DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "facilityID"           BIGINT(20) UNSIGNED NOT NULL,
     "installerID"          BIGINT(20) UNSIGNED NOT NULL,
-    "installerName" CHAR(50) DEFAULT NULL,
+    "installerName"        CHAR(50)                     DEFAULT NULL,
     "jobID"                BIGINT(20) UNSIGNED NOT NULL,
     "licensedRuns"         BIGINT(20) UNSIGNED NOT NULL,
     "outputLocationID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -351,7 +351,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charKillMails" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charMailBodies";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charMailBodies" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
-    "body" TEXT,
+    "body"      TEXT,
     "messageID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "messageID")
 )
@@ -421,7 +421,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charNotificationTexts";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charNotificationTexts" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED NOT NULL,
-    "text" TEXT,
+    "text"           TEXT,
     PRIMARY KEY ("ownerID", "notificationID")
 )
     ENGINE =InnoDB

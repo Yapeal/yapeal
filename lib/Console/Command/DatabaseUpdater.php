@@ -66,7 +66,6 @@ class DatabaseUpdater extends Command
         $this->setDic($dic);
         parent::__construct($name);
     }
-
     /**
      * @param string $value
      *
@@ -82,7 +81,6 @@ class DatabaseUpdater extends Command
         $this->cwd = $value;
         return $this;
     }
-
     /**
      * @param ContainerInterface $value
      *
@@ -193,7 +191,6 @@ You can also use the command before setting up a configuration file like so:
 HELP;
         $this->setHelp($help);
     }
-
     /**
      * Executes the current command.
      *
@@ -217,34 +214,6 @@ HELP;
         $this->processSql($output);
         return;
     }
-
-    /**
-     * @param OutputInterface $output
-     *
-     * @return string
-     */
-    protected function getCurrentDatabaseVersion(OutputInterface $output)
-    {
-        /**
-         * @var CommonSqlQueries $csq
-         */
-        $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
-        $sql = $csq->getUtilCurrentDatabaseVersion();
-        try {
-            $result = $this->getPdo($output)
-                           ->query($sql, PDO::FETCH_NUM);
-            $version = $result->fetchColumn();
-            //$output->writeln($version);
-            $result->closeCursor();
-        } catch (PDOException $exc) {
-            $mess =
-                '<warning>Could NOT get database version using default 197001010001</warning>';
-            $output->writeln([$sql, $mess]);
-            $version = '197001010001';
-        }
-        return sprintf('%1$012d', $version);
-    }
-
     /**
      * @return string
      */
@@ -252,7 +221,6 @@ HELP;
     {
         return $this->cwd;
     }
-
     /**
      * @return ContainerInterface
      */
@@ -260,7 +228,32 @@ HELP;
     {
         return $this->dic;
     }
-
+    /**
+     * @param OutputInterface $output
+     *
+     * @return string
+     */
+    protected function getLatestDatabaseVersion(OutputInterface $output)
+    {
+        /**
+         * @var CommonSqlQueries $csq
+         */
+        $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
+        $sql = $csq->getUtilLatestDatabaseVersion();
+        try {
+            $result = $this->getPdo($output)
+                           ->query($sql, PDO::FETCH_NUM);
+            $version = $result->fetchColumn();
+            //$output->writeln('database column version = ' . $version);
+            $result->closeCursor();
+        } catch (PDOException $exc) {
+            $mess =
+                '<warning>Could NOT get latest database version using default 197001010001</warning>';
+            $output->writeln([$sql, $mess]);
+            $version = '197001010001';
+        }
+        return sprintf('%1$012s', $version);
+    }
     /**
      * @param string $path
      *
@@ -272,7 +265,6 @@ HELP;
         $fpn = new FilePathNormalizer();
         return $fpn->normalizePath($path);
     }
-
     /**
      * @param OutputInterface $output
      *
@@ -324,7 +316,6 @@ HELP;
         }
         return $fileNames;
     }
-
     /**
      * @param array $options
      *
@@ -354,7 +345,6 @@ HELP;
         }
         return $this;
     }
-
     /**
      * @param OutputInterface $output
      */
@@ -370,8 +360,9 @@ HELP;
                 ';'
             ];
         $pdo = $this->getPdo($output);
-        $currentVersion = $this->getCurrentDatabaseVersion($output);
         foreach ($this->getUpdateFileList($output) as $fileName) {
+            $latestVersion = $this->getLatestDatabaseVersion($output);
+            //$output->writeln('$latestVersion = ' . $latestVersion);
             if (!is_file($fileName)) {
                 $mess = sprintf(
                     '<info>Could NOT find SQL file %1$s</info>',
@@ -380,11 +371,13 @@ HELP;
                 $output->writeln($mess);
                 continue;
             }
-            if (basename($fileName, '.sql') <= $currentVersion) {
+            $updateVersion = basename($fileName, '.sql');
+            //$output->writeln('$updateVersion = ' . $updateVersion);
+            if ($updateVersion <= $latestVersion) {
                 $mess = sprintf(
-                    '<info>Skipping SQL file %1$s <= database current version %2$s</info>',
+                    '<info>Skipping SQL file %1$s since its <= the latest database version %2$s</info>',
                     basename($fileName),
-                    $currentVersion
+                    $latestVersion
                 );
                 $output->writeln($mess);
                 continue;
@@ -401,7 +394,7 @@ HELP;
             $output->writeln($fileName);
             // Split up SQL into statements.
             $sqlStatements = explode(';', $sqlStatements);
-            // Replace {database}, {table_prefix}, and ';' in statements.
+            // Replace {database}, {table_prefix}, ';', and '$$' in statements.
             $sqlStatements =
                 str_replace($templates, $replacements, $sqlStatements);
             foreach ($sqlStatements as $statement => $sql) {
@@ -426,27 +419,25 @@ HELP;
                 }
                 $output->write('.');
             }
-            $currentVersion = basename($fileName, '.sql');
-            $this->updateCurrentDatabaseVersion($currentVersion, $output);
+            $this->updateDatabaseVersion($updateVersion, $output);
             $output->writeln('');
         }
     }
     /**
-     * @param string          $currentVersion
+     * @param string $updateVersion
      * @param OutputInterface $output
      *
      * @return self
      */
-    protected function updateCurrentDatabaseVersion(
-        $currentVersion,
+    protected function updateDatabaseVersion(
+        $updateVersion,
         OutputInterface $output
-    )
-    {
+    ) {
         /**
          * @var CommonSqlQueries $csq
          */
         $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
-        $sql = $csq->getUtilCurrentDatabaseVersionUpdate($currentVersion);
+        $sql = $csq->getUtilLatestDatabaseVersionUpdate($updateVersion);
         //$mess =sprintf( 'Updating database version to %1$s',$currentVersion);
         //$output->writeln([$sql, $mess]);
         try {
@@ -454,13 +445,13 @@ HELP;
                  ->beginTransaction();
             $stmt = $this->getPdo($output)
                          ->prepare($sql);
-            $stmt->execute([$currentVersion]);
+            $stmt->execute([$updateVersion]);
             $this->getPdo($output)
                  ->commit();
         } catch (PDOException $exc) {
             $mess = sprintf(
                 '<error>Database "version" update failed for %1$s</error>',
-                $currentVersion
+                $updateVersion
             );
             $output->writeln([$sql, $mess]);
             $this->getPdo($output)

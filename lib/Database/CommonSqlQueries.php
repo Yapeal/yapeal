@@ -280,10 +280,10 @@ SQL;
     /**
      * @return string
      */
-    public function getUtilCurrentDatabaseVersion()
+    public function getUtilLatestDatabaseVersion()
     {
         return sprintf(
-            'SELECT "version" FROM "%1$s"."%2$sutilDatabaseVersion"',
+            'SELECT MAX("version") FROM "%1$s"."%2$sutilDatabaseVersion"',
             $this->databaseName,
             $this->tablePrefix
         );
@@ -291,7 +291,7 @@ SQL;
     /**
      * @return string
      */
-    public function getUtilCurrentDatabaseVersionUpdate()
+    public function getUtilLatestDatabaseVersionUpdate()
     {
         return $this->getUpsert('utilDatabaseVersion', ['version'], 1);
     }

@@ -61,7 +61,7 @@ class Blueprints extends AbstractCorpSection
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'charBlueprints'
+            'corpBlueprints'
         );
         return $this;
     }

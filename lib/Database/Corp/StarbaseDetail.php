@@ -81,29 +81,40 @@ class StarbaseDetail extends AbstractCorpSection
             $preservers,
             $interval
         );
-        $active = $this->getActiveTowers();
-        if (empty($active)) {
+        $activeCorps = $this->getActiveCorporations();
+        if (empty($activeCorps)) {
             $this->getLogger()
-                ->info('No active Starbases found');
+                ->info('No active registered corporations found');
             return;
         }
-        foreach ($active as $tower) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
+        foreach ($activeCorps as $corp) {
+            $corpID = $corp['corporationID'];
             if ($this->cacheNotExpired(
                 $this->getApiName(),
                 $this->getSectionName(),
-                $tower['corporationID']
+                $corpID
             )
             ) {
                 continue;
             }
-            $data->setEveApiArguments($tower)
-                 ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers)) {
+            $activeTowers = $this->getActiveTowers($corpID);
+            if (empty($activeTowers)) {
+                $mess =
+                    sprintf('No active Starbase(s) found for %1$s', $corpID);
+                $this->getLogger()
+                     ->info($mess);
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $tower['corporationID']);
+            foreach ($activeTowers as $tower) {
+                $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                     ->setEveApiName($this->getApiName());
+                $data->setEveApiArguments($tower)
+                     ->setEveApiXml();
+                if (!$this->oneShot($data, $retrievers, $preservers)) {
+                    continue 2;
+                }
+            }
+            $this->updateCachedUntil($data, $interval, $corpID);
         }
     }
     /**
@@ -158,12 +169,14 @@ class StarbaseDetail extends AbstractCorpSection
         return true;
     }
     /**
+     * @param string $ownerID
+     *
      * @throws LogicException
      * @return array
      */
-    protected function getActiveTowers()
+    protected function getActiveTowers($ownerID)
     {
-        $sql = $this->csq->getActiveStarbaseTowers($this->getMask());
+        $sql = $this->csq->getActiveStarbaseTowers($this->getMask(), $ownerID);
         $this->getLogger()
              ->debug($sql);
         try {
@@ -171,10 +184,11 @@ class StarbaseDetail extends AbstractCorpSection
                          ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of towers';
+            $mess =
+                sprintf('Could NOT get a list of Starbases for %1$s', $ownerID);
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
+                ->warning($mess, ['exception' => $exc]);
+            return [];
         }
     }
     /**
@@ -206,7 +220,7 @@ class StarbaseDetail extends AbstractCorpSection
                 $this->getApiName()
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
         }
@@ -224,7 +238,7 @@ class StarbaseDetail extends AbstractCorpSection
         $ownerID,
         $itemID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
             'onAggressionEnabled' => '0',
@@ -233,7 +247,7 @@ class StarbaseDetail extends AbstractCorpSection
             'onStatusDropEnabled' => '0',
             'onStatusDropStanding' => '0',
             'useStandingsFromOwnerID' => '0',
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -254,12 +268,12 @@ class StarbaseDetail extends AbstractCorpSection
         $ownerID,
         $itemID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
             'typeID' => '0',
             'quantity' => '0'
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -280,14 +294,14 @@ class StarbaseDetail extends AbstractCorpSection
         $ownerID,
         $itemID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
             'usageFlags' => '0',
             'deployFlags' => '0',
             'allowCorporationMembers' => '0',
             'allowAllianceMembers' => '0'
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -308,13 +322,13 @@ class StarbaseDetail extends AbstractCorpSection
         $ownerID,
         $itemID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
             'onlineTimestamp' => '1970-01-01 00:00:01',
             'state' => '0',
             'stateTimestamp' => '1970-01-01 00:00:01'
-        );
+        ];
         $this->valuesPreserveData($xml, $columnDefaults, 'corpStarbaseDetail');
         return $this;
     }

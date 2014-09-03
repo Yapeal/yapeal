@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
+DROP TABLE IF EXISTS "{database}"."{table_prefix}utilDatabaseVersion";
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
+    "version" CHAR(12) NOT NULL,
+    PRIMARY KEY ("version")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
+INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
+VALUES
+    ('197001010001');
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
@@ -30,7 +40,7 @@ VALUES
     ('api', 'CallList', 1, 86400, 1),
     ('char', 'AccountBalance', 1, 900, 1),
     ('char', 'AssetList', 2, 21600, 1),
-    ('char', 'Blueprints', 2, 86400, 0),
+    ('char', 'Blueprints', 2, 86400, 1),
     ('char', 'CalendarEventAttendees', 4, 3600, 1),
     ('char', 'CharacterSheet', 8, 3600, 1),
     ('char', 'ContactList', 16, 900, 1),
@@ -57,7 +67,7 @@ VALUES
     ('char', 'WalletTransactions', 4194304, 3600, 1),
     ('corp', 'AccountBalance', 1, 900, 1),
     ('corp', 'AssetList', 2, 21600, 1),
-    ('corp', 'Blueprints', 2, 86400, 0),
+    ('corp', 'Blueprints', 2, 86400, 1),
     ('corp', 'ContactList', 16, 900, 1),
     ('corp', 'ContainerLog', 32, 3600, 1),
     ('corp', 'Contracts', 8388608, 900, 1),

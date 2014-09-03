@@ -30,6 +30,7 @@
  */
 namespace Yapeal\Database\Eve;
 
+use LogicException;
 use PDOException;
 use Yapeal\Database\Char\AbstractCharSection;
 use Yapeal\Database\EveSectionNameTrait;
@@ -51,6 +52,7 @@ class CharacterInfoPublic extends AbstractCharSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserve(
@@ -72,7 +74,7 @@ class CharacterInfoPublic extends AbstractCharSection
                 $ownerID
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
         }
@@ -86,7 +88,7 @@ class CharacterInfoPublic extends AbstractCharSection
     protected function preserverToCharacterInfo(
         $xml
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'characterID' => null,
             'characterName' => null,
             'race' => null,
@@ -105,7 +107,7 @@ class CharacterInfoPublic extends AbstractCharSection
             'allianceDate' => '1970-01-01 00:00:01',
             'lastKnownLocation' => '',
             'securityStatus' => '0'
-        );
+        ];
         $this->getValuesDatabasePreserver()
              ->setTableName('eveCharacterInfo')
              ->setColumnDefaults($columnDefaults)
@@ -122,13 +124,13 @@ class CharacterInfoPublic extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'recordID' => null,
             'corporationID' => null,
             'corporationName' => null,
             'startDate' => null,
             'ownerID' => $ownerID
-        );
+        ];
         $this->getAttributesDatabasePreserver()
              ->setTableName('eveEmploymentHistory')
              ->setColumnDefaults($columnDefaults)

@@ -70,7 +70,7 @@ class MemberTrackingExtended extends AbstractCorpSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'characterID' => null,
             'name' => null,
@@ -80,13 +80,13 @@ class MemberTrackingExtended extends AbstractCorpSection
             'title' => null,
             'logonDateTime' => '1970-01-01 00:00:01',
             'logoffDateTime' => '1970-01-01 00:00:01',
-            'locationID' => null,
+            'locationID' => '0',
             'location' => null,
-            'shipTypeID' => null,
+            'shipTypeID' => '0',
             'shipType' => null,
             'roles' => null,
             'grantableRoles' => null
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,

@@ -53,9 +53,11 @@ class WalletTransactions extends AbstractAccountKey
         $ownerID,
         $accountKey
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'accountKey' => $accountKey,
+            'characterID' => null,
+            'characterName' => null,
             'clientID' => null,
             'clientName' => null,
             'clientTypeID' => null,
@@ -70,7 +72,7 @@ class WalletTransactions extends AbstractAccountKey
             'transactionType' => null,
             'typeID' => null,
             'typeName' => null
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,

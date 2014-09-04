@@ -92,7 +92,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
          */
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName())
-            ->setEveApiArguments(array())
+            ->setEveApiArguments([])
              ->setEveApiXml();
         if ($this->cacheNotExpired(
             $this->getApiName(),
@@ -260,7 +260,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                 $data->getEveApiName()
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             return false;
         }
     }
@@ -373,12 +373,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             'Y-m-d H:i:s',
             strtotime($simple->currentTime . '+00:00') + $interval
         );
-        $row = array(
+        $row = [
             $this->getApiName(),
             $dateTime,
             $ownerID,
             $this->getSectionName()
-        );
+        ];
         try {
             $pdo->beginTransaction();
             $statement = $pdo->prepare($sql);

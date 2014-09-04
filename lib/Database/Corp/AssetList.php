@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use SimpleXMLElement;
 use Yapeal\Database\EveApiNameTrait;
 
@@ -89,6 +90,7 @@ class AssetList extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToAssetList($xml, $ownerID)
@@ -106,18 +108,27 @@ class AssetList extends AbstractCorpSection
             'singleton' => '0',
             'typeID' => null
         ];
+        $tableName = 'corpAssetList';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
         $simple = new SimpleXMLElement($xml);
-        $row = $simple->result->row[0];
-        $row['itemID'] = $ownerID;
-        $this->addNesting($simple->result->row[0]);
-        $this->flush(
-            $this->columns,
-            array_keys($this->columnDefaults),
-            'corpAssetList',
-            $this->rowCount
-        );
-        $this->columns = [];
-        $this->rowCount = 0;
+        if (!empty($simple->result)) {
+            $row = $simple->result->row[0];
+            $row['itemID'] = $ownerID;
+            $this->addNesting($simple->result->row[0]);
+            $this->flush(
+                $this->columns,
+                array_keys($this->columnDefaults),
+                $tableName,
+                $this->rowCount
+            );
+            $this->columns = [];
+            $this->rowCount = 0;
+        }
         return $this;
     }
     /**
@@ -155,13 +166,12 @@ class AssetList extends AbstractCorpSection
         <xsl:element name="row">
             <xsl:attribute name="itemID">0</xsl:attribute>
             <xsl:attribute name="locationID">0</xsl:attribute>
-            <xsl:attribute name="typeID">25</xsl:attribute>
+            <xsl:attribute name="typeID">2</xsl:attribute>
             <xsl:attribute name="quantity">1</xsl:attribute>
             <xsl:attribute name="flag">0</xsl:attribute>
             <xsl:attribute name="singleton">1</xsl:attribute>
             <xsl:attribute name="rawQuantity">-1</xsl:attribute>
             <xsl:attribute name="lvl">0</xsl:attribute>
-            <xsl:attribute name="lft">0</xsl:attribute>
             <xsl:apply-templates>
                 <xsl:sort select="@locationID" data-type="number"/>
                 <xsl:sort select="@itemID" data-type="number"/>

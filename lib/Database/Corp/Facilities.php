@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 
@@ -42,6 +43,7 @@ class Facilities extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToFacilities($xml, $ownerID)

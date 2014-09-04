@@ -58,10 +58,17 @@ class Blueprints extends AbstractCharSection
             'materialEfficiency' => null,
             'runs' => null
         ];
+        $tableName = 'charBlueprints';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'charBlueprints'
+            $tableName
         );
         return $this;
     }

@@ -29,6 +29,7 @@
  */
 namespace Yapeal\Database\Corp;
 
+use LogicException;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 
@@ -42,6 +43,7 @@ class Blueprints extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToBlueprints($xml, $ownerID)
@@ -58,10 +60,17 @@ class Blueprints extends AbstractCorpSection
             'materialEfficiency' => null,
             'runs' => null
         ];
+        $tableName = 'corpBlueprints';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'corpBlueprints'
+            $tableName
         );
         return $this;
     }

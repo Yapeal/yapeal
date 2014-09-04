@@ -58,10 +58,17 @@ class Facilities extends AbstractCorpSection
             'starbaseModifier' => null,
             'tax' => null
         ];
+        $tableName = 'corpFacilities';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'corpFacilities'
+            $tableName
         );
         return $this;
     }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element name="currentTQTime">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="eveNEDTType">
+                            <xs:attribute type="xs:unsignedByte" name="offset"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element type="eveNEDTType" name="trainingEndTime" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveNEDTType" name="trainingStartTime" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="eveIDType" name="trainingTypeID" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="trainingStartSP" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="trainingDestinationSP" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="trainingToLevel" maxOccurs="1"
+                minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="skillInTraining" maxOccurs="1"
+                minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

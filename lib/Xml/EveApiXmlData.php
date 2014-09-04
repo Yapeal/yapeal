@@ -47,7 +47,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
     public function __construct(
         $eveApiName = '',
         $eveApiSectionName = '',
-        array $eveApiArguments = array(),
+        array $eveApiArguments = [],
         $eveApiXml = false
     ) {
         $this->setEveApiName($eveApiName);
@@ -100,7 +100,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
     public function getEveApiArguments()
     {
         if (empty($this->eveApiArguments)) {
-            return array();
+            return [];
         }
         return $this->eveApiArguments;
     }
@@ -172,8 +172,8 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function setEveApiArguments(array $values)
     {
+        $this->eveApiArguments = [];
         if (empty($values)) {
-            $this->eveApiArguments = array();
             return $this;
         }
         foreach ($values as $name => $value) {

@@ -47,5 +47,5 @@ CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
 CALL "{database}"."AddOrModifyColumn"('{database}',
                                       '{table_prefix}eveCharacterInfo',
                                       'shipName',
-                                      "CHAR(255) COLLATE utf8_unicode_ci DEFAULT ''");
+                                      'CHAR(255) COLLATE utf8_unicode_ci DEFAULT \'\'');
 DROP PROCEDURE IF EXISTS "{database}"."AddOrModifyColumn";

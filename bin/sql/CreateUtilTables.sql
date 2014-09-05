@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('197001010001');
+    ('201409051857');
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,

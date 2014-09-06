@@ -29,32 +29,29 @@
  */
 namespace Yapeal\Database\Corp;
 
-use Yapeal\Database\AbstractAccountKey;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
-use Yapeal\Database\EveSectionNameTrait;
 
 /**
  * Class AccountBalance
  */
-class AccountBalance extends AbstractAccountKey
+class AccountBalance extends AbstractCorpSection
 {
-    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param string $xml
      * @param string $ownerID
-     * @param string $accountKey
      *
      * @return self
      */
-    protected function preserverToAccountBalance($xml, $ownerID, $accountKey)
+    protected function preserverToAccountBalance($xml, $ownerID)
     {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'accountID' => null,
-            'accountKey' => $accountKey,
+            'accountKey' => null,
             'balance' => null
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -66,8 +63,4 @@ class AccountBalance extends AbstractAccountKey
      * @var int $mask
      */
     protected $mask = 1;
-    /**
-     * @var int $maxKeyRange
-     */
-    protected $maxKeyRange = 1006;
 }

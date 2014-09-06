@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAccountBalance";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
     "accountID"  BIGINT(20) UNSIGNED  NOT NULL,
-    "accountKey" SMALLINT(4) UNSIGNED NOT NULL,
+    "accountKey" SMALLINT(5) UNSIGNED NOT NULL,
     "balance"    DECIMAL(17, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "accountKey")
 )

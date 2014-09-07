@@ -52,7 +52,7 @@ class WalletJournal extends AbstractAccountKey
         $ownerID,
         $accountKey
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'accountKey' => $accountKey,
             'date' => null,
@@ -71,7 +71,7 @@ class WalletJournal extends AbstractAccountKey
             'reason' => null,
             'taxReceiverID' => '0',
             'taxAmount' => '0'
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -80,11 +80,20 @@ class WalletJournal extends AbstractAccountKey
         return $this;
     }
     /**
+     * @type string[] $keyList
+     */
+    protected $keyList = [
+        '1000',
+        '1001',
+        '1002',
+        '1003',
+        '1004',
+        '1005',
+        '1006',
+        '10000'
+    ];
+    /**
      * @var int $mask
      */
     protected $mask = 1048576;
-    /**
-     * @var int $maxKeyRange
-     */
-    protected $maxKeyRange = 1006;
 }

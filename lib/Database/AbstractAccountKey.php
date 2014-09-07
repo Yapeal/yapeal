@@ -39,9 +39,6 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class AbstractAccountKey
- *
- * @property-read int $mask
- * @property-read int $maxKeyRange
  */
 abstract class AbstractAccountKey extends AbstractCommonEveApi
 {
@@ -93,13 +90,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             ) {
                 continue;
             }
-            foreach (range(1000, $this->getMaxKeyRange()) as $accountKey) {
+            foreach ($this->getKeyList() as $accountKey) {
                 $data->setEveApiSectionName(strtolower($this->getSectionName()))
                      ->setEveApiName($this->getApiName());
                 $activeKey['accountKey'] = $accountKey;
-                if (strpos($this->getApiName(), 'wallet')) {
-                    $data->addEveApiArgument('rowCount', '2560');
-                }
+                $activeKey['rowCount'] = '2560';
                 $data->setEveApiArguments($activeKey)
                      ->setEveApiXml();
                 if (!$this->oneShot($data, $retrievers, $preservers)) {
@@ -187,8 +182,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         } catch (PDOException $exc) {
             $mess = 'Could NOT get a list of active characters';
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
+                ->warning($mess, ['exception' => $exc]);
+            return [];
         }
     }
     /**
@@ -208,9 +203,17 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         } catch (PDOException $exc) {
             $mess = 'Could NOT get a list of active corporations';
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
+                ->warning($mess, ['exception' => $exc]);
+            return [];
         }
+    }
+    /**
+     * @throws LogicException
+     * @return string[]
+     */
+    protected function getKeyList()
+    {
+        return $this->keyList;
     }
     /**
      * @throws LogicException
@@ -223,18 +226,6 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             throw new LogicException($mess);
         }
         return $this->mask;
-    }
-    /**
-     * @throws LogicException
-     * @return int
-     */
-    protected function getMaxKeyRange()
-    {
-        if (is_null($this->maxKeyRange)) {
-            $mess = 'Tried to use max key range when it was NOT set';
-            throw new LogicException($mess);
-        }
-        return $this->maxKeyRange;
     }
     /**
      * @param string $xml
@@ -265,7 +256,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 $accountKey
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;
@@ -273,11 +264,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         return true;
     }
     /**
+     * @type string[] $keyList
+     */
+    protected $keyList;
+    /**
      * @var int $mask
      */
     protected $mask;
-    /**
-     * @var int $maxKeyRange
-     */
-    protected $maxKeyRange;
 }

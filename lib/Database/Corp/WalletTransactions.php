@@ -81,11 +81,20 @@ class WalletTransactions extends AbstractAccountKey
         return $this;
     }
     /**
+     * @type string[] $keyList
+     */
+    protected $keyList = [
+        '1000',
+        '1001',
+        '1002',
+        '1003',
+        '1004',
+        '1005',
+        '1006',
+        '10000'
+    ];
+    /**
      * @var int $mask
      */
     protected $mask = 2097152;
-    /**
-     * @var int $maxKeyRange
-     */
-    protected $maxKeyRange = 1006;
 }

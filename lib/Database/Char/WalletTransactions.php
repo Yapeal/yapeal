@@ -52,7 +52,7 @@ class WalletTransactions extends AbstractAccountKey
         $ownerID,
         $accountKey
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'accountKey' => $accountKey,
             'clientID' => null,
@@ -69,7 +69,7 @@ class WalletTransactions extends AbstractAccountKey
             'transactionType' => null,
             'typeID' => null,
             'typeName' => null
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
@@ -78,11 +78,11 @@ class WalletTransactions extends AbstractAccountKey
         return $this;
     }
     /**
+     * @type int[] $keyList
+     */
+    protected $keyList = ['1000'];
+    /**
      * @var int $mask
      */
     protected $mask = 4194304;
-    /**
-     * @var int $maxKeyRange
-     */
-    protected $maxKeyRange = 1000;
 }

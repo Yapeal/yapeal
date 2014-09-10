@@ -46,17 +46,19 @@ class MemberTrackingExtended extends AbstractCorpSection
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @return bool
      */
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         $data->setEveApiName('MemberTracking');
         $data->addEveApiArgument('extended', '1');
-        return parent::oneShot($data, $retrievers, $preservers);
+        return parent::oneShot($data, $retrievers, $preservers, $interval);
     }
     /**
      * @param string $xml

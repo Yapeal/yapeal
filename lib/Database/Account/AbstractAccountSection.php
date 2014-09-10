@@ -85,16 +85,20 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($key)
                  ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers)) {
+            $untilInterval = $interval;
+            if (!$this->oneShot($data, $retrievers, $preservers,
+                $untilInterval)
+            ) {
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $key['keyID']);
+            $this->updateCachedUntil($data, $untilInterval, $key['keyID']);
         }
     }
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -102,7 +106,8 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -139,6 +144,11 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         $this->preserve(
             $data->getEveApiXml(),
             $keyID
@@ -162,8 +172,8 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         } catch (PDOException $exc) {
             $mess = 'Could NOT select from utilRegisteredKeys';
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
+                ->warning($mess, ['exception' => $exc]);
+            return [];
         }
     }
     /**

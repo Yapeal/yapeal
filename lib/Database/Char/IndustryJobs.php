@@ -96,7 +96,7 @@ class IndustryJobs extends AbstractCharSection
             }
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers)) {
+            if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
                 continue;
             }
             $this->updateCachedUntil($data, $interval, $char['characterID']);
@@ -112,7 +112,7 @@ class IndustryJobs extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'activityID' => null,
             'blueprintID' => null,
@@ -141,7 +141,7 @@ class IndustryJobs extends AbstractCharSection
             'status' => null,
             'teamID' => null,
             'timeInSeconds' => null
-        );
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,

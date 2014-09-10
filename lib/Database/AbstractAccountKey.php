@@ -97,7 +97,13 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 $activeKey['rowCount'] = '2560';
                 $data->setEveApiArguments($activeKey)
                      ->setEveApiXml();
-                if (!$this->oneShot($data, $retrievers, $preservers)) {
+                if (!$this->oneShot(
+                    $data,
+                    $retrievers,
+                    $preservers,
+                    $interval
+                )
+                ) {
                     continue 2;
                 }
             }
@@ -108,6 +114,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -115,7 +122,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -158,6 +166,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         $this->preserve(
             $data->getEveApiXml(),
             $ownerID,

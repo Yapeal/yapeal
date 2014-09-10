@@ -105,22 +105,30 @@ class StarbaseDetail extends AbstractCorpSection
                      ->info($mess);
                 continue;
             }
+            $untilInterval = $interval;
             foreach ($activeTowers as $tower) {
                 $data->setEveApiSectionName(strtolower($this->getSectionName()))
                      ->setEveApiName($this->getApiName());
                 $data->setEveApiArguments($tower)
                      ->setEveApiXml();
-                if (!$this->oneShot($data, $retrievers, $preservers)) {
+                $untilInterval = $interval;
+                if (!$this->oneShot($data, $retrievers, $preservers,
+                    $untilInterval)
+                ) {
                     continue 2;
                 }
+                if ($untilInterval != $interval) {
+                    continue;
+                }
             }
-            $this->updateCachedUntil($data, $interval, $corpID);
+            $this->updateCachedUntil($data, $untilInterval, $corpID);
         }
     }
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -128,7 +136,8 @@ class StarbaseDetail extends AbstractCorpSection
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -165,6 +174,11 @@ class StarbaseDetail extends AbstractCorpSection
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         $this->preserve($data->getEveApiXml(), $corpID, $itemID);
         return true;
     }

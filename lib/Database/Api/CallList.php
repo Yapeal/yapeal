@@ -49,6 +49,7 @@ class CallList extends AbstractCommonEveApi
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -56,7 +57,8 @@ class CallList extends AbstractCommonEveApi
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -86,6 +88,11 @@ class CallList extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         return $this->preserve($data->getEveApiXml());
     }
     /**
@@ -111,7 +118,7 @@ class CallList extends AbstractCommonEveApi
                 $this->getApiName()
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;
@@ -127,11 +134,11 @@ class CallList extends AbstractCommonEveApi
     protected function preserveToCallGroups(
         $xml
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'description' => null,
             'groupID' => null,
             'name' => null
-        );
+        ];
         $tableName = 'apiCallGroups';
         $sql = $this->getCsq()
                     ->getDeleteFromTable($tableName);
@@ -156,13 +163,13 @@ class CallList extends AbstractCommonEveApi
     protected function preserveToCalls(
         $xml
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'accessMask' => null,
             'description' => null,
             'groupID' => null,
             'name' => null,
             'type' => null
-        );
+        ];
         $tableName = 'apiCalls';
         $sql = $this->getCsq()
                     ->getDeleteFromTable($tableName);

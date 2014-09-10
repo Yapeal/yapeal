@@ -67,6 +67,7 @@ interface EveApiDatabaseInterface
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -74,7 +75,8 @@ interface EveApiDatabaseInterface
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     );
     /**
      * @param CommonSqlQueries $value

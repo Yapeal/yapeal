@@ -88,16 +88,21 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             }
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers)) {
+            $untilInterval = $interval;
+            if (!$this->oneShot($data, $retrievers, $preservers,
+                $untilInterval)
+            ) {
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $char['characterID']);
+            $this->updateCachedUntil($data, $untilInterval,
+                $char['characterID']);
         }
     }
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -105,7 +110,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -141,10 +147,12 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
-        if (!$this->preserve($data->getEveApiXml(), $charID)) {
-            return false;
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
         }
-        return true;
+        return $this->preserve($data->getEveApiXml(), $charID);
     }
     /**
      * @throws LogicException
@@ -163,8 +171,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         } catch (PDOException $exc) {
             $mess = 'Could NOT get a list of active characters';
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
-            return array();
+                ->warning($mess, ['exception' => $exc]);
+            return [];
         }
     }
     /**
@@ -200,7 +208,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
                 $ownerID
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;

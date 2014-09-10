@@ -50,6 +50,7 @@ class AllianceList extends AbstractCommonEveApi
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -57,7 +58,8 @@ class AllianceList extends AbstractCommonEveApi
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -87,6 +89,11 @@ class AllianceList extends AbstractCommonEveApi
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserve.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         return $this->preserve($data->getEveApiXml());
     }
     /**
@@ -121,7 +128,7 @@ class AllianceList extends AbstractCommonEveApi
                     $tableName,
                     $this->rowCount
                 );
-                $this->columns = array();
+                $this->columns = [];
                 $this->rowCount = 0;
             }
         }
@@ -148,7 +155,7 @@ class AllianceList extends AbstractCommonEveApi
                 $this->getApiName()
             );
             $this->getLogger()
-                 ->warning($mess, array('exception' => $exc));
+                ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;
@@ -191,9 +198,9 @@ class AllianceList extends AbstractCommonEveApi
         $this->getPdo()
              ->exec($sql);
         $rowCount = 0;
-        $columns = array();
+        $columns = [];
         $this->rowCount = 0;
-        $this->columns = array();
+        $this->columns = [];
         /**
          * @var SimpleXMLIterator $row
          */
@@ -211,7 +218,7 @@ class AllianceList extends AbstractCommonEveApi
                     $tableName,
                     $rowCount
                 );
-                $columns = array();
+                $columns = [];
                 $rowCount = 0;
             }
         }

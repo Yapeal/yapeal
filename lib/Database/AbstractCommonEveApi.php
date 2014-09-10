@@ -101,7 +101,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         ) {
             return;
         }
-        if (!$this->oneShot($data, $retrievers, $preservers)) {
+        if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
             return;
         }
         $this->updateCachedUntil($data, $interval, '0');
@@ -110,6 +110,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -117,7 +118,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     public function oneShot(
         EveApiReadWriteInterface &$data,
         EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers
+        EveApiPreserverInterface $preservers,
+        &$interval
     ) {
         if (!$this->gotApiLock($data)) {
             return false;
@@ -147,6 +149,11 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             return false;
         }
         $preservers->preserveEveApi($data);
+        // No need / way to preserve XML errors to the database with normal
+        // preserveTo*.
+        if ($this->isEveApiXmlError($data, $interval)) {
+            return true;
+        }
         $method = 'preserveTo' . $this->getApiName();
         return $this->$method($data->getEveApiXml());
     }
@@ -196,6 +203,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      */
     abstract protected function getApiName();
     /**
+     * @deprecated Need to switch to using trait instead.
      * @throws LogicException
      * @return DatabasePreserverInterface
      */
@@ -216,6 +224,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      */
     abstract protected function getSectionName();
     /**
+     * @deprecated Need to switch to using trait instead.
      * @throws LogicException
      * @return DatabasePreserverInterface
      */
@@ -451,10 +460,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
 </xsl:transform>
 XSL;
     /**
+     * @deprecated Need to switch to using trait instead.
      * @var DatabasePreserverInterface $attributesDatabasePreserver
      */
     private $attributesDatabasePreserver;
     /**
+     * @deprecated Need to switch to using trait instead.
      * @var DatabasePreserverInterface $valuesDatabasePreserver
      */
     private $valuesDatabasePreserver;

@@ -32,6 +32,7 @@ namespace Yapeal\Database\Eve;
 
 use LogicException;
 use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\Char\AbstractCharSection;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
@@ -44,7 +45,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
  */
 class CharacterInfo extends AbstractCharSection
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use EveApiNameTrait, EveSectionNameTrait, AttributesDatabasePreserverTrait;
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -129,10 +130,7 @@ class CharacterInfo extends AbstractCharSection
             'lastKnownLocation' => '',
             'securityStatus' => '0'
         ];
-        $this->getValuesDatabasePreserver()
-             ->setTableName('eveCharacterInfo')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml);
+        $this->attributePreserveData($xml, $columnDefaults, 'eveCharacterInfo');
         return $this;
     }
     /**
@@ -152,10 +150,9 @@ class CharacterInfo extends AbstractCharSection
             'startDate' => null,
             'ownerID' => $ownerID
         ];
-        $this->getAttributesDatabasePreserver()
-             ->setTableName('eveEmploymentHistory')
-             ->setColumnDefaults($columnDefaults)
-             ->preserveData($xml, '//employmentHistory/row');
+        $tableName = 'eveEmploymentHistory';
+        $this->attributePreserveData($xml, $columnDefaults, $tableName,
+            '//employmentHistory/row');
         return $this;
     }
     /**

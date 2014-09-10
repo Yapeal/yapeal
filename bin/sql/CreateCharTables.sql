@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "contactName"   CHAR(50)            NOT NULL,
-    "inWatchlist"   TINYINT(1)          NOT NULL,
+    "inWatchlist" CHAR(5) NOT NULL,
     "standing"      DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "contactID")
 )

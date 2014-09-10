@@ -509,15 +509,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
     "amount"        DECIMAL(17, 2)       NOT NULL,
     "argID1"        BIGINT(20) UNSIGNED DEFAULT NULL,
-    "argName1"      CHAR(50)            DEFAULT NULL,
+    "argName1" CHAR(255) DEFAULT NULL,
     "balance"       DECIMAL(17, 2)       NOT NULL,
     "date"          DATETIME             NOT NULL,
     "ownerID1"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerID2"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerName1"    CHAR(50)            DEFAULT NULL,
     "ownerName2"    CHAR(50)            DEFAULT NULL,
-    "reason"        TEXT
-                    COLLATE utf8_unicode_ci,
+    "reason"   TEXT,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
     "refTypeID"     SMALLINT(5) UNSIGNED NOT NULL,
     "taxAmount"     DECIMAL(17, 2)       NOT NULL,
@@ -527,7 +526,8 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
     PRIMARY KEY ("ownerID", "accountKey", "refID")
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =ascii;
+    DEFAULT CHARSET =utf8
+    COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletTransactions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,

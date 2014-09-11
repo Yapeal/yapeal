@@ -168,9 +168,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "ceoName"         CHAR(24)               NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED    NOT NULL,
     "corporationName" CHAR(50)               NOT NULL,
-    "description"     TEXT
-                      COLLATE utf8_unicode_ci,
+    "description" TEXT,
     "factionID"       BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
+    "factionName" CHAR(50)     DEFAULT NULL,
     "memberCount"     SMALLINT(5) UNSIGNED   NOT NULL,
     "memberLimit"     SMALLINT(5)            NOT NULL DEFAULT '0',
     "shares"          BIGINT(20) UNSIGNED    NOT NULL,
@@ -178,21 +178,22 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "stationName"     CHAR(255)              NOT NULL,
     "taxRate"         DECIMAL(5, 2) UNSIGNED NOT NULL,
     "ticker"          CHAR(5)                NOT NULL,
-    "url"             VARCHAR(255)
-                      COLLATE utf8_unicode_ci         DEFAULT NULL,
+    "url"         VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB
-    DEFAULT CHARSET =ascii;
+    DEFAULT CHARSET =utf8
+    COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpDivisions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpDivisions" (
-    "ownerID"     BIGINT(20) UNSIGNED     NOT NULL,
-    "accountKey"  SMALLINT(4) UNSIGNED    NOT NULL,
-    "description" VARCHAR(255)
-                  COLLATE utf8_unicode_ci NOT NULL,
+    "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
+    "accountKey"  SMALLINT(4) UNSIGNED NOT NULL,
+    "description" VARCHAR(255)         NOT NULL,
     PRIMARY KEY ("ownerID", "accountKey")
 )
-    ENGINE =InnoDB;
+    ENGINE =InnoDB
+    DEFAULT CHARSET =utf8
+    COLLATE =utf8_unicode_ci;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacilities";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacilities" (
     "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -494,10 +495,9 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
     DEFAULT CHARSET =ascii;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletDivisions";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletDivisions" (
-    "ownerID"     BIGINT(20) UNSIGNED     NOT NULL,
-    "accountKey"  SMALLINT(4) UNSIGNED    NOT NULL,
-    "description" VARCHAR(255)
-                  COLLATE utf8_unicode_ci NOT NULL,
+    "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
+    "accountKey"  SMALLINT(4) UNSIGNED NOT NULL,
+    "description" VARCHAR(255)         NOT NULL,
     PRIMARY KEY ("ownerID", "accountKey")
 )
     ENGINE =InnoDB

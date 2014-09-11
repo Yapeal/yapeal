@@ -68,6 +68,12 @@
             <xs:fractionDigits value="2" fixed="true"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="eveNameType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="50"/>
+            <xs:minLength value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="eveNEDTType">
         <xs:annotation>
             <xs:documentation>Date/time that can NOT be empty.
@@ -93,15 +99,15 @@
     <!-- Eve Attributes -->
     <xs:attributeGroup name="charAttrs">
         <xs:attribute type="eveIDType" name="characterID" use="required"/>
-        <xs:attribute type="xs:string" name="characterName" use="required"/>
+        <xs:attribute type="eveNameType" name="characterName" use="required"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="acfAttrs">
         <xs:attribute type="eveIDType" name="allianceID" use="required"/>
-        <xs:attribute type="xs:string" name="allianceName" use="required"/>
+        <xs:attribute type="eveNameType" name="allianceName" use="required"/>
         <xs:attribute type="eveIDType" name="corporationID" use="required"/>
-        <xs:attribute type="xs:string" name="corporationName" use="required"/>
+        <xs:attribute type="eveNameType" name="corporationName" use="required"/>
         <xs:attribute type="eveIDType" name="factionID" use="required"/>
-        <xs:attribute type="xs:string" name="factionName" use="required"/>
+        <xs:attribute type="eveNameType" name="factionName" use="required"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="rowsetAttrs">
         <xs:attribute name="columns" use="required" type="eveListType"/>

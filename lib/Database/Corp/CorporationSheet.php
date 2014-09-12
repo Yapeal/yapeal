@@ -269,4 +269,54 @@ class CorporationSheet extends AbstractCorpSection
      * @type int $mask
      */
     protected $mask = 8;
+    /**
+     * @var string
+     */
+    protected $xsl = <<<'XSL'
+<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"
+        version="1.0"
+        encoding="utf-8"
+        omit-xml-declaration="no"
+        standalone="no"
+        indent="yes"/>
+    <xsl:template match="result">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="corporationID|corporationName|ticker|ceoID|ceoName|stationID|stationName|description|url|allianceID|allianceName|factionID|factionName|taxRate|memberCount|memberLimit|shares">
+                <xsl:sort select="name()" data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+            <xsl:apply-templates select="logo|rowset"/>
+        </xsl:copy>
+    </xsl:template>
+    <xsl:template match="logo">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="*">
+                <xsl:sort select="name()" data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+    <xsl:template match="rowset">
+        <xsl:choose>
+            <xsl:when test="@name">
+                <xsl:element name="{@name}">
+                    <xsl:copy-of select="@key"/>
+                    <xsl:copy-of select="@columns"/>
+                    <xsl:apply-templates/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+</xsl:transform>
+XSL;
 }

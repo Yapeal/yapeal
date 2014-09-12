@@ -15,26 +15,26 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="eveIDType" name="corporationID"/>
-            <xs:element type="eveNameType" name="corporationName"/>
-            <xs:element type="xs:string" name="ticker"/>
-            <xs:element type="eveIDType" name="ceoID"/>
-            <xs:element type="eveNameType" name="ceoName"/>
-            <xs:element type="eveIDType" name="stationID"/>
-            <xs:element type="xs:string" name="stationName"/>
-            <xs:element type="xs:string" name="description"/>
-            <xs:element type="xs:string" name="url"/>
             <xs:element type="eveIDType" name="allianceID"/>
             <xs:element type="eveNameType" name="allianceName" minOccurs="0"
                         maxOccurs="1"/>
+            <xs:element type="eveIDType" name="ceoID"/>
+            <xs:element type="eveNameType" name="ceoName"/>
+            <xs:element type="eveIDType" name="corporationID"/>
+            <xs:element type="eveNameType" name="corporationName"/>
+            <xs:element type="xs:string" name="description"/>
             <xs:element type="eveIDType" name="factionID"/>
             <xs:element type="eveNameType" name="factionName" minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="xs:decimal" name="taxRate"/>
             <xs:element type="xs:unsignedLong" name="memberCount"/>
             <xs:element type="xs:unsignedLong" name="memberLimit" minOccurs="0"
                         maxOccurs="1"/>
             <xs:element type="xs:unsignedLong" name="shares"/>
+            <xs:element type="eveIDType" name="stationID"/>
+            <xs:element type="xs:string" name="stationName"/>
+            <xs:element type="xs:decimal" name="taxRate"/>
+            <xs:element type="xs:string" name="ticker"/>
+            <xs:element type="xs:string" name="url"/>
             <xs:element name="divisions" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:sequence>
@@ -56,13 +56,13 @@
             <xs:element name="logo">
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element type="xs:unsignedShort" name="color1"/>
+                        <xs:element type="xs:unsignedShort" name="color2"/>
+                        <xs:element type="xs:unsignedShort" name="color3"/>
                         <xs:element type="xs:unsignedShort" name="graphicID"/>
                         <xs:element type="xs:unsignedShort" name="shape1"/>
                         <xs:element type="xs:unsignedShort" name="shape2"/>
                         <xs:element type="xs:unsignedShort" name="shape3"/>
-                        <xs:element type="xs:unsignedShort" name="color1"/>
-                        <xs:element type="xs:unsignedShort" name="color2"/>
-                        <xs:element type="xs:unsignedShort" name="color3"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

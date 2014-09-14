@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
     "allianceName"    CHAR(50)                        DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED    NOT NULL,
-    "ceoName"         CHAR(24)               NOT NULL,
+    "ceoName"     CHAR(50) NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED    NOT NULL,
     "corporationName" CHAR(50)               NOT NULL,
     "description" TEXT,

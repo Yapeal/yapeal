@@ -50,7 +50,7 @@
                 <xs:attribute type="eveISKType" name="reward"/>
                 <xs:attribute type="eveISKType" name="collateral"/>
                 <xs:attribute type="eveISKType" name="buyout"/>
-                <xs:attribute type="eveISKType" name="volume"/>
+                <xs:attribute type="eveVolumeType" name="volume"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

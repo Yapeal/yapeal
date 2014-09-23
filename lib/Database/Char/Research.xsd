@@ -8,7 +8,7 @@
                 <xs:attribute type="eveIDType" name="agentID"/>
                 <xs:attribute type="eveIDType" name="skillTypeID"/>
                 <xs:attribute type="eveNEDTType" name="researchStartDate"/>
-                <xs:attribute type="eveISKType" name="pointsPerDay"/>
+                <xs:attribute type="xs:float" name="pointsPerDay"/>
                 <xs:attribute type="xs:float" name="remainderPoints"/>
             </xs:extension>
         </xs:simpleContent>

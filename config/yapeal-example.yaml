@@ -116,10 +116,50 @@ Yapeal:
     # Some network related settings mostly having to do with Eve API server
     # connection.
     Network:
-        # Which API server to connect to. Currently only live (Tranquility) and
-        # the test server (Singularity).
+        # Used to set a custom application comment which will be added to the
+        # User Agent header sent to the Eve API server.
+        # Commonly this is used to include short contact information like an
+        # e-mail. Remember this information is visible to anyone in the headers.
+        # Note that a '(' and a ')' should be added around the comment as they
+        # are NOT added automatically.
+        # See Yapeal.Network.userAgent and Yapeal.Network.appName for more
+        # information.
+        appComment: ''
+
+        # Used to set a custom application name which will be added to the User
+        # Agent header sent to the Eve API server.
+        # Application developers please insure you use this especially in
+        # publicly released software so CCP contacts YOU and NOT me if something
+        # breaks in your application.
+        # Note if this is blank the Yapeal.Network.appVersion and
+        # Yapeal.Network.appComment will also be ignored.
+        # See Yapeal.Network.userAgent for more information.
+        appName: ''
+
+        # Used to set a custom application version which will be added to the
+        # User Agent header sent to the Eve API server.
+        # See Yapeal.Network.userAgent and Yapeal.Network.appName for more
+        # information.
+        appVersion: ''
+
+        # Which Eve API server to connect to. Currently only the live
+        # (Tranquility) and test (Singularity) servers are available.
         # Default for production: https://api.eveonline.com
         # Default for test server: https://api.testeveonline.com
         baseUrl: 'https://api.eveonline.com'
+
+        # User Agent used for connection to Eve API server.
+        # In the User Agent string the {osName} {osRelease}, and {machineType}
+        # will be replaced by results from php_uname(). The {phpVersion} will be
+        # replaced by PHP_VERSION constant. The other three
+        # {Yapeal.Network.app*} parts will be replaced by their Yaml settings.
+        # If 'appName' is empty the other two settings will be ignored as well.
+        # Note that any and all parts of the string can be removed or replaced
+        # including the 'Yapeal/2.0 (...)' part if you prefer.
+        # Note that if this setting is empty (NOT recommend) no user agent
+        # header will be sent.
+        # Example result:
+        # myApp/0.1 (poc@myApp.com) Yapeal/2.0 (Windows NT 6.1; PHP 5.4.29; Platform i586)
+        userAgent: '{Yapeal.Network.appName}/{Yapeal.Network.appVersion} {Yapeal.Network.appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
 
 ...

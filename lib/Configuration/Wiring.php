@@ -5,23 +5,26 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
- * Copyright (C) 2014 Michael Cummings
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database. Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -118,14 +121,14 @@ class Wiring
                 new RecursiveArrayIterator($config)
             );
             foreach ($rItIt as $leafValue) {
-                $keys = array();
+                $keys = [];
                 foreach (range(0, $rItIt->getDepth()) as $depth) {
                     $keys[] = $rItIt->getSubIterator($depth)
                                     ->key();
                 }
                 $dic[implode('.', $keys)] = str_replace(
-                    array('{Yapeal.baseDir}', '{Yapeal.cwd}'),
-                    array($dic['Yapeal.baseDir'], $dic['Yapeal.cwd']),
+                    ['{Yapeal.baseDir}', '{Yapeal.cwd}'],
+                    [$dic['Yapeal.baseDir'], $dic['Yapeal.cwd']],
                     $leafValue
                 );
             }
@@ -178,7 +181,7 @@ class Wiring
      */
     public function wireDefaults()
     {
-        $defaults = array(
+        $defaults = [
             'Yapeal.Config.class' => 'Symfony\\Component\\Yaml\\Parser',
             'Yapeal.Config.configDir' => $this->dic['Yapeal.baseDir']
                 . 'config/',
@@ -202,8 +205,15 @@ class Wiring
             'Yapeal.Log.logDir' => $this->dic['Yapeal.baseDir'] . 'log/',
             'Yapeal.Log.fileName' => 'yapeal.log',
             'Yapeal.Log.threshold' => 300,
-            'Yapeal.Network.baseUrl' => 'https://api.eveonline.com'
-        );
+            'Yapeal.Network.appComment' => '',
+            'Yapeal.Network.appName' => '',
+            'Yapeal.Network.appVersion' => '',
+            'Yapeal.Network.baseUrl' => 'https://api.eveonline.com',
+            'Yapeal.Network.userAgent' => '{Yapeal.Network.appName}/'
+                . '{Yapeal.Network.appVersion} {Yapeal.Network.appComment}'
+                . ' Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion};'
+                . ' Platform {machineType})'
+        ];
         foreach ($defaults as $setting => $default) {
             if (empty($this->dic[$setting])) {
                 $this->dic[$setting] = $default;
@@ -239,7 +249,7 @@ class Wiring
             $logger = new $dic['Yapeal.Error.loggerName'](
                 $dic['Yapeal.Error.channel']
             );
-            $group = array();
+            $group = [];
             /**
              * @var Logger $logger
              */
@@ -264,7 +274,7 @@ class Wiring
             $error = $dic['Yapeal.Error.class'];
             $error::register(
                 $logger,
-                array(),
+                [],
                 $dic['Yapeal.Error.threshold'],
                 $dic['Yapeal.Error.threshold']
             );
@@ -285,7 +295,7 @@ class Wiring
              * @var LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
-            $group = array();
+            $group = [];
             /**
              * @var Logger $logger
              */
@@ -316,12 +326,12 @@ class Wiring
             return $this;
         }
         $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
-            $preservers = array(
+            $preservers = [
                 new FileCachePreserver(
                     $dic['Yapeal.Log.Logger'],
                     $dic['Yapeal.baseDir'] . 'cache/'
                 )
-            );
+            ];
             return new GroupPreserver($dic['Yapeal.Log.Logger'], $preservers);
         };
         return $this;
@@ -335,7 +345,32 @@ class Wiring
             return $this;
         }
         $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
-            $headers = array(
+            $appComment = $dic['Yapeal.Network.appComment'];
+            $appName = $dic['Yapeal.Network.appName'];
+            $appVersion = $dic['Yapeal.Network.appVersion'];
+            if (empty($appName)) {
+                $appComment = '';
+                $appVersion = '';
+            }
+            $userAgent = trim(str_replace([
+                    '{machineType}',
+                    '{osName}',
+                    '{osRelease}',
+                    '{phpVersion}',
+                    '{Yapeal.Network.appComment}',
+                    '{Yapeal.Network.appName}',
+                    '{Yapeal.Network.appVersion}'
+                ], [
+                    php_uname('m'),
+                    php_uname('s'),
+                    php_uname('r'),
+                    PHP_VERSION,
+                    $appComment,
+                    $appName,
+                    $appVersion
+                ],
+                $dic['Yapeal.Network.userAgent']));
+            $headers = [
                 'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
                     . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
                     . 'q=0.6,*/*;q=0.5',
@@ -344,14 +379,17 @@ class Wiring
                 'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
                 'Connection' => 'Keep-Alive',
                 'Keep-Alive' => '300'
-            );
-            $defaults = array(
+            ];
+            if (!empty($userAgent)) {
+                $headers['User-Agent'] = $userAgent;
+            }
+            $defaults = [
                 'headers' => $headers,
                 'timeout' => 10,
                 'connect_timeout' => 30,
                 'verify' => $dic['Yapeal.baseDir'] . 'config/eveonline.crt',
-            );
-            $retrievers = array(
+            ];
+            $retrievers = [
                 new FileCacheRetriever(
                     $dic['Yapeal.Log.Logger'],
                     $dic['Yapeal.baseDir'] . 'cache/'
@@ -360,10 +398,10 @@ class Wiring
                     $dic['Yapeal.Log.Logger'],
                     new Client(
                         $dic['Yapeal.Network.baseUrl'],
-                        array('defaults' => $defaults)
+                        ['defaults' => $defaults]
                     )
                 )
-            );
+            ];
             return new GroupRetriever($dic['Yapeal.Log.Logger'], $retrievers);
         };
         return $this;

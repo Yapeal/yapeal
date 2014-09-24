@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201409131955');
+    ('201409232048');
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
@@ -37,6 +37,7 @@ START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName", "apiName", "mask", "interval", "isActive")
 VALUES
     ('account', 'AccountStatus', 33554432, 3600, 1),
+    ('account', 'YapealCorporationSheet', 0, 21600, 1),
     ('api', 'CallList', 1, 86400, 1),
     ('char', 'AccountBalance', 1, 900, 1),
     ('char', 'AssetList', 2, 21600, 1),
@@ -107,6 +108,7 @@ VALUES
     ('eve', 'FacWarTopStats', 128, 3600, 1),
     ('eve', 'RefTypes', 256, 86400, 1),
     ('eve', 'SkillTree', 512, 86400, 1),
+    ('eve', 'YapealCorporationSheet', 0, 86400, 0),
     ('map', 'FacWarSystems', 1, 3600, 1),
     ('map', 'Jumps', 2, 3600, 1),
     ('map', 'Kills', 4, 3600, 1),

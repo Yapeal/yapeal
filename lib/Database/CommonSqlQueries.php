@@ -5,23 +5,26 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
- * Copyright (C) 2014 Michael Cummings
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database. Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -42,6 +45,35 @@ class CommonSqlQueries
     {
         $this->databaseName = $databaseName;
         $this->tablePrefix = $tablePrefix;
+    }
+    /**
+     * Get account corporationIDs for corps without a corporation type key.
+     *
+     * @return string
+     */
+    public function getAccountCorporationIDsExcludingCorporationKeys()
+    {
+        $sql = <<<'SQL'
+SELECT DISTINCT acc."corporationID"
+ FROM "%1$s"."%2$saccountCharacters" AS acc
+ WHERE
+ acc."corporationID" NOT IN (
+ SELECT ac."corporationID"
+ FROM "%1$s"."%2$saccountCharacters" AS ac
+ JOIN "%1$s"."%2$saccountKeyBridge" AS akb
+ ON (ac."characterID"=akb."characterID")
+ JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
+ ON (akb."keyID"=aaki."keyID")
+ WHERE
+ aaki."type"='Corporation'
+ AND acc."corporationID" = ac."corporationID"
+)
+SQL;
+        return sprintf(
+            str_replace(["\n", "\r\n"], '', $sql),
+            $this->databaseName,
+            $this->tablePrefix
+        );
     }
     /**
      * @return string
@@ -208,6 +240,30 @@ SQL;
             $this->tablePrefix,
             $tableName,
             $ownerID
+        );
+    }
+    /**
+     * Get alliance corporationIDs for corps excluding any in accountCharacters.
+     *
+     * @return string
+     */
+    public function getMemberCorporationIDsExcludingAccountCorporations()
+    {
+        $sql = <<<'SQL'
+SELECT DISTINCT emc."corporationID"
+ FROM "%1$s"."%2$seveMemberCorporations" AS emc
+ WHERE
+ emc."corporationID" NOT IN (
+ SELECT ac."corporationID"
+ FROM "%1$s"."%2$saccountCharacters" AS ac
+ WHERE
+ emc."corporationID" = ac."corporationID"
+)
+SQL;
+        return sprintf(
+            str_replace(["\n", "\r\n"], '', $sql),
+            $this->databaseName,
+            $this->tablePrefix
         );
     }
     /**

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="rowType">
         <xs:simpleContent>
@@ -39,9 +40,23 @@
                     </xs:simpleType>
                 </xs:attribute>
                 <xs:attribute type="xs:string" name="title"/>
-                <xs:attribute type="eveBooleanType" name="forCorp"/>
-                <xs:attribute type="xs:string" name="availability"/>
-                <xs:attribute type="eveDTType" name="dateIssued"/>
+                <xs:attribute name="forCorp">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:integer">
+                            <xs:enumeration value="0"/>
+                            <xs:enumeration value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="availability">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="Private"/>
+                            <xs:enumeration value="Public"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute type="eveNEDTType" name="dateIssued"/>
                 <xs:attribute type="eveDTType" name="dateExpired"/>
                 <xs:attribute type="eveDTType" name="dateAccepted"/>
                 <xs:attribute type="xs:unsignedInt" name="numDays"/>
@@ -50,7 +65,15 @@
                 <xs:attribute type="eveISKType" name="reward"/>
                 <xs:attribute type="eveISKType" name="collateral"/>
                 <xs:attribute type="eveISKType" name="buyout"/>
-                <xs:attribute type="eveISKType" name="volume"/>
+                <xs:attribute name="volume">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:minInclusive value="0"/>
+                            <xs:totalDigits value="18" fixed="true"/>
+                            <xs:fractionDigits value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -60,7 +83,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="rowType" name="row" minOccurs="0"
-                            maxOccurs="unbounded"/>
+                                    maxOccurs="unbounded"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

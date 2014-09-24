@@ -50,7 +50,7 @@ class Contracts extends AbstractCharSection
         $xml,
         $ownerID
     ) {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'contractID' => null,
             'issuerID' => null,
@@ -74,7 +74,7 @@ class Contracts extends AbstractCharSection
             'collateral' => null,
             'buyout' => null,
             'volume' => null
-        );
+        ];
         $this->attributePreserveData($xml, $columnDefaults, 'charContracts');
         return $this;
     }

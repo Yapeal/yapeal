@@ -1,6 +1,6 @@
 # TODO #
 
-## API Implementation (45 of 85) ##
+## API Implementation (49 of 85) ##
 
 ### Account (3 of 3)
 
@@ -11,12 +11,12 @@
 | account/APIKeyInfo    | yes         |
 | account/Characters    | yes via APIKeyInfo |
 
-### Character (17 of 33)
+### Character (19 of 33)
 
 | Endpoint                    | Implemented |
 |-----------------------------|-------------|
 | char/AccountBalance         | yes         |
-| char/AssetList              | no          |
+| char/AssetList              | yes         |
 | char/Blueprints             | yes         |
 | char/CalendarEventAttendees | no          |
 | char/CharacterSheet         | yes         |
@@ -42,26 +42,26 @@
 | char/PlanetaryRoutes        | no          |
 | char/PlanetaryLinks         | no          |
 | char/Research               | yes         |
-| char/SkillInTraining        | no          |
+| char/SkillInTraining        | yes         |
 | char/SkillQueue             | yes         |
 | char/Standings              | yes         |
 | char/UpcomingCalendarEvents | no          |
 | char/WalletJournal          | yes         |
 | char/WalletTransactions     | yes         |
 
-### Corporation (14 of 30)
+### Corporation (16 of 30)
 
 | Endpoint                  | Implemented                |
 |---------------------------|----------------------------|
 | corp/AccountBalance       | yes                        |
-| corp/AssetList            | no                         |
+| corp/AssetList            | yes                        |
 | corp/Blueprints           | yes                        |
 | corp/ContactList          | yes                        |
 | corp/ContainerLog         | no                         |
 | corp/ContractBids         | no                         |
 | corp/ContractItems        | no                         |
 | corp/Contracts            | yes                        |
-| corp/CorporationSheet     | no                         |
+| corp/CorporationSheet     | yes                        |
 | corp/Facilities           | yes                        |
 | corp/FacWarStats          | no                         |
 | corp/IndustryJobs         | yes                        |
@@ -86,21 +86,21 @@
 
 ### Eve (5 of 13)
 
-| Endpoint                   | Implemented |
-|----------------------------|-------------|
-| eve/AllianceList           | yes         |
-| eve/CertificateTree        | no          |
-| eve/CharacterAffiliation   | no          |
-| eve/CharacterID            | no          |
-| eve/CharacterInfo          | yes (public & private)      |
-| eve/CharacterName          | no          |
-| eve/ConquerableStationList | yes         |
-| eve/ErrorList              | yes         |
-| eve/FacWarStats            | no          |
-| eve/FacWarTopStats         | no          |
-| eve/RefTypes               | yes         |
-| eve/SkillTree              | no          |
-| eve/TypeName               | no          |
+| Endpoint                   | Implemented            |
+|----------------------------|------------------------|
+| eve/AllianceList           | yes                    |
+| eve/CertificateTree        | no                     |
+| eve/CharacterAffiliation   | no                     |
+| eve/CharacterID            | no                     |
+| eve/CharacterInfo          | yes (public & private) |
+| eve/CharacterName          | no                     |
+| eve/ConquerableStationList | yes                    |
+| eve/ErrorList              | yes                    |
+| eve/FacWarStats            | no                     |
+| eve/FacWarTopStats         | no                     |
+| eve/RefTypes               | yes                    |
+| eve/SkillTree              | no                     |
+| eve/TypeName               | no                     |
 
 ### Map (4 of 4)
 

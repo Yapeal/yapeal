@@ -431,7 +431,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charResearch";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charResearch" (
     "ownerID"           BIGINT(20) UNSIGNED NOT NULL,
     "agentID"           BIGINT(20) UNSIGNED NOT NULL,
-    "pointsPerDay"      DECIMAL(5, 2)       NOT NULL,
+    "pointsPerDay" DOUBLE NOT NULL,
     "skillTypeID"       BIGINT(20) UNSIGNED DEFAULT NULL,
     "remainderPoints"   DOUBLE              NOT NULL,
     "researchStartDate" DATETIME            NOT NULL,

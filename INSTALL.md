@@ -78,7 +78,7 @@ php /path/to/composer.phar install -o
 This will create a vendor/ directory inside of Yapeal and auto-update Composer's
 auto-loader.
 
-Next you will want to read the configure instructions in [CONFIG.md][1].
+Next you will want to read the configure instructions in [CONFIG.md](CONFIG.md).
 
 ## Install - Zip
 
@@ -105,6 +105,4 @@ php /path/to/composer.phar install -o
 This will create a vendor/ directory inside of Yapeal and auto-update Composer's
 auto-loader.
 
-Next you will want to read the configure instructions in [CONFIG.md][1].
-
-[1]: CONFIG.md "CONFIG.md"
+Next you will want to read the configure instructions in [CONFIG.md](CONFIG.md).

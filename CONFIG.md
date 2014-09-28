@@ -130,10 +130,11 @@ Error section is 400(ERROR) then the setting in Log must be 300(WARNING) or less
 
 ### Network Section
 
-Currently there is only a single setting here which allows you to use Yapeal
-with the default main Eve API servers or the test server. It can be useful to
-sometimes test things in the more control environment provided by the test
-server.
+There are now several settings in the Network section which the comments should
+explain for you. Most of them have to do with the User-Agent header Yapeal will
+use while connecting to the Eve API servers. There is also one to change between
+the live server and the test server which can be useful during testing when you
+want a little less variable data source that what the live server provides.
 
 ## Command Line Tool
 
@@ -148,6 +149,9 @@ cases commands can be shortened init_Letter:init_Letter of the command as long
 as there only one match.
 
 ### Database Initialization Using `yc D:I`
+
+_NOTE:_ This is for initial install only now as there's a new database update
+command explained below.
 
 To keep the example simple I'll assume you have already set up
 `config/yapeal.yaml` with the correct settings Yapeal will need to use during
@@ -185,7 +189,7 @@ in is:
   * CreateServerTables.sql
   * CreateUtilTables.sql
   * CreateCustomTables.sql
- 
+
 The first one of course drops then recreates the database and the others do the
 same for the tables in each section. The `CreateCustomTables.sql` is of special
 note in that it's the only one that doesn't exist by default. It was added to
@@ -198,6 +202,16 @@ strings are replaced with the value from the settings and then it's broke up
 into individual SQL statements and sent to the database server. Any bad
 statements will cause it to abort processing all remaining SQL and return a
 hopefully useful error message.
+
+### Database Updating Using `yc D:U`
+
+All the same conditions and settings are assumed as in the initial install above.
+The command will look in the `bin/sql/updates/` directory for any `###.sql`
+files and compare them with the latest version it finds in the
+`utilDatabaseVersion` and apply any with a newer date-time stamp name. Note that
+this command in addition to the permissions like `CREATE TABLE` needs by
+`yc D:I` will also need to have `CREATE PROCEDURE`, `DROP PROCEDURE`, and be
+able to `CALL` them as well.
 
 ## Epilogue
 

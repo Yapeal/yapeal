@@ -7,7 +7,8 @@
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -359,4 +360,63 @@ SQL;
      * @var string
      */
     protected $tablePrefix;
+    /**
+     * Used by 'yc D:U'
+     *
+     * @return string
+     */
+    public function getCreateAddOrModifyColumnProcedure()
+    {
+        $sql = <<<'SQL'
+CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
+    IN param_database_name  VARCHAR(100),
+    IN param_table_name     VARCHAR(100),
+    IN param_column_name    VARCHAR(100),
+    IN param_column_details VARCHAR(255))
+    BEGIN
+        IF NOT EXISTS(SELECT NULL
+                      FROM
+                          "information_schema"."COLUMNS"
+                      WHERE
+                          "COLUMN_NAME" = param_column_name AND
+                          "TABLE_NAME" = param_table_name AND
+                          "table_schema" = param_database_name)
+        THEN
+/* Create the full statement to execute */
+            SET @StatementToExecute = concat('ALTER TABLE "',
+                                             param_database_name, '"."',
+                                             param_table_name,
+                                             '" ADD COLUMN "',
+                                             param_column_name, '" ',
+                                             param_column_details) $$
+/* Prepare and execute the statement that was built */
+            PREPARE DynamicStatement FROM @StatementToExecute$$
+            EXECUTE DynamicStatement$$
+/* Cleanup the prepared statement */
+            DEALLOCATE PREPARE DynamicStatement$$
+        ELSE
+/* Create the full statement to execute */
+            SET @StatementToExecute = concat('ALTER TABLE "',
+                                             param_database_name, '"."',
+                                             param_table_name,
+                                             '" MODIFY COLUMN "',
+                                             param_column_name, '" ',
+                                             param_column_details) $$
+/* Prepare and execute the statement that was built */
+            PREPARE DynamicStatement FROM @StatementToExecute$$
+            EXECUTE DynamicStatement$$
+/* Cleanup the prepared statement */
+            DEALLOCATE PREPARE DynamicStatement$$
+        END IF$$
+    END;
+SQL;
+        return $sql;
+    }
+    /**
+     * @return string
+     */
+    public function getDropAddOrModifyColumnProcedure()
+    {
+        return 'DROP PROCEDURE IF EXISTS "{database}"."AddOrModifyColumn";';
+    }
 }

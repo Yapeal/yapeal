@@ -7,7 +7,8 @@
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -166,12 +167,12 @@ class Wiring
                 $dic['Yapeal.Database.password']
             );
             $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $database->exec("set session sql_mode='ANSI,TRADITIONAL'");
+            $database->exec("SET SESSION SQL_MODE='ANSI,TRADITIONAL'");
             $database->exec(
-                'set session transaction isolation level serializable'
+                'SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE'
             );
-            $database->exec("set session time_zone='+00:00'");
-            $database->exec('set names utf8');
+            $database->exec("SET SESSION TIME_ZONE='+00:00'");
+            $database->exec('SET NAMES UTF8');
             return $database;
         };
         return $this;
@@ -370,6 +371,7 @@ class Wiring
                     $appVersion
                 ],
                 $dic['Yapeal.Network.userAgent']));
+            $userAgent = ltrim($userAgent, '/ ');
             $headers = [
                 'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
                     . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'

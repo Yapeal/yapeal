@@ -1,6 +1,3 @@
-SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
-SET SESSION TIME_ZONE = '+00:00';
-SET NAMES UTF8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}accountAccountStatus";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountAccountStatus" (
     "keyID"        BIGINT(20) UNSIGNED NOT NULL,
@@ -25,7 +22,7 @@ ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" ADD INDEX "accountAPI
 DROP TABLE IF EXISTS "{database}"."{table_prefix}accountCharacters";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountCharacters" (
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
-    "characterName" CHAR(50) NOT NULL,
+    "characterName"   CHAR(50)            NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50)            NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,

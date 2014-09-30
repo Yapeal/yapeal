@@ -1,7 +1,3 @@
-SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
-SET SESSION TIME_ZONE = '+00:00';
-SET NAMES UTF8;
-SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
     "apiName"     CHAR(32)            NOT NULL,

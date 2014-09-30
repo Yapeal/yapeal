@@ -1,6 +1,3 @@
-SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
-SET SESSION TIME_ZONE = '+00:00';
-SET NAMES UTF8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveAllianceList";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
     "allianceID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -22,15 +19,15 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
     "accountBalance"    DECIMAL(17, 2)      NOT NULL,
     "skillPoints"       BIGINT(20) UNSIGNED NOT NULL,
     "nextTrainingEnds"  DATETIME            NOT NULL,
-    "shipName"     CHAR(255)
-                   COLLATE utf8_unicode_ci DEFAULT '',
-    "shipTypeID"   BIGINT(20) UNSIGNED     DEFAULT '0',
-    "shipTypeName" CHAR(50)                DEFAULT '',
+    "shipName"          CHAR(255)
+                        COLLATE utf8_unicode_ci DEFAULT '',
+    "shipTypeID"        BIGINT(20) UNSIGNED     DEFAULT '0',
+    "shipTypeName"      CHAR(50)                DEFAULT '',
     "corporationID"     BIGINT(20) UNSIGNED NOT NULL,
     "corporation"       CHAR(50)            NOT NULL,
     "corporationDate"   DATETIME            NOT NULL,
-    "allianceID"   BIGINT(20) UNSIGNED     DEFAULT '0',
-    "alliance"     CHAR(50)                DEFAULT '',
+    "allianceID"        BIGINT(20) UNSIGNED     DEFAULT '0',
+    "alliance"          CHAR(50)                DEFAULT '',
     "allianceDate"      DATETIME            NOT NULL,
     "lastKnownLocation" CHAR(255)           NOT NULL,
     "securityStatus"    CHAR(20)            NOT NULL,
@@ -286,7 +283,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveRefTypes" (
 DROP TABLE IF EXISTS "{database}"."{table_prefix}eveTypeName";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveTypeName" (
     "typeID"   SMALLINT(5) UNSIGNED NOT NULL,
-    "typeName" CHAR(255) NOT NULL,
+    "typeName" CHAR(255)            NOT NULL,
     PRIMARY KEY ("typeID")
 )
     ENGINE =InnoDB

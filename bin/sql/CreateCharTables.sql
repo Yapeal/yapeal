@@ -1,6 +1,3 @@
-SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
-SET SESSION TIME_ZONE = '+00:00';
-SET NAMES UTF8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}charAccountBalance";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
@@ -141,7 +138,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "contactName"   CHAR(50)            NOT NULL,
-    "inWatchlist" CHAR(5) NOT NULL,
+    "inWatchlist"   CHAR(5)             NOT NULL,
     "standing"      DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "contactID")
 )
@@ -431,7 +428,7 @@ DROP TABLE IF EXISTS "{database}"."{table_prefix}charResearch";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charResearch" (
     "ownerID"           BIGINT(20) UNSIGNED NOT NULL,
     "agentID"           BIGINT(20) UNSIGNED NOT NULL,
-    "pointsPerDay" DOUBLE NOT NULL,
+    "pointsPerDay"      DOUBLE              NOT NULL,
     "skillTypeID"       BIGINT(20) UNSIGNED DEFAULT NULL,
     "remainderPoints"   DOUBLE              NOT NULL,
     "researchStartDate" DATETIME            NOT NULL,
@@ -529,14 +526,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charWalletJournal" (
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
     "amount"        DECIMAL(17, 2)       NOT NULL,
     "argID1"        BIGINT(20) UNSIGNED DEFAULT NULL,
-    "argName1" CHAR(255) DEFAULT NULL,
+    "argName1"      CHAR(255)           DEFAULT NULL,
     "balance"       DECIMAL(17, 2)       NOT NULL,
     "date"          DATETIME             NOT NULL,
     "ownerID1"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerID2"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerName1"    CHAR(50)            DEFAULT NULL,
     "ownerName2"    CHAR(50)            DEFAULT NULL,
-    "reason"   TEXT,
+    "reason"        TEXT,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
     "refTypeID"     SMALLINT(5) UNSIGNED NOT NULL,
     "taxAmount"     DECIMAL(17, 2)       NOT NULL,

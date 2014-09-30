@@ -1,6 +1,3 @@
-SET SESSION SQL_MODE = 'ANSI,TRADITIONAL';
-SET SESSION TIME_ZONE = '+00:00';
-SET NAMES UTF8;
 DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAccountBalance";
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
@@ -165,12 +162,12 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
     "allianceName"    CHAR(50)                        DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED    NOT NULL,
-    "ceoName"     CHAR(50) NOT NULL,
+    "ceoName"         CHAR(50)               NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED    NOT NULL,
     "corporationName" CHAR(50)               NOT NULL,
-    "description" TEXT,
+    "description"     TEXT,
     "factionID"       BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
-    "factionName" CHAR(50)     DEFAULT NULL,
+    "factionName"     CHAR(50)                        DEFAULT NULL,
     "memberCount"     SMALLINT(5) UNSIGNED   NOT NULL,
     "memberLimit"     SMALLINT(5)            NOT NULL DEFAULT '0',
     "shares"          BIGINT(20) UNSIGNED    NOT NULL,
@@ -178,7 +175,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     "stationName"     CHAR(255)              NOT NULL,
     "taxRate"         DECIMAL(5, 2) UNSIGNED NOT NULL,
     "ticker"          CHAR(5)                NOT NULL,
-    "url"         VARCHAR(255) DEFAULT NULL,
+    "url"             VARCHAR(255)                    DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB
@@ -509,14 +506,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
     "amount"        DECIMAL(17, 2)       NOT NULL,
     "argID1"        BIGINT(20) UNSIGNED DEFAULT NULL,
-    "argName1" CHAR(255) DEFAULT NULL,
+    "argName1"      CHAR(255)           DEFAULT NULL,
     "balance"       DECIMAL(17, 2)       NOT NULL,
     "date"          DATETIME             NOT NULL,
     "ownerID1"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerID2"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerName1"    CHAR(50)            DEFAULT NULL,
     "ownerName2"    CHAR(50)            DEFAULT NULL,
-    "reason"   TEXT,
+    "reason"        TEXT,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
     "refTypeID"     SMALLINT(5) UNSIGNED NOT NULL,
     "taxAmount"     DECIMAL(17, 2)       NOT NULL,

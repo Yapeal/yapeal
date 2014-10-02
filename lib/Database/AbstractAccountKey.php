@@ -104,6 +104,10 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                     $interval
                 )
                 ) {
+                    // Special handling for optional faction warfare account.
+                    if ($accountKey == '10000') {
+                        continue 1;
+                    }
                     continue 2;
                 }
             }
@@ -139,6 +143,16 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
+            if ($accountKey == '10000') {
+                $mess = sprintf(
+                    'Corporation %1$s does NOT have a faction warfare account %2$s',
+                    $ownerID,
+                    $accountKey
+                );
+                $this->getLogger()
+                     ->info($mess);
+                return false;
+            }
             $mess = sprintf(
                 'Could NOT retrieve any data from Eve API %1$s/%2$s for %3$s on account %4$s',
                 strtolower($this->getSectionName()),

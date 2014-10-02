@@ -84,14 +84,14 @@ class WalletTransactions extends AbstractAccountKey
      * @type string[] $keyList
      */
     protected $keyList = [
+        '10000',
         '1000',
         '1001',
         '1002',
         '1003',
         '1004',
         '1005',
-        '1006',
-        '10000'
+        '1006'
     ];
     /**
      * @var int $mask

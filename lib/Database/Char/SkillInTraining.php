@@ -89,7 +89,11 @@ class SkillInTraining extends AbstractCharSection
     </xsl:template>
     <xsl:template match="currentTQTime">
         <xsl:element name="currentTQTime"><xsl:value-of select="."/></xsl:element>
-        <xsl:element name="offset"><xsl:value-of select="@offset"/></xsl:element>
+        <xsl:choose>
+            <xsl:when test="@offset">
+                <xsl:element name="offset"><xsl:value-of select="@offset"/></xsl:element>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
 </xsl:transform>
 XSL;

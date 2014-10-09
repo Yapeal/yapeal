@@ -46,14 +46,14 @@ class ContactNotifications extends AbstractCharSection
      */
     protected function preserverToContactNotifications($xml, $ownerID)
     {
-        $columnDefaults = array(
+        $columnDefaults = [
             'ownerID' => $ownerID,
             'notificationID' => null,
-            'senderID ' => null,
+            'senderID' => null,
             'senderName' => null,
-            'sentDate ' => null,
-            'messageData ' => null
-        );
+            'sentDate' => null,
+            'messageData' => null
+        ];
         $this->attributePreserveData(
             $xml,
             $columnDefaults,

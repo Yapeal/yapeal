@@ -5,23 +5,27 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
  * Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -92,7 +96,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
          */
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName())
-            ->setEveApiArguments([])
+             ->setEveApiArguments([])
              ->setEveApiXml();
         if ($this->cacheNotExpired(
             $this->getApiName(),
@@ -203,42 +207,9 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      */
     abstract protected function getApiName();
     /**
-     * @deprecated Need to switch to using trait instead.
-     * @throws LogicException
-     * @return DatabasePreserverInterface
-     */
-    protected function getAttributesDatabasePreserver()
-    {
-        if (empty($this->attributesDatabasePreserver)) {
-            $this->attributesDatabasePreserver =
-                new AttributesDatabasePreserver(
-                    $this->getPdo(),
-                    $this->getLogger(),
-                    $this->getCsq()
-                );
-        }
-        return $this->attributesDatabasePreserver;
-    }
-    /**
      * @return string
      */
     abstract protected function getSectionName();
-    /**
-     * @deprecated Need to switch to using trait instead.
-     * @throws LogicException
-     * @return DatabasePreserverInterface
-     */
-    protected function getValuesDatabasePreserver()
-    {
-        if (empty($this->valuesDatabasePreserver)) {
-            $this->valuesDatabasePreserver = new ValuesDatabasePreserver(
-                $this->getPdo(),
-                $this->getLogger(),
-                $this->getCsq()
-            );
-        }
-        return $this->valuesDatabasePreserver;
-    }
     /**
      * @return string
      */
@@ -269,7 +240,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                 $data->getEveApiName()
             );
             $this->getLogger()
-                ->warning($mess, ['exception' => $exc]);
+                 ->warning($mess, ['exception' => $exc]);
             return false;
         }
     }
@@ -316,7 +287,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->warning($mess);
             $interval = 300;
         } elseif ($code > 903
-            && $code < 905
+                  && $code < 905
         ) { // Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
@@ -427,9 +398,10 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return $this;
     }
     /**
-     * @var string
+     * @type string $xsl
      */
-    protected $xsl = <<<'XSL'
+    protected $xsl
+        = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
         version="1.0"
@@ -459,14 +431,4 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     </xsl:template>
 </xsl:transform>
 XSL;
-    /**
-     * @deprecated Need to switch to using trait instead.
-     * @var DatabasePreserverInterface $attributesDatabasePreserver
-     */
-    private $attributesDatabasePreserver;
-    /**
-     * @deprecated Need to switch to using trait instead.
-     * @var DatabasePreserverInterface $valuesDatabasePreserver
-     */
-    private $valuesDatabasePreserver;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="callsRowType">
         <xs:simpleContent>
@@ -8,9 +8,9 @@
                 <xs:attribute type="eveIDType" name="groupID" use="required"/>
                 <xs:attribute type="xs:string" name="name" use="required"/>
                 <xs:attribute type="xs:string" name="description"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="eveIDType" name="accessMask"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:string" name="type" use="required"/>
             </xs:extension>
         </xs:simpleContent>
@@ -21,14 +21,14 @@
                 <xs:attribute type="eveIDType" name="groupID" use="required"/>
                 <xs:attribute type="xs:string" name="name" use="required"/>
                 <xs:attribute type="xs:string" name="description"
-                    use="required"/>
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="callGroupsType">
         <xs:sequence>
             <xs:element type="callGroupsRowType" name="row"
-                maxOccurs="unbounded" minOccurs="1"/>
+                        maxOccurs="unbounded" minOccurs="1"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
@@ -41,7 +41,7 @@
     <xs:complexType name="callsType">
         <xs:sequence>
             <xs:element type="callsRowType" name="row" maxOccurs="unbounded"
-                minOccurs="1"/>
+                        minOccurs="1"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>

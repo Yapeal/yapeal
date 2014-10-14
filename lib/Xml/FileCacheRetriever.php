@@ -5,18 +5,25 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
  * Copyright (C) 2014 Michael Cummings
+ *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version. This program is distributed in the hope that it
- * will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
- * General Public License for more details. You should have received a copy of
- * the GNU Lesser General Public License along with this program. If not, see
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
+ *
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
@@ -75,10 +82,11 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         $this->getLogger()
              ->debug($mess);
         try {
-            $cachePath =
-                $this->getNormalizedCachePath($data->getEveApiSectionName());
+            $cachePath
+                = $this->getNormalizedCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
-            $cacheFile =
+            $cacheFile
+                =
                 $cachePath . $data->getEveApiName() . $data->getHash() . '.xml';
             $this->checkUsableCacheFile($cacheFile);
             $this->prepareConnection($cacheFile);
@@ -94,7 +102,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         } catch (YapealRetrieverException $exc) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                 ->debug($mess, array('exception' => $exc));
+                 ->debug($mess, ['exception' => $exc]);
             return $this;
         }
         //$this->getLogger()->debug($result);
@@ -140,9 +148,9 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     protected function checkUsableCacheFile($cacheFile)
     {
         if (!is_readable($cacheFile) || !is_file($cacheFile)) {
-            $mess =
-                'Could NOT find accessible cache file was given '
-                . $cacheFile;
+            $mess
+                = 'Could NOT find accessible cache file was given '
+                  . $cacheFile;
             throw new YapealRetrieverFileException($mess);
         }
         return $this;
@@ -157,12 +165,12 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     {
         if (!is_readable($cachePath)) {
             $mess = 'Cache path is NOT readable or does NOT exist was given '
-                . $cachePath;
+                    . $cachePath;
             throw new YapealRetrieverPathException($mess);
         }
         if (!is_dir($cachePath)) {
             $mess = 'Cache path is NOT a directory was given '
-                . $cachePath;
+                    . $cachePath;
             throw new YapealRetrieverPathException($mess);
         }
         return $this;
@@ -181,7 +189,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         while (false !== strpos($path, '//')) {
             $path = str_replace('//', '/', $path);
         }
-        $parts = array();
+        $parts = [];
         foreach (explode('/', $path) as $part) {
             if ('.' == $part || '' == $part) {
                 continue;
@@ -229,8 +237,9 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         $path = str_replace('\\', '/', $cachePath);
         // Optional wrapper(s), Optional root prefix, Actual path.
         $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)'
-            . '(?<root>(?:[[:alpha:]]:/|/)?)' . '(?<path>(?:[[:print:]]*))$%';
-        $parts = array();
+                  . '(?<root>(?:[[:alpha:]]:/|/)?)'
+                  . '(?<path>(?:[[:print:]]*))$%';
+        $parts = [];
         preg_match($regExp, $path, $parts);
         $wrappers = $parts['wrappers'];
         // vfsStream does NOT allow absolute path.
@@ -238,8 +247,8 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
             $absoluteRequired = false;
         }
         if ($absoluteRequired && empty($parts['root'])) {
-            $mess =
-                'Path NOT absolute missing drive or root was given ' . $path;
+            $mess
+                = 'Path NOT absolute missing drive or root was given ' . $path;
             throw new YapealRetrieverPathException($mess, 1);
         }
         $root = $parts['root'];
@@ -356,15 +365,15 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         return $xml;
     }
     /**
-     * @var string
+     * @type string $cachePath
      */
     protected $cachePath;
     /**
-     * @var resource|false File handle
+     * @type resource|false $handle File handle
      */
     protected $handle;
     /**
-     * @type LoggerInterface
+     * @type LoggerInterface $logger
      */
     protected $logger;
 }

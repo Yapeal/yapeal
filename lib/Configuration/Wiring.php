@@ -93,7 +93,7 @@ class Wiring
         }
         $this->dic['Yapeal.Config.Parser'] = function ($dic) {
             $configFile = $dic['Yapeal.Config.configDir']
-                . $dic['Yapeal.Config.fileName'];
+                          . $dic['Yapeal.Config.fileName'];
             if (!is_readable($configFile) || !is_file($configFile)) {
                 $mess = sprintf(
                     'Configuration file %1$s is NOT accessible',
@@ -102,13 +102,13 @@ class Wiring
                 throw new YapealException($mess);
             }
             /**
-             * @var Parser $parser
+             * @type Parser $parser
              */
             $parser = new $dic['Yapeal.Config.class'];
             $config = file_get_contents($configFile);
             try {
-                $config =
-                    $parser->parse($config, true, false);
+                $config
+                    = $parser->parse($config, true, false);
             } catch (ParseException $exc) {
                 $mess = sprintf(
                     'Unable to parse the YAML configuration file %2$s.'
@@ -148,18 +148,18 @@ class Wiring
         }
         if ($this->dic['Yapeal.Database.platform'] != 'mysql') {
             $mess = 'Unknown platform was given '
-                . $this->dic['Yapeal.Database.platform'];
+                    . $this->dic['Yapeal.Database.platform'];
             throw new YapealDatabaseException($mess);
         }
         $this->dic['Yapeal.Database.Connection'] = function ($dic) {
             $dsn = $dic['Yapeal.Database.platform'] . ':host='
-                . $dic['Yapeal.Database.hostName']
-                . ';charset=utf8';
+                   . $dic['Yapeal.Database.hostName']
+                   . ';charset=utf8';
             if (!empty($dic['Yapeal.Database.port'])) {
                 $dsn .= ';port=' . $dic['Yapeal.Database.port'];
             }
             /**
-             * @var PDO $database
+             * @type PDO $database
              */
             $database = new $dic['Yapeal.Database.class'](
                 $dsn,
@@ -185,7 +185,7 @@ class Wiring
         $defaults = [
             'Yapeal.Config.class' => 'Symfony\\Component\\Yaml\\Parser',
             'Yapeal.Config.configDir' => $this->dic['Yapeal.baseDir']
-                . 'config/',
+                                         . 'config/',
             'Yapeal.Config.fileName' => 'yapeal.yaml',
             'Yapeal.Database.platform' => 'mysql',
             'Yapeal.Database.class' => 'PDO',
@@ -211,9 +211,9 @@ class Wiring
             'Yapeal.Network.appVersion' => '',
             'Yapeal.Network.baseUrl' => 'https://api.eveonline.com',
             'Yapeal.Network.userAgent' => '{Yapeal.Network.appName}/'
-                . '{Yapeal.Network.appVersion} {Yapeal.Network.appComment}'
-                . ' Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion};'
-                . ' Platform {machineType})'
+                                          . '{Yapeal.Network.appVersion} {Yapeal.Network.appComment}'
+                                          . ' Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion};'
+                                          . ' Platform {machineType})'
         ];
         foreach ($defaults as $setting => $default) {
             if (empty($this->dic[$setting])) {
@@ -245,14 +245,14 @@ class Wiring
          */
         $this->dic['Yapeal.Error.Logger'] = function ($dic) {
             /**
-             * @var LoggerInterface $logger
+             * @type LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Error.loggerName'](
                 $dic['Yapeal.Error.channel']
             );
             $group = [];
             /**
-             * @var Logger $logger
+             * @type Logger $logger
              */
             if (PHP_SAPI == 'cli') {
                 $group[] = new StreamHandler('php://stderr', 100);
@@ -270,7 +270,7 @@ class Wiring
                 )
             );
             /**
-             * @var ErrorHandler $error
+             * @type ErrorHandler $error
              */
             $error = $dic['Yapeal.Error.class'];
             $error::register(
@@ -293,12 +293,12 @@ class Wiring
         }
         $this->dic['Yapeal.Log.Logger'] = function ($dic) {
             /**
-             * @var LoggerInterface $logger
+             * @type LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
             $group = [];
             /**
-             * @var Logger $logger
+             * @type Logger $logger
              */
             if (PHP_SAPI == 'cli') {
                 $group[] = new StreamHandler('php://stderr', 100);
@@ -353,29 +353,34 @@ class Wiring
                 $appComment = '';
                 $appVersion = '';
             }
-            $userAgent = trim(str_replace([
-                    '{machineType}',
-                    '{osName}',
-                    '{osRelease}',
-                    '{phpVersion}',
-                    '{Yapeal.Network.appComment}',
-                    '{Yapeal.Network.appName}',
-                    '{Yapeal.Network.appVersion}'
-                ], [
-                    php_uname('m'),
-                    php_uname('s'),
-                    php_uname('r'),
-                    PHP_VERSION,
-                    $appComment,
-                    $appName,
-                    $appVersion
-                ],
-                $dic['Yapeal.Network.userAgent']));
+            $userAgent = trim(
+                str_replace(
+                    [
+                        '{machineType}',
+                        '{osName}',
+                        '{osRelease}',
+                        '{phpVersion}',
+                        '{Yapeal.Network.appComment}',
+                        '{Yapeal.Network.appName}',
+                        '{Yapeal.Network.appVersion}'
+                    ],
+                    [
+                        php_uname('m'),
+                        php_uname('s'),
+                        php_uname('r'),
+                        PHP_VERSION,
+                        $appComment,
+                        $appName,
+                        $appVersion
+                    ],
+                    $dic['Yapeal.Network.userAgent']
+                )
+            );
             $userAgent = ltrim($userAgent, '/ ');
             $headers = [
                 'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
-                    . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
-                    . 'q=0.6,*/*;q=0.5',
+                            . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
+                            . 'q=0.6,*/*;q=0.5',
                 'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
                 'Accept-Encoding' => 'gzip',
                 'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
@@ -409,7 +414,7 @@ class Wiring
         return $this;
     }
     /**
-     * @var ContainerInterface $dic
+     * @type ContainerInterface $dic
      */
     protected $dic;
 }

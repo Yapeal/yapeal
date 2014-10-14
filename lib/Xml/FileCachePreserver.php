@@ -5,23 +5,27 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
  * Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -71,8 +75,8 @@ class FileCachePreserver implements EveApiPreserverInterface
     public function preserveEveApi(EveApiReadInterface $data)
     {
         try {
-            $cachePath =
-                $this->getNormalizedCachePath($data->getEveApiSectionName());
+            $cachePath
+                = $this->getNormalizedCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
             $hash = $data->getHash();
             // Insures retriever never see partly written file by using temp file.
@@ -83,7 +87,7 @@ class FileCachePreserver implements EveApiPreserverInterface
         } catch (YapealPreserverException $exp) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                 ->info($mess, array('exception' => $exp));
+                 ->info($mess, ['exception' => $exp]);
             return $data;
         }
         $cacheFile = $cachePath . $data->getEveApiName() . $hash . '.xml';
@@ -130,12 +134,12 @@ class FileCachePreserver implements EveApiPreserverInterface
     {
         if (!is_readable($cachePath)) {
             $mess = 'Cache path is NOT readable or does NOT exist was given '
-                . $cachePath;
+                    . $cachePath;
             throw new YapealPreserverPathException($mess, 1);
         }
         if (!is_dir($cachePath)) {
             $mess = 'Cache path is NOT a directory was given '
-                . $cachePath;
+                    . $cachePath;
             throw new YapealPreserverPathException($mess, 2);
         }
         if (!is_writable($cachePath)) {
@@ -158,7 +162,7 @@ class FileCachePreserver implements EveApiPreserverInterface
         while (false !== strpos($path, '//')) {
             $path = str_replace('//', '/', $path);
         }
-        $parts = array();
+        $parts = [];
         foreach (explode('/', $path) as $part) {
             if ('.' == $part || '' == $part) {
                 continue;
@@ -211,7 +215,7 @@ class FileCachePreserver implements EveApiPreserverInterface
         $regExp .= '(?<root>(?:[[:alpha:]]:/|/)?)';
         // Actual path.
         $regExp .= '(?<path>(?:[[:print:]]*))$%';
-        $parts = array();
+        $parts = [];
         preg_match($regExp, $path, $parts);
         $wrappers = $parts['wrappers'];
         // vfsStream does NOT allow absolute path.
@@ -219,8 +223,8 @@ class FileCachePreserver implements EveApiPreserverInterface
             $absoluteRequired = false;
         }
         if ($absoluteRequired && empty($parts['root'])) {
-            $mess =
-                'Path NOT absolute missing drive or root was given ' . $path;
+            $mess
+                = 'Path NOT absolute missing drive or root was given ' . $path;
             throw new YapealPreserverPathException($mess);
         }
         $root = $parts['root'];
@@ -283,15 +287,15 @@ class FileCachePreserver implements EveApiPreserverInterface
         return $this;
     }
     /**
-     * @var string
+     * @type string $cachePath
      */
     protected $cachePath;
     /**
-     * @var resource|false File handle
+     * @type resource|false $handle File handle
      */
     protected $handle;
     /**
-     * @type LoggerInterface
+     * @type LoggerInterface $logger
      */
     protected $logger;
 }

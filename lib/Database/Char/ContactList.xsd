@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="rowType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
                 <xs:attribute type="xs:string" name="contactName"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="eveBooleanType" name="inWatchlist"
-                    use="optional" default="0"/>
+                              use="optional" default="0"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
                 <xs:attribute type="eveIDType" name="contactTypeID"
-                    use="required"/>
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -21,10 +21,10 @@
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
                 <xs:attribute type="xs:string" name="contactName"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
                 <xs:attribute type="eveIDType" name="contactTypeID"
-                    use="required"/>
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -33,31 +33,31 @@
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
                 <xs:attribute type="xs:string" name="contactName"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
                 <xs:attribute type="eveIDType" name="contactTypeID"
-                    use="required"/>
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="contactListType">
         <xs:sequence>
             <xs:element type="rowType" name="row" maxOccurs="unbounded"
-                minOccurs="0"/>
+                        minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="allianceContactListType">
         <xs:sequence>
             <xs:element type="allianceRowType" name="row" maxOccurs="unbounded"
-                minOccurs="0"/>
+                        minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="corporateContactListType">
         <xs:sequence>
             <xs:element type="corporateRowType" name="row" maxOccurs="unbounded"
-                minOccurs="0"/>
+                        minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
@@ -65,9 +65,9 @@
         <xs:sequence>
             <xs:element type="contactListType" name="contactList"/>
             <xs:element type="corporateContactListType"
-                name="corporateContactList"/>
+                        name="corporateContactList"/>
             <xs:element type="allianceContactListType"
-                name="allianceContactList"/>
+                        name="allianceContactList"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

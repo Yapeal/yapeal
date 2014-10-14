@@ -54,7 +54,8 @@ class CommonSqlQueries
      */
     public function getAccountCorporationIDsExcludingCorporationKeys()
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT DISTINCT acc."corporationID"
  FROM "%1$s"."%2$saccountCharacters" AS acc
  WHERE
@@ -92,7 +93,8 @@ SQL;
      */
     public function getActiveRegisteredAccountStatus()
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT urk."keyID",urk."vCode"
  FROM "%1$s"."%2$sutilRegisteredKey" AS urk
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -111,7 +113,8 @@ SQL;
      */
     public function getActiveRegisteredCharacters($mask)
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT ac."characterID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -139,7 +142,8 @@ SQL;
      */
     public function getActiveRegisteredCorporations($mask)
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT ac."corporationID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -179,7 +183,8 @@ SQL;
      */
     public function getActiveStarbaseTowers($mask, $ownerID)
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -214,6 +219,59 @@ SQL;
         return sprintf('SELECT GET_LOCK(\'%1$s\',5)', $hash);
     }
     /**
+     * Used by 'yc D:U'
+     *
+     * @return string
+     */
+    public function getCreateAddOrModifyColumnProcedure()
+    {
+        $sql
+            = <<<'SQL'
+CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
+    IN param_database_name  VARCHAR(100),
+    IN param_table_name     VARCHAR(100),
+    IN param_column_name    VARCHAR(100),
+    IN param_column_details VARCHAR(255))
+    BEGIN
+        IF NOT EXISTS(SELECT NULL
+                      FROM
+                          "information_schema"."COLUMNS"
+                      WHERE
+                          "COLUMN_NAME" = param_column_name AND
+                          "TABLE_NAME" = param_table_name AND
+                          "table_schema" = param_database_name)
+        THEN
+/* Create the full statement to execute */
+            SET @StatementToExecute = concat('ALTER TABLE "',
+                                             param_database_name, '"."',
+                                             param_table_name,
+                                             '" ADD COLUMN "',
+                                             param_column_name, '" ',
+                                             param_column_details) $$
+/* Prepare and execute the statement that was built */
+            PREPARE DynamicStatement FROM @StatementToExecute$$
+            EXECUTE DynamicStatement$$
+/* Cleanup the prepared statement */
+            DEALLOCATE PREPARE DynamicStatement$$
+        ELSE
+/* Create the full statement to execute */
+            SET @StatementToExecute = concat('ALTER TABLE "',
+                                             param_database_name, '"."',
+                                             param_table_name,
+                                             '" MODIFY COLUMN "',
+                                             param_column_name, '" ',
+                                             param_column_details) $$
+/* Prepare and execute the statement that was built */
+            PREPARE DynamicStatement FROM @StatementToExecute$$
+            EXECUTE DynamicStatement$$
+/* Cleanup the prepared statement */
+            DEALLOCATE PREPARE DynamicStatement$$
+        END IF$$
+    END;
+SQL;
+        return $sql;
+    }
+    /**
      * @param string $tableName
      *
      * @return string
@@ -244,13 +302,21 @@ SQL;
         );
     }
     /**
+     * @return string
+     */
+    public function getDropAddOrModifyColumnProcedure()
+    {
+        return 'DROP PROCEDURE IF EXISTS "{database}"."AddOrModifyColumn";';
+    }
+    /**
      * Get alliance corporationIDs for corps excluding any in accountCharacters.
      *
      * @return string
      */
     public function getMemberCorporationIDsExcludingAccountCorporations()
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT DISTINCT emc."corporationID"
  FROM "%1$s"."%2$seveMemberCorporations" AS emc
  WHERE
@@ -277,9 +343,9 @@ SQL;
     public function getUpsert($tableName, array $columnNameList, $rowCount)
     {
         $columns = implode('","', $columnNameList);
-        $rowPrototype =
-            '(' . implode(',', array_fill(0, count($columnNameList), '?'))
-            . ')';
+        $rowPrototype
+            = '(' . implode(',', array_fill(0, count($columnNameList), '?'))
+              . ')';
         $rows = implode(',', array_fill(0, $rowCount, $rowPrototype));
         $updates = [];
         foreach ($columnNameList as $column) {
@@ -306,7 +372,8 @@ SQL;
      */
     public function getUtilCachedUntilExpires($apiName, $sectionName, $ownerID)
     {
-        $sql = <<<'SQL'
+        $sql
+            = <<<'SQL'
 SELECT "expires"
  FROM "%1$s"."%2$sutilCachedUntil"
  WHERE
@@ -353,70 +420,11 @@ SQL;
         return $this->getUpsert('utilDatabaseVersion', ['version'], 1);
     }
     /**
-     * @var string
+     * @type string $databaseName
      */
     protected $databaseName;
     /**
-     * @var string
+     * @type string $tablePrefix
      */
     protected $tablePrefix;
-    /**
-     * Used by 'yc D:U'
-     *
-     * @return string
-     */
-    public function getCreateAddOrModifyColumnProcedure()
-    {
-        $sql = <<<'SQL'
-CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
-    IN param_database_name  VARCHAR(100),
-    IN param_table_name     VARCHAR(100),
-    IN param_column_name    VARCHAR(100),
-    IN param_column_details VARCHAR(255))
-    BEGIN
-        IF NOT EXISTS(SELECT NULL
-                      FROM
-                          "information_schema"."COLUMNS"
-                      WHERE
-                          "COLUMN_NAME" = param_column_name AND
-                          "TABLE_NAME" = param_table_name AND
-                          "table_schema" = param_database_name)
-        THEN
-/* Create the full statement to execute */
-            SET @StatementToExecute = concat('ALTER TABLE "',
-                                             param_database_name, '"."',
-                                             param_table_name,
-                                             '" ADD COLUMN "',
-                                             param_column_name, '" ',
-                                             param_column_details) $$
-/* Prepare and execute the statement that was built */
-            PREPARE DynamicStatement FROM @StatementToExecute$$
-            EXECUTE DynamicStatement$$
-/* Cleanup the prepared statement */
-            DEALLOCATE PREPARE DynamicStatement$$
-        ELSE
-/* Create the full statement to execute */
-            SET @StatementToExecute = concat('ALTER TABLE "',
-                                             param_database_name, '"."',
-                                             param_table_name,
-                                             '" MODIFY COLUMN "',
-                                             param_column_name, '" ',
-                                             param_column_details) $$
-/* Prepare and execute the statement that was built */
-            PREPARE DynamicStatement FROM @StatementToExecute$$
-            EXECUTE DynamicStatement$$
-/* Cleanup the prepared statement */
-            DEALLOCATE PREPARE DynamicStatement$$
-        END IF$$
-    END;
-SQL;
-        return $sql;
-    }
-    /**
-     * @return string
-     */
-    public function getDropAddOrModifyColumnProcedure()
-    {
-        return 'DROP PROCEDURE IF EXISTS "{database}"."AddOrModifyColumn";';
-    }
 }

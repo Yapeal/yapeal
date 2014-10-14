@@ -378,13 +378,14 @@ class CharacterSheet extends AbstractCharSection
         return $this;
     }
     /**
-     * @var int $mask
+     * @type int $mask
      */
     protected $mask = 8;
     /**
-     * @var string
+     * @type string $xsl
      */
-    protected $xsl = <<<'XSL'
+    protected $xsl
+        = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
                 version="1.0"

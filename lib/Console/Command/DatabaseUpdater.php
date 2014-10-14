@@ -54,7 +54,7 @@ class DatabaseUpdater extends AbstractDatabaseCommon
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function __construct($name = null, $cwd, ContainerInterface $dic)
+    public function __construct($name, $cwd, ContainerInterface $dic)
     {
         $this->setDescription(
             'Retrieves SQL from files and updates database'
@@ -73,9 +73,12 @@ class DatabaseUpdater extends AbstractDatabaseCommon
         $name = 'DatabaseUpdater::addDatabaseProcedure';
         $output->writeln($name);
         $csq = $this->getCsq($output);
-        $this->executeSqlStatements($csq->getDropAddOrModifyColumnProcedure()
-            . PHP_EOL . $csq->getCreateAddOrModifyColumnProcedure(), $name,
-            $output);
+        $this->executeSqlStatements(
+            $csq->getDropAddOrModifyColumnProcedure()
+            . PHP_EOL . $csq->getCreateAddOrModifyColumnProcedure(),
+            $name,
+            $output
+        );
         $output->writeln('');
     }
     /**
@@ -84,7 +87,8 @@ class DatabaseUpdater extends AbstractDatabaseCommon
     protected function configure()
     {
         $this->addOptions();
-        $help = <<<'HELP'
+        $help
+            = <<<'HELP'
 The <info>%command.full_name%</info> command is used to initialize (create) a new
  database and tables to be used by Yapeal. If you already have a
  config/yapeal.yaml file setup you can use the following:
@@ -112,9 +116,12 @@ HELP;
     ) {
         $name = 'DatabaseUpdater::dropDatabaseProcedure';
         $output->writeln($name);
-        $this->executeSqlStatements($this->getCsq($output)
-                                         ->getDropAddOrModifyColumnProcedure(),
-            $name, $output);
+        $this->executeSqlStatements(
+            $this->getCsq($output)
+                 ->getDropAddOrModifyColumnProcedure(),
+            $name,
+            $output
+        );
         $output->writeln('');
     }
     /**
@@ -148,7 +155,7 @@ HELP;
     protected function getLatestDatabaseVersion(OutputInterface $output)
     {
         /**
-         * @var CommonSqlQueries $csq
+         * @type CommonSqlQueries $csq
          */
         $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
         $sql = $csq->getUtilLatestDatabaseVersion();
@@ -159,8 +166,8 @@ HELP;
             //$output->writeln('database column version = ' . $version);
             $result->closeCursor();
         } catch (PDOException $exc) {
-            $mess =
-                '<warning>Could NOT get latest database version using default 197001010001</warning>';
+            $mess
+                = '<warning>Could NOT get latest database version using default 197001010001</warning>';
             $output->writeln([$sql, $mess]);
             $version = '197001010001';
         }
@@ -251,14 +258,14 @@ HELP;
         OutputInterface $output
     ) {
         /**
-         * @var CommonSqlQueries $csq
+         * @type CommonSqlQueries $csq
          */
         $sql = $this->getCsq($output)
                     ->getUtilLatestDatabaseVersionUpdate();
         //$mess =sprintf( 'Updating database version to %1$s',$currentVersion);
         //$output->writeln([$sql, $mess]);
         try {
-            $pdo=$this->getPdo($output);
+            $pdo = $this->getPdo($output);
             $pdo->beginTransaction();
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$updateVersion]);

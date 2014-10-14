@@ -52,7 +52,7 @@ class DatabaseInitializer extends AbstractDatabaseCommon
      * @throws InvalidArgumentException
      * @throws LogicException
      */
-    public function __construct($name = null, $cwd, ContainerInterface $dic)
+    public function __construct($name, $cwd, ContainerInterface $dic)
     {
         $this->setDescription(
             'Retrieves SQL from files and initializes database'
@@ -68,7 +68,8 @@ class DatabaseInitializer extends AbstractDatabaseCommon
     protected function configure()
     {
         $this->addOptions();
-        $help = <<<'HELP'
+        $help
+            = <<<'HELP'
 The <info>%command.full_name%</info> command is used to initialize (create) a new
  database and tables to be used by Yapeal. If you already have a
  config/yapeal.yaml file setup you can use the following:

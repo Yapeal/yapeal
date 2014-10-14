@@ -54,7 +54,7 @@
         "ext-date": "*",
         "ext-hash": "*",
         "ext-openssl": "*",
-        "ext-PDO": "*",
+        "ext-PDO": ">=1.0.0",
         "ext-pdo_mysql": "*",
         "ext-Reflection": "*",
         "ext-SimpleXML": "*",
@@ -66,18 +66,19 @@
         "lib-openssl": ">=0.9.8",
         "php": ">=5.4.24",
         "guzzle/guzzle": "~3.9",
-        "monolog/monolog": "~1.9",
+        "monolog/monolog": "~1.11",
         "symfony/console": "~2.5",
         "symfony/yaml": "~2.5"
     },
     "require-dev": {
         "dragonrun1/semantic-version": "master@dev",
         "erusev/parsedown": "*",
-        "mikey179/vfsStream": "~1.2",
+        "mikey179/vfsStream": "~1.4",
+        "squizlabs/php_codesniffer": "dev-master",
         "phploc/phploc": "*",
-        "phpmd/phpmd": "~2.0",
+        "phpmd/phpmd": "~2.1",
         "phpspec/phpspec": "2.1.*@dev",
-        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit": "~4.3",
         "phpunit/phpunit-skeleton-generator": "2.0.*@dev",
         "satooshi/php-coveralls": "dev-master"
     }

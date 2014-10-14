@@ -1,28 +1,24 @@
 <?php
 /**
  * Contains UtilRegisterKey class.
- *
  * PHP version 5.4
- *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
- *
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
@@ -40,7 +36,6 @@ use Yapeal\Database\CommonSqlQueries;
 require_once __DIR__ . '/bootstrap.php';
 /**
  * Class UtilRegisterKey
- *
  * WARNING: This class changes the PDO connection into MySQL's ANSI,TRADITIONAL
  * mode and makes other changes that may cause other queries in any other code
  * that reuses the connection after the changes to fail. For example if you use
@@ -91,12 +86,10 @@ class UtilRegisterKey
     }
     /**
      * Method used to persist changes to the database.
-     *
      * NOTE: After calling this method the MySQL PDO connection will be
      * switched to ANSI mode and use UTF-8.
      *
      * @see UtilRegisteredKey
-     *
      * @throws LogicException
      * @return self
      */
@@ -129,13 +122,15 @@ class UtilRegisterKey
             $value = (string)$value;
         }
         if (!is_string($value)) {
-            $mess =
+            $mess
+                =
                 'ActiveAPIMask MUST be an integer or integer string but was given '
                 . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         if (!$this->isIntString($value)) {
-            $mess =
+            $mess
+                =
                 'ActiveAPIMask MUST be an integer or integer string but was given '
                 . $value;
             throw new InvalidArgumentException($mess);
@@ -175,15 +170,15 @@ class UtilRegisterKey
             $value = (string)$value;
         }
         if (!is_string($value)) {
-            $mess =
-                'KeyID MUST be an integer or integer string but was given '
-                . gettype($value);
+            $mess
+                = 'KeyID MUST be an integer or integer string but was given '
+                  . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         if (!$this->isIntString($value)) {
-            $mess =
-                'KeyID MUST be an integer or integer string but was given '
-                . $value;
+            $mess
+                = 'KeyID MUST be an integer or integer string but was given '
+                  . $value;
             throw new InvalidArgumentException($mess);
         }
         $this->keyID = $value;
@@ -208,9 +203,9 @@ class UtilRegisterKey
     public function setVCode($value)
     {
         if (!is_string($value)) {
-            $mess =
-                'VCode MUST be a string but was given '
-                . gettype($value);
+            $mess
+                = 'VCode MUST be a string but was given '
+                  . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         $this->vCode = $value;
@@ -261,12 +256,23 @@ class UtilRegisterKey
             return false;
         }
         if (strlen(
-                str_replace(
-                    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-                    '',
-                    $value
-                )
-            ) !== 0
+            str_replace(
+                [
+                    '0',
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9'
+                ],
+                '',
+                $value
+            )
+        ) !== 0
         ) {
             return false;
         }

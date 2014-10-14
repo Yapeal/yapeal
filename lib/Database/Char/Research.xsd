@@ -20,7 +20,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="rowType" name="row" minOccurs="0"
-                            maxOccurs="unbounded"/>
+                                    maxOccurs="unbounded"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

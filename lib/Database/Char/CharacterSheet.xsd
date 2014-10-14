@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           attributeFormDefault="unqualified"
-           elementFormDefault="qualified">
+           attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="attributeEnhancersRowType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="xs:string" name="augmentatorName"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:string" name="augmentatorValue"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:string" name="bonusName" use="required"/>
             </xs:extension>
         </xs:simpleContent>
@@ -18,7 +17,7 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="certificateID"
-                    use="required"/>
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -34,11 +33,11 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="xs:unsignedByte" name="level"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="eveBooleanType" name="published"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="xs:unsignedInt" name="skillpoints"
-                    use="required"/>
+                              use="required"/>
                 <xs:attribute type="eveIDType" name="typeID" use="required"/>
             </xs:extension>
         </xs:simpleContent>
@@ -60,7 +59,7 @@
     <xs:complexType name="attributeEnhancersType">
         <xs:sequence>
             <xs:element type="attributeEnhancersRowType" name="row"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
@@ -76,7 +75,7 @@
     <xs:complexType name="rolesType">
         <xs:sequence>
             <xs:element type="rolesRowType" name="row" maxOccurs="unbounded"
-                minOccurs="0"/>
+                        minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
@@ -103,13 +102,13 @@
             <xs:element type="xs:unsignedInt" name="cloneSkillPoints"/>
             <xs:element type="eveISKType" name="balance"/>
             <xs:element type="attributeEnhancersType"
-                name="attributeEnhancers"/>
+                        name="attributeEnhancers"/>
             <xs:element type="attributesType" name="attributes"/>
             <xs:element name="skills">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="skillsRowType" name="row"
-                            maxOccurs="unbounded" minOccurs="0"/>
+                                    maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -118,24 +117,24 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="certificatesRowType" name="row"
-                            maxOccurs="unbounded" minOccurs="0"/>
+                                    maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
             <xs:element type="rolesType" name="corporationRoles"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="rolesType" name="corporationRolesAtHQ"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="rolesType" name="corporationRolesAtBase"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="rolesType" name="corporationRolesAtOther"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
             <xs:element name="corporationTitles">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="titlesRowType" name="row"
-                            maxOccurs="unbounded" minOccurs="0"/>
+                                    maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

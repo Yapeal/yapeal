@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="alliancesRowType">
         <xs:sequence>
             <xs:element type="memberCorporationsType" name="memberCorporations"
-                minOccurs="1"/>
+                        minOccurs="1"/>
         </xs:sequence>
         <xs:attribute type="eveNEDTType" name="startDate" use="required"/>
         <xs:attribute type="xs:string" name="name" use="required"/>
         <xs:attribute type="xs:string" name="shortName" use="required"/>
         <xs:attribute type="xs:unsignedLong" name="allianceID" use="required"/>
         <xs:attribute type="xs:unsignedLong" name="executorCorpID"
-            use="required"/>
+                      use="required"/>
         <xs:attribute type="xs:unsignedLong" name="memberCount" use="required"/>
     </xs:complexType>
     <xs:complexType name="memberCorporationsRowType">
         <xs:attribute type="xs:unsignedLong" name="corporationID"
-            use="required"/>
+                      use="required"/>
         <xs:attribute type="eveNEDTType" name="startDate" use="required"/>
     </xs:complexType>
     <xs:complexType name="memberCorporationsType">
         <xs:sequence>
             <xs:element type="memberCorporationsRowType" name="row"
-                maxOccurs="unbounded" minOccurs="1"/>
+                        maxOccurs="unbounded" minOccurs="1"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="alliancesType">
         <xs:sequence>
             <xs:element type="alliancesRowType" name="row" maxOccurs="unbounded"
-                minOccurs="0"/>
+                        minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
             <xs:element type="alliancesType" name="alliances"
-                maxOccurs="unbounded" minOccurs="0"/>
+                        maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

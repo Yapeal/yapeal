@@ -7,7 +7,8 @@
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -72,9 +73,10 @@ class SkillInTraining extends AbstractCharSection
      */
     protected $mask = 131072;
     /**
-     * @type string
+     * @type string $xsl
      */
-    protected $xsl = <<<'XSL'
+    protected $xsl
+        = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
         version="1.0"

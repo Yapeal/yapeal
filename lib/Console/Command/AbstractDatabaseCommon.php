@@ -108,8 +108,9 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
             $dic['Yapeal.cwd'] = $this->getNormalizedPath($this->getCwd());
         }
         if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] =
-                $this->getNormalizedPath(dirname(dirname(dirname(__DIR__))));
+            $dic['Yapeal.baseDir'] = $this->getNormalizedPath(
+                dirname(dirname(dirname(__DIR__)))
+            );
         }
         $wiring = new ConsoleWiring($dic);
         $wiring->wireDefaults()
@@ -186,19 +187,17 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         OutputInterface $output
     ) {
         $templates = [';', '{database}', '{table_prefix}', '$$'];
-        $replacements =
-            [
-                '',
-                $this->getDic()['Yapeal.Database.database'],
-                $this->getDic()['Yapeal.Database.tablePrefix'],
-                ';'
-            ];
+        $replacements = [
+            '',
+            $this->getDic()['Yapeal.Database.database'],
+            $this->getDic()['Yapeal.Database.tablePrefix'],
+            ';'
+        ];
         $pdo = $this->getPdo($output);
         // Split up SQL into statements.
         $sqlStatements = explode(';', $sqlStatements);
         // Replace {database}, {table_prefix}, ';', and '$$' in statements.
-        $sqlStatements =
-            str_replace($templates, $replacements, $sqlStatements);
+        $sqlStatements = str_replace($templates, $replacements, $sqlStatements);
         foreach ($sqlStatements as $statement => $sql) {
             $sql = trim($sql);
             // 5 is a 'magic' number that I think is shorter than any legal SQL
@@ -234,7 +233,9 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
             $this->csq = $this->getDic()['Yapeal.Database.CommonQueries'];
         }
         if (empty($this->csq)) {
-            $output->writeln('<error>Tried to use csq before it was set</error>');
+            $output->writeln(
+                '<error>Tried to use csq before it was set</error>'
+            );
             exit(2);
         }
         return $this->csq;
@@ -295,23 +296,25 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     {
         $base = 'Yapeal.Database.';
         foreach ([
-            'class',
-            'database',
-            'hostName',
-            'password',
-            'platform',
-            'tablePrefix',
-            'userName'
-        ] as $option) {
+                     'class',
+                     'database',
+                     'hostName',
+                     'password',
+                     'platform',
+                     'tablePrefix',
+                     'userName'
+                 ] as $option) {
             if (!empty($options[$option])) {
                 $this->getDic()[$base . $option] = $options[$option];
             }
         }
         if (!empty($options['configFile'])) {
-            $this->getDic()['Yapeal.Config.configDir'] =
-                dirname($options['configFile']);
-            $this->getDic()['Yapeal.Config.fileName'] =
-                basename($options['configFile']);
+            $this->getDic()['Yapeal.Config.configDir'] = dirname(
+                $options['configFile']
+            );
+            $this->getDic()['Yapeal.Config.fileName'] = basename(
+                $options['configFile']
+            );
         }
         return $this;
     }

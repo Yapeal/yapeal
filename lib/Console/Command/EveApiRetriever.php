@@ -5,23 +5,27 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
  * Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -59,7 +63,7 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
      * @throws InvalidArgumentException
      * @throws \LogicException
      */
-    public function __construct($name = null, $cwd)
+    public function __construct($name, $cwd)
     {
         $this->setDescription(
             'Retrieves Eve Api XML from servers and puts it in file'
@@ -121,7 +125,8 @@ class EveApiRetriever extends Command implements LoggerAwareInterface
             InputOption::VALUE_REQUIRED,
             'Directory that XML will be sent to.'
         );
-        $help = <<<EOF
+        $help
+            = <<<EOF
 The <info>%command.full_name%</info> command retrieves the XML data from the Eve Api
 server and stores it in a file. By default it will put the file in the current
 working directory.
@@ -192,8 +197,8 @@ EOF;
     {
         $headers = [
             'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
-                . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;'
-                . 'q=0.5',
+                        . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;'
+                        . 'q=0.5',
             'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
             'Accept-Encoding' => 'gzip',
             'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
@@ -226,8 +231,8 @@ EOF;
     protected function getLogger()
     {
         if (empty($this->logger)) {
-            $this->logger =
-                new Logger('console', [new StreamHandler('php://stderr')]);
+            $this->logger
+                = new Logger('console', [new StreamHandler('php://stderr')]);
         }
         return $this->logger;
     }
@@ -237,7 +242,8 @@ EOF;
     protected function getNetworkRetriever()
     {
         return new GuzzleNetworkRetriever(
-            $this->getLogger(), $this->getClient()
+            $this->getLogger(),
+            $this->getClient()
         );
     }
     /**

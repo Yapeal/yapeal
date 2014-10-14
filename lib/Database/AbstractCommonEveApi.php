@@ -92,7 +92,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  )
              );
         /**
-         * @var EveApiReadWriteInterface $data
+         * @type EveApiReadWriteInterface $data
          */
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName())

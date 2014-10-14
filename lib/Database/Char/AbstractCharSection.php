@@ -129,7 +129,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         }
         $charID = $data->getEveApiArgument('characterID');
         /**
-         * @var EveApiReadWriteInterface $data
+         * @type EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {

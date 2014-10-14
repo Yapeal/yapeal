@@ -69,23 +69,23 @@ class Yapeal implements WiringInterface
     {
         $dic = $this->getDic();
         /**
-         * @var LoggerInterface $logger
+         * @type LoggerInterface $logger
          */
         $logger = $dic['Yapeal.Log.Logger'];
         $logger->info('Let the magic begin!');
         /**
-         * @var CommonSqlQueries $csq
+         * @type CommonSqlQueries $csq
          */
         $csq = $dic['Yapeal.Database.CommonQueries'];
         $sql = $csq->getActiveApis();
         $logger->info($sql);
         try {
             /**
-             * @var PDO $pdo
+             * @type PDO $pdo
              */
             $pdo = $dic['Yapeal.Database.Connection'];
             /**
-             * @var PDOStatement $smt
+             * @type PDOStatement $smt
              */
             $stmt = $pdo->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -118,7 +118,7 @@ class Yapeal implements WiringInterface
                 continue;
             }
             /**
-             * @var AbstractCommonEveApi $class
+             * @type AbstractCommonEveApi $class
              */
             $class = new $className($pdo, $logger, $csq);
             $class->autoMagic(
@@ -182,7 +182,7 @@ class Yapeal implements WiringInterface
         return $this->dic;
     }
     /**
-     * @var ContainerInterface
+     * @type ContainerInterface $dic
      */
     protected $dic;
 }

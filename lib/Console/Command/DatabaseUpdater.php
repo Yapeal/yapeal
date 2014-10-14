@@ -155,7 +155,7 @@ HELP;
     protected function getLatestDatabaseVersion(OutputInterface $output)
     {
         /**
-         * @var CommonSqlQueries $csq
+         * @type CommonSqlQueries $csq
          */
         $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
         $sql = $csq->getUtilLatestDatabaseVersion();
@@ -258,7 +258,7 @@ HELP;
         OutputInterface $output
     ) {
         /**
-         * @var CommonSqlQueries $csq
+         * @type CommonSqlQueries $csq
          */
         $sql = $this->getCsq($output)
                     ->getUtilLatestDatabaseVersionUpdate();

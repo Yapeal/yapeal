@@ -66,7 +66,7 @@ trait AttributesDatabasePreserverTrait
         $rowCount = 0;
         $columns = [];
         /**
-         * @var SimpleXMLElement $row
+         * @type SimpleXMLElement $row
          */
         foreach ($rows as $row) {
             // Replace empty values with any existing defaults.

@@ -113,7 +113,7 @@ class AllianceList extends AbstractCommonEveApi
         ];
         $tableName = 'eveMemberCorporations';
         /**
-         * @var SimpleXMLIterator[] $kids
+         * @type SimpleXMLIterator[] $kids
          */
         $kids = $parent->xpath('memberCorporations/row');
         foreach ($kids as $row) {
@@ -206,7 +206,7 @@ class AllianceList extends AbstractCommonEveApi
         $this->rowCount = 0;
         $this->columns = [];
         /**
-         * @var SimpleXMLIterator $row
+         * @type SimpleXMLIterator $row
          */
         foreach ($rows as $row) {
             foreach ($columnDefaults as $key => $value) {
@@ -241,15 +241,15 @@ class AllianceList extends AbstractCommonEveApi
         return $this;
     }
     /**
-     * @var string[] $columnDefaults
+     * @type string[] $columnDefaults
      */
     protected $columnDefaults;
     /**
-     * @var array $columns
+     * @type array $columns
      */
     protected $columns;
     /**
-     * @var int $rowCount
+     * @type int $rowCount
      */
     protected $rowCount;
 }

@@ -58,7 +58,7 @@ trait ValuesDatabasePreserverTrait
     ) {
         $columns = (new SimpleXMLIterator($xml))->xpath($xPath);
         /**
-         * @var SimpleXMLIterator $column
+         * @type SimpleXMLIterator $column
          */
         foreach ($columns as $column) {
             $columnName = $column->getName();

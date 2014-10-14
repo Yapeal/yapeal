@@ -156,7 +156,7 @@ class StarbaseDetail extends AbstractCorpSection
         $corpID = $data->getEveApiArgument('corporationID');
         $itemID = $data->getEveApiArgument('itemID');
         /**
-         * @var EveApiReadWriteInterface $data
+         * @type EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {

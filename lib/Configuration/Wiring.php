@@ -102,7 +102,7 @@ class Wiring
                 throw new YapealException($mess);
             }
             /**
-             * @var Parser $parser
+             * @type Parser $parser
              */
             $parser = new $dic['Yapeal.Config.class'];
             $config = file_get_contents($configFile);
@@ -159,7 +159,7 @@ class Wiring
                 $dsn .= ';port=' . $dic['Yapeal.Database.port'];
             }
             /**
-             * @var PDO $database
+             * @type PDO $database
              */
             $database = new $dic['Yapeal.Database.class'](
                 $dsn,
@@ -245,14 +245,14 @@ class Wiring
          */
         $this->dic['Yapeal.Error.Logger'] = function ($dic) {
             /**
-             * @var LoggerInterface $logger
+             * @type LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Error.loggerName'](
                 $dic['Yapeal.Error.channel']
             );
             $group = [];
             /**
-             * @var Logger $logger
+             * @type Logger $logger
              */
             if (PHP_SAPI == 'cli') {
                 $group[] = new StreamHandler('php://stderr', 100);
@@ -270,7 +270,7 @@ class Wiring
                 )
             );
             /**
-             * @var ErrorHandler $error
+             * @type ErrorHandler $error
              */
             $error = $dic['Yapeal.Error.class'];
             $error::register(
@@ -293,12 +293,12 @@ class Wiring
         }
         $this->dic['Yapeal.Log.Logger'] = function ($dic) {
             /**
-             * @var LoggerInterface $logger
+             * @type LoggerInterface $logger
              */
             $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
             $group = [];
             /**
-             * @var Logger $logger
+             * @type Logger $logger
              */
             if (PHP_SAPI == 'cli') {
                 $group[] = new StreamHandler('php://stderr', 100);

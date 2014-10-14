@@ -128,7 +128,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
         /**
-         * @var EveApiReadWriteInterface $data
+         * @type EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {

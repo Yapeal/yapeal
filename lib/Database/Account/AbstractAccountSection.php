@@ -123,7 +123,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         $keyID = $data->getEveApiArguments();
         $keyID = $keyID['keyID'];
         /**
-         * @var EveApiReadWriteInterface $data
+         * @type EveApiReadWriteInterface $data
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {

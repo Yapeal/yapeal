@@ -15,7 +15,7 @@ CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201409272333');
+    ('201411031600');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
     "interval"    INT(10) UNSIGNED    NOT NULL,

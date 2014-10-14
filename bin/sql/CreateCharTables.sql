@@ -52,15 +52,6 @@ CREATE TABLE "{database}"."{table_prefix}charAttackers" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-CREATE TABLE "{database}"."{table_prefix}charAttributeEnhancers" (
-    "augmentatorName"  CHAR(50)            NOT NULL,
-    "augmentatorValue" TINYINT(2) UNSIGNED NOT NULL,
-    "bonusName"        CHAR(20)            NOT NULL,
-    "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
-    PRIMARY KEY ("ownerID", "bonusName")
-)
-    ENGINE =InnoDB
-    DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charAttributes" (
     "charisma"     TINYINT(2) UNSIGNED NOT NULL,
     "intelligence" TINYINT(2) UNSIGNED NOT NULL,
@@ -102,20 +93,27 @@ CREATE TABLE "{database}"."{table_prefix}charCertificates" (
 )
     ENGINE =InnoDB;
 CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
-    "allianceID"       BIGINT(20) UNSIGNED DEFAULT '0',
-    "allianceName"     CHAR(50)            DEFAULT '',
+    "allianceID"       BIGINT(20) UNSIGNED          DEFAULT 0,
+    "allianceName"     CHAR(50)                     DEFAULT '',
     "ancestry"         CHAR(24)            NOT NULL,
     "balance"          DECIMAL(17, 2)      NOT NULL,
     "bloodLine"        CHAR(24)            NOT NULL,
     "characterID"      BIGINT(20) UNSIGNED NOT NULL,
+    "cloneJumpDate"    DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "cloneName"        CHAR(24)            NOT NULL,
     "cloneSkillPoints" BIGINT(20) UNSIGNED NOT NULL,
+    "cloneTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     "corporationID"    BIGINT(20) UNSIGNED NOT NULL,
     "corporationName"  CHAR(50)            NOT NULL,
-    "factionID"        BIGINT(20) UNSIGNED DEFAULT '0',
-    "factionName"      CHAR(50)            DEFAULT '',
     "DoB"              DATETIME            NOT NULL,
+    "factionID"        BIGINT(20) UNSIGNED          DEFAULT 0,
+    "factionName"      CHAR(50)                     DEFAULT '',
+    "freeRespecs"      INT(4) UNSIGNED     NOT NULL DEFAULT 0,
+    "freeSkillPoints"  BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
     "gender"           CHAR(6)             NOT NULL,
+    "homeStationID"    BIGINT(20) UNSIGNED NOT NULL,
+    "lastRespecDate"   DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
+    "lastTimedRespec"  DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "name"             CHAR(50)            NOT NULL,
     "race"             CHAR(8)             NOT NULL,
     PRIMARY KEY ("characterID")
@@ -265,6 +263,14 @@ CREATE TABLE "{database}"."{table_prefix}charFacWarStats" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}charFacWarStats" ADD INDEX "charFacWarStats1"  ("factionID");
+CREATE TABLE "{database}"."{table_prefix}charImplants" (
+    "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
+    "typeID"   BIGINT(20) UNSIGNED NOT NULL,
+    "typeName" CHAR(100)           NOT NULL,
+    PRIMARY KEY ("ownerID", "typeID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
     "activityID"           TINYINT(2) UNSIGNED NOT NULL,
@@ -312,6 +318,26 @@ CREATE TABLE "{database}"."{table_prefix}charItems" (
     PRIMARY KEY ("killID", "lft")
 )
     ENGINE =InnoDB;
+CREATE TABLE "{database}"."{table_prefix}charJumpCloneImplants" (
+    "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
+    "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
+    "typeID"      BIGINT(20) UNSIGNED NOT NULL,
+    "typeName"    CHAR(100)           NOT NULL,
+    PRIMARY KEY ("ownerID", "jumpCloneID", "typeID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;
+CREATE TABLE "{database}"."{table_prefix}charJumpClones" (
+    "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
+    "locationID"  BIGINT(20) UNSIGNED NOT NULL,
+    "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
+    "typeID"      BIGINT(20) UNSIGNED NOT NULL,
+    "cloneName"   CHAR(50)            NOT NULL,
+    PRIMARY KEY ("ownerID", "jumpCloneID")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =utf8
+    COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charKillMails" (
     "killID"        BIGINT(20) UNSIGNED NOT NULL,
     "killTime"      DATETIME            NOT NULL,

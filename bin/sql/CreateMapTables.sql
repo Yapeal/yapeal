@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "{database}"."{table_prefix}mapFacWarSystems";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapFacWarSystems" (
+CREATE TABLE "{database}"."{table_prefix}mapFacWarSystems" (
     "contested"             ENUM('False', 'True') NOT NULL,
     "occupyingFactionID"    BIGINT(20) UNSIGNED DEFAULT NULL,
     "occupyingFactionName"  CHAR(50)            DEFAULT NULL,
@@ -13,15 +12,13 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapFacWarSystems" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}mapJumps";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapJumps" (
+CREATE TABLE "{database}"."{table_prefix}mapJumps" (
     "shipJumps"     BIGINT(20) UNSIGNED NOT NULL,
     "solarSystemID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}mapKills";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapKills" (
+CREATE TABLE "{database}"."{table_prefix}mapKills" (
     "factionKills"  BIGINT(20) UNSIGNED NOT NULL,
     "podKills"      BIGINT(20) UNSIGNED NOT NULL,
     "shipKills"     BIGINT(20) UNSIGNED NOT NULL,
@@ -29,8 +26,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapKills" (
     PRIMARY KEY ("solarSystemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}mapSovereignty";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}mapSovereignty" (
+CREATE TABLE "{database}"."{table_prefix}mapSovereignty" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionID"       BIGINT(20) UNSIGNED NOT NULL,

@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveAllianceList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
+CREATE TABLE "{database}"."{table_prefix}eveAllianceList" (
     "allianceID"     BIGINT(20) UNSIGNED NOT NULL,
     "executorCorpID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "memberCount"    BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -10,8 +9,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveAllianceList" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharacterInfo";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
+CREATE TABLE "{database}"."{table_prefix}eveCharacterInfo" (
     "characterID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterName"     CHAR(50)            NOT NULL,
     "race"              CHAR(8)             NOT NULL,
@@ -35,8 +33,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharacterInfo" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
@@ -44,8 +41,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsLastWee
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
@@ -53,8 +49,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsTotal" 
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
@@ -62,8 +57,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersKillsYesterd
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -71,8 +65,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -80,8 +73,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -89,8 +81,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCharactersVictoryPoint
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveConquerableStationList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveConquerableStationList" (
+CREATE TABLE "{database}"."{table_prefix}eveConquerableStationList" (
     "corporationID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     "corporationName" CHAR(50)            DEFAULT NULL,
     "solarSystemID"   BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -101,8 +92,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveConquerableStationList
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsKillsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsLastWeek" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
@@ -110,8 +100,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsLastW
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsKillsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsTotal" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
@@ -119,8 +108,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsTotal
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsKillsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsYesterday" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
@@ -128,8 +116,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsKillsYeste
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsLastWeek" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
@@ -137,8 +124,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPoi
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsTotal" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
@@ -146,8 +132,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPoi
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPointsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsYesterday" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
     "corporationName" CHAR(50) DEFAULT NULL,
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
@@ -155,16 +140,14 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveCorporationsVictoryPoi
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveErrorList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveErrorList" (
+CREATE TABLE "{database}"."{table_prefix}eveErrorList" (
     "errorCode" SMALLINT(4) UNSIGNED NOT NULL,
     "errorText" TEXT,
     PRIMARY KEY ("errorCode")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveEmploymentHistory";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveEmploymentHistory" (
+CREATE TABLE "{database}"."{table_prefix}eveEmploymentHistory" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
     "recordID"        BIGINT(20) UNSIGNED NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -175,8 +158,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveEmploymentHistory" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 #ALTER TABLE "{database}"."{table_prefix}eveEmploymentHistory" ADD INDEX "eveEmploymentHistory1"  ("corporationID");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactions";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactions" (
+CREATE TABLE "{database}"."{table_prefix}eveFactions" (
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
     "factionName"            CHAR(50) DEFAULT NULL,
     "killsYesterday"         BIGINT(20) UNSIGNED NOT NULL,
@@ -191,8 +173,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactions" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsLastWeek" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
@@ -200,8 +181,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsLastWeek"
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsTotal" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
@@ -209,8 +189,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsTotal" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsYesterday" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionName" CHAR(50) DEFAULT NULL,
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
@@ -218,8 +197,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsKillsYesterday
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
     "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -227,8 +205,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsL
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsTotal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsTotal" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsTotal" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
     "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -236,8 +213,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsT
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
     "factionName"   CHAR(50) DEFAULT NULL,
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -245,8 +221,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionsVictoryPointsY
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFactionWars";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionWars" (
+CREATE TABLE "{database}"."{table_prefix}eveFactionWars" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
     "factionName" CHAR(50) DEFAULT NULL,
     "againstID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -254,8 +229,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFactionWars" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveFacWarStats";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFacWarStats" (
+CREATE TABLE "{database}"."{table_prefix}eveFacWarStats" (
     "killsYesterday"         BIGINT(20) UNSIGNED NOT NULL,
     "killsLastWeek"          BIGINT(20) UNSIGNED NOT NULL,
     "killsTotal"             BIGINT(20) UNSIGNED NOT NULL,
@@ -264,24 +238,21 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveFacWarStats" (
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveMemberCorporations";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveMemberCorporations" (
+CREATE TABLE "{database}"."{table_prefix}eveMemberCorporations" (
     "allianceID"    BIGINT(20) UNSIGNED NOT NULL,
     "corporationID" BIGINT(20) UNSIGNED NOT NULL,
     "startDate"     DATETIME DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveRefTypes";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveRefTypes" (
+CREATE TABLE "{database}"."{table_prefix}eveRefTypes" (
     "refTypeID"   SMALLINT(5) UNSIGNED NOT NULL,
     "refTypeName" VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("refTypeID")
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}eveTypeName";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}eveTypeName" (
+CREATE TABLE "{database}"."{table_prefix}eveTypeName" (
     "typeID"   SMALLINT(5) UNSIGNED NOT NULL,
     "typeName" CHAR(255)            NOT NULL,
     PRIMARY KEY ("typeID")

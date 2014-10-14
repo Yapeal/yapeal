@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAccountBalance";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAccountBalance" (
+CREATE TABLE "{database}"."{table_prefix}corpAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
     "accountID"  BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey" SMALLINT(5) UNSIGNED NOT NULL,
@@ -9,8 +8,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAccountBalance" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAllianceContactList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAllianceContactList" (
+CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -20,8 +18,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAllianceContactList" 
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAssetList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAssetList" (
+CREATE TABLE "{database}"."{table_prefix}corpAssetList" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
     "flag"        SMALLINT(5) UNSIGNED NOT NULL,
     "itemID"      BIGINT(20) UNSIGNED  NOT NULL,
@@ -38,8 +35,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAssetList" (
     ENGINE =InnoDB;
 ALTER TABLE "{database}"."{table_prefix}corpAssetList" ADD INDEX "corpAssetList1"  ("lft");
 ALTER TABLE "{database}"."{table_prefix}corpAssetList" ADD INDEX "corpAssetList2"  ("locationID");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpAttackers";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
+CREATE TABLE "{database}"."{table_prefix}corpAttackers" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
@@ -58,8 +54,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpAttackers" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpBlueprints";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpBlueprints" (
+CREATE TABLE "{database}"."{table_prefix}corpBlueprints" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
     "itemID"             BIGINT(20) UNSIGNED NOT NULL,
     "locationID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -74,8 +69,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpBlueprints" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendees" (
+CREATE TABLE "{database}"."{table_prefix}corpCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50)            NOT NULL,
@@ -84,8 +78,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCalendarEventAttendee
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCombatSettings";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCombatSettings" (
+CREATE TABLE "{database}"."{table_prefix}corpCombatSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED    NOT NULL,
     "itemID"                  BIGINT(20) UNSIGNED    NOT NULL,
     "onAggressionEnabled"     TINYINT(1)             NOT NULL,
@@ -97,8 +90,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCombatSettings" (
     PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpContainerLog";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContainerLog" (
+CREATE TABLE "{database}"."{table_prefix}corpContainerLog" (
     "ownerID"          BIGINT(20) UNSIGNED  NOT NULL,
     "action"           CHAR(24)             NOT NULL,
     "actorID"          BIGINT(20) UNSIGNED  NOT NULL,
@@ -117,8 +109,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContainerLog" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpContracts";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContracts" (
+CREATE TABLE "{database}"."{table_prefix}corpContracts" (
     "ownerID"        BIGINT(20) UNSIGNED     NOT NULL,
     "contractID"     BIGINT(20) UNSIGNED     NOT NULL,
     "issuerID"       BIGINT(20) UNSIGNED     NOT NULL,
@@ -146,8 +137,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpContracts" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCorporateContactList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactList" (
+CREATE TABLE "{database}"."{table_prefix}corpCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -157,8 +147,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactList"
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpCorporationSheet";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
+CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED    NOT NULL DEFAULT '0',
     "allianceName"    CHAR(50)                        DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED    NOT NULL,
@@ -181,8 +170,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporationSheet" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpDivisions";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpDivisions" (
+CREATE TABLE "{database}"."{table_prefix}corpDivisions" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"  SMALLINT(4) UNSIGNED NOT NULL,
     "description" VARCHAR(255)         NOT NULL,
@@ -191,8 +179,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpDivisions" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacilities";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacilities" (
+CREATE TABLE "{database}"."{table_prefix}corpFacilities" (
     "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
     "facilityID"       BIGINT(20) UNSIGNED NOT NULL,
     "typeID"           BIGINT(20) UNSIGNED NOT NULL,
@@ -207,8 +194,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacilities" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFacWarStats";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacWarStats" (
+CREATE TABLE "{database}"."{table_prefix}corpFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
     "factionName"            CHAR(50)            NOT NULL,
@@ -226,8 +212,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacWarStats" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}corpFacWarStats" ADD INDEX "corpFacWarStats1"  ("factionID");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpFuel";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFuel" (
+CREATE TABLE "{database}"."{table_prefix}corpFuel" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "itemID"   BIGINT(20) UNSIGNED NOT NULL,
     "typeID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -235,8 +220,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFuel" (
     PRIMARY KEY ("ownerID", "itemID", "typeID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpGeneralSettings";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpGeneralSettings" (
+CREATE TABLE "{database}"."{table_prefix}corpGeneralSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED  NOT NULL,
     "itemID"                  BIGINT(20) UNSIGNED  NOT NULL,
     "allowAllianceMembers"    TINYINT(1)           NOT NULL,
@@ -246,8 +230,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpGeneralSettings" (
     PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpIndustryJobs";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpIndustryJobs" (
+CREATE TABLE "{database}"."{table_prefix}corpIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
     "activityID"           TINYINT(2) UNSIGNED NOT NULL,
     "blueprintID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -281,8 +264,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpIndustryJobs" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpItems";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpItems" (
+CREATE TABLE "{database}"."{table_prefix}corpItems" (
     "flag"         SMALLINT(5) UNSIGNED NOT NULL,
     "killID"       BIGINT(20) UNSIGNED  NOT NULL,
     "lft"          BIGINT(20) UNSIGNED  NOT NULL,
@@ -295,8 +277,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpItems" (
     PRIMARY KEY ("killID", "lft")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpKillMails";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpKillMails" (
+CREATE TABLE "{database}"."{table_prefix}corpKillMails" (
     "killID"        BIGINT(20) UNSIGNED NOT NULL,
     "killTime"      DATETIME            NOT NULL,
     "moonID"        BIGINT(20) UNSIGNED NOT NULL,
@@ -304,8 +285,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpKillMails" (
     PRIMARY KEY ("killID", "killTime")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpLogo";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpLogo" (
+CREATE TABLE "{database}"."{table_prefix}corpLogo" (
     "ownerID"   BIGINT(20) UNSIGNED  NOT NULL,
     "color1"    SMALLINT(5) UNSIGNED NOT NULL,
     "color2"    SMALLINT(5) UNSIGNED NOT NULL,
@@ -317,8 +297,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpLogo" (
     PRIMARY KEY ("ownerID", "graphicID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMarketOrders";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMarketOrders" (
+CREATE TABLE "{database}"."{table_prefix}corpMarketOrders" (
     "ownerID"      BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"   SMALLINT(4) UNSIGNED NOT NULL,
     "bid"          TINYINT(1)           NOT NULL,
@@ -338,8 +317,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMarketOrders" (
     PRIMARY KEY ("ownerID", "orderID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMedals";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMedals" (
+CREATE TABLE "{database}"."{table_prefix}corpMedals" (
     "ownerID"     BIGINT(20) UNSIGNED     NOT NULL,
     "created"     DATETIME                NOT NULL,
     "creatorID"   BIGINT(20) UNSIGNED     NOT NULL,
@@ -353,8 +331,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMedals" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMemberMedals";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberMedals" (
+CREATE TABLE "{database}"."{table_prefix}corpMemberMedals" (
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "medalID"     BIGINT(20) UNSIGNED NOT NULL,
     "characterID" BIGINT(20) UNSIGNED NOT NULL,
@@ -367,8 +344,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberMedals" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpMemberTracking";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberTracking" (
+CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
     "base"           CHAR(50)            DEFAULT NULL,
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
@@ -390,8 +366,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpMemberTracking" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}corpMemberTracking" ADD INDEX "corpMemberTracking1"  ("ownerID");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpOutpostList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpOutpostList" (
+CREATE TABLE "{database}"."{table_prefix}corpOutpostList" (
     "ownerID"                  BIGINT(20) UNSIGNED NOT NULL,
     "dockingCostPerShipVolume" DECIMAL(17, 2)      NOT NULL,
     "officeRentalCost"         DECIMAL(17, 2)      NOT NULL,
@@ -406,8 +381,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpOutpostList" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpOutpostServiceDetail";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpOutpostServiceDetail" (
+CREATE TABLE "{database}"."{table_prefix}corpOutpostServiceDetail" (
     "ownerID"                 BIGINT(20) UNSIGNED    NOT NULL,
     "stationID"               BIGINT(20) UNSIGNED    NOT NULL,
     "discountPerGoodStanding" DECIMAL(5, 2)          NOT NULL,
@@ -419,8 +393,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpOutpostServiceDetail"
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromAgents";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromAgents" (
+CREATE TABLE "{database}"."{table_prefix}corpStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -429,8 +402,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromAgents" 
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromFactions";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromFactions" (
+CREATE TABLE "{database}"."{table_prefix}corpStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -439,8 +411,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromFactions
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStandingsFromNPCCorporations";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromNPCCorporations" (
+CREATE TABLE "{database}"."{table_prefix}corpStandingsFromNPCCorporations" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -449,8 +420,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStandingsFromNPCCorpo
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStarbaseDetail";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseDetail" (
+CREATE TABLE "{database}"."{table_prefix}corpStarbaseDetail" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
     "itemID"          BIGINT(20) UNSIGNED NOT NULL,
     "onlineTimestamp" DATETIME            NOT NULL,
@@ -459,8 +429,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseDetail" (
     PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpStarbaseList";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseList" (
+CREATE TABLE "{database}"."{table_prefix}corpStarbaseList" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
     "itemID"          BIGINT(20) UNSIGNED NOT NULL,
     "locationID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -473,8 +442,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpStarbaseList" (
     PRIMARY KEY ("ownerID", "itemID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpVictim";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
+CREATE TABLE "{database}"."{table_prefix}corpVictim" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
@@ -490,8 +458,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpVictim" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletDivisions";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletDivisions" (
+CREATE TABLE "{database}"."{table_prefix}corpWalletDivisions" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"  SMALLINT(4) UNSIGNED NOT NULL,
     "description" VARCHAR(255)         NOT NULL,
@@ -500,8 +467,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletDivisions" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletJournal";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
+CREATE TABLE "{database}"."{table_prefix}corpWalletJournal" (
     "ownerID"       BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
     "amount"        DECIMAL(17, 2)       NOT NULL,
@@ -525,8 +491,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletJournal" (
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}corpWalletTransactions";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpWalletTransactions" (
+CREATE TABLE "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"           SMALLINT(4) UNSIGNED NOT NULL,
     "characterID"          BIGINT(20) UNSIGNED           DEFAULT NULL,

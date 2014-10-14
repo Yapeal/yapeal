@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "{database}"."{table_prefix}accountAccountStatus";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountAccountStatus" (
+CREATE TABLE "{database}"."{table_prefix}accountAccountStatus" (
     "keyID"        BIGINT(20) UNSIGNED NOT NULL,
     "createDate"   DATETIME            NOT NULL,
     "logonCount"   BIGINT(20) UNSIGNED NOT NULL,
@@ -8,8 +7,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountAccountStatus" (
     PRIMARY KEY ("keyID")
 )
     ENGINE =InnoDB;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}accountAPIKeyInfo";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountAPIKeyInfo" (
+CREATE TABLE "{database}"."{table_prefix}accountAPIKeyInfo" (
     "keyID"      BIGINT(20) UNSIGNED                         NOT NULL,
     "accessMask" BIGINT(20) UNSIGNED                         NOT NULL,
     "expires"    DATETIME                                    NOT NULL DEFAULT '2038-01-19 03:14:07',
@@ -19,8 +17,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountAPIKeyInfo" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" ADD INDEX "accountAPIKeyInfo1"  ("type");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}accountCharacters";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountCharacters" (
+CREATE TABLE "{database}"."{table_prefix}accountCharacters" (
     "characterID"     BIGINT(20) UNSIGNED NOT NULL,
     "characterName"   CHAR(50)            NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -34,8 +31,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountCharacters" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" ADD INDEX "accountCharacters1"  ("corporationID");
-DROP TABLE IF EXISTS "{database}"."{table_prefix}accountKeyBridge";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountKeyBridge" (
+CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
     "keyID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID", "characterID")

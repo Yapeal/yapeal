@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilCachedUntil";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
+CREATE TABLE "{database}"."{table_prefix}utilCachedUntil" (
     "apiName"     CHAR(32)            NOT NULL,
     "expires"     DATETIME            NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -8,8 +7,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilCachedUntil" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilDatabaseVersion";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
+CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     "version" CHAR(12) NOT NULL,
     PRIMARY KEY ("version")
 )
@@ -18,8 +16,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilDatabaseVersion" (
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
     ('201409272333');
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilEveApi";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilEveApi" (
+CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
     "interval"    INT(10) UNSIGNED    NOT NULL,
     "isActive"    TINYINT(1)          NOT NULL,
@@ -111,8 +108,7 @@ VALUES
     ('map', 'Sovereignty', 8, 3600, 1),
     ('server', 'ServerStatus', 1, 300, 1);
 COMMIT;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredKey";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
+CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
     "isActive"      TINYINT(1)          DEFAULT NULL,
     "keyID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -124,8 +120,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredKey" (
 INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask", "isActive", "keyID", "vCode")
 VALUES
     (8388608, 1, 1156, 'abc123');
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilRegisteredUploader";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredUploader" (
+CREATE TABLE "{database}"."{table_prefix}utilRegisteredUploader" (
     "isActive"            TINYINT(1)   DEFAULT NULL,
     "key"                 VARCHAR(255) DEFAULT NULL,
     "ownerID"             BIGINT(20) UNSIGNED NOT NULL,
@@ -134,8 +129,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilRegisteredUploader" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilUploadDestination";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilUploadDestination" (
+CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
     "isActive"            TINYINT(1)   DEFAULT NULL,
     "name"                VARCHAR(25)  DEFAULT NULL,
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
@@ -144,8 +138,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilUploadDestination" (
 )
     ENGINE =InnoDB
     DEFAULT CHARSET =utf8;
-DROP TABLE IF EXISTS "{database}"."{table_prefix}utilXmlCache";
-CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}utilXmlCache" (
+CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
     "hash"        CHAR(40)  NOT NULL,
     "apiName"     CHAR(32)  NOT NULL,
     "modified"    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

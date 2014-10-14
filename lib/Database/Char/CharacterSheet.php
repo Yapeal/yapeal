@@ -5,23 +5,27 @@
  * PHP version 5.4
  *
  * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal which can be used to access the Eve Online
- * API data and place it into a database.
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
  * Copyright (C) 2014 Michael Cummings
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * You should be able to find a copy of this license in the LICENSE.md file. A copy of the GNU GPL should also be
- * available in the GNU-GPL.md file.
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
@@ -56,12 +60,14 @@ class CharacterSheet extends AbstractCharSection
             $this->getPdo()
                  ->beginTransaction();
             $this->preserverToCharacterSheet($xml, $ownerID)
-                 ->preserverToAttributeEnhancers($xml, $ownerID)
                  ->preserverToAttributes($xml, $ownerID)
-                 ->preserverToSkills($xml, $ownerID)
                  ->preserverToCertificates($xml, $ownerID)
                  ->preserverToCorporationRoles($xml, $ownerID)
-                 ->preserverToCorporationTitles($xml, $ownerID);
+                 ->preserverToCorporationTitles($xml, $ownerID)
+                 ->preserverToImplants($xml, $ownerID)
+                 ->preserverToJumpCloneImplants($xml, $ownerID)
+                 ->preserverToJumpClones($xml, $ownerID)
+                 ->preserverToSkills($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -72,44 +78,12 @@ class CharacterSheet extends AbstractCharSection
                 $ownerID
             );
             $this->getLogger()
-                ->warning($mess, ['exception' => $exc]);
+                 ->warning($mess, ['exception' => $exc]);
             $this->getPdo()
                  ->rollBack();
             return false;
         }
         return true;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @throws LogicException
-     * @return self
-     */
-    protected function preserverToAttributeEnhancers(
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = [
-            'augmentatorName' => null,
-            'augmentatorValue' => null,
-            'bonusName' => null,
-            'ownerID' => $ownerID
-        ];
-        $tableName = 'charAttributeEnhancers';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $this->attributePreserveData(
-            $xml,
-            $columnDefaults,
-            $tableName,
-            '//attributeEnhancers/row'
-        );
-        return $this;
     }
     /**
      * @param string $xml
@@ -184,14 +158,21 @@ class CharacterSheet extends AbstractCharSection
             'balance' => null,
             'bloodLine' => null,
             'characterID' => $ownerID,
-            'cloneName' => null,
+            'cloneJumpDate' => null,
+            'cloneName' => '',
             'cloneSkillPoints' => null,
+            'cloneTypeID' => null,
             'corporationID' => null,
             'corporationName' => null,
             'DoB' => null,
             'factionID' => '0',
             'factionName' => null,
+            'freeRespecs' => null,
+            'freeSkillPoints' => null,
             'gender' => null,
+            'homeStationID' => null,
+            'lastRespecDate' => null,
+            'lastTimedRespec' => null,
             'name' => null,
             'race' => null
         ];
@@ -274,6 +255,102 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
+    protected function preserverToImplants(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = [
+            'ownerID' => $ownerID,
+            'typeID' => null,
+            'typeName' => null
+        ];
+        $tableName = 'charImplants';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//implants/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverToJumpCloneImplants(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = [
+            'jumpCloneID' => null,
+            'ownerID' => $ownerID,
+            'typeID' => null,
+            'typeName' => null
+        ];
+        $tableName = 'charJumpCloneImplants';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//jumpCloneImplants/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverToJumpClones(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = [
+            'cloneName' => null,
+            'jumpCloneID' => null,
+            'locationID' => null,
+            'ownerID' => $ownerID,
+            'typeID' => null
+        ];
+        $tableName = 'charJumpClones';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//jumpClones/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
     protected function preserverToSkills(
         $xml,
         $ownerID
@@ -310,18 +387,59 @@ class CharacterSheet extends AbstractCharSection
     protected $xsl = <<<'XSL'
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
+                version="1.0"
+                encoding="utf-8"
+                omit-xml-declaration="no"
+                standalone="no"
+                indent="yes"/>
+    <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:template match="result">
+        <xsl:copy>
+            <xsl:apply-templates select="child::*[not(*|@*)]">
+                <xsl:sort select="translate(name(),$upper,$lower)"
+                          data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+            <xsl:apply-templates select="child::*[* and not(@*)]">
+                <xsl:sort select="translate(name(),$upper,$lower)"
+                          data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+            <xsl:apply-templates select="child::*[@name]">
+                <xsl:sort select="translate(@name,$upper,$lower)"
+                          data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
     <xsl:template match="rowset">
         <xsl:choose>
             <xsl:when test="@name">
                 <xsl:element name="{@name}">
                     <xsl:copy-of select="@key"/>
                     <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
+                    <xsl:choose>
+                        <xsl:when test="@key='jumpCloneID'">
+                            <xsl:apply-templates select="child::*">
+                                <xsl:sort select="@jumpCloneID"
+                                          data-type="number"/>
+                                <xsl:sort select="@typeID" data-type="number"/>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:when test="@key='roleID'">
+                            <xsl:apply-templates select="child::*">
+                                <xsl:sort select="roleID" data-type="number"/>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:when test="@key='titleID'">
+                            <xsl:apply-templates select="child::*">
+                                <xsl:sort select="titleID" data-type="number"/>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <xsl:when test="@key='typeID'">
+                            <xsl:apply-templates select="child::*">
+                                <xsl:sort select="@typeID" data-type="number"/>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                    </xsl:choose>
                 </xsl:element>
             </xsl:when>
             <xsl:otherwise>
@@ -330,19 +448,15 @@ class CharacterSheet extends AbstractCharSection
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    <xsl:template match="attributeEnhancers">
-        <xsl:element name="{name(.)}">
-            <xsl:attribute name="key">bonusName</xsl:attribute>
-            <xsl:attribute name="columns">augmentatorValue,augmentatorName,bonusName</xsl:attribute>
-            <xsl:apply-templates/>
-        </xsl:element>
+    <xsl:template match="attributes">
+        <xsl:copy>
+            <xsl:apply-templates select="child::*">
+                <xsl:sort select="translate(name(),$upper,$lower)"
+                          data-type="text" order="ascending"/>
+            </xsl:apply-templates>
+        </xsl:copy>
     </xsl:template>
-    <xsl:template match="perceptionBonus|memoryBonus|willpowerBonus|intelligenceBonus|charismaBonus">
-        <row bonusName="{name(.)}">
-        <xsl:attribute name="augmentatorName"><xsl:value-of select="./augmentatorName"/></xsl:attribute>
-        <xsl:attribute name="augmentatorValue"><xsl:value-of select="./augmentatorValue"/></xsl:attribute>
-        </row>
-    </xsl:template>
+    <xsl:template match="attributeEnhancers"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>

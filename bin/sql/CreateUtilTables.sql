@@ -15,7 +15,7 @@ CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201409272333');
+  ('201410140322');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
     "interval"    INT(10) UNSIGNED    NOT NULL,
@@ -91,7 +91,7 @@ VALUES
     ('eve', 'AllianceList', 1, 3600, 1),
     ('eve', 'CertificateTree', 2, 86400, 1),
     ('eve', 'CharacterID', 4, 3600, 1),
-    ('eve', 'CharacterInfo', 0, 3600, 1),
+  ('eve', 'CharacterInfo', 0, 3600, 0),
     ('eve', 'CharacterInfoPrivate', 16777216, 3600, 1),
     ('eve', 'CharacterInfoPublic', 8388608, 3600, 1),
     ('eve', 'CharacterName', 8, 3600, 1),

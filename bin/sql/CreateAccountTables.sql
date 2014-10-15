@@ -38,3 +38,10 @@ CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
 )
     ENGINE =InnoDB;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" ADD UNIQUE INDEX "accountKeyBridge1"  ("characterID", "keyID");
+CREATE TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" (
+    "trainingEnd" DATETIME            NOT NULL,
+    "keyID"       BIGINT(20) UNSIGNED NOT NULL,
+    PRIMARY KEY ("keyID", "trainingEnd")
+)
+    ENGINE =InnoDB
+    DEFAULT CHARSET =ascii;

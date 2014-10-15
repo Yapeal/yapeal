@@ -36,6 +36,7 @@ namespace Yapeal\Database\Account;
 use LogicException;
 use PDO;
 use PDOException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\ValuesDatabasePreserverTrait;
 
@@ -44,7 +45,7 @@ use Yapeal\Database\ValuesDatabasePreserverTrait;
  */
 class AccountStatus extends AbstractAccountSection
 {
-    use EveApiNameTrait, ValuesDatabasePreserverTrait;
+    use EveApiNameTrait, ValuesDatabasePreserverTrait, AttributesDatabasePreserverTrait;
     /**
      * @throws LogicException
      * @return array
@@ -80,7 +81,8 @@ class AccountStatus extends AbstractAccountSection
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserveToAccountStatus($xml, $ownerID);
+            $this->preserveToAccountStatus($xml, $ownerID)
+                 ->preserveToMultiCharacterTraining($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -118,6 +120,34 @@ class AccountStatus extends AbstractAccountSection
             $xml,
             $columnDefaults,
             'accountAccountStatus'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserveToMultiCharacterTraining($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'keyID' => $ownerID,
+            'trainingEnd' => null
+        ];
+        $tableName = 'multiCharacterTraining';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTable($tableName);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//multiCharacterTraining/row'
         );
         return $this;
     }

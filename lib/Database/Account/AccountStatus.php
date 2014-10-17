@@ -136,7 +136,7 @@ class AccountStatus extends AbstractAccountSection
             'keyID' => $ownerID,
             'trainingEnd' => null
         ];
-        $tableName = 'multiCharacterTraining';
+        $tableName = 'accountMultiCharacterTraining';
         $sql = $this->getCsq()
                     ->getDeleteFromTable($tableName);
         $this->getLogger()

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="rowType">
         <xs:simpleContent>
@@ -63,11 +64,11 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
+            <xs:element type="allianceContactListType"
+                        name="allianceContactList"/>
             <xs:element type="contactListType" name="contactList"/>
             <xs:element type="corporateContactListType"
                         name="corporateContactList"/>
-            <xs:element type="allianceContactListType"
-                        name="allianceContactList"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

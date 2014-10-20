@@ -18,7 +18,7 @@
         <xs:attribute type="xs:unsignedLong" name="quantity" use="required"/>
         <xs:attribute type="xs:unsignedShort" name="flag" use="required"/>
         <xs:attribute type="eveBooleanType" name="singleton" use="required"/>
-        <xs:attribute type="xs:byte" name="rawQuantity" use="optional"/>
+        <xs:attribute type="xs:long" name="rawQuantity" use="optional"/>
         <xs:attribute type="eveIDType" name="lft" use="optional"/>
         <xs:attribute type="eveIDType" name="lvl" use="optional"/>
     </xs:complexType>

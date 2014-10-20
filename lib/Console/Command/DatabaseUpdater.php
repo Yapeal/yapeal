@@ -200,6 +200,7 @@ HELP;
             //$output->writeln(str_replace('\\', '/', $fileInfo->getPathname()));
             $fileNames[] = str_replace('\\', '/', $fileInfo->getPathname());
         }
+        asort($fileNames);
         return $fileNames;
     }
     /**

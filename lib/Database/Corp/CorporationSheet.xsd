@@ -34,6 +34,19 @@
             <xs:element type="xs:decimal" name="taxRate"/>
             <xs:element type="xs:string" name="ticker"/>
             <xs:element type="xs:string" name="url"/>
+            <xs:element name="logo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="xs:unsignedShort" name="graphicID"/>
+                        <xs:element type="xs:unsignedShort" name="shape1"/>
+                        <xs:element type="xs:unsignedShort" name="shape2"/>
+                        <xs:element type="xs:unsignedShort" name="shape3"/>
+                        <xs:element type="xs:unsignedShort" name="color1"/>
+                        <xs:element type="xs:unsignedShort" name="color2"/>
+                        <xs:element type="xs:unsignedShort" name="color3"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="divisions" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:sequence>
@@ -50,19 +63,6 @@
                                     maxOccurs="8"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="logo">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element type="xs:unsignedShort" name="color1"/>
-                        <xs:element type="xs:unsignedShort" name="color2"/>
-                        <xs:element type="xs:unsignedShort" name="color3"/>
-                        <xs:element type="xs:unsignedShort" name="graphicID"/>
-                        <xs:element type="xs:unsignedShort" name="shape1"/>
-                        <xs:element type="xs:unsignedShort" name="shape2"/>
-                        <xs:element type="xs:unsignedShort" name="shape3"/>
-                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:sequence>

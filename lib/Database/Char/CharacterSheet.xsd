@@ -125,8 +125,8 @@
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
-            <xs:element type="rolesType" name="corporationRoles"
-                        maxOccurs="1" minOccurs="0"/>
+            <xs:element type="rolesType" name="corporationRoles" maxOccurs="1"
+                        minOccurs="0"/>
             <xs:element type="rolesType" name="corporationRolesAtBase"
                         maxOccurs="1" minOccurs="0"/>
             <xs:element type="rolesType" name="corporationRolesAtHQ"

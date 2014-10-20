@@ -89,6 +89,7 @@ class CharacterSheet extends AbstractCharSection
      * @param string $xml
      * @param string $ownerID
      *
+     * @throws LogicException
      * @return self
      */
     protected function preserverToAttributes(

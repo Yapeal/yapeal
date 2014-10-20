@@ -4,24 +4,23 @@
     <xs:include schemaLocation="../common.xsd"/>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="eveNEDTType" name="currentTQTime"/>
-            <xs:element type="xs:byte" name="offset"/>
+            <xs:element type="eveIDType" name="skillInTraining"/>
+            <xs:element type="xs:unsignedLong" name="trainingDestinationSP"
+                        maxOccurs="1" minOccurs="0"/>
             <xs:element type="eveDTType" name="trainingEndTime" maxOccurs="1"
                         minOccurs="0"/>
+            <xs:element type="xs:unsignedLong" name="trainingStartSP"
+                        maxOccurs="1" minOccurs="0"/>
             <xs:element type="eveDTType" name="trainingStartTime" maxOccurs="1"
                         minOccurs="0"/>
+            <xs:element type="xs:unsignedInt" name="trainingToLevel"
+                        maxOccurs="1" minOccurs="0"/>
             <xs:element type="eveIDType" name="trainingTypeID" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="xs:unsignedLong" name="trainingStartSP"
-                        maxOccurs="1"
+            <xs:element type="eveNEDTType" name="currentTQTime" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="xs:unsignedLong" name="trainingDestinationSP"
-                        maxOccurs="1"
+            <xs:element type="xs:byte" name="offset" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="xs:unsignedInt" name="trainingToLevel"
-                        maxOccurs="1"
-                        minOccurs="0"/>
-            <xs:element type="eveIDType" name="skillInTraining"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

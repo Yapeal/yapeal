@@ -56,7 +56,7 @@ class SkillInTraining extends AbstractCharSection
         $columnDefaults = [
             'ownerID' => $ownerID,
             'currentTQTime' => '1970-01-01 00:00:01',
-            'offset' => null,
+            'offset' => '0',
             'trainingEndTime' => '1970-01-01 00:00:01',
             'trainingStartTime' => '1970-01-01 00:00:01',
             'trainingTypeID' => '0',
@@ -72,31 +72,4 @@ class SkillInTraining extends AbstractCharSection
      * @type int $mask
      */
     protected $mask = 131072;
-    /**
-     * @type string $xsl
-     */
-    protected $xsl
-        = <<<'XSL'
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-    <xsl:template match="currentTQTime">
-        <xsl:element name="currentTQTime"><xsl:value-of select="."/></xsl:element>
-        <xsl:choose>
-            <xsl:when test="@offset">
-                <xsl:element name="offset"><xsl:value-of select="@offset"/></xsl:element>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
-</xsl:transform>
-XSL;
 }

@@ -14,7 +14,8 @@ CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
-VALUES ('201411031600');
+VALUES
+    ('201411031600');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "apiName"     CHAR(32)            NOT NULL,
     "interval"    INT(10) UNSIGNED    NOT NULL,
@@ -27,22 +28,28 @@ CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     DEFAULT CHARSET =ascii;
 START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName", "apiName", "mask", "interval", "isActive")
-VALUES ('account', 'AccountStatus', 33554432, 3600, 1),
+VALUES
+    ('account', 'AccountStatus', 33554432, 3600, 1),
     ('account', 'YapealCorporationSheet', 0, 21600, 1),
-    ('api', 'CallList', 1, 86400, 1), ('char', 'AccountBalance', 1, 900, 1),
-    ('char', 'AssetList', 2, 21600, 1), ('char', 'Blueprints', 2, 86400, 1),
+    ('api', 'CallList', 1, 86400, 1),
+    ('char', 'AccountBalance', 1, 900, 1),
+    ('char', 'AssetList', 2, 21600, 1),
+    ('char', 'Blueprints', 2, 43200, 1),
     ('char', 'CalendarEventAttendees', 4, 3600, 1),
-    ('char', 'CharacterSheet', 8, 3600, 1), ('char', 'ContactList', 16, 900, 1),
+    ('char', 'CharacterSheet', 8, 3600, 1),
+    ('char', 'ContactList', 16, 900, 1),
     ('char', 'ContactNotifications', 32, 21600, 1),
     ('char', 'Contracts', 67108864, 900, 1),
-    ('char', 'FacWarStats', 64, 3600, 1), ('char', 'IndustryJobs', 128, 900, 1),
+    ('char', 'FacWarStats', 64, 3600, 1),
+    ('char', 'IndustryJobs', 128, 900, 1),
     ('char', 'IndustryJobsHistory', 128, 21600, 1),
     ('char', 'KillMails', 256, 1800, 1),
     ('char', 'Locations', 134217728, 3600, 1),
     ('char', 'MailBodies', 512, 1800, 1),
     ('char', 'MailingLists', 1024, 21600, 1),
     ('char', 'MailMessages', 2048, 1800, 1),
-    ('char', 'MarketOrders', 4096, 3600, 1), ('char', 'Medals', 8192, 3600, 1),
+    ('char', 'MarketOrders', 4096, 3600, 1),
+    ('char', 'Medals', 8192, 3600, 1),
     ('char', 'Notifications', 16384, 1800, 1),
     ('char', 'NotificationTexts', 32768, 1800, 1),
     ('char', 'Research', 65536, 900, 1),
@@ -52,17 +59,21 @@ VALUES ('account', 'AccountStatus', 33554432, 3600, 1),
     ('char', 'UpcomingCalendarEvents', 1048576, 900, 1),
     ('char', 'WalletJournal', 2097152, 1800, 1),
     ('char', 'WalletTransactions', 4194304, 3600, 1),
-    ('corp', 'AccountBalance', 1, 900, 1), ('corp', 'AssetList', 2, 21600, 1),
-    ('corp', 'Blueprints', 2, 86400, 1), ('corp', 'ContactList', 16, 900, 1),
+    ('corp', 'AccountBalance', 1, 900, 1),
+    ('corp', 'AssetList', 2, 21600, 1),
+    ('corp', 'Blueprints', 2, 43200, 1),
+    ('corp', 'ContactList', 16, 900, 1),
     ('corp', 'ContainerLog', 32, 3600, 1),
     ('corp', 'Contracts', 8388608, 900, 1),
     ('corp', 'CorporationSheet', 8, 21600, 1),
-    ('corp', 'Facilities', 64, 900, 1), ('corp', 'FacWarStats', 64, 3600, 1),
+    ('corp', 'Facilities', 64, 900, 1),
+    ('corp', 'FacWarStats', 64, 3600, 1),
     ('corp', 'IndustryJobs', 128, 900, 1),
     ('corp', 'IndustryJobsHistory', 128, 21600, 1),
     ('corp', 'KillMails', 256, 1800, 1),
     ('corp', 'Locations', 16777216, 3600, 1),
-    ('corp', 'MarketOrders', 4096, 3600, 1), ('corp', 'Medals', 8192, 3600, 1),
+    ('corp', 'MarketOrders', 4096, 3600, 1),
+    ('corp', 'Medals', 8192, 3600, 1),
     ('corp', 'MemberMedals', 4, 3600, 1),
     ('corp', 'MemberSecurity', 512, 3600, 1),
     ('corp', 'MemberSecurityLog', 1024, 3600, 1),
@@ -78,18 +89,23 @@ VALUES ('account', 'AccountStatus', 33554432, 3600, 1),
     ('corp', 'WalletJournal', 1048576, 1800, 1),
     ('corp', 'WalletTransactions', 2097152, 3600, 1),
     ('eve', 'AllianceList', 1, 3600, 1),
-    ('eve', 'CertificateTree', 2, 86400, 1), ('eve', 'CharacterID', 4, 3600, 1),
+    ('eve', 'CertificateTree', 2, 86400, 1),
+    ('eve', 'CharacterID', 4, 3600, 1),
     ('eve', 'CharacterInfo', 0, 3600, 0),
     ('eve', 'CharacterInfoPrivate', 16777216, 3600, 1),
     ('eve', 'CharacterInfoPublic', 8388608, 3600, 1),
     ('eve', 'CharacterName', 8, 3600, 1),
     ('eve', 'ConquerableStationList', 16, 3600, 1),
-    ('eve', 'ErrorList', 32, 86400, 1), ('eve', 'FacWarStats', 64, 3600, 1),
-    ('eve', 'FacWarTopStats', 128, 3600, 1), ('eve', 'RefTypes', 256, 86400, 1),
+    ('eve', 'ErrorList', 32, 86400, 1),
+    ('eve', 'FacWarStats', 64, 3600, 1),
+    ('eve', 'FacWarTopStats', 128, 3600, 1),
+    ('eve', 'RefTypes', 256, 86400, 1),
     ('eve', 'SkillTree', 512, 86400, 1),
     ('eve', 'YapealCorporationSheet', 0, 86400, 0),
-    ('map', 'FacWarSystems', 1, 3600, 1), ('map', 'Jumps', 2, 3600, 1),
-    ('map', 'Kills', 4, 3600, 1), ('map', 'Sovereignty', 8, 3600, 1),
+    ('map', 'FacWarSystems', 1, 3600, 1),
+    ('map', 'Jumps', 2, 3600, 1),
+    ('map', 'Kills', 4, 3600, 1),
+    ('map', 'Sovereignty', 8, 3600, 1),
     ('server', 'ServerStatus', 1, 300, 1);
 COMMIT;
 CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
@@ -102,7 +118,8 @@ CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
     ENGINE =InnoDB
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask", "isActive", "keyID", "vCode")
-VALUES (8388608, 1, 1156, 'abc123');
+VALUES
+    (8388608, 1, 1156, 'abc123');
 CREATE TABLE "{database}"."{table_prefix}utilRegisteredUploader" (
     "isActive"            TINYINT(1)   DEFAULT NULL,
     "key"                 VARCHAR(255) DEFAULT NULL,

@@ -56,15 +56,16 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
 {
     use LoggerAwareTrait, EveApiToolsTrait;
     /**
-     * @param PDO              $pdo
-     * @param LoggerInterface  $logger
+     * @param PDO $pdo
+     * @param LoggerInterface $logger
      * @param CommonSqlQueries $csq
      */
     public function __construct(
         PDO $pdo,
         LoggerInterface $logger,
         CommonSqlQueries $csq
-    ) {
+    )
+    {
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setCsq($csq);
@@ -73,7 +74,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
+     * @param int $interval
      *
      * @throws LogicException
      */
@@ -82,7 +83,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->info(
                  sprintf(
@@ -114,7 +116,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
+     * @param int $interval
      *
      * @throws LogicException
      * @return bool
@@ -124,7 +126,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -211,11 +214,26 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      */
     abstract protected function getSectionName();
     /**
+     * @param EveApiReadInterface $data
+     *
+     * @throws LogicException
      * @return string
      */
-    protected function getXsl()
+    protected function getXslName(EveApiReadInterface &$data)
     {
-        return $this->xsl;
+        $xslName = sprintf(
+            str_replace('\\', '/', __DIR__) . '/%1$s/%2$s.xsl',
+            ucfirst($data->getEveApiSectionName()),
+            $data->getEveApiName()
+        );
+        if (!is_file($xslName)) {
+            $xslName = str_replace('\\', '/', __DIR__) . '/common.xsl';
+        }
+        $mess = 'Given XSL name ' . $xslName;
+        $this->getLogger()
+             ->debug($mess);
+        //$xsl = file_get_contents($xslName);
+        return $xslName;
     }
     /**
      * @param EveApiReadInterface $data
@@ -246,7 +264,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     }
     /**
      * @param EveApiReadWriteInterface $data
-     * @param int                      $interval
+     * @param int $interval
      *
      * @throws LogicException
      * @return bool
@@ -254,7 +272,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     protected function isEveApiXmlError(
         EveApiReadWriteInterface &$data,
         &$interval
-    ) {
+    )
+    {
         if (strpos($data->getEveApiXml(), '<error') === false) {
             return false;
         }
@@ -332,8 +351,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     }
     /**
      * @param EveApiReadInterface $data
-     * @param int                 $interval
-     * @param string              $ownerID
+     * @param int $interval
+     * @param string $ownerID
      *
      * @throws LogicException
      */
@@ -341,7 +360,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiReadInterface $data,
         $interval,
         $ownerID
-    ) {
+    )
+    {
         $simple = new SimpleXMLElement($data->getEveApiXml());
         $sql = $this->getCsq()
                     ->getUtilCachedUntilUpsert();
@@ -371,12 +391,31 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     /**
      * @param EveApiReadWriteInterface $data
      *
+     * @throws LogicException
      * @return self
      */
     protected function xsltTransform(EveApiReadWriteInterface &$data)
     {
         $xslt = new XSLTProcessor();
-        $xslt->importStylesheet(new  SimpleXMLElement($this->getXsl()));
+        $oldErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $dom = new DOMDocument();
+        $dom->load($this->getXslName($data));
+        $xslt->importStylesheet($dom);
+        $xml = $xslt->transformToXml(
+            new SimpleXMLElement($data->getEveApiXml())
+        );
+        if (false === $xml) {
+            $logger = $this->getLogger();
+            foreach (libxml_get_errors() as $error) {
+                $logger->debug($error->message);
+            }
+            libxml_clear_errors();
+            libxml_use_internal_errors($oldErrors);
+            return $this;
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($oldErrors);
         $config = [
             'indent' => true,
             'indent-spaces' => 2,
@@ -388,47 +427,11 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $tidy = new tidy();
         $data->setEveApiXml(
             $tidy->repairString(
-                $xslt->transformToXml(
-                    new SimpleXMLElement($data->getEveApiXml())
-                ),
+                $xml,
                 $config,
                 'utf8'
             )
         );
         return $this;
     }
-    /**
-     * @type string $xsl
-     */
-    protected $xsl
-        = <<<'XSL'
-<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml"
-        version="1.0"
-        encoding="utf-8"
-        omit-xml-declaration="no"
-        standalone="no"
-        indent="yes"/>
-    <xsl:template match="rowset">
-        <xsl:choose>
-            <xsl:when test="@name">
-                <xsl:element name="{@name}">
-                    <xsl:copy-of select="@key"/>
-                    <xsl:copy-of select="@columns"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="."/>
-                <xsl:apply-templates/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    <xsl:template match="@*|node()">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-</xsl:transform>
-XSL;
 }

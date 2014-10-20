@@ -298,6 +298,7 @@ CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
     "startDate"            DATETIME            NOT NULL,
     "stationID"            BIGINT(20) UNSIGNED NOT NULL,
     "status"               INT                 NOT NULL,
+    "successfulRuns" BIGINT(20) UNSIGNED DEFAULT 0,
     "teamID"               BIGINT(20) UNSIGNED NOT NULL,
     "timeInSeconds"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "jobID")

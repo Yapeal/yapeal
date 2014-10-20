@@ -50,7 +50,7 @@ class IndustryJobs extends AbstractCorpSection
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
+     * @param int $interval
      *
      * @throws LogicException
      */
@@ -59,7 +59,8 @@ class IndustryJobs extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -116,9 +117,9 @@ class IndustryJobs extends AbstractCorpSection
     protected function preserverToIndustryJobs(
         $xml,
         $ownerID
-    ) {
+    )
+    {
         $columnDefaults = [
-            'ownerID' => $ownerID,
             'activityID' => null,
             'blueprintID' => null,
             'blueprintLocationID' => null,
@@ -132,8 +133,9 @@ class IndustryJobs extends AbstractCorpSection
             'installerID' => null,
             'installerName' => null,
             'jobID' => null,
-            'licensedRuns' => null,
+            'licensedRuns' => 0,
             'outputLocationID' => null,
+            'ownerID' => $ownerID,
             'pauseDate' => '1970-01-01 00:00:01',
             'probability' => null,
             'productTypeID' => null,
@@ -144,6 +146,7 @@ class IndustryJobs extends AbstractCorpSection
             'startDate' => null,
             'stationID' => null,
             'status' => null,
+            'successfulRuns' => null,
             'teamID' => null,
             'timeInSeconds' => null
         ];

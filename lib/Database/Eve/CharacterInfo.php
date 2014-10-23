@@ -38,43 +38,27 @@ use LogicException;
 use PDOException;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\Char\AbstractCharSection;
-use Yapeal\Database\EveApiNameTrait;
-use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Database\ValuesDatabasePreserverTrait;
-use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class CharacterInfo
  */
 class CharacterInfo extends AbstractCharSection
 {
-    use EveApiNameTrait, EveSectionNameTrait;
     use AttributesDatabasePreserverTrait, ValuesDatabasePreserverTrait;
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     *
-     * @throws LogicException
+     * @return string
      */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    ) {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'AutoMagic for %1$s/%2$s is not allowed',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
-        return;
+    protected function getApiName()
+    {
+        return 'CharacterInfo';
+    }
+    /**
+     * @return string
+     */
+    protected function getSectionName()
+    {
+        return 'eve';
     }
     /**
      * @param string $xml
@@ -83,15 +67,13 @@ class CharacterInfo extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserve($xml, $ownerID)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserverToCharacterInfo($xml);
-            $this->preserverToEmploymentHistory($xml, $ownerID);
+            $this->preserverToCharacterInfo($xml)
+                 ->preserverToEmploymentHistory($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -113,9 +95,8 @@ class CharacterInfo extends AbstractCharSection
      *
      * @return self
      */
-    protected function preserverToCharacterInfo(
-        $xml
-    ) {
+    protected function preserverToCharacterInfo($xml)
+    {
         $columnDefaults = [
             'characterID' => null,
             'characterName' => null,
@@ -145,10 +126,8 @@ class CharacterInfo extends AbstractCharSection
      *
      * @return self
      */
-    protected function preserverToEmploymentHistory(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToEmploymentHistory($xml, $ownerID)
+    {
         $columnDefaults = [
             'recordID' => null,
             'corporationID' => null,

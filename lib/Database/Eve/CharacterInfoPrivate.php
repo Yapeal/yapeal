@@ -34,23 +34,84 @@
  */
 namespace Yapeal\Database\Eve;
 
-use Yapeal\Database\AttributesDatabasePreserverTrait;
-use Yapeal\Database\EveSectionNameTrait;
-use Yapeal\Database\ValuesDatabasePreserverTrait;
+use LogicException;
+use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class CharacterInfoPrivate
  */
 class CharacterInfoPrivate extends CharacterInfo
 {
-    use EveSectionNameTrait;
-    use AttributesDatabasePreserverTrait, ValuesDatabasePreserverTrait;
     /**
-     * @return string
+     * @param EveApiReadWriteInterface $data
+     * @param EveApiRetrieverInterface $retrievers
+     * @param EveApiPreserverInterface $preservers
+     * @param int $interval
+     *
+     * @throws LogicException
      */
-    protected function getApiName()
+    public function autoMagic(
+        EveApiReadWriteInterface $data,
+        EveApiRetrieverInterface $retrievers,
+        EveApiPreserverInterface $preservers,
+        $interval
+    )
     {
-        return 'CharacterInfo';
+        $this->getLogger()
+             ->debug(
+                 sprintf(
+                     'Starting autoMagic for %1$s/%2$s',
+                     $this->getSectionName(),
+                     $this->getApiName()
+                 )
+             );
+        /**
+         * Update CharacterInfo public first so it does NOT overwrite additional
+         * information from private in cases were keys have overlap.
+         */
+        $class = new CharacterInfoPublic(
+            $this->getPdo(),
+            $this->getLogger(),
+            $this->getCsq()
+        );
+        $class->autoMagic(
+            $data,
+            $retrievers,
+            $preservers,
+            $interval
+        );
+        $active = $this->getActiveCharacters();
+        if (empty($active)) {
+            $this->getLogger()
+                 ->info('No active characters found');
+            return;
+        }
+        foreach ($active as $char) {
+            $data->setEveApiSectionName(strtolower($this->getSectionName()))
+                 ->setEveApiName($this->getApiName());
+            if ($this->cacheNotExpired(
+                $this->getApiName(),
+                $this->getSectionName(),
+                $char['characterID']
+            )
+            ) {
+                continue;
+            }
+            $data->setEveApiArguments($char)
+                 ->setEveApiXml();
+            $untilInterval = $interval;
+            if (!$this->oneShot($data, $retrievers, $preservers, $untilInterval)
+            ) {
+                continue;
+            }
+            $this->updateCachedUntil(
+                $data,
+                $untilInterval,
+                $char['characterID']
+            );
+        }
     }
     /**
      * @type int $mask

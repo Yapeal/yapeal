@@ -17,34 +17,34 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="eveIDType" name="characterID"/>
-            <xs:element type="xs:string" name="characterName"/>
-            <xs:element type="xs:string" name="race"/>
-            <xs:element type="xs:string" name="bloodline"/>
             <xs:element type="eveISKType" name="accountBalance" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="xs:unsignedInt" name="skillPoints" maxOccurs="1"
+            <xs:element type="xs:string" name="alliance" maxOccurs="1"
+                        minOccurs="0"/>
+            <xs:element type="eveNEDTType" name="allianceDate" maxOccurs="1"
+                        minOccurs="0"/>
+            <xs:element type="eveIDType" name="allianceID" maxOccurs="1"
+                        minOccurs="0"/>
+            <xs:element type="xs:string" name="bloodline"/>
+            <xs:element type="eveIDType" name="characterID"/>
+            <xs:element type="xs:string" name="characterName"/>
+            <xs:element type="xs:string" name="corporation"/>
+            <xs:element type="eveNEDTType" name="corporationDate"/>
+            <xs:element type="eveIDType" name="corporationID"/>
+            <xs:element type="xs:string" name="lastKnownLocation" maxOccurs="1"
                         minOccurs="0"/>
             <xs:element type="eveNEDTType" name="nextTrainingEnds" maxOccurs="1"
                         minOccurs="0"/>
+            <xs:element type="xs:string" name="race"/>
+            <xs:element type="xs:decimal" name="securityStatus"/>
             <xs:element type="xs:string" name="shipName" maxOccurs="1"
                         minOccurs="0"/>
             <xs:element type="eveIDType" name="shipTypeID" maxOccurs="1"
                         minOccurs="0"/>
             <xs:element type="xs:string" name="shipTypeName" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="eveIDType" name="corporationID"/>
-            <xs:element type="xs:string" name="corporation"/>
-            <xs:element type="eveNEDTType" name="corporationDate"/>
-            <xs:element type="eveIDType" name="allianceID" maxOccurs="1"
+            <xs:element type="xs:unsignedInt" name="skillPoints" maxOccurs="1"
                         minOccurs="0"/>
-            <xs:element type="xs:string" name="alliance" maxOccurs="1"
-                        minOccurs="0"/>
-            <xs:element type="eveNEDTType" name="allianceDate" maxOccurs="1"
-                        minOccurs="0"/>
-            <xs:element type="xs:string" name="lastKnownLocation" maxOccurs="1"
-                        minOccurs="0"/>
-            <xs:element type="xs:decimal" name="securityStatus"/>
             <xs:element name="employmentHistory" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>

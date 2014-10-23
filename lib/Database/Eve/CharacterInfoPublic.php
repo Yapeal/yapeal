@@ -34,24 +34,11 @@
  */
 namespace Yapeal\Database\Eve;
 
-use Yapeal\Database\AttributesDatabasePreserverTrait;
-use Yapeal\Database\EveSectionNameTrait;
-use Yapeal\Database\ValuesDatabasePreserverTrait;
-
 /**
  * Class CharacterInfoPublic
  */
 class CharacterInfoPublic extends CharacterInfo
 {
-    use EveSectionNameTrait;
-    use AttributesDatabasePreserverTrait, ValuesDatabasePreserverTrait;
-    /**
-     * @return string
-     */
-    protected function getApiName()
-    {
-        return 'CharacterInfo';
-    }
     /**
      * @type int $mask
      */

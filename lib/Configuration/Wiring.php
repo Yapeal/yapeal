@@ -54,6 +54,7 @@ use Yapeal\Xml\FileCacheRetriever;
 use Yapeal\Xml\GroupPreserver;
 use Yapeal\Xml\GroupRetriever;
 use Yapeal\Xml\GuzzleNetworkRetriever;
+use Yapeal\Xml\NullPreserver;
 
 /**
  * Class Wiring
@@ -183,6 +184,8 @@ class Wiring
     public function wireDefaults()
     {
         $defaults = [
+            'Yapeal.Cache.cacheDir' => '{Yapeal.baseDir}cache/',
+            'Yapeal.Cache.fileSystemMode' => 'none',
             'Yapeal.Config.class' => 'Symfony\\Component\\Yaml\\Parser',
             'Yapeal.Config.configDir' => $this->dic['Yapeal.baseDir']
                                          . 'config/',
@@ -327,12 +330,14 @@ class Wiring
             return $this;
         }
         $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
-            $preservers = [
-                new FileCachePreserver(
+            if ('none' != $dic['Yapeal.Cache.fileSystemMode']) {
+                $preservers[] = new FileCachePreserver(
                     $dic['Yapeal.Log.Logger'],
-                    $dic['Yapeal.baseDir'] . 'cache/'
-                )
-            ];
+                    $dic['Yapeal.Cache.cacheDir']
+                );
+            } else {
+                $preservers[] = new NullPreserver();
+            }
             return new GroupPreserver($dic['Yapeal.Log.Logger'], $preservers);
         };
         return $this;
@@ -396,19 +401,20 @@ class Wiring
                 'connect_timeout' => 30,
                 'verify' => $dic['Yapeal.baseDir'] . 'config/eveonline.crt',
             ];
-            $retrievers = [
-                new FileCacheRetriever(
+            $retrievers = [];
+            if ('none' != $dic['Yapeal.Cache.fileSystemMode']) {
+                $retrievers[] = new FileCacheRetriever(
                     $dic['Yapeal.Log.Logger'],
-                    $dic['Yapeal.baseDir'] . 'cache/'
-                ),
-                new GuzzleNetworkRetriever(
-                    $dic['Yapeal.Log.Logger'],
-                    new Client(
-                        $dic['Yapeal.Network.baseUrl'],
-                        ['defaults' => $defaults]
-                    )
+                    $dic['Yapeal.Cache.cacheDir']
+                );
+            }
+            $retrievers[] = new GuzzleNetworkRetriever(
+                $dic['Yapeal.Log.Logger'],
+                new Client(
+                    $dic['Yapeal.Network.baseUrl'],
+                    ['defaults' => $defaults]
                 )
-            ];
+            );
             return new GroupRetriever($dic['Yapeal.Log.Logger'], $retrievers);
         };
         return $this;

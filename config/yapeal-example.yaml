@@ -1,5 +1,21 @@
 ---
 Yapeal:
+    # Settings in the 'Cache' section normally will only be changed during
+    # troubleshooting or development work.
+    Cache:
+        # Base directory where the cached XML will be stored if filesystem
+        # caching is active.
+        # The default setting of '{Yapeal.baseDir}cache/' uses a cache/
+        # directory inside the directory where Yapeal was installed.
+        cacheDir: '{Yapeal.baseDir}cache/'
+
+        # Used to set the file system caching mode to be used. Currently the
+        # only modes are 'all' and 'none' but additional modes may be added in
+        # the future. If you want the to continue to have the cache files change
+        # the setting to 'all'.
+        # The default of 'none' turns off using the filesystem cache.
+        fileSystemMode: 'none'
+
     # Settings in the 'Database' section will normal be the only ones that need
     # changed by most users.
     Database:

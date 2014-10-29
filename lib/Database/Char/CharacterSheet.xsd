@@ -89,8 +89,10 @@
             <xs:element type="eveISKType" name="balance"/>
             <xs:element type="xs:string" name="bloodLine"/>
             <xs:element type="eveIDType" name="characterID"/>
+            <xs:element type="eveDTType" name="cloneJumpDate"/>
             <xs:element type="xs:string" name="cloneName"/>
             <xs:element type="xs:unsignedInt" name="cloneSkillPoints"/>
+            <xs:element type="eveIDType" name="cloneTypeID"/>
             <xs:element type="eveIDType" name="corporationID"/>
             <xs:element type="xs:string" name="corporationName"/>
             <xs:element type="eveNEDTType" name="DoB"/>
@@ -98,9 +100,18 @@
                         maxOccurs="1"/>
             <xs:element type="xs:string" name="factionName" minOccurs="0"
                         maxOccurs="1"/>
+            <xs:element type="xs:unsignedInt" name="freeRespecs"/>
+            <xs:element type="xs:unsignedInt" name="freeSkillPoints"/>
             <xs:element type="xs:string" name="gender"/>
+            <xs:element type="eveIDType" name="homeStationID"/>
+            <xs:element type="eveNEDTType" name="jumpActivation"/>
+            <xs:element type="eveNEDTType" name="jumpFatigue"/>
+            <xs:element type="eveNEDTType" name="jumpLastUpdate"/>
+            <xs:element type="eveDTType" name="lastRespecDate"/>
+            <xs:element type="eveDTType" name="lastTimedRespec"/>
             <xs:element type="xs:string" name="name"/>
             <xs:element type="xs:string" name="race"/>
+            <xs:element type="eveNEDTType" name="remoteStationDate"/>
             <xs:choice>
                 <xs:sequence>
                     <xs:element type="attributeEnhancersType"

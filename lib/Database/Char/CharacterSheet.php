@@ -52,10 +52,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return bool
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserve($xml, $ownerID)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
@@ -92,10 +90,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToAttributes(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToAttributes($xml, $ownerID)
+    {
         $columnDefaults = [
             'charisma' => null,
             'intelligence' => null,
@@ -119,10 +115,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCertificates(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCertificates($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'certificateID' => null
@@ -148,10 +142,8 @@ class CharacterSheet extends AbstractCharSection
      *
      * @return self
      */
-    protected function preserverToCharacterSheet(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCharacterSheet($xml, $ownerID)
+    {
         $columnDefaults = [
             'allianceID' => '0',
             'allianceName' => null,
@@ -172,16 +164,16 @@ class CharacterSheet extends AbstractCharSection
             'freeSkillPoints' => null,
             'gender' => null,
             'homeStationID' => null,
+            'jumpActivation' => null,
+            'jumpFatigue' => null,
+            'jumpLastUpdate' => null,
             'lastRespecDate' => null,
             'lastTimedRespec' => null,
             'name' => null,
-            'race' => null
+            'race' => null,
+            'remoteStationDate' => null
         ];
-        $this->valuesPreserveData(
-            $xml,
-            $columnDefaults,
-            'charCharacterSheet'
-        );
+        $this->valuesPreserveData($xml, $columnDefaults, 'charCharacterSheet');
         return $this;
     }
     /**
@@ -191,10 +183,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCorporationRoles(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCorporationRoles($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'roleID' => null,
@@ -225,10 +215,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCorporationTitles(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCorporationTitles($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'titleID' => null,
@@ -256,10 +244,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToImplants(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToImplants($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'typeID' => null,
@@ -287,10 +273,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToJumpCloneImplants(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToJumpCloneImplants($xml, $ownerID)
+    {
         $columnDefaults = [
             'jumpCloneID' => null,
             'ownerID' => $ownerID,
@@ -319,10 +303,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToJumpClones(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToJumpClones($xml, $ownerID)
+    {
         $columnDefaults = [
             'cloneName' => null,
             'jumpCloneID' => null,
@@ -352,10 +334,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToSkills(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToSkills($xml, $ownerID)
+    {
         $columnDefaults = [
             'level' => null,
             'ownerID' => $ownerID,

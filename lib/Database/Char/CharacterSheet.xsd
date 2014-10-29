@@ -114,24 +114,12 @@
             <xs:element type="eveNEDTType" name="jumpActivation"/>
             <xs:element type="eveNEDTType" name="jumpFatigue"/>
             <xs:element type="eveNEDTType" name="jumpLastUpdate"/>
-            <xs:element type="eveDTType" name="lastRespecDate"/>
-            <xs:element type="eveDTType" name="lastTimedRespec"/>
+            <xs:element type="eveNEDTType" name="lastRespecDate"/>
+            <xs:element type="eveNEDTType" name="lastTimedRespec"/>
             <xs:element type="xs:string" name="name"/>
             <xs:element type="xs:string" name="race"/>
             <xs:element type="eveNEDTType" name="remoteStationDate"/>
-            <xs:choice>
-                <xs:sequence>
-                    <xs:element type="attributeEnhancersType"
-                                name="attributeEnhancers"/>
-                    <xs:element type="attributesType" name="attributes"/>
-                </xs:sequence>
-                <xs:sequence>
-                    <xs:element type="attributesType" name="attributes"/>
-                    <xs:element type="attributeEnhancersType"
-                                name="attributeEnhancers" maxOccurs="1"
-                                minOccurs="0"/>
-                </xs:sequence>
-            </xs:choice>
+            <xs:element type="attributesType" name="attributes"/>
             <xs:element name="certificates" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>

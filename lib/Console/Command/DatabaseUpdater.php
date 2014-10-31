@@ -34,9 +34,10 @@
 namespace Yapeal\Console\Command;
 
 use DirectoryIterator;
+use InvalidArgumentException;
+use LogicException;
 use PDO;
 use PDOException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Database\CommonSqlQueries;
@@ -51,8 +52,8 @@ class DatabaseUpdater extends AbstractDatabaseCommon
      * @param string             $cwd
      * @param ContainerInterface $dic
      *
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
+     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     public function __construct($name, $cwd, ContainerInterface $dic)
     {
@@ -67,9 +68,8 @@ class DatabaseUpdater extends AbstractDatabaseCommon
     /**
      * @param OutputInterface $output
      */
-    protected function addDatabaseProcedure(
-        OutputInterface $output
-    ) {
+    protected function addDatabaseProcedure(OutputInterface $output)
+    {
         $name = 'DatabaseUpdater::addDatabaseProcedure';
         $output->writeln($name);
         $csq = $this->getCsq($output);
@@ -111,9 +111,8 @@ HELP;
     /**
      * @param OutputInterface $output
      */
-    protected function dropDatabaseProcedure(
-        OutputInterface $output
-    ) {
+    protected function dropDatabaseProcedure(OutputInterface $output)
+    {
         $name = 'DatabaseUpdater::dropDatabaseProcedure';
         $output->writeln($name);
         $this->executeSqlStatements(
@@ -125,45 +124,18 @@ HELP;
         $output->writeln('');
     }
     /**
-     * Executes the current command.
-     *
-     * This method is not abstract because you can use this class
-     * as a concrete class. In this case, instead of defining the
-     * execute() method, you set the code to execute by passing
-     * a Closure to the setCode() method.
-     *
-     * @param InputInterface  $input  An InputInterface instance
-     * @param OutputInterface $output An OutputInterface instance
-     *
-     * @return null|int     null or 0 if everything went fine, or an error code
-     *
-     * @throws \LogicException When this abstract method is not implemented
-     * @see    setCode()
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->processCliOptions($input->getOptions());
-        $this->wire($this->getDic());
-        $this->processSql($output);
-        return;
-    }
-    /**
      * @param OutputInterface $output
      *
      * @return string
      */
     protected function getLatestDatabaseVersion(OutputInterface $output)
     {
-        /**
-         * @type CommonSqlQueries $csq
-         */
-        $csq = $this->getDic()['Yapeal.Database.CommonQueries'];
-        $sql = $csq->getUtilLatestDatabaseVersion();
+        $sql = $this->getCsq($output)
+                    ->getUtilLatestDatabaseVersion();
         try {
             $result = $this->getPdo($output)
                            ->query($sql, PDO::FETCH_NUM);
             $version = $result->fetchColumn();
-            //$output->writeln('database column version = ' . $version);
             $result->closeCursor();
         } catch (PDOException $exc) {
             $mess
@@ -181,7 +153,7 @@ HELP;
     protected function getUpdateFileList(OutputInterface $output)
     {
         $fileNames = [];
-        $path = $this->getDic()['Yapeal.baseDir'] . 'bin/sql/updates/';
+        $path = $this->getDic($output)['Yapeal.baseDir'] . 'bin/sql/updates/';
         if (!is_readable($path)) {
             $mess = sprintf(
                 '<info>Could NOT access update directory %1$s</info>',
@@ -197,7 +169,6 @@ HELP;
             if ($fileInfo->getExtension() != 'sql') {
                 continue;
             }
-            //$output->writeln(str_replace('\\', '/', $fileInfo->getPathname()));
             $fileNames[] = str_replace('\\', '/', $fileInfo->getPathname());
         }
         asort($fileNames);
@@ -206,13 +177,11 @@ HELP;
     /**
      * @param OutputInterface $output
      */
-    protected function processSql(
-        OutputInterface $output
-    ) {
+    protected function processSql(OutputInterface $output)
+    {
         $this->addDatabaseProcedure($output);
         foreach ($this->getUpdateFileList($output) as $fileName) {
             $latestVersion = $this->getLatestDatabaseVersion($output);
-            //$output->writeln('$latestVersion = ' . $latestVersion);
             if (!is_file($fileName)) {
                 $mess = sprintf(
                     '<info>Could NOT find SQL file %1$s</info>',
@@ -222,7 +191,6 @@ HELP;
                 continue;
             }
             $updateVersion = basename($fileName, '.sql');
-            //$output->writeln('$updateVersion = ' . $updateVersion);
             if ($updateVersion <= $latestVersion) {
                 $mess = sprintf(
                     '<info>Skipping SQL file %1$s since its <= the latest database version %2$s</info>',
@@ -257,7 +225,8 @@ HELP;
     protected function updateDatabaseVersion(
         $updateVersion,
         OutputInterface $output
-    ) {
+    )
+    {
         /**
          * @type CommonSqlQueries $csq
          */

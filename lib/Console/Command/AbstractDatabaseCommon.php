@@ -33,16 +33,16 @@
  */
 namespace Yapeal\Console\Command;
 
-use InvalidArgumentException;
-use PDO;
+use LogicException;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Configuration\ConsoleWiring;
+use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
-use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealNormalizerException;
 use Yapeal\Filesystem\FilePathNormalizer;
@@ -52,51 +52,7 @@ use Yapeal\Filesystem\FilePathNormalizer;
  */
 abstract class AbstractDatabaseCommon extends Command implements WiringInterface
 {
-    /**
-     * @param CommonSqlQueries $value
-     *
-     * @return self
-     */
-    public function setCsq($value)
-    {
-        $this->csq = $value;
-        return $this;
-    }
-    /**
-     * @param string $value
-     *
-     * @throws \InvalidArgumentException
-     * @return self
-     */
-    public function setCwd($value)
-    {
-        if (!is_string($value)) {
-            $mess = 'Cwd MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
-        }
-        $this->cwd = $value;
-        return $this;
-    }
-    /**
-     * @param ContainerInterface $value
-     *
-     * @return self
-     */
-    public function setDic(ContainerInterface $value)
-    {
-        $this->dic = $value;
-        return $this;
-    }
-    /**
-     * @param PDO $value
-     *
-     * @return self
-     */
-    public function setPdo(PDO $value)
-    {
-        $this->pdo = $value;
-        return $this;
-    }
+    use CommandToolsTrait;
     /**
      * @param ContainerInterface $dic
      *
@@ -177,20 +133,44 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
              );
     }
     /**
-     * @param string          $sqlStatements
-     * @param string          $fileName
+     * Executes the current command.
+     *
+     * This method is not abstract because you can use this class
+     * as a concrete class. In this case, instead of defining the
+     * execute() method, you set the code to execute by passing
+     * a Closure to the setCode() method.
+     *
+     * @param InputInterface  $input  An InputInterface instance
+     * @param OutputInterface $output An OutputInterface instance
+     *
+     * @return null|int     null or 0 if everything went fine, or an error code
+     *
+     * @throws LogicException When this abstract method is not implemented
+     * @see    setCode()
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->processCliOptions($input->getOptions(), $output);
+        $this->wire($this->getDic($output));
+        $this->processSql($output);
+        return;
+    }
+    /**
+     * @param string $sqlStatements
+     * @param string $fileName
      * @param OutputInterface $output
      */
     protected function executeSqlStatements(
         $sqlStatements,
         $fileName,
         OutputInterface $output
-    ) {
+    )
+    {
         $templates = [';', '{database}', '{table_prefix}', '$$'];
         $replacements = [
             '',
-            $this->getDic()['Yapeal.Database.database'],
-            $this->getDic()['Yapeal.Database.tablePrefix'],
+            $this->getDic($output)['Yapeal.Database.database'],
+            $this->getDic($output)['Yapeal.Database.tablePrefix'],
             ';'
         ];
         $pdo = $this->getPdo($output);
@@ -223,38 +203,6 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         }
     }
     /**
-     * @param OutputInterface $output
-     *
-     * @return CommonSqlQueries
-     */
-    protected function getCsq(OutputInterface $output)
-    {
-        if (is_null($this->csq)) {
-            $this->csq = $this->getDic()['Yapeal.Database.CommonQueries'];
-        }
-        if (empty($this->csq)) {
-            $output->writeln(
-                '<error>Tried to use csq before it was set</error>'
-            );
-            exit(2);
-        }
-        return $this->csq;
-    }
-    /**
-     * @return string
-     */
-    protected function getCwd()
-    {
-        return $this->cwd;
-    }
-    /**
-     * @return ContainerInterface
-     */
-    protected function getDic()
-    {
-        return $this->dic;
-    }
-    /**
      * @param string $path
      *
      * @throws YapealNormalizerException
@@ -262,37 +210,18 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
      */
     protected function getNormalizedPath($path)
     {
-        $fpn = new FilePathNormalizer();
-        return $fpn->normalizePath($path);
-    }
-    /**
-     * @param OutputInterface $output
-     *
-     * @return PDO
-     */
-    protected function getPdo(OutputInterface $output)
-    {
-        if (is_null($this->pdo)) {
-            try {
-                $this->pdo = $this->getDic()['Yapeal.Database.Connection'];
-            } catch (PDOException $exc) {
-                $mess = sprintf(
-                    '<error>Could NOT connect to database. Database error was (%1$s) %2$s</error>',
-                    $exc->getCode(),
-                    $exc->getMessage()
-                );
-                $output->writeln($mess);
-                exit(2);
-            }
-        }
-        return $this->pdo;
+        return (new FilePathNormalizer())->normalizePath($path);
     }
     /**
      * @param array $options
+     * @param OutputInterface $output
      *
      * @return self
      */
-    protected function processCliOptions(array $options)
+    protected function processCliOptions(
+        array $options,
+        OutputInterface $output
+    )
     {
         $base = 'Yapeal.Database.';
         foreach ([
@@ -305,33 +234,21 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
                      'userName'
                  ] as $option) {
             if (!empty($options[$option])) {
-                $this->getDic()[$base . $option] = $options[$option];
+                $this->getDic($output)[$base . $option] = $options[$option];
             }
         }
         if (!empty($options['configFile'])) {
-            $this->getDic()['Yapeal.Config.configDir'] = dirname(
+            $this->getDic($output)['Yapeal.Config.configDir'] = dirname(
                 $options['configFile']
             );
-            $this->getDic()['Yapeal.Config.fileName'] = basename(
+            $this->getDic($output)['Yapeal.Config.fileName'] = basename(
                 $options['configFile']
             );
         }
         return $this;
     }
     /**
-     * @type CommonSqlQueries $csq
+     * @param OutputInterface $output
      */
-    protected $csq;
-    /**
-     * @type string $cwd
-     */
-    protected $cwd;
-    /**
-     * @type ContainerInterface $dic
-     */
-    protected $dic;
-    /**
-     * @type PDO $pdo
-     */
-    protected $pdo;
+    abstract protected function processSql(OutputInterface $output);
 }

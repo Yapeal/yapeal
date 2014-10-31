@@ -33,70 +33,71 @@
  */
 namespace Yapeal\Console\Command;
 
-use Guzzle\Http\Client;
 use InvalidArgumentException;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
+use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yapeal\Xml\EveApiPreserverInterface;
+use Yapeal\Configuration\ConsoleWiring;
+use Yapeal\Console\CommandToolsTrait;
+use Yapeal\Container\ContainerInterface;
+use Yapeal\Container\WiringInterface;
+use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealNormalizerException;
+use Yapeal\Filesystem\FilePathNormalizer;
 use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
 use Yapeal\Xml\EveApiXmlData;
-use Yapeal\Xml\FileCachePreserver;
-use Yapeal\Xml\GuzzleNetworkRetriever;
 
 /**
  * Class EveApiRetriever
  */
-class EveApiRetriever extends Command implements LoggerAwareInterface
+class EveApiRetriever extends Command implements WiringInterface
 {
+    use CommandToolsTrait;
     /**
-     * @param string|null $name
-     * @param string      $cwd
+     * @param string|null        $name
+     * @param string             $cwd
+     * @param ContainerInterface $dic
      *
      * @throws InvalidArgumentException
-     * @throws \LogicException
+     * @throws LogicException
      */
-    public function __construct($name, $cwd)
+    public function __construct($name, $cwd, ContainerInterface $dic)
     {
         $this->setDescription(
             'Retrieves Eve Api XML from servers and puts it in file'
         );
         $this->setName($name);
         $this->setCwd($cwd);
+        $this->setDic($dic);
         parent::__construct($name);
     }
     /**
-     * @param string $value
+     * @param ContainerInterface $dic
      *
-     * @throws InvalidArgumentException
-     * @return self
+     * @throws YapealDatabaseException
      */
-    public function setCwd($value)
+    public function wire(ContainerInterface $dic)
     {
-        if (!is_string($value)) {
-            $mess = 'Cwd MUST be string but given ' . gettype($value);
-            throw new InvalidArgumentException($mess);
+        if (empty($dic['Yapeal.cwd'])) {
+            $dic['Yapeal.cwd'] = $this->getNormalizedPath($this->getCwd());
         }
-        $this->cwd = $value;
-        return $this;
-    }
-    /**
-     * Sets a logger instance on the object
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return null
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+        if (empty($dic['Yapeal.baseDir'])) {
+            $dic['Yapeal.baseDir'] = $this->getNormalizedPath(
+                dirname(dirname(dirname(__DIR__)))
+            );
+        }
+        $wiring = new ConsoleWiring($dic);
+        $wiring->wireDefaults()
+               ->wireConfiguration();
+        $dic['Yapeal.Config.Parser'];
+        $wiring->wireErrorLogger();
+        $dic['Yapeal.Error.Logger'];
+        $wiring->wireLogLogger()
+               ->wirePreserver()
+               ->wireRetriever();
     }
     /**
      * Configures the current command.
@@ -156,10 +157,8 @@ EOF;
      * @throws \LogicException
      * @see    setCode()
      */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output
-    ) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $posts = $input->getArgument('post');
         if (!empty($posts)) {
             $arguments = [];
@@ -169,82 +168,28 @@ EOF;
             }
             $posts = $arguments;
         }
+        $this->wire($this->getDic($output));
         $data = $this->getXmlData(
             $input->getArgument('api_name'),
             $input->getArgument('section_name'),
             $posts
         );
-        $retriever = $this->getNetworkRetriever();
+        $retriever = $this->getDic($output)['Yapeal.Xml.Retriever'];
         $retriever->retrieveEveApi($data);
-        $preserver = $this->getCachingPreserver();
-        $preserver->preserveEveApi($data);
-        $output->writeln('I ran!!!');
+        if (false !== $data->getEveApiXml()) {
+            $preserver = $this->getDic($output)['Yapeal.Xml.Preserver'];
+            $preserver->preserveEveApi($data);
+        }
     }
     /**
-     * @return EveApiPreserverInterface
-     */
-    protected function getCachingPreserver()
-    {
-        return new FileCachePreserver(
-            $this->getLogger(),
-            $this->getCwd() . DIRECTORY_SEPARATOR . 'cache'
-        );
-    }
-    /**
-     * @return Client
-     */
-    protected function getClient()
-    {
-        $headers = [
-            'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
-                        . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;q=0.6,*/*;'
-                        . 'q=0.5',
-            'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
-            'Accept-Encoding' => 'gzip',
-            'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
-            'Connection' => 'Keep-Alive',
-            'Keep-Alive' => '300'
-        ];
-        $defaults = [
-            'headers' => $headers,
-            'timeout' => 10,
-            'connect_timeout' => 30,
-            'verify' =>
-                dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'config'
-                . DIRECTORY_SEPARATOR . 'eveonline.crt',
-        ];
-        return new Client(
-            'https://api.eveonline.com',
-            ['defaults' => $defaults]
-        );
-    }
-    /**
+     * @param string $path
+     *
+     * @throws YapealNormalizerException
      * @return string
      */
-    protected function getCwd()
+    protected function getNormalizedPath($path)
     {
-        return $this->cwd;
-    }
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        if (empty($this->logger)) {
-            $this->logger
-                = new Logger('console', [new StreamHandler('php://stderr')]);
-        }
-        return $this->logger;
-    }
-    /**
-     * @return EveApiRetrieverInterface
-     */
-    protected function getNetworkRetriever()
-    {
-        return new GuzzleNetworkRetriever(
-            $this->getLogger(),
-            $this->getClient()
-        );
+        return (new FilePathNormalizer())->normalizePath($path);
     }
     /**
      * @param string   $apiName
@@ -257,12 +202,4 @@ EOF;
     {
         return new EveApiXmlData($apiName, $sectionName, $posts);
     }
-    /**
-     * @type string
-     */
-    protected $cwd;
-    /**
-     * @type LoggerInterface
-     */
-    protected $logger;
 }

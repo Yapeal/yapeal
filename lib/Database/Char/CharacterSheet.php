@@ -52,20 +52,20 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return bool
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserve($xml, $ownerID)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
             $this->preserverToCharacterSheet($xml, $ownerID)
-                 ->preserverToAttributeEnhancers($xml, $ownerID)
                  ->preserverToAttributes($xml, $ownerID)
-                 ->preserverToSkills($xml, $ownerID)
                  ->preserverToCertificates($xml, $ownerID)
                  ->preserverToCorporationRoles($xml, $ownerID)
-                 ->preserverToCorporationTitles($xml, $ownerID);
+                 ->preserverToCorporationTitles($xml, $ownerID)
+                 ->preserverToImplants($xml, $ownerID)
+                 ->preserverToJumpCloneImplants($xml, $ownerID)
+                 ->preserverToJumpClones($xml, $ownerID)
+                 ->preserverToSkills($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -90,41 +90,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToAttributeEnhancers(
-        $xml,
-        $ownerID
-    ) {
-        $columnDefaults = [
-            'augmentatorName' => null,
-            'augmentatorValue' => null,
-            'bonusName' => null,
-            'ownerID' => $ownerID
-        ];
-        $tableName = 'charAttributeEnhancers';
-        $sql = $this->getCsq()
-                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
-        $this->getLogger()
-             ->info($sql);
-        $this->getPdo()
-             ->exec($sql);
-        $this->attributePreserveData(
-            $xml,
-            $columnDefaults,
-            $tableName,
-            '//attributeEnhancers/row'
-        );
-        return $this;
-    }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    protected function preserverToAttributes(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToAttributes($xml, $ownerID)
+    {
         $columnDefaults = [
             'charisma' => null,
             'intelligence' => null,
@@ -148,10 +115,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCertificates(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCertificates($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'certificateID' => null
@@ -177,10 +142,8 @@ class CharacterSheet extends AbstractCharSection
      *
      * @return self
      */
-    protected function preserverToCharacterSheet(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCharacterSheet($xml, $ownerID)
+    {
         $columnDefaults = [
             'allianceID' => '0',
             'allianceName' => null,
@@ -188,22 +151,29 @@ class CharacterSheet extends AbstractCharSection
             'balance' => null,
             'bloodLine' => null,
             'characterID' => $ownerID,
-            'cloneName' => null,
+            'cloneJumpDate' => null,
+            'cloneName' => '',
             'cloneSkillPoints' => null,
+            'cloneTypeID' => null,
             'corporationID' => null,
             'corporationName' => null,
             'DoB' => null,
             'factionID' => '0',
             'factionName' => null,
+            'freeRespecs' => null,
+            'freeSkillPoints' => null,
             'gender' => null,
+            'homeStationID' => null,
+            'jumpActivation' => null,
+            'jumpFatigue' => null,
+            'jumpLastUpdate' => null,
+            'lastRespecDate' => null,
+            'lastTimedRespec' => null,
             'name' => null,
-            'race' => null
+            'race' => null,
+            'remoteStationDate' => null
         ];
-        $this->valuesPreserveData(
-            $xml,
-            $columnDefaults,
-            'charCharacterSheet'
-        );
+        $this->valuesPreserveData($xml, $columnDefaults, 'charCharacterSheet');
         return $this;
     }
     /**
@@ -213,10 +183,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCorporationRoles(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCorporationRoles($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'roleID' => null,
@@ -247,10 +215,8 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToCorporationTitles(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToCorporationTitles($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'titleID' => null,
@@ -278,10 +244,98 @@ class CharacterSheet extends AbstractCharSection
      * @throws LogicException
      * @return self
      */
-    protected function preserverToSkills(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToImplants($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'ownerID' => $ownerID,
+            'typeID' => null,
+            'typeName' => null
+        ];
+        $tableName = 'charImplants';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//implants/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverToJumpCloneImplants($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'jumpCloneID' => null,
+            'ownerID' => $ownerID,
+            'typeID' => null,
+            'typeName' => null
+        ];
+        $tableName = 'charJumpCloneImplants';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//jumpCloneImplants/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverToJumpClones($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'cloneName' => null,
+            'jumpCloneID' => null,
+            'locationID' => null,
+            'ownerID' => $ownerID,
+            'typeID' => null
+        ];
+        $tableName = 'charJumpClones';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//jumpClones/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverToSkills($xml, $ownerID)
+    {
         $columnDefaults = [
             'level' => null,
             'ownerID' => $ownerID,

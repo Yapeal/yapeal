@@ -57,25 +57,5 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
-    <xsl:template match="attributeEnhancers[not(*) and not(@*)]"/>
-    <xsl:template match="attributeEnhancers[* and not(@*)]">
-        <xsl:element name="{name(.)}">
-            <xsl:attribute name="key">bonusName</xsl:attribute>
-            <xsl:attribute name="columns">
-                <xsl:value-of
-                        select="normalize-space('augmentatorValue,augmentatorName,bonusName')"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </xsl:element>
-    </xsl:template>
-    <xsl:template match="attributeEnhancers/*[not(name()='row')]">
-        <row bonusName="{name(.)}">
-            <xsl:attribute name="augmentatorName">
-                <xsl:value-of select="./augmentatorName"/>
-            </xsl:attribute>
-            <xsl:attribute name="augmentatorValue">
-                <xsl:value-of select="./augmentatorValue"/>
-            </xsl:attribute>
-        </row>
-    </xsl:template>
+    <xsl:template match="attributeEnhancers"/>
 </xsl:transform>

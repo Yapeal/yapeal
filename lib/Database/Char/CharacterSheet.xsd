@@ -170,7 +170,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="jumpCloneImplantsRowType" name="row"
-                                    maxOccurs="10" minOccurs="0"/>
+                                    maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

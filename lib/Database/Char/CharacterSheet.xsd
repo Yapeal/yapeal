@@ -23,7 +23,8 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="typeID" use="required"/>
-                <xs:attribute type="xs:string" name="typeName" use="required"/>
+                <xs:attribute type="eveNameType" name="typeName"
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -46,7 +47,8 @@
                 <xs:attribute type="eveIDType" name="jumpCloneID"
                               use="required"/>
                 <xs:attribute type="eveIDType" name="typeID" use="required"/>
-                <xs:attribute type="xs:string" name="typeName" use="required"/>
+                <xs:attribute type="eveNameType" name="typeName"
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -54,7 +56,8 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="roleID" use="required"/>
-                <xs:attribute type="xs:string" name="roleName" use="required"/>
+                <xs:attribute type="eveNameType" name="roleName"
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -82,7 +85,8 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="titleID" use="required"/>
-                <xs:attribute type="xs:string" name="titleName" use="required"/>
+                <xs:attribute type="eveNameType" name="titleName"
+                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -90,34 +94,41 @@
         <xs:sequence>
             <xs:element type="eveIDType" name="allianceID" minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="xs:string" name="allianceName" minOccurs="0"
+            <xs:element type="eveNameType" name="allianceName" minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="xs:string" name="ancestry"/>
+            <xs:element type="eveNameType" name="ancestry"/>
             <xs:element type="eveISKType" name="balance"/>
-            <xs:element type="xs:string" name="bloodLine"/>
+            <xs:element type="eveNameType" name="bloodLine"/>
             <xs:element type="eveIDType" name="characterID"/>
             <xs:element type="eveDTType" name="cloneJumpDate"/>
-            <xs:element type="xs:string" name="cloneName"/>
-            <xs:element type="xs:unsignedInt" name="cloneSkillPoints"/>
+            <xs:element type="eveNameType" name="cloneName"/>
+            <xs:element type="xs:unsignedLong" name="cloneSkillPoints"/>
             <xs:element type="eveIDType" name="cloneTypeID"/>
             <xs:element type="eveIDType" name="corporationID"/>
-            <xs:element type="xs:string" name="corporationName"/>
+            <xs:element type="eveNameType" name="corporationName"/>
             <xs:element type="eveNEDTType" name="DoB"/>
             <xs:element type="eveIDType" name="factionID" minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="xs:string" name="factionName" minOccurs="0"
+            <xs:element type="eveNameType" name="factionName" minOccurs="0"
                         maxOccurs="1"/>
             <xs:element type="xs:unsignedInt" name="freeRespecs"/>
-            <xs:element type="xs:unsignedInt" name="freeSkillPoints"/>
-            <xs:element type="xs:string" name="gender"/>
+            <xs:element type="xs:unsignedLong" name="freeSkillPoints"/>
+            <xs:element name="gender">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="Male"/>
+                        <xs:enumeration value="Female"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
             <xs:element type="eveIDType" name="homeStationID"/>
             <xs:element type="eveNEDTType" name="jumpActivation"/>
             <xs:element type="eveNEDTType" name="jumpFatigue"/>
             <xs:element type="eveNEDTType" name="jumpLastUpdate"/>
             <xs:element type="eveNEDTType" name="lastRespecDate"/>
             <xs:element type="eveNEDTType" name="lastTimedRespec"/>
-            <xs:element type="xs:string" name="name"/>
-            <xs:element type="xs:string" name="race"/>
+            <xs:element type="eveNameType" name="name"/>
+            <xs:element type="eveNameType" name="race"/>
             <xs:element type="eveNEDTType" name="remoteStationDate"/>
             <xs:element type="attributesType" name="attributes"/>
             <xs:element name="certificates" maxOccurs="1" minOccurs="0">
@@ -150,7 +161,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="implantsRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                                    maxOccurs="10" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -159,7 +170,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="jumpCloneImplantsRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                                    maxOccurs="10" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

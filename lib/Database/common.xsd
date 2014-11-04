@@ -70,7 +70,7 @@
     </xs:simpleType>
     <xs:simpleType name="eveNameType">
         <xs:restriction base="xs:string">
-            <xs:maxLength value="50"/>
+            <xs:maxLength value="100"/>
             <xs:minLength value="0"/>
         </xs:restriction>
     </xs:simpleType>

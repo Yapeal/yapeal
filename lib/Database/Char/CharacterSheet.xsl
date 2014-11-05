@@ -52,6 +52,14 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+    <xsl:template match="row">
+        <xsl:copy>
+            <xsl:apply-templates select="@*">
+                <xsl:sort select="name()"/>
+            </xsl:apply-templates>
+            <xsl:apply-templates/>
+        </xsl:copy>
+    </xsl:template>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>

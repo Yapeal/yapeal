@@ -5,9 +5,7 @@
     <xsl:template match="combatSettings">
         <xsl:element name="{name(.)}">
             <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
-            <xsl:attribute name="columns">
-                onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID
-            </xsl:attribute>
+            <xsl:attribute name="columns">onAggressionEnabled,onCorporationWarEnabled,onStandingDropStanding,onStatusDropEnabled,onStatusDropStanding,useStandingFromOwnerID</xsl:attribute>
             <xsl:element name="row">
                 <xsl:attribute name="onAggressionEnabled">
                     <xsl:value-of select="onAggression/@enabled"/>
@@ -34,9 +32,7 @@
     <xsl:template match="generalSettings">
         <xsl:element name="{name(.)}">
             <xsl:attribute name="key">ownerID,itemID</xsl:attribute>
-            <xsl:attribute name="columns">
-                usageFlags,deployFlags,allowCorporationMembers,allowAllianceMembers
-            </xsl:attribute>
+            <xsl:attribute name="columns">allowAllianceMembers,allowCorporationMembers,deployFlags,usageFlags</xsl:attribute>
             <xsl:element name="row">
                 <xsl:attribute name="allowAllianceMembers">
                     <xsl:value-of select="allowAllianceMembers"/>
@@ -54,8 +50,6 @@
         </xsl:element>
         <xsl:apply-templates/>
     </xsl:template>
-    <xsl:template
-            match="usageFlags|deployFlags|allowCorporationMembers|allowAllianceMembers"/>
-    <xsl:template
-            match="useStandingsFrom|onStandingDrop|onStatusDrop|onAggression|onCorporationWar"/>
+    <xsl:template match="combatSettings/*[not(name() = 'row')]"/>
+    <xsl:template match="generalSettings/*[not(name() = 'row')]"/>
 </xsl:transform>

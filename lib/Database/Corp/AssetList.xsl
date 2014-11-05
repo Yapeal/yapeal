@@ -31,10 +31,12 @@
                             select="ancestor::*[@locationID][1]/@locationID"/>
                 </xsl:attribute>
             </xsl:if>
-            <xsl:copy-of select="@*"/>
             <xsl:attribute name="lvl">
                 <xsl:value-of select="count(ancestor::row[*])+1"/>
             </xsl:attribute>
+            <xsl:apply-templates select="@*">
+                <xsl:sort select="name()"/>
+            </xsl:apply-templates>
             <xsl:apply-templates/>
         </xsl:element>
     </xsl:template>

@@ -5,13 +5,13 @@ CREATE TABLE "{database}"."{table_prefix}utilCachedUntil" (
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName", "ownerID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     "version" CHAR(12) NOT NULL,
     PRIMARY KEY ("version")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
@@ -24,7 +24,7 @@ CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName", "sectionName")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName", "apiName", "mask", "interval", "isActive")
@@ -115,7 +115,7 @@ CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
     "vCode"         VARCHAR(64)         NOT NULL,
     PRIMARY KEY ("keyID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask", "isActive", "keyID", "vCode")
 VALUES
@@ -127,7 +127,7 @@ CREATE TABLE "{database}"."{table_prefix}utilRegisteredUploader" (
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "uploadDestinationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8;
 CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
     "isActive"            TINYINT(1)   DEFAULT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
     "url"                 VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("uploadDestinationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8;
 CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
     "hash"        CHAR(40)  NOT NULL,
@@ -147,7 +147,7 @@ CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
                   COLLATE utf8_unicode_ci,
     PRIMARY KEY ("hash")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache1" ("sectionName");
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache2" ("apiName");

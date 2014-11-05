@@ -10,14 +10,14 @@ CREATE TABLE "{database}"."{table_prefix}mapFacWarSystems" (
     "victoryPointThreshold" BIGINT(20) UNSIGNED   NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}mapJumps" (
     "shipJumps"     BIGINT(20) UNSIGNED NOT NULL,
     "solarSystemID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}mapKills" (
     "factionKills"  BIGINT(20) UNSIGNED NOT NULL,
     "podKills"      BIGINT(20) UNSIGNED NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE "{database}"."{table_prefix}mapKills" (
     "solarSystemID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}mapSovereignty" (
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -34,5 +34,5 @@ CREATE TABLE "{database}"."{table_prefix}mapSovereignty" (
     "solarSystemName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("solarSystemID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

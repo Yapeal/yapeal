@@ -7,7 +7,7 @@ CREATE TABLE "{database}"."{table_prefix}eveAllianceList" (
     "startDate"      DATETIME            DEFAULT NULL,
     PRIMARY KEY ("allianceID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharacterInfo" (
     "characterID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharacterInfo" (
     "securityStatus"    CHAR(20)            NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsLastWeek" (
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsTotal" (
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersKillsYesterday" (
     "kills"         BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsLastWeek" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsTotal" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsTotal" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveConquerableStationList" (
     "corporationID"   BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE "{database}"."{table_prefix}eveConquerableStationList" (
     "stationTypeID"   BIGINT(20) UNSIGNED DEFAULT NULL,
     PRIMARY KEY ("stationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsLastWeek" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsLastWeek" (
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsTotal" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsTotal" (
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsYesterday" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsKillsYesterday" (
     "kills"           BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsLastWeek" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsLastWeek" (
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsTotal" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsTotal" (
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsYesterday" (
     "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -138,14 +138,14 @@ CREATE TABLE "{database}"."{table_prefix}eveCorporationsVictoryPointsYesterday" 
     "victoryPoints"   BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveErrorList" (
     "errorCode" SMALLINT(4) UNSIGNED NOT NULL,
     "errorText" TEXT,
     PRIMARY KEY ("errorCode")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveEmploymentHistory" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE "{database}"."{table_prefix}eveEmploymentHistory" (
     "startDate"       DATETIME            NOT NULL,
     PRIMARY KEY ("ownerID", "recordID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 #ALTER TABLE "{database}"."{table_prefix}eveEmploymentHistory" ADD INDEX "eveEmploymentHistory1"  ("corporationID");
 CREATE TABLE "{database}"."{table_prefix}eveFactions" (
@@ -171,7 +171,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactions" (
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsLastWeek" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsLastWeek" (
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsTotal" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -187,7 +187,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsTotal" (
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsYesterday" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsKillsYesterday" (
     "kills"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -203,7 +203,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsLastWeek" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsTotal" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -211,7 +211,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsTotal" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday" (
     "factionID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -219,7 +219,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionsVictoryPointsYesterday" (
     "victoryPoints" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("factionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFactionWars" (
     "factionID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -227,7 +227,7 @@ CREATE TABLE "{database}"."{table_prefix}eveFactionWars" (
     "againstID"   BIGINT(20) UNSIGNED NOT NULL,
     "againstName" CHAR(50) DEFAULT NULL
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveFacWarStats" (
     "killsYesterday"         BIGINT(20) UNSIGNED NOT NULL,
@@ -237,25 +237,25 @@ CREATE TABLE "{database}"."{table_prefix}eveFacWarStats" (
     "victoryPointsLastWeek"  BIGINT(20) UNSIGNED NOT NULL,
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}eveMemberCorporations" (
     "allianceID"    BIGINT(20) UNSIGNED NOT NULL,
     "corporationID" BIGINT(20) UNSIGNED NOT NULL,
     "startDate"     DATETIME DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}eveRefTypes" (
     "refTypeID"   SMALLINT(5) UNSIGNED NOT NULL,
     "refTypeName" VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("refTypeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}eveTypeName" (
     "typeID"   SMALLINT(5) UNSIGNED NOT NULL,
     "typeName" CHAR(255)            NOT NULL,
     PRIMARY KEY ("typeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

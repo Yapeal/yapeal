@@ -5,7 +5,7 @@ CREATE TABLE "{database}"."{table_prefix}charAccountBalance" (
     "balance"    DECIMAL(17, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "accountKey")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
     "standing"      DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "contactID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charAssetList" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE "{database}"."{table_prefix}charAssetList" (
     "typeID"      BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("ownerID", "itemID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 ALTER TABLE "{database}"."{table_prefix}charAssetList" ADD INDEX "charAssetList1"  ("lft");
 ALTER TABLE "{database}"."{table_prefix}charAssetList" ADD INDEX "charAssetList2"  ("locationID");
 CREATE TABLE "{database}"."{table_prefix}charAttackers" (
@@ -50,7 +50,7 @@ CREATE TABLE "{database}"."{table_prefix}charAttackers" (
     "weaponTypeID"    BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charAttributes" (
     "charisma"     TINYINT(2) UNSIGNED NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE "{database}"."{table_prefix}charAttributes" (
     "willpower"    TINYINT(2) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charBlueprints" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
     "itemID"             BIGINT(20) UNSIGNED NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE "{database}"."{table_prefix}charBlueprints" (
     "runs"               BIGINT(20)          NOT NULL,
     PRIMARY KEY ("ownerID", "itemID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -84,14 +84,14 @@ CREATE TABLE "{database}"."{table_prefix}charCalendarEventAttendees" (
     "response"      CHAR(10)            NOT NULL,
     PRIMARY KEY ("ownerID", "characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCertificates" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "certificateID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "certificateID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
     "allianceID"        BIGINT(20) UNSIGNED          DEFAULT 0,
     "allianceName"      CHAR(50)                     DEFAULT '',
@@ -122,7 +122,7 @@ CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
     "remoteStationDate" DATETIME            NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactList" (
     "standing"      DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "contactID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charContactNotifications" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactNotifications" (
                      COLLATE utf8_unicode_ci,
     PRIMARY KEY ("ownerID", "notificationID", "senderID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charContracts" (
     "ownerID"        BIGINT(20) UNSIGNED     NOT NULL,
@@ -174,7 +174,7 @@ CREATE TABLE "{database}"."{table_prefix}charContracts" (
     "volume"         DECIMAL(18, 4) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "contractID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charContractItems" (
     "contractID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE "{database}"."{table_prefix}charContractItems" (
     "typeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("contractID", "recordID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charContractBids" (
     "amount"     DECIMAL(17, 2)      NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE "{database}"."{table_prefix}charContractBids" (
     "dateBid"    DATETIME            NOT NULL,
     PRIMARY KEY ("contractID", "bidID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporateContactList" (
     "standing"      DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "contactID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporationRoles" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -214,7 +214,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRoles" (
     "roleName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "roleID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -222,7 +222,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" (
     "roleName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "roleID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -230,7 +230,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" (
     "roleName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "roleID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtOther" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -238,7 +238,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtOther" (
     "roleName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "roleID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charCorporationTitles" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationTitles" (
     "titleName" CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "titleID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charFacWarStats" (
@@ -264,7 +264,7 @@ CREATE TABLE "{database}"."{table_prefix}charFacWarStats" (
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}charFacWarStats" ADD INDEX "charFacWarStats1"  ("factionID");
 CREATE TABLE "{database}"."{table_prefix}charImplants" (
@@ -273,7 +273,7 @@ CREATE TABLE "{database}"."{table_prefix}charImplants" (
     "typeName" CHAR(100)           NOT NULL,
     PRIMARY KEY ("ownerID", "typeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
@@ -307,7 +307,7 @@ CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
     "timeInSeconds"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "jobID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charItems" (
@@ -322,7 +322,7 @@ CREATE TABLE "{database}"."{table_prefix}charItems" (
     "typeID"       BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("killID", "lft")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charJumpCloneImplants" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -330,7 +330,7 @@ CREATE TABLE "{database}"."{table_prefix}charJumpCloneImplants" (
     "typeName"    CHAR(100)           NOT NULL,
     PRIMARY KEY ("ownerID", "jumpCloneID", "typeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charJumpClones" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
@@ -340,7 +340,7 @@ CREATE TABLE "{database}"."{table_prefix}charJumpClones" (
     "cloneName"   CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "jumpCloneID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charKillMails" (
@@ -350,14 +350,14 @@ CREATE TABLE "{database}"."{table_prefix}charKillMails" (
     "solarSystemID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "killTime")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charMailBodies" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
     "body"      TEXT,
     "messageID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "messageID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charMailingLists" (
@@ -366,7 +366,7 @@ CREATE TABLE "{database}"."{table_prefix}charMailingLists" (
     "listID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "listID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charMailMessages" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
@@ -382,7 +382,7 @@ CREATE TABLE "{database}"."{table_prefix}charMailMessages" (
     "senderTypeID"       BIGINT(20) UNSIGNED     DEFAULT NULL,
     PRIMARY KEY ("ownerID", "messageID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charMarketOrders" (
     "ownerID"      BIGINT(20) UNSIGNED  NOT NULL,
@@ -403,7 +403,7 @@ CREATE TABLE "{database}"."{table_prefix}charMarketOrders" (
     "volRemaining" BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("ownerID", "orderID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charNotifications" (
     "ownerID"        BIGINT(20) UNSIGNED  NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED  NOT NULL,
@@ -414,14 +414,14 @@ CREATE TABLE "{database}"."{table_prefix}charNotifications" (
     "typeID"         SMALLINT(5) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "notificationID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charNotificationTexts" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED NOT NULL,
     "text"           TEXT,
     PRIMARY KEY ("ownerID", "notificationID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charResearch" (
@@ -433,7 +433,7 @@ CREATE TABLE "{database}"."{table_prefix}charResearch" (
     "researchStartDate" DATETIME            NOT NULL,
     PRIMARY KEY ("ownerID", "agentID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charSkillInTraining" (
     "currentTQTime"         DATETIME                     DEFAULT NULL,
     "offset"                TINYINT(2)          NOT NULL,
@@ -447,7 +447,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkillInTraining" (
     "trainingTypeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charSkillQueue" (
     "endSP"         BIGINT(20) UNSIGNED NOT NULL,
     "endTime"       DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
@@ -459,7 +459,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkillQueue" (
     "typeID"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID", "queuePosition")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charSkills" (
     "level"       TINYINT(1) UNSIGNED NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -468,7 +468,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkills" (
     "published"   TINYINT(1)          NOT NULL,
     PRIMARY KEY ("ownerID", "typeID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}charStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -476,7 +476,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromAgents" (
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -485,7 +485,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromFactions" (
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charStandingsFromNPCCorporations" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -494,7 +494,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromNPCCorporations" (
     "standing" DECIMAL(5, 2)       NOT NULL,
     PRIMARY KEY ("ownerID", "fromID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charVictim" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -510,7 +510,7 @@ CREATE TABLE "{database}"."{table_prefix}charVictim" (
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID", "characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}charWalletJournal" (
     "ownerID"       BIGINT(20) UNSIGNED  NOT NULL,
@@ -533,7 +533,7 @@ CREATE TABLE "{database}"."{table_prefix}charWalletJournal" (
     "owner2TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
     PRIMARY KEY ("ownerID", "refID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charWalletTransactions" (
@@ -555,5 +555,5 @@ CREATE TABLE "{database}"."{table_prefix}charWalletTransactions" (
     "typeName"             CHAR(255)            NOT NULL,
     PRIMARY KEY ("ownerID", "transactionID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

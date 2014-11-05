@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}accountMultiCharacterTrai
     "keyID"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID", "trainingEnd")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

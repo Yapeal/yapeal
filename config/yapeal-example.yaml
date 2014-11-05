@@ -27,6 +27,12 @@ Yapeal:
         # default 'yapeal'
         database: yapeal
 
+        # Database engine to use for tables during table create like when using
+        # 'yc D:I' or 'yc D:U'.
+        # Note that ONLY transaction compatible engines are supported for
+        # example 'InnoDB', 'tokuDB', etc but NOT 'MyISAM', etc.
+        engine: InnoDB
+
         # Host name of computer where database server is.
         # Should never need to be changed from default of 'localhost' except if
         # the system Yapeal is running on is different from that of the database.

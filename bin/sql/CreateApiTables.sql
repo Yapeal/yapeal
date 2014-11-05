@@ -4,7 +4,7 @@ CREATE TABLE "{database}"."{table_prefix}apiCallGroups" (
     "name"        CHAR(24)            NOT NULL,
     PRIMARY KEY ("groupID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE "{database}"."{table_prefix}apiCalls" (
     "accessMask"  BIGINT(20) UNSIGNED              NOT NULL,
@@ -14,5 +14,5 @@ CREATE TABLE "{database}"."{table_prefix}apiCalls" (
     "type"        ENUM('Character', 'Corporation') NOT NULL,
     PRIMARY KEY ("accessMask", "type")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

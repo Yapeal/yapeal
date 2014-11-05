@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charImplants" (
     "typeName" CHAR(100)           NOT NULL,
     PRIMARY KEY ("ownerID", "typeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charJumpCloneImplants" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charJumpCloneImplants" (
     "typeName"    CHAR(100)           NOT NULL,
     PRIMARY KEY ("ownerID", "jumpCloneID", "typeID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charJumpClones" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}charJumpClones" (
     "cloneName"   CHAR(50)            NOT NULL,
     PRIMARY KEY ("ownerID", "jumpCloneID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =utf8
     COLLATE =utf8_unicode_ci;
 CALL "{database}"."AddOrModifyColumn"('{database}',

@@ -6,7 +6,7 @@ CREATE TABLE "{database}"."{table_prefix}accountAccountStatus" (
     "paidUntil"    DATETIME            NOT NULL,
     PRIMARY KEY ("keyID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 CREATE TABLE "{database}"."{table_prefix}accountAPIKeyInfo" (
     "keyID"      BIGINT(20) UNSIGNED                         NOT NULL,
     "accessMask" BIGINT(20) UNSIGNED                         NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE "{database}"."{table_prefix}accountAPIKeyInfo" (
     "type"       ENUM('Account', 'Character', 'Corporation') NOT NULL,
     PRIMARY KEY ("keyID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" ADD INDEX "accountAPIKeyInfo1"  ("type");
 CREATE TABLE "{database}"."{table_prefix}accountCharacters" (
@@ -28,7 +28,7 @@ CREATE TABLE "{database}"."{table_prefix}accountCharacters" (
     "factionName"     CHAR(50)            NOT NULL,
     PRIMARY KEY ("characterID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" ADD INDEX "accountCharacters1"  ("corporationID");
 CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
@@ -36,12 +36,12 @@ CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
     "characterID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID", "characterID")
 )
-    ENGINE =InnoDB;
+    ENGINE ={engine};
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" ADD UNIQUE INDEX "accountKeyBridge1"  ("characterID", "keyID");
 CREATE TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" (
     "trainingEnd" DATETIME            NOT NULL,
     "keyID"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID", "trainingEnd")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;

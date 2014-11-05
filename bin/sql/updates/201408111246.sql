@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpFacilities" (
     "tax"              DECIMAL(17, 2)      NOT NULL,
     PRIMARY KEY ("ownerID", "facilityID")
 )
-    ENGINE =InnoDB
+    ENGINE ={engine}
     DEFAULT CHARSET =ascii;
 START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi"

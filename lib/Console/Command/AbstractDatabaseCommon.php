@@ -33,6 +33,9 @@
  */
 namespace Yapeal\Console\Command;
 
+use DomainException;
+use FilePathNormalizer\FilePathNormalizer;
+use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
@@ -44,8 +47,6 @@ use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Exception\YapealDatabaseException;
-use Yapeal\Exception\YapealNormalizerException;
-use Yapeal\Filesystem\FilePathNormalizer;
 
 /**
  * Class AbstractDatabaseCommon
@@ -78,6 +79,10 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
                ->wireDatabase()
                ->wireCommonSqlQueries();
     }
+    /**
+     * @param OutputInterface $output
+     */
+    abstract protected function processSql(OutputInterface $output);
     /**
      *
      */
@@ -156,8 +161,8 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         return;
     }
     /**
-     * @param string $sqlStatements
-     * @param string $fileName
+     * @param string          $sqlStatements
+     * @param string          $fileName
      * @param OutputInterface $output
      */
     protected function executeSqlStatements(
@@ -166,7 +171,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         OutputInterface $output
     )
     {
-        $templates = [';', '{database}','{engine}', '{table_prefix}', '$$'];
+        $templates = [';', '{database}', '{engine}', '{table_prefix}', '$$'];
         $replacements = [
             '',
             $this->getDic($output)['Yapeal.Database.database'],
@@ -206,7 +211,8 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     /**
      * @param string $path
      *
-     * @throws YapealNormalizerException
+     * @throws DomainException
+     * @throws InvalidArgumentException
      * @return string
      */
     protected function getNormalizedPath($path)
@@ -214,7 +220,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         return (new FilePathNormalizer())->normalizePath($path);
     }
     /**
-     * @param array $options
+     * @param array           $options
      * @param OutputInterface $output
      *
      * @return self
@@ -248,8 +254,4 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         }
         return $this;
     }
-    /**
-     * @param OutputInterface $output
-     */
-    abstract protected function processSql(OutputInterface $output);
 }

@@ -33,6 +33,8 @@
  */
 namespace Yapeal\Console\Command;
 
+use DomainException;
+use FilePathNormalizer\FilePathNormalizer;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
@@ -45,8 +47,6 @@ use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Exception\YapealDatabaseException;
-use Yapeal\Exception\YapealNormalizerException;
-use Yapeal\Filesystem\FilePathNormalizer;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiXmlData;
 
@@ -184,7 +184,8 @@ EOF;
     /**
      * @param string $path
      *
-     * @throws YapealNormalizerException
+     * @throws InvalidArgumentException
+     * @throws DomainException
      * @return string
      */
     protected function getNormalizedPath($path)

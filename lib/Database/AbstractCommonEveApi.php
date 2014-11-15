@@ -33,7 +33,10 @@
  */
 namespace Yapeal\Database;
 
+use DomainException;
 use DOMDocument;
+use FilePathNormalizer\FilePathNormalizer;
+use InvalidArgumentException;
 use LogicException;
 use PDO;
 use PDOException;
@@ -56,7 +59,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
 {
     use LoggerAwareTrait, EveApiToolsTrait;
     /**
-     * @param PDO $pdo
+     * @param PDO             $pdo
      * @param LoggerInterface $logger
      * @param CommonSqlQueries $csq
      */
@@ -74,7 +77,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      */
@@ -116,7 +119,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -165,6 +168,14 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return $this->$method($data->getEveApiXml());
     }
     /**
+     * @return string
+     */
+    abstract protected function getApiName();
+    /**
+     * @return string
+     */
+    abstract protected function getSectionName();
+    /**
      * @param string $apiName
      * @param string $sectionName
      * @param string $ownerID
@@ -206,13 +217,17 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return true;
     }
     /**
+     * @throws DomainException
+     * @throws InvalidArgumentException
      * @return string
      */
-    abstract protected function getApiName();
-    /**
-     * @return string
-     */
-    abstract protected function getSectionName();
+    protected function getCwd()
+    {
+        if (empty($this->cwd)) {
+            $this->cwd = (new FilePathNormalizer())->normalizePath(__DIR__);
+        }
+        return $this->cwd;
+    }
     /**
      * @param EveApiReadInterface $data
      *
@@ -222,12 +237,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     protected function getXslName(EveApiReadInterface &$data)
     {
         $xslName = sprintf(
-            str_replace('\\', '/', __DIR__) . '/%1$s/%2$s.xsl',
+            $this->getCwd() . '%1$s/%2$s.xsl',
             ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName()
         );
         if (!is_file($xslName)) {
-            $xslName = str_replace('\\', '/', __DIR__) . '/common.xsl';
+            $xslName = $this->getCwd() . 'common.xsl';
         }
         $mess = 'Given XSL name ' . $xslName;
         $this->getLogger()
@@ -264,7 +279,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     }
     /**
      * @param EveApiReadWriteInterface $data
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      * @return bool
@@ -333,7 +348,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $dom = new DOMDocument();
         $dom->loadXML($data->getEveApiXml());
         $schema = sprintf(
-            str_replace('\\', '/', __DIR__) . '/%1$s/%2$s.xsd',
+            $this->getCwd() . '%1$s/%2$s.xsd',
             ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName()
         );
@@ -351,8 +366,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     }
     /**
      * @param EveApiReadInterface $data
-     * @param int $interval
-     * @param string $ownerID
+     * @param int                 $interval
+     * @param string              $ownerID
      *
      * @throws LogicException
      */
@@ -434,4 +449,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         );
         return $this;
     }
+    /**
+     * @type string $cwd
+     */
+    protected $cwd;
 }

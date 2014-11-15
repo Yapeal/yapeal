@@ -33,6 +33,9 @@
  */
 namespace Yapeal;
 
+use DomainException;
+use FilePathNormalizer\FilePathNormalizer;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -144,15 +147,17 @@ class Yapeal implements WiringInterface
      * @param ContainerInterface $dic
      *
      * @throws YapealDatabaseException
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function wire(ContainerInterface $dic)
     {
+        $path = (new FilePathNormalizer())->normalizePath(dirname(__DIR__));
         if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = str_replace('\\', '/', dirname(__DIR__)) . '/';
+            $dic['Yapeal.cwd'] = $path;
         }
         if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir']
-                = str_replace('\\', '/', dirname(__DIR__)) . '/';
+            $dic['Yapeal.baseDir'] = $path;
         }
         $wiring = new Wiring($dic);
         $wiring->wireDefaults()

@@ -34,6 +34,8 @@
 namespace Yapeal\Console\Command;
 
 use DirectoryIterator;
+use DomainException;
+use FilePathNormalizer\FilePathNormalizer;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
@@ -148,6 +150,8 @@ HELP;
     /**
      * @param OutputInterface $output
      *
+     * @throws InvalidArgumentException
+     * @throws DomainException
      * @return string[]
      */
     protected function getUpdateFileList(OutputInterface $output)
@@ -162,6 +166,7 @@ HELP;
             $output->writeln($mess);
             return $fileNames;
         }
+        $fpn = new FilePathNormalizer();
         foreach (new DirectoryIterator($path) as $fileInfo) {
             if ($fileInfo->isDot() || $fileInfo->isDir()) {
                 continue;
@@ -169,7 +174,7 @@ HELP;
             if ($fileInfo->getExtension() != 'sql') {
                 continue;
             }
-            $fileNames[] = str_replace('\\', '/', $fileInfo->getPathname());
+            $fileNames[] = $fpn->normalizeFile($fileInfo->getPathname());
         }
         asort($fileNames);
         return $fileNames;

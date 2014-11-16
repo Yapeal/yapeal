@@ -87,11 +87,11 @@ class FileCachePreserver implements EveApiPreserverInterface
             $this->prepareConnection($cacheTemp)
                  ->writeXmlData($data->getEveApiXml(), $cacheTemp)
                  ->__destruct();
-        } catch (YapealPreserverException $exp) {
+        } catch (YapealPreserverException $exc) {
             $mess = 'Could NOT get XML data';
             $this->getLogger()
-                 ->info($mess, ['exception' => $exp]);
-            return $data;
+                ->info($mess, ['exception' => $exc]);
+            return $this;
         }
         $cacheFile = $cachePath . $data->getEveApiName() . $hash . '.xml';
         rename($cacheTemp, $cacheFile);

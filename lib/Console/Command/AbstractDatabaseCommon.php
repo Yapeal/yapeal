@@ -33,9 +33,7 @@
  */
 namespace Yapeal\Console\Command;
 
-use DomainException;
-use FilePathNormalizer\FilePathNormalizer;
-use InvalidArgumentException;
+use FilePathNormalizer\FilePathNormalizerTrait;
 use LogicException;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
@@ -53,7 +51,7 @@ use Yapeal\Exception\YapealDatabaseException;
  */
 abstract class AbstractDatabaseCommon extends Command implements WiringInterface
 {
-    use CommandToolsTrait;
+    use CommandToolsTrait, FilePathNormalizerTrait;
     /**
      * @param ContainerInterface $dic
      *
@@ -62,12 +60,14 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     public function wire(ContainerInterface $dic)
     {
         if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $this->getNormalizedPath($this->getCwd());
+            $dic['Yapeal.cwd'] = $this->getFpn()
+                                      ->normalizePath($this->getCwd());
         }
         if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $this->getNormalizedPath(
-                dirname(dirname(dirname(__DIR__)))
-            );
+            $dic['Yapeal.baseDir'] = $this->getFpn()
+                                          ->normalizePath(
+                                              dirname(dirname(dirname(__DIR__)))
+                                          );
         }
         $wiring = new ConsoleWiring($dic);
         $wiring->wireDefaults()
@@ -207,17 +207,6 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
             }
             $output->write('.');
         }
-    }
-    /**
-     * @param string $path
-     *
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @return string
-     */
-    protected function getNormalizedPath($path)
-    {
-        return (new FilePathNormalizer())->normalizePath($path);
     }
     /**
      * @param array           $options

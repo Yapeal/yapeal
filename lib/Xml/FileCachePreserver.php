@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Xml;
 
+use FilePathNormalizer\FilePathNormalizerTrait;
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
@@ -43,6 +44,7 @@ use Yapeal\Exception\YapealPreserverPathException;
  */
 class FileCachePreserver implements EveApiPreserverInterface
 {
+    use FilePathNormalizerTrait;
     /**
      * @param LoggerInterface $logger
      * @param string|null     $cachePath
@@ -76,7 +78,7 @@ class FileCachePreserver implements EveApiPreserverInterface
     {
         try {
             $cachePath
-                = $this->getNormalizedCachePath($data->getEveApiSectionName());
+                = $this->getSectionCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
             $hash = $data->getHash();
             // Insures retriever never see partly written file by using temp file.
@@ -149,35 +151,17 @@ class FileCachePreserver implements EveApiPreserverInterface
         return $this;
     }
     /**
-     * @param string $path
-     *
-     * @return string[]
      * @throws YapealPreserverPathException
+     * @return string
      */
-    protected function cleanPartsPath($path)
+    protected function getCachePath()
     {
-        // Drop all leading and trailing "/"s.
-        $path = trim($path, '/');
-        // Drop pointless consecutive "/"s.
-        while (false !== strpos($path, '//')) {
-            $path = str_replace('//', '/', $path);
+        if (empty($this->cachePath)) {
+            $mess = 'Tried to access $cachePath before it was set';
+            throw new YapealPreserverPathException($mess);
         }
-        $parts = [];
-        foreach (explode('/', $path) as $part) {
-            if ('.' == $part || '' == $part) {
-                continue;
-            }
-            if ('..' == $part) {
-                if (count($parts) < 1) {
-                    $mess = 'Can NOT go above root path but given ' . $path;
-                    throw new YapealPreserverPathException($mess, 1);
-                }
-                array_pop($parts);
-                continue;
-            }
-            $parts[] = $part;
-        }
-        return $parts;
+        return $this->getFpn()
+                    ->normalizePath($this->cachePath);
     }
     /**
      * @return false|resource
@@ -200,40 +184,10 @@ class FileCachePreserver implements EveApiPreserverInterface
      * @throws YapealPreserverPathException
      * @return string
      */
-    protected function getNormalizedCachePath($sectionName)
+    protected function getSectionCachePath($sectionName)
     {
-        if (empty($this->cachePath)) {
-            $mess = 'Tried to access $cachePath before it was set';
-            throw new YapealPreserverPathException($mess);
-        }
-        $absoluteRequired = true;
-        $cachePath = $this->cachePath . '/' . $sectionName;
-        $path = str_replace('\\', '/', $cachePath);
-        // Optional wrapper(s).
-        $regExp = '%^(?<wrappers>(?:[[:alpha:]][[:alnum:]]+://)*)';
-        // Optional root prefix.
-        $regExp .= '(?<root>(?:[[:alpha:]]:/|/)?)';
-        // Actual path.
-        $regExp .= '(?<path>(?:[[:print:]]*))$%';
-        $parts = [];
-        preg_match($regExp, $path, $parts);
-        $wrappers = $parts['wrappers'];
-        // vfsStream does NOT allow absolute path.
-        if ('vfs://' == substr($wrappers, -6)) {
-            $absoluteRequired = false;
-        }
-        if ($absoluteRequired && empty($parts['root'])) {
-            $mess
-                = 'Path NOT absolute missing drive or root was given ' . $path;
-            throw new YapealPreserverPathException($mess);
-        }
-        $root = $parts['root'];
-        $parts = $this->cleanPartsPath($parts['path']);
-        $path = $wrappers . $root . implode('/', $parts);
-        if ('/' != substr($path, -1)) {
-            $path .= '/';
-        }
-        return $path;
+        return $this->getFpn()
+                    ->normalizePath($this->getCachePath() . $sectionName);
     }
     /**
      * @param $cacheFile

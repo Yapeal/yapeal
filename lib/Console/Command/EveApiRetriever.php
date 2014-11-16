@@ -33,8 +33,7 @@
  */
 namespace Yapeal\Console\Command;
 
-use DomainException;
-use FilePathNormalizer\FilePathNormalizer;
+use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
@@ -55,7 +54,7 @@ use Yapeal\Xml\EveApiXmlData;
  */
 class EveApiRetriever extends Command implements WiringInterface
 {
-    use CommandToolsTrait;
+    use CommandToolsTrait, FilePathNormalizerTrait;
     /**
      * @param string|null        $name
      * @param string             $cwd
@@ -82,12 +81,14 @@ class EveApiRetriever extends Command implements WiringInterface
     public function wire(ContainerInterface $dic)
     {
         if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $this->getNormalizedPath($this->getCwd());
+            $dic['Yapeal.cwd'] = $this->getFpn()
+                                      ->normalizePath($this->getCwd());
         }
         if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $this->getNormalizedPath(
-                dirname(dirname(dirname(__DIR__)))
-            );
+            $dic['Yapeal.baseDir'] = $this->getFpn()
+                                          ->normalizePath(
+                                              dirname(dirname(dirname(__DIR__)))
+                                          );
         }
         $wiring = new ConsoleWiring($dic);
         $wiring->wireDefaults()
@@ -180,17 +181,6 @@ EOF;
             $preserver = $this->getDic($output)['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }
-    }
-    /**
-     * @param string $path
-     *
-     * @throws InvalidArgumentException
-     * @throws DomainException
-     * @return string
-     */
-    protected function getNormalizedPath($path)
-    {
-        return (new FilePathNormalizer())->normalizePath($path);
     }
     /**
      * @param string   $apiName

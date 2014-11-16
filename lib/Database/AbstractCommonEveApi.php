@@ -35,7 +35,7 @@ namespace Yapeal\Database;
 
 use DomainException;
 use DOMDocument;
-use FilePathNormalizer\FilePathNormalizer;
+use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
@@ -57,7 +57,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     LoggerAwareInterface
 {
-    use LoggerAwareTrait, EveApiToolsTrait;
+    use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
     /**
      * @param PDO             $pdo
      * @param LoggerInterface $logger
@@ -224,7 +224,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     protected function getCwd()
     {
         if (empty($this->cwd)) {
-            $this->cwd = (new FilePathNormalizer())->normalizePath(__DIR__);
+            $this->cwd = $this->getFpn()
+                              ->normalizePath(__DIR__);
         }
         return $this->cwd;
     }

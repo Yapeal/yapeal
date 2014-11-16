@@ -324,35 +324,35 @@ class FileCachePreserverTest extends PHPUnit_Framework_TestCase
                  ->will($this->returnValue('test'));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
-                 ->will($this->returnValue(array('dummy' => 'amount')));
-        $this->logger
-            ->expects($this->atLeastOnce())
-            ->method('info')
-            ->with(
-                'Could NOT get XML data',
-                $this->callback(
-                    function (
-                        $subject,
-                        $message = 'Giving up could NOT get flock on '
-                    ) {
-                        /**
-                         * @type array $subject
-                         */
-                        if (isset($subject['exception'])) {
-                            /** @type \Exception $exception */
-                            $exception = $subject['exception'];
-                            if (false !== strpos(
-                                    $exception->getMessage(),
-                                    $message
-                                )
-                            ) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                )
-            );
+            ->will($this->returnValue(['dummy' => 'amount']));
+//        $this->logger
+//            ->expects($this->atLeastOnce())
+//            ->method('info')
+//            ->with(
+//                'Could NOT get XML data',
+//                $this->callback(
+//                    function (
+//                        $subject,
+//                        $message = 'Giving up could NOT get flock on '
+//                    ) {
+//                        /**
+//                         * @type array $subject
+//                         */
+//                        if (isset($subject['exception'])) {
+//                            /** @type \Exception $exception */
+//                            $exception = $subject['exception'];
+//                            if (false !== strpos(
+//                                    $exception->getMessage(),
+//                                    $message
+//                                )
+//                            ) {
+//                                return true;
+//                            }
+//                        }
+//                        return false;
+//                    }
+//                )
+//            );
         $lock =
             $filesystem->url() . '/cache/account/test' . $hash . '.tmp';
         $handle = fopen($lock, 'rb+');
@@ -383,7 +383,7 @@ class FileCachePreserverTest extends PHPUnit_Framework_TestCase
                  ->will($this->returnValue('test'));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
-                 ->will($this->returnValue(array('dummy' => 'amount')));
+            ->will($this->returnValue(['dummy' => 'amount']));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiXml')
                  ->will($this->returnValue('Not XML'));
@@ -441,7 +441,7 @@ class FileCachePreserverTest extends PHPUnit_Framework_TestCase
                  ->will($this->returnValue('test'));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
-                 ->will($this->returnValue(array('dummy' => 'amount')));
+            ->will($this->returnValue(['dummy' => 'amount']));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiXml')
                  ->will($this->returnValue('Not XML'));
@@ -474,7 +474,7 @@ class FileCachePreserverTest extends PHPUnit_Framework_TestCase
                  ->will($this->returnValue('test'));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiArguments')
-                 ->will($this->returnValue(array('dummy' => 'amount')));
+            ->will($this->returnValue(['dummy' => 'amount']));
         $dataMock->expects($this->atLeastOnce())
                  ->method('getEveApiXml')
                  ->will($this->returnValue('Not XML'));
@@ -583,17 +583,17 @@ class FileCachePreserverTest extends PHPUnit_Framework_TestCase
      */
     protected function getVfsStream()
     {
-        $structure = array(
-            'cache' => array(
-                'account' => array(
+        $structure = [
+            'cache' => [
+                'account' => [
                     'test98427c308f8b8d734b659ce1830ae006.tmp' => 'Not XML'
-                ),
-                'char' => array(),
-                'deniedRead' => array(),
-                'deniedWrite' => array(),
+                ],
+                'char' => [],
+                'deniedRead' => [],
+                'deniedWrite' => [],
                 'NotDir' => ''
-            )
-        );
+            ]
+        ];
         $filesystem = vfsStream::setup('yapealTest');
         vfsStream::create($structure, $filesystem);
         $filesystem->getChild('yapealTest/cache/deniedRead')

@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Dragonrun1/file_path_normalizer.git",
-                "reference": "72beab4d0e5a31d2bddc9a1511df07539e16bec7"
+                "reference": "4203715ffb73e0b616da0f57e0e965c20b98a343"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Dragonrun1/file_path_normalizer/zipball/72beab4d0e5a31d2bddc9a1511df07539e16bec7",
-                "reference": "72beab4d0e5a31d2bddc9a1511df07539e16bec7",
+                "url": "https://api.github.com/repos/Dragonrun1/file_path_normalizer/zipball/4203715ffb73e0b616da0f57e0e965c20b98a343",
+                "reference": "4203715ffb73e0b616da0f57e0e965c20b98a343",
                 "shasum": ""
             },
             "require": {
@@ -42,7 +42,7 @@
                 }
             ],
             "description": "File_path_normalizer is a class used to normalize PHP file paths without several of the shortcomings of the built-in functions.",
-            "time": "2014-11-15 20:05:21"
+            "time": "2014-11-16 00:41:15"
         },
         {
             "name": "guzzle/guzzle",

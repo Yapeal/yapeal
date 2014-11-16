@@ -35,7 +35,7 @@ namespace Yapeal\Console\Command;
 
 use DirectoryIterator;
 use DomainException;
-use FilePathNormalizer\FilePathNormalizer;
+use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
@@ -49,6 +49,7 @@ use Yapeal\Database\CommonSqlQueries;
  */
 class DatabaseUpdater extends AbstractDatabaseCommon
 {
+    use FilePathNormalizerTrait;
     /**
      * @param string|null        $name
      * @param string             $cwd
@@ -166,7 +167,6 @@ HELP;
             $output->writeln($mess);
             return $fileNames;
         }
-        $fpn = new FilePathNormalizer();
         foreach (new DirectoryIterator($path) as $fileInfo) {
             if ($fileInfo->isDot() || $fileInfo->isDir()) {
                 continue;
@@ -174,7 +174,8 @@ HELP;
             if ($fileInfo->getExtension() != 'sql') {
                 continue;
             }
-            $fileNames[] = $fpn->normalizeFile($fileInfo->getPathname());
+            $fileNames[] = $this->getFpn()
+                                ->normalizeFile($fileInfo->getPathname());
         }
         asort($fileNames);
         return $fileNames;

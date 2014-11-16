@@ -34,7 +34,7 @@
 namespace Yapeal;
 
 use DomainException;
-use FilePathNormalizer\FilePathNormalizer;
+use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -54,6 +54,7 @@ use Yapeal\Xml\EveApiXmlData;
  */
 class Yapeal implements WiringInterface
 {
+    use FilePathNormalizerTrait;
     /**
      * @param ContainerInterface $dic
      */
@@ -152,7 +153,8 @@ class Yapeal implements WiringInterface
      */
     public function wire(ContainerInterface $dic)
     {
-        $path = (new FilePathNormalizer())->normalizePath(dirname(__DIR__));
+        $path = $this->getFpn()
+                     ->normalizePath(dirname(__DIR__));
         if (empty($dic['Yapeal.cwd'])) {
             $dic['Yapeal.cwd'] = $path;
         }

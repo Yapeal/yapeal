@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Xml;
 
+use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -212,8 +213,16 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     protected function getSectionCachePath($sectionName)
     {
-        return $this->getFpn()
-                    ->normalizePath($this->getCachePath() . $sectionName);
+        try {
+            return $this->getFpn()
+                        ->normalizePath($this->getCachePath() . $sectionName);
+        } catch (DomainException $exc) {
+            throw new YapealRetrieverPathException(
+                $exc->getMessage(),
+                null,
+                $exc
+            );
+        }
     }
     /**
      * @param string $xml

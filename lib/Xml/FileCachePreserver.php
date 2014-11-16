@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Xml;
 
+use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealPreserverException;
@@ -186,8 +187,16 @@ class FileCachePreserver implements EveApiPreserverInterface
      */
     protected function getSectionCachePath($sectionName)
     {
-        return $this->getFpn()
-                    ->normalizePath($this->getCachePath() . $sectionName);
+        try {
+            return $this->getFpn()
+                        ->normalizePath($this->getCachePath() . $sectionName);
+        } catch (DomainException $exc) {
+            throw new YapealPreserverPathException(
+                $exc->getMessage(),
+                null,
+                $exc
+            );
+        }
     }
     /**
      * @param $cacheFile

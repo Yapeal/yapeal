@@ -32,8 +32,6 @@
  */
 namespace Yapeal;
 
-use Yapeal\Container\PimpleContainer;
-
 /*
  * Find auto loader from one of
  * vendor/bin/
@@ -48,7 +46,3 @@ use Yapeal\Container\PimpleContainer;
 || (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
 || (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
 || die('Could not find required auto class loader. Aborting ...');
-/**
- * @type PimpleContainer $container
- */
-$container = new PimpleContainer();

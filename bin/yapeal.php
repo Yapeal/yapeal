@@ -37,8 +37,5 @@ namespace Yapeal;
 require_once __DIR__ . '/bootstrap.php';
 use Yapeal\Container\PimpleContainer;
 
-/**
- * @type PimpleContainer $container
- */
-$yapeal = new Yapeal($container);
+$yapeal = new Yapeal(new PimpleContainer());
 exit($yapeal->autoMagic());

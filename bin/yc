@@ -41,9 +41,7 @@ use Yapeal\Console\Command\DatabaseUpdater;
 use Yapeal\Console\Command\EveApiRetriever;
 use Yapeal\Container\PimpleContainer;
 
-/**
- * @type PimpleContainer $container
- */
+$container = new PimpleContainer();
 $cwd = str_replace('\\', '/', getcwd());
 $application = new Application('Yapeal Console', '0.0.1');
 $application->add(new EveApiRetriever('Network:Cache', $cwd, $container));

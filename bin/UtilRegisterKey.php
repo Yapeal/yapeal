@@ -1,7 +1,9 @@
 <?php
 /**
  * Contains UtilRegisterKey class.
+ *
  * PHP version 5.4
+ *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
@@ -36,6 +38,7 @@ use Yapeal\Database\CommonSqlQueries;
 require_once __DIR__ . '/bootstrap.php';
 /**
  * Class UtilRegisterKey
+ *
  * WARNING: This class changes the PDO connection into MySQL's ANSI,TRADITIONAL
  * mode and makes other changes that may cause other queries in any other code
  * that reuses the connection after the changes to fail. For example if you use
@@ -52,7 +55,8 @@ class UtilRegisterKey
     public function __construct(
         PDO $pdo,
         CommonSqlQueries $csq
-    ) {
+    )
+    {
         $this->setPdo($pdo);
         $this->setCsq($csq);
     }
@@ -86,6 +90,7 @@ class UtilRegisterKey
     }
     /**
      * Method used to persist changes to the database.
+     *
      * NOTE: After calling this method the MySQL PDO connection will be
      * switched to ANSI mode and use UTF-8.
      *
@@ -96,10 +101,10 @@ class UtilRegisterKey
     public function save()
     {
         $columnsNames = ['activeAPIMask', 'isActive', 'keyID', 'vCode'];
-        $this->initPdo();
         $sql = $this->getCsq()
-                    ->getUpsert('utilRegisterKey', $columnsNames, 1);
-        $stmt = $this->getPdo()
+            ->getUpsert('utilRegisteredKey', $columnsNames, 1);
+        $stmt = $this->initPdo()
+                     ->getPdo()
                      ->prepare($sql);
         $columns = [
             $this->getActiveAPIMask(),
@@ -235,15 +240,19 @@ class UtilRegisterKey
         }
         return $this->pdo;
     }
+    /**
+     * @throws LogicException
+     * @return self
+     */
     protected function initPdo()
     {
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec("set session sql_mode='ANSI,TRADITIONAL'");
-        $this->pdo->exec(
-            'set session transaction isolation level serializable'
-        );
-        $this->pdo->exec("set session time_zone='+00:00'");
-        $this->pdo->exec('set names utf8');
+        $pdo = $this->getPdo();
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec("SET SESSION SQL_MODE='ANSI,TRADITIONAL'");
+        $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        $pdo->exec("SET SESSION TIME_ZONE='+00:00'");
+        $pdo->exec('SET NAMES UTF8');
+        return $this;
     }
     /**
      * @param string $value
@@ -256,23 +265,12 @@ class UtilRegisterKey
             return false;
         }
         if (strlen(
-            str_replace(
-                [
-                    '0',
-                    '1',
-                    '2',
-                    '3',
-                    '4',
-                    '5',
-                    '6',
-                    '7',
-                    '8',
-                    '9'
-                ],
-                '',
-                $value
-            )
-        ) !== 0
+                str_replace(
+                    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+                    '',
+                    $value
+                )
+            ) !== 0
         ) {
             return false;
         }
@@ -283,7 +281,7 @@ class UtilRegisterKey
      */
     protected $activeAPIMask;
     /**
-     * @var CommonSqlQueries
+     * @type CommonSqlQueries $csq
      */
     protected $csq;
     /**
@@ -295,7 +293,7 @@ class UtilRegisterKey
      */
     protected $keyID;
     /**
-     * @var PDO
+     * @type PDO $pdo
      */
     protected $pdo;
     /**

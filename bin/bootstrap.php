@@ -32,16 +32,16 @@
  */
 namespace Yapeal;
 
-/*
-* Find auto loader from one of
-* vendor/bin/
-* OR ./
-* OR bin/
-* OR lib/PhpEOL/
-* OR vendor/PhpEOL/PhpEOL/bin/
-*/
 use Yapeal\Container\PimpleContainer;
 
+/*
+ * Find auto loader from one of
+ * vendor/bin/
+ * OR ./
+ * OR bin/
+ * OR lib/PhpEOL/
+ * OR vendor/PhpEOL/PhpEOL/bin/
+ */
 (@include_once dirname(__DIR__) . '/autoload.php')
 || (@include_once __DIR__ . '/vendor/autoload.php')
 || (@include_once dirname(__DIR__) . '/vendor/autoload.php')

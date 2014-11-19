@@ -161,6 +161,12 @@ class Yapeal implements WiringInterface
         if (empty($dic['Yapeal.baseDir'])) {
             $dic['Yapeal.baseDir'] = $path;
         }
+        if (empty($dic['Yapeal.vendorParentDir'])) {
+            $vendorPos = strpos($path, 'vendor/');
+            if (false !== $vendorPos) {
+                $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
+            }
+        }
         $wiring = new Wiring($dic);
         $wiring->wireDefaults()
                ->wireConfiguration();

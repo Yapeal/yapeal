@@ -93,46 +93,49 @@ class Wiring
             return $this;
         }
         $this->dic['Yapeal.Config.Parser'] = function ($dic) {
-            $configFile = $dic['Yapeal.Config.configDir']
-                          . $dic['Yapeal.Config.fileName'];
-            if (!is_readable($configFile) || !is_file($configFile)) {
-                $mess = sprintf(
-                    'Configuration file %1$s is NOT accessible',
-                    $configFile
-                );
-                throw new YapealException($mess);
-            }
             /**
              * @type Parser $parser
              */
             $parser = new $dic['Yapeal.Config.class'];
-            $config = file_get_contents($configFile);
-            try {
-                $config
-                    = $parser->parse($config, true, false);
-            } catch (ParseException $exc) {
-                $mess = sprintf(
-                    'Unable to parse the YAML configuration file %2$s.'
-                    . ' The error message was %1$s',
-                    $exc->getMessage(),
-                    $configFile
-                );
-                throw new YapealException($mess, 0, $exc);
+            $configFiles = [];
+            $configFiles[] = $dic['Yapeal.Config.configDir']
+                             . $dic['Yapeal.Config.fileName'];
+            if (isset($dic['Yapeal.vendorParentDir'])) {
+                $configFiles[] = $dic['Yapeal.vendorParentDir'] . 'config/'
+                                 . $dic['Yapeal.Config.fileName'];
             }
-            $rItIt = new RecursiveIteratorIterator(
-                new RecursiveArrayIterator($config)
-            );
-            foreach ($rItIt as $leafValue) {
-                $keys = [];
-                foreach (range(0, $rItIt->getDepth()) as $depth) {
-                    $keys[] = $rItIt->getSubIterator($depth)
-                                    ->key();
+            foreach ($configFiles as $configFile) {
+                if (!is_readable($configFile) || !is_file($configFile)) {
+                    continue;
                 }
-                $dic[implode('.', $keys)] = str_replace(
-                    ['{Yapeal.baseDir}', '{Yapeal.cwd}'],
-                    [$dic['Yapeal.baseDir'], $dic['Yapeal.cwd']],
-                    $leafValue
+                $config = file_get_contents($configFile);
+                try {
+                    $config
+                        = $parser->parse($config, true, false);
+                } catch (ParseException $exc) {
+                    $mess = sprintf(
+                        'Unable to parse the YAML configuration file %2$s.'
+                        . ' The error message was %1$s',
+                        $exc->getMessage(),
+                        $configFile
+                    );
+                    throw new YapealException($mess, 0, $exc);
+                }
+                $rItIt = new RecursiveIteratorIterator(
+                    new RecursiveArrayIterator($config)
                 );
+                foreach ($rItIt as $leafValue) {
+                    $keys = [];
+                    foreach (range(0, $rItIt->getDepth()) as $depth) {
+                        $keys[] = $rItIt->getSubIterator($depth)
+                                        ->key();
+                    }
+                    $dic[implode('.', $keys)] = str_replace(
+                        ['{Yapeal.baseDir}', '{Yapeal.cwd}'],
+                        [$dic['Yapeal.baseDir'], $dic['Yapeal.cwd']],
+                        $leafValue
+                    );
+                }
             }
             return $parser;
         };

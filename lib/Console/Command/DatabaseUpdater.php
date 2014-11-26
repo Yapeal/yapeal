@@ -35,7 +35,6 @@ namespace Yapeal\Console\Command;
 
 use DirectoryIterator;
 use DomainException;
-use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
@@ -49,7 +48,6 @@ use Yapeal\Database\CommonSqlQueries;
  */
 class DatabaseUpdater extends AbstractDatabaseCommon
 {
-    use FilePathNormalizerTrait;
     /**
      * @param string|null        $name
      * @param string             $cwd

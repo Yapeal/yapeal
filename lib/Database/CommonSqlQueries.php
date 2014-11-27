@@ -89,6 +89,26 @@ SQL;
         );
     }
     /**
+     * @param string $ownerID
+     *
+     * @return string
+     */
+    public function getActiveMailBodiesWithOwnerID($ownerID)
+    {
+        $sql
+            = <<<'SQL'
+SELECT "messageID"
+ FROM "%1$s"."%2$scharMailMessages" AS cmm
+ WHERE "ownerID"=%3$s
+SQL;
+        return sprintf(
+            str_replace(["\n", "\r\n"], '', $sql),
+            $this->databaseName,
+            $this->tablePrefix,
+            $ownerID
+        );
+    }
+    /**
      * @return string
      */
     public function getActiveRegisteredAccountStatus()

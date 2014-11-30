@@ -63,7 +63,8 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -132,7 +133,11 @@ class StarbaseDetail extends AbstractCorpSection
                     continue;
                 }
             }
-            $this->updateCachedUntil($data, $untilInterval, $corpID);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $untilInterval,
+                $corpID
+            );
         }
     }
     /**
@@ -149,7 +154,8 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -226,11 +232,8 @@ class StarbaseDetail extends AbstractCorpSection
      * @throws LogicException
      * @return self
      */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        $itemID = null
-    ) {
+    protected function preserve($xml, $ownerID, $itemID = null)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
@@ -260,11 +263,8 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToCombatSettings(
-        $xml,
-        $ownerID,
-        $itemID
-    ) {
+    protected function preserverToCombatSettings($xml, $ownerID, $itemID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
@@ -290,11 +290,8 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToFuel(
-        $xml,
-        $ownerID,
-        $itemID
-    ) {
+    protected function preserverToFuel($xml, $ownerID, $itemID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
@@ -316,11 +313,8 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToGeneralSettings(
-        $xml,
-        $ownerID,
-        $itemID
-    ) {
+    protected function preserverToGeneralSettings($xml, $ownerID, $itemID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,
@@ -344,11 +338,8 @@ class StarbaseDetail extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToStarbaseDetail(
-        $xml,
-        $ownerID,
-        $itemID
-    ) {
+    protected function preserverToStarbaseDetail($xml, $ownerID, $itemID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'itemID' => $itemID,

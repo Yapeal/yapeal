@@ -61,7 +61,8 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -99,7 +100,11 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
             ) {
                 continue;
             }
-            $this->updateCachedUntil($data, $untilInterval, $key['keyID']);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $untilInterval,
+                $key['keyID']
+            );
         }
     }
     /**
@@ -116,7 +121,8 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -164,6 +170,13 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         return true;
     }
     /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
+     */
+    abstract protected function preserve($xml, $ownerID);
+    /**
      * @throws LogicException
      * @return array
      */
@@ -184,14 +197,4 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
             return [];
         }
     }
-    /**
-     * @param string $xml
-     * @param string $ownerID
-     *
-     * @return self
-     */
-    abstract protected function preserve(
-        $xml,
-        $ownerID
-    );
 }

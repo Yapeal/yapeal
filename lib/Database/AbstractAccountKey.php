@@ -59,7 +59,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -115,7 +116,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                     continue 2;
                 }
             }
-            $this->updateCachedUntil($data, $interval, $activeKey[$ownerID]);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $interval,
+                $activeKey[$ownerID]
+            );
         }
     }
     /**
@@ -132,7 +137,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -266,11 +272,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      * @throws LogicException
      * @return bool
      */
-    protected function preserve(
-        $xml,
-        $ownerID,
-        $accountKey
-    ) {
+    protected function preserve($xml, $ownerID, $accountKey)
+    {
         $pTo = 'preserverTo' . $this->getApiName();
         try {
             $this->getPdo()

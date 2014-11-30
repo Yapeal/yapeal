@@ -48,7 +48,7 @@ class CharacterInfoPrivate extends CharacterInfo
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      */
@@ -107,7 +107,7 @@ class CharacterInfoPrivate extends CharacterInfo
                 continue;
             }
             $this->updateCachedUntil(
-                $data,
+                $data->getEveApiXml(),
                 $untilInterval,
                 $char['characterID']
             );

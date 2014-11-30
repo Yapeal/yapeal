@@ -113,7 +113,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
             return;
         }
-        $this->updateCachedUntil($data, $interval, '0');
+        $this->updateCachedUntil($data->getEveApiXml(), $interval, '0');
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -363,19 +363,15 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return true;
     }
     /**
-     * @param EveApiReadInterface $data
-     * @param int                 $interval
-     * @param string              $ownerID
+     * @param string $xml
+     * @param int    $interval
+     * @param string $ownerID
      *
      * @throws LogicException
      */
-    protected function updateCachedUntil(
-        EveApiReadInterface &$data,
-        $interval,
-        $ownerID
-    )
+    protected function updateCachedUntil($xml, $interval, $ownerID)
     {
-        $simple = new SimpleXMLElement($data->getEveApiXml());
+        $simple = new SimpleXMLElement($xml);
         $sql = $this->getCsq()
                     ->getUtilCachedUntilUpsert();
         $pdo = $this->getPdo();

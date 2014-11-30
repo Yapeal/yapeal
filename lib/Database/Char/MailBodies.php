@@ -137,7 +137,11 @@ class MailBodies extends AbstractCharSection
                     continue;
                 }
             }
-            $this->updateCachedUntil($data, $untilInterval, $charID);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $untilInterval,
+                $charID
+            );
         }
     }
     /**

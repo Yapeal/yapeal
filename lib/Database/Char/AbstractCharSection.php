@@ -64,7 +64,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    ) {
+    )
+    {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -103,7 +104,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
                 continue;
             }
             $this->updateCachedUntil(
-                $data,
+                $data->getEveApiXml(),
                 $untilInterval,
                 $char['characterID']
             );
@@ -123,7 +124,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -200,10 +202,8 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
      * @throws LogicException
      * @return bool
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserve($xml, $ownerID)
+    {
         $pTo = 'preserverTo' . $this->getApiName();
         try {
             $this->getPdo()

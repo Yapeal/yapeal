@@ -50,7 +50,7 @@ class IndustryJobs extends AbstractCharSection
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      */
@@ -105,7 +105,11 @@ class IndustryJobs extends AbstractCharSection
             if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $char['characterID']);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $interval,
+                $char['characterID']
+            );
         }
     }
     /**
@@ -114,10 +118,7 @@ class IndustryJobs extends AbstractCharSection
      *
      * @return self
      */
-    protected function preserverToIndustryJobs(
-        $xml,
-        $ownerID
-    )
+    protected function preserverToIndustryJobs($xml, $ownerID)
     {
         $columnDefaults = [
             'activityID' => null,

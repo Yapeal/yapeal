@@ -50,7 +50,7 @@ class IndustryJobs extends AbstractCorpSection
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
-     * @param int $interval
+     * @param int                      $interval
      *
      * @throws LogicException
      */
@@ -105,7 +105,11 @@ class IndustryJobs extends AbstractCorpSection
             if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
                 continue;
             }
-            $this->updateCachedUntil($data, $interval, $corp['corporationID']);
+            $this->updateCachedUntil(
+                $data->getEveApiXml(),
+                $interval,
+                $corp['corporationID']
+            );
         }
     }
     /**

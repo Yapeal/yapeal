@@ -60,6 +60,8 @@ interface EveApiDatabaseInterface
      * @param EveApiRetrieverInterface $retrievers
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
+     *
+     * @api
      */
     public function autoMagic(
         EveApiReadWriteInterface $data,
@@ -73,6 +75,7 @@ interface EveApiDatabaseInterface
      * @param EveApiPreserverInterface $preservers
      * @param int                      $interval
      *
+     * @api
      * @throws LogicException
      * @return bool
      */
@@ -85,6 +88,7 @@ interface EveApiDatabaseInterface
     /**
      * @param CommonSqlQueries $value
      *
+     * @api
      * @return self
      */
     public function setCsq($value);
@@ -92,11 +96,14 @@ interface EveApiDatabaseInterface
      * Sets a logger.
      *
      * @param LoggerInterface $logger
+     *
+     * @api
      */
     public function setLogger(LoggerInterface $logger);
     /**
      * @param PDO $value
      *
+     * @api
      * @return self
      */
     public function setPdo(PDO $value);

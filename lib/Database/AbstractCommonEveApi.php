@@ -230,25 +230,28 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return $this->cwd;
     }
     /**
-     * @param EveApiReadInterface $data
+     * @param string $apiName
+     * @param string $sectionName
      *
      * @throws LogicException
      * @return string
      */
-    protected function getXslName(EveApiReadInterface &$data)
+    protected function getXslName($apiName, $sectionName)
     {
         $xslName = sprintf(
             $this->getCwd() . '%1$s/%2$s.xsl',
-            ucfirst($data->getEveApiSectionName()),
-            $data->getEveApiName()
+            ucfirst($sectionName),
+            $apiName
         );
         if (!is_file($xslName)) {
+            $mess = 'Could NOT find ' . $xslName;
+            $this->getLogger()
+                 ->info($mess);
             $xslName = $this->getCwd() . 'common.xsl';
         }
         $mess = 'Given XSL name ' . $xslName;
         $this->getLogger()
              ->debug($mess);
-        //$xsl = file_get_contents($xslName);
         return $xslName;
     }
     /**
@@ -409,7 +412,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $oldErrors = libxml_use_internal_errors(true);
         libxml_clear_errors();
         $dom = new DOMDocument();
-        $dom->load($this->getXslName($data));
+        $dom->load(
+            $this->getXslName(
+                $data->getEveApiName(),
+                $data->getEveApiSectionName()
+            )
+        );
         $xslt->importStylesheet($dom);
         $xml = $xslt->transformToXml(
             new SimpleXMLElement($data->getEveApiXml())

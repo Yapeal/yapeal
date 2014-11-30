@@ -305,33 +305,30 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             $code,
             (string)$simple->error
         );
-        if (strpos($mess, 'retry after') !== false) {
+        if ($code < 200) {
+            if (strpos($mess, 'retry after') !== false) {
+                $interval = strtotime(substr($mess, -19) . '+00:00') - time();
+            }
             $this->getLogger()
                  ->warning($mess);
-            $interval = strtotime(substr($mess, -19) . '+00:00') - time();
-        } elseif ($code < 200) {
-            $this->getLogger()
-                 ->warning($mess);
-        } elseif ($code > 199 && $code < 300) { // API key errors.
+            return true;
+        }
+        if ($code < 300) { // API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $this->getLogger()
                  ->error($mess);
             $interval = 86400;
-        } elseif ($code > 500 && $code < 903) { // API server internal errors.
-            $this->getLogger()
-                 ->warning($mess);
-            $interval = 300;
-        } elseif ($code > 903
-                  && $code < 905
-        ) { // Major application or Yapeal error.
+            return true;
+        }
+        if ($code > 903 && $code < 905) { // Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
             $interval = 86400;
-        } else {
-            $this->getLogger()
-                 ->warning($mess);
-            $interval = 300;
+            return true;
         }
+        $this->getLogger()
+             ->warning($mess);
+        $interval = 300;
         return true;
     }
     /**
@@ -373,7 +370,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @throws LogicException
      */
     protected function updateCachedUntil(
-        EveApiReadInterface $data,
+        EveApiReadInterface &$data,
         $interval,
         $ownerID
     )

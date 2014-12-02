@@ -79,6 +79,7 @@ class IndustryJobsHistory extends AbstractCharSection
             'startDate' => null,
             'stationID' => null,
             'status' => null,
+            'successfulRuns' => null,
             'teamID' => null,
             'timeInSeconds' => null
         ];

@@ -2,7 +2,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
     "accountID"  BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey" SMALLINT(5) UNSIGNED NOT NULL,
-    "balance" DECIMAL(17,2) NOT NULL,
+    "balance"    DECIMAL(17,2)        NOT NULL,
     PRIMARY KEY ("ownerID","accountKey")
 )
 ENGINE = { engine}
@@ -11,7 +11,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "standing" DECIMAL(5,2) NOT NULL,
+    "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
 ENGINE = { engine}
@@ -141,24 +141,24 @@ CREATE TABLE "{database}"."{table_prefix}corpCorporateContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "standing" DECIMAL(5,2) NOT NULL,
+    "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
 ENGINE = { engine}
 DEFAULT CHARSET = utf8
 COLLATE = utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
-    "allianceID"  BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+    "allianceID"      BIGINT(20) UNSIGNED   NOT NULL DEFAULT 0,
     "allianceName"    CHAR(50)                       DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED   NOT NULL,
     "ceoName"         CHAR(50)              NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED   NOT NULL,
     "corporationName" CHAR(50)              NOT NULL,
     "description"     TEXT,
-    "factionID"   BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+    "factionID"       BIGINT(20) UNSIGNED   NOT NULL DEFAULT 0,
     "factionName"     CHAR(50)                       DEFAULT NULL,
-    "memberCount" BIGINT(20) UNSIGNED NOT NULL,
-    "memberLimit" BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+    "memberCount"     BIGINT(20) UNSIGNED   NOT NULL,
+    "memberLimit"     BIGINT(20) UNSIGNED   NOT NULL DEFAULT 0,
     "shares"          BIGINT(20) UNSIGNED   NOT NULL,
     "stationID"       BIGINT(20) UNSIGNED   NOT NULL,
     "stationName"     CHAR(255)             NOT NULL,
@@ -188,8 +188,8 @@ CREATE TABLE "{database}"."{table_prefix}corpFacilities" (
     "solarSystemName"  CHAR(255)           NOT NULL,
     "regionID"         BIGINT(20) UNSIGNED NOT NULL,
     "regionName"       CHAR(255)           NOT NULL,
-    "starbaseModifier" DECIMAL(17,2) NOT NULL,
-    "tax"              DECIMAL(17,2) NOT NULL,
+    "starbaseModifier" DECIMAL(17,2)       NOT NULL,
+    "tax"              DECIMAL(17,2)       NOT NULL,
     PRIMARY KEY ("ownerID","facilityID")
 )
 ENGINE = { engine}
@@ -239,7 +239,7 @@ CREATE TABLE "{database}"."{table_prefix}corpIndustryJobs" (
     "blueprintTypeName"    CHAR(255)           NOT NULL,
     "completedCharacterID" BIGINT(20) UNSIGNED NOT NULL,
     "completedDate"        DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
-    "cost" DECIMAL(17,2) NOT NULL,
+    "cost"                 DECIMAL(17,2)       NOT NULL,
     "endDate"              DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "facilityID"           BIGINT(20) UNSIGNED NOT NULL,
     "installerID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -304,12 +304,12 @@ CREATE TABLE "{database}"."{table_prefix}corpMarketOrders" (
     "bid"          TINYINT(1)           NOT NULL,
     "charID"       BIGINT(20) UNSIGNED  NOT NULL,
     "duration"     SMALLINT(3) UNSIGNED NOT NULL,
-    "escrow" DECIMAL(17,2) NOT NULL,
+    "escrow"       DECIMAL(17,2)        NOT NULL,
     "issued"       DATETIME             NOT NULL,
     "minVolume"    BIGINT(20) UNSIGNED  NOT NULL,
     "orderID"      BIGINT(20) UNSIGNED  NOT NULL,
     "orderState"   TINYINT(2) UNSIGNED  NOT NULL,
-    "price"  DECIMAL(17,2) NOT NULL,
+    "price"        DECIMAL(17,2)        NOT NULL,
     "range"        SMALLINT(6)          NOT NULL,
     "stationID"    BIGINT(20) UNSIGNED DEFAULT NULL,
     "typeID"       BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -369,10 +369,10 @@ DEFAULT CHARSET = ascii;
 ALTER TABLE "{database}"."{table_prefix}corpMemberTracking" ADD INDEX "corpMemberTracking1"  ("ownerID");
 CREATE TABLE "{database}"."{table_prefix}corpOutpostList" (
     "ownerID"                  BIGINT(20) UNSIGNED NOT NULL,
-    "dockingCostPerShipVolume" DECIMAL(17,2) NOT NULL,
-    "officeRentalCost"         DECIMAL(17,2) NOT NULL,
-    "reprocessingEfficiency"   DECIMAL(5,4)  NOT NULL,
-    "reprocessingStationTake"  DECIMAL(5,4)  NOT NULL,
+    "dockingCostPerShipVolume" DECIMAL(17,2)       NOT NULL,
+    "officeRentalCost"         DECIMAL(17,2)       NOT NULL,
+    "reprocessingEfficiency"   DECIMAL(5,4)        NOT NULL,
+    "reprocessingStationTake"  DECIMAL(5,4)        NOT NULL,
     "solarSystemID"            BIGINT(20) UNSIGNED NOT NULL,
     "standingOwnerID"          BIGINT(20) UNSIGNED NOT NULL,
     "stationID"                BIGINT(20) UNSIGNED NOT NULL,
@@ -398,7 +398,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
-    "standing" DECIMAL(5,2) NOT NULL,
+    "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
 ENGINE = { engine}
@@ -407,7 +407,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
-    "standing" DECIMAL(5,2) NOT NULL,
+    "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
 ENGINE = { engine}
@@ -416,7 +416,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromNPCCorporations" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
-    "standing" DECIMAL(5,2) NOT NULL,
+    "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
 ENGINE = { engine}
@@ -471,10 +471,10 @@ COLLATE = utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpWalletJournal" (
     "ownerID"       BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
-    "amount"    DECIMAL(17,2) NOT NULL,
+    "amount"        DECIMAL(17,2)        NOT NULL,
     "argID1"        BIGINT(20) UNSIGNED DEFAULT NULL,
     "argName1"      CHAR(255)           DEFAULT NULL,
-    "balance"   DECIMAL(17,2) NOT NULL,
+    "balance"       DECIMAL(17,2)        NOT NULL,
     "date"          DATETIME             NOT NULL,
     "ownerID1"      BIGINT(20) UNSIGNED DEFAULT NULL,
     "ownerID2"      BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -483,7 +483,7 @@ CREATE TABLE "{database}"."{table_prefix}corpWalletJournal" (
     "reason"        TEXT,
     "refID"         BIGINT(20) UNSIGNED  NOT NULL,
     "refTypeID"     SMALLINT(5) UNSIGNED NOT NULL,
-    "taxAmount" DECIMAL(17,2) NOT NULL,
+    "taxAmount"     DECIMAL(17,2)        NOT NULL,
     "taxReceiverID" BIGINT(20) UNSIGNED DEFAULT '0',
     "owner1TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
     "owner2TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -501,7 +501,7 @@ CREATE TABLE "{database}"."{table_prefix}corpWalletTransactions" (
     "clientName"           CHAR(50)                      DEFAULT NULL,
     "clientTypeID"         BIGINT(20) UNSIGNED           DEFAULT NULL,
     "journalTransactionID" BIGINT(20) UNSIGNED  NOT NULL,
-    "price" DECIMAL(17,2) NOT NULL,
+    "price"                DECIMAL(17,2)        NOT NULL,
     "quantity"             BIGINT(20) UNSIGNED  NOT NULL,
     "stationID"            BIGINT(20) UNSIGNED           DEFAULT NULL,
     "stationName"          CHAR(255)                     DEFAULT NULL,

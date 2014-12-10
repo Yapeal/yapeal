@@ -176,10 +176,18 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         OutputInterface $output
     )
     {
-        $templates = [';', '{database}', '{engine}', '{table_prefix}', '$$'];
+        $templates = [
+            ';',
+            '{database}',
+            '{engine}',
+            '{ engine}',
+            '{table_prefix}',
+            '$$'
+        ];
         $replacements = [
             '',
             $this->getDic($output)['Yapeal.Database.database'],
+            $this->getDic($output)['Yapeal.Database.engine'],
             $this->getDic($output)['Yapeal.Database.engine'],
             $this->getDic($output)['Yapeal.Database.tablePrefix'],
             ';'

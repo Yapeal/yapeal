@@ -11,7 +11,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "standing"      DECIMAL(5,2) NOT NULL,
+    "standing" DECIMAL(5,2) NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
 ENGINE = { engine}
@@ -141,24 +141,24 @@ CREATE TABLE "{database}"."{table_prefix}corpCorporateContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "standing"      DECIMAL(5,2) NOT NULL,
+    "standing" DECIMAL(5,2) NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
 ENGINE = { engine}
 DEFAULT CHARSET = utf8
 COLLATE = utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
-    "allianceID"      BIGINT(20) UNSIGNED   NOT NULL DEFAULT '0',
+    "allianceID"  BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
     "allianceName"    CHAR(50)                       DEFAULT NULL,
     "ceoID"           BIGINT(20) UNSIGNED   NOT NULL,
     "ceoName"         CHAR(50)              NOT NULL,
     "corporationID"   BIGINT(20) UNSIGNED   NOT NULL,
     "corporationName" CHAR(50)              NOT NULL,
     "description"     TEXT,
-    "factionID"       BIGINT(20) UNSIGNED   NOT NULL DEFAULT '0',
+    "factionID"   BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
     "factionName"     CHAR(50)                       DEFAULT NULL,
-    "memberCount"     SMALLINT(5) UNSIGNED  NOT NULL,
-    "memberLimit"     SMALLINT(5)           NOT NULL DEFAULT '0',
+    "memberCount" BIGINT(20) UNSIGNED NOT NULL,
+    "memberLimit" BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
     "shares"          BIGINT(20) UNSIGNED   NOT NULL,
     "stationID"       BIGINT(20) UNSIGNED   NOT NULL,
     "stationName"     CHAR(255)             NOT NULL,

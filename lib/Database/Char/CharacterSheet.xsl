@@ -66,4 +66,7 @@
         </xsl:copy>
     </xsl:template>
     <xsl:template match="attributeEnhancers"/>
+    <xsl:template match="cloneName"/>
+    <xsl:template match="cloneSkillPoints"/>
+    <xsl:template match="cloneTypeID"/>
 </xsl:transform>

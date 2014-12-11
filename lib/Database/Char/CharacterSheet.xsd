@@ -101,9 +101,6 @@
             <xs:element type="eveNameType" name="bloodLine"/>
             <xs:element type="eveIDType" name="characterID"/>
             <xs:element type="eveDTType" name="cloneJumpDate"/>
-            <xs:element type="eveNameType" name="cloneName"/>
-            <xs:element type="xs:unsignedLong" name="cloneSkillPoints"/>
-            <xs:element type="eveIDType" name="cloneTypeID"/>
             <xs:element type="eveIDType" name="corporationID"/>
             <xs:element type="eveNameType" name="corporationName"/>
             <xs:element type="eveNEDTType" name="DoB"/>

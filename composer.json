@@ -64,7 +64,7 @@
         "ext-xsl": "*",
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
-        "php": ">=5.4.24",
+        "php": ">=5.4.20",
         "guzzle/guzzle": "~3.9",
         "monolog/monolog": "~1.11",
         "symfony/console": "~2.5",

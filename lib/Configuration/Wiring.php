@@ -176,7 +176,7 @@ class Wiring
                 'SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE'
             );
             $database->exec("SET SESSION TIME_ZONE='+00:00'");
-            $database->exec('SET NAMES UTF8');
+            $database->exec('SET NAMES utf8 COLLATE utf8_unicode_ci');
             return $database;
         };
         return $this;

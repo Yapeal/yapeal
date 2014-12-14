@@ -55,13 +55,14 @@ class APIKeyInfo extends AbstractAccountSection
     protected function preserve(
         $xml,
         $ownerID
-    ) {
+    )
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserveToAPIKeyInfo($xml, $ownerID);
-            $this->preserveToCharacters($xml);
-            $this->preserveToKeyBridge($xml, $ownerID);
+            $this->preserveToAPIKeyInfo($xml, $ownerID)
+                 ->preserveToCharacters($xml)
+                 ->preserveToKeyBridge($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -87,7 +88,8 @@ class APIKeyInfo extends AbstractAccountSection
     protected function preserveToAPIKeyInfo(
         $xml,
         $ownerID
-    ) {
+    )
+    {
         $columnDefaults = [
             'keyID' => $ownerID,
             'accessMask' => null,
@@ -104,10 +106,13 @@ class APIKeyInfo extends AbstractAccountSection
     }
     /**
      * @param string $xml
+     *
+     * @return self
      */
     protected function preserveToCharacters(
         $xml
-    ) {
+    )
+    {
         $columnDefaults = [
             'characterID' => null,
             'characterName' => null,
@@ -123,6 +128,7 @@ class APIKeyInfo extends AbstractAccountSection
             $columnDefaults,
             'accountCharacters'
         );
+        return $this;
     }
     /**
      * @param string $xml
@@ -134,7 +140,8 @@ class APIKeyInfo extends AbstractAccountSection
     protected function preserveToKeyBridge(
         $xml,
         $ownerID
-    ) {
+    )
+    {
         $chars = (new SimpleXMLIterator($xml))->xpath('//row');
         if (count($chars) == 0) {
             return $this;
@@ -155,5 +162,6 @@ class APIKeyInfo extends AbstractAccountSection
         $stmt = $this->getPdo()
                      ->prepare($sql);
         $stmt->execute($rows);
+        return $this;
     }
 }

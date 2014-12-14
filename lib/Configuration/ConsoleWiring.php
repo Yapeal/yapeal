@@ -34,7 +34,6 @@
 namespace Yapeal\Configuration;
 
 use Guzzle\Http\Client;
-use Yapeal\Container\ContainerInterface;
 use Yapeal\Xml\FileCachePreserver;
 use Yapeal\Xml\GuzzleNetworkRetriever;
 
@@ -128,8 +127,4 @@ class ConsoleWiring extends Wiring
         };
         return $this;
     }
-    /**
-     * @type ContainerInterface $dic
-     */
-    protected $dic;
 }

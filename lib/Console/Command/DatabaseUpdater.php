@@ -41,7 +41,6 @@ use PDO;
 use PDOException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Database\CommonSqlQueries;
 
 /**
  * Class DatabaseUpdater
@@ -231,13 +230,8 @@ HELP;
         OutputInterface $output
     )
     {
-        /**
-         * @type CommonSqlQueries $csq
-         */
         $sql = $this->getCsq($output)
                     ->getUtilLatestDatabaseVersionUpdate();
-        //$mess =sprintf( 'Updating database version to %1$s',$currentVersion);
-        //$output->writeln([$sql, $mess]);
         try {
             $pdo = $this->getPdo($output);
             $pdo->beginTransaction();

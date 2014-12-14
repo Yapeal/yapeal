@@ -49,7 +49,7 @@ trait CommandToolsTrait
      *
      * @return self
      */
-    public function setCsq($value)
+    public function setCsq(CommonSqlQueries $value)
     {
         $this->csq = $value;
         return $this;

@@ -3,7 +3,8 @@ DEFAULT CHARACTER SET utf8
 DEFAULT COLLATE utf8_unicode_ci;
 /* Convert existing columns */
 ALTER TABLE "{database}"."{table_prefix}accountAccountStatus" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}accountApiKeyInfo" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CONVERT TO CHARACTER SET utf8
+COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -130,7 +131,8 @@ ALTER TABLE "{database}"."{table_prefix}utilUploadDestination" CONVERT TO CHARAC
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 /* Convert Tables */
 ALTER TABLE "{database}"."{table_prefix}accountAccountStatus" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}accountApiKeyInfo" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CHARACTER SET utf8
+COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" CHARACTER SET utf8 COLLATE utf8_unicode_ci;

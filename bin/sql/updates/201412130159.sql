@@ -3,8 +3,7 @@ DEFAULT CHARACTER SET utf8
 DEFAULT COLLATE utf8_unicode_ci;
 /* Convert existing columns */
 ALTER TABLE "{database}"."{table_prefix}accountAccountStatus" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CONVERT TO CHARACTER SET utf8
-COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -24,8 +23,7 @@ ALTER TABLE "{database}"."{table_prefix}charContactNotifications" CONVERT TO CHA
 ALTER TABLE "{database}"."{table_prefix}charContractBids" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charContractItems" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charContracts" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}charCorporateContactList" CONVERT TO CHARACTER SET utf8
-COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}charCorporateContactList" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRoles" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -132,8 +130,7 @@ ALTER TABLE "{database}"."{table_prefix}utilUploadDestination" CONVERT TO CHARAC
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 /* Convert Tables */
 ALTER TABLE "{database}"."{table_prefix}accountAccountStatus" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CHARACTER SET utf8
-COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -153,8 +150,7 @@ ALTER TABLE "{database}"."{table_prefix}charContactNotifications" CHARACTER SET 
 ALTER TABLE "{database}"."{table_prefix}charContractBids" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charContractItems" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charContracts" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}charCorporateContactList" CHARACTER SET utf8
-COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}charCorporateContactList" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRoles" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" CHARACTER SET utf8 COLLATE utf8_unicode_ci;

@@ -61,14 +61,6 @@ class IndustryJobs extends AbstractCorpSection
         $interval
     )
     {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
         /**
          * Update Industry Jobs History
          */
@@ -77,40 +69,8 @@ class IndustryJobs extends AbstractCorpSection
             $this->getLogger(),
             $this->getCsq()
         );
-        $class->autoMagic(
-            $data,
-            $retrievers,
-            $preservers,
-            $interval
-        );
-        $active = $this->getActiveCorporations();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active registered corporations found');
-            return;
-        }
-        foreach ($active as $corp) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $corp['corporationID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($corp)
-                 ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
-                continue;
-            }
-            $this->updateCachedUntil(
-                $data->getEveApiXml(),
-                $interval,
-                $corp['corporationID']
-            );
-        }
+        $class->autoMagic($data, $retrievers, $preservers, $interval);
+        parent::autoMagic($data, $retrievers, $preservers, $interval);
     }
     /**
      * @param string $xml

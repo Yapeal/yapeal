@@ -61,14 +61,6 @@ class IndustryJobs extends AbstractCharSection
         $interval
     )
     {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
         /**
          * Update Industry Jobs History
          */
@@ -77,40 +69,8 @@ class IndustryJobs extends AbstractCharSection
             $this->getLogger(),
             $this->getCsq()
         );
-        $class->autoMagic(
-            $data,
-            $retrievers,
-            $preservers,
-            $interval
-        );
-        $active = $this->getActiveCharacters();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active characters found');
-            return;
-        }
-        foreach ($active as $char) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $char['characterID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($char)
-                 ->setEveApiXml();
-            if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
-                continue;
-            }
-            $this->updateCachedUntil(
-                $data->getEveApiXml(),
-                $interval,
-                $char['characterID']
-            );
-        }
+        $class->autoMagic($data, $retrievers, $preservers, $interval);
+        parent::autoMagic($data, $retrievers, $preservers, $interval);
     }
     /**
      * @param string $xml

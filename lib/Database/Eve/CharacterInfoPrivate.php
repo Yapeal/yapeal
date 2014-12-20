@@ -59,14 +59,6 @@ class CharacterInfoPrivate extends CharacterInfo
         $interval
     )
     {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting autoMagic for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName()
-                 )
-             );
         /**
          * Update CharacterInfo public first so it does NOT overwrite additional
          * information from private in cases were keys have overlap.
@@ -76,42 +68,8 @@ class CharacterInfoPrivate extends CharacterInfo
             $this->getLogger(),
             $this->getCsq()
         );
-        $class->autoMagic(
-            $data,
-            $retrievers,
-            $preservers,
-            $interval
-        );
-        $active = $this->getActiveCharacters();
-        if (empty($active)) {
-            $this->getLogger()
-                 ->info('No active characters found');
-            return;
-        }
-        foreach ($active as $char) {
-            $data->setEveApiSectionName(strtolower($this->getSectionName()))
-                 ->setEveApiName($this->getApiName());
-            if ($this->cacheNotExpired(
-                $this->getApiName(),
-                $this->getSectionName(),
-                $char['characterID']
-            )
-            ) {
-                continue;
-            }
-            $data->setEveApiArguments($char)
-                 ->setEveApiXml();
-            $untilInterval = $interval;
-            if (!$this->oneShot($data, $retrievers, $preservers, $untilInterval)
-            ) {
-                continue;
-            }
-            $this->updateCachedUntil(
-                $data->getEveApiXml(),
-                $untilInterval,
-                $char['characterID']
-            );
-        }
+        $class->autoMagic($data, $retrievers, $preservers, $interval);
+        parent::autoMagic($data, $retrievers, $preservers, $interval);
     }
     /**
      * @type int $mask

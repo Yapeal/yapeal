@@ -68,6 +68,7 @@
         "guzzle/guzzle": "~3.9",
         "monolog/monolog": "~1.11",
         "symfony/console": "~2.5",
+        "symfony/event-dispatcher": "~2.5",
         "symfony/yaml": "~2.5"
     },
     "require-dev": {

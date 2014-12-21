@@ -39,6 +39,7 @@ use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -66,6 +67,11 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
         $interval
     )
     {
+        $event = $this->getYed()
+                      ->dispatchEveApiEvent(EveApiEvent::START, $data);
+        if ($event->isChanged()) {
+            $data = $event->getData();
+        }
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -94,6 +100,14 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
             $untilInterval = $interval;
+            $event = $this->getYed()
+                          ->dispatchEveApiEvent(
+                              EveApiEvent::PRE_PRESERVER,
+                              $data
+                          );
+            if ($event->isChanged()) {
+                $data = $event->getData();
+            }
             if (!$this->oneShot(
                 $data,
                 $retrievers,
@@ -103,12 +117,22 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             ) {
                 continue;
             }
+            $event = $this->getYed()
+                          ->dispatchEveApiEvent(
+                              EveApiEvent::POST_PRESERVER,
+                              $data
+                          );
+            if ($event->isChanged()) {
+                $data = $event->getData();
+            }
             $this->updateCachedUntil(
                 $data->getEveApiXml(),
                 $untilInterval,
                 $char['characterID']
             );
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -130,9 +154,6 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             return false;
         }
         $charID = $data->getEveApiArgument('characterID');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -145,7 +166,17 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
                  ->notice($mess);
             return false;
         }
+        $event = $this->getYed()
+                      ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
+        if ($event->isChanged()) {
+            $data = $event->getData();
+        }
         $this->xsltTransform($data);
+        $event = $this->getYed()
+                      ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
+        if ($event->isChanged()) {
+            $data = $event->getData();
+        }
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -158,6 +189,11 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             $data->setEveApiName('Invalid' . $this->getApiName());
             $preservers->preserveEveApi($data);
             return false;
+        }
+        $event = $this->getYed()
+                      ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+        if ($event->isChanged()) {
+            $data = $event->getData();
         }
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal

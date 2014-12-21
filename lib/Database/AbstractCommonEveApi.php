@@ -46,6 +46,8 @@ use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use tidy;
 use XSLTProcessor;
+use Yapeal\Event\EveApiEvent;
+use Yapeal\Event\YapealEventDispatcherInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -59,19 +61,22 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
 {
     use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
     /**
-     * @param PDO             $pdo
-     * @param LoggerInterface $logger
-     * @param CommonSqlQueries $csq
+     * @param PDO                            $pdo
+     * @param LoggerInterface                $logger
+     * @param CommonSqlQueries               $csq
+     * @param YapealEventDispatcherInterface $yed
      */
     public function __construct(
         PDO $pdo,
         LoggerInterface $logger,
-        CommonSqlQueries $csq
+        CommonSqlQueries $csq,
+        YapealEventDispatcherInterface $yed
     )
     {
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setCsq($csq);
+        $this->setYed($yed);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -88,6 +93,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $interval
     )
     {
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->info(
                  sprintf(
@@ -96,9 +103,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                      $this->getApiName()
                  )
              );
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $data->setEveApiSectionName(strtolower($this->getSectionName()))
              ->setEveApiName($this->getApiName())
              ->setEveApiArguments([])
@@ -110,10 +114,16 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         ) {
             return;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
             return;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
         $this->updateCachedUntil($data->getEveApiXml(), $interval, '0');
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -145,7 +155,11 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->debug($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -157,6 +171,11 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             $data->setEveApiName('Invalid' . $this->getApiName());
             $preservers->preserveEveApi($data);
             return false;
+        }
+        $event = $this->getYed()
+                      ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+        if ($event->isChanged()) {
+            $data = $event->getData();
         }
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
@@ -300,6 +319,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         if (!isset($simple->error)) {
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_XML_ERROR, $data);
         $code = (int)$simple->error['code'];
         $mess = sprintf(
             'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',

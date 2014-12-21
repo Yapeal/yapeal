@@ -47,6 +47,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Event\YapealEventDispatcher;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Xml\FileCachePreserver;
@@ -287,6 +288,19 @@ class Wiring
                 $dic['Yapeal.Error.threshold']
             );
             return $error;
+        };
+        return $this;
+    }
+    /**
+     * @return self
+     */
+    public function wireEvents()
+    {
+        if (isset($this->dic['Yapeal.Event.Dispatcher'])) {
+            return $this;
+        }
+        $this->dic['Yapeal.Event.Dispatcher'] = function () {
+            return new YapealEventDispatcher();
         };
         return $this;
     }

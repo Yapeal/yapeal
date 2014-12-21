@@ -36,6 +36,7 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
+use Yapeal\Event\YapealEventDispatcherInterface;
 
 /**
  * Trait EveApiToolsTrait
@@ -47,7 +48,7 @@ trait EveApiToolsTrait
      *
      * @return self
      */
-    public function setCsq($value)
+    public function setCsq(CommonSqlQueries $value)
     {
         $this->csq = $value;
         return $this;
@@ -60,6 +61,16 @@ trait EveApiToolsTrait
     public function setPdo(PDO $value)
     {
         $this->pdo = $value;
+        return $this;
+    }
+    /**
+     * @param YapealEventDispatcherInterface $value
+     *
+     * @return self
+     */
+    public function setYed(YapealEventDispatcherInterface $value)
+    {
+        $this->yed = $value;
         return $this;
     }
     /**
@@ -76,7 +87,8 @@ trait EveApiToolsTrait
         array $columnNames,
         $tableName,
         $rowCount = 1
-    ) {
+    )
+    {
         if (empty($columns)) {
             return $this;
         }
@@ -148,6 +160,18 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
+     * @return YapealEventDispatcherInterface
+     * @throws LogicException
+     */
+    protected function getYed()
+    {
+        if (empty($this->yed)) {
+            $mess = 'Tried to use yed before it was set';
+            throw new LogicException($mess);
+        }
+        return $this->yed;
+    }
+    /**
      * @type CommonSqlQueries $csq
      */
     protected $csq;
@@ -155,4 +179,8 @@ trait EveApiToolsTrait
      * @type PDO $pdo
      */
     protected $pdo;
+    /**
+     * @type YapealEventDispatcherInterface $yed
+     */
+    protected $yed;
 }

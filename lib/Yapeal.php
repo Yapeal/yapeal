@@ -98,6 +98,7 @@ class Yapeal implements WiringInterface
             $logger->error($mess, ['exception' => $exc]);
             return 1;
         }
+        $yed = $dic['Yapeal.Event.Dispatcher'];
         $data = new EveApiXmlData();
         // Always check APIKeyInfo.
         $class = new APIKeyInfo($pdo, $logger, $csq);

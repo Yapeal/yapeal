@@ -38,7 +38,8 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 /**
  * Class YapealEventDispatcher
  */
-class YapealEventDispatcher extends EventDispatcher
+class YapealEventDispatcher extends EventDispatcher implements
+    YapealEventDispatcherInterface
 {
     /**
      * Dispatches an event to all registered listeners.

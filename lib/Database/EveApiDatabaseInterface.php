@@ -36,7 +36,6 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Yapeal\Event\YapealEventDispatcherInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -112,10 +111,10 @@ interface EveApiDatabaseInterface
      */
     public function setPdo(PDO $value);
     /**
-     * @param EventDispatcherInterface $value
+     * @param YapealEventDispatcherInterface $value
      *
      * @api
      * @return self
      */
-    public function setYed(EventDispatcherInterface $value);
+    public function setYed(YapealEventDispatcherInterface $value);
 }

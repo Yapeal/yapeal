@@ -101,7 +101,7 @@ class Yapeal implements WiringInterface
         $yed = $dic['Yapeal.Event.Dispatcher'];
         $data = new EveApiXmlData();
         // Always check APIKeyInfo.
-        $class = new APIKeyInfo($pdo, $logger, $csq);
+        $class = new APIKeyInfo($pdo, $logger, $csq, $yed);
         $class->autoMagic(
             $data,
             $dic['Yapeal.Xml.Retriever'],
@@ -125,7 +125,7 @@ class Yapeal implements WiringInterface
             /**
              * @type AbstractCommonEveApi $class
              */
-            $class = new $className($pdo, $logger, $csq);
+            $class = new $className($pdo, $logger, $csq, $yed);
             $class->autoMagic(
                 $data,
                 $dic['Yapeal.Xml.Retriever'],
@@ -178,7 +178,8 @@ class Yapeal implements WiringInterface
                ->wireDatabase()
                ->wireCommonSqlQueries()
                ->wireRetriever()
-               ->wirePreserver();
+            ->wirePreserver()
+            ->wireEvents();
     }
     /**
      * @return array

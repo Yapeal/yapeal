@@ -56,6 +56,6 @@ interface YapealEventDispatcherInterface extends EventDispatcherInterface
      */
     public function dispatchEveApiEvent(
         $eventName,
-        EveApiReadWriteInterface $data
+        EveApiReadWriteInterface &$data
     );
 }

@@ -39,6 +39,7 @@ use PDO;
 use PDOException;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -64,6 +65,8 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         $interval
     )
     {
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -101,12 +104,16 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
             ) {
                 continue;
             }
+            $this->getYed()
+                 ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
             $this->updateCachedUntil(
                 $data->getEveApiXml(),
                 $untilInterval,
                 $corp['corporationID']
             );
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -129,9 +136,8 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
         }
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -144,7 +150,11 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
                  ->notice($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -158,6 +168,8 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

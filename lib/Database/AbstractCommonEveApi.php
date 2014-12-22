@@ -49,7 +49,6 @@ use XSLTProcessor;
 use Yapeal\Event\EveApiEvent;
 use Yapeal\Event\YapealEventDispatcherInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
-use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
 
@@ -114,8 +113,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         ) {
             return;
         }
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
             return;
         }
@@ -144,6 +141,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         if (!$this->gotApiLock($data)) {
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -172,11 +171,8 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             $preservers->preserveEveApi($data);
             return false;
         }
-        $event = $this->getYed()
-                      ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
-        if ($event->isChanged()) {
-            $data = $event->getData();
-        }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserveTo*.
@@ -274,12 +270,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return $xslName;
     }
     /**
-     * @param EveApiReadInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @throws LogicException
      * @return bool
      */
-    protected function gotApiLock(EveApiReadInterface &$data)
+    protected function gotApiLock(EveApiReadWriteInterface &$data)
     {
         $sql = $this->getCsq()
                     ->getApiLock($data->getHash());
@@ -356,12 +352,12 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         return true;
     }
     /**
-     * @param EveApiReadInterface $data
+     * @param EveApiReadWriteInterface $data
      *
      * @throws LogicException
      * @return bool
      */
-    protected function isInvalid(EveApiReadInterface &$data)
+    protected function isInvalid(EveApiReadWriteInterface &$data)
     {
         $this->getLogger()
              ->debug('Started XSD validating');

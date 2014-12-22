@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EveApiEvent class.
+ * Contains EventInterface Interface.
  *
  * PHP version 5.4
  *
@@ -32,46 +32,28 @@
  */
 namespace Yapeal\Event;
 
-use LogicException;
-use Symfony\Component\EventDispatcher\Event;
-use Yapeal\Xml\EveApiReadWriteInterface;
-
 /**
- * Class EveApiEvent
+ * Interface EventInterface
  */
-class EveApiEvent extends Event implements EveApiEventInterface
+interface EventInterface
 {
     /**
-     * @param EveApiReadWriteInterface $data
-     */
-    public function __construct(EveApiReadWriteInterface &$data)
-    {
-        $this->setData($data);
-    }
-    /**
-     * @return EveApiReadWriteInterface
-     * @throws LogicException
-     */
-    public function getData()
-    {
-        if (empty($this->data)) {
-            $mess = 'Tried to use data before it was set';
-            throw new LogicException($mess);
-        }
-        return $this->data;
-    }
-    /**
-     * @param EveApiReadWriteInterface $value
+     * Returns whether further event listeners should be triggered.
      *
-     * @return self
+     * @see Event::stopPropagation
+     * @return bool Whether propagation was already stopped for this event.
+     *
+     * @api
      */
-    public function setData(EveApiReadWriteInterface &$value)
-    {
-        $this->data = $value;
-        return $this;
-    }
+    public function isPropagationStopped();
     /**
-     * @type EveApiReadWriteInterface $data
+     * Stops the propagation of the event to further event listeners.
+     *
+     * If multiple event listeners are connected to the same event, no
+     * further event listener will be triggered once any trigger calls
+     * stopPropagation().
+     *
+     * @api
      */
-    protected $data;
+    public function stopPropagation();
 }

@@ -40,6 +40,7 @@ use SimpleXMLElement;
 use SimpleXMLIterator;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -65,6 +66,8 @@ class MailBodies extends AbstractCharSection
         $interval
     )
     {
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -76,12 +79,13 @@ class MailBodies extends AbstractCharSection
         /**
          * Update MailMessages List
          */
-        $class = new MailMessages(
+        (
+        new MailMessages(
             $this->getPdo(),
             $this->getLogger(),
-            $this->getCsq()
-        );
-        $class->autoMagic($data, $retrievers, $preservers, $interval);
+            $this->getCsq(), $this->getYed()
+        )
+        )->autoMagic($data, $retrievers, $preservers, $interval);
         $active = $this->getActiveCharacters();
         if (empty($active)) {
             $this->getLogger()
@@ -110,14 +114,14 @@ class MailBodies extends AbstractCharSection
             $mailIDs = array_chunk($mailIDs, 1000);
             $untilInterval = $interval;
             foreach ($mailIDs as $mailGroup) {
-                $mailIDs = [];
+                $mails = [];
                 foreach ($mailGroup as $mail) {
-                    $mailIDs[] = $mail[0];
+                    $mails[] = $mail[0];
                 }
-                $mess = 'Mail IDs = ' . implode(',', $mailIDs);
+                $mess = 'Mails = ' . implode(',', $mails);
                 $this->getLogger()
                      ->debug($mess);
-                $char['ids'] = implode(',', $mailIDs);
+                $char['ids'] = implode(',', $mails);
                 $data->setEveApiArguments($char)
                      ->setEveApiXml();
                 $untilInterval = $interval;
@@ -130,6 +134,8 @@ class MailBodies extends AbstractCharSection
                 ) {
                     continue 2;
                 }
+                $this->getYed()
+                     ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
                 if ($untilInterval > $interval) {
                     $untilInterval = $interval;
                 }
@@ -143,6 +149,8 @@ class MailBodies extends AbstractCharSection
                 $charID
             );
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param string $ownerID

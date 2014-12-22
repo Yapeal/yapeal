@@ -59,7 +59,8 @@ class MemberTrackingLimited extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         $data->setEveApiName('MemberTracking');
         return parent::oneShot($data, $retrievers, $preservers, $interval);
     }
@@ -71,10 +72,8 @@ class MemberTrackingLimited extends AbstractCorpSection
      *
      * @return self
      */
-    protected function preserverToMemberTrackingLimited(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserverToMemberTrackingLimited($xml, $ownerID)
+    {
         $columnDefaults = [
             'ownerID' => $ownerID,
             'characterID' => null,

@@ -50,7 +50,7 @@ interface YapealEventDispatcherInterface extends EventDispatcherInterface
      *                                            listeners.
      * @param EveApiReadWriteInterface $data
      *
-     * @return EveApiEvent
+     * @return EveApiEventInterface
      *
      * @api
      */

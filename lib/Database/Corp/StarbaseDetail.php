@@ -40,6 +40,7 @@ use PDOException;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\ValuesDatabasePreserverTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -65,6 +66,8 @@ class StarbaseDetail extends AbstractCorpSection
         $interval
     )
     {
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -76,17 +79,14 @@ class StarbaseDetail extends AbstractCorpSection
         /**
          * Update Starbase List
          */
-        $class = new StarbaseList(
+        (
+        new StarbaseList(
             $this->getPdo(),
             $this->getLogger(),
-            $this->getCsq()
-        );
-        $class->autoMagic(
-            $data,
-            $retrievers,
-            $preservers,
-            $interval
-        );
+            $this->getCsq(),
+            $this->getYed()
+        )
+        )->autoMagic($data, $retrievers, $preservers, $interval);
         $activeCorps = $this->getActiveCorporations();
         if (empty($activeCorps)) {
             $this->getLogger()
@@ -129,6 +129,8 @@ class StarbaseDetail extends AbstractCorpSection
                 ) {
                     continue 2;
                 }
+                $this->getYed()
+                     ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
                 if ($untilInterval != $interval) {
                     continue;
                 }
@@ -139,6 +141,8 @@ class StarbaseDetail extends AbstractCorpSection
                 $corpID
             );
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -161,9 +165,8 @@ class StarbaseDetail extends AbstractCorpSection
         }
         $corpID = $data->getEveApiArgument('corporationID');
         $itemID = $data->getEveApiArgument('itemID');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -176,7 +179,11 @@ class StarbaseDetail extends AbstractCorpSection
                  ->notice($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'The data retrieved from Eve API %1$s/%2$s for %3$s is invalid',
@@ -190,6 +197,8 @@ class StarbaseDetail extends AbstractCorpSection
             $preservers->preserveEveApi($data);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

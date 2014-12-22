@@ -50,15 +50,15 @@ class YapealEventDispatcher extends EventDispatcher
      *                                            listeners.
      * @param EveApiReadWriteInterface $data
      *
-     * @return EveApiEvent
+     * @return EveApiEventInterface
      *
      * @api
      */
     public function dispatchEveApiEvent(
         $eventName,
-        EveApiReadWriteInterface $data
+        EveApiReadWriteInterface &$data
     )
     {
-        return parent::dispatch($eventName, new EveApiEvent(clone $data));
+        return parent::dispatch($eventName, new EveApiEvent($data));
     }
 }

@@ -40,6 +40,7 @@ use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -68,6 +69,8 @@ class AllianceList extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -79,7 +82,11 @@ class AllianceList extends AbstractCommonEveApi
                  ->debug($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -92,6 +99,8 @@ class AllianceList extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

@@ -64,12 +64,14 @@ class IndustryJobs extends AbstractCharSection
         /**
          * Update Industry Jobs History
          */
-        $class = new IndustryJobsHistory(
+        (
+        new IndustryJobsHistory(
             $this->getPdo(),
             $this->getLogger(),
-            $this->getCsq()
-        );
-        $class->autoMagic($data, $retrievers, $preservers, $interval);
+            $this->getCsq(),
+            $this->getYed()
+        )
+        )->autoMagic($data, $retrievers, $preservers, $interval);
         parent::autoMagic($data, $retrievers, $preservers, $interval);
     }
     /**

@@ -1,14 +1,13 @@
 <?php
 /**
- * Contains CharacterInfoPrivate class.
+ * Contains EveApiEventInterface Interface.
  *
  * PHP version 5.4
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database.
- * Copyright (C) 2014 Michael Cummings
+ * database. Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -30,51 +29,34 @@
  * @copyright 2014 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
- * @author    Stephen Gulick <stephenmg12@gmail.com>
  */
-namespace Yapeal\Database\Eve;
+namespace Yapeal\Event;
 
 use LogicException;
-use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
- * Class CharacterInfoPrivate
+ * Interface EveApiEventInterface
  */
-class CharacterInfoPrivate extends CharacterInfo
+interface EveApiEventInterface extends EventInterface
 {
+    const DONE = 'eve_api.done';
+    const POST_PRESERVER = 'eve_api.post_preserver';
+    const PRE_PRESERVER = 'eve_api.pre_preserver';
+    const PRE_RETRIEVE = 'eve_api.pre_retrieve';
+    const PRE_TRANSFORM = 'eve_api.pre_transform';
+    const PRE_VALIDATE = 'eve_api.pre_validate';
+    const PRE_XML_ERROR = 'eve_api.pre_xml_error';
+    const START = 'eve_api.start';
     /**
-     * @param EveApiReadWriteInterface $data
-     * @param EveApiRetrieverInterface $retrievers
-     * @param EveApiPreserverInterface $preservers
-     * @param int                      $interval
-     *
+     * @return EveApiReadWriteInterface
      * @throws LogicException
      */
-    public function autoMagic(
-        EveApiReadWriteInterface $data,
-        EveApiRetrieverInterface $retrievers,
-        EveApiPreserverInterface $preservers,
-        $interval
-    )
-    {
-        /**
-         * Update CharacterInfo public first so it does NOT overwrite additional
-         * information from private in cases were keys have overlap.
-         */
-        (
-        new CharacterInfoPublic(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq(),
-            $this->getYed()
-        )
-        )->autoMagic($data, $retrievers, $preservers, $interval);
-        parent::autoMagic($data, $retrievers, $preservers, $interval);
-    }
+    public function getData();
     /**
-     * @type int $mask
+     * @param EveApiReadWriteInterface $value
+     *
+     * @return self
      */
-    protected $mask = 16777216;
+    public function setData(EveApiReadWriteInterface &$value);
 }

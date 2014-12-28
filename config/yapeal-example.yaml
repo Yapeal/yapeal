@@ -14,12 +14,12 @@ Yapeal:
         # the future. If you want the to continue to have the cache files change
         # the setting to 'all'.
         # The default of 'none' turns off using the filesystem cache.
-        fileSystemMode: 'none'
+        fileSystemMode: none
 
     # Settings in the 'Database' section will normal be the only ones that need
     # changed by most users.
     Database:
-        class: \PDO
+        class: PDO
 
         # Name of the database (schema) Yapeal will use for tables.
         # Note that the database user will need create and drop access to this
@@ -52,6 +52,8 @@ Yapeal:
         # (Optional) Only needed if using http connection.
         # port: ''
 
+        sharedSql: Yapeal\Database\CommonSqlQueries
+
         # Prefix to add to all database table names.
         # This default to an empty string and will have no effect on the table
         # names in Yapeal.
@@ -79,8 +81,6 @@ Yapeal:
         # See Yapeal.Log.channel for more information.
         channel: php
 
-        class: Monolog\ErrorHandler
-
         # Same as the Yapeal.Log.fileName setting but for errors.
         fileName: yapeal.log
 
@@ -96,6 +96,25 @@ Yapeal:
         # Recommended default is 1-2 levels above Yapeal.Log.threshold but
         # capped no higher than 500(CRITICAL)
         threshold: 400
+
+    # Events
+    Event:
+        class: Yapeal\Event\EveApiEvent
+
+        dispatcher: Yapeal\Event\EventDispatcher
+
+        # A list of event subscribers names to be added automatically during
+        # wiring.
+        # Each subscriber MUST implement `EventSubscriberInterface`.
+        # NOTE: To keep the list of subscribers from being overwelmed by all the
+        # internal subscribers they are not listed here but are added
+        # automatically during wiring.
+        # Example:
+        # subscribers:
+        #     internal: '...'
+        #     user: MyApp\MySubscriberClass1, MyApp\MySubscriberClass2
+        Subscribers:
+            user: ''
 
     # Care should be taken when making changes to the 'Log' section as mistakes
     # here could cause Yapeal not to run correctly and also have no way to
@@ -121,6 +140,14 @@ Yapeal:
         # The default 'yapeal.log' will be found in the logDir.
         # For example: /where/installed/yapeal/log/yapeal.log
         fileName: yapeal.log
+
+        Handlers:
+
+            stream: Monolog\Handler\StreamHandler
+
+            fingersCrossed: Monolog\Handler\FingersCrossedHandler
+
+            group: Monolog\Handler\GroupHandler
 
         # Directory where log file will be stored.
         # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
@@ -174,7 +201,7 @@ Yapeal:
         # In the User Agent string the {osName} {osRelease}, and {machineType}
         # will be replaced by results from php_uname(). The {phpVersion} will be
         # replaced by PHP_VERSION constant. The other three
-        # {Yapeal.Network.app*} parts will be replaced by their Yaml settings.
+        # {app*} parts will be replaced by their Yaml settings.
         # If 'appName' is empty the other two settings will be ignored as well.
         # Note that any and all parts of the string can be removed or replaced
         # including the 'Yapeal/2.0 (...)' part if you prefer.
@@ -182,6 +209,8 @@ Yapeal:
         # header will be sent.
         # Example result:
         # myApp/0.1 (poc@myApp.com) Yapeal/2.0 (Windows NT 6.1; PHP 5.4.29; Platform i586)
-        userAgent: '{Yapeal.Network.appName}/{Yapeal.Network.appVersion} {Yapeal.Network.appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
+        userAgent: '{appName}/{appVersion} {appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
 
+    Xml:
+        class: Yapeal\Xml\EveApiXmlData
 ...

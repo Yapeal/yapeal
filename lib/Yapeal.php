@@ -33,9 +33,7 @@
  */
 namespace Yapeal;
 
-use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
-use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -44,9 +42,9 @@ use Yapeal\Configuration\Wiring;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\Account\APIKeyInfo;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiXmlData;
 
 /**
@@ -98,20 +96,17 @@ class Yapeal implements WiringInterface
             $logger->error($mess, ['exception' => $exc]);
             return 1;
         }
-        $yed = $dic['Yapeal.Event.Dispatcher'];
-        $data = new EveApiXmlData();
         // Always check APIKeyInfo.
-        $class = new APIKeyInfo($pdo, $logger, $csq, $yed);
-        $class->autoMagic(
-            $data,
-            $dic['Yapeal.Xml.Retriever'],
-            $dic['Yapeal.Xml.Preserver'],
-            300
+        array_unshift(
+            $result,
+            [
+                'apiName' => 'APIKeyInfo',
+                'interval' => '300',
+                'sectionName' => 'account'
+            ]
         );
-        if (empty($result)) {
-            $logger->warning('Exiting no active Eve APIs found');
-            return 1;
-        }
+        $yed = $dic['Yapeal.Event.EventDispatcher'];
+        $data = new EveApiXmlData();
         foreach ($result as $record) {
             $className = sprintf(
                 'Yapeal\\Database\\%1$s\\%2$s',
@@ -148,9 +143,8 @@ class Yapeal implements WiringInterface
     /**
      * @param ContainerInterface $dic
      *
+     * @throws YapealException
      * @throws YapealDatabaseException
-     * @throws DomainException
-     * @throws InvalidArgumentException
      */
     public function wire(ContainerInterface $dic)
     {
@@ -168,18 +162,14 @@ class Yapeal implements WiringInterface
                 $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
             }
         }
-        $wiring = new Wiring($dic);
-        $wiring->wireDefaults()
-               ->wireConfiguration();
-        $dic['Yapeal.Config.Parser'];
-        $wiring->wireErrorLogger();
-        $dic['Yapeal.Error.Logger'];
-        $wiring->wireLogLogger()
-               ->wireDatabase()
-               ->wireCommonSqlQueries()
-               ->wireRetriever()
-            ->wirePreserver()
-            ->wireEvents();
+        (new Wiring($dic))->wireConfig()
+                          ->wireError()
+                          ->wireCache()
+                          ->wireDatabase()
+                          ->wireEvent()
+                          ->wireLog()
+                          ->wireNetwork()
+                          ->wireXml();
     }
     /**
      * @return array

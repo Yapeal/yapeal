@@ -45,6 +45,7 @@ use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealException;
 
 /**
  * Class AbstractDatabaseCommon
@@ -56,6 +57,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
      * @param ContainerInterface $dic
      *
      * @throws YapealDatabaseException
+     * @throws YapealException
      */
     public function wire(ContainerInterface $dic)
     {
@@ -74,15 +76,10 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
                 $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
             }
         }
-        $wiring = new ConsoleWiring($dic);
-        $wiring->wireDefaults()
-               ->wireConfiguration();
-        $dic['Yapeal.Config.Parser'];
-        $wiring->wireErrorLogger();
-        $dic['Yapeal.Error.Logger'];
-        $wiring->wireLogLogger()
-               ->wireDatabase()
-               ->wireCommonSqlQueries();
+        (new ConsoleWiring($dic))->wireConfig()
+                                 ->wireError()
+                                 ->wireLog()
+                                 ->wireDatabase();
     }
     /**
      * @param OutputInterface $output

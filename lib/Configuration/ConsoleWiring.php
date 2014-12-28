@@ -33,10 +33,6 @@
  */
 namespace Yapeal\Configuration;
 
-use Guzzle\Http\Client;
-use Yapeal\Xml\FileCachePreserver;
-use Yapeal\Xml\GuzzleNetworkRetriever;
-
 /**
  * Class ConsoleWiring
  */
@@ -45,86 +41,24 @@ class ConsoleWiring extends Wiring
     /**
      * @return self
      */
-    public function wirePreserver()
+    public function wireXml()
     {
-        if (isset($this->dic['Yapeal.Xml.Preserver'])) {
-            return $this;
+        if (empty($this->dic['Yapeal.Xml.Preserver'])) {
+            $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
+                return new $dic['Yapeal.Xml.Preservers.file'](
+                    $dic['Yapeal.Log.Logger'],
+                    $dic['Yapeal.Cache.cacheDir']
+                );
+            };
         }
-        $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
-            return new FileCachePreserver(
-                $dic['Yapeal.Log.Logger'],
-                $dic['Yapeal.Cache.cacheDir']
-            );
-        };
-        return $this;
-    }
-    /**
-     * @return self
-     */
-    public function wireRetriever()
-    {
-        if (isset($this->dic['Yapeal.Xml.Retriever'])) {
-            return $this;
+        if (empty($this->dic['Yapeal.Xml.Retriever'])) {
+            $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
+                return new $dic['Yapeal.Xml.Retrievers.network'](
+                    $dic['Yapeal.Log.Logger'],
+                    $dic['Yapeal.Network.Client']
+                );
+            };
         }
-        $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
-            $appComment = $dic['Yapeal.Network.appComment'];
-            $appName = $dic['Yapeal.Network.appName'];
-            $appVersion = $dic['Yapeal.Network.appVersion'];
-            if (empty($appName)) {
-                $appComment = '';
-                $appVersion = '';
-            }
-            $userAgent = trim(
-                str_replace(
-                    [
-                        '{machineType}',
-                        '{osName}',
-                        '{osRelease}',
-                        '{phpVersion}',
-                        '{Yapeal.Network.appComment}',
-                        '{Yapeal.Network.appName}',
-                        '{Yapeal.Network.appVersion}'
-                    ],
-                    [
-                        php_uname('m'),
-                        php_uname('s'),
-                        php_uname('r'),
-                        PHP_VERSION,
-                        $appComment,
-                        $appName,
-                        $appVersion
-                    ],
-                    $dic['Yapeal.Network.userAgent']
-                )
-            );
-            $userAgent = ltrim($userAgent, '/ ');
-            $headers = [
-                'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
-                            . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
-                            . 'q=0.6,*/*;q=0.5',
-                'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
-                'Accept-Encoding' => 'gzip',
-                'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
-                'Connection' => 'Keep-Alive',
-                'Keep-Alive' => '300'
-            ];
-            if (!empty($userAgent)) {
-                $headers['User-Agent'] = $userAgent;
-            }
-            $defaults = [
-                'headers' => $headers,
-                'timeout' => 10,
-                'connect_timeout' => 30,
-                'verify' => $dic['Yapeal.baseDir'] . 'config/eveonline.crt',
-            ];
-            return new GuzzleNetworkRetriever(
-                $dic['Yapeal.Log.Logger'],
-                new Client(
-                    $dic['Yapeal.Network.baseUrl'],
-                    ['defaults' => $defaults]
-                )
-            );
-        };
         return $this;
     }
 }

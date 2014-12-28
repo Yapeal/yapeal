@@ -31,13 +31,16 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Xml;
+namespace Yapeal\Network;
 
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Exception\RequestException;
 use Guzzle\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Yapeal\Xml\EveApiReadInterface;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class GuzzleNetworkRetriever
@@ -54,7 +57,8 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     public function __construct(
         LoggerInterface $logger,
         ClientInterface $client = null
-    ) {
+    )
+    {
         $this->setLogger($logger);
         $this->setClient($client);
     }
@@ -119,7 +123,8 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     protected function addYapealProcessingInstructionToXml(
         $xml,
         array $arguments
-    ) {
+    )
+    {
         if ($xml === false) {
             return $xml;
         }

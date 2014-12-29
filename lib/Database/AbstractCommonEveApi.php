@@ -47,7 +47,7 @@ use SimpleXMLElement;
 use tidy;
 use XSLTProcessor;
 use Yapeal\Event\EveApiEvent;
-use Yapeal\Event\YapealEventDispatcherInterface;
+use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -63,13 +63,13 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
      * @param PDO                            $pdo
      * @param LoggerInterface                $logger
      * @param CommonSqlQueries               $csq
-     * @param YapealEventDispatcherInterface $yed
+     * @param EventDispatcherInterface       $yed
      */
     public function __construct(
         PDO $pdo,
         LoggerInterface $logger,
         CommonSqlQueries $csq,
-        YapealEventDispatcherInterface $yed
+        EventDispatcherInterface $yed
     )
     {
         $this->setPdo($pdo);
@@ -117,7 +117,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             return;
         }
         $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
+            ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
         $this->updateCachedUntil($data->getEveApiXml(), $interval, '0');
         $this->getYed()
              ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
@@ -172,7 +172,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             return false;
         }
         $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+            ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserveTo*.
@@ -264,7 +264,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->info($mess);
             $xslName = $this->getCwd() . 'common.xsl';
         }
-        $mess = 'Given XSL name ' . $xslName;
+        $mess = 'Using XSL file ' . $xslName;
         $this->getLogger()
              ->debug($mess);
         return $xslName;

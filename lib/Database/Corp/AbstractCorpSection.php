@@ -105,7 +105,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
                 continue;
             }
             $this->getYed()
-                 ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
+                ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
             $this->updateCachedUntil(
                 $data->getEveApiXml(),
                 $untilInterval,
@@ -169,7 +169,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
             return false;
         }
         $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+            ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

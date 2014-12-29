@@ -74,10 +74,8 @@ class AccountStatus extends AbstractAccountSection
      * @throws LogicException
      * @return self
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserve($xml, $ownerID)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
@@ -105,10 +103,8 @@ class AccountStatus extends AbstractAccountSection
      *
      * @return self
      */
-    protected function preserveToAccountStatus(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserveToAccountStatus($xml, $ownerID)
+    {
         $columnDefaults = [
             'keyID' => $ownerID,
             'createDate' => null,

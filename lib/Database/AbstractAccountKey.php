@@ -37,6 +37,7 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use PDOException;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -61,6 +62,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         $interval
     )
     {
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -115,6 +118,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                     }
                     continue 2;
                 }
+                $this->getYed()
+                     ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
             }
             $this->updateCachedUntil(
                 $data->getEveApiXml(),
@@ -122,6 +127,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 $activeKey[$ownerID]
             );
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -148,9 +155,8 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             $ownerID = $data->getEveApiArgument('corporationID');
         }
         $accountKey = $data->getEveApiArgument('accountKey');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             if ($accountKey == '10000') {
@@ -174,7 +180,11 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                  ->notice($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'The data retrieved from Eve API %1$s/%2$s for %3$s on account %4$s is invalid',
@@ -189,18 +199,15 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.
         if ($this->isEveApiXmlError($data, $interval)) {
             return true;
         }
-        $this->preserve(
-            $data->getEveApiXml(),
-            $ownerID,
-            $accountKey
-        );
-        return true;
+        return $this->preserve($data->getEveApiXml(), $ownerID, $accountKey);
     }
     /**
      * @throws \LogicException

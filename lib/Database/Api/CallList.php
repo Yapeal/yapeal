@@ -39,6 +39,7 @@ use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\AttributesDatabasePreserverTrait;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\Event\EveApiEvent;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -63,10 +64,13 @@ class CallList extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    ) {
+    )
+    {
         if (!$this->gotApiLock($data)) {
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -78,7 +82,11 @@ class CallList extends AbstractCommonEveApi
                  ->debug($mess);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -91,6 +99,8 @@ class CallList extends AbstractCommonEveApi
             $preservers->preserveEveApi($data);
             return false;
         }
+        $this->getYed()
+             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.
@@ -105,9 +115,8 @@ class CallList extends AbstractCommonEveApi
      * @throws LogicException
      * @return bool
      */
-    protected function preserve(
-        $xml
-    ) {
+    protected function preserve($xml)
+    {
         try {
             $this->getPdo()
                  ->beginTransaction();
@@ -135,9 +144,8 @@ class CallList extends AbstractCommonEveApi
      * @throws LogicException
      * @return self
      */
-    protected function preserveToCallGroups(
-        $xml
-    ) {
+    protected function preserveToCallGroups($xml)
+    {
         $columnDefaults = [
             'description' => null,
             'groupID' => null,
@@ -164,9 +172,8 @@ class CallList extends AbstractCommonEveApi
      * @throws LogicException
      * @return self
      */
-    protected function preserveToCalls(
-        $xml
-    ) {
+    protected function preserveToCalls($xml)
+    {
         $columnDefaults = [
             'accessMask' => null,
             'description' => null,

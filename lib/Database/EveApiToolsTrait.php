@@ -36,7 +36,7 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
-use Yapeal\Event\YapealEventDispatcherInterface;
+use Yapeal\Event\EventDispatcherInterface;
 
 /**
  * Trait EveApiToolsTrait
@@ -64,11 +64,11 @@ trait EveApiToolsTrait
         return $this;
     }
     /**
-     * @param YapealEventDispatcherInterface $value
+     * @param EventDispatcherInterface $value
      *
      * @return self
      */
-    public function setYed(YapealEventDispatcherInterface $value)
+    public function setYed(EventDispatcherInterface $value)
     {
         $this->yed = $value;
         return $this;
@@ -160,7 +160,7 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
-     * @return YapealEventDispatcherInterface
+     * @return EventDispatcherInterface
      * @throws LogicException
      */
     protected function getYed()
@@ -180,7 +180,7 @@ trait EveApiToolsTrait
      */
     protected $pdo;
     /**
-     * @type YapealEventDispatcherInterface $yed
+     * @type EventDispatcherInterface $yed
      */
     protected $yed;
 }

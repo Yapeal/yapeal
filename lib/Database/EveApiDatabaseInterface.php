@@ -36,7 +36,7 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
-use Yapeal\Event\YapealEventDispatcherInterface;
+use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;
@@ -50,13 +50,13 @@ interface EveApiDatabaseInterface
      * @param PDO              $pdo
      * @param LoggerInterface  $logger
      * @param CommonSqlQueries $csq
-     * @param YapealEventDispatcherInterface $yed
+     * @param EventDispatcherInterface $yed
      */
     public function __construct(
         PDO $pdo,
         LoggerInterface $logger,
         CommonSqlQueries $csq,
-        YapealEventDispatcherInterface $yed
+        EventDispatcherInterface $yed
     );
     /**
      * @param EveApiReadWriteInterface $data
@@ -111,10 +111,10 @@ interface EveApiDatabaseInterface
      */
     public function setPdo(PDO $value);
     /**
-     * @param YapealEventDispatcherInterface $value
+     * @param EventDispatcherInterface $value
      *
      * @api
      * @return self
      */
-    public function setYed(YapealEventDispatcherInterface $value);
+    public function setYed(EventDispatcherInterface $value);
 }

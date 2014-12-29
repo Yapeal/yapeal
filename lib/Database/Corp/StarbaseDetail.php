@@ -130,7 +130,7 @@ class StarbaseDetail extends AbstractCorpSection
                     continue 2;
                 }
                 $this->getYed()
-                     ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
+                    ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
                 if ($untilInterval != $interval) {
                     continue;
                 }
@@ -198,7 +198,7 @@ class StarbaseDetail extends AbstractCorpSection
             return false;
         }
         $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+            ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

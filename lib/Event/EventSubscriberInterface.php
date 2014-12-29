@@ -1,13 +1,14 @@
 <?php
 /**
- * Contains YapealEventDispatcher class.
+ * Contains EventSubscriberInterface Interface.
  *
  * PHP version 5.4
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -32,34 +33,11 @@
  */
 namespace Yapeal\Event;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Yapeal\Xml\EveApiReadWriteInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface as SymfonyEventSubscriberInterface;
 
 /**
- * Class YapealEventDispatcher
+ * Interface EventSubscriberInterface
  */
-class YapealEventDispatcher extends EventDispatcher implements
-    YapealEventDispatcherInterface
+interface EventSubscriberInterface extends SymfonyEventSubscriberInterface
 {
-    /**
-     * Dispatches an event to all registered listeners.
-     *
-     * @param string                   $eventName The name of the event to
-     *                                            dispatch. The name of the
-     *                                            event is the name of the
-     *                                            method that is invoked on
-     *                                            listeners.
-     * @param EveApiReadWriteInterface $data
-     *
-     * @return EveApiEventInterface
-     *
-     * @api
-     */
-    public function dispatchEveApiEvent(
-        $eventName,
-        EveApiReadWriteInterface &$data
-    )
-    {
-        return parent::dispatch($eventName, new EveApiEvent($data));
-    }
 }

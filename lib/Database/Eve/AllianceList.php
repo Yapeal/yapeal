@@ -100,7 +100,7 @@ class AllianceList extends AbstractCommonEveApi
             return false;
         }
         $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVER, $data);
+            ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserve.

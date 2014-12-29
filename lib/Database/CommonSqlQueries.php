@@ -82,11 +82,14 @@ SQL;
      */
     public function getActiveApis()
     {
-        return sprintf(
-            'SELECT * FROM "%1$s"."%2$sutilEveApi" WHERE "isActive"=1 ORDER BY RAND()',
-            $this->databaseName,
-            $this->tablePrefix
-        );
+        $sql
+            = <<<'SQL'
+SELECT "apiName","interval","sectionName"
+ FROM "%1$s"."%2$sutilEveApi"
+ WHERE "isActive"=1
+ ORDER BY RAND()
+SQL;
+        return sprintf($sql, $this->databaseName, $this->tablePrefix);
     }
     /**
      * @param string $ownerID

@@ -52,10 +52,7 @@ class APIKeyInfo extends AbstractAccountSection
      * @throws LogicException
      * @return self
      */
-    protected function preserve(
-        $xml,
-        $ownerID
-    )
+    protected function preserve($xml, $ownerID)
     {
         try {
             $this->getPdo()
@@ -85,10 +82,7 @@ class APIKeyInfo extends AbstractAccountSection
      *
      * @return self
      */
-    protected function preserveToAPIKeyInfo(
-        $xml,
-        $ownerID
-    )
+    protected function preserveToAPIKeyInfo($xml, $ownerID)
     {
         $columnDefaults = [
             'keyID' => $ownerID,
@@ -109,9 +103,7 @@ class APIKeyInfo extends AbstractAccountSection
      *
      * @return self
      */
-    protected function preserveToCharacters(
-        $xml
-    )
+    protected function preserveToCharacters($xml)
     {
         $columnDefaults = [
             'characterID' => null,
@@ -137,10 +129,7 @@ class APIKeyInfo extends AbstractAccountSection
      * @throws LogicException
      * @return self
      */
-    protected function preserveToKeyBridge(
-        $xml,
-        $ownerID
-    )
+    protected function preserveToKeyBridge($xml, $ownerID)
     {
         $chars = (new SimpleXMLIterator($xml))->xpath('//row');
         if (count($chars) == 0) {

@@ -7,7 +7,8 @@
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2014 Michael Cummings
+ * database.
+ * Copyright (C) 2014 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -41,8 +42,8 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 interface EveApiEventInterface extends EventInterface
 {
     const DONE = 'eve_api.done';
-    const POST_PRESERVER = 'eve_api.post_preserver';
-    const PRE_PRESERVER = 'eve_api.pre_preserver';
+    const POST_PRESERVE = 'eve_api.post_preserve';
+    const PRE_PRESERVE = 'eve_api.pre_preserve';
     const PRE_RETRIEVE = 'eve_api.pre_retrieve';
     const PRE_TRANSFORM = 'eve_api.pre_transform';
     const PRE_VALIDATE = 'eve_api.pre_validate';

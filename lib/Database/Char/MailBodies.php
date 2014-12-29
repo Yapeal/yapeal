@@ -135,7 +135,7 @@ class MailBodies extends AbstractCharSection
                     continue 2;
                 }
                 $this->getYed()
-                     ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVER, $data);
+                    ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
                 if ($untilInterval > $interval) {
                     $untilInterval = $interval;
                 }

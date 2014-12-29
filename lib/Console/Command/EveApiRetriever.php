@@ -47,7 +47,6 @@ use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiXmlData;
 
 /**
  * Class EveApiRetriever
@@ -171,27 +170,18 @@ EOF;
             $posts = $arguments;
         }
         $this->wire($this->getDic($output));
-        $data = $this->getXmlData(
-            $input->getArgument('api_name'),
-            $input->getArgument('section_name'),
-            $posts
-        );
+        /**
+         * @type EveApiReadWriteInterface $data
+         */
+        $data = $this->getDic($output)['Yapeal.Xml.Data'];
+        $data = $data->setEveApiName($input->getArgument('api_name'))
+                     ->setEveApiSectionName($input->getArgument('section_name'))
+                     ->setEveApiArguments($posts);
         $retriever = $this->getDic($output)['Yapeal.Xml.Retriever'];
         $retriever->retrieveEveApi($data);
         if (false !== $data->getEveApiXml()) {
             $preserver = $this->getDic($output)['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }
-    }
-    /**
-     * @param string   $apiName
-     * @param string   $sectionName
-     * @param string[] $posts
-     *
-     * @return EveApiReadWriteInterface
-     */
-    protected function getXmlData($apiName, $sectionName, $posts)
-    {
-        return new EveApiXmlData($apiName, $sectionName, $posts);
     }
 }

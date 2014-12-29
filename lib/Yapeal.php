@@ -45,7 +45,6 @@ use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
-use Yapeal\Xml\EveApiXmlData;
 
 /**
  * Class Yapeal
@@ -106,7 +105,6 @@ class Yapeal implements WiringInterface
             ]
         );
         $yed = $dic['Yapeal.Event.EventDispatcher'];
-        $data = new EveApiXmlData();
         foreach ($result as $record) {
             $className = sprintf(
                 'Yapeal\\Database\\%1$s\\%2$s',
@@ -122,7 +120,7 @@ class Yapeal implements WiringInterface
              */
             $class = new $className($pdo, $logger, $csq, $yed);
             $class->autoMagic(
-                $data,
+                $dic['Yapeal.Xml.Data'],
                 $dic['Yapeal.Xml.Retriever'],
                 $dic['Yapeal.Xml.Preserver'],
                 (int)$record['interval']

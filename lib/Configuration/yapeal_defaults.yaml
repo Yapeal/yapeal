@@ -74,5 +74,4 @@ Yapeal:
             group: Yapeal\Xml\GroupRetriever
             network: Yapeal\Network\GuzzleNetworkRetriever
             'null': Yapeal\Xml\NullRetriever
-
 ...

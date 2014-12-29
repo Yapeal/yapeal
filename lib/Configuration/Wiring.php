@@ -335,6 +335,13 @@ class Wiring
      */
     public function wireXml()
     {
+        if (empty($this->dic['Yapeal.Xml.Data'])) {
+            $this->dic['Yapeal.Xml.Data'] = $this->dic->factory(
+                function ($dic) {
+                    return new $dic['Yapeal.Xml.class']();
+                }
+            );
+        }
         if (empty($this->dic['Yapeal.Xml.Preserver'])) {
             $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
                 if ('none' != $dic['Yapeal.Cache.fileSystemMode']) {

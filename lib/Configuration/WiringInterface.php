@@ -31,7 +31,9 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Container;
+namespace Yapeal\Configuration;
+
+use Yapeal\Container\ContainerInterface;
 
 /**
  * Interface WiringInterface

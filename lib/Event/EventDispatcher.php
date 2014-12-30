@@ -209,11 +209,11 @@ class EventDispatcher extends SymfonyEventDispatcher implements
         $this->lazyLoad($eventName);
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $i => $args) {
-                list($serviceId, $method, $priority) = $args;
-                $key = $serviceId . '.' . $method;
+                // ServiceID and method.
+                $key = $args[0] . '.' . $args[1];
                 if (isset($this->listeners[$eventName][$key])
                     &&
-                    $listener === [$this->listeners[$eventName][$key], $method]
+                    $listener === [$this->listeners[$eventName][$key], $args[1]]
                 ) {
                     unset($this->listeners[$eventName][$key]);
                     if (empty($this->listeners[$eventName])) {
@@ -235,7 +235,7 @@ class EventDispatcher extends SymfonyEventDispatcher implements
      */
     public function setEveApiEvent(EveApiEventInterface $value = null)
     {
-        if (null == $value) {
+        if (null === $value) {
             $value = new EveApiEvent();
         }
         $this->eveApiEvent = $value;

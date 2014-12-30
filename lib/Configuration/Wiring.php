@@ -45,6 +45,7 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 
@@ -222,10 +223,30 @@ class Wiring
         if (empty($this->dic['Yapeal.Event.EventDispatcher'])) {
             $this->dic['Yapeal.Event.EventDispatcher'] = function ($dic) {
                 return new $dic['Yapeal.Event.dispatcher'](
+                    $dic,
                     $dic['Yapeal.Event.Event']
                 );
             };
         }
+        $dic = $this->dic;
+        /**
+         * @type EventDispatcherInterface $dispatcher
+         */
+        $dispatcher = $dic['Yapeal.Event.EventDispatcher'];
+        $internal = explode(',', $dic['Yapeal.Event.Subscribers.internal']);
+        foreach ($internal as $subscriber) {
+            $subscriber = trim($subscriber);
+            print $subscriber . PHP_EOL;
+            $serviceID = str_replace('\\', '.', $subscriber);
+            print $serviceID . PHP_EOL;
+            if (empty($this->dic[$serviceID])) {
+                $this->dic[$serviceID] = function () use ($subscriber) {
+                    return new $subscriber();
+                };
+                $dispatcher->addSubscriberService($serviceID, $subscriber);
+            }
+        }
+        print_r($dispatcher->getListeners());
         return $this;
     }
     /**

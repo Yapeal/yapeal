@@ -202,7 +202,6 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
                 continue;
             }
             try {
-                //$output->writeln($sql);
                 $pdo->exec($sql);
             } catch (PDOException $exc) {
                 $mess = sprintf(

@@ -30,7 +30,7 @@ Yapeal:
         dispatcher: Yapeal\Event\EventDispatcher
         Subscribers:
             internal: >
-                Yapeal\Database\Account\APIKeyInfo, Yapeal\Database\Account\AccountStatus
+                Yapeal\Database\Account\TestAPIKeyInfo
             user: ''
     Log:
         bufferSize: 25

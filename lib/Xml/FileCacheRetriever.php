@@ -108,7 +108,6 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
                  ->debug($mess, ['exception' => $exc]);
             return $this;
         }
-        //$this->getLogger()->debug($result);
         $data->setEveApiXml($result);
         return $this;
     }

@@ -49,7 +49,7 @@
         "wiki": "https://github.com/Dragonrun1/yapeal/wiki"
     },
     "require": {
-        "dragonrun1/file_path_normalizer": "dev-master",
+      "dragonrun1/file_path_normalizer": "~1.0",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-hash": "*",

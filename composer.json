@@ -17,10 +17,6 @@
             "Yapeal\\": [
                 "lib/",
                 "bin/"
-            ],
-            "Pimple\\": [
-                "subtree/Pimple/src/",
-                "subtree/Pimple/src/Pimple/"
             ]
         }
     },

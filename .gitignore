@@ -5,7 +5,7 @@ bin/sql/createCustomTables.sql
 composer.lock
 config/yapeal.ini
 config/yapeal.yaml
-log/*.log
+*.log
 .idea/
 cache/
 docs/

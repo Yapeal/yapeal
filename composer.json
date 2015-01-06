@@ -61,11 +61,10 @@
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
         "php": ">=5.4.20",
-        "guzzle/guzzle": "~3.9",
+        "guzzlehttp/guzzle": "~5.0",
         "monolog/monolog": "~1.11",
         "pimple/pimple": "~3.0",
         "symfony/console": "~2.5",
-        "symfony/event-dispatcher": "~2.5",
         "symfony/yaml": "~2.5"
     },
     "require-dev": {
@@ -75,7 +74,6 @@
         "squizlabs/php_codesniffer": "dev-master",
         "phploc/phploc": "*",
         "phpmd/phpmd": "~2.1",
-        "phpspec/phpspec": "2.1.*@dev",
         "phpunit/phpunit": "~4.3",
         "phpunit/phpunit-skeleton-generator": "2.0.*@dev",
         "satooshi/php-coveralls": "dev-master"

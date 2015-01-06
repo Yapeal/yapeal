@@ -101,7 +101,7 @@ Yapeal:
     Event:
         class: Yapeal\Event\EveApiEvent
 
-        dispatcher: Yapeal\Event\EventDispatcher
+        dispatcher: Yapeal\Event\ContainerAwareEventDispatcher
 
         # A list of event subscribers names to be added automatically during
         # wiring.

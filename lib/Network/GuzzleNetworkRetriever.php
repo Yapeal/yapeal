@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,40 +27,68 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Network;
 
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Exception\RequestException;
-use Guzzle\Http\Message\RequestInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Yapeal\Xml\EveApiReadInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-use Yapeal\Xml\EveApiRetrieverInterface;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Log\LogLevel;
+use Yapeal\Container\ContainerInterface;
+use Yapeal\Container\ServiceCallableInterface;
+use Yapeal\Event\ContainerAwareEventDispatcherInterface;
+use Yapeal\Event\EveApiEventInterface;
+use Yapeal\Event\EventSubscriberInterface;
+use Yapeal\Event\LogEvent;
 
 /**
  * Class GuzzleNetworkRetriever
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
-    LoggerAwareInterface
+class GuzzleNetworkRetriever implements EventSubscriberInterface,
+    ServiceCallableInterface
 {
     /**
-     * @param LoggerInterface      $logger
      * @param ClientInterface|null $client
      */
-    public function __construct(
-        LoggerInterface $logger,
-        ClientInterface $client = null
-    )
+    public function __construct(ClientInterface $client = null)
     {
-        $this->setLogger($logger);
         $this->setClient($client);
+    }
+    /**
+     * @inheritdoc
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        $priorityBase = -100;
+        $events = [
+            'Yapeal.EveApi.retrieve' => [
+                'eveApiRetrieve',
+                $priorityBase
+            ]
+        ];
+        return $events;
+    }
+    /**
+     * @inheritdoc
+     */
+    public static function injectCallable(ContainerInterface $dic)
+    {
+        $class = __CLASS__;
+        $serviceName = str_replace('\\', '.', $class);
+        $dic[$serviceName] = function () use ($dic, $class) {
+            /**
+             * @type GuzzleNetworkRetriever $callable
+             */
+            $callable = new $class($dic['Yapeal.Network.Client']);
+            return $callable;
+        };
+        return $serviceName;
     }
     /**
      *
@@ -69,28 +97,83 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     {
     }
     /**
-     * @param EveApiReadWriteInterface $data
+     * @param EveApiEventInterface                   $event
+     * @param                                        $eventName
+     * @param ContainerAwareEventDispatcherInterface $yed
      *
-     * @return self
+     * @return EveApiEventInterface
      */
-    public function retrieveEveApi(EveApiReadWriteInterface &$data)
+    public function eveApiRetrieve(
+        EveApiEventInterface $event,
+        $eventName,
+        ContainerAwareEventDispatcherInterface $yed
+    )
     {
+        $data = $event->getData();
+        $mess = sprintf(
+            'Received %1$s event for %2$s/%3$s',
+            $eventName,
+            $data->getEveApiSectionName(),
+            $data->getEveApiName()
+        );
+        $yed->dispatchLogEvent(
+            'Yapeal.Log.log',
+            new LogEvent(LogLevel::DEBUG, $mess)
+        );
         $mess = sprintf(
             'Started network retrieve for %1$s/%2$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName()
         );
-        $this->getLogger()
-             ->debug($mess);
-        $result = $this->readXmlData($this->prepareConnection($data));
+        $yed->dispatchLogEvent(
+            'Yapeal.Log.log',
+            new LogEvent(LogLevel::DEBUG, $mess)
+        );
+        $uri = [
+            '/{EveApiSectionName}/{EveApiName}.xml.aspx',
+            [
+                'EveApiSectionName' => strtolower(
+                    $data->getEveApiSectionName()
+                ),
+                'EveApiName' => $data->getEveApiName()
+            ]
+        ];
+        try {
+            $response = $this->getClient()
+                             ->post(
+                                 $uri,
+                                 ['body' => $data->getEveApiArguments()]
+                             );
+        } catch (RequestException $exc) {
+            $mess = sprintf(
+                'Could NOT get XML data for %1$s/%2$s',
+                $data->getEveApiSectionName(),
+                $data->getEveApiName()
+            );
+            $yed->dispatchLogEvent(
+                'Yapeal.Log.log',
+                new LogEvent(LogLevel::DEBUG, $mess, ['exception' => $exc])
+            );
+            return $event->stopPropagation();
+        }
         $data->setEveApiXml(
             $this->addYapealProcessingInstructionToXml(
-                $result,
+                $response->getBody(),
                 $data->getEveApiArguments()
             )
         );
         $this->__destruct();
-        return $this;
+        $mess = sprintf(
+            'Finished %1$s event for %2$s/%3$s',
+            $eventName,
+            $data->getEveApiSectionName(),
+            $data->getEveApiName()
+        );
+        $yed->dispatchLogEvent(
+            'Yapeal.Log.log',
+            new LogEvent(LogLevel::DEBUG, $mess)
+        );
+        return $event->setData($data);
     }
     /**
      * @param ClientInterface|null $value
@@ -100,18 +183,6 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
     public function setClient(ClientInterface $value = null)
     {
         $this->client = $value;
-        return $this;
-    }
-    /**
-     * Sets a logger instance on the object
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return self
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
         return $this;
     }
     /**
@@ -150,52 +221,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
         return $this->client;
     }
     /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-    /**
-     * @param EveApiReadInterface $data
-     *
-     * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface
-     */
-    protected function prepareConnection(EveApiReadInterface $data)
-    {
-        $uri = [
-            '/{EveApiSectionName}/{EveApiName}.xml.aspx',
-            [
-                'EveApiSectionName' => $data->getEveApiSectionName(),
-                'EveApiName' => $data->getEveApiName()
-            ]
-        ];
-        $client = $this->getClient();
-        return $client->post($uri, null, $data->getEveApiArguments());
-    }
-    /**
-     * @param RequestInterface $request
-     *
-     * @return string|bool
-     */
-    protected function readXmlData(RequestInterface $request)
-    {
-        try {
-            $response = $request->send();
-        } catch (RequestException $exc) {
-            $mess = 'Could NOT get XML data';
-            $this->getLogger()
-                 ->debug($mess, ['exception' => $exc]);
-            return false;
-        }
-        return $response->getBody(true);
-    }
-    /**
      * @type ClientInterface $client
      */
     protected $client;
-    /**
-     * @type LoggerInterface $logger
-     */
-    protected $logger;
 }

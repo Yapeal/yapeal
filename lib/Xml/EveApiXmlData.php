@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,7 +27,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -46,6 +46,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      * @param string      $eveApiSectionName
      * @param string[]    $eveApiArguments
      * @param bool|string $eveApiXml Only allows string or false NOT true.
+     * @param int $cacheInterval
      *
      * @throws InvalidArgumentException
      */
@@ -53,28 +54,25 @@ class EveApiXmlData implements EveApiReadWriteInterface
         $eveApiName = '',
         $eveApiSectionName = '',
         array $eveApiArguments = [],
-        $eveApiXml = false
-    ) {
+        $eveApiXml = false,
+        $cacheInterval = 300
+    )
+    {
         $this->setEveApiName($eveApiName);
         $this->setEveApiSectionName($eveApiSectionName);
         $this->setEveApiArguments($eveApiArguments);
         $this->setEveApiXml($eveApiXml);
+        $this->setCacheInterval($cacheInterval);
     }
     /**
-     * @return string
+     * @inheritdoc
      */
     public function __toString()
     {
         return $this->eveApiXml;
     }
     /**
-     * Used to add item to arguments list.
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @throws InvalidArgumentException
-     * @return self
+     * @inheritdoc
      */
     public function addEveApiArgument($name, $value)
     {
@@ -86,10 +84,18 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @param string $name
-     *
-     * @throws InvalidArgumentException
-     * @return string|null
+     * @inheritdoc
+     */
+    public function getCacheInterval()
+    {
+        if (empty($this->cacheInterval)) {
+            $mess = 'Tried to access cache interval before it was set';
+            throw new LogicException($mess);
+        }
+        return $this->cacheInterval;
+    }
+    /**
+     * @inheritdoc
      */
     public function getEveApiArgument($name)
     {
@@ -100,7 +106,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiArguments[$name];
     }
     /**
-     * @return string[]
+     * @inheritdoc
      */
     public function getEveApiArguments()
     {
@@ -110,8 +116,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiArguments;
     }
     /**
-     * @throws LogicException
-     * @return string
+     * @inheritdoc
      */
     public function getEveApiName()
     {
@@ -122,8 +127,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiName;
     }
     /**
-     * @throws LogicException
-     * @return string
+     * @inheritdoc
      */
     public function getEveApiSectionName()
     {
@@ -134,7 +138,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiSectionName;
     }
     /**
-     * @return string|false
+     * @inheritdoc
      */
     public function getEveApiXml()
     {
@@ -144,8 +148,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiXml;
     }
     /**
-     * @throws LogicException
-     * @return string
+     * @inheritdoc
      */
     public function getHash()
     {
@@ -156,24 +159,15 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return hash('md5', $hash);
     }
     /**
-     * Used to set a list of arguments used when forming request to Eve Api
-     * server.
-     *
-     * Things like KeyID, vCode etc that are either required or optional for the
-     * Eve API. See setter for example.
-     *
-     * Example:
-     * <code>
-     * <?php
-     * $args = array( 'KeyID' => '1156', 'vCode' => 'abc123');
-     * $api->setEveApiArguments($args);
-     * ...
-     * </code>
-     *
-     * @param string[] $values
-     *
-     * @throws InvalidArgumentException
-     * @return self
+     * @inheritdoc
+     */
+    public function setCacheInterval($value)
+    {
+        $this->cacheInterval = (int)$value;
+        return $this;
+    }
+    /**
+     * @inheritdoc
      */
     public function setEveApiArguments(array $values)
     {
@@ -187,10 +181,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @param string $value
-     *
-     * @throws InvalidArgumentException
-     * @return self
+     * @inheritdoc
      */
     public function setEveApiName($value)
     {
@@ -202,10 +193,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @param string $value
-     *
-     * @throws InvalidArgumentException
-     * @return self
+     * @inheritdoc
      */
     public function setEveApiSectionName($value)
     {
@@ -217,10 +205,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @param string|bool $xml Only allows string or false NOT true.
-     *
-     * @throws InvalidArgumentException
-     * @return self
+     * @inheritdoc
      */
     public function setEveApiXml($xml = false)
     {
@@ -234,6 +219,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         $this->eveApiXml = $xml;
         return $this;
     }
+    /**
+     * @type int $cacheInterval
+     */
+    protected $cacheInterval;
     /**
      * @type string[] $eveApiArguments
      */

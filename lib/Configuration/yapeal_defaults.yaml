@@ -10,7 +10,8 @@ Yapeal:
         hostName: localhost
         password: secret
         platform: mysql
-        sharedSql: Yapeal\Database\CommonSqlQueries
+        sharedSql: Yapeal\Sql\CommonSqlQueries
+        sqlDir: '{Yapeal.baseDir}lib/Sql/'
         tablePrefix: ''
         userName: YapealUser
     Error:
@@ -27,19 +28,25 @@ Yapeal:
             stream: Monolog\Handler\StreamHandler
     Event:
         class: Yapeal\Event\EveApiEvent
-        dispatcher: Yapeal\Event\EventDispatcher
+        dispatcher: Yapeal\Event\ContainerAwareEventDispatcher
         Subscribers:
             internal: >
-                Yapeal\Database\Account\TestAPIKeyInfo
+                Yapeal\Log\Logger,
+                Yapeal\EveApi\Account\AccountSection,
+                Yapeal\EveApi\Account\APIKeyInfo,
+                Yapeal\Network\GuzzleNetworkRetriever,
+                Yapeal\Xsl\Transformer
             user: ''
     Log:
         bufferSize: 25
         channel: yapeal
-        class: Monolog\Logger
+        class: Yapeal\Log\Logger
         fileName: yapeal.log
         logDir: '{Yapeal.baseDir}log/'
-        threshold: 300
+        # TODO: Must reset to 300 before merge to master.
+        threshold: 100
         Handlers:
+            logger: Monolog\Logger
             fingersCrossed: Monolog\Handler\FingersCrossedHandler
             group: Monolog\Handler\GroupHandler
             stream: Monolog\Handler\StreamHandler
@@ -49,7 +56,7 @@ Yapeal:
         appVersion: ''
         baseUrl: 'https://api.eveonline.com'
         timeout: 10
-        class: Guzzle\Http\Client
+        class: GuzzleHttp\Client
         connect_timeout: 30
         verify: '{Yapeal.baseDir}config/eveonline.crt'
         userAgent: '{appName}/{appVersion} {appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'

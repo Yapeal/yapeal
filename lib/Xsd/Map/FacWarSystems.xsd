@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="rowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="solarSystemID"/>
+                <xs:attribute type="xs:string" name="solarSystemName"/>
+                <xs:attribute type="eveIDType" name="occupyingFactionID"/>
+                <xs:attribute type="eveIDType" name="owningFactionID"/>
+                <xs:attribute type="xs:string" name="occupyingFactionName"/>
+                <xs:attribute type="xs:string" name="owningFactionName"/>
+                <xs:attribute type="eveBooleanType" name="contested"/>
+                <xs:attribute type="xs:unsignedLong" name="victoryPoints"/>
+                <xs:attribute type="xs:unsignedLong"
+                              name="victoryPointThreshold"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element name="solarSystems">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="rowType"
+                                    name="row"
+                                    minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,7 +27,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -45,7 +45,7 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Event\EventDispatcherInterface;
+use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 
@@ -230,23 +230,16 @@ class Wiring
         }
         $dic = $this->dic;
         /**
-         * @type EventDispatcherInterface $dispatcher
+         * @type ContainerAwareEventDispatcherInterface $dispatcher
          */
         $dispatcher = $dic['Yapeal.Event.EventDispatcher'];
         $internal = explode(',', $dic['Yapeal.Event.Subscribers.internal']);
+        $method = 'injectCallable';
         foreach ($internal as $subscriber) {
             $subscriber = trim($subscriber);
-            print $subscriber . PHP_EOL;
-            $serviceID = str_replace('\\', '.', $subscriber);
-            print $serviceID . PHP_EOL;
-            if (empty($this->dic[$serviceID])) {
-                $this->dic[$serviceID] = function () use ($subscriber) {
-                    return new $subscriber();
-                };
-                $dispatcher->addSubscriberService($serviceID, $subscriber);
-            }
+            $serviceID = $subscriber::$method($dic);
+            $dispatcher->addSubscriberService($serviceID, $subscriber);
         }
-        print_r($dispatcher->getListeners());
         return $this;
     }
     /**
@@ -254,33 +247,6 @@ class Wiring
      */
     public function wireLog()
     {
-        if (isset($this->dic['Yapeal.Log.Logger'])) {
-            return $this;
-        }
-        $this->dic['Yapeal.Log.Logger'] = function ($dic) {
-            /**
-             * @type Logger $logger
-             */
-            $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
-            $group = [];
-            if (PHP_SAPI == 'cli') {
-                $group[] = new $dic['Yapeal.Log.Handlers.stream'](
-                    'php://stderr', 100
-                );
-            }
-            $group[] = new $dic['Yapeal.Log.Handlers.stream'](
-                $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
-                100
-            );
-            $logger->pushHandler(
-                new $dic['Yapeal.Log.Handlers.fingersCrossed'](
-                    new $dic['Yapeal.Log.Handlers.group']($group),
-                    (int)$dic['Yapeal.Log.threshold'],
-                    (int)$dic['Yapeal.Log.bufferSize']
-                )
-            );
-            return $logger;
-        };
         return $this;
     }
     /**
@@ -345,8 +311,10 @@ class Wiring
                 'verify' => $dic['Yapeal.Network.verify'],
             ];
             return new $dic['Yapeal.Network.class'](
-                $dic['Yapeal.Network.baseUrl'],
-                ['defaults' => $defaults]
+                [
+                    'base_url' => $dic['Yapeal.Network.baseUrl'],
+                    'defaults' => $defaults
+                ]
             );
         };
         return $this;
@@ -374,24 +342,20 @@ class Wiring
                 return new $dic['Yapeal.Xml.Preservers.null']();
             };
         }
-        if (empty($this->dic['Yapeal.Xml.Retriever'])) {
-            $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
-                $retrievers = [];
-                if ('none' != $dic['Yapeal.Cache.fileSystemMode']) {
-                    $retrievers[] = new $dic['Yapeal.Xml.Retrievers.file'](
-                        $dic['Yapeal.Log.Logger'],
-                        $dic['Yapeal.Cache.cacheDir']
-                    );
-                }
-                $retrievers[] = new $dic['Yapeal.Xml.Retrievers.network'](
-                    $dic['Yapeal.Log.Logger'],
-                    $dic['Yapeal.Network.Client']
-                );
-                return new $dic['Yapeal.Xml.Retrievers.group'](
-                    $dic['Yapeal.Log.Logger'], $retrievers
-                );
-            };
-        }
+//        if (empty($this->dic['Yapeal.Xml.Retriever'])) {
+//            $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
+//                $retrievers = [];
+//                if ('none' != $dic['Yapeal.Cache.fileSystemMode']) {
+//                    $retrievers[] = new $dic['Yapeal.Xml.Retrievers.file'](
+//                        $dic['Yapeal.Log.Logger'],
+//                        $dic['Yapeal.Cache.cacheDir']
+//                    );
+//                }
+//                return new $dic['Yapeal.Xml.Retrievers.group'](
+//                    $dic['Yapeal.Log.Logger'], $retrievers
+//                );
+//            };
+//        }
         return $this;
     }
     /**

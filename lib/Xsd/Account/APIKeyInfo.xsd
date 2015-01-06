@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="charactersType">
+        <xs:sequence>
+            <xs:element type="rowType" name="row" maxOccurs="3" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="rowsetAttrs"/>
+    </xs:complexType>
+    <xs:complexType name="rowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attributeGroup ref="charAttrs"/>
+                <xs:attributeGroup ref="acfAttrs"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="keyType">
+        <xs:sequence>
+            <xs:element type="charactersType" name="characters"/>
+        </xs:sequence>
+        <xs:attribute type="eveIDType" name="accessMask"/>
+        <xs:attribute type="eveDTType" name="expires"/>
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Account"/>
+                    <xs:enumeration value="Character"/>
+                    <xs:enumeration value="Corporation"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element type="keyType" name="key"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

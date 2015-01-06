@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,11 +27,13 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Xml;
+
+use InvalidArgumentException;
 
 /**
  * Interface EveApiModifyInterface
@@ -47,12 +49,18 @@ interface EveApiWriteInterface
      * @return self
      */
     public function addEveApiArgument($name, $value);
+
+    /**
+     * @param int $value Caching interval.
+     * @return self
+     */
+    public function setCacheInterval($value);
     /**
      * Used to set a list of arguments used when forming request to Eve Api
      * server.
      *
      * Things like KeyID, vCode etc that are either required or optional for the
-     * Eve API. See setter for example.
+     * Eve API.
      *
      * Example:
      * <code>
@@ -62,7 +70,7 @@ interface EveApiWriteInterface
      * ...
      * </code>
      *
-     * @param string[] $values
+     * @param array|string[] $values
      *
      * @return self
      */
@@ -82,7 +90,7 @@ interface EveApiWriteInterface
     /**
      * @param string|bool $xml Only allows string or false NOT true.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setEveApiXml($xml = false);

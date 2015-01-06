@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,7 +27,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -37,14 +37,16 @@ use FilePathNormalizer\FilePathNormalizerTrait;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Yapeal\Configuration\Wiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Event\ContainerAwareEventDispatcher;
+use Yapeal\Event\LogEvent;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
+use Yapeal\Sql\CommonSqlQueries;
+use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
  * Class Yapeal
@@ -70,16 +72,28 @@ class Yapeal implements WiringInterface
     {
         $dic = $this->getDic();
         /**
-         * @type LoggerInterface $logger
+         * @type ContainerAwareEventDispatcher $yed
          */
-        $logger = $dic['Yapeal.Log.Logger'];
-        $logger->info('Let the magic begin!');
+        $yed = $dic['Yapeal.Event.EventDispatcher'];
+        $yed->dispatchLogEvent(
+            'Yapeal.Log.log',
+            new LogEvent(
+                LogLevel::INFO,
+                'Let the magic begin!'
+            )
+        );
         /**
          * @type CommonSqlQueries $csq
          */
         $csq = $dic['Yapeal.Database.CommonQueries'];
         $sql = $csq->getActiveApis();
-        $logger->info($sql);
+        $yed->dispatchLogEvent(
+            'Yapeal.Log.log',
+            new LogEvent(
+                LogLevel::INFO,
+                $sql
+            )
+        );
         try {
             /**
              * @type PDO $pdo
@@ -92,7 +106,14 @@ class Yapeal implements WiringInterface
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
             $mess = 'Could not access utilEveApi table';
-            $logger->error($mess, ['exception' => $exc]);
+            $yed->dispatchLogEvent(
+                'Yapeal.Log.log',
+                new LogEvent(
+                    LogLevel::INFO,
+                    $mess,
+                    ['exception' => $exc]
+                )
+            );
             return 1;
         }
         // Always check APIKeyInfo.
@@ -104,27 +125,15 @@ class Yapeal implements WiringInterface
                 'sectionName' => 'account'
             ]
         );
-        $yed = $dic['Yapeal.Event.EventDispatcher'];
         foreach ($result as $record) {
-            $className = sprintf(
-                'Yapeal\\Database\\%1$s\\%2$s',
-                ucfirst($record['sectionName']),
-                $record['apiName']
-            );
-            if (!class_exists($className)) {
-                $logger->debug('Class not found ' . $className);
-                continue;
-            }
             /**
-             * @type AbstractCommonEveApi $class
+             * @type EveApiReadWriteInterface $data
              */
-            $class = new $className($pdo, $logger, $csq, $yed);
-            $class->autoMagic(
-                $dic['Yapeal.Xml.Data'],
-                $dic['Yapeal.Xml.Retriever'],
-                $dic['Yapeal.Xml.Preserver'],
-                (int)$record['interval']
-            );
+            $data = $dic['Yapeal.Xml.Data'];
+            $data->setEveApiName($record['apiName'])
+                 ->setEveApiSectionName($record['sectionName'])
+                 ->setCacheInterval($record['interval']);
+            $yed->dispatchEveApiEvent('Yapeal.EveApi.start', $data);
         }
         return 0;
     }

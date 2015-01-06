@@ -4,82 +4,115 @@
  *
  * PHP version 5.4
  *
- * LICENSE:
- * This file is part of Yet Another Php Eve Api Library also know as Yapeal
- * which can be used to access the Eve Online API data and place it into a
- * database.
- * Copyright (C) 2014 Michael Cummings
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * You should be able to find a copy of this license in the LICENSE.md file. A
- * copy of the GNU GPL should also be available in the GNU-GPL.md file.
- *
- * @copyright 2014 Michael Cummings
- * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @copyright 2015 Michael Cummings
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Event;
 
-use InvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
-
 /**
  * Interface EventDispatcherInterface
+ * The EventDispatcherInterface is the central point of Yapeal's event
+ * listener system. Listeners are registered on the manager and events are
+ * dispatched through the manager.
+ *
+ * @api
  */
-interface EventDispatcherInterface extends SymfonyEventDispatcherInterface
+interface EventDispatcherInterface
 {
     /**
-     * Adds a service as event listener
+     * Adds an event listener that listens on the specified events.
      *
-     * @param string $eventName Event for which the listener is added
-     * @param array  $callback  The service ID of the listener service & the
-     *                          method name that has to be called
-     * @param int    $priority  The higher this value, the earlier an event
-     *                          listener will be triggered in the chain.
-     *                          Defaults to 0.
+     * Each combination of $eventName, $listener, and $priority is unique.
+     * Re-adding the same listener will cause it to leave the $eventName,
+     * $priority chain and be added to the end of that chain.
+     * Example:
+     *     $listeners[$eventName][$priority] = ['listener1', 'listener2'];
+     * Re-add 'listener1' and it becomes:
+     *     $listeners[$eventName][$priority] = ['listener2', 'listener1'];
      *
-     * @throws InvalidArgumentException
+     * @param string $eventName   The event to listen for
+     * @param array  $callback    The listener to be added. Needs to have either
+     *                            [object, 'methodName'] or
+     *                            ['className', 'methodName']
+     * @param int    $priority    The higher this value, the earlier an event
+     *                            listener will be triggered in the chain
+     *                            (defaults to 0)
+     *
+     * @return self
+     * @api
      */
-    public function addListenerService($eventName, $callback, $priority = 0);
+    public function addListener($eventName, array $callback, $priority = 0);
     /**
-     * Adds a service as event subscriber
+     * Adds an event subscriber.
      *
-     * @param string $serviceId The service ID of the subscriber service
-     * @param string $class     The service's class name (which must implement
-     *                          EventSubscriberInterface)
+     * The subscriber is asked for all the events he is
+     * interested in and added as a listener for these events.
+     *
+     * @param string|object $class The subscriber class instance or name.
+     *
+     * @return self
+     * @api
      */
-    public function addSubscriberService($serviceId, $class);
-
+    public function addSubscriber($class);
     /**
      * Dispatches an event to all registered listeners.
      *
-     * @param string                   $eventName The name of the event to
-     *                                            dispatch. The name of the
-     *                                            event is the name of the
-     *                                            method that is invoked on
-     *                                            listeners.
-     * @param EveApiReadWriteInterface $data
+     * @param string         $eventName The name of the event to dispatch. The
+     *                                  name of the event is the name of the
+     *                                  method that is invoked on listeners.
+     * @param EventInterface $event     The event to pass to the event
+     *                                  handlers/listeners. If not supplied, an
+     *                                  empty Event instance is created.
      *
-     * @return EveApiEventInterface
+     * @return EventInterface
      *
      * @api
      */
-    public function dispatchEveApiEvent(
+    public function dispatch($eventName, EventInterface $event = null);
+    /**
+     * Gets the listeners of a specific event or all listeners.
+     *
+     * @param string $eventName The name of the event
+     *
+     * @return array The event listeners for the specified event, or all event
+     *               listeners by event name
+     */
+    public function getListeners($eventName = null);
+    /**
+     * Checks whether an event has any registered listeners.
+     *
+     * @param string $eventName The name of the event
+     *
+     * @return bool true if the specified event has any listeners, false
+     *              otherwise
+     */
+    public function hasListeners($eventName = null);
+    /**
+     * Removes an event listener from the specified events.
+     *
+     * @param string   $eventName The event to remove a listener from
+     * @param array    $callback  The listener to be removed. Needs to have
+     *                            either [object, 'methodName'] or
+     *                            ['className', 'methodName']
+     * @param int|null $priority  Priority level of listener to be removed.
+     *                            If it is the default value null then listener
+     *                            will be removed for all found priorities.
+     *
+     * @return self
+     * @api
+     */
+    public function removeListener(
         $eventName,
-        EveApiReadWriteInterface &$data
+        array $callback,
+        $priority = null
     );
+    /**
+     * Removes an event subscriber.
+     *
+     * @param string|object $class The subscriber class instance or name.
+     *
+     * @return self
+     * @api
+     */
+    public function removeSubscriber($class);
 }

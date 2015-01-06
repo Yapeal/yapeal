@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,7 +27,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -44,8 +44,8 @@ use Yapeal\Container\ContainerInterface;
 class DatabaseInitializer extends AbstractDatabaseCommon
 {
     /**
-     * @param string|null        $name
-     * @param string             $cwd
+     * @param string|null $name
+     * @param string      $cwd
      * @param ContainerInterface $dic
      *
      * @throws InvalidArgumentException
@@ -104,11 +104,10 @@ HELP;
             'EveTables',
             'MapTables',
             'ServerTables',
-            'UtilTables',
-            'CustomTables'
+            'UtilTables'
         ];
         $fileList = [];
-        $path = $this->getDic($output)['Yapeal.baseDir'] . 'bin/sql/';
+        $path = $this->getDic($output)['Yapeal.Database.sqlDir'];
         if (!is_readable($path)) {
             $mess = sprintf(
                 '<info>Could NOT access sql directory %1$s</info>',
@@ -120,9 +119,6 @@ HELP;
         foreach ($fileNames as $fileName) {
             $file = $path . 'Create' . $fileName . '.sql';
             if (!is_file($file)) {
-                if ($fileName == 'CustomTables') {
-                    continue;
-                }
                 $mess = sprintf(
                     '<info>Could NOT find SQL file %1$s</info>',
                     $file
@@ -131,6 +127,21 @@ HELP;
                 continue;
             }
             $fileList[] = $file;
+        }
+        $fileNames = [
+            $path . 'CustomTables.sql',
+            $this->getDic($output)['Yapeal.baseDir']
+            . 'config/CustomTables.sql'
+        ];
+        if (isset($this->getDic($output)['Yapeal.vendorParentDir'])) {
+            $fileNames[] = $this->getDic($output)['Yapeal.vendorParentDir']
+                           . 'config/CustomTables.sql';
+        }
+        foreach ($fileNames as $fileName) {
+            if (!is_readable($fileName) || !is_file($fileName)) {
+                continue;
+            }
+            $fileList[] = $fileName;
         }
         return $fileList;
     }

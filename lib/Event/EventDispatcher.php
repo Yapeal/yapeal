@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EventDispatcher class.
+ * Contains EventSubscriberInterface Interface.
  *
  * PHP version 5.4
  *
@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,283 +27,325 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ *
+ * Additional licence and copyright information:
+ * @copyright 2004-2014 Fabien Potencier <fabien@symfony.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 namespace Yapeal\Event;
 
+use DomainException;
 use InvalidArgumentException;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
-use Yapeal\Container\ContainerInterface;
-use Yapeal\Xml\EveApiReadWriteInterface;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * Class EventDispatcher
+ *
+ * Listeners are registered on the manager and events are dispatched through the
+ * manager.
+ *
+ * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author  Jonathan Wage <jonwage@gmail.com>
+ * @author  Roman Borschel <roman@code-factory.org>
+ * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @author  Fabien Potencier <fabien@symfony.com>
+ * @author  Jordi Boggiano <j.boggiano@seld.be>
+ * @author  Jordan Alliot <jordan.alliot@gmail.com>
+ *
+ * @api
  */
-class EventDispatcher extends SymfonyEventDispatcher implements
-    EventDispatcherInterface
+class EventDispatcher implements EventDispatcherInterface
 {
     /**
-     * @param ContainerInterface $dic A ContainerInterface instance
-     * @param EveApiEventInterface $eae
-     */
-    public function __construct(
-        ContainerInterface $dic,
-        EveApiEventInterface $eae = null
-    )
-    {
-        $this->container = $dic;
-        $this->setEveApiEvent($eae);
-    }
-    /**
-     * Adds a service as event listener
+     * @inheritDoc
      *
-     * @param string $eventName Event for which the listener is added
-     * @param array  $callback  The service ID of the listener service & the
-     *                          method name that has to be called
-     * @param int    $priority  The higher this value, the earlier an event
-     *                          listener will be triggered in the chain.
-     *                          Defaults to 0.
-     *
-     * @throws InvalidArgumentException
+     * @api
      */
-    public function addListenerService($eventName, $callback, $priority = 0)
+    public function addListener($eventName, array $callback, $priority = 0)
     {
-        if (!is_array($callback) || 2 !== count($callback)) {
-            $mess = 'Expected an array("service", "method") argument';
+        if (2 !== count($callback)) {
+            $mess = 'Expected an array("class", "method") argument';
             throw new InvalidArgumentException($mess);
         }
-        $this->listenerIds[$eventName][] = [
-            $callback[0],
-            $callback[1],
-            $priority
-        ];
-    }
-    /**
-     * Adds a service as event subscriber
-     *
-     * @param string $serviceId The service ID of the subscriber service
-     * @param string $class     The service's class name (which must implement
-     *                          EventSubscriberInterface)
-     */
-    public function addSubscriberService($serviceId, $class)
-    {
-        /**
-         * @type EventSubscriberInterface $class
-         */
-        foreach ($class::getSubscribedEvents() as $eventName => $params) {
-            if (is_string($params)) {
-                $this->listenerIds[$eventName][] = [$serviceId, $params, 0];
-            } elseif (is_string($params[0])) {
-                $this->listenerIds[$eventName][] = [
-                    $serviceId,
-                    $params[0],
-                    isset($params[1])
-                        ? $params[1] : 0
-                ];
-            } else {
-                foreach ($params as $listener) {
-                    $this->listenerIds[$eventName][] = [
-                        $serviceId,
-                        $listener[0],
-                        isset($listener[1])
-                            ? $listener[1] : 0
-                    ];
-                }
-            }
-        }
-    }
-    /**
-     * Dispatches an event to all registered listeners.
-     *
-     * @param string $eventName The name of the event to dispatch. The name of
-     *                          the event is the name of the method that is
-     *                          invoked on listeners.
-     * @param Event  $event     The event to pass to the event
-     *                          handlers/listeners. If not supplied, an empty
-     *                          Event instance is created.
-     *
-     * @return Event
-     *
-     * @api
-     */
-    public function dispatch($eventName, Event $event = null)
-    {
-        $this->lazyLoad($eventName);
-        return parent::dispatch($eventName, $event);
-    }
-    /**
-     * Dispatches an event to all registered listeners.
-     *
-     * @param string $eventName                    The name of the event to
-     *                                             dispatch. The name of the
-     *                                             event is the name of the
-     *                                             method that is invoked on
-     *                                             listeners.
-     * @param EveApiReadWriteInterface $data
-     *
-     * @return EveApiEventInterface
-     *
-     * @api
-     */
-    public function dispatchEveApiEvent(
-        $eventName,
-        EveApiReadWriteInterface &$data
-    )
-    {
-        $this->lazyLoad($eventName);
-        return parent::dispatch(
-            $eventName,
-            $this->getEveApiEvent()
-                 ->setData($data)
-        );
-    }
-    /**
-     * Gets the listeners of a specific event or all listeners.
-     *
-     * @param string $eventName The name of the event
-     *
-     * @return array The event listeners for the specified event, or all event
-     *               listeners by event name
-     */
-    public function getListeners($eventName = null)
-    {
-        if (null === $eventName) {
-            foreach (array_keys($this->listenerIds) as $serviceEventName) {
-                $this->lazyLoad($serviceEventName);
-            }
-        } else {
-            $this->lazyLoad($eventName);
-        }
-        return parent::getListeners($eventName);
-    }
-    /**
-     * Checks whether an event has any registered listeners.
-     *
-     * @param string $eventName The name of the event
-     *
-     * @return bool true if the specified event has any listeners, false
-     *              otherwise
-     */
-    public function hasListeners($eventName = null)
-    {
-        if (null === $eventName) {
-            return (bool)count($this->listenerIds)
-                   || (bool)count(
-                $this->listeners
-            );
-        }
-        if (isset($this->listenerIds[$eventName])) {
-            return true;
-        }
-        return parent::hasListeners($eventName);
-    }
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     */
-    public function removeListener($eventName, $listener)
-    {
-        $this->lazyLoad($eventName);
-        if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $i => $args) {
-                // ServiceID and method.
-                $key = $args[0] . '.' . $args[1];
-                if (isset($this->listeners[$eventName][$key])
-                    &&
-                    $listener === [$this->listeners[$eventName][$key], $args[1]]
-                ) {
-                    unset($this->listeners[$eventName][$key]);
-                    if (empty($this->listeners[$eventName])) {
-                        unset($this->listeners[$eventName]);
-                    }
-                    unset($this->listenerIds[$eventName][$i]);
-                    if (empty($this->listenerIds[$eventName])) {
-                        unset($this->listenerIds[$eventName]);
-                    }
-                }
-            }
-        }
-        parent::removeListener($eventName, $listener);
-    }
-    /**
-     * @param EveApiEventInterface|null $value
-     *
-     * @return self
-     */
-    public function setEveApiEvent(EveApiEventInterface $value = null)
-    {
-        if (null === $value) {
-            $value = new EveApiEvent();
-        }
-        $this->eveApiEvent = $value;
+        $this->removeListener($eventName, $callback, $priority);
+        $this->listeners[$eventName][$priority][] = $callback;
+        unset($this->sorted[$eventName]);
         return $this;
     }
     /**
-     * @return Event|EveApiEventInterface
-     */
-    protected function getEveApiEvent()
-    {
-        return $this->eveApiEvent;
-    }
-    /**
-     * Lazily loads listeners for this event from the dependency injection
-     * container.
+     * @inheritDoc
      *
-     * @param string $eventName The name of the event to dispatch. The name of
-     *                          the event is the name of the method that is
-     *                          invoked on listeners.
+     * @api
      */
-    protected function lazyLoad($eventName)
+    public function addSubscriber($class)
     {
-        if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $args) {
-                list($serviceId, $method, $priority) = $args;
-                $listener = $this->container[$serviceId];
-                $key = $serviceId . '.' . $method;
-                if (!isset($this->listeners[$eventName][$key])) {
+        $method = 'getSubscribedEvents';
+        if (!$this->hasRequiredMethod($class, $method)) {
+            $mess = sprintf(
+                'Class %1$s MUST have public static function %2$s()',
+                $class,
+                $method
+            );
+            throw new DomainException($mess);
+        }
+        foreach ($class::$method() as $eventName => $params) {
+            if (is_string($params)) {
+                $this->addListener($eventName, [$class, $params]);
+            } elseif (is_string($params[0])) {
+                $this->addListener(
+                    $eventName,
+                    [$class, $params[0]],
+                    isset($params[1]) ? $params[1] : 0
+                );
+            } else {
+                foreach ($params as $listener) {
                     $this->addListener(
                         $eventName,
-                        [$listener, $method],
-                        $priority
-                    );
-                } elseif ($listener !== $this->listeners[$eventName][$key]) {
-                    parent::removeListener(
-                        $eventName,
-                        [$this->listeners[$eventName][$key], $method]
-                    );
-                    $this->addListener(
-                        $eventName,
-                        [$listener, $method],
-                        $priority
+                        [$class, $listener[0]],
+                        isset($listener[1]) ? $listener[1] : 0
                     );
                 }
-                $this->listeners[$eventName][$key] = $listener;
+            }
+        }
+        return $this;
+    }
+    /**
+     * @inheritDoc
+     *
+     * @api
+     */
+    public function dispatch($eventName, EventInterface $event = null)
+    {
+        if (null === $event) {
+            $event = new Event();
+        }
+        if (!isset($this->listeners[$eventName])) {
+            return $event;
+        }
+        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
+        return $event;
+    }
+    /**
+     * @inheritDoc
+     *
+     * @api
+     */
+    public function getListeners($eventName = null)
+    {
+        if (null !== $eventName) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+            return $this->sorted[$eventName];
+        }
+        foreach (array_keys($this->listeners) as $eventName) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+        }
+        return array_filter($this->sorted);
+    }
+    /**
+     * @inheritDoc
+     *
+     * @api
+     */
+    public function hasListeners($eventName = null)
+    {
+        return (bool)count($this->getListeners($eventName));
+    }
+    /**
+     * @inheritDoc
+     *
+     * @api
+     */
+    public function removeListener(
+        $eventName,
+        array $callback,
+        $priority = null
+    )
+    {
+        if (!isset($this->listeners[$eventName])) {
+            return $this;
+        }
+        if (2 !== count($callback)) {
+            $mess = 'Expected an array("class", "method") argument';
+            throw new InvalidArgumentException($mess);
+        }
+        if (null === $priority) {
+            $priority = array_keys($this->listeners[$eventName]);
+        }
+        if (!is_array($priority)) {
+            $priority = (array)$priority;
+        }
+        $this->doRemoveListener($eventName, $callback, $priority);
+        return $this;
+    }
+    /**
+     * @inheritDoc
+     *
+     * @api
+     */
+    public function removeSubscriber($class)
+    {
+        $method = 'getSubscribedEvents';
+        if (!$this->hasRequiredMethod($class, $method)) {
+            $mess = sprintf(
+                'Class %1$s MUST have public static function %2$s()',
+                $class,
+                $method
+            );
+            throw new DomainException($mess);
+        }
+        foreach ($class::$method() as $eventName => $params) {
+            if (is_array($params) && is_array($params[0])) {
+                foreach ($params as $listener) {
+                    $this->removeListener(
+                        $eventName,
+                        [$class, $listener[0]]
+                    );
+                }
+            } else {
+                $this->removeListener(
+                    $eventName,
+                    [$class, is_string($params) ? $params : $params[0]]
+                );
             }
         }
     }
     /**
-     * The container from where services are loaded
-     * @type ContainerInterface
+     * Triggers the listeners of an event.
+     *
+     * This method can be overridden to add functionality that is executed
+     * for each listener.
+     *
+     * @param callable[] $listeners The event listeners.
+     * @param string     $eventName The name of the event to dispatch.
+     * @param Event      $event     The event object to pass to the event
+     *                              handlers/listeners.
      */
-    protected $container;
+    protected function doDispatch($listeners, $eventName, Event $event)
+    {
+        foreach ($listeners as $listener) {
+            call_user_func($listener, $event, $eventName, $this);
+            if ($event->isPropagationStopped()) {
+                break;
+            }
+        }
+    }
     /**
-     * @type Event|EveApiEventInterface $eveApiEvent
+     * @param string $eventName
+     * @param array  $callback
+     * @param array  $priority
      */
-    protected $eveApiEvent;
+    protected function doRemoveListener(
+        $eventName,
+        array $callback,
+        array $priority
+    )
+    {
+        if (empty($priority)) {
+            return;
+        }
+        foreach ($priority as $pri) {
+            if (!isset($this->listeners[$eventName][$pri])) {
+                continue;
+            }
+            foreach ($this->listeners[$eventName][$pri] as $key =>
+                     $listener) {
+                // Match class and method.
+                if ($listener[0] === $callback[0]
+                    && $listener[1] == $callback[1]
+                ) {
+                    unset($this->listeners[$eventName][$pri][$key],
+                        $this->sorted[$eventName]);
+                    if (empty($this->listeners[$eventName][$pri])) {
+                        unset($this->listeners[$eventName][$pri]);
+                    }
+                    if (empty($this->listeners[$eventName])) {
+                        unset($this->listeners[$eventName]);
+                    }
+                }
+            }
+        };
+    }
     /**
-     * The service IDs of the event listeners and subscribers
-     * @type array $listenerIds
+     * @param string|object $class
+     * @param string        $method
+     *
+     * @return bool
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
-    protected $listenerIds = [];
+    protected function hasRequiredMethod($class, $method)
+    {
+        if (!is_string($method)) {
+            $mess
+                = 'Method name MUST be a string, but given ' . gettype($class);
+            throw new InvalidArgumentException($mess);
+        }
+        if (empty($method)) {
+            $mess = 'Method name can NOT be empty';
+            throw new DomainException($mess);
+        }
+        if (!(is_string($class) || is_object($class))) {
+            $mess = 'Class MUST be a string or instance, but given ' . gettype(
+                    $class
+                );
+            throw new InvalidArgumentException($mess);
+        }
+        if (!(new ReflectionClass($class))->hasMethod($method)) {
+            return false;
+        }
+        $rfl = new ReflectionMethod($class, $method);
+        if (!($rfl->isStatic() && $rfl->isPublic())) {
+            return false;
+        }
+        return true;
+    }
     /**
-     * @type callable[] $listeners
+     * Sorts the internal list of listeners for the given event by priority.
+     *
+     * @param string $eventName The name of the event.
+     */
+    protected function sortListeners($eventName)
+    {
+        $this->sorted[$eventName] = [];
+        if (isset($this->listeners[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            $this->sorted[$eventName] = call_user_func_array(
+                'array_merge',
+                $this->listeners[$eventName]
+            );
+        }
+    }
+    /**
+     * @type array $listeners
      */
     protected $listeners = [];
     /**
-     * @type callable[] $sorted
+     * @type array $sorted
      */
     protected $sorted = [];
 }

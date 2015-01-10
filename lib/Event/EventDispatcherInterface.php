@@ -4,7 +4,31 @@
  *
  * PHP version 5.4
  *
+ * LICENSE:
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
+ * Copyright (C) 2015 Michael Cummings
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
+ *
  * @copyright 2015 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Event;
@@ -24,16 +48,15 @@ interface EventDispatcherInterface
      *
      * Each combination of $eventName, $listener, and $priority is unique.
      * Re-adding the same listener will cause it to leave the $eventName,
-     * $priority chain and be added to the end of that chain.
+     * $priority queue and be added to the end of that queue again.
      * Example:
      *     $listeners[$eventName][$priority] = ['listener1', 'listener2'];
-     * Re-add 'listener1' and it becomes:
+     * Re-add 'listener1' to the event with the same priority and it becomes:
      *     $listeners[$eventName][$priority] = ['listener2', 'listener1'];
      *
      * @param string $eventName   The event to listen for
-     * @param array  $callback    The listener to be added. Needs to have either
-     *                            [object, 'methodName'] or
-     *                            ['className', 'methodName']
+     * @param array $callback     The listener to be added. Needs to be
+     *                            array('instance','method')
      * @param int    $priority    The higher this value, the earlier an event
      *                            listener will be triggered in the chain
      *                            (defaults to 0)
@@ -45,15 +68,15 @@ interface EventDispatcherInterface
     /**
      * Adds an event subscriber.
      *
-     * The subscriber is asked for all the events he is
-     * interested in and added as a listener for these events.
+     * The subscriber is asked for all the events it is
+     * interested in and is added as a listener for these events.
      *
-     * @param string|object $class The subscriber class instance or name.
+     * @param EventSubscriberInterface $class The subscriber class instance.
      *
      * @return self
      * @api
      */
-    public function addSubscriber($class);
+    public function addSubscriber(EventSubscriberInterface $class);
     /**
      * Dispatches an event to all registered listeners.
      *
@@ -77,7 +100,7 @@ interface EventDispatcherInterface
      * @return array The event listeners for the specified event, or all event
      *               listeners by event name
      */
-    public function getListeners($eventName = null);
+    public function getListeners($eventName = '');
     /**
      * Checks whether an event has any registered listeners.
      *
@@ -86,7 +109,7 @@ interface EventDispatcherInterface
      * @return bool true if the specified event has any listeners, false
      *              otherwise
      */
-    public function hasListeners($eventName = null);
+    public function hasListeners($eventName = '');
     /**
      * Removes an event listener from the specified events.
      *
@@ -109,10 +132,10 @@ interface EventDispatcherInterface
     /**
      * Removes an event subscriber.
      *
-     * @param string|object $class The subscriber class instance or name.
+     * @param EventSubscriberInterface $class The subscriber class instance.
      *
      * @return self
      * @api
      */
-    public function removeSubscriber($class);
+    public function removeSubscriber(EventSubscriberInterface $class);
 }

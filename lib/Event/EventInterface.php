@@ -41,7 +41,8 @@ interface EventInterface
     /**
      * Returns whether further event listeners should be triggered.
      *
-     * @see Event::stopPropagation
+     * @see EventInterface::stopPropagation()
+     *
      * @return bool Whether propagation was already stopped for this event.
      *
      * @api
@@ -53,6 +54,8 @@ interface EventInterface
      * If multiple event listeners are connected to the same event, no
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
+     *
+     * @return self
      *
      * @api
      */

@@ -10,9 +10,6 @@
 namespace Yapeal\Log;
 
 use Monolog\Logger as MLogger;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\Event\EventSubscriberInterface;
@@ -21,17 +18,9 @@ use Yapeal\Event\LogEventInterface;
 /**
  * Class Logger
  */
-class Logger implements LoggerAwareInterface, ServiceCallableInterface,
+class Logger extends MLogger implements ServiceCallableInterface,
     EventSubscriberInterface
 {
-    use LoggerAwareTrait;
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->setLogger($logger);
-    }
     /**
      * @inheritdoc
      *
@@ -39,7 +28,7 @@ class Logger implements LoggerAwareInterface, ServiceCallableInterface,
      */
     public static function getSubscribedEvents()
     {
-        $events = ['Yapeal.Log.log' => ['logEvent', -100]];
+        $events = ['Yapeal.Log.log' => ['logEvent', -PHP_INT_MAX]];
         return $events;
     }
     /**
@@ -53,12 +42,6 @@ class Logger implements LoggerAwareInterface, ServiceCallableInterface,
         $serviceName = str_replace('\\', '.', $class);
         if (!isset($dic[$serviceName])) {
             $dic[$serviceName] = function () use ($dic, $class) {
-                /**
-                 * @type MLogger $logger
-                 */
-                $logger = new $dic['Yapeal.Log.Handlers.logger'](
-                    $dic['Yapeal.Log.channel']
-                );
                 $group = [];
                 if (PHP_SAPI == 'cli') {
                     $group[] = new $dic['Yapeal.Log.Handlers.stream'](
@@ -69,14 +52,18 @@ class Logger implements LoggerAwareInterface, ServiceCallableInterface,
                     $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
                     100
                 );
-                $logger->pushHandler(
-                    new $dic['Yapeal.Log.Handlers.fingersCrossed'](
-                        new $dic['Yapeal.Log.Handlers.group']($group),
-                        (int)$dic['Yapeal.Log.threshold'],
-                        (int)$dic['Yapeal.Log.bufferSize']
-                    )
+                return new $class(
+                    $dic['Yapeal.Log.channel'],
+                    [
+                        new $dic['Yapeal.Log.Handlers.fingersCrossed'](
+                            new $dic['Yapeal.Log.Handlers.group'](
+                                $group
+                            ),
+                            (int)$dic['Yapeal.Log.threshold'],
+                            (int)$dic['Yapeal.Log.bufferSize']
+                        )
+                    ]
                 );
-                return new $class($logger);
             };
         }
         return $serviceName;
@@ -86,7 +73,7 @@ class Logger implements LoggerAwareInterface, ServiceCallableInterface,
      */
     public function logEvent(LogEventInterface $event)
     {
-        $this->logger->log(
+        $this->log(
             $event->getLevel(),
             $event->getMessage(),
             $event->getContext()

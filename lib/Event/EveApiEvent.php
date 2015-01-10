@@ -49,8 +49,7 @@ class EveApiEvent extends Event implements EveApiEventInterface
         $this->setData($data);
     }
     /**
-     * @return EveApiReadWriteInterface
-     * @throws LogicException
+     * @inheritdoc
      */
     public function getData()
     {
@@ -61,9 +60,14 @@ class EveApiEvent extends Event implements EveApiEventInterface
         return $this->data;
     }
     /**
-     * @param EveApiReadWriteInterface|null $value
-     *
-     * @return self
+     * @inheritdoc
+     */
+    public function isHandled()
+    {
+        return $this->handled;
+    }
+    /**
+     * @inheritdoc
      */
     public function setData(EveApiReadWriteInterface &$value = null)
     {
@@ -71,7 +75,19 @@ class EveApiEvent extends Event implements EveApiEventInterface
         return $this;
     }
     /**
+     * @inheritdoc
+     */
+    public function setHandled()
+    {
+        $this->handled = true;
+        return $this;
+    }
+    /**
      * @type EveApiReadWriteInterface $data
      */
     protected $data;
+    /**
+     * @type bool $handled
+     */
+    protected $handled = false;
 }

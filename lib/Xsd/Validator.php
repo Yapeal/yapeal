@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains Transformer class.
+ * Contains Validator class.
  *
  * PHP version 5.4
  *
@@ -31,23 +31,22 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Xsl;
+namespace Yapeal\Xsd;
 
 use DOMDocument;
 use SimpleXMLElement;
-use tidy;
-use XSLTProcessor;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventSubscriberInterface;
 use Yapeal\Log\Logger;
+use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
- * Class Transformer
+ * Class Validator
  */
-class Transformer implements EventSubscriberInterface, ServiceCallableInterface
+class Validator implements EventSubscriberInterface, ServiceCallableInterface
 {
     /**
      * @inheritdoc
@@ -58,8 +57,8 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
     {
         $priorityBase = -PHP_INT_MAX;
         $events = [
-            'Yapeal.EveApi.transform' => [
-                'eveApiTransform',
+            'Yapeal.EveApi.validate' => [
+                'eveApiValidate',
                 $priorityBase
             ]
         ];
@@ -74,7 +73,7 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
         $serviceName = str_replace('\\', '.', $class);
         $dic[$serviceName] = function () use ($dic, $class) {
             /**
-             * @type Transformer $callable
+             * @type Validator $callable
              */
             $callable = new $class();
             return $callable;
@@ -82,13 +81,13 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
         return $serviceName;
     }
     /**
-     * @param EveApiEventInterface $event
-     * @param string               $eventName
+     * @param EveApiEventInterface                   $event
+     * @param string                                 $eventName
      * @param ContainerAwareEventDispatcherInterface $yed
      *
      * @return EveApiEventInterface
      */
-    public function eveApiTransform(
+    public function eveApiValidate(
         EveApiEventInterface $event,
         $eventName,
         ContainerAwareEventDispatcherInterface $yed
@@ -104,7 +103,7 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
         );
         $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $fileNames = sprintf(
-            '%3$s/%1$s/%2$s.xsl,%3$s/%2$s.xsl,%3$s/%1$s/%1$s.xsl,%3$s/common.xsl',
+            '%3$s/%1$s/%2$s.xsd,%3$s/%2$s.xsd,%3$s/%1$s/%1$s.xsd,%3$s/common.xsd',
             $data->getEveApiSectionName(),
             $data->getEveApiName(),
             str_replace('\\', '/', __DIR__)
@@ -113,22 +112,17 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
             if (!is_readable($fileName) || !is_file($fileName)) {
                 continue;
             }
-            $mess = 'Using Xsl file ' . $fileName;
+            $mess = 'Using Xsd file ' . $fileName;
             $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            $xslt = new XSLTProcessor();
             $oldErrors = libxml_use_internal_errors(true);
             libxml_clear_errors();
             $dom = new DOMDocument();
-            $dom->load($fileName);
-            $xslt->importStylesheet($dom);
-            $xml = $xslt->transformToXml(
-                new SimpleXMLElement($data->getEveApiXml())
-            );
-            if (false === $xml) {
+            $dom->loadXML($data->getEveApiXml());
+            if (!$dom->schemaValidate($fileName)) {
                 foreach (libxml_get_errors() as $error) {
                     $yed->dispatchLogEvent(
                         'Yapeal.Log.log',
-                        Logger::DEBUG,
+                        Logger::INFO,
                         $error->message
                     );
                 }
@@ -139,17 +133,9 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
             }
             libxml_clear_errors();
             libxml_use_internal_errors($oldErrors);
-            $config = [
-                'indent' => true,
-                'indent-spaces' => 4,
-                'output-xml' => true,
-                'input-xml' => true,
-                'wrap' => '1000'
-            ];
-            // Tidy
-            $tidy = new tidy();
-            $data->setEveApiXml($tidy->repairString($xml, $config, 'utf8'));
-            $event->setData($data);
+            if (false !== strpos($data->getEveApiXml(), '<error')) {
+                $event = $this->emitXmlErrorEvents($event, $yed);
+            }
             $mess = sprintf(
                 'Finished %1$s event for %2$s/%3$s',
                 $eventName,
@@ -161,12 +147,102 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
                          ->stopPropagation();
         }
         $mess = sprintf(
-            'Failed to transform data for %1$s/%2$s',
+            'Failed to validate data for %1$s/%2$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName()
         );
         $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         return $event->setHandled()
                      ->stopPropagation();
+    }
+    /**
+     * @param EveApiReadWriteInterface               $data
+     * @param ContainerAwareEventDispatcherInterface $yed
+     */
+    protected function checkEveApiXmlError(
+        EveApiReadWriteInterface &$data,
+        ContainerAwareEventDispatcherInterface $yed
+    )
+    {
+        if (strpos($data->getEveApiXml(), '<error') === false) {
+            return;
+        }
+        $eventSuffix = 'xmlError';
+        $eventNames = sprintf(
+            '%3$s.%1$s.%2$s.%4$s,%3$s.%1$s.%4$s,%3$s.%4$s',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            'Yapeal.EveApi',
+            $eventSuffix
+        );
+        foreach (explode(',', $eventNames) as $eventName) {
+            $event = $yed
+                ->dispatchEveApiEvent($eventName, $data);
+            $data = $event->getData();
+        }
+        $simple = new SimpleXMLElement($data->getEveApiXml());
+        if (!isset($simple->error)) {
+            return;
+        }
+        $code = (int)$simple->error['code'];
+        $mess = sprintf(
+            'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            $code,
+            (string)$simple->error
+        );
+        if ($code < 200) {
+            if (strpos($mess, 'retry after') !== false) {
+                $data->setCacheInterval(
+                    strtotime(substr($mess, -19) . '+00:00') - time()
+                );
+            }
+            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            return;
+        }
+        if ($code < 300) { // API key errors.
+            $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
+            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ERROR, $mess);
+            $data->setCacheInterval(86400);
+            return;
+        }
+        if ($code > 903 && $code < 905) { // Major application or Yapeal error.
+            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ALERT, $mess);
+            $data->setCacheInterval(86400);
+            return;
+        }
+        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+        $data->setCacheInterval(300);
+    }
+    /**
+     * @param EveApiEventInterface                   $event
+     * @param ContainerAwareEventDispatcherInterface $yed
+     *
+     * @return EveApiEventInterface
+     */
+    protected function emitXmlErrorEvents(
+        EveApiEventInterface $event,
+        ContainerAwareEventDispatcherInterface $yed
+    )
+    {
+        $data = $event->getData();
+        $eventSuffix = 'xmlError';
+        $eventNames = sprintf(
+            '%3$s.%1$s.%2$s.%4$s,%3$s.%1$s.%4$s,%3$s.%4$s',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            'Yapeal.EveApi',
+            $eventSuffix
+        );
+        foreach (explode(',', $eventNames) as $eventName) {
+            $event = $yed
+                ->dispatchEveApiEvent($eventName, $data);
+            if ($event->isHandled()) {
+                break;
+            }
+            $data = $event->getData();
+        }
+        return $event->setData($data);
     }
 }

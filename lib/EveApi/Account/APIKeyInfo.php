@@ -34,37 +34,22 @@
 namespace Yapeal\EveApi\Account;
 
 use LogicException;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
-use Yapeal\EveApi\EveApiToolsTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Event\EventSubscriberInterface;
+use Yapeal\Log\Logger;
 
 /**
  * Class APIKeyInfo
  */
-class APIKeyInfo implements EventSubscriberInterface, ServiceCallableInterface,
-    LoggerAwareInterface
+class APIKeyInfo extends AccountSection implements EventSubscriberInterface,
+    ServiceCallableInterface
 {
-    use LoggerAwareTrait, EveApiNameTrait, EveSectionNameTrait, EveApiToolsTrait;
-    /**
-     * @param LoggerInterface          $logger
-     * @param EventDispatcherInterface $yed
-     */
-    public function __construct(
-        LoggerInterface $logger,
-        EventDispatcherInterface $yed = null
-    )
-    {
-        $this->setLogger($logger);
-        $this->setYed($yed);
-    }
+    use EveApiNameTrait, EveSectionNameTrait;
     /**
      * @inheritDoc
      *
@@ -72,18 +57,12 @@ class APIKeyInfo implements EventSubscriberInterface, ServiceCallableInterface,
      */
     public static function getSubscribedEvents()
     {
-        $priorityBase = -100;
-        $serviceBase = str_replace('\\', '.', __CLASS__) . '.';
-        $events = [
-            $serviceBase . 'start' => ['eveApiStart', $priorityBase],
-            $serviceBase . 'end' => ['eveApiEnd', $priorityBase]
-        ];
+        $eventName = str_replace('\\', '.', __CLASS__) . '.preserve';
+        $events = [$eventName => ['eveApiPreserve', -PHP_INT_MAX]];
         return $events;
     }
     /**
-     * @param ContainerInterface $dic
-     *
-     * @return string Returns the service name.
+     * @inheritdoc
      */
     public static function injectCallable(ContainerInterface $dic)
     {
@@ -93,7 +72,7 @@ class APIKeyInfo implements EventSubscriberInterface, ServiceCallableInterface,
             /**
              * @type APIKeyInfo $callable
              */
-            $callable = new $class($dic['Yapeal.Log.Logger']);
+            $callable = new $class();
             return $callable->setCsq($dic['Yapeal.Database.CommonQueries'])
                             ->setPdo($dic['Yapeal.Database.Connection']);
         };
@@ -104,38 +83,33 @@ class APIKeyInfo implements EventSubscriberInterface, ServiceCallableInterface,
      * @param string                   $eventName
      * @param EventDispatcherInterface $yed
      *
+     * @return EveApiEventInterface
      * @throws LogicException
      */
-    public function eveApiStart(
+    public function eveApiPreserve(
         EveApiEventInterface $event,
         $eventName,
         EventDispatcherInterface $yed
     )
     {
-        $this->getLogger()
-             ->debug(
-                 sprintf(
-                     'Starting %3$s for %1$s/%2$s',
-                     $this->getSectionName(),
-                     $this->getApiName(),
-                     __METHOD__
-                 )
-             );
-        $this->getLogger()
-             ->debug(sprintf('Received %1$s event', $eventName));
         $this->setYed($yed);
         $data = $event->getData();
-    }
-    /**
-     * @throws LogicException
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        if (empty($this->logger)) {
-            $mess = 'Tried to use logger before it was set';
-            throw new LogicException($mess);
-        }
-        return $this->logger;
+        $mess = sprintf(
+            'Received %1$s event for %2$s/%3$s in %4$s',
+            $eventName,
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            __CLASS__
+        );
+        $this->getYed()
+             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $fileName = sprintf(
+            '%1$s/cache/%2$s/%3$s.xml',
+            dirname(dirname(__DIR__)),
+            strtolower($data->getEveApiSectionName()),
+            $data->getEveApiName()
+        );
+        file_put_contents($fileName, $data->getEveApiXml());
+        return $event->setHandled();
     }
 }

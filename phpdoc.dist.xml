@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>Yapeal (Yet Another PHP Eve Api Library)</title>
+    <logging>
+        <level>warn</level>
+        <paths>
+            <default>{APP_ROOT}/log/{DATE}.phpdoc.log</default>
+            <errors>{APP_ROOT}/log/{DATE}.phpdoc.errors.log</errors>
+        </paths>
+    </logging>
+    <parser>
+        <default-package-name>Yapeal</default-package-name>
+        <target>docs/phpdoc</target>
+    </parser>
+    <transformer>
+        <target>docs/phpdoc</target>
+        <template name="clean"/>
+    </transformer>
+    <files>
+        <directory>bin</directory>
+        <directory>lib</directory>
+        <file>bin/yc</file>
+        <ignore>Database/*</ignore>
+    </files>
+</phpdoc>

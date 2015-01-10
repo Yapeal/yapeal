@@ -47,10 +47,19 @@ interface EveApiEventInterface extends EventInterface
      *                        before it is set.
      */
     public function getData();
+
+    /**
+     * @return bool
+     */
+    public function isHandled();
     /**
      * @param EveApiReadWriteInterface $value
      *
      * @return self
      */
     public function setData(EveApiReadWriteInterface &$value);
+    /**
+     * @return self
+     */
+    public function setHandled();
 }

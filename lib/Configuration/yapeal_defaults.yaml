@@ -27,15 +27,18 @@ Yapeal:
             group: Monolog\Handler\GroupHandler
             stream: Monolog\Handler\StreamHandler
     Event:
-        class: Yapeal\Event\EveApiEvent
         dispatcher: Yapeal\Event\ContainerAwareEventDispatcher
+        Events:
+            eveApi: Yapeal\Event\EveApiEvent
+            log: Yapeal\Event\LogEvent
         Subscribers:
             internal: >
                 Yapeal\Log\Logger,
                 Yapeal\EveApi\Account\AccountSection,
                 Yapeal\EveApi\Account\APIKeyInfo,
                 Yapeal\Network\GuzzleNetworkRetriever,
-                Yapeal\Xsl\Transformer
+                Yapeal\Xsl\Transformer,
+                Yapeal\Xsd\Validator
             user: ''
     Log:
         bufferSize: 25

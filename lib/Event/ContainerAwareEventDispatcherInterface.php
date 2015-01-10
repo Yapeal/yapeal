@@ -92,14 +92,32 @@ interface ContainerAwareEventDispatcherInterface extends
     /**
      * Adds a service as event subscriber
      *
-     * @param string $serviceId The service ID of the subscriber service
-     * @param string $class     The service's class name which SHOULD implement
-     *                          EventSubscriberInterface, and MUST have a public
-     *                          static function getSubscribedEvents()
+     * @param string                          $serviceId The service ID of the
+     *                                                   subscriber service
+     * @param EventSubscriberInterface|string $class     The subscriber class
+     *                                                   instance or FQN for
+     *                                                   class that has a
+     *                                                   public static
+     *                                                   getSubscribedEvents().
      *
      * @return self
      */
     public function addSubscriberService($serviceId, $class);
+    /**
+     * Dispatches an event to all registered listeners.
+     *
+     * @param string         $eventName The name of the event to dispatch. The
+     *                                  name of the event is the name of the
+     *                                  method that is invoked on listeners.
+     * @param EventInterface $event     The event to pass to the event
+     *                                  handlers/listeners. If not supplied, an
+     *                                  empty Event instance is created.
+     *
+     * @return EventInterface
+     *
+     * @api
+     */
+    public function dispatch($eventName, EventInterface $event = null);
     /**
      * Dispatches an event to all registered listeners.
      *
@@ -119,10 +137,17 @@ interface ContainerAwareEventDispatcherInterface extends
         EveApiReadWriteInterface &$data
     );
     /**
-     * @param string            $eventName
-     * @param LogEventInterface $event
+     * @param string $eventName
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
      *
-     * @return EventInterface|LogEventInterface
+     * @return LogEventInterface
      */
-    public function dispatchLogEvent($eventName, LogEventInterface $event);
+    public function dispatchLogEvent(
+        $eventName,
+        $level,
+        $message,
+        array $context = []
+    );
 }

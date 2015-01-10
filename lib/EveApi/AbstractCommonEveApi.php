@@ -7,7 +7,8 @@
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
- * database. Copyright (C) 2015 Michael Cummings
+ * database.
+ * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -36,17 +37,15 @@ use FilePathNormalizer\FilePathNormalizerTrait;
 use LogicException;
 use PDO;
 use PDOException;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LogLevel;
 use SimpleXMLElement;
-use Yapeal\Event\LogEvent;
+use Yapeal\Log\Logger;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements LoggerAwareInterface
+abstract class AbstractCommonEveApi
 {
     use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
     /**
@@ -60,16 +59,13 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
     protected function cacheNotExpired($apiName, $sectionName, $ownerID = '0')
     {
         $mess = sprintf(
-            'Checking if cache expired on table %1$s/%2$s for ownerID = %3$s',
-            strtolower($sectionName),
+            'Checking if cache expired on table %1$s%2$s for ownerID = %3$s',
+            $sectionName,
             $apiName,
             $ownerID
         );
         $this->getYed()
-             ->dispatchLogEvent(
-                 'Yapeal.Log.log',
-                 new LogEvent(LogLevel::DEBUG, $mess)
-             );
+            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $sql = $this->getCsq()
                     ->getUtilCachedUntilExpires(
                         $apiName,
@@ -77,32 +73,70 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
                         $ownerID
                     );
         $this->getYed()
-             ->dispatchLogEvent(
-                 'Yapeal.Log.log',
-                 new LogEvent(LogLevel::DEBUG, $sql)
-             );
+            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         $stmt = $this->getPdo()
                      ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($expires)) {
-            $mess = 'No UtilCachedUntil record found';
+            $mess = 'No UtilCachedUntil record found for ownerID = ' . $ownerID;
             $this->getYed()
-                 ->dispatchLogEvent(
-                     'Yapeal.Log.log',
-                     new LogEvent(LogLevel::DEBUG, $mess)
-                 );
+                ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
         if (strtotime($expires[0]['expires'] . '+00:00') < time()) {
-            $mess = 'Expired UtilCachedUntil record found';
+            $mess = 'Expired UtilCachedUntil record found for ownerID = '
+                    . $ownerID;
             $this->getYed()
-                 ->dispatchLogEvent(
-                     'Yapeal.Log.log',
-                     new LogEvent(LogLevel::DEBUG, $mess)
-                 );
+                ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
         return true;
+    }
+    /**
+     * @param EveApiReadWriteInterface $data
+     *
+     * @throws LogicException
+     * @return bool
+     */
+    protected function gotApiLock(EveApiReadWriteInterface &$data)
+    {
+        $sql = $this->getCsq()
+                    ->getApiLock($data->getHash());
+        $this->getYed()
+             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
+        try {
+            $stmt = $this->getPdo()
+                         ->query($sql);
+            $lock = (bool)$stmt->fetchColumn();
+            if (false !== $lock) {
+                $mess = sprintf(
+                    'Got lock for %1$s/%2$s',
+                    $data->getEveApiSectionName(),
+                    $data->getEveApiName()
+                );
+                $this->getYed()
+                     ->dispatchLogEvent(
+                         'Yapeal.Log.log',
+                         Logger::DEBUG,
+                         $mess
+                     );
+            }
+            return $lock;
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Could NOT get lock for %1$s/%2$s',
+                $data->getEveApiSectionName(),
+                $data->getEveApiName()
+            );
+            $this->getYed()
+                 ->dispatchLogEvent(
+                     'Yapeal.Log.log',
+                     Logger::WARNING,
+                     $mess,
+                     ['exception' => $exc]
+                 );
+            return false;
+        }
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -144,28 +178,22 @@ abstract class AbstractCommonEveApi implements LoggerAwareInterface
         } catch (PDOException $exc) {
             $pdo->rollBack();
             $mess = sprintf(
-                'Could NOT update cached until time from Eve API %1$s/%2$s for %3$s',
+                'Could NOT update cached until time of Eve API %1$s/%2$s for ownerID = %3$s',
                 $data->getEveApiSectionName(),
                 $data->getEveApiName(),
                 $ownerID
             );
             $this->getYed()
-                 ->dispatchLogEvent(
-                     'Yapeal.Log.log',
-                     new LogEvent(LogLevel::NOTICE, $mess)
-                 );
+                ->dispatchLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
             return;
         }
         $mess = sprintf(
-            'Updated cached until time from Eve API %1$s/%2$s for %3$s',
+            'Updated cached until time of Eve API %1$s/%2$s for ownerID = %3$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName(),
             $ownerID
         );
         $this->getYed()
-             ->dispatchLogEvent(
-                 'Yapeal.Log.log',
-                 new LogEvent(LogLevel::DEBUG, $mess)
-             );
+            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains LogEvent class.
+ * Contains PriorityQueue class.
  *
  * PHP version 5.4
  *
@@ -32,83 +32,47 @@
  */
 namespace Yapeal\Event;
 
-use Yapeal\Log\Logger;
+use DomainException;
+use SplPriorityQueue;
 
 /**
- * Class LogEvent
+ * Class PriorityQueue
  */
-class LogEvent extends Event implements LogEventInterface
+class PriorityQueue extends SplPriorityQueue
 {
     /**
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
+     *
      */
-    public function __construct(
-        $level = LOGGER::DEBUG,
-        $message = '',
-        array $context = []
-    )
+    public function __construct()
     {
-        $this->setLevel($level)
-             ->setMessage($message)
-             ->setContext($context);
+        $this->setExtractFlags(self::EXTR_DATA);
     }
     /**
-     * @inheritdoc
+     *
      */
-    public function getContext()
+    public function __clone()
     {
-        return $this->context;
+        $this->setExtractFlags(self::EXTR_DATA);
     }
     /**
-     * @inheritdoc
+     * @param mixed $priority1
+     * @param mixed $priority2
+     *
+     * @return int
+     * @throws DomainException
      */
-    public function getLevel()
+    public function compare($priority1, $priority2)
     {
-        return $this->level;
+        if (2 != count($priority1) || 2 != count($priority2)) {
+            $mess = 'Expect priorities to be array("priority", "index")';
+            throw new DomainException($mess);
+        }
+        if ($priority1[0] == $priority2[0]) {
+            if ($priority1[1] == $priority2[1]) {
+                return 0;
+            }
+            return ($priority2[1] > $priority1[1]) ? 1 : -1;
+        }
+        return ($priority1[0] > $priority2[0]) ? 1 : -1;
     }
-    /**
-     * @inheritdoc
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-    /**
-     * @inheritdoc
-     */
-    public function setContext(array $value)
-    {
-        $this->context = $value;
-        return $this;
-    }
-    /**
-     * @inheritdoc
-     */
-    public function setLevel($value)
-    {
-        $this->level = $value;
-        return $this;
-    }
-    /**
-     * @inheritdoc
-     */
-    public function setMessage($value)
-    {
-        $this->message = $value;
-        return $this;
-    }
-    /**
-     * @type array $context
-     */
-    protected $context;
-    /**
-     * @type mixed $level
-     */
-    protected $level;
-    /**
-     * @type string $message
-     */
-    protected $message;
 }

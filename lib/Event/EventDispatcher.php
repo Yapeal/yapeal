@@ -30,34 +30,10 @@
  * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
- *
- * Additional licence and copyright information:
- * @copyright 2004-2014 Fabien Potencier <fabien@symfony.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
  */
 namespace Yapeal\Event;
 
 use DomainException;
-use InvalidArgumentException;
-use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * Class EventDispatcher
@@ -65,283 +41,296 @@ use ReflectionMethod;
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
- * @author  Fabien Potencier <fabien@symfony.com>
- * @author  Jordi Boggiano <j.boggiano@seld.be>
- * @author  Jordan Alliot <jordan.alliot@gmail.com>
- *
  * @api
  */
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      *
+     * @throws DomainException
      * @api
      */
     public function addListener($eventName, array $callback, $priority = 0)
     {
-        if (2 !== count($callback)) {
-            $mess = 'Expected an array("class", "method") argument';
-            throw new InvalidArgumentException($mess);
+        if (2 !== count($callback) || !is_object($callback[0])
+            || !is_string($callback[1])
+        ) {
+            $mess = 'Expected an array("instance", "methodName") argument';
+            throw new DomainException($mess);
         }
-        $this->removeListener($eventName, $callback, $priority);
-        $this->listeners[$eventName][$priority][] = $callback;
-        unset($this->sorted[$eventName]);
+        $eventName = (string)$eventName;
+        $priority = (int)$priority;
+        // Use a hash so we can maintain a single list of unique listeners.
+        $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
+        $refCount = 0;
+        if (isset($this->listeners[$hash])) {
+            $refCount = $this->listeners[$hash][3];
+        }
+        // Re-adding the same listener to the same event moves it to the
+        // end of the priority queue for that event. This only matters if there
+        // are multiple listeners for an event with the same priority.
+        if (isset($this->listenerIds[$eventName])) {
+            $key = array_search($hash, $this->listenerIds[$eventName]);
+            if (false !== $key) {
+                unset($this->listenerIds[$eventName][$key]);
+                --$refCount;
+            }
+        }
+        $this->listenerIds[$eventName][] = $hash;
+        $this->listeners[$hash] = [
+            $callback[0],
+            $callback[1],
+            $priority,
+            ++$refCount
+        ];
         return $this;
     }
     /**
-     * @inheritDoc
+     * @inheritdoc
      *
      * @api
      */
-    public function addSubscriber($class)
+    public function addSubscriber(EventSubscriberInterface $class)
     {
-        $method = 'getSubscribedEvents';
-        if (!$this->hasRequiredMethod($class, $method)) {
-            $mess = sprintf(
-                'Class %1$s MUST have public static function %2$s()',
-                $class,
-                $method
-            );
-            throw new DomainException($mess);
-        }
-        foreach ($class::$method() as $eventName => $params) {
+        foreach ($class::getSubscribedEvents() as $eventName => $params) {
+            // Single method using default priority.
             if (is_string($params)) {
                 $this->addListener($eventName, [$class, $params]);
-            } elseif (is_string($params[0])) {
-                $this->addListener(
-                    $eventName,
-                    [$class, $params[0]],
-                    isset($params[1]) ? $params[1] : 0
-                );
-            } else {
-                foreach ($params as $listener) {
+                continue;
+            }
+            // Single method with optional priority.
+            if (is_string($params[0])) {
+                if (isset($params[1])) {
+                    $this->addListener(
+                        $eventName,
+                        [$class, $params[0]],
+                        $params[1]
+                    );
+                } else {
+                    $this->addListener($eventName, [$class, $params[0]]);
+                }
+                continue;
+            }
+            // Multiple methods with optional priorities.
+            foreach ($params as $listener) {
+                if (isset($listener[1])) {
                     $this->addListener(
                         $eventName,
                         [$class, $listener[0]],
-                        isset($listener[1]) ? $listener[1] : 0
+                        $listener[1]
                     );
+                } else {
+                    $this->addListener($eventName, [$class, $listener[0]]);
                 }
             }
         }
         return $this;
     }
     /**
-     * @inheritDoc
+     * @inheritdoc
      *
      * @api
      */
-    public function dispatch($eventName, EventInterface $event = null)
+    public function dispatch(
+        $eventName,
+        EventInterface $event = null,
+        PriorityQueue $queue = null
+    )
     {
+        $eventName = (string)$eventName;
         if (null === $event) {
             $event = new Event();
         }
-        if (!isset($this->listeners[$eventName])) {
+        if (!isset($this->listenerIds[$eventName])) {
             return $event;
         }
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
-        return $event;
-    }
-    /**
-     * @inheritDoc
-     *
-     * @api
-     */
-    public function getListeners($eventName = null)
-    {
-        if (null !== $eventName) {
-            if (!isset($this->sorted[$eventName])) {
-                $this->sortListeners($eventName);
-            }
-            return $this->sorted[$eventName];
+        if (null === $queue) {
+            $queue = new PriorityQueue();
         }
-        foreach (array_keys($this->listeners) as $eventName) {
-            if (!isset($this->sorted[$eventName])) {
-                $this->sortListeners($eventName);
-            }
+        foreach ($this->listenerIds[$eventName] as $index => $hash) {
+            $object = $this->listeners[$hash][0];
+            $method = $this->listeners[$hash][1];
+            $priority = $this->listeners[$hash][2];
+            $queue->insert([$object, $method], [$priority, $index]);
         }
-        return array_filter($this->sorted);
-    }
-    /**
-     * @inheritDoc
-     *
-     * @api
-     */
-    public function hasListeners($eventName = null)
-    {
-        return (bool)count($this->getListeners($eventName));
-    }
-    /**
-     * @inheritDoc
-     *
-     * @api
-     */
-    public function removeListener(
-        $eventName,
-        array $callback,
-        $priority = null
-    )
-    {
-        if (!isset($this->listeners[$eventName])) {
-            return $this;
-        }
-        if (2 !== count($callback)) {
-            $mess = 'Expected an array("class", "method") argument';
-            throw new InvalidArgumentException($mess);
-        }
-        if (null === $priority) {
-            $priority = array_keys($this->listeners[$eventName]);
-        }
-        if (!is_array($priority)) {
-            $priority = (array)$priority;
-        }
-        $this->doRemoveListener($eventName, $callback, $priority);
-        return $this;
-    }
-    /**
-     * @inheritDoc
-     *
-     * @api
-     */
-    public function removeSubscriber($class)
-    {
-        $method = 'getSubscribedEvents';
-        if (!$this->hasRequiredMethod($class, $method)) {
-            $mess = sprintf(
-                'Class %1$s MUST have public static function %2$s()',
-                $class,
-                $method
-            );
-            throw new DomainException($mess);
-        }
-        foreach ($class::$method() as $eventName => $params) {
-            if (is_array($params) && is_array($params[0])) {
-                foreach ($params as $listener) {
-                    $this->removeListener(
-                        $eventName,
-                        [$class, $listener[0]]
-                    );
-                }
-            } else {
-                $this->removeListener(
-                    $eventName,
-                    [$class, is_string($params) ? $params : $params[0]]
-                );
-            }
-        }
-    }
-    /**
-     * Triggers the listeners of an event.
-     *
-     * This method can be overridden to add functionality that is executed
-     * for each listener.
-     *
-     * @param callable[] $listeners The event listeners.
-     * @param string     $eventName The name of the event to dispatch.
-     * @param Event      $event     The event object to pass to the event
-     *                              handlers/listeners.
-     */
-    protected function doDispatch($listeners, $eventName, Event $event)
-    {
-        foreach ($listeners as $listener) {
+        foreach ($queue as $listener) {
             call_user_func($listener, $event, $eventName, $this);
             if ($event->isPropagationStopped()) {
                 break;
             }
         }
+        return $event;
+    }
+    /**
+     * @inheritdoc
+     *
+     * @api
+     */
+    public function getListeners($eventName = '', PriorityQueue $queue = null)
+    {
+        if (0 == count($this->listenerIds)) {
+            return [];
+        }
+        if (null === $queue) {
+            $queue = new PriorityQueue();
+        }
+        if (!empty($eventName)) {
+            $eventNames = [(string)$eventName];
+        } else {
+            $eventNames = array_keys($this->listenerIds);
+        }
+        $events = [];
+        sort($eventNames);
+        foreach ($eventNames as $eventName) {
+            if (!isset($this->listenerIds[$eventName])) {
+                continue;
+            }
+            $mpq = clone $queue;
+            foreach ($this->listenerIds[$eventName] as $index => $hash) {
+                $object = $this->listeners[$hash][0];
+                $method = $this->listeners[$hash][1];
+                $priority = $this->listeners[$hash][2];
+                $mpq->insert([$object, $method], [$priority, $index]);
+            }
+            $events = array_merge($events, iterator_to_array($mpq, false));
+        }
+        return $events;
+    }
+    /**
+     * @inheritdoc
+     *
+     * @api
+     */
+    public function hasListeners($eventName = '')
+    {
+        return (bool)count($this->getListeners($eventName));
+    }
+    /**
+     * @inheritdoc
+     *
+     * @throws DomainException
+     * @api
+     */
+    public function removeListener(
+        $eventName,
+        array $callback,
+        $priority = 0
+    )
+    {
+        if (2 !== count($callback) || !is_object($callback[0])
+            || !is_string($callback[1])
+        ) {
+            $mess = 'Expected an array("instance", "methodName") argument';
+            throw new DomainException($mess);
+        }
+        $priority = (int)$priority;
+        $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
+        if (!isset($this->listeners[$hash])) {
+            return $this;
+        }
+        $eventName = (string)$eventName;
+        $refCount = $this->listeners[$hash][3];
+        $key = array_search($hash, $this->listenerIds[$eventName]);
+        if (false !== $key) {
+            unset($this->listenerIds[$eventName][$key]);
+            --$refCount;
+        }
+        if (empty($this->listenerIds[$eventName])) {
+            unset($this->listenerIds[$eventName]);
+        } else {
+            // Reindex listeners to keep them neater.
+            $this->listenerIds[$eventName] = array_values(
+                $this->listenerIds[$eventName]
+            );
+        }
+        if ($refCount < 1) {
+            unset($this->listeners[$hash]);
+        } else {
+            $this->listeners[$hash][3] = $refCount;
+        }
+        return $this;
+    }
+    /**
+     * @inheritdoc
+     *
+     * @api
+     */
+    public function removeSubscriber(EventSubscriberInterface $class)
+    {
+        foreach ($class::getSubscribedEvents() as $eventName => $params) {
+            // Single method using default priority.
+            if (is_string($params)) {
+                $this->removeListener($eventName, [$class, $params]);
+                continue;
+            }
+            // Single method with optional priority.
+            if (is_string($params[0])) {
+                if (isset($params[1])) {
+                    $this->removeListener(
+                        $eventName,
+                        [$class, $params[0]],
+                        $params[1]
+                    );
+                } else {
+                    $this->removeListener($eventName, [$class, $params[0]]);
+                }
+                continue;
+            }
+            // Multiple methods with optional priorities.
+            foreach ($params as $listener) {
+                if (isset($listener[1])) {
+                    $this->removeListener(
+                        $eventName,
+                        [$class, $listener[0]],
+                        $listener[1]
+                    );
+                } else {
+                    $this->removeListener($eventName, [$class, $listener[0]]);
+                }
+            }
+        }
+        return $this;
     }
     /**
      * @param string $eventName
      * @param array  $callback
-     * @param array  $priority
-     */
-    protected function doRemoveListener(
-        $eventName,
-        array $callback,
-        array $priority
-    )
-    {
-        if (empty($priority)) {
-            return;
-        }
-        foreach ($priority as $pri) {
-            if (!isset($this->listeners[$eventName][$pri])) {
-                continue;
-            }
-            foreach ($this->listeners[$eventName][$pri] as $key =>
-                     $listener) {
-                // Match class and method.
-                if ($listener[0] === $callback[0]
-                    && $listener[1] == $callback[1]
-                ) {
-                    unset($this->listeners[$eventName][$pri][$key],
-                        $this->sorted[$eventName]);
-                    if (empty($this->listeners[$eventName][$pri])) {
-                        unset($this->listeners[$eventName][$pri]);
-                    }
-                    if (empty($this->listeners[$eventName])) {
-                        unset($this->listeners[$eventName]);
-                    }
-                }
-            }
-        };
-    }
-    /**
-     * @param string|object $class
-     * @param string        $method
+     * @param int    $priority
      *
      * @return bool
      * @throws DomainException
-     * @throws InvalidArgumentException
      */
-    protected function hasRequiredMethod($class, $method)
+    protected function hasListener(
+        $eventName,
+        array $callback,
+        $priority = 0
+    )
     {
-        if (!is_string($method)) {
-            $mess
-                = 'Method name MUST be a string, but given ' . gettype($class);
-            throw new InvalidArgumentException($mess);
-        }
-        if (empty($method)) {
-            $mess = 'Method name can NOT be empty';
+        if (2 !== count($callback) || !is_object($callback[0])
+            || !is_string($callback[1])
+        ) {
+            $mess = 'Expected an array("instance", "methodName") argument';
             throw new DomainException($mess);
         }
-        if (!(is_string($class) || is_object($class))) {
-            $mess = 'Class MUST be a string or instance, but given ' . gettype(
-                    $class
-                );
-            throw new InvalidArgumentException($mess);
+        $priority = (int)$priority;
+        $eventName = (string)$eventName;
+        $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
+        if ('Yapeal.Log.log' != $eventName
+            && in_array($hash, $this->listenerIds[$eventName])
+        ) {
+            print 'Have listener ' . PHP_EOL;
+            return true;
         }
-        if (!(new ReflectionClass($class))->hasMethod($method)) {
-            return false;
-        }
-        $rfl = new ReflectionMethod($class, $method);
-        if (!($rfl->isStatic() && $rfl->isPublic())) {
-            return false;
-        }
-        return true;
+        print 'No listener' . PHP_EOL;
+        return false;
     }
     /**
-     * Sorts the internal list of listeners for the given event by priority.
-     *
-     * @param string $eventName The name of the event.
+     * @type array $listenersIds A list of listeners hashes indexed by event
+     * names.
      */
-    protected function sortListeners($eventName)
-    {
-        $this->sorted[$eventName] = [];
-        if (isset($this->listeners[$eventName])) {
-            krsort($this->listeners[$eventName]);
-            $this->sorted[$eventName] = call_user_func_array(
-                'array_merge',
-                $this->listeners[$eventName]
-            );
-        }
-    }
+    protected $listenerIds = [];
     /**
-     * @type array $listeners
+     * @type array $listeners List of listeners indexed by unique hash.
      */
     protected $listeners = [];
     /**

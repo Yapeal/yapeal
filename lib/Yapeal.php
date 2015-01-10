@@ -37,14 +37,13 @@ use FilePathNormalizer\FilePathNormalizerTrait;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Psr\Log\LogLevel;
 use Yapeal\Configuration\Wiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Event\ContainerAwareEventDispatcher;
-use Yapeal\Event\LogEvent;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
+use Yapeal\Log\Logger;
 use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
@@ -75,25 +74,14 @@ class Yapeal implements WiringInterface
          * @type ContainerAwareEventDispatcher $yed
          */
         $yed = $dic['Yapeal.Event.EventDispatcher'];
-        $yed->dispatchLogEvent(
-            'Yapeal.Log.log',
-            new LogEvent(
-                LogLevel::INFO,
-                'Let the magic begin!'
-            )
-        );
+        $mess = 'Let the magic begin!';
+        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
         /**
          * @type CommonSqlQueries $csq
          */
         $csq = $dic['Yapeal.Database.CommonQueries'];
         $sql = $csq->getActiveApis();
-        $yed->dispatchLogEvent(
-            'Yapeal.Log.log',
-            new LogEvent(
-                LogLevel::INFO,
-                $sql
-            )
-        );
+        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
         try {
             /**
              * @type PDO $pdo
@@ -108,11 +96,9 @@ class Yapeal implements WiringInterface
             $mess = 'Could not access utilEveApi table';
             $yed->dispatchLogEvent(
                 'Yapeal.Log.log',
-                new LogEvent(
-                    LogLevel::INFO,
-                    $mess,
-                    ['exception' => $exc]
-                )
+                Logger::INFO,
+                $mess,
+                ['exception' => $exc]
             );
             return 1;
         }
@@ -122,7 +108,7 @@ class Yapeal implements WiringInterface
             [
                 'apiName' => 'APIKeyInfo',
                 'interval' => '300',
-                'sectionName' => 'account'
+                'sectionName' => 'Account'
             ]
         );
         foreach ($result as $record) {
@@ -133,7 +119,7 @@ class Yapeal implements WiringInterface
             $data->setEveApiName($record['apiName'])
                  ->setEveApiSectionName($record['sectionName'])
                  ->setCacheInterval($record['interval']);
-            $yed->dispatchEveApiEvent('Yapeal.EveApi.start', $data);
+            $this->emitEvents($data, $yed);
         }
         return 0;
     }
@@ -177,6 +163,34 @@ class Yapeal implements WiringInterface
                           ->wireLog()
                           ->wireNetwork()
                           ->wireXml();
+    }
+    /**
+     * @param EveApiReadWriteInterface      $data
+     * @param ContainerAwareEventDispatcher $yed
+     *
+     * @return self
+     */
+    protected function emitEvents(
+        EveApiReadWriteInterface $data,
+        ContainerAwareEventDispatcher $yed
+    )
+    {
+        // Yapeal.EveApi.Section.Api.start, Yapeal.EveApi.Api.start,
+        // Yapeal.EveApi.Section.start, Yapeal.EveApi.start
+        $eventNames = sprintf(
+            '%3$s.%1$s.%2$s.start,%3$s.%2$s.start,%3$s.%1$s.start,%3$s.start',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            'Yapeal.EveApi'
+        );
+        foreach (explode(',', $eventNames) as $eventName) {
+            $event = $yed->dispatchEveApiEvent($eventName, $data);
+            $data = $event->getData();
+            if ($event->isHandled()) {
+                break;
+            }
+        }
+        return $this;
     }
     /**
      * @return array

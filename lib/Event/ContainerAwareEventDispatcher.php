@@ -30,27 +30,6 @@
  * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
- *
- * Additional licence and copyright information:
- * @copyright 2004-2014 Fabien Potencier <fabien@symfony.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
  */
 namespace Yapeal\Event;
 
@@ -64,10 +43,6 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  *
  * Lazily loads listeners and subscribers from the dependency injection
  * container.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 class ContainerAwareEventDispatcher extends EventDispatcher implements
     ContainerAwareEventDispatcherInterface
@@ -75,17 +50,23 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
     /**
      * @param ContainerInterface $dic A ContainerInterface instance
      * @param EveApiEventInterface $eae
+     * @param LogEventInterface    $lei
      */
     public function __construct(
         ContainerInterface $dic,
-        EveApiEventInterface $eae = null
+        EveApiEventInterface $eae = null,
+        LogEventInterface $lei
     )
     {
         $this->container = $dic;
-        $this->setEveApiEvent($eae);
+        $this->setEveApiEvent($eae)
+             ->setLogEvent($lei);
     }
     /**
      * @inheritdoc
+     *
+     * @throws DomainException
+     * @api
      */
     public function addListenerService(
         $eventName,
@@ -93,50 +74,93 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         $priority = 0
     )
     {
-        if (2 !== count($callback)) {
-            $mess
-                = 'For $callback expected an array("service", "method") argument';
-            throw new InvalidArgumentException($mess);
+        if (2 !== count($callback) || !is_string($callback[0])
+            || !is_string($callback[1])
+        ) {
+            $mess = 'Expected an array("serviceName", "methodName") argument';
+            throw new DomainException($mess);
         }
-        $this->listenerIds[$eventName][] = [
+        $eventName = (string)$eventName;
+        $priority = (int)$priority;
+        // Use a hash so we can maintain a single list of unique service listeners.
+        $hash = md5($callback[0] . $callback[1] . $priority);
+        $refCount = 0;
+        if (isset($this->serviceListeners[$hash])) {
+            $refCount = $this->serviceListeners[$hash][3];
+        }
+        // Re-adding the same service listener to the same event moves it to the
+        // end of the priority queue for that event. This only matters if there
+        // are multiple listeners for an event with the same priority.
+        if (isset($this->serviceIds[$eventName])) {
+            $key = array_search($hash, $this->serviceIds[$eventName]);
+            if (false !== $key) {
+                unset($this->serviceIds[$eventName][$key]);
+                --$refCount;
+            }
+        }
+        $this->serviceIds[$eventName][] = $hash;
+        $this->serviceListeners[$hash] = [
             $callback[0],
             $callback[1],
-            $priority
+            $priority,
+            ++$refCount
         ];
         return $this;
     }
     /**
      * @inheritdoc
+     *
+     * @throws DomainException
+     * @api
      */
     public function addSubscriberService($serviceId, $class)
     {
-        $method = 'getSubscribedEvents';
-        if (!$this->hasRequiredMethod($class, $method)) {
-            $mess = sprintf(
-                'Class %1$s MUST have public static function %2$s()',
-                $class,
-                $method
-            );
+        if (!method_exists($class, 'getSubscribedEvents')) {
+            $mess = 'Class MUST has a public static getSubscribedEvents()';
             throw new DomainException($mess);
         }
-        foreach ($class::$method() as $eventName => $params) {
+        foreach ($class::getSubscribedEvents() as $eventName => $params) {
+            // Single method using default priority.
             if (is_string($params)) {
-                $this->addListenerService($eventName, [$serviceId, $params], 0);
-            } elseif (is_string($params[0])) {
-                $this->addListenerService(
-                    $eventName,
-                    [$serviceId, $params[0]],
-                    isset($params[1]) ? $params[1] : 0
-                );
-            } else {
-                foreach ($params as $listener) {
+                $this->addListenerService($eventName, [$serviceId, $params]);
+                continue;
+            }
+            // Single method with optional priority.
+            if (is_string($params[0])) {
+                if (isset($params[1])) {
+                    $this->addListenerService(
+                        $eventName,
+                        [$serviceId, $params[0]],
+                        $params[1]
+                    );
+                } else {
+                    $this->addListenerService(
+                        $eventName,
+                        [$serviceId, $params[0]]
+                    );
+                }
+                continue;
+            }
+            // Multiple methods with optional priorities.
+            foreach ($params as $listener) {
+                if (isset($listener[1])) {
                     $this->addListenerService(
                         $eventName,
                         [$serviceId, $listener[0]],
-                        isset($listener[1])
-                            ? $listener[1] : 0
+                        $listener[1]
+                    );
+                } else {
+                    $this->addListenerService(
+                        $eventName,
+                        [$serviceId, $listener[0]]
                     );
                 }
+                $this->addListenerService(
+                    $eventName,
+                    [$serviceId, $listener[0]],
+                    (null !== $listener[1])
+                        ? (int)$listener[1] : 0
+                );
             }
         }
         return $this;
@@ -144,9 +168,15 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
     /**
      * @inheritdoc
      *
+     * @param PriorityQueue $queue
+     *
      * @api
      */
-    public function dispatch($eventName, EventInterface $event = null)
+    public function dispatch(
+        $eventName,
+        EventInterface $event = null,
+        PriorityQueue $queue = null
+    )
     {
         $this->lazyLoad($eventName);
         return parent::dispatch($eventName, $event);
@@ -161,7 +191,6 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         EveApiReadWriteInterface &$data
     )
     {
-        $this->lazyLoad($eventName);
         return $this->dispatch(
             $eventName,
             $this->getEveApiEvent()
@@ -173,25 +202,29 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
      *
      * @api
      */
-    public function dispatchLogEvent($eventName, LogEventInterface $event)
+    public function dispatchLogEvent(
+        $eventName,
+        $level,
+        $message,
+        array $context = []
+    )
     {
-        $this->lazyLoad($eventName);
-        return $this->dispatch($eventName, $event);
+        return $this->dispatch(
+            $eventName,
+            $this->getLogEvent()
+                 ->setLevel($level)
+                 ->setMessage($message)
+                 ->setContext($context)
+        );
     }
     /**
      * @inheritdoc
      *
      * @api
      */
-    public function getListeners($eventName = null)
+    public function getListeners($eventName = '')
     {
-        if (null === $eventName) {
-            foreach (array_keys($this->listenerIds) as $serviceEventName) {
-                $this->lazyLoad($serviceEventName);
-            }
-        } else {
-            $this->lazyLoad($eventName);
-        }
+        $this->lazyLoad($eventName);
         return parent::getListeners($eventName);
     }
     /**
@@ -199,15 +232,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
      *
      * @api
      */
-    public function hasListeners($eventName = null)
+    public function hasListeners($eventName = '')
     {
-        if (null === $eventName) {
-            return (bool)count($this->listenerIds)
-                   || (bool)count($this->listeners);
-        }
-        if (isset($this->listenerIds[$eventName])) {
-            return true;
-        }
+        $this->lazyLoad($eventName);
         return parent::hasListeners($eventName);
     }
     /**
@@ -224,6 +251,16 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         return $this;
     }
     /**
+     * @param LogEventInterface $value
+     *
+     * @return self
+     */
+    public function setLogEvent(LogEventInterface $value)
+    {
+        $this->logEvent = $value;
+        return $this;
+    }
+    /**
      * @return EveApiEventInterface
      */
     protected function getEveApiEvent()
@@ -231,32 +268,48 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         return $this->eveApiEvent;
     }
     /**
-     * Lazily loads listeners for this event from the dependency injection
-     * container.
+     * @return LogEventInterface
+     */
+    protected function getLogEvent()
+    {
+        return $this->logEvent;
+    }
+    /**
+     * @param string|null $eventName
      *
-     * @param string $eventName The name of the event to dispatch. The name of
-     *                          the event is the name of the method that is
-     *                          invoked on listeners.
-     *
+     * @return self
+     * @throws DomainException
      * @throws InvalidArgumentException
      */
-    protected function lazyLoad($eventName)
+    protected function lazyLoad($eventName = null)
     {
-        if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $args) {
-                list($serviceId, $method, $priority) = $args;
-                $listener = $this->container[$serviceId];
-                $this->addListener(
-                    $eventName,
-                    [$listener, $method],
-                    $priority
-                );
+        if (!empty($eventName)) {
+            $eventNames = [(string)$eventName];
+        } else {
+            $eventNames = array_keys($this->serviceIds);
+        }
+        sort($eventNames);
+        foreach ($eventNames as $eventName) {
+            if (!isset($this->serviceIds[$eventName])) {
+                continue;
+            }
+            foreach ($this->serviceIds[$eventName] as $hash) {
+                $listenerName = $this->serviceListeners[$hash][0];
+                $method = $this->serviceListeners[$hash][1];
+                $priority = $this->serviceListeners[$hash][2];
+                if (!isset($this->container[$listenerName])) {
+                    $mess = 'Unknown service ' . $listenerName;
+                    throw new InvalidArgumentException($mess);
+                }
+                $instance = $this->container[$listenerName];
+                $this->addListener($eventName, [$instance, $method], $priority);
             }
         }
+        return $this;
     }
     /**
      * @type ContainerInterface $container The container from where services
-     *       are loaded
+     * are loaded.
      */
     protected $container;
     /**
@@ -264,8 +317,16 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
      */
     protected $eveApiEvent;
     /**
-     * @type array $listenerIds The service IDs of the event listeners and
-     *       subscribers
+     * @type LogEventInterface $logEvent
      */
-    protected $listenerIds = [];
+    protected $logEvent;
+    /**
+     * @type array $serviceIds A list of service hashes indexed by event names.
+     */
+    protected $serviceIds = [];
+    /**
+     * @type array $serviceListeners List of service listeners indexed by unique
+     * hash.
+     */
+    protected $serviceListeners = [];
 }

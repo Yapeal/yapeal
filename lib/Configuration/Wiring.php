@@ -215,16 +215,22 @@ class Wiring
      */
     public function wireEvent()
     {
-        if (empty($this->dic['Yapeal.Event.Event'])) {
-            $this->dic['Yapeal.Event.Event'] = function ($dic) {
-                return new $dic['Yapeal.Event.class'];
+        if (empty($this->dic['Yapeal.Event.EveApiEvent'])) {
+            $this->dic['Yapeal.Event.EveApiEvent'] = function ($dic) {
+                return new $dic['Yapeal.Event.Events.eveApi'];
+            };
+        }
+        if (empty($this->dic['Yapeal.Event.LogEvent'])) {
+            $this->dic['Yapeal.Event.LogEvent'] = function ($dic) {
+                return new $dic['Yapeal.Event.Events.log'];
             };
         }
         if (empty($this->dic['Yapeal.Event.EventDispatcher'])) {
             $this->dic['Yapeal.Event.EventDispatcher'] = function ($dic) {
                 return new $dic['Yapeal.Event.dispatcher'](
                     $dic,
-                    $dic['Yapeal.Event.Event']
+                    $dic['Yapeal.Event.EveApiEvent'],
+                    $dic['Yapeal.Event.LogEvent']
                 );
             };
         }

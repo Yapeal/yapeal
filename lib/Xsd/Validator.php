@@ -71,7 +71,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
-        $dic[$serviceName] = function () use ($dic, $class) {
+        $dic[$serviceName] = function () use ($class) {
             /**
              * @type Validator $callable
              */

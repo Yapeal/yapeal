@@ -37,6 +37,7 @@ use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Yapeal\Event\EventDispatcherInterface;
+use Yapeal\Sql\CommonSqlQueries;
 
 /**
  * Trait EveApiToolsTrait

@@ -87,8 +87,7 @@ trait EveApiToolsTrait
         array $columnNames,
         $tableName,
         $rowCount = 1
-    )
-    {
+    ) {
         if (empty($columns)) {
             return $this;
         }

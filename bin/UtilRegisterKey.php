@@ -257,7 +257,7 @@ class UtilRegisterKey
     protected function isIntString($value)
     {
         return ('' === str_replace(
-                [
+            [
                     '0',
                     '1',
                     '2',
@@ -269,9 +269,9 @@ class UtilRegisterKey
                     '8',
                     '9'
                 ],
-                '',
-                $value
-            ));
+            '',
+            $value
+        ));
     }
     /**
      * @type string $activeAPIMask

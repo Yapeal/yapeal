@@ -64,8 +64,7 @@ class CallList extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }

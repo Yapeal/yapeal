@@ -64,8 +64,7 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getYed()
              ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
@@ -158,8 +157,7 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }

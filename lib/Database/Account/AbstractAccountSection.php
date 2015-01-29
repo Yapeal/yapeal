@@ -62,8 +62,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -126,8 +125,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }

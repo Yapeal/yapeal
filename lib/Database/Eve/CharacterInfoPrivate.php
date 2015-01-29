@@ -57,8 +57,7 @@ class CharacterInfoPrivate extends CharacterInfo
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         /**
          * Update CharacterInfo public first so it does NOT overwrite additional
          * information from private in cases were keys have overlap.

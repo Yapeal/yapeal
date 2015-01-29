@@ -61,7 +61,7 @@ class APIKeyInfo extends AccountSection
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -76,8 +76,8 @@ class APIKeyInfo extends AccountSection
         return $serviceName;
     }
     /**
-     * @param EveApiEventInterface     $event
-     * @param string                   $eventName
+     * @param EveApiEventInterface $event
+     * @param string $eventName
      * @param EventDispatcherInterface $yed
      *
      * @return EveApiEventInterface
@@ -87,8 +87,7 @@ class APIKeyInfo extends AccountSection
         EveApiEventInterface $event,
         $eventName,
         EventDispatcherInterface $yed
-    )
-    {
+    ) {
         $this->setYed($yed);
         if ($event->isHandled()) {
             $mess = 'Received already handled event ' . $eventName;

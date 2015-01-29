@@ -135,8 +135,7 @@ class EventDispatcher implements EventDispatcherInterface
         $eventName,
         EventInterface $event = null,
         PriorityQueue $queue = null
-    )
-    {
+    ) {
         $eventName = (string)$eventName;
         /**
          * @type EventInterface|Event $event
@@ -213,8 +212,7 @@ class EventDispatcher implements EventDispatcherInterface
         $eventName,
         array $callback,
         $priority = 0
-    )
-    {
+    ) {
         if (2 !== count($callback) || !is_object($callback[0])
             || !is_string($callback[1])
         ) {

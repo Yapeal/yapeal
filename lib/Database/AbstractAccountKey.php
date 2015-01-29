@@ -60,8 +60,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getYed()
              ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
@@ -144,8 +143,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }

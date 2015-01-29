@@ -48,7 +48,8 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 /**
  * Class FileCacheRetriever
  */
-class FileCacheRetriever implements EveApiRetrieverInterface,
+class FileCacheRetriever implements
+    EveApiRetrieverInterface,
     LoggerAwareInterface
 {
     use FilePathNormalizerTrait;

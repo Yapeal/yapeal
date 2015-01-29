@@ -158,8 +158,7 @@ abstract class AbstractCommonEveApi
     protected function updateCachedUntil(
         EveApiReadWriteInterface &$data,
         $ownerID
-    )
-    {
+    ) {
         if (false === $data->getEveApiXml()) {
             return;
         }

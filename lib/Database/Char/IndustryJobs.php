@@ -59,8 +59,7 @@ class IndustryJobs extends AbstractCharSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         /**
          * Update Industry Jobs History
          */

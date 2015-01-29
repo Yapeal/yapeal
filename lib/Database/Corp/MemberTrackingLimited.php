@@ -59,8 +59,7 @@ class MemberTrackingLimited extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         $data->setEveApiName('MemberTracking');
         return parent::oneShot($data, $retrievers, $preservers, $interval);
     }

@@ -67,7 +67,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -91,8 +91,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
         EveApiEventInterface $event,
         $eventName,
         ContainerAwareEventDispatcherInterface $yed
-    )
-    {
+    ) {
         $data = $event->getData();
         $mess = sprintf(
             'Received %1$s event for %2$s/%3$s in %4$s',
@@ -162,8 +161,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
     protected function checkEveApiXmlError(
         EveApiReadWriteInterface &$data,
         ContainerAwareEventDispatcherInterface $yed
-    )
-    {
+    ) {
         if (strpos($data->getEveApiXml(), '<error') === false) {
             return;
         }
@@ -226,8 +224,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
     protected function emitXmlErrorEvents(
         EveApiEventInterface $event,
         ContainerAwareEventDispatcherInterface $yed
-    )
-    {
+    ) {
         $data = $event->getData();
         $eventSuffix = 'xmlError';
         $eventNames = sprintf(

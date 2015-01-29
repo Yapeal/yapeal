@@ -18,9 +18,10 @@ use Yapeal\Event\LogEventInterface;
 /**
  * Class Logger
  */
-class Logger extends MLogger
-    implements ServiceCallableInterface, EventSubscriberInterface,
-               EventAwareLoggerInterface
+class Logger extends MLogger implements
+    ServiceCallableInterface,
+    EventSubscriberInterface,
+    EventAwareLoggerInterface
 {
     /**
      * @inheritdoc
@@ -37,7 +38,7 @@ class Logger extends MLogger
      *
      * @api
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);

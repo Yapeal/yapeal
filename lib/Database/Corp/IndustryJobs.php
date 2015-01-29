@@ -59,8 +59,7 @@ class IndustryJobs extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         /**
          * Update Industry Jobs History
          */
@@ -83,8 +82,7 @@ class IndustryJobs extends AbstractCorpSection
     protected function preserverToIndustryJobs(
         $xml,
         $ownerID
-    )
-    {
+    ) {
         $columnDefaults = [
             'activityID' => null,
             'blueprintID' => null,

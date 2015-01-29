@@ -63,8 +63,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         $eventName,
         array $callback,
         $priority = 0
-    )
-    {
+    ) {
         if (2 !== count($callback) || !is_string($callback[0])
             || !is_string($callback[1])
         ) {
@@ -162,8 +161,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher implements
         $eventName,
         EventInterface $event = null,
         PriorityQueue $queue = null
-    )
-    {
+    ) {
         $this->lazyLoad($eventName);
         return parent::dispatch($eventName, $event);
     }

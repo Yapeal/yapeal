@@ -56,7 +56,8 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
+abstract class AbstractCommonEveApi implements
+    EveApiDatabaseInterface,
     LoggerAwareInterface
 {
     use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
@@ -71,8 +72,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         LoggerInterface $logger,
         CommonSqlQueries $csq,
         EventDispatcherInterface $yed
-    )
-    {
+    ) {
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setCsq($csq);
@@ -91,8 +91,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->info(
                  sprintf(
@@ -131,8 +130,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -293,8 +291,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     protected function isEveApiXmlError(
         EveApiReadWriteInterface &$data,
         &$interval
-    )
-    {
+    ) {
         if (strpos($data->getEveApiXml(), '<error') === false) {
             return false;
         }

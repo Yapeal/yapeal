@@ -56,8 +56,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         array $eveApiArguments = [],
         $eveApiXml = false,
         $cacheInterval = 300
-    )
-    {
+    ) {
         $this->setEveApiName($eveApiName);
         $this->setEveApiSectionName($eveApiSectionName);
         $this->setEveApiArguments($eveApiArguments);

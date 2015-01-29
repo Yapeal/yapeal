@@ -47,7 +47,8 @@ use Yapeal\Log\Logger;
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever implements EventSubscriberInterface,
+class GuzzleNetworkRetriever implements
+    EventSubscriberInterface,
     ServiceCallableInterface
 {
     /**
@@ -75,7 +76,7 @@ class GuzzleNetworkRetriever implements EventSubscriberInterface,
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -105,8 +106,7 @@ class GuzzleNetworkRetriever implements EventSubscriberInterface,
         EveApiEventInterface $event,
         $eventName,
         ContainerAwareEventDispatcherInterface $yed
-    )
-    {
+    ) {
         $data = $event->getData();
         $mess = sprintf(
             'Received %1$s event for %2$s/%3$s in %4$s',
@@ -197,8 +197,7 @@ class GuzzleNetworkRetriever implements EventSubscriberInterface,
     protected function addYapealProcessingInstructionToXml(
         $xml,
         array $arguments
-    )
-    {
+    ) {
         if ($xml === false) {
             return $xml;
         }

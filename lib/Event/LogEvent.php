@@ -48,8 +48,7 @@ class LogEvent extends Event implements LogEventInterface
         $level = LOGGER::DEBUG,
         $message = '',
         array $context = []
-    )
-    {
+    ) {
         $this->setLevel($level)
              ->setMessage($message)
              ->setContext($context);

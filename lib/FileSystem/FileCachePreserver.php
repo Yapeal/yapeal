@@ -48,8 +48,7 @@ use Yapeal\Log\Logger;
 /**
  * Class FileCachePreserver
  */
-class FileCachePreserver
-    implements EventSubscriberInterface, ServiceCallableInterface
+class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInterface
 {
     use FilePathNormalizerTrait;
     /**
@@ -79,7 +78,7 @@ class FileCachePreserver
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
             $class = __CLASS__;

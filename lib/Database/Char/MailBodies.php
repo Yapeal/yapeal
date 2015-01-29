@@ -64,8 +64,7 @@ class MailBodies extends AbstractCharSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getYed()
              ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
@@ -82,7 +81,9 @@ class MailBodies extends AbstractCharSection
         (
         new MailMessages(
             $this->getPdo(),
-            $this->getLogger(), $this->getCsq(), $this->getYed()
+            $this->getLogger(),
+            $this->getCsq(),
+            $this->getYed()
         )
         )->autoMagic($data, $retrievers, $preservers, $interval);
         $active = $this->getActiveCharacters();

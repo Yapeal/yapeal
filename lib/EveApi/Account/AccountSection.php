@@ -49,8 +49,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 /**
  * Class AccountSection
  */
-class AccountSection extends AbstractCommonEveApi implements
-    EventSubscriberInterface, ServiceCallableInterface
+class AccountSection extends AbstractCommonEveApi implements EventSubscriberInterface, ServiceCallableInterface
 {
     use EveSectionNameTrait;
     /**
@@ -68,7 +67,7 @@ class AccountSection extends AbstractCommonEveApi implements
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public static function injectCallable(ContainerInterface &$dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -84,7 +83,7 @@ class AccountSection extends AbstractCommonEveApi implements
     }
     /**
      * @param EveApiEventInterface $event
-     * @param string               $eventName
+     * @param string $eventName
      * @param EventDispatcherInterface $yed
      *
      * @return EveApiEventInterface
@@ -94,8 +93,7 @@ class AccountSection extends AbstractCommonEveApi implements
         EveApiEventInterface $event,
         $eventName,
         EventDispatcherInterface $yed
-    )
-    {
+    ) {
         $this->setYed($yed);
         $data = $event->getData();
         $mess = sprintf(
@@ -106,12 +104,12 @@ class AccountSection extends AbstractCommonEveApi implements
             __CLASS__
         );
         $this->getYed()
-            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $active = $this->getActive();
         if (0 === count($active)) {
             $mess = 'No active registered keys found';
             $this->getYed()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
             return $this->getYed()
                         ->dispatchEveApiEvent('Yapeal.EveApi.end', $data);
         }
@@ -168,12 +166,12 @@ class AccountSection extends AbstractCommonEveApi implements
             if (false === $data->getEveApiXml()) {
                 $mess
                     = sprintf(
-                    'Eve API %1$s/%2$s data empty after %4$s event for ownerID = %3$s',
-                    $data->getEveApiSectionName(),
-                    $data->getEveApiName(),
-                    $data->getEveApiArgument('keyID'),
-                    $eventSuffix
-                );
+                        'Eve API %1$s/%2$s data empty after %4$s event for ownerID = %3$s',
+                        $data->getEveApiSectionName(),
+                        $data->getEveApiName(),
+                        $data->getEveApiArgument('keyID'),
+                        $eventSuffix
+                    );
                 $this->getYed()
                      ->dispatchLogEvent(
                          'Yapeal.Log.log',
@@ -229,14 +227,14 @@ class AccountSection extends AbstractCommonEveApi implements
         if (null === $event || !$event->isHandled()) {
             $mess
                 = sprintf(
-                'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
-                $data->getEveApiSectionName(),
-                $data->getEveApiName(),
-                $data->getEveApiArgument('keyID'),
-                $eventSuffix
-            );
+                    'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
+                    $data->getEveApiSectionName(),
+                    $data->getEveApiName(),
+                    $data->getEveApiArgument('keyID'),
+                    $eventSuffix
+                );
             $this->getYed()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return false;
         }
         return true;
@@ -250,7 +248,7 @@ class AccountSection extends AbstractCommonEveApi implements
         $sql = $this->getCsq()
                     ->getActiveRegisteredKeys();
         $this->getYed()
-            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
+             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         try {
             $stmt = $this->getPdo()
                          ->query($sql);
@@ -258,7 +256,7 @@ class AccountSection extends AbstractCommonEveApi implements
         } catch (PDOException $exc) {
             $mess = 'Could NOT select from utilRegisteredKeys';
             $this->getYed()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             $mess = 'Database error message was ' . $exc->getMessage();
             $this->getYed()
                  ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);

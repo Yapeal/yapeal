@@ -174,8 +174,7 @@ class Yapeal implements WiringInterface
     protected function emitEvents(
         EveApiReadWriteInterface $data,
         ContainerAwareEventDispatcher $yed
-    )
-    {
+    ) {
         // Yapeal.EveApi.Section.Api.start, Yapeal.EveApi.Api.start,
         // Yapeal.EveApi.Section.start, Yapeal.EveApi.start
         $eventNames = sprintf(

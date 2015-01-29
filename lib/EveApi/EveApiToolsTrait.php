@@ -80,7 +80,7 @@ trait EveApiToolsTrait
      */
     protected function getCsq()
     {
-        if (empty($this->csq)) {
+        if (!$this->csq instanceof CommonSqlQueries) {
             $mess = 'Tried to use csq before it was set';
             throw new LogicException($mess);
         }
@@ -92,7 +92,7 @@ trait EveApiToolsTrait
      */
     protected function getPdo()
     {
-        if (empty($this->pdo)) {
+        if (!$this->pdo instanceof PDO) {
             $mess = 'Tried to use pdo before it was set';
             throw new LogicException($mess);
         }
@@ -104,7 +104,7 @@ trait EveApiToolsTrait
      */
     protected function getYed()
     {
-        if (empty($this->yed)) {
+        if (!$this->yed instanceof EventDispatcherInterface) {
             $mess = 'Tried to use yed before it was set';
             throw new LogicException($mess);
         }

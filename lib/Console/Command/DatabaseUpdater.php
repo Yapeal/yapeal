@@ -75,7 +75,8 @@ class DatabaseUpdater extends AbstractDatabaseCommon
         $csq = $this->getCsq($output);
         $this->executeSqlStatements(
             $csq->getDropAddOrModifyColumnProcedure()
-            . PHP_EOL . $csq->getCreateAddOrModifyColumnProcedure(),
+            . PHP_EOL
+            . $csq->getCreateAddOrModifyColumnProcedure(),
             $name,
             $output
         );
@@ -141,6 +142,11 @@ HELP;
             $mess
                 = '<warning>Could NOT get latest database version using default 197001010001</warning>';
             $output->writeln([$sql, $mess]);
+            $mess = sprintf(
+                '<info>Error message from database connection was %s</info>',
+                $exc->getMessage()
+            );
+            $output->writeln($mess);
             $version = '197001010001';
         }
         return sprintf('%1$012s', $version);
@@ -168,7 +174,7 @@ HELP;
             if ($fileInfo->isDot() || $fileInfo->isDir()) {
                 continue;
             };
-            if ($fileInfo->getExtension() != 'sql') {
+            if ('sql' !== $fileInfo->getExtension()) {
                 continue;
             }
             $fileNames[] = $this->getFpn()
@@ -239,11 +245,16 @@ HELP;
             $stmt->execute([$updateVersion]);
             $pdo->commit();
         } catch (PDOException $exc) {
-            $mess = sprintf(
+            $mess = [$sql];
+            $mess[] = sprintf(
                 '<error>Database "version" update failed for %1$s</error>',
                 $updateVersion
             );
-            $output->writeln([$sql, $mess]);
+            $mess[] = sprintf(
+                '<info>Error message from database connection was %s</info>',
+                $exc->getMessage()
+            );
+            $output->writeln($mess);
             $this->getPdo($output)
                  ->rollBack();
             exit(2);

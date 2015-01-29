@@ -41,7 +41,8 @@ interface ServiceCallableInterface
     /**
      * @param ContainerInterface $dic
      *
-     * @return string Returns the service name.
+     * @return string|false Returns the service name or false if no service to
+     * add.
      */
     public static function injectCallable(ContainerInterface $dic);
 }

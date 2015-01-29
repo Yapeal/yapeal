@@ -63,12 +63,12 @@ class PriorityQueue extends SplPriorityQueue
      */
     public function compare($priority1, $priority2)
     {
-        if (2 != count($priority1) || 2 != count($priority2)) {
+        if (2 !== count($priority1) || 2 !== count($priority2)) {
             $mess = 'Expect priorities to be array("priority", "index")';
             throw new DomainException($mess);
         }
-        if ($priority1[0] == $priority2[0]) {
-            if ($priority1[1] == $priority2[1]) {
+        if ($priority1[0] === $priority2[0]) {
+            if ($priority1[1] === $priority2[1]) {
                 return 0;
             }
             return ($priority2[1] > $priority1[1]) ? 1 : -1;

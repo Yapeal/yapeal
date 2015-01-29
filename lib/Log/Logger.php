@@ -18,8 +18,9 @@ use Yapeal\Event\LogEventInterface;
 /**
  * Class Logger
  */
-class Logger extends MLogger implements ServiceCallableInterface,
-    EventSubscriberInterface
+class Logger extends MLogger
+    implements ServiceCallableInterface, EventSubscriberInterface,
+               EventAwareLoggerInterface
 {
     /**
      * @inheritdoc
@@ -40,10 +41,10 @@ class Logger extends MLogger implements ServiceCallableInterface,
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
-        if (!isset($dic[$serviceName])) {
+        if (empty($dic[$serviceName])) {
             $dic[$serviceName] = function () use ($dic, $class) {
                 $group = [];
-                if (PHP_SAPI == 'cli') {
+                if (PHP_SAPI === 'cli') {
                     $group[] = new $dic['Yapeal.Log.Handlers.stream'](
                         'php://stderr', 100
                     );
@@ -69,7 +70,7 @@ class Logger extends MLogger implements ServiceCallableInterface,
         return $serviceName;
     }
     /**
-     * @param LogEventInterface $event
+     * @inheritdoc
      */
     public function logEvent(LogEventInterface $event)
     {

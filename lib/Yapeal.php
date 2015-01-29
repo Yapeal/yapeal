@@ -41,6 +41,7 @@ use Yapeal\Configuration\Wiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Event\ContainerAwareEventDispatcher;
+use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Log\Logger;
@@ -184,6 +185,9 @@ class Yapeal implements WiringInterface
             'Yapeal.EveApi'
         );
         foreach (explode(',', $eventNames) as $eventName) {
+            /**
+             * @type EveApiEventInterface $event
+             */
             $event = $yed->dispatchEveApiEvent($eventName, $data);
             $data = $event->getData();
             if ($event->isHandled()) {

@@ -53,7 +53,7 @@ interface EveApiEventInterface extends EventInterface
      */
     public function isHandled();
     /**
-     * @param EveApiReadWriteInterface $value
+     * @param EveApiReadWriteInterface|null $value
      *
      * @return self
      */

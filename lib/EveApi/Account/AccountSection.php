@@ -83,8 +83,8 @@ class AccountSection extends AbstractCommonEveApi implements
         return $serviceName;
     }
     /**
-     * @param EveApiEventInterface     $event
-     * @param string                   $eventName
+     * @param EveApiEventInterface $event
+     * @param string               $eventName
      * @param EventDispatcherInterface $yed
      *
      * @return EveApiEventInterface
@@ -108,7 +108,7 @@ class AccountSection extends AbstractCommonEveApi implements
         $this->getYed()
             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $active = $this->getActive();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $mess = 'No active registered keys found';
             $this->getYed()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
@@ -166,7 +166,8 @@ class AccountSection extends AbstractCommonEveApi implements
                 break;
             }
             if (false === $data->getEveApiXml()) {
-                $mess = sprintf(
+                $mess
+                    = sprintf(
                     'Eve API %1$s/%2$s data empty after %4$s event for ownerID = %3$s',
                     $data->getEveApiSectionName(),
                     $data->getEveApiName(),
@@ -205,6 +206,7 @@ class AccountSection extends AbstractCommonEveApi implements
                 $eventSuffix
             )
         );
+        $event = null;
         foreach ($eventNames as $eventName) {
             $mess = 'Emitting event ' . $eventName;
             if (!$this->getYed()
@@ -224,8 +226,9 @@ class AccountSection extends AbstractCommonEveApi implements
                 break;
             }
         }
-        if (!isset($event) || !$event->isHandled()) {
-            $mess = sprintf(
+        if (null === $event || !$event->isHandled()) {
+            $mess
+                = sprintf(
                 'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
                 $data->getEveApiSectionName(),
                 $data->getEveApiName(),
@@ -233,11 +236,7 @@ class AccountSection extends AbstractCommonEveApi implements
                 $eventSuffix
             );
             $this->getYed()
-                 ->dispatchLogEvent(
-                     'Yapeal.Log.log',
-                     Logger::WARNING,
-                     $mess
-                 );
+                ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return false;
         }
         return true;
@@ -260,6 +259,9 @@ class AccountSection extends AbstractCommonEveApi implements
             $mess = 'Could NOT select from utilRegisteredKeys';
             $this->getYed()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            $mess = 'Database error message was ' . $exc->getMessage();
+            $this->getYed()
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return [];
         }
     }

@@ -93,8 +93,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         $interval
     )
     {
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::START, $data);
         $this->getLogger()
              ->info(
                  sprintf(
@@ -117,11 +115,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         if (!$this->oneShot($data, $retrievers, $preservers, $interval)) {
             return;
         }
-        $this->getYed()
-            ->dispatchEveApiEvent(EveApiEvent::POST_PRESERVE, $data);
         $this->updateCachedUntil($data->getEveApiXml(), $interval, '0');
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::DONE, $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -142,8 +136,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_RETRIEVE, $data);
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -155,11 +147,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->debug($mess);
             return false;
         }
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_TRANSFORM, $data);
         $this->xsltTransform($data);
-        $this->getYed()
-             ->dispatchEveApiEvent(EveApiEvent::PRE_VALIDATE, $data);
         if ($this->isInvalid($data)) {
             $mess = sprintf(
                 'Data retrieved is invalid for %1$s/%2$s',
@@ -172,8 +160,6 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
             $preservers->preserveEveApi($data);
             return false;
         }
-        $this->getYed()
-            ->dispatchEveApiEvent(EveApiEvent::PRE_PRESERVE, $data);
         $preservers->preserveEveApi($data);
         // No need / way to preserve XML errors to the database with normal
         // preserveTo*.
@@ -334,14 +320,16 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->warning($mess);
             return true;
         }
-        if ($code < 300) { // API key errors.
+        if ($code < 300) {
+// API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $this->getLogger()
                  ->error($mess);
             $interval = 86400;
             return true;
         }
-        if ($code > 903 && $code < 905) { // Major application or Yapeal error.
+        if ($code > 903 && $code < 905) {
+// Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
             $interval = 86400;

@@ -30,6 +30,7 @@
  * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @filesource
  */
 namespace Yapeal\Event;
 
@@ -49,7 +50,6 @@ class EventDispatcher implements EventDispatcherInterface
      * @inheritdoc
      *
      * @throws DomainException
-     * @api
      */
     public function addListener($eventName, array $callback, $priority = 0)
     {
@@ -64,14 +64,14 @@ class EventDispatcher implements EventDispatcherInterface
         // Use a hash so we can maintain a single list of unique listeners.
         $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
         $refCount = 0;
-        if (isset($this->listeners[$hash])) {
+        if (!empty($this->listeners[$hash])) {
             $refCount = $this->listeners[$hash][3];
         }
         // Re-adding the same listener to the same event moves it to the
         // end of the priority queue for that event. This only matters if there
         // are multiple listeners for an event with the same priority.
-        if (isset($this->listenerIds[$eventName])) {
-            $key = array_search($hash, $this->listenerIds[$eventName]);
+        if (!empty($this->listenerIds[$eventName])) {
+            $key = array_search($hash, $this->listenerIds[$eventName], true);
             if (false !== $key) {
                 unset($this->listenerIds[$eventName][$key]);
                 --$refCount;
@@ -88,11 +88,12 @@ class EventDispatcher implements EventDispatcherInterface
     }
     /**
      * @inheritdoc
-     *
-     * @api
      */
     public function addSubscriber(EventSubscriberInterface $class)
     {
+        /**
+         * @type string|array $params
+         */
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
             // Single method using default priority.
             if (is_string($params)) {
@@ -101,7 +102,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
             // Single method with optional priority.
             if (is_string($params[0])) {
-                if (isset($params[1])) {
+                if (!empty($params[1])) {
                     $this->addListener(
                         $eventName,
                         [$class, $params[0]],
@@ -114,7 +115,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
             // Multiple methods with optional priorities.
             foreach ($params as $listener) {
-                if (isset($listener[1])) {
+                if (!empty($listener[1])) {
                     $this->addListener(
                         $eventName,
                         [$class, $listener[0]],
@@ -129,8 +130,6 @@ class EventDispatcher implements EventDispatcherInterface
     }
     /**
      * @inheritdoc
-     *
-     * @api
      */
     public function dispatch(
         $eventName,
@@ -139,10 +138,13 @@ class EventDispatcher implements EventDispatcherInterface
     )
     {
         $eventName = (string)$eventName;
+        /**
+         * @type EventInterface|Event $event
+         */
         if (null === $event) {
             $event = new Event();
         }
-        if (!isset($this->listenerIds[$eventName])) {
+        if (empty($this->listenerIds[$eventName])) {
             return $event;
         }
         if (null === $queue) {
@@ -164,26 +166,24 @@ class EventDispatcher implements EventDispatcherInterface
     }
     /**
      * @inheritdoc
-     *
-     * @api
      */
     public function getListeners($eventName = '', PriorityQueue $queue = null)
     {
-        if (0 == count($this->listenerIds)) {
+        if (0 === count($this->listenerIds)) {
             return [];
         }
         if (null === $queue) {
             $queue = new PriorityQueue();
         }
-        if (!empty($eventName)) {
-            $eventNames = [(string)$eventName];
+        if ('' !== $eventName) {
+            $eventNames = [$eventName];
         } else {
             $eventNames = array_keys($this->listenerIds);
         }
         $events = [];
         sort($eventNames);
         foreach ($eventNames as $eventName) {
-            if (!isset($this->listenerIds[$eventName])) {
+            if (empty($this->listenerIds[$eventName])) {
                 continue;
             }
             $mpq = clone $queue;
@@ -199,8 +199,6 @@ class EventDispatcher implements EventDispatcherInterface
     }
     /**
      * @inheritdoc
-     *
-     * @api
      */
     public function hasListeners($eventName = '')
     {
@@ -210,7 +208,6 @@ class EventDispatcher implements EventDispatcherInterface
      * @inheritdoc
      *
      * @throws DomainException
-     * @api
      */
     public function removeListener(
         $eventName,
@@ -226,12 +223,12 @@ class EventDispatcher implements EventDispatcherInterface
         }
         $priority = (int)$priority;
         $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
-        if (!isset($this->listeners[$hash])) {
+        if (empty($this->listeners[$hash])) {
             return $this;
         }
         $eventName = (string)$eventName;
         $refCount = $this->listeners[$hash][3];
-        $key = array_search($hash, $this->listenerIds[$eventName]);
+        $key = array_search($hash, $this->listenerIds[$eventName], true);
         if (false !== $key) {
             unset($this->listenerIds[$eventName][$key]);
             --$refCount;
@@ -253,11 +250,12 @@ class EventDispatcher implements EventDispatcherInterface
     }
     /**
      * @inheritdoc
-     *
-     * @api
      */
     public function removeSubscriber(EventSubscriberInterface $class)
     {
+        /**
+         * @type string|array $params
+         */
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
             // Single method using default priority.
             if (is_string($params)) {
@@ -266,7 +264,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
             // Single method with optional priority.
             if (is_string($params[0])) {
-                if (isset($params[1])) {
+                if (!empty($params[1])) {
                     $this->removeListener(
                         $eventName,
                         [$class, $params[0]],
@@ -279,7 +277,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
             // Multiple methods with optional priorities.
             foreach ($params as $listener) {
-                if (isset($listener[1])) {
+                if (!empty($listener[1])) {
                     $this->removeListener(
                         $eventName,
                         [$class, $listener[0]],
@@ -291,38 +289,6 @@ class EventDispatcher implements EventDispatcherInterface
             }
         }
         return $this;
-    }
-    /**
-     * @param string $eventName
-     * @param array  $callback
-     * @param int    $priority
-     *
-     * @return bool
-     * @throws DomainException
-     */
-    protected function hasListener(
-        $eventName,
-        array $callback,
-        $priority = 0
-    )
-    {
-        if (2 !== count($callback) || !is_object($callback[0])
-            || !is_string($callback[1])
-        ) {
-            $mess = 'Expected an array("instance", "methodName") argument';
-            throw new DomainException($mess);
-        }
-        $priority = (int)$priority;
-        $eventName = (string)$eventName;
-        $hash = md5(spl_object_hash($callback[0]) . $callback[1] . $priority);
-        if ('Yapeal.Log.log' != $eventName
-            && in_array($hash, $this->listenerIds[$eventName])
-        ) {
-            print 'Have listener ' . PHP_EOL;
-            return true;
-        }
-        print 'No listener' . PHP_EOL;
-        return false;
     }
     /**
      * @type array $listenersIds A list of listeners hashes indexed by event

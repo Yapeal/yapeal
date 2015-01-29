@@ -181,7 +181,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
             $data = $event->getData();
         }
         $simple = new SimpleXMLElement($data->getEveApiXml());
-        if (!isset($simple->error)) {
+        if (empty($simple->error['code'])) {
             return;
         }
         $code = (int)$simple->error['code'];
@@ -201,13 +201,15 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
             $yed->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return;
         }
-        if ($code < 300) { // API key errors.
+        if ($code < 300) {
+            // API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ERROR, $mess);
             $data->setCacheInterval(86400);
             return;
         }
-        if ($code > 903 && $code < 905) { // Major application or Yapeal error.
+        if ($code > 903 && $code < 905) {
+            // Major application or Yapeal error.
             $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ALERT, $mess);
             $data->setCacheInterval(86400);
             return;

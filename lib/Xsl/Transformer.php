@@ -63,6 +63,7 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
                 $priorityBase
             ]
         ];
+
         return $events;
     }
     /**
@@ -77,8 +78,10 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
              * @type Transformer $callable
              */
             $callable = new $class();
+
             return $callable;
         };
+
         return $serviceName;
     }
     /**
@@ -103,7 +106,8 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
             __CLASS__
         );
         $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        $fileNames = sprintf(
+        $fileNames
+            = sprintf(
             '%3$s/%1$s/%2$s.xsl,%3$s/%2$s.xsl,%3$s/%1$s/%1$s.xsl,%3$s/common.xsl',
             $data->getEveApiSectionName(),
             $data->getEveApiName(),
@@ -121,7 +125,8 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
             $dom = new DOMDocument();
             $dom->load($fileName);
             $xslt->importStylesheet($dom);
-            $xml = $xslt->transformToXml(
+            $xml
+                = $xslt->transformToXml(
                 new SimpleXMLElement($data->getEveApiXml())
             );
             if (false === $xml) {

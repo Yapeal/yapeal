@@ -73,7 +73,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
                  )
              );
         $active = $this->getActiveKeys();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active registered keys found');
             return;

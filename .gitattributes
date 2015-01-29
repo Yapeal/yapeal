@@ -7,6 +7,7 @@
 #*.h text
 
 # Declare files that will always have CRLF line endings on checkout.
+*.bat text eol=crlf
 *.txt text eol=crlf
 
 # Declare files that will always have LF line endings on checkout.
@@ -14,6 +15,7 @@
 .gitignore text eol=lf
 *.crt text eol=lf
 *.ini text eol=lf
+*.dist text eol=lf
 *.json text eol=lf
 *.md text eol=lf
 *.pem text eol=lf

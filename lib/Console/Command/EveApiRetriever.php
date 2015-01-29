@@ -160,8 +160,11 @@ EOF;
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /**
+         * @type array $posts
+         */
         $posts = $input->getArgument('post');
-        if (!empty($posts)) {
+        if (0 !== count($posts)) {
             $arguments = [];
             foreach ($posts as $post) {
                 list($key, $value) = explode('=', $post);

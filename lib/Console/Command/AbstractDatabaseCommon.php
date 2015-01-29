@@ -191,10 +191,10 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         ];
         $pdo = $this->getPdo($output);
         // Split up SQL into statements.
-        $sqlStatements = explode(';', $sqlStatements);
+        $statements = explode(';', $sqlStatements);
         // Replace {database}, {table_prefix}, ';', and '$$' in statements.
-        $sqlStatements = str_replace($templates, $replacements, $sqlStatements);
-        foreach ($sqlStatements as $statement => $sql) {
+        $statements = str_replace($templates, $replacements, $statements);
+        foreach ($statements as $statement => $sql) {
             $sql = trim($sql);
             // 5 is a 'magic' number that I think is shorter than any legal SQL
             // statement.

@@ -88,7 +88,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getCacheInterval()
     {
-        if (empty($this->cacheInterval)) {
+        if (!is_int($this->cacheInterval)) {
             $mess = 'Tried to access cache interval before it was set';
             throw new LogicException($mess);
         }
@@ -110,8 +110,9 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiArguments()
     {
-        if (empty($this->eveApiArguments)) {
-            return [];
+        if (null === $this->eveApiArguments) {
+            $mess = 'Tried to access Eve Api arguments before it was set';
+            throw new LogicException($mess);
         }
         return $this->eveApiArguments;
     }
@@ -120,7 +121,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiName()
     {
-        if (empty($this->eveApiName)) {
+        if (0 === strlen($this->eveApiName)) {
             $mess = 'Tried to access Eve Api name before it was set';
             throw new LogicException($mess);
         }
@@ -131,7 +132,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiSectionName()
     {
-        if (empty($this->eveApiSectionName)) {
+        if (0 === strlen($this->eveApiSectionName)) {
             $mess = 'Tried to access Eve Api section name before it was set';
             throw new LogicException($mess);
         }
@@ -142,7 +143,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiXml()
     {
-        if (empty($this->eveApiXml)) {
+        if (0 === strlen($this->eveApiXml)) {
             return false;
         }
         return $this->eveApiXml;
@@ -172,7 +173,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
     public function setEveApiArguments(array $values)
     {
         $this->eveApiArguments = [];
-        if (empty($values)) {
+        if (0 === count($values)) {
             return $this;
         }
         foreach ($values as $name => $value) {

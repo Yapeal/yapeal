@@ -152,7 +152,7 @@ class GuzzleNetworkRetriever implements EventSubscriberInterface,
             return $event->stopPropagation();
         }
         $body = (string)$response->getBody();
-        if (empty($body)) {
+        if ('' === $body) {
             $mess = sprintf(
                 'Body empty for %1$s/%2$s',
                 $data->getEveApiSectionName(),
@@ -202,7 +202,7 @@ class GuzzleNetworkRetriever implements EventSubscriberInterface,
         if ($xml === false) {
             return $xml;
         }
-        if (isset($arguments['vCode'])) {
+        if (!empty($arguments['vCode'])) {
             $arguments['vCode'] = substr($arguments['vCode'], 0, 8) . '...';
         }
         $json = json_encode($arguments);

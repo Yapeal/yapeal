@@ -1,0 +1,12 @@
+suites:
+    yapeal_suite:
+        namespace: Yapeal
+        psr4_prefix: Yapeal
+        spec_path: tests
+        spec_prefix: spec
+        src_path: lib
+
+extensions:
+    - PhpSpec\NyanFormattersExtension\Extension
+
+formatter.name: nyan.cat

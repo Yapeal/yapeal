@@ -97,12 +97,12 @@ trait CommandToolsTrait
      */
     protected function getCsq(OutputInterface $output)
     {
-        if (is_null($this->csq)) {
+        if (null === $this->csq) {
             $this->csq = $this->getDic(
                 $output
             )['Yapeal.Database.CommonQueries'];
         }
-        if (empty($this->csq)) {
+        if (!$this->csq instanceof CommonSqlQueries) {
             $output->writeln(
                 '<error>Tried to use csq before it was set</error>'
             );
@@ -124,7 +124,7 @@ trait CommandToolsTrait
      */
     protected function getDic(OutputInterface $output)
     {
-        if (empty($this->dic)) {
+        if (!$this->dic instanceof ContainerInterface) {
             $output->writeln(
                 '<error>Tried to use dic before it was set</error>'
             );
@@ -139,7 +139,7 @@ trait CommandToolsTrait
      */
     protected function getPdo(OutputInterface $output)
     {
-        if (is_null($this->pdo)) {
+        if (null === $this->pdo) {
             try {
                 $this->pdo = $this->getDic(
                     $output

@@ -33,10 +33,11 @@ Yapeal:
             log: Yapeal\Event\LogEvent
         Subscribers:
             internal: >
-                Yapeal\Log\Logger,
                 Yapeal\EveApi\Account\AccountSection,
                 Yapeal\EveApi\Account\APIKeyInfo,
+                Yapeal\FileSystem\FileCachePreserver,
                 Yapeal\Network\GuzzleNetworkRetriever,
+                Yapeal\Log\Logger,
                 Yapeal\Xsl\Transformer,
                 Yapeal\Xsd\Validator
             user: ''

@@ -42,18 +42,11 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 class EveApiEvent extends Event implements EveApiEventInterface
 {
     /**
-     * @param EveApiReadWriteInterface|null $data
-     */
-    public function __construct(EveApiReadWriteInterface &$data = null)
-    {
-        $this->setData($data);
-    }
-    /**
      * @inheritdoc
      */
     public function getData()
     {
-        if (empty($this->data)) {
+        if (!$this->data instanceof EveApiReadWriteInterface) {
             $mess = 'Tried to use data before it was set';
             throw new LogicException($mess);
         }
@@ -69,7 +62,7 @@ class EveApiEvent extends Event implements EveApiEventInterface
     /**
      * @inheritdoc
      */
-    public function setData(EveApiReadWriteInterface &$value = null)
+    public function setData(EveApiReadWriteInterface &$value)
     {
         $this->data = $value;
         return $this;

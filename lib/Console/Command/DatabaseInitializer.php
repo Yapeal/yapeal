@@ -133,7 +133,7 @@ HELP;
             $this->getDic($output)['Yapeal.baseDir']
             . 'config/CustomTables.sql'
         ];
-        if (isset($this->getDic($output)['Yapeal.vendorParentDir'])) {
+        if (!empty($this->getDic($output)['Yapeal.vendorParentDir'])) {
             $fileNames[] = $this->getDic($output)['Yapeal.vendorParentDir']
                            . 'config/CustomTables.sql';
         }

@@ -60,7 +60,7 @@ class GroupRetriever implements EveApiRetrieverInterface, LoggerAwareInterface
     public function retrieveEveApi(EveApiReadWriteInterface &$data)
     {
         $retrievers = $this->getRetrieverList();
-        if (empty($retrievers)) {
+        if (0 === count($retrievers)) {
             $mess = 'No retrievers received';
             $this->getLogger()
                  ->warning($mess);

@@ -35,19 +35,16 @@ namespace Yapeal\EveApi\Account;
 
 use LogicException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\Database\EveApiNameTrait;
 use Yapeal\Database\EveSectionNameTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventDispatcherInterface;
-use Yapeal\Event\EventSubscriberInterface;
 use Yapeal\Log\Logger;
 
 /**
  * Class APIKeyInfo
  */
-class APIKeyInfo extends AccountSection implements EventSubscriberInterface,
-    ServiceCallableInterface
+class APIKeyInfo extends AccountSection
 {
     use EveApiNameTrait, EveSectionNameTrait;
     /**
@@ -93,6 +90,12 @@ class APIKeyInfo extends AccountSection implements EventSubscriberInterface,
     )
     {
         $this->setYed($yed);
+        if ($event->isHandled()) {
+            $mess = 'Received already handled event ' . $eventName;
+            $this->getYed()
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            return $event;
+        }
         $data = $event->getData();
         $mess = sprintf(
             'Received %1$s event for %2$s/%3$s in %4$s',
@@ -105,11 +108,11 @@ class APIKeyInfo extends AccountSection implements EventSubscriberInterface,
              ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $fileName = sprintf(
             '%1$s/cache/%2$s/%3$s.xml',
-            dirname(dirname(__DIR__)),
-            strtolower($data->getEveApiSectionName()),
+            dirname(dirname(dirname(__DIR__))),
+            $data->getEveApiSectionName(),
             $data->getEveApiName()
         );
         file_put_contents($fileName, $data->getEveApiXml());
-        return $event->setHandled();
+        return $event;
     }
 }

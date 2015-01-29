@@ -31,16 +31,19 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Xml;
+namespace Yapeal\FileSystem;
 
 use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
+use InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use Yapeal\Exception\YapealRetrieverException;
 use Yapeal\Exception\YapealRetrieverFileException;
 use Yapeal\Exception\YapealRetrieverPathException;
+use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class FileCacheRetriever
@@ -65,9 +68,9 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     public function __destruct()
     {
-        if ($this->handle) {
-            @flock($this->handle, LOCK_UN);
-            @fclose($this->handle);
+        if (is_resource($this->handle)) {
+            flock($this->handle, LOCK_UN);
+            fclose($this->handle);
         }
     }
     /**
@@ -124,7 +127,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         }
         if (!is_string($value)) {
             $mess = 'Cache path MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->cachePath = $value;
         return $this;
@@ -183,7 +186,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     protected function getCachePath()
     {
-        if (empty($this->cachePath)) {
+        if (0 === strlen($this->cachePath)) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new YapealRetrieverPathException($mess);
         }
@@ -230,22 +233,23 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
      */
     protected function isExpired($xml)
     {
+
         $simple = new SimpleXMLElement($xml);
-        if (!isset($simple->currentTime)) {
+        if (null === $simple->currentTime[0]) {
             $mess = 'Xml file missing required currentTime element';
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
-        if (!isset($simple->cachedUntil)) {
+        if (null === $simple->cachedUntil[0]) {
             $mess = 'Xml file missing required cachedUntil element';
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
         $now = time();
-        $current = strtotime($simple->currentTime . '+00:00');
-        $until = strtotime($simple->cachedUntil . '+00:00');
+        $current = strtotime($simple->currentTime[0] . '+00:00');
+        $until = strtotime($simple->cachedUntil[0] . '+00:00');
         // At minimum use cached XML for 5 minutes (300 secs).
         if (($now - $current) <= 300) {
             return false;
@@ -255,8 +259,8 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         if ($until <= $current) {
             $mess = sprintf(
                 'CachedUntil is invalid was given %1$s and currentTime is %2$s',
-                $simple->cachedUntil,
-                $simple->currentTime
+                $until,
+                $current
             );
             $this->getLogger()
                  ->warning($mess);
@@ -266,17 +270,14 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
         if ($until > ($now + 86400)) {
             $mess = sprintf(
                 'CachedUntil is excessively long was given %1$s and currentTime is %2$s',
-                $simple->cachedUntil,
-                $simple->currentTime
+                $until,
+                $current
             );
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
-        if ($until <= $now) {
-            return true;
-        }
-        return false;
+        return ($until <= $now);
     }
     /**
      * @param $cacheFile
@@ -311,8 +312,8 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
     {
         $xml = '';
         $tries = 0;
-        //Give a minute to try reading file.
-        $timeout = time() + 60;
+        //Give 10 seconds to try reading file.
+        $timeout = time() + 10;
         while (!feof($this->getHandle())) {
             if (++$tries > 10 || time() > $timeout) {
                 $this->__destruct();
@@ -321,7 +322,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface,
             }
             $read = fread($this->getHandle(), 16384);
             // Decrease $tries while making progress but NEVER $tries < 1.
-            if (strlen($read) > 0 && $tries > 0) {
+            if ('' !== $read && $tries > 0) {
                 --$tries;
             }
             $xml .= $read;

@@ -165,7 +165,7 @@ trait EveApiToolsTrait
      */
     protected function getYed()
     {
-        if (empty($this->yed)) {
+        if (!$this->yed instanceof EventDispatcherInterface) {
             $mess = 'Tried to use yed before it was set';
             throw new LogicException($mess);
         }

@@ -77,15 +77,26 @@ abstract class AbstractCommonEveApi
         $stmt = $this->getPdo()
                      ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($expires)) {
+        if (0 === count($expires)) {
             $mess = 'No UtilCachedUntil record found for ownerID = ' . $ownerID;
             $this->getYed()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
+        if (1 < count($expires)) {
+            $mess
+                =
+                'Multiple UtilCachedUntil record found for ownerID = '
+                . $ownerID;
+            $this->getYed()
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            return false;
+        }
         if (strtotime($expires[0]['expires'] . '+00:00') < time()) {
-            $mess = 'Expired UtilCachedUntil record found for ownerID = '
-                    . $ownerID;
+            $mess
+                =
+                'Expired UtilCachedUntil record found for ownerID = '
+                . $ownerID;
             $this->getYed()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
@@ -153,12 +164,12 @@ abstract class AbstractCommonEveApi
             return;
         }
         $simple = new SimpleXMLElement($data->getEveApiXml());
-        if (!isset($simple->currentTime)) {
+        if (null === $simple->currentTime[0]) {
             return;
         }
         $dateTime = gmdate(
             'Y-m-d H:i:s',
-            strtotime($simple->currentTime . '+00:00')
+            strtotime($simple->currentTime[0] . '+00:00')
             + $data->getCacheInterval()
         );
         $row = [
@@ -185,6 +196,9 @@ abstract class AbstractCommonEveApi
             );
             $this->getYed()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
+            $mess = 'Database error message was ' . $exc->getMessage();
+            $this->getYed()
+                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return;
         }
         $mess = sprintf(

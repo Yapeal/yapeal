@@ -35,7 +35,6 @@ namespace Yapeal\EveApi;
 
 use LogicException;
 use PDO;
-use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Sql\CommonSqlQueries;
 
@@ -99,7 +98,7 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
-     * @return EventDispatcherInterface|ContainerAwareEventDispatcherInterface
+     * @return EventDispatcherInterface|\Yapeal\Event\ContainerAwareEventDispatcherInterface
      * @throws LogicException
      */
     protected function getYed()
@@ -119,7 +118,7 @@ trait EveApiToolsTrait
      */
     protected $pdo;
     /**
-     * @type EventDispatcherInterface $yed
+     * @type EventDispatcherInterface|\Yapeal\Event\ContainerAwareEventDispatcherInterface $yed
      */
     protected $yed;
 }

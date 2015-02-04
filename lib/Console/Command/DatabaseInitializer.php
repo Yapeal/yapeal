@@ -37,6 +37,7 @@ use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Exception\YapealConsoleException;
 
 /**
  * Class DatabaseInitializer
@@ -92,6 +93,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string[]
+     * @throws YapealConsoleException
      */
     protected function getCreateFileList(OutputInterface $output)
     {
@@ -107,7 +109,7 @@ HELP;
             'UtilTables'
         ];
         $fileList = [];
-        $path = $this->getDic($output)['Yapeal.Database.sqlDir'];
+        $path = $this->getDic()['Yapeal.Database.sqlDir'];
         if (!is_readable($path)) {
             $mess = sprintf(
                 '<info>Could NOT access sql directory %1$s</info>',
@@ -130,11 +132,11 @@ HELP;
         }
         $fileNames = [
             $path . 'CustomTables.sql',
-            $this->getDic($output)['Yapeal.baseDir']
+            $this->getDic()['Yapeal.baseDir']
             . 'config/CustomTables.sql'
         ];
-        if (!empty($this->getDic($output)['Yapeal.vendorParentDir'])) {
-            $fileNames[] = $this->getDic($output)['Yapeal.vendorParentDir']
+        if (!empty($this->getDic()['Yapeal.vendorParentDir'])) {
+            $fileNames[] = $this->getDic()['Yapeal.vendorParentDir']
                            . 'config/CustomTables.sql';
         }
         foreach ($fileNames as $fileName) {
@@ -147,6 +149,8 @@ HELP;
     }
     /**
      * @param OutputInterface $output
+     *
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {

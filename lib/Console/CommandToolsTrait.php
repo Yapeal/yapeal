@@ -36,8 +36,8 @@ namespace Yapeal\Console;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Sql\CommonSqlQueries;
 
 /**
@@ -91,22 +91,17 @@ trait CommandToolsTrait
         return $this;
     }
     /**
-     * @param OutputInterface $output
-     *
      * @return CommonSqlQueries
+     * @throws YapealConsoleException
      */
-    protected function getCsq(OutputInterface $output)
+    protected function getCsq()
     {
         if (null === $this->csq) {
-            $this->csq = $this->getDic(
-                $output
-            )['Yapeal.Database.CommonQueries'];
+            $this->csq = $this->getDic()['Yapeal.Database.CommonQueries'];
         }
         if (!$this->csq instanceof CommonSqlQueries) {
-            $output->writeln(
-                '<error>Tried to use csq before it was set</error>'
-            );
-            exit(2);
+            $mess = 'Tried to use csq before it was set';
+            throw new YapealConsoleException($mess, 1);
         }
         return $this->csq;
     }
@@ -118,40 +113,33 @@ trait CommandToolsTrait
         return $this->cwd;
     }
     /**
-     * @param OutputInterface $output
-     *
      * @return ContainerInterface
+     * @throws YapealConsoleException
      */
-    protected function getDic(OutputInterface $output)
+    protected function getDic()
     {
         if (!$this->dic instanceof ContainerInterface) {
-            $output->writeln(
-                '<error>Tried to use dic before it was set</error>'
-            );
-            exit(2);
+            $mess = 'Tried to use dic before it was set';
+            throw new YapealConsoleException($mess, 1);
         }
         return $this->dic;
     }
     /**
-     * @param OutputInterface $output
-     *
      * @return PDO
+     * @throws YapealConsoleException
      */
-    protected function getPdo(OutputInterface $output)
+    protected function getPdo()
     {
         if (null === $this->pdo) {
             try {
-                $this->pdo = $this->getDic(
-                    $output
-                )['Yapeal.Database.Connection'];
+                $this->pdo = $this->getDic()['Yapeal.Database.Connection'];
             } catch (PDOException $exc) {
                 $mess = sprintf(
-                    '<error>Could NOT connect to database. Database error was (%1$s) %2$s</error>',
+                    'Could NOT connect to database. Database error was (%1$s) %2$s',
                     $exc->getCode(),
                     $exc->getMessage()
                 );
-                $output->writeln($mess);
-                exit(2);
+                throw new YapealConsoleException($mess, 1);
             }
         }
         return $this->pdo;

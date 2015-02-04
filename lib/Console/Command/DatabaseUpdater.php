@@ -34,13 +34,14 @@
 namespace Yapeal\Console\Command;
 
 use DirectoryIterator;
-use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Exception\YapealConsoleException;
+use Yapeal\Exception\YapealDatabaseException;
 
 /**
  * Class DatabaseUpdater
@@ -67,12 +68,15 @@ class DatabaseUpdater extends AbstractDatabaseCommon
     }
     /**
      * @param OutputInterface $output
+     *
+     * @throws YapealDatabaseException
+     * @throws YapealConsoleException
      */
     protected function addDatabaseProcedure(OutputInterface $output)
     {
         $name = 'DatabaseUpdater::addDatabaseProcedure';
         $output->writeln($name);
-        $csq = $this->getCsq($output);
+        $csq = $this->getCsq();
         $this->executeSqlStatements(
             $csq->getDropAddOrModifyColumnProcedure()
             . PHP_EOL
@@ -111,13 +115,16 @@ HELP;
     }
     /**
      * @param OutputInterface $output
+     *
+     * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
     protected function dropDatabaseProcedure(OutputInterface $output)
     {
         $name = 'DatabaseUpdater::dropDatabaseProcedure';
         $output->writeln($name);
         $this->executeSqlStatements(
-            $this->getCsq($output)
+            $this->getCsq()
                  ->getDropAddOrModifyColumnProcedure(),
             $name,
             $output
@@ -128,13 +135,14 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string
+     * @throws YapealConsoleException
      */
     protected function getLatestDatabaseVersion(OutputInterface $output)
     {
-        $sql = $this->getCsq($output)
+        $sql = $this->getCsq()
                     ->getUtilLatestDatabaseVersion();
         try {
-            $result = $this->getPdo($output)
+            $result = $this->getPdo()
                            ->query($sql, PDO::FETCH_NUM);
             $version = $result->fetchColumn();
             $result->closeCursor();
@@ -154,14 +162,13 @@ HELP;
     /**
      * @param OutputInterface $output
      *
-     * @throws InvalidArgumentException
-     * @throws DomainException
      * @return string[]
+     * @throws YapealConsoleException
      */
     protected function getUpdateFileList(OutputInterface $output)
     {
         $fileNames = [];
-        $path = $this->getDic($output)['Yapeal.Database.sqlDir'] . 'updates/';
+        $path = $this->getDic()['Yapeal.Database.sqlDir'] . 'updates/';
         if (!is_readable($path) || !is_dir($path)) {
             $mess = sprintf(
                 '<info>Could NOT access update directory %1$s</info>',
@@ -185,6 +192,8 @@ HELP;
     }
     /**
      * @param OutputInterface $output
+     *
+     * @throws YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {
@@ -220,43 +229,42 @@ HELP;
             }
             $output->writeln($fileName);
             $this->executeSqlStatements($sqlStatements, $fileName, $output);
-            $this->updateDatabaseVersion($updateVersion, $output);
+            $this->updateDatabaseVersion($updateVersion);
             $output->writeln('');
         }
         $this->dropDatabaseProcedure($output);
     }
     /**
-     * @param string          $updateVersion
-     * @param OutputInterface $output
+     * @param string $updateVersion
      *
-     * @return self
+     * @return DatabaseUpdater
+     * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
-    protected function updateDatabaseVersion(
-        $updateVersion,
-        OutputInterface $output
-    ) {
-        $sql = $this->getCsq($output)
+    protected function updateDatabaseVersion($updateVersion)
+    {
+        $sql = $this->getCsq()
                     ->getUtilLatestDatabaseVersionUpdate();
         try {
-            $pdo = $this->getPdo($output);
+            $pdo = $this->getPdo();
             $pdo->beginTransaction();
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$updateVersion]);
             $pdo->commit();
         } catch (PDOException $exc) {
-            $mess = [$sql];
-            $mess[] = sprintf(
-                '<error>Database "version" update failed for %1$s</error>',
+            $mess = $sql . PHP_EOL;
+            $mess .=
+                sprintf('Database error message was %s', $exc->getMessage())
+                . PHP_EOL;
+            $mess .= sprintf(
+                'Database "version" update failed for %1$s',
                 $updateVersion
             );
-            $mess[] = sprintf(
-                '<info>Error message from database connection was %s</info>',
-                $exc->getMessage()
-            );
-            $output->writeln($mess);
-            $this->getPdo($output)
-                 ->rollBack();
-            exit(2);
+            if ($this->getPdo()->inTransaction()) {
+                $this->getPdo()
+                     ->rollBack();
+            }
+            throw new YapealDatabaseException($mess, 2);
         }
         return $this;
     }

@@ -45,6 +45,7 @@ use Yapeal\Configuration\ConsoleWiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
@@ -153,9 +154,9 @@ EOF;
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return null|integer null or 0 if everything went fine, or an error code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
-     * @throws \LogicException
+     * @throws YapealConsoleException
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -172,18 +173,18 @@ EOF;
             }
             $posts = $arguments;
         }
-        $this->wire($this->getDic($output));
+        $this->wire($this->getDic());
         /**
          * @type EveApiReadWriteInterface $data
          */
-        $data = $this->getDic($output)['Yapeal.Xml.Data'];
+        $data = $this->getDic()['Yapeal.Xml.Data'];
         $data = $data->setEveApiName($input->getArgument('api_name'))
                      ->setEveApiSectionName($input->getArgument('section_name'))
                      ->setEveApiArguments($posts);
-        $retriever = $this->getDic($output)['Yapeal.Xml.Retriever'];
+        $retriever = $this->getDic()['Yapeal.Xml.Retriever'];
         $retriever->retrieveEveApi($data);
         if (false !== $data->getEveApiXml()) {
-            $preserver = $this->getDic($output)['Yapeal.Xml.Preserver'];
+            $preserver = $this->getDic()['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }
     }

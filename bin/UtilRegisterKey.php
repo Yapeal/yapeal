@@ -66,7 +66,7 @@ class UtilRegisterKey
     /**
      * @return string
      */
-    public function getIsActive()
+    public function getActive()
     {
         return (string)$this->isActive;
     }
@@ -104,7 +104,7 @@ class UtilRegisterKey
                      ->prepare($sql);
         $columns = [
             $this->getActiveAPIMask(),
-            $this->getIsActive(),
+            $this->getActive(),
             $this->getKeyID(),
             $this->getVCode()
         ];
@@ -154,7 +154,7 @@ class UtilRegisterKey
      *
      * @return self
      */
-    public function setIsActive($value)
+    public function setActive($value)
     {
         $this->isActive = (bool)$value;
         return $this;

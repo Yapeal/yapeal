@@ -1,7 +1,6 @@
-#!/usr/bin/env php
 <?php
 /**
- * Contains Yapeal Console.
+ * Contains Custom Yapeal exception class.
  *
  * PHP version 5.4
  *
@@ -9,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -28,23 +27,15 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
- * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright  2008-2015 Michael Cummings
+ * @license    http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author     Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal;
+namespace Yapeal\Exception;
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
-use Symfony\Component\Console\Application;
-use Yapeal\Console\Command\DatabaseInitializer;
-use Yapeal\Console\Command\DatabaseUpdater;
-use Yapeal\Console\Command\EveApiRetriever;
-use Yapeal\Container\PimpleContainer;
-
-$container = new PimpleContainer();
-$cwd = str_replace('\\', '/', getcwd());
-$application = new Application('Yapeal Console', '0.0.2');
-$application->add(new EveApiRetriever('Network:Cache', $cwd, $container));
-$application->add(new DatabaseInitializer('Database:Init', $cwd, $container));
-$application->add(new DatabaseUpdater('Database:Update', $cwd, $container));
-return $application->run();
+/**
+ * Base class used for all Yapeal exceptions.
+ */
+class YapealConsoleException extends YapealException
+{
+}

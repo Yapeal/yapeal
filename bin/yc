@@ -47,4 +47,4 @@ $application = new Application('Yapeal Console', '0.0.1');
 $application->add(new EveApiRetriever('Network:Cache', $cwd, $container));
 $application->add(new DatabaseInitializer('Database:Init', $cwd, $container));
 $application->add(new DatabaseUpdater('Database:Update', $cwd, $container));
-$application->run();
+return $application->run();

@@ -34,16 +34,29 @@
 namespace Yapeal;
 
 /*
+ * Turn off warning messages for the following includes.
+ */
+$errorReporting = error_reporting(E_ALL & ~E_WARNING);
+/*
  * Find auto loader from one of
  * vendor/bin/
  * OR ./
  * OR bin/
- * OR lib/PhpEOL/
- * OR vendor/PhpEOL/PhpEOL/bin/
+ * OR src/Project/
+ * OR vendor/Project/Project/
  */
-(@include_once dirname(__DIR__) . '/autoload.php')
-|| (@include_once __DIR__ . '/vendor/autoload.php')
-|| (@include_once dirname(__DIR__) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
-|| (@include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php')
-|| die('Could not find required auto class loader. Aborting ...');
+(include_once dirname(__DIR__) . '/autoload.php')
+|| (include_once __DIR__ . '/vendor/autoload.php')
+|| (include_once dirname(__DIR__) . '/vendor/autoload.php')
+|| (include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
+|| (include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php');
+error_reporting($errorReporting);
+unset($errorReporting);
+if (!class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
+    if ('cli' === PHP_SAPI) {
+        $mess
+            = 'Could NOT find required Composer class auto loader. Aborting ...';
+        fwrite(STDERR, $mess);
+    }
+    return 1;
+}

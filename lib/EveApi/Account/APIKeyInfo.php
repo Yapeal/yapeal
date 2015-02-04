@@ -35,8 +35,8 @@ namespace Yapeal\EveApi\Account;
 
 use LogicException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Database\EveApiNameTrait;
-use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\EveApi\EveApiNameTrait;
+use Yapeal\EveApi\EveSectionNameTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Log\Logger;

@@ -38,7 +38,7 @@ use PDO;
 use PDOException;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
-use Yapeal\Database\EveSectionNameTrait;
+use Yapeal\EveApi\EveSectionNameTrait;
 use Yapeal\EveApi\AbstractCommonEveApi;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventDispatcherInterface;

@@ -104,13 +104,13 @@ Here a simple test example of how to use one of the new events.
     $yapeal = new Yapeal($dic);
     $yapeal->wire($dic);
     /**
-     * @type YapealEventDispatcherInterface $yed
+     * @type YapealEventDispatcherInterface $yem
      */
-    $yed = $dic['Yapeal.Event.Dispatcher'];
+    $yem = $dic['Yapeal.Event.Dispatcher'];
     $test = function (
         EveApiEventInterface $event,
         $eventName,
-        YapealEventDispatcherInterface $yed
+        YapealEventDispatcherInterface $yem
     ) {
         $data = $event->getData();
         $mess = 'Received event ' . $eventName . ' for Eve API '
@@ -118,9 +118,9 @@ Here a simple test example of how to use one of the new events.
                 . PHP_EOL;
         print $mess;
     };
-    $yed->addListener('eve_api.pre_retrieve', $test);
+    $yem->addListener('eve_api.pre_retrieve', $test);
     exit($yapeal->autoMagic());
 
 This example uses a function for the callable but I would expect you to be use a
 class method in actual production code of course so more like this:
-`$yed->addListener('eve_api.pre_retrieve', ['myAppClass', 'myHandler']);`
+`$yem->addListener('eve_api.pre_retrieve', ['myAppClass', 'myHandler']);`

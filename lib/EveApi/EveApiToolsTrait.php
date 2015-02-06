@@ -33,9 +33,9 @@
  */
 namespace Yapeal\EveApi;
 
+use EventMediator\ContainerMediatorInterface;
 use LogicException;
 use PDO;
-use Yapeal\Event\EventDispatcherInterface;
 use Yapeal\Sql\CommonSqlQueries;
 
 /**
@@ -64,13 +64,13 @@ trait EveApiToolsTrait
         return $this;
     }
     /**
-     * @param EventDispatcherInterface $value
+     * @param ContainerMediatorInterface $value
      *
-     * @return self
+     * @return EveApiToolsTrait
      */
-    public function setYed(EventDispatcherInterface $value)
+    public function setYem(ContainerMediatorInterface $value)
     {
-        $this->yed = $value;
+        $this->yem = $value;
         return $this;
     }
     /**
@@ -98,16 +98,16 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
-     * @return EventDispatcherInterface|\Yapeal\Event\ContainerAwareEventDispatcherInterface
+     * @return ContainerMediatorInterface
      * @throws LogicException
      */
-    protected function getYed()
+    protected function getYem()
     {
-        if (!$this->yed instanceof EventDispatcherInterface) {
-            $mess = 'Tried to use yed before it was set';
+        if (!$this->yem instanceof ContainerMediatorInterface) {
+            $mess = 'Tried to use yem before it was set';
             throw new LogicException($mess);
         }
-        return $this->yed;
+        return $this->yem;
     }
     /**
      * @type CommonSqlQueries $csq
@@ -118,7 +118,7 @@ trait EveApiToolsTrait
      */
     protected $pdo;
     /**
-     * @type EventDispatcherInterface|\Yapeal\Event\ContainerAwareEventDispatcherInterface $yed
+     * @type ContainerMediatorInterface $yem
      */
-    protected $yed;
+    protected $yem;
 }

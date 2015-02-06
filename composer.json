@@ -21,6 +21,7 @@
         }
     },
     "autoload-dev": {
+        "psr-0": {"Spec\\": ["specs/"]},
         "psr-4": {
             "Yapeal\\Test\\": ["tests/"]
         }
@@ -49,6 +50,7 @@
     },
     "require": {
         "dragonrun1/file_path_normalizer": "~1.0",
+        "dragonrun1/event-mediator": "dev-master",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-hash": "*",
@@ -72,8 +74,10 @@
     },
     "require-dev": {
         "dragonrun1/semantic-version": "master@dev",
+        "dragonrun1/phpspec": "dev-master",
         "erusev/parsedown": "*",
         "mikey179/vfsStream": "~1.4",
+        "phpspec/nyan-formatters": "1.0.1",
         "phpunit/phpunit": "~4.3",
         "satooshi/php-coveralls": "dev-master"
     }

@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Event;
 
+use EventMediator\Event;
 use LogicException;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
@@ -55,32 +56,13 @@ class EveApiEvent extends Event implements EveApiEventInterface
     /**
      * @inheritdoc
      */
-    public function isHandled()
-    {
-        return $this->handled;
-    }
-    /**
-     * @inheritdoc
-     */
     public function setData(EveApiReadWriteInterface &$value)
     {
         $this->data = $value;
         return $this;
     }
     /**
-     * @inheritdoc
-     */
-    public function setHandled()
-    {
-        $this->handled = true;
-        return $this;
-    }
-    /**
      * @type EveApiReadWriteInterface $data
      */
     protected $data;
-    /**
-     * @type bool $handled
-     */
-    protected $handled = false;
 }

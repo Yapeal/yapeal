@@ -35,6 +35,7 @@ namespace Yapeal\Configuration;
 
 use ArrayAccess;
 use DomainException;
+use EventMediator\ContainerMediatorInterface;
 use FilePathNormalizer\FilePathNormalizerTrait;
 use InvalidArgumentException;
 use Monolog\ErrorHandler;
@@ -236,23 +237,23 @@ class Wiring
                 }
             );
         }
-        if (empty($this->dic['Yapeal.Event.EventDispatcher'])) {
-            $this->dic['Yapeal.Event.EventDispatcher'] = function ($dic) {
-                return new $dic['Yapeal.Event.dispatcher']($dic);
+        if (empty($this->dic['Yapeal.Event.EventMediator'])) {
+            $this->dic['Yapeal.Event.EventMediator'] = function ($dic) {
+                return new $dic['Yapeal.Event.mediator']($dic);
             };
         }
         $dic = $this->dic;
         /**
-         * @type ContainerAwareEventDispatcherInterface $dispatcher
+         * @type ContainerMediatorInterface $mediator
          */
-        $dispatcher = $dic['Yapeal.Event.EventDispatcher'];
+        $mediator = $dic['Yapeal.Event.EventMediator'];
         $internal = explode(',', $dic['Yapeal.Event.Subscribers.internal']);
         $method = 'injectCallable';
         foreach ($internal as $subscriber) {
             $subscriber = trim($subscriber);
             $serviceName = $subscriber::$method($dic);
             if (false !== $serviceName) {
-                $dispatcher->addSubscriberService($serviceName, $subscriber);
+                $mediator->addServiceSubscriber($serviceName, new $subscriber());
             }
         }
         return $this;

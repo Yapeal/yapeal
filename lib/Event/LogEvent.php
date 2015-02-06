@@ -32,6 +32,7 @@
  */
 namespace Yapeal\Event;
 
+use EventMediator\Event;
 use Yapeal\Log\Logger;
 
 /**

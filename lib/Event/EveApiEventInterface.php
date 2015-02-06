@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Event;
 
+use EventMediator\EventInterface;
 use LogicException;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
@@ -47,19 +48,10 @@ interface EveApiEventInterface extends EventInterface
      *                        before it is set.
      */
     public function getData();
-
-    /**
-     * @return bool
-     */
-    public function isHandled();
     /**
      * @param EveApiReadWriteInterface|null $value
      *
      * @return self
      */
     public function setData(EveApiReadWriteInterface &$value);
-    /**
-     * @return self
-     */
-    public function setHandled();
 }

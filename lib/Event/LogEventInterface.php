@@ -9,6 +9,8 @@
  */
 namespace Yapeal\Event;
 
+use EventMediator\EventInterface;
+
 /**
  * Class LogEvent
  */

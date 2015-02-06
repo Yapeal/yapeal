@@ -88,10 +88,10 @@ class APIKeyInfo extends AccountSection
         $eventName,
         EventDispatcherInterface $yed
     ) {
-        $this->setYed($yed);
+        $this->setYem($yed);
         if ($event->isHandled()) {
             $mess = 'Received already handled event ' . $eventName;
-            $this->getYed()
+            $this->getYem()
                  ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return $event;
         }
@@ -103,7 +103,7 @@ class APIKeyInfo extends AccountSection
             $data->getEveApiName(),
             __CLASS__
         );
-        $this->getYed()
+        $this->getYem()
              ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $fileName = sprintf(
             '%1$s/cache/%2$s/%3$s.xml',

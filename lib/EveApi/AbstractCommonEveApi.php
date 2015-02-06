@@ -64,7 +64,7 @@ abstract class AbstractCommonEveApi
             $apiName,
             $ownerID
         );
-        $this->getYed()
+        $this->getYem()
             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $sql = $this->getCsq()
                     ->getUtilCachedUntilExpires(
@@ -72,14 +72,14 @@ abstract class AbstractCommonEveApi
                         $sectionName,
                         $ownerID
                     );
-        $this->getYed()
+        $this->getYem()
             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         $stmt = $this->getPdo()
                      ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (0 === count($expires)) {
             $mess = 'No UtilCachedUntil record found for ownerID = ' . $ownerID;
-            $this->getYed()
+            $this->getYem()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
@@ -88,7 +88,7 @@ abstract class AbstractCommonEveApi
                 =
                 'Multiple UtilCachedUntil record found for ownerID = '
                 . $ownerID;
-            $this->getYed()
+            $this->getYem()
                  ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return false;
         }
@@ -97,7 +97,7 @@ abstract class AbstractCommonEveApi
                 =
                 'Expired UtilCachedUntil record found for ownerID = '
                 . $ownerID;
-            $this->getYed()
+            $this->getYem()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
@@ -113,7 +113,7 @@ abstract class AbstractCommonEveApi
     {
         $sql = $this->getCsq()
                     ->getApiLock($data->getHash());
-        $this->getYed()
+        $this->getYem()
              ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         try {
             $stmt = $this->getPdo()
@@ -125,7 +125,7 @@ abstract class AbstractCommonEveApi
                     $data->getEveApiSectionName(),
                     $data->getEveApiName()
                 );
-                $this->getYed()
+                $this->getYem()
                      ->dispatchLogEvent(
                          'Yapeal.Log.log',
                          Logger::DEBUG,
@@ -139,7 +139,7 @@ abstract class AbstractCommonEveApi
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $this->getYed()
+            $this->getYem()
                  ->dispatchLogEvent(
                      'Yapeal.Log.log',
                      Logger::WARNING,
@@ -193,10 +193,10 @@ abstract class AbstractCommonEveApi
                 $data->getEveApiName(),
                 $ownerID
             );
-            $this->getYed()
+            $this->getYem()
                 ->dispatchLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
             $mess = 'Database error message was ' . $exc->getMessage();
-            $this->getYed()
+            $this->getYem()
                  ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return;
         }
@@ -206,7 +206,7 @@ abstract class AbstractCommonEveApi
             $data->getEveApiName(),
             $ownerID
         );
-        $this->getYed()
+        $this->getYem()
             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
     }
 }

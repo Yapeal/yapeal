@@ -27,7 +27,7 @@ Yapeal:
             group: Monolog\Handler\GroupHandler
             stream: Monolog\Handler\StreamHandler
     Event:
-        dispatcher: Yapeal\Event\ContainerAwareEventDispatcher
+        mediator: EventMediator\PimpleContainerMediator
         Events:
             eveApi: Yapeal\Event\EveApiEvent
             log: Yapeal\Event\LogEvent

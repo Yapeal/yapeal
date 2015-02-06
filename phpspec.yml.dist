@@ -2,8 +2,8 @@ suites:
     yapeal_suite:
         namespace: Yapeal
         psr4_prefix: Yapeal
-        spec_path: tests
-        spec_prefix: spec
+        spec_path: specs
+        spec_prefix: Spec
         src_path: lib
 
 extensions:

@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains EventInterface Interface.
+ * Contains YapealEventMediator class.
  *
  * PHP version 5.4
  *
@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014-2015 Michael Cummings
+ * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,37 +27,31 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014-2015 Michael Cummings
- * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @author    Michael Cummings <mgcummings@yahoo.com>
+ * @copyright 2015 Michael Cummings
+ * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Event;
 
+use EventMediator\PimpleContainerMediator;
+
 /**
- * Interface EventInterface
+ * Class YapealEventMediator
  */
-interface EventInterface
+class YapealEventMediator extends PimpleContainerMediator
 {
     /**
-     * Returns whether further event listeners should be triggered.
+     * @param string         $eventName
+     * @param EveApiEventInterface $event
      *
-     * @see EventInterface::stopPropagation()
-     *
-     * @return bool Whether propagation was already stopped for this event.
-     *
-     * @api
+     * @return EveApiEventInterface
      */
-    public function isPropagationStopped();
-    /**
-     * Stops the propagation of the event to further event listeners.
-     *
-     * If multiple event listeners are connected to the same event, no
-     * further event listener will be triggered once any trigger calls
-     * stopPropagation().
-     *
-     * @return self
-     *
-     * @api
-     */
-    public function stopPropagation();
+    public function triggerEveApiEvent($eventName, EveApiEventInterface $event = null)
+    {
+        $this->checkEventName($eventName);
+        if (null === $event) {
+            $event = new EveApiEvent();
+        }
+        return $event;
+    }
 }

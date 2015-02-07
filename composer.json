@@ -25,6 +25,9 @@
         }
     },
     "autoload-dev": {
+        "psr-0": {
+            "Spec\\": ["specs/"]
+        },
         "psr-4": {
             "Yapeal\\Test\\": ["tests/"]
         }
@@ -41,15 +44,18 @@
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/Dragonrun1/yapeal",
+    "config": {
+        "optimize-autoloader": true
+    },
+    "homepage": "https://github.com/Yapeal/yapeal",
     "support": {
         "forum": "https://forums.eveonline.com/default.aspx?g=posts&t=360758",
-        "issues": "https://github.com/Dragonrun1/yapeal/issues?state=open",
-        "source": "https://github.com/Dragonrun1/yapeal",
-        "wiki": "https://github.com/Dragonrun1/yapeal/wiki"
+        "issues": "https://github.com/Yapeal/yapeal/issues?state=open",
+        "source": "https://github.com/Yapeal/yapeal",
+        "wiki": "https://github.com/Yapeal/yapeal/wiki"
     },
     "require": {
-        "dragonrun1/file_path_normalizer": "dev-master",
+        "dragonrun1/file_path_normalizer": "<2.0",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-hash": "*",
@@ -64,22 +70,21 @@
         "ext-xsl": "*",
         "lib-curl": ">=7.15.0",
         "lib-openssl": ">=0.9.8",
-        "php": ">=5.4.20",
         "guzzle/guzzle": "~3.9",
         "monolog/monolog": "~1.11",
+        "php": ">=5.4.20",
         "symfony/console": "~2.5",
         "symfony/yaml": "~2.5"
     },
     "require-dev": {
-        "dragonrun1/semantic-version": "master@dev",
+        "dragonrun1/phpspec": "2.1.*@dev",
         "erusev/parsedown": "*",
         "mikey179/vfsStream": "~1.4",
         "squizlabs/php_codesniffer": "dev-master",
+        "fabpot/php-cs-fixer": "1.4.2",
         "phploc/phploc": "*",
         "phpmd/phpmd": "~2.1",
-        "phpspec/phpspec": "2.1.*@dev",
-        "phpunit/phpunit": "~4.3",
-        "phpunit/phpunit-skeleton-generator": "2.0.*@dev",
+        "phpspec/nyan-formatters": "1.0.1",
         "satooshi/php-coveralls": "dev-master"
     }
 }

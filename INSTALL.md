@@ -17,13 +17,13 @@ If you are using Composer in your own project then add require line for Yapeal
 to your `composer.json` file like any other package:
 
 ```
-require: "yapeal/yapeal": "master"
+require: "yapeal/yapeal": "dev-master"
 ```
 
 And do an update in Composer on command line:
 
 ```
-composer update -o
+composer update
 ```
 
 Next you will want to read the configure instructions in [CONFIG.md][1].
@@ -41,7 +41,7 @@ command line interface like Bash (Linux) or CMD (Windows).
 An example Git clone command:
 
 ```
-git clone https://github.com/Dragonrun1/yapeal.git
+git clone https://github.com/Yapeal/yapeal.git
 ```
 
 This will create a `yapeal/` directory in the current path where it is run so
@@ -84,7 +84,7 @@ Next you will want to read the configure instructions in [CONFIG.md](CONFIG.md).
 
 You can download a zp file for Yapeal from the main project page at:
 
-https://github.com/Dragonrun1/yapeal
+https://github.com/Yapeal/yapeal
 
 After un-zipping where you want Yapeal installed you will need to run Composer
 to install Yapeal's dependencies.

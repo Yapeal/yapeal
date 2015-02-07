@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) 2014-2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -24,7 +24,7 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright 2014-2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
@@ -35,7 +35,6 @@ use LogicException;
 use PDO;
 use Yapeal\Database\CommonSqlQueries;
 
-require_once __DIR__ . '/bootstrap.php';
 /**
  * Class UtilRegisterKey
  *
@@ -49,13 +48,11 @@ require_once __DIR__ . '/bootstrap.php';
 class UtilRegisterKey
 {
     /**
-     * @param PDO              $pdo
+     * @param PDO $pdo
      * @param CommonSqlQueries $csq
      */
-    public function __construct(
-        PDO $pdo,
-        CommonSqlQueries $csq
-    ) {
+    public function __construct(PDO $pdo, CommonSqlQueries $csq)
+    {
         $this->setPdo($pdo);
         $this->setCsq($csq);
     }
@@ -69,7 +66,7 @@ class UtilRegisterKey
     /**
      * @return string
      */
-    public function getIsActive()
+    public function getActive()
     {
         return (string)$this->isActive;
     }
@@ -107,7 +104,7 @@ class UtilRegisterKey
                      ->prepare($sql);
         $columns = [
             $this->getActiveAPIMask(),
-            $this->getIsActive(),
+            $this->getActive(),
             $this->getKeyID(),
             $this->getVCode()
         ];
@@ -115,7 +112,7 @@ class UtilRegisterKey
         return $this;
     }
     /**
-     * @param string $value
+     * @param string|int $value
      *
      * @throws InvalidArgumentException
      * @return self
@@ -157,13 +154,13 @@ class UtilRegisterKey
      *
      * @return self
      */
-    public function setIsActive($value)
+    public function setActive($value)
     {
         $this->isActive = (bool)$value;
         return $this;
     }
     /**
-     * @param string $value
+     * @param string|int $value
      *
      * @throws InvalidArgumentException
      * @return self
@@ -208,8 +205,7 @@ class UtilRegisterKey
     {
         if (!is_string($value)) {
             $mess
-                = 'VCode MUST be a string but was given '
-                  . gettype($value);
+                = 'VCode MUST be a string but was given ' . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         $this->vCode = $value;
@@ -221,7 +217,7 @@ class UtilRegisterKey
      */
     protected function getCsq()
     {
-        if (empty($this->csq)) {
+        if (!$this->csq instanceof CommonSqlQueries) {
             $mess = 'Tried to use csq before it was set';
             throw new LogicException($mess);
         }
@@ -233,7 +229,7 @@ class UtilRegisterKey
      */
     protected function getPdo()
     {
-        if (empty($this->pdo)) {
+        if (!$this->pdo instanceof PDO) {
             $mess = 'Tried to use pdo before it was set';
             throw new LogicException($mess);
         }
@@ -247,9 +243,9 @@ class UtilRegisterKey
     {
         $pdo = $this->getPdo();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->exec("SET SESSION SQL_MODE='ANSI,TRADITIONAL'");
+        $pdo->exec('SET SESSION SQL_MODE=\'ANSI,TRADITIONAL\'');
         $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE');
-        $pdo->exec("SET SESSION TIME_ZONE='+00:00'");
+        $pdo->exec('SET SESSION TIME_ZONE=\'+00:00\'');
         $pdo->exec('SET NAMES UTF8');
         return $this;
     }
@@ -260,20 +256,22 @@ class UtilRegisterKey
      */
     protected function isIntString($value)
     {
-        if (strlen($value) == 0) {
-            return false;
-        }
-        if (strlen(
-            str_replace(
-                ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-                '',
-                $value
-            )
-        ) !== 0
-        ) {
-            return false;
-        }
-        return true;
+        return ('' === str_replace(
+            [
+                    '0',
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9'
+                ],
+            '',
+            $value
+        ));
     }
     /**
      * @type string $activeAPIMask

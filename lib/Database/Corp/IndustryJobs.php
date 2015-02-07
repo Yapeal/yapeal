@@ -59,8 +59,7 @@ class IndustryJobs extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -121,8 +120,7 @@ class IndustryJobs extends AbstractCorpSection
     protected function preserverToIndustryJobs(
         $xml,
         $ownerID
-    )
-    {
+    ) {
         $columnDefaults = [
             'activityID' => null,
             'blueprintID' => null,

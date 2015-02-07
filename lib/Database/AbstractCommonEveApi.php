@@ -54,7 +54,8 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
+abstract class AbstractCommonEveApi implements
+    EveApiDatabaseInterface,
     LoggerAwareInterface
 {
     use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
@@ -67,8 +68,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         PDO $pdo,
         LoggerInterface $logger,
         CommonSqlQueries $csq
-    )
-    {
+    ) {
         $this->setPdo($pdo);
         $this->setLogger($logger);
         $this->setCsq($csq);
@@ -86,8 +86,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->info(
                  sprintf(
@@ -129,8 +128,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -291,8 +289,7 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
     protected function isEveApiXmlError(
         EveApiReadWriteInterface &$data,
         &$interval
-    )
-    {
+    ) {
         if (strpos($data->getEveApiXml(), '<error') === false) {
             return false;
         }
@@ -316,14 +313,16 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface,
                  ->warning($mess);
             return true;
         }
-        if ($code < 300) { // API key errors.
+        if ($code < 300) {
+// API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $this->getLogger()
                  ->error($mess);
             $interval = 86400;
             return true;
         }
-        if ($code > 903 && $code < 905) { // Major application or Yapeal error.
+        if ($code > 903 && $code < 905) {
+// Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
             $interval = 86400;

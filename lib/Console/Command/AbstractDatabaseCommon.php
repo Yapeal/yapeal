@@ -174,8 +174,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
         $sqlStatements,
         $fileName,
         OutputInterface $output
-    )
-    {
+    ) {
         $templates = [
             ';',
             '{database}',
@@ -230,8 +229,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     protected function processCliOptions(
         array $options,
         OutputInterface $output
-    )
-    {
+    ) {
         $base = 'Yapeal.Database.';
         foreach ([
                      'class',

@@ -45,7 +45,8 @@ use Yapeal\Exception\YapealRetrieverPathException;
 /**
  * Class FileCacheRetriever
  */
-class FileCacheRetriever implements EveApiRetrieverInterface,
+class FileCacheRetriever implements
+    EveApiRetrieverInterface,
     LoggerAwareInterface
 {
     use FilePathNormalizerTrait;

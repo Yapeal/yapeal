@@ -63,8 +63,7 @@ class MailBodies extends AbstractCharSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->debug(
                  sprintf(

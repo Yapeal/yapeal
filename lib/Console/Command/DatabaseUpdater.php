@@ -228,8 +228,7 @@ HELP;
     protected function updateDatabaseVersion(
         $updateVersion,
         OutputInterface $output
-    )
-    {
+    ) {
         $sql = $this->getCsq($output)
                     ->getUtilLatestDatabaseVersionUpdate();
         try {

@@ -44,7 +44,8 @@ use Psr\Log\LoggerInterface;
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever implements EveApiRetrieverInterface,
+class GuzzleNetworkRetriever implements
+    EveApiRetrieverInterface,
     LoggerAwareInterface
 {
     /**

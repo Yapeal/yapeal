@@ -107,7 +107,7 @@ class Yapeal implements WiringInterface
             $dic['Yapeal.Xml.Preserver'],
             300
         );
-        if (empty($result)) {
+        if (0 === count($result)) {
             $logger->warning('Exiting no active Eve APIs found');
             return 1;
         }

@@ -63,8 +63,7 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         $interval
-    )
-    {
+    ) {
         $this->getLogger()
              ->debug(
                  sprintf(
@@ -154,8 +153,7 @@ class StarbaseDetail extends AbstractCorpSection
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
-    )
-    {
+    ) {
         if (!$this->gotApiLock($data)) {
             return false;
         }

@@ -148,17 +148,7 @@ EOF;
         $this->setHelp($help);
     }
     /**
-     * Executes the current command.
-     *
-     * This method is not abstract because you can use this class
-     * as a concrete class. In this case, instead of defining the
-     * execute() method, you set the code to execute by passing
-     * a Closure to the setCode() method.
-     *
-     * @param InputInterface  $input  An InputInterface instance
-     * @param OutputInterface $output An OutputInterface instance
-     *
-     * @return null|integer null or 0 if everything went fine, or an error code
+     * @inheritdoc
      *
      * @throws \LogicException
      * @see    setCode()

@@ -35,6 +35,7 @@ namespace Yapeal\Xml;
 
 use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
+use InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -109,14 +110,13 @@ class FileCacheRetriever implements
                  ->debug($mess, ['exception' => $exc]);
             return $this;
         }
-        //$this->getLogger()->debug($result);
         $data->setEveApiXml($result);
         return $this;
     }
     /**
      * @param string|null $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setCachePath($value = null)
@@ -126,7 +126,7 @@ class FileCacheRetriever implements
         }
         if (!is_string($value)) {
             $mess = 'Cache path MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->cachePath = $value;
         return $this;
@@ -185,7 +185,7 @@ class FileCacheRetriever implements
      */
     protected function getCachePath()
     {
-        if (empty($this->cachePath)) {
+        if (null === $this->cachePath) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new YapealRetrieverPathException($mess);
         }
@@ -233,21 +233,21 @@ class FileCacheRetriever implements
     protected function isExpired($xml)
     {
         $simple = new SimpleXMLElement($xml);
-        if (!isset($simple->currentTime)) {
+        if (null === $simple->currentTime[0]) {
             $mess = 'Xml file missing required currentTime element';
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
-        if (!isset($simple->cachedUntil)) {
+        if (null === $simple->cachedUntil[0]) {
             $mess = 'Xml file missing required cachedUntil element';
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
         $now = time();
-        $current = strtotime($simple->currentTime . '+00:00');
-        $until = strtotime($simple->cachedUntil . '+00:00');
+        $current = strtotime($simple->currentTime[0] . '+00:00');
+        $until = strtotime($simple->cachedUntil[0] . '+00:00');
         // At minimum use cached XML for 5 minutes (300 secs).
         if (($now - $current) <= 300) {
             return false;
@@ -257,8 +257,8 @@ class FileCacheRetriever implements
         if ($until <= $current) {
             $mess = sprintf(
                 'CachedUntil is invalid was given %1$s and currentTime is %2$s',
-                $simple->cachedUntil,
-                $simple->currentTime
+                $simple->cachedUntil[0],
+                $simple->currentTime[0]
             );
             $this->getLogger()
                  ->warning($mess);
@@ -268,17 +268,14 @@ class FileCacheRetriever implements
         if ($until > ($now + 86400)) {
             $mess = sprintf(
                 'CachedUntil is excessively long was given %1$s and currentTime is %2$s',
-                $simple->cachedUntil,
-                $simple->currentTime
+                $simple->cachedUntil[0],
+                $simple->currentTime[0]
             );
             $this->getLogger()
                  ->notice($mess);
             return true;
         }
-        if ($until <= $now) {
-            return true;
-        }
-        return false;
+        return ($until <= $now);
     }
     /**
      * @param $cacheFile

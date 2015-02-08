@@ -1,7 +1,7 @@
 composer.phar
 junk*.php
 test.php
-bin/sql/createCustomTables.sql
+CreateCustomTables.sql
 composer.lock
 config/yapeal.ini
 config/yapeal.yaml

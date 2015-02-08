@@ -174,16 +174,16 @@ EOF;
             }
             $posts = $arguments;
         }
-        $this->wire($this->getDic($output));
+        $this->wire($this->getDic());
         $data = $this->getXmlData(
             $input->getArgument('api_name'),
             $input->getArgument('section_name'),
             $posts
         );
-        $retriever = $this->getDic($output)['Yapeal.Xml.Retriever'];
+        $retriever = $this->getDic()['Yapeal.Xml.Retriever'];
         $retriever->retrieveEveApi($data);
         if (false !== $data->getEveApiXml()) {
-            $preserver = $this->getDic($output)['Yapeal.Xml.Preserver'];
+            $preserver = $this->getDic()['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }
     }

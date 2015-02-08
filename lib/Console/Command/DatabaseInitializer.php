@@ -67,8 +67,7 @@ class DatabaseInitializer extends AbstractDatabaseCommon
     protected function configure()
     {
         $this->addOptions();
-        $help
-            = <<<'HELP'
+        $help = <<<'HELP'
 The <info>%command.full_name%</info> command is used to initialize (create) a new
  database and tables to be used by Yapeal. If you already have a
  config/yapeal.yaml file setup you can use the following:
@@ -92,6 +91,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string[]
+     * @throws \Yapeal\Exception\YapealConsoleException
      */
     protected function getCreateFileList(OutputInterface $output)
     {
@@ -108,7 +108,8 @@ HELP;
             'CustomTables'
         ];
         $fileList = [];
-        $path = $this->getDic($output)['Yapeal.baseDir'] . 'bin/sql/';
+        $dic = $this->getDic();
+        $path = $dic['Yapeal.baseDir'] . 'bin/sql/';
         if (!is_readable($path)) {
             $mess = sprintf(
                 '<info>Could NOT access sql directory %1$s</info>',
@@ -120,7 +121,7 @@ HELP;
         foreach ($fileNames as $fileName) {
             $file = $path . 'Create' . $fileName . '.sql';
             if (!is_file($file)) {
-                if ($fileName == 'CustomTables') {
+                if ($fileName === 'CustomTables') {
                     continue;
                 }
                 $mess = sprintf(
@@ -132,10 +133,24 @@ HELP;
             }
             $fileList[] = $file;
         }
+        $file = $dic['Yapeal.baseDir'] . 'config/CreateCustomTables.sql';
+        if (is_file($file)) {
+            $fileList[] = $file;
+        }
+        if (array_key_exists('Yapeal.vendorParentDir', $dic)) {
+            $file =
+                $dic['Yapeal.vendorParentDir']
+                . 'config/CreateCustomTables.sql';
+            if (is_file($file)) {
+                $fileList[] = $file;
+            }
+        }
         return $fileList;
     }
     /**
      * @param OutputInterface $output
+     *
+     * @return int
      */
     protected function processSql(OutputInterface $output)
     {
@@ -150,8 +165,16 @@ HELP;
                 continue;
             }
             $output->writeln($fileName);
-            $this->executeSqlStatements($sqlStatements, $fileName, $output);
+            $result = $this->executeSqlStatements(
+                $sqlStatements,
+                $fileName,
+                $output
+            );
+            if (0 !== $result) {
+                return $result;
+            }
             $output->writeln('');
         }
+        return 0;
     }
 }

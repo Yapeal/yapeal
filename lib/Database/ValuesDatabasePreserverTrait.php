@@ -33,8 +33,6 @@
  */
 namespace Yapeal\Database;
 
-use LogicException;
-use Psr\Log\LoggerInterface;
 use SimpleXMLIterator;
 
 /**
@@ -65,7 +63,7 @@ trait ValuesDatabasePreserverTrait
             if (!array_key_exists($columnName, $columnDefaults)) {
                 break;
             }
-            if (is_null($columnDefaults[$columnName]) || strlen($column) != 0) {
+            if ('' !== (string)$column || null === $columnDefaults[$columnName]) {
                 $columnDefaults[$columnName] = (string)$column;
             }
             $this->getLogger()
@@ -92,8 +90,8 @@ trait ValuesDatabasePreserverTrait
         $rowCount = 1
     );
     /**
-     * @throws LogicException
-     * @return LoggerInterface
+     * @return \Psr\Log\LoggerInterface
+     * @throws \LogicException
      */
     abstract protected function getLogger();
 }

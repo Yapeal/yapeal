@@ -43,7 +43,7 @@ trait EveApiNameTrait
      */
     protected function getApiName()
     {
-        if (empty($this->apiName)) {
+        if (null === $this->apiName) {
             $this->apiName = basename(str_replace('\\', '/', __CLASS__));
         }
         return $this->apiName;

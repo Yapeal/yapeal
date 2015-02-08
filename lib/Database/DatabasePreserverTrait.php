@@ -33,9 +33,6 @@
  */
 namespace Yapeal\Database;
 
-use PDO;
-use Psr\Log\LoggerInterface;
-
 /**
  * Trait DatabasePreserverTrait
  */
@@ -55,7 +52,7 @@ trait DatabasePreserverTrait
         $tableName,
         $rowCount = 1
     ) {
-        if (empty($columns)) {
+        if (0 === count($columns)) {
             return $this;
         }
         $mess = sprintf(
@@ -87,11 +84,11 @@ trait DatabasePreserverTrait
      */
     abstract protected function getCsq();
     /**
-     * @return LoggerInterface
+     * @return \Psr\Log\LoggerInterface
      */
     abstract protected function getLogger();
     /**
-     * @return PDO
+     * @return \PDO
      */
     abstract protected function getPdo();
 }

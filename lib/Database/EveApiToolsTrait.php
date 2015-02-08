@@ -35,7 +35,6 @@ namespace Yapeal\Database;
 
 use LogicException;
 use PDO;
-use Psr\Log\LoggerInterface;
 
 /**
  * Trait EveApiToolsTrait
@@ -77,7 +76,7 @@ trait EveApiToolsTrait
         $tableName,
         $rowCount = 1
     ) {
-        if (empty($columns)) {
+        if (0 === count($columns)) {
             return $this;
         }
         $mess = sprintf(
@@ -117,7 +116,7 @@ trait EveApiToolsTrait
      */
     protected function getCsq()
     {
-        if (empty($this->csq)) {
+        if (null === $this->csq) {
             $mess = 'Tried to use csq before it was set';
             throw new LogicException($mess);
         }
@@ -125,11 +124,11 @@ trait EveApiToolsTrait
     }
     /**
      * @throws LogicException
-     * @return LoggerInterface
+     * @return \Psr\Log\LoggerInterface
      */
     protected function getLogger()
     {
-        if (empty($this->logger)) {
+        if (null === $this->logger) {
             $mess = 'Tried to use logger before it was set';
             throw new LogicException($mess);
         }
@@ -141,7 +140,7 @@ trait EveApiToolsTrait
      */
     protected function getPdo()
     {
-        if (empty($this->pdo)) {
+        if (null === $this->pdo) {
             $mess = 'Tried to use pdo before it was set';
             throw new LogicException($mess);
         }

@@ -33,9 +33,6 @@
  */
 namespace Yapeal\Database;
 
-use LogicException;
-use Psr\Log\LoggerInterface;
-use SimpleXMLElement;
 use SimpleXMLIterator;
 
 /**
@@ -60,18 +57,18 @@ trait AttributesDatabasePreserverTrait
         $maxRowCount = 1000
     ) {
         $rows = (new SimpleXMLIterator($xml))->xpath($xPath);
-        if (count($rows) == 0) {
+        if (0 === count($rows)) {
             return $this;
         }
         $rowCount = 0;
         $columns = [];
         /**
-         * @type SimpleXMLElement $row
+         * @type \SimpleXMLElement $row
          */
         foreach ($rows as $row) {
             // Replace empty values with any existing defaults.
             foreach ($columnDefaults as $key => $value) {
-                if (is_null($value) || strlen($row[$key]) != 0) {
+                if (null === $value || '' === $row[$key]) {
                     $columns[] = (string)$row[$key];
                     continue;
                 }
@@ -111,8 +108,8 @@ trait AttributesDatabasePreserverTrait
         $rowCount = 1
     );
     /**
-     * @throws LogicException
-     * @return LoggerInterface
+     * @throws \LogicException
+     * @return \Psr\Log\LoggerInterface
      */
     abstract protected function getLogger();
 }

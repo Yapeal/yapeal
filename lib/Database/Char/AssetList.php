@@ -53,9 +53,13 @@ class AssetList extends AbstractCharSection
      */
     protected function addNesting(SimpleXMLElement $row, $idx = 0)
     {
+        /**
+         * @type  SimpleXMLElement|\Traversable $row
+         */
         $row['lft'] = $idx;
         if ($row->count()) {
-            foreach ($row->children() as $descendant) {
+            $children = $row->children();
+            foreach ($children as $descendant) {
                 $idx = $this->addNesting($descendant, ++$idx);
             }
         }
@@ -72,7 +76,7 @@ class AssetList extends AbstractCharSection
     {
         // Replace empty values with any existing defaults.
         foreach ($this->columnDefaults as $key => $value) {
-            if (is_null($value) || strlen($row[$key]) != 0) {
+            if (null === $value || '' !== (string)$row[$key]) {
                 $this->columns[] = (string)$row[$key];
                 continue;
             }
@@ -120,10 +124,9 @@ class AssetList extends AbstractCharSection
         $this->getPdo()
              ->exec($sql);
         $simple = new SimpleXMLElement($xml);
-        if (!empty($simple->result)) {
-            $row = $simple->result->row[0];
-            $row['itemID'] = $ownerID;
-            $this->addNesting($simple->result->row[0]);
+        if (0 !== $simple->result[0]->count()) {
+            $simple->result[0]->row[0]['itemID'] = $ownerID;
+            $this->addNesting($simple->result[0]->row[0]);
             $this->flush(
                 $this->columns,
                 array_keys($this->columnDefaults),

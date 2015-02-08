@@ -97,14 +97,6 @@ trait CommandToolsTrait
     protected function getCsq()
     {
         if (null === $this->csq) {
-            if (!array_key_exists(
-                'Yapeal.Database.CommonQueries',
-                $this->getDic()
-            )
-            ) {
-                $mess = 'Tried to use csq before it was set';
-                throw new YapealConsoleException($mess, 1);
-            }
             $this->csq = $this->getDic()['Yapeal.Database.CommonQueries'];
         }
         return $this->csq;

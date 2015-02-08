@@ -1,3 +1,73 @@
+-- sql/updates/201412101858.sql
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charAllianceContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charCorporateContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpAllianceContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporateContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+-- sql/updates/201412102009.sql
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporationSheet',
+                                      'memberCount',
+                                      'BIGINT(20) UNSIGNED NOT NULL AFTER "factionName"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporationSheet',
+                                      'memberLimit',
+                                      'BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 AFTER "memberCount"');
+-- sql/updates/201412112108.sql
+DROP PROCEDURE IF EXISTS "{database}"."DropColumn";
+CREATE PROCEDURE "{database}"."DropColumn"(
+    IN param_database_name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_table_name    VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_name   VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci)
+    BEGIN
+        IF EXISTS(SELECT
+                      NULL
+                  FROM
+                      "information_schema"."COLUMNS"
+                  WHERE
+                      "COLUMN_NAME" COLLATE utf8_unicode_ci = param_column_name AND
+                      "TABLE_NAME" COLLATE utf8_unicode_ci = param_table_name AND
+                      "table_schema" COLLATE utf8_unicode_ci = param_database_name)
+        THEN
+/* Create the full statement to execute */
+            SET @StatementToExecute = concat('ALTER TABLE "',
+                                             param_database_name,'"."',
+                                             param_table_name,
+                                             '" DROP COLUMN "',
+                                             param_column_name,'"') $$
+/* Prepare and execute the statement that was built */
+            PREPARE DynamicStatement FROM @StatementToExecute$$
+            EXECUTE DynamicStatement$$
+/* Cleanup the prepared statement */
+            DEALLOCATE PREPARE DynamicStatement$$
+        END IF$$
+    END;
+CALL "{database}"."DropColumn"('{database}',
+                               '{table_prefix}charCharacterSheet',
+                               'cloneName');
+CALL "{database}"."DropColumn"('{database}',
+                               '{table_prefix}charCharacterSheet',
+                               'cloneSkillPoints');
+CALL "{database}"."DropColumn"('{database}',
+                               '{table_prefix}charCharacterSheet',
+                               'cloneTypeID');
+DROP PROCEDURE IF EXISTS "{database}"."DropColumn";
+-- sql/updates/201412130159.sql
 ALTER DATABASE "{database}"
 DEFAULT CHARACTER SET utf8
 DEFAULT COLLATE utf8_unicode_ci;

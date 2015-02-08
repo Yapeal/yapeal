@@ -248,18 +248,18 @@ SQL;
         $sql
             = <<<'SQL'
 CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
-    IN param_database_name  VARCHAR(100),
-    IN param_table_name     VARCHAR(100),
-    IN param_column_name    VARCHAR(100),
-    IN param_column_details VARCHAR(255))
+    IN param_database_name  VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_table_name     VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_name    VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_details VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci)
     BEGIN
         IF NOT EXISTS(SELECT NULL
                       FROM
                           "information_schema"."COLUMNS"
                       WHERE
-                          "COLUMN_NAME" = param_column_name AND
-                          "TABLE_NAME" = param_table_name AND
-                          "table_schema" = param_database_name)
+                          "COLUMN_NAME" COLLATE utf8_unicode_ci = param_column_name AND
+                          "TABLE_NAME" COLLATE utf8_unicode_ci = param_table_name AND
+                          "table_schema" COLLATE utf8_unicode_ci = param_database_name)
         THEN
 /* Create the full statement to execute */
             SET @StatementToExecute = concat('ALTER TABLE "',

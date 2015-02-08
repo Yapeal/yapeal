@@ -35,6 +35,7 @@ namespace Yapeal\Xml;
 
 use DomainException;
 use FilePathNormalizer\FilePathNormalizerTrait;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Yapeal\Exception\YapealPreserverException;
 use Yapeal\Exception\YapealPreserverFileException;
@@ -62,9 +63,9 @@ class FileCachePreserver implements EveApiPreserverInterface
      */
     public function __destruct()
     {
-        if ($this->handle) {
-            @flock($this->handle, LOCK_UN);
-            @fclose($this->handle);
+        if (is_resource($this->handle)) {
+            flock($this->handle, LOCK_UN);
+            fclose($this->handle);
         }
     }
     /**
@@ -100,7 +101,7 @@ class FileCachePreserver implements EveApiPreserverInterface
     /**
      * @param string|null $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return self
      */
     public function setCachePath($value = null)
@@ -110,7 +111,7 @@ class FileCachePreserver implements EveApiPreserverInterface
         }
         if (!is_string($value)) {
             $mess = 'Cache path MUST be string but given ' . gettype($value);
-            throw new \InvalidArgumentException($mess);
+            throw new InvalidArgumentException($mess);
         }
         $this->cachePath = $value;
         return $this;
@@ -157,7 +158,7 @@ class FileCachePreserver implements EveApiPreserverInterface
      */
     protected function getCachePath()
     {
-        if (empty($this->cachePath)) {
+        if (null === $this->cachePath) {
             $mess = 'Tried to access $cachePath before it was set';
             throw new YapealPreserverPathException($mess);
         }
@@ -208,7 +209,7 @@ class FileCachePreserver implements EveApiPreserverInterface
     {
         $this->handle = fopen($cacheFile, 'cb');
         $tries = 0;
-        //Give a minute to try getting lock.
+        //Give 10 secs to try getting lock.
         $timeout = time() + 10;
         while (!flock($this->getHandle(), LOCK_EX | LOCK_NB)) {
             if (++$tries > 10 || time() > $timeout) {

@@ -34,7 +34,6 @@
 namespace Yapeal\Console\Command;
 
 use FilePathNormalizer\FilePathNormalizerTrait;
-use LogicException;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

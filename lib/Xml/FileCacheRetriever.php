@@ -66,9 +66,9 @@ class FileCacheRetriever implements
      */
     public function __destruct()
     {
-        if ($this->handle) {
-            @flock($this->handle, LOCK_UN);
-            @fclose($this->handle);
+        if (is_resource($this->handle)) {
+            flock($this->handle, LOCK_UN);
+            fclose($this->handle);
         }
     }
     /**

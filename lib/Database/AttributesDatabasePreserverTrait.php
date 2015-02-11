@@ -68,7 +68,7 @@ trait AttributesDatabasePreserverTrait
         foreach ($rows as $row) {
             // Replace empty values with any existing defaults.
             foreach ($columnDefaults as $key => $value) {
-                if (null === $value || '' === $row[$key]) {
+                if (null === $value || '' !== (string)$row[$key]) {
                     $columns[] = (string)$row[$key];
                     continue;
                 }

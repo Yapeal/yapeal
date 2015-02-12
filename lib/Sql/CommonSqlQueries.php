@@ -31,7 +31,7 @@
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal\Database;
+namespace Yapeal\Sql;
 
 /**
  * Class CommonSqlQueries

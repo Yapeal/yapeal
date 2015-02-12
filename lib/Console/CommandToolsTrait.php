@@ -36,7 +36,7 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Exception\YapealDatabaseException;
 

@@ -33,7 +33,7 @@ namespace Yapeal;
 use InvalidArgumentException;
 use LogicException;
 use PDO;
-use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Sql\CommonSqlQueries;
 
 /**
  * Class UtilRegisterKey

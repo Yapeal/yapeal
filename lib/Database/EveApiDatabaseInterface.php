@@ -36,6 +36,7 @@ namespace Yapeal\Database;
 use LogicException;
 use PDO;
 use Psr\Log\LoggerInterface;
+use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiRetrieverInterface;

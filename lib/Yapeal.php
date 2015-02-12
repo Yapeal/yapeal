@@ -45,7 +45,7 @@ use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Database\AbstractCommonEveApi;
 use Yapeal\Database\Account\APIKeyInfo;
-use Yapeal\Database\CommonSqlQueries;
+use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Xml\EveApiXmlData;
 

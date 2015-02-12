@@ -46,6 +46,7 @@ use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use tidy;
 use XSLTProcessor;
+use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;

@@ -68,8 +68,7 @@
                     <xs:simpleType>
                         <xs:restriction base="xs:decimal">
                             <xs:minInclusive value="0"/>
-                            <xs:totalDigits value="18" fixed="true"/>
-                            <xs:fractionDigits value="4"/>
+                            <xs:totalDigits value="20" fixed="true"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>

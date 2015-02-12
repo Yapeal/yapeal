@@ -35,6 +35,7 @@ namespace Yapeal\Database;
 
 use LogicException;
 use PDO;
+use Yapeal\Sql\CommonSqlQueries;
 
 /**
  * Trait EveApiToolsTrait

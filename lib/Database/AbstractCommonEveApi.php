@@ -203,7 +203,7 @@ abstract class AbstractCommonEveApi implements
         $stmt = $this->getPdo()
                      ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($expires)) {
+        if (0 === count($expires)) {
             $this->getLogger()
                  ->debug('No UtilCachedUntil record found');
             return false;
@@ -222,7 +222,7 @@ abstract class AbstractCommonEveApi implements
      */
     protected function getCwd()
     {
-        if (empty($this->cwd)) {
+        if (null === $this->cwd) {
             $this->cwd = $this->getFpn()
                               ->normalizePath(__DIR__);
         }
@@ -295,16 +295,16 @@ abstract class AbstractCommonEveApi implements
             return false;
         }
         $simple = new SimpleXMLElement($data->getEveApiXml());
-        if (!isset($simple->error)) {
+        if (!isset($simple->error[0])) {
             return false;
         }
-        $code = (int)$simple->error['code'];
+        $code = (int)$simple->error[0]['code'];
         $mess = sprintf(
             'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',
             strtolower($this->getSectionName()),
             $this->getApiName(),
             $code,
-            (string)$simple->error
+            (string)$simple->error[0]
         );
         if ($code < 200) {
             if (strpos($mess, 'retry after') !== false) {
@@ -315,7 +315,7 @@ abstract class AbstractCommonEveApi implements
             return true;
         }
         if ($code < 300) {
-// API key errors.
+        // API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $this->getLogger()
                  ->error($mess);
@@ -323,7 +323,7 @@ abstract class AbstractCommonEveApi implements
             return true;
         }
         if ($code > 903 && $code < 905) {
-// Major application or Yapeal error.
+        // Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
             $interval = 86400;
@@ -378,12 +378,12 @@ abstract class AbstractCommonEveApi implements
         $sql = $this->getCsq()
                     ->getUtilCachedUntilUpsert();
         $pdo = $this->getPdo();
-        if (!isset($simple->currentTime)) {
+        if (!isset($simple->currentTime[0])) {
             return;
         }
         $dateTime = gmdate(
             'Y-m-d H:i:s',
-            strtotime($simple->currentTime . '+00:00') + $interval
+            strtotime($simple->currentTime[0] . '+00:00') + $interval
         );
         $row = [
             $this->getApiName(),

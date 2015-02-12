@@ -109,10 +109,10 @@ HELP;
         ];
         $fileList = [];
         $dic = $this->getDic();
-        $path = $dic['Yapeal.baseDir'] . 'bin/sql/';
+        $path = $dic['Yapeal.baseDir'] . 'lib/Sql/';
         if (!is_readable($path)) {
             $mess = sprintf(
-                '<info>Could NOT access sql directory %1$s</info>',
+                '<info>Could NOT access Sql directory %1$s</info>',
                 $path
             );
             $output->writeln($mess);

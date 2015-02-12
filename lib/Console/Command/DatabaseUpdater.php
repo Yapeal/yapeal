@@ -163,10 +163,10 @@ HELP;
     protected function getUpdateFileList(OutputInterface $output)
     {
         $fileNames = [];
-        $path = $this->getDic()['Yapeal.baseDir'] . 'bin/sql/updates/';
+        $path = $this->getDic()['Yapeal.baseDir'] . 'lib/Sql/updates/';
         if (!is_readable($path)) {
             $mess = sprintf(
-                '<info>Could NOT access update directory %1$s</info>',
+                '<info>Could NOT access Sql update directory %1$s</info>',
                 $path
             );
             $output->writeln($mess);

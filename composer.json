@@ -78,7 +78,6 @@
         "erusev/parsedown": "*",
         "mikey179/vfsStream": "~1.4",
         "phpspec/nyan-formatters": "1.0.1",
-        "phpunit/phpunit": "~4.3",
         "satooshi/php-coveralls": "dev-master"
     }
 }

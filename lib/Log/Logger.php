@@ -9,10 +9,10 @@
  */
 namespace Yapeal\Log;
 
+use EventMediator\SubscriberInterface;
 use Monolog\Logger as MLogger;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
-use Yapeal\Event\EventSubscriberInterface;
 use Yapeal\Event\LogEventInterface;
 
 /**
@@ -20,7 +20,7 @@ use Yapeal\Event\LogEventInterface;
  */
 class Logger extends MLogger implements
     ServiceCallableInterface,
-    EventSubscriberInterface,
+    SubscriberInterface,
     EventAwareLoggerInterface
 {
     /**
@@ -28,9 +28,9 @@ class Logger extends MLogger implements
      *
      * @api
      */
-    public static function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
-        $events = ['Yapeal.Log.log' => ['logEvent', -PHP_INT_MAX]];
+        $events = ['Yapeal.Log.log' => ['logEvent', 'last']];
         return $events;
     }
     /**

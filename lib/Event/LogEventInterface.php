@@ -12,7 +12,7 @@ namespace Yapeal\Event;
 use EventMediator\EventInterface;
 
 /**
- * Class LogEvent
+ * Interface LogEventInterface
  */
 interface LogEventInterface extends EventInterface
 {

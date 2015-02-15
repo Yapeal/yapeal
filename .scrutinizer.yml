@@ -37,5 +37,6 @@ checks:
         duplication: false
 filter:
     excluded_paths:
-        - 'tests/*'
         - 'specs/*'
+        - 'subtree/*'
+        - 'tests/*'

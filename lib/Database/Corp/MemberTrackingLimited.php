@@ -67,9 +67,8 @@ class MemberTrackingLimited extends AbstractCorpSection
      * @param string $xml
      * @param string $ownerID
      *
-     * @internal param int $key
-     *
-     * @return self
+     * @return MemberTrackingLimited
+     * @throws \LogicException
      */
     protected function preserverToMemberTrackingLimited(
         $xml,
@@ -92,10 +91,17 @@ class MemberTrackingLimited extends AbstractCorpSection
             'roles' => null,
             'grantableRoles' => null
         ];
+        $tableName = 'corpMemberTracking';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
         $this->attributePreserveData(
             $xml,
             $columnDefaults,
-            'corpMemberTracking'
+            $tableName
         );
         return $this;
     }

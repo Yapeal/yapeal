@@ -370,7 +370,7 @@ class Wiring
      */
     protected function doSubs($settings)
     {
-        if (!(is_string($settings) && !is_array($settings))) {
+        if (!(is_string($settings) || is_array($settings))) {
             $mess
                 =
                 'Settings MUST be a string or string array, but was given '

@@ -37,11 +37,14 @@ use ArrayAccess;
 use DomainException;
 use EventMediator\ContainerMediatorInterface;
 use FilePathNormalizer\FilePathNormalizerTrait;
+use FilesystemIterator;
 use InvalidArgumentException;
 use Monolog\ErrorHandler;
 use Monolog\Logger;
 use PDO;
 use RecursiveArrayIterator;
+use RecursiveCallbackFilterIterator;
+use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
@@ -87,12 +90,11 @@ class Wiring
                  )
         ];
         if (!empty($this->dic['Yapeal.vendorParentDir'])) {
-            $configFiles[]
-                = $this->getFpn()
-                       ->normalizeFile(
-                           $this->dic['Yapeal.vendorParentDir']
-                           . 'config/yapeal.yaml'
-                       );
+            $configFiles[] = $this->getFpn()
+                                  ->normalizeFile(
+                                      $this->dic['Yapeal.vendorParentDir']
+                                      . 'config/yapeal.yaml'
+                                  );
         }
         $settings = [];
         // Process each file in turn so any substitutions are done in a more
@@ -132,15 +134,13 @@ class Wiring
             return $this;
         }
         if ('mysql' !== $this->dic['Yapeal.Database.platform']) {
-            $mess
-                =
+            $mess =
                 'Unknown platform, was given '
                 . $this->dic['Yapeal.Database.platform'];
             throw new YapealDatabaseException($mess);
         }
         $this->dic['Yapeal.Database.Connection'] = function ($dic) {
-            $dsn
-                =
+            $dsn =
                 $dic['Yapeal.Database.platform']
                 . ':host='
                 . $dic['Yapeal.Database.hostName']
@@ -179,8 +179,8 @@ class Wiring
             /**
              * @type Logger $logger
              */
-            $logger
-                = new $dic['Yapeal.Error.class']($dic['Yapeal.Error.channel']);
+            $logger =
+                new $dic['Yapeal.Error.class']($dic['Yapeal.Error.channel']);
             $group = [];
             if ('cli' === PHP_SAPI) {
                 $group[] = new $dic['Yapeal.Error.Handlers.stream'](
@@ -253,7 +253,10 @@ class Wiring
             $subscriber = trim($subscriber);
             $serviceName = $subscriber::$method($dic);
             if (false !== $serviceName) {
-                $mediator->addServiceSubscriber($serviceName, new $subscriber());
+                $mediator->addServiceSubscriber(
+                    $serviceName,
+                    new $subscriber()
+                );
             }
         }
         return $this;
@@ -306,12 +309,12 @@ class Wiring
             );
             $userAgent = ltrim($userAgent, '/ ');
             $headers = [
-                'Accept'         => $dic['Yapeal.Network.Headers.Accept'],
-                'Accept-Charset' => $dic['Yapeal.Network.Headers.Accept-Charset'],
+                'Accept'          => $dic['Yapeal.Network.Headers.Accept'],
+                'Accept-Charset'  => $dic['Yapeal.Network.Headers.Accept-Charset'],
                 'Accept-Encoding' => $dic['Yapeal.Network.Headers.Accept-Encoding'],
                 'Accept-Language' => $dic['Yapeal.Network.Headers.Accept-Language'],
-                'Connection'     => $dic['Yapeal.Network.Headers.Connection'],
-                'Keep-Alive'     => $dic['Yapeal.Network.Headers.Keep-Alive']
+                'Connection'      => $dic['Yapeal.Network.Headers.Connection'],
+                'Keep-Alive'      => $dic['Yapeal.Network.Headers.Keep-Alive']
             ];
             // Clean up any extra spaces and EOL chars from Yaml.
             foreach ($headers as $key => $value) {
@@ -321,10 +324,10 @@ class Wiring
                 $headers['User-Agent'] = $userAgent;
             }
             $defaults = [
-                'headers' => $headers,
-                'timeout' => (int)$dic['Yapeal.Network.timeout'],
+                'headers'         => $headers,
+                'timeout'         => (int)$dic['Yapeal.Network.timeout'],
                 'connect_timeout' => (int)$dic['Yapeal.Network.connect_timeout'],
-                'verify'  => $dic['Yapeal.Network.verify']
+                'verify'          => $dic['Yapeal.Network.verify']
             ];
             return new $dic['Yapeal.Network.class'](
                 [
@@ -371,8 +374,7 @@ class Wiring
     protected function doSubs($settings)
     {
         if (!(is_string($settings) || is_array($settings))) {
-            $mess
-                =
+            $mess =
                 'Settings MUST be a string or string array, but was given '
                 . getType($settings);
             throw new InvalidArgumentException($mess);
@@ -406,8 +408,8 @@ class Wiring
                 $count
             );
             if (++$depth > $maxDepth) {
-                $mess
-                    = 'Exceeded maximum depth, check for possible circular reference(s)';
+                $mess =
+                    'Exceeded maximum depth, check for possible circular reference(s)';
                 throw new DomainException($mess);
             }
             $lastError = preg_last_error();
@@ -468,4 +470,47 @@ class Wiring
      * @type ContainerInterface|ArrayAccess $dic
      */
     protected $dic;
+    protected function getFilteredEventSubscriberList()
+    {
+        $flags =
+            FilesystemIterator::CURRENT_AS_FILEINFO
+            | FilesystemIterator::KEY_AS_PATHNAME
+            | FilesystemIterator::SKIP_DOTS
+            | FilesystemIterator::UNIX_PATHS;
+        $rdi = new RecursiveDirectoryIterator($this->dic['Yapeal.baseDir']);
+        $rdi->setFlags($flags);
+        $files = new RecursiveCallbackFilterIterator(
+            $rdi, function ($current, $key, $iterator) {
+            /**
+             * @type \RecursiveDirectoryIterator $iterator
+             */
+            if ($iterator->hasChildren()) {
+                return true;
+            }
+            $dirs = [
+                'Account',
+                'Api',
+                'Char',
+                'Corp',
+                'Eve',
+                'Map',
+                'Map',
+                'Server'
+            ];
+            /**
+             * @type \SplFileInfo $current
+             */
+            return (in_array(basename($key), $dirs, true) && $current->isFile());
+        }
+        );
+        $rItIt = new RecursiveIteratorIterator(
+            $files,
+            RecursiveIteratorIterator::LEAVES_ONLY,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+        $rItIt->setMaxDepth(2);
+        foreach ($rItIt as $file) {
+            echo $file->getPathname() . PHP_EOL;
+        }
+    }
 }

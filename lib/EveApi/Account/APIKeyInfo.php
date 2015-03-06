@@ -34,11 +34,10 @@
 namespace Yapeal\EveApi\Account;
 
 use LogicException;
-use Yapeal\Container\ContainerInterface;
 use Yapeal\EveApi\EveApiNameTrait;
 use Yapeal\EveApi\EveSectionNameTrait;
 use Yapeal\Event\EveApiEventInterface;
-use Yapeal\Event\EventDispatcherInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
 
 /**
@@ -48,51 +47,24 @@ class APIKeyInfo extends AccountSection
 {
     use EveApiNameTrait, EveSectionNameTrait;
     /**
-     * @inheritDoc
-     *
-     * @api
-     */
-    public static function getSubscribedEvents()
-    {
-        $eventName = str_replace('\\', '.', __CLASS__) . '.preserve';
-        $events = [$eventName => ['eveApiPreserve', -PHP_INT_MAX]];
-        return $events;
-    }
-    /**
-     * @inheritdoc
-     */
-    public static function injectCallable(ContainerInterface &$dic)
-    {
-        $class = __CLASS__;
-        $serviceName = str_replace('\\', '.', $class);
-        $dic[$serviceName] = function () use ($dic, $class) {
-            /**
-             * @type APIKeyInfo $callable
-             */
-            $callable = new $class();
-            return $callable->setCsq($dic['Yapeal.Database.CommonQueries'])
-                            ->setPdo($dic['Yapeal.Database.Connection']);
-        };
-        return $serviceName;
-    }
-    /**
-     * @param EveApiEventInterface $event
-     * @param string $eventName
-     * @param EventDispatcherInterface $yed
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
      * @throws LogicException
+     *
      */
     public function eveApiPreserve(
         EveApiEventInterface $event,
         $eventName,
-        EventDispatcherInterface $yed
+        EventMediatorInterface $yem
     ) {
-        $this->setYem($yed);
-        if ($event->isHandled()) {
+        $this->setYem($yem);
+        if ($event->hasBeenHandled()) {
             $mess = 'Received already handled event ' . $eventName;
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return $event;
         }
         $data = $event->getData();
@@ -104,7 +76,7 @@ class APIKeyInfo extends AccountSection
             __CLASS__
         );
         $this->getYem()
-             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $fileName = sprintf(
             '%1$s/cache/%2$s/%3$s.xml',
             dirname(dirname(dirname(__DIR__))),

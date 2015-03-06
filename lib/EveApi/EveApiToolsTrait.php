@@ -36,6 +36,7 @@ namespace Yapeal\EveApi;
 use EventMediator\ContainerMediatorInterface;
 use LogicException;
 use PDO;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Sql\CommonSqlQueries;
 
 /**
@@ -64,11 +65,11 @@ trait EveApiToolsTrait
         return $this;
     }
     /**
-     * @param ContainerMediatorInterface $value
+     * @param EventMediatorInterface $value
      *
      * @return EveApiToolsTrait
      */
-    public function setYem(ContainerMediatorInterface $value)
+    public function setYem(EventMediatorInterface $value)
     {
         $this->yem = $value;
         return $this;
@@ -98,7 +99,7 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
-     * @return ContainerMediatorInterface
+     * @return EventMediatorInterface
      * @throws LogicException
      */
     protected function getYem()
@@ -118,7 +119,7 @@ trait EveApiToolsTrait
      */
     protected $pdo;
     /**
-     * @type ContainerMediatorInterface $yem
+     * @type EventMediatorInterface $yem
      */
     protected $yem;
 }

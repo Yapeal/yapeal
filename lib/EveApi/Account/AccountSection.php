@@ -37,54 +37,23 @@ use EventMediator\MediatorInterface;
 use LogicException;
 use PDO;
 use PDOException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Yapeal\Container\ContainerInterface;
-use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\EveApi\EveSectionNameTrait;
 use Yapeal\EveApi\AbstractCommonEveApi;
 use Yapeal\Event\EveApiEventInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
  * Class AccountSection
  */
-class AccountSection extends AbstractCommonEveApi implements EventSubscriberInterface, ServiceCallableInterface
+class AccountSection extends AbstractCommonEveApi
 {
     use EveSectionNameTrait;
     /**
-     * @inheritdoc
-     *
-     * @api
-     */
-    public static function getSubscribedEvents()
-    {
-        $priorityBase = -PHP_INT_MAX;
-        $serviceBase = str_replace('\\', '.', __NAMESPACE__) . '.start';
-        $events = [$serviceBase => ['eveApiStart', $priorityBase]];
-        return $events;
-    }
-    /**
-     * @inheritdoc
-     */
-    public static function injectCallable(ContainerInterface &$dic)
-    {
-        $class = __CLASS__;
-        $serviceName = str_replace('\\', '.', $class);
-        $dic[$serviceName] = function () use ($dic, $class) {
-            /**
-             * @type AccountSection $callable
-             */
-            $callable = new $class();
-            return $callable->setCsq($dic['Yapeal.Database.CommonQueries'])
-                            ->setPdo($dic['Yapeal.Database.Connection']);
-        };
-        return $serviceName;
-    }
-    /**
      * @param EveApiEventInterface $event
      * @param string $eventName
-     * @param MediatorInterface $yem
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
      * @throws LogicException
@@ -92,7 +61,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
     public function eveApiStart(
         EveApiEventInterface $event,
         $eventName,
-        MediatorInterface $yem
+        EventMediatorInterface $yem
     ) {
         $this->setYem($yem);
         $data = $event->getData();
@@ -104,14 +73,14 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
             __CLASS__
         );
         $this->getYem()
-             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $active = $this->getActive();
         if (0 === count($active)) {
             $mess = 'No active registered keys found';
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
             return $this->getYem()
-                        ->dispatchEveApiEvent('Yapeal.EveApi.end', $data);
+                        ->triggerEveApiEvent('Yapeal.EveApi.end', $data);
         }
         $untilInterval = $data->getCacheInterval();
         foreach ($active as $key) {
@@ -134,7 +103,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
             $this->updateCachedUntil($data, $ownerID);
         }
         return $this->getYem()
-                    ->dispatchEveApiEvent('Yapeal.EveApi.end', $data);
+                    ->triggerEveApiEvent('Yapeal.EveApi.end', $data);
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -151,7 +120,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
             $data->getEveApiArgument('keyID')
         );
         $this->getYem()
-             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         if (!$this->gotApiLock($data)) {
             return false;
         }
@@ -159,7 +128,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
         foreach ($eventSuffixes as $eventSuffix) {
             $mess = sprintf('Emit %1$s events', $eventSuffix);
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             if (!$this->emitEvents($data, $eventSuffix)) {
                 break;
             }
@@ -173,7 +142,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
                         $eventSuffix
                     );
                 $this->getYem()
-                     ->dispatchLogEvent(
+                     ->triggerLogEvent(
                          'Yapeal.Log.log',
                          Logger::NOTICE,
                          $mess
@@ -213,18 +182,18 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
                 continue;
             }
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             $event = $this->getYem()
-                          ->dispatchEveApiEvent($eventName, $data);
+                          ->triggerEveApiEvent($eventName, $data);
             $data = $event->getData();
-            if ($event->isHandled()) {
+            if ($event->hasBeenHandled()) {
                 $mess = 'Handled in event ' . $eventName;
                 $this->getYem()
-                     ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                     ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
                 break;
             }
         }
-        if (null === $event || !$event->isHandled()) {
+        if (null === $event || !$event->hasBeenHandled()) {
             $mess
                 = sprintf(
                     'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
@@ -234,7 +203,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
                     $eventSuffix
                 );
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return false;
         }
         return true;
@@ -248,7 +217,7 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
         $sql = $this->getCsq()
                     ->getActiveRegisteredKeys();
         $this->getYem()
-             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         try {
             $stmt = $this->getPdo()
                          ->query($sql);
@@ -256,10 +225,10 @@ class AccountSection extends AbstractCommonEveApi implements EventSubscriberInte
         } catch (PDOException $exc) {
             $mess = 'Could NOT select from utilRegisteredKeys';
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             $mess = 'Database error message was ' . $exc->getMessage();
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return [];
         }
     }

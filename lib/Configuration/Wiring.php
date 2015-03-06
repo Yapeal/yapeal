@@ -35,7 +35,6 @@ namespace Yapeal\Configuration;
 
 use ArrayAccess;
 use DomainException;
-use EventMediator\ContainerMediatorInterface;
 use FilePathNormalizer\FilePathNormalizerTrait;
 use FilesystemIterator;
 use InvalidArgumentException;
@@ -50,7 +49,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Traversable;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 
@@ -244,19 +242,67 @@ class Wiring
         }
         $dic = $this->dic;
         /**
-         * @type ContainerMediatorInterface $mediator
+         * @type \Yapeal\Event\EventMediatorInterface $mediator
          */
         $mediator = $dic['Yapeal.Event.EventMediator'];
-        $internal = explode(',', $dic['Yapeal.Event.Subscribers.internal']);
-        $method = 'injectCallable';
-        foreach ($internal as $subscriber) {
-            $subscriber = trim($subscriber);
-            $serviceName = $subscriber::$method($dic);
-            if (false !== $serviceName) {
-                $mediator->addServiceSubscriber(
-                    $serviceName,
-                    new $subscriber()
+        $internal = $this->getFilteredEveApiSubscriberList();
+        if (0 !== count($internal)) {
+            $base = 'Yapeal.EveApi';
+            /**
+             * @type \SplFileInfo $subscriber
+             */
+            foreach ($internal as $subscriber) {
+                $service = sprintf(
+                    '%1$s.%2$s.%3$s',
+                    $base,
+                    basename(dirname($subscriber)),
+                    basename($subscriber, 'php')
                 );
+                /**
+                 * @type ContainerInterface|\ArrayObject $dic
+                 */
+                if (!array_key_exists($service, $dic)) {
+                    $dic[$service] = function () use ($dic, $service) {
+                        $class = '\\' . str_replace('.', '\\', $service);
+                        /**
+                         * @type \Yapeal\EveApi\AbstractCommonEveApi $callable
+                         */
+                        $callable = new $class();
+                        return $callable->setCsq(
+                            $dic['Yapeal.Database.CommonQueries']
+                        )
+                                        ->setPdo(
+                                            $dic['Yapeal.Database.Connection']
+                                        );
+                    };
+                }
+                if (false === strpos($subscriber, 'Section')) {
+                    $events = [
+                        $service . '.start' => [
+                            [$service, 'eveApiStart'],
+                            'last'
+                        ],
+                        $service . '.preserve' => [
+                            [$service, 'eveApiPreserve'],
+                            'last'
+                        ]
+                    ];
+                    $mediator->addServiceSubscriberByEventList(
+                        $service,
+                        $events
+                    );
+                } else {
+                    $events = [
+                        $service . '.start' => [
+                            [$service, 'eveApiStart'],
+                            'last'
+                        ]
+                    ];
+                    $mediator->addServiceSubscriberByEventList(
+                        $service,
+                        $events
+                    );
+                }
             }
         }
         return $this;
@@ -317,8 +363,8 @@ class Wiring
                 'Keep-Alive'      => $dic['Yapeal.Network.Headers.Keep-Alive']
             ];
             // Clean up any extra spaces and EOL chars from Yaml.
-            foreach ($headers as $key => $value) {
-                $headers[$key] = trim(str_replace(' ', '', $value));
+            foreach ($headers as &$value) {
+                $value = trim(str_replace(' ', '', $value));
             }
             if ('' !== $userAgent) {
                 $headers['User-Agent'] = $userAgent;
@@ -423,6 +469,59 @@ class Wiring
         return $settings;
     }
     /**
+     * @return array
+     */
+    protected function getFilteredEveApiSubscriberList()
+    {
+        $flags =
+            FilesystemIterator::CURRENT_AS_FILEINFO
+            | FilesystemIterator::KEY_AS_PATHNAME
+            | FilesystemIterator::SKIP_DOTS
+            | FilesystemIterator::UNIX_PATHS;
+        $rdi = new RecursiveDirectoryIterator(
+            $this->dic['Yapeal.baseDir'] . '/lib/EveApi/'
+        );
+        $rdi->setFlags($flags);
+        $rcfi = new RecursiveCallbackFilterIterator(
+            $rdi, function ($current, $key, $iterator) {
+            /**
+             * @type \RecursiveDirectoryIterator $iterator
+             */
+            if ($iterator->hasChildren()) {
+                return true;
+            }
+            $dirs = [
+                'Account',
+                'Api',
+                'Char',
+                'Corp',
+                'Eve',
+                'Map',
+                'Map',
+                'Server'
+            ];
+            /**
+             * @type \SplFileInfo $current
+             */
+            return (in_array(basename(dirname($key)), $dirs, true)
+                    && $current->isFile()
+                    && 'php' === $current->getExtension());
+        }
+        );
+        $rii = new RecursiveIteratorIterator(
+            $rcfi,
+            RecursiveIteratorIterator::LEAVES_ONLY,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+        $rii->setMaxDepth(3);
+        $fpn = $this->getFpn();
+        $files = [];
+        foreach ($rii as $file) {
+            $files[] = $fpn->normalizeFile($file->getPathname());
+        }
+        return $files;
+    }
+    /**
      * @param $configFile
      * @param $settings
      *
@@ -470,47 +569,4 @@ class Wiring
      * @type ContainerInterface|ArrayAccess $dic
      */
     protected $dic;
-    protected function getFilteredEventSubscriberList()
-    {
-        $flags =
-            FilesystemIterator::CURRENT_AS_FILEINFO
-            | FilesystemIterator::KEY_AS_PATHNAME
-            | FilesystemIterator::SKIP_DOTS
-            | FilesystemIterator::UNIX_PATHS;
-        $rdi = new RecursiveDirectoryIterator($this->dic['Yapeal.baseDir']);
-        $rdi->setFlags($flags);
-        $files = new RecursiveCallbackFilterIterator(
-            $rdi, function ($current, $key, $iterator) {
-            /**
-             * @type \RecursiveDirectoryIterator $iterator
-             */
-            if ($iterator->hasChildren()) {
-                return true;
-            }
-            $dirs = [
-                'Account',
-                'Api',
-                'Char',
-                'Corp',
-                'Eve',
-                'Map',
-                'Map',
-                'Server'
-            ];
-            /**
-             * @type \SplFileInfo $current
-             */
-            return (in_array(basename($key), $dirs, true) && $current->isFile());
-        }
-        );
-        $rItIt = new RecursiveIteratorIterator(
-            $files,
-            RecursiveIteratorIterator::LEAVES_ONLY,
-            RecursiveIteratorIterator::CATCH_GET_CHILD
-        );
-        $rItIt->setMaxDepth(2);
-        foreach ($rItIt as $file) {
-            echo $file->getPathname() . PHP_EOL;
-        }
-    }
 }

@@ -41,6 +41,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  * Class EventMediator
  */
 class EventMediator extends PimpleContainerMediator
+    implements EventMediatorInterface
 {
     /**
      * @param string                   $eventName
@@ -56,7 +57,6 @@ class EventMediator extends PimpleContainerMediator
         EveApiReadWriteInterface $data,
         EveApiEventInterface $event = null
     ) {
-        $this->checkEventName($eventName);
         if (null === $event) {
             $event = new EveApiEvent();
         }
@@ -81,7 +81,6 @@ class EventMediator extends PimpleContainerMediator
         array $context = [],
         LogEventInterface $event = null
     ) {
-        $this->checkEventName($eventName);
         if (null === $event) {
             $event = new LogEvent();
         }

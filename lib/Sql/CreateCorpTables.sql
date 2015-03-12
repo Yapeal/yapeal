@@ -346,7 +346,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberMedals" (
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
-    "base"           CHAR(50)            DEFAULT NULL,
+    "base"           CHAR(255)           DEFAULT NULL,
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
     "grantableRoles" CHAR(64)            DEFAULT NULL,

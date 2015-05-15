@@ -6,7 +6,7 @@ CREATE TABLE "{database}"."{table_prefix}accountAccountStatus" (
     "paidUntil"    DATETIME            NOT NULL,
     PRIMARY KEY ("keyID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}accountAPIKeyInfo" (
     "keyID"      BIGINT(20) UNSIGNED                       NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "{database}"."{table_prefix}accountAPIKeyInfo" (
     "type"       ENUM('Account','Character','Corporation') NOT NULL,
     PRIMARY KEY ("keyID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountAPIKeyInfo" ADD INDEX "accountAPIKeyInfo1"  ("type");
 CREATE TABLE "{database}"."{table_prefix}accountCharacters" (
@@ -29,7 +29,7 @@ CREATE TABLE "{database}"."{table_prefix}accountCharacters" (
     "factionName"     CHAR(50)            NOT NULL,
     PRIMARY KEY ("characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountCharacters" ADD INDEX "accountCharacters1"  ("corporationID");
 CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
@@ -37,7 +37,7 @@ CREATE TABLE "{database}"."{table_prefix}accountKeyBridge" (
     "characterID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID","characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}accountKeyBridge" ADD UNIQUE INDEX "accountKeyBridge1"  ("characterID","keyID");
 CREATE TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" (
@@ -45,5 +45,16 @@ CREATE TABLE "{database}"."{table_prefix}accountMultiCharacterTraining" (
     "keyID"       BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("keyID","trainingEnd")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}accountOffers" (
+    "from"        CHAR(20)            NOT NULL,
+    "ISK"         DECIMAL(17,2)       NOT NULL,
+    "keyID"       BIGINT(20) UNSIGNED NOT NULL,
+    "offeredDate" DATETIME            NOT NULL,
+    "offerID"     BIGINT(20) UNSIGNED NOT NULL,
+    "to"          CHAR(20)            NOT NULL,
+    PRIMARY KEY ("keyID","offerID")
+)
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;

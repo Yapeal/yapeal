@@ -322,6 +322,22 @@ SQL;
         );
     }
     /**
+     * @param string $tableName
+     * @param string $keyID
+     *
+     * @return string
+     */
+    public function getDeleteFromTableWithKeyID($tableName, $keyID)
+    {
+        return sprintf(
+            'DELETE FROM "%1$s"."%2$s%3$s" WHERE "keyID"= \'%4$s\'',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName,
+            $keyID
+        );
+    }
+    /**
      * @return string
      */
     public function getDropAddOrModifyColumnProcedure()

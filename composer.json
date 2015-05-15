@@ -55,7 +55,7 @@
         "wiki": "https://github.com/Yapeal/yapeal/wiki"
     },
     "require": {
-        "dragonrun1/file_path_normalizer": "<2.0",
+        "dragonrun1/file_path_normalizer": "1.1.*",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-hash": "*",
@@ -80,7 +80,6 @@
         "dragonrun1/phpspec": "2.1.*@dev",
         "erusev/parsedown": "*",
         "mikey179/vfsStream": "~1.4",
-        "squizlabs/php_codesniffer": "dev-master",
         "fabpot/php-cs-fixer": "1.4.2",
         "phploc/phploc": "*",
         "phpmd/phpmd": "~2.1",

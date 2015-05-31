@@ -55,7 +55,7 @@ class GroupPreserver implements EveApiPreserverInterface, LoggerAwareInterface
      *
      * @return self
      */
-    public function preserveEveApi(EveApiReadInterface $data)
+    public function preserveEveApi(EveApiReadInterface &$data)
     {
         $preservers = $this->getPreserverList();
         if (empty($preservers)) {

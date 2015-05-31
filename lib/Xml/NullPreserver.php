@@ -43,7 +43,7 @@ class NullPreserver implements EveApiPreserverInterface
      *
      * @return self
      */
-    public function preserveEveApi(EveApiReadInterface $data)
+    public function preserveEveApi(EveApiReadInterface &$data)
     {
         $data->getEveApiXml();
         return $this;

@@ -44,5 +44,5 @@ interface EveApiPreserverInterface
      *
      * @return self
      */
-    public function preserveEveApi(EveApiReadInterface $data);
+    public function preserveEveApi(EveApiReadInterface &$data);
 }

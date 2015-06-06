@@ -82,26 +82,13 @@
             <xs:element type="eveNEDTType" name="onlineTimestamp"/>
             <xs:element type="eveIDType" name="state"/>
             <xs:element type="eveNEDTType" name="stateTimestamp"/>
-            <xs:choice>
-                <xs:sequence>
-                    <xs:element type="generalSettingsType"
-                                name="generalSettings"
-                                maxOccurs="1" minOccurs="0"/>
-                    <xs:element type="combatSettingsType" name="combatSettings"
-                                maxOccurs="1" minOccurs="0"/>
-                    <xs:element type="fuelType" name="fuel" maxOccurs="1"
-                                minOccurs="0"/>
-                </xs:sequence>
-                <xs:sequence>
-                    <xs:element type="combatSettingsType" name="combatSettings"
-                                maxOccurs="1" minOccurs="0"/>
-                    <xs:element type="fuelType" name="fuel" maxOccurs="1"
-                                minOccurs="0"/>
-                    <xs:element type="generalSettingsType"
-                                name="generalSettings"
-                                maxOccurs="1" minOccurs="0"/>
-                </xs:sequence>
-            </xs:choice>
+            <xs:element type="combatSettingsType" name="combatSettings"
+                        maxOccurs="1" minOccurs="0"/>
+            <xs:element type="generalSettingsType"
+                        name="generalSettings"
+                        maxOccurs="1" minOccurs="0"/>
+            <xs:element type="fuelType" name="fuel" maxOccurs="1"
+                        minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

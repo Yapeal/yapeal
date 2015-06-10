@@ -147,6 +147,7 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  aaki."type" IN ('Account','Character')
  AND urk."isActive"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ AND aaki."expires" > now()
 SQL;
         return sprintf(
             str_replace(["\n", "\r\n"], '', $sql),
@@ -176,6 +177,7 @@ SELECT ac."corporationID",urk."keyID",urk."vCode"
  aaki."type" = 'Corporation'
  AND urk."isActive"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ AND aaki."expires" > now()
 SQL;
         return sprintf(
             str_replace(["\n", "\r\n"], '', $sql),

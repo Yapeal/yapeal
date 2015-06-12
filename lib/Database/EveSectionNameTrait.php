@@ -43,9 +43,9 @@ trait EveSectionNameTrait
      */
     protected function getSectionName()
     {
-        if (empty($this->sectionName)) {
-            $this->sectionName
-                = basename(dirname(str_replace('\\', '/', __CLASS__)));
+        if (null === $this->sectionName) {
+            $this->sectionName =
+                basename(dirname(str_replace('\\', '/', __CLASS__)));
         }
         return $this->sectionName;
     }

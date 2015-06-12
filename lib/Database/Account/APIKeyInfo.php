@@ -139,7 +139,7 @@ class APIKeyInfo extends AbstractAccountSection
         $ownerID
     ) {
         $chars = (new SimpleXMLIterator($xml))->xpath('//row');
-        if (count($chars) == 0) {
+        if (0 === count($chars)) {
             return $this;
         }
         $rows = [];

@@ -68,14 +68,14 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                      $this->getApiName()
                  )
              );
-        if ($this->getSectionName() == 'Char') {
+        if ('Char' === $this->getSectionName()) {
             $active = $this->getActiveCharacters();
             $ownerID = 'characterID';
         } else {
             $active = $this->getActiveCorporations();
             $ownerID = 'corporationID';
         }
-        if (empty($active)) {
+        if (0 === count($active)) {
             $mess = sprintf(
                 'No active registered keys found for %1$s/%2$s',
                 $this->getSectionName(),
@@ -109,7 +109,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
                 )
                 ) {
                     // Special handling for optional faction warfare account.
-                    if ($accountKey == '10000') {
+                    if ('10000' === $accountKey) {
                         continue 1;
                     }
                     continue 2;
@@ -140,7 +140,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
         if (!$this->gotApiLock($data)) {
             return false;
         }
-        if ($this->getSectionName() == 'Char') {
+        if ('Char' === $this->getSectionName()) {
             $ownerID = $data->getEveApiArgument('characterID');
         } else {
             $ownerID = $data->getEveApiArgument('corporationID');
@@ -151,7 +151,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
          */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
-            if ($accountKey == '10000') {
+            if ('10000' === $accountKey) {
                 $mess = sprintf(
                     'Corporation %1$s does NOT have a faction warfare account %2$s',
                     $ownerID,
@@ -248,7 +248,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      */
     protected function getKeyList()
     {
-        return $this->keyList;
+        return self::$keyList;
     }
     /**
      * @throws LogicException
@@ -256,7 +256,7 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
      */
     protected function getMask()
     {
-        if (is_null($this->mask)) {
+        if (null === $this->mask) {
             $mess = 'Tried to use mask when it was NOT set';
             throw new LogicException($mess);
         }
@@ -298,7 +298,16 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
     /**
      * @type string[] $keyList
      */
-    protected $keyList;
+    static protected $keyList = [
+        '10000',
+        '1000',
+        '1001',
+        '1002',
+        '1003',
+        '1004',
+        '1005',
+        '1006'
+    ];
     /**
      * @type int $mask
      */

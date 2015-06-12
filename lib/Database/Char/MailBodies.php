@@ -76,13 +76,11 @@ class MailBodies extends AbstractCharSection
          * Update MailMessages List
          */
         $class = new MailMessages(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
+            $this->getPdo(), $this->getLogger(), $this->getCsq()
         );
         $class->autoMagic($data, $retrievers, $preservers, $interval);
         $active = $this->getActiveCharacters();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active characters found');
             return;
@@ -100,15 +98,18 @@ class MailBodies extends AbstractCharSection
                 continue;
             }
             $mailIDs = $this->getActiveMails($charID);
-            if (empty($mailIDs)) {
+            if (0 === count($mailIDs)) {
                 $mess = 'No mail messages for ' . $charID;
                 $this->getLogger()
                      ->info($mess);
                 continue;
             }
-            $mailIDs = array_chunk($mailIDs, 1000);
+            /**
+             * @type array $mailGroups
+             */
+            $mailGroups = array_chunk($mailIDs, 1000);
             $untilInterval = $interval;
-            foreach ($mailIDs as $mailGroup) {
+            foreach ($mailGroups as $mailGroup) {
                 $mailIDs = [];
                 foreach ($mailGroup as $mail) {
                     $mailIDs[] = $mail[0];
@@ -132,7 +133,7 @@ class MailBodies extends AbstractCharSection
                 if ($untilInterval > $interval) {
                     $untilInterval = $interval;
                 }
-                if ($untilInterval != $interval) {
+                if ($untilInterval !== $interval) {
                     continue;
                 }
             }
@@ -160,8 +161,8 @@ class MailBodies extends AbstractCharSection
                          ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_NUM);
         } catch (PDOException $exc) {
-            $mess = 'Could NOT get a list of active mail bodies for '
-                    . $ownerID;
+            $mess =
+                'Could NOT get a list of active mail bodies for ' . $ownerID;
             $this->getLogger()
                  ->warning($mess, ['exception' => $exc]);
             return [];
@@ -176,7 +177,7 @@ class MailBodies extends AbstractCharSection
     protected function preserverToMailBodies($xml, $ownerID)
     {
         $rows = (new SimpleXMLIterator($xml))->xpath('//row');
-        if (count($rows) == 0) {
+        if (0 === count($rows)) {
             return $this;
         }
         $columnNames = ['body', 'messageID', 'ownerID'];

@@ -58,24 +58,24 @@ class WalletTransactions extends AbstractAccountKey
         $accountKey
     ) {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'accountKey' => $accountKey,
-            'characterID' => null,
-            'characterName' => null,
-            'clientID' => null,
-            'clientName' => null,
-            'clientTypeID' => null,
+            'ownerID'              => $ownerID,
+            'accountKey'           => $accountKey,
+            'characterID'          => null,
+            'characterName'        => null,
+            'clientID'             => null,
+            'clientName'           => null,
+            'clientTypeID'         => null,
             'journalTransactionID' => null,
-            'price' => null,
-            'quantity' => null,
-            'stationID' => null,
-            'stationName' => null,
-            'transactionDateTime' => null,
-            'transactionFor' => null,
-            'transactionID' => null,
-            'transactionType' => null,
-            'typeID' => null,
-            'typeName' => null
+            'price'                => null,
+            'quantity'             => null,
+            'stationID'            => null,
+            'stationName'          => null,
+            'transactionDateTime'  => null,
+            'transactionFor'       => null,
+            'transactionID'        => null,
+            'transactionType'      => null,
+            'typeID'               => null,
+            'typeName'             => null
         ];
         $this->attributePreserveData(
             $xml,
@@ -84,20 +84,6 @@ class WalletTransactions extends AbstractAccountKey
         );
         return $this;
     }
-    /**
-     * @type string[] $keyList
-     */
-    protected $keyList
-        = [
-            '10000',
-            '1000',
-            '1001',
-            '1002',
-            '1003',
-            '1004',
-            '1005',
-            '1006'
-        ];
     /**
      * @type int $mask
      */

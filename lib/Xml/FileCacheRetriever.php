@@ -320,7 +320,7 @@ class FileCacheRetriever implements
             }
             $read = fread($this->getHandle(), 16384);
             // Decrease $tries while making progress but NEVER $tries < 1.
-            if (strlen($read) > 0 && $tries > 0) {
+            if ($tries > 0 && strlen($read) > 0) {
                 --$tries;
             }
             $xml .= $read;

@@ -80,7 +80,7 @@ trait DatabasePreserverTrait
         return $this;
     }
     /**
-     * @return CommonSqlQueries
+     * @return \Yapeal\Sql\CommonSqlQueries
      */
     abstract protected function getCsq();
     /**

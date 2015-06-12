@@ -104,7 +104,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiArguments()
     {
-        if (empty($this->eveApiArguments)) {
+        if (null === $this->eveApiArguments) {
             return [];
         }
         return $this->eveApiArguments;
@@ -115,7 +115,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiName()
     {
-        if (empty($this->eveApiName)) {
+        if (null === $this->eveApiName) {
             $mess = 'Tried to access Eve Api name before it was set';
             throw new LogicException($mess);
         }
@@ -127,7 +127,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      */
     public function getEveApiSectionName()
     {
-        if (empty($this->eveApiSectionName)) {
+        if (null === $this->eveApiSectionName) {
             $mess = 'Tried to access Eve Api section name before it was set';
             throw new LogicException($mess);
         }
@@ -178,7 +178,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
     public function setEveApiArguments(array $values)
     {
         $this->eveApiArguments = [];
-        if (empty($values)) {
+        if (0 === count($values)) {
             return $this;
         }
         foreach ($values as $name => $value) {

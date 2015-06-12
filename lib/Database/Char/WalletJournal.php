@@ -57,24 +57,24 @@ class WalletJournal extends AbstractAccountKey
         $accountKey
     ) {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'accountKey' => $accountKey,
-            'date' => null,
-            'refID' => null,
-            'refTypeID' => null,
-            'owner1TypeID' => null,
-            'ownerID1' => null,
-            'ownerName1' => null,
-            'owner2TypeID' => null,
-            'ownerID2' => null,
-            'ownerName2' => null,
-            'argID1' => null,
-            'argName1' => null,
-            'amount' => null,
-            'balance' => null,
-            'reason' => null,
+            'ownerID'       => $ownerID,
+            'accountKey'    => $accountKey,
+            'date'          => null,
+            'refID'         => null,
+            'refTypeID'     => null,
+            'owner1TypeID'  => null,
+            'ownerID1'      => null,
+            'ownerName1'    => null,
+            'owner2TypeID'  => null,
+            'ownerID2'      => null,
+            'ownerName2'    => null,
+            'argID1'        => null,
+            'argName1'      => null,
+            'amount'        => null,
+            'balance'       => null,
+            'reason'        => null,
             'taxReceiverID' => '0',
-            'taxAmount' => '0'
+            'taxAmount'     => '0'
         ];
         $this->attributePreserveData(
             $xml,
@@ -86,7 +86,7 @@ class WalletJournal extends AbstractAccountKey
     /**
      * @type int[] $keyList
      */
-    protected $keyList = ['1000'];
+    static protected $keyList = ['1000'];
     /**
      * @type int $mask
      */

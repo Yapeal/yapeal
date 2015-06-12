@@ -69,7 +69,7 @@ class CorporationSheet extends AbstractCorpSection
         $corp = $data->getEveApiArguments();
         $corpID = $corp['corporationID'];
         // Can NOT include corporationID or only get public info.
-        if (isset($corp['keyID'])) {
+        if (array_key_exists('keyID', $corp)) {
             unset($corp['corporationID']);
             $data->setEveApiArguments($corp);
         }
@@ -154,23 +154,23 @@ class CorporationSheet extends AbstractCorpSection
     protected function preserverToCorporationSheet($xml, $ownerID)
     {
         $columnDefaults = [
-            'allianceID' => '0',
-            'allianceName' => '',
-            'ceoID' => null,
-            'ceoName' => null,
-            'corporationID' => $ownerID,
+            'allianceID'      => '0',
+            'allianceName'    => '',
+            'ceoID'           => null,
+            'ceoName'         => null,
+            'corporationID'   => $ownerID,
             'corporationName' => null,
-            'description' => null,
-            'factionID' => '0',
-            'factionName' => '',
-            'memberCount' => null,
-            'memberLimit' => '0',
-            'shares' => null,
-            'stationID' => null,
-            'stationName' => null,
-            'taxRate' => null,
-            'ticker' => null,
-            'url' => null
+            'description'     => null,
+            'factionID'       => '0',
+            'factionName'     => '',
+            'memberCount'     => null,
+            'memberLimit'     => '0',
+            'shares'          => null,
+            'stationID'       => null,
+            'stationName'     => null,
+            'taxRate'         => null,
+            'ticker'          => null,
+            'url'             => null
         ];
         $this->valuesPreserveData(
             $xml,
@@ -189,8 +189,8 @@ class CorporationSheet extends AbstractCorpSection
     protected function preserverToDivisions($xml, $ownerID)
     {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'accountKey' => null,
+            'ownerID'     => $ownerID,
+            'accountKey'  => null,
             'description' => null
         ];
         $tableName = 'corpDivisions';
@@ -218,14 +218,14 @@ class CorporationSheet extends AbstractCorpSection
     protected function preserverToLogo($xml, $ownerID)
     {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'color1' => null,
-            'color2' => null,
-            'color3' => null,
+            'ownerID'   => $ownerID,
+            'color1'    => null,
+            'color2'    => null,
+            'color3'    => null,
             'graphicID' => null,
-            'shape1' => null,
-            'shape2' => null,
-            'shape3' => null
+            'shape1'    => null,
+            'shape2'    => null,
+            'shape3'    => null
         ];
         $tableName = 'corpLogo';
         $sql = $this->getCsq()
@@ -251,8 +251,8 @@ class CorporationSheet extends AbstractCorpSection
     protected function preserverToWalletDivisions($xml, $ownerID)
     {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'accountKey' => null,
+            'ownerID'     => $ownerID,
+            'accountKey'  => null,
             'description' => null
         ];
         $tableName = 'corpWalletDivisions';

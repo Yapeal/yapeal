@@ -41,7 +41,6 @@ use LogicException;
 use PDO;
 use PDOException;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use tidy;
@@ -59,10 +58,10 @@ abstract class AbstractCommonEveApi implements
     EveApiDatabaseInterface,
     LoggerAwareInterface
 {
-    use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
+    use EveApiToolsTrait, FilePathNormalizerTrait;
     /**
-     * @param PDO             $pdo
-     * @param LoggerInterface $logger
+     * @param PDO              $pdo
+     * @param LoggerInterface  $logger
      * @param CommonSqlQueries $csq
      */
     public function __construct(
@@ -134,7 +133,7 @@ abstract class AbstractCommonEveApi implements
             return false;
         }
         $retrievers->retrieveEveApi($data);
-        if ($data->getEveApiXml() === false) {
+        if (false === $data->getEveApiXml()) {
             $mess = sprintf(
                 'Could NOT retrieve Eve Api data for %1$s/%2$s',
                 strtolower($this->getSectionName()),
@@ -315,7 +314,7 @@ abstract class AbstractCommonEveApi implements
             return true;
         }
         if ($code < 300) {
-        // API key errors.
+            // API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
             $this->getLogger()
                  ->error($mess);
@@ -323,7 +322,7 @@ abstract class AbstractCommonEveApi implements
             return true;
         }
         if ($code > 903 && $code < 905) {
-        // Major application or Yapeal error.
+            // Major application or Yapeal error.
             $this->getLogger()
                  ->alert($mess);
             $interval = 86400;
@@ -434,11 +433,11 @@ abstract class AbstractCommonEveApi implements
         libxml_clear_errors();
         libxml_use_internal_errors($oldErrors);
         $config = [
-            'indent' => true,
+            'indent'        => true,
             'indent-spaces' => 2,
-            'output-xml' => true,
-            'input-xml' => true,
-            'wrap' => '1000'
+            'output-xml'    => true,
+            'input-xml'     => true,
+            'wrap'          => '1000'
         ];
         // Tidy
         $tidy = new tidy();

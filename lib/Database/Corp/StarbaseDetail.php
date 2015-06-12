@@ -87,7 +87,7 @@ class StarbaseDetail extends AbstractCorpSection
             $interval
         );
         $activeCorps = $this->getActiveCorporations();
-        if (empty($activeCorps)) {
+        if (0 === count($activeCorps)) {
             $this->getLogger()
                  ->info('No active registered corporations found');
             return;
@@ -103,7 +103,7 @@ class StarbaseDetail extends AbstractCorpSection
                 continue;
             }
             $activeTowers = $this->getActiveTowers($corpID);
-            if (empty($activeTowers)) {
+            if (0 === count($activeTowers)) {
                 $mess = sprintf(
                     'No active Starbase(s) found for %1$s',
                     $corpID
@@ -128,7 +128,7 @@ class StarbaseDetail extends AbstractCorpSection
                 ) {
                     continue 2;
                 }
-                if ($untilInterval != $interval) {
+                if ($untilInterval !== $interval) {
                     continue;
                 }
             }
@@ -271,7 +271,7 @@ class StarbaseDetail extends AbstractCorpSection
             'onStandingDropStanding' => '0',
             'onStatusDropEnabled' => '0',
             'onStatusDropStanding' => '0',
-            'useStandingsFromOwnerID' => '0',
+            'useStandingsFromOwnerID' => '0'
         ];
         $this->attributePreserveData(
             $xml,

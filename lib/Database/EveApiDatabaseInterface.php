@@ -92,7 +92,7 @@ interface EveApiDatabaseInterface
      * @api
      * @return self
      */
-    public function setCsq($value);
+    public function setCsq(CommonSqlQueries $value);
     /**
      * Sets a logger.
      *

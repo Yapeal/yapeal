@@ -83,7 +83,7 @@ class IndustryJobs extends AbstractCharSection
             $interval
         );
         $active = $this->getActiveCharacters();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active characters found');
             return;

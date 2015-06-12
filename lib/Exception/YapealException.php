@@ -33,9 +33,11 @@
  */
 namespace Yapeal\Exception;
 
+use Exception;
+
 /**
  * Base class used for all Yapeal exceptions.
  */
-class YapealException extends \Exception
+class YapealException extends Exception
 {
 }

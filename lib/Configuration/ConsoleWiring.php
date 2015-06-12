@@ -47,13 +47,12 @@ class ConsoleWiring extends Wiring
      */
     public function wirePreserver()
     {
-        if (isset($this->dic['Yapeal.Xml.Preserver'])) {
+        if (!empty($this->dic['Yapeal.Xml.Preserver'])) {
             return $this;
         }
         $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
             return new FileCachePreserver(
-                $dic['Yapeal.Log.Logger'],
-                $dic['Yapeal.Cache.cacheDir']
+                $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']
             );
         };
         return $this;
@@ -63,14 +62,14 @@ class ConsoleWiring extends Wiring
      */
     public function wireRetriever()
     {
-        if (isset($this->dic['Yapeal.Xml.Retriever'])) {
+        if (!empty($this->dic['Yapeal.Xml.Retriever'])) {
             return $this;
         }
         $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
-            $appComment = $dic['Yapeal.Network.appComment'];
-            $appName = $dic['Yapeal.Network.appName'];
-            $appVersion = $dic['Yapeal.Network.appVersion'];
-            if (empty($appName)) {
+            $appComment = (string)$dic['Yapeal.Network.appComment'];
+            $appName = (string)$dic['Yapeal.Network.appName'];
+            $appVersion = (string)$dic['Yapeal.Network.appVersion'];
+            if ('' === $appName) {
                 $appComment = '';
                 $appVersion = '';
             }
@@ -99,29 +98,28 @@ class ConsoleWiring extends Wiring
             );
             $userAgent = ltrim($userAgent, '/ ');
             $headers = [
-                'Accept' => 'text/xml,application/xml,application/xhtml+xml;'
-                            . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
-                            . 'q=0.6,*/*;q=0.5',
-                'Accept-Charset' => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
+                'Accept'          => 'text/xml,application/xml,application/xhtml+xml;'
+                                     . 'q=0.9,text/html;q=0.8,text/plain;q=0.7,image/png;'
+                                     . 'q=0.6,*/*;q=0.5',
+                'Accept-Charset'  => 'utf-8;q=0.9,windows-1251;q=0.7,*;q=0.6',
                 'Accept-Encoding' => 'gzip',
                 'Accept-Language' => 'en-us;q=0.9,en;q=0.8,*;q=0.7',
-                'Connection' => 'Keep-Alive',
-                'Keep-Alive' => '300'
+                'Connection'      => 'Keep-Alive',
+                'Keep-Alive'      => '300'
             ];
-            if (!empty($userAgent)) {
+            if ('' !== $userAgent) {
                 $headers['User-Agent'] = $userAgent;
             }
             $defaults = [
-                'headers' => $headers,
-                'timeout' => 10,
+                'headers'         => $headers,
+                'timeout'         => 10,
                 'connect_timeout' => 30,
-                'verify' => $dic['Yapeal.baseDir'] . 'config/eveonline.crt',
+                'verify'          => $dic['Yapeal.baseDir']
+                                     . 'config/eveonline.crt'
             ];
             return new GuzzleNetworkRetriever(
-                $dic['Yapeal.Log.Logger'],
-                new Client(
-                    $dic['Yapeal.Network.baseUrl'],
-                    ['defaults' => $defaults]
+                $dic['Yapeal.Log.Logger'], new Client(
+                    $dic['Yapeal.Network.baseUrl'], ['defaults' => $defaults]
                 )
             );
         };

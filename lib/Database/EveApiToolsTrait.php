@@ -35,6 +35,7 @@ namespace Yapeal\Database;
 
 use LogicException;
 use PDO;
+use Psr\Log\LoggerAwareTrait;
 use Yapeal\Sql\CommonSqlQueries;
 
 /**
@@ -42,12 +43,13 @@ use Yapeal\Sql\CommonSqlQueries;
  */
 trait EveApiToolsTrait
 {
+    use LoggerAwareTrait;
     /**
      * @param CommonSqlQueries $value
      *
      * @return self
      */
-    public function setCsq($value)
+    public function setCsq(CommonSqlQueries $value)
     {
         $this->csq = $value;
         return $this;

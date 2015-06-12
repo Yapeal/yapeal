@@ -72,7 +72,7 @@ abstract class AbstractCorpSection extends AbstractCommonEveApi
                  )
              );
         $active = $this->getActiveCorporations();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active registered corporations found');
             return;

@@ -57,22 +57,22 @@ class WalletTransactions extends AbstractAccountKey
         $accountKey
     ) {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'accountKey' => $accountKey,
-            'clientID' => null,
-            'clientName' => null,
-            'clientTypeID' => null,
+            'ownerID'              => $ownerID,
+            'accountKey'           => $accountKey,
+            'clientID'             => null,
+            'clientName'           => null,
+            'clientTypeID'         => null,
             'journalTransactionID' => null,
-            'price' => null,
-            'quantity' => null,
-            'stationID' => null,
-            'stationName' => null,
-            'transactionDateTime' => null,
-            'transactionFor' => null,
-            'transactionID' => null,
-            'transactionType' => null,
-            'typeID' => null,
-            'typeName' => null
+            'price'                => null,
+            'quantity'             => null,
+            'stationID'            => null,
+            'stationName'          => null,
+            'transactionDateTime'  => null,
+            'transactionFor'       => null,
+            'transactionID'        => null,
+            'transactionType'      => null,
+            'typeID'               => null,
+            'typeName'             => null
         ];
         $this->attributePreserveData(
             $xml,
@@ -84,7 +84,7 @@ class WalletTransactions extends AbstractAccountKey
     /**
      * @type int[] $keyList
      */
-    protected $keyList = ['1000'];
+    static protected $keyList = ['1000'];
     /**
      * @type int $mask
      */

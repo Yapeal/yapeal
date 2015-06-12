@@ -72,9 +72,7 @@ class IndustryJobs extends AbstractCorpSection
          * Update Industry Jobs History
          */
         $class = new IndustryJobsHistory(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
+            $this->getPdo(), $this->getLogger(), $this->getCsq()
         );
         $class->autoMagic(
             $data,
@@ -83,7 +81,7 @@ class IndustryJobs extends AbstractCorpSection
             $interval
         );
         $active = $this->getActiveCorporations();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active registered corporations found');
             return;
@@ -122,35 +120,35 @@ class IndustryJobs extends AbstractCorpSection
         $ownerID
     ) {
         $columnDefaults = [
-            'activityID' => null,
-            'blueprintID' => null,
-            'blueprintLocationID' => null,
-            'blueprintTypeID' => null,
-            'blueprintTypeName' => null,
+            'activityID'           => null,
+            'blueprintID'          => null,
+            'blueprintLocationID'  => null,
+            'blueprintTypeID'      => null,
+            'blueprintTypeName'    => null,
             'completedCharacterID' => 0,
-            'completedDate' => '1970-01-01 00:00:01',
-            'cost' => null,
-            'endDate' => '1970-01-01 00:00:01',
-            'facilityID' => null,
-            'installerID' => null,
-            'installerName' => null,
-            'jobID' => null,
-            'licensedRuns' => 0,
-            'outputLocationID' => null,
-            'ownerID' => $ownerID,
-            'pauseDate' => '1970-01-01 00:00:01',
-            'probability' => null,
-            'productTypeID' => null,
-            'productTypeName' => null,
-            'runs' => 0,
-            'solarSystemID' => null,
-            'solarSystemName' => null,
-            'startDate' => null,
-            'stationID' => null,
-            'status' => null,
-            'successfulRuns' => null,
-            'teamID' => null,
-            'timeInSeconds' => null
+            'completedDate'        => '1970-01-01 00:00:01',
+            'cost'                 => null,
+            'endDate'              => '1970-01-01 00:00:01',
+            'facilityID'           => null,
+            'installerID'          => null,
+            'installerName'        => null,
+            'jobID'                => null,
+            'licensedRuns'         => 0,
+            'outputLocationID'     => null,
+            'ownerID'              => $ownerID,
+            'pauseDate'            => '1970-01-01 00:00:01',
+            'probability'          => null,
+            'productTypeID'        => null,
+            'productTypeName'      => null,
+            'runs'                 => 0,
+            'solarSystemID'        => null,
+            'solarSystemName'      => null,
+            'startDate'            => null,
+            'stationID'            => null,
+            'status'               => null,
+            'successfulRuns'       => null,
+            'teamID'               => null,
+            'timeInSeconds'        => null
         ];
         $this->attributePreserveData(
             $xml,

@@ -44,10 +44,8 @@ use Yapeal\Configuration\Wiring;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\WiringInterface;
 use Yapeal\Database\AbstractCommonEveApi;
-use Yapeal\Database\Account\APIKeyInfo;
-use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Exception\YapealDatabaseException;
-use Yapeal\Xml\EveApiXmlData;
+use Yapeal\Sql\CommonSqlQueries;
 
 /**
  * Class Yapeal
@@ -68,6 +66,7 @@ class Yapeal implements WiringInterface
      *
      * @return int Returns 0 if everything was fine else something >= 1 for any
      * errors.
+     * @throws \LogicException
      */
     public function autoMagic()
     {
@@ -98,19 +97,15 @@ class Yapeal implements WiringInterface
             $logger->error($mess, ['exception' => $exc]);
             return 1;
         }
-        $data = new EveApiXmlData();
         // Always check APIKeyInfo.
-        $class = new APIKeyInfo($pdo, $logger, $csq);
-        $class->autoMagic(
-            $data,
-            $dic['Yapeal.Xml.Retriever'],
-            $dic['Yapeal.Xml.Preserver'],
-            300
+        array_unshift(
+            $result,
+            [
+                'sectionName' => 'account',
+                'apiName'     => 'APIKeyInfo',
+                'interval'    => '300'
+            ]
         );
-        if (0 === count($result)) {
-            $logger->warning('Exiting no active Eve APIs found');
-            return 1;
-        }
         foreach ($result as $record) {
             $className = sprintf(
                 'Yapeal\\Database\\%1$s\\%2$s',
@@ -126,7 +121,7 @@ class Yapeal implements WiringInterface
              */
             $class = new $className($pdo, $logger, $csq);
             $class->autoMagic(
-                $data,
+                $dic['Yapeal.XmlData'],
                 $dic['Yapeal.Xml.Retriever'],
                 $dic['Yapeal.Xml.Preserver'],
                 (int)$record['interval']
@@ -177,7 +172,8 @@ class Yapeal implements WiringInterface
                ->wireDatabase()
                ->wireCommonSqlQueries()
                ->wireRetriever()
-               ->wirePreserver();
+               ->wirePreserver()
+               ->wireXmlData();
     }
     /**
      * @return array

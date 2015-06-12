@@ -74,7 +74,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
                  )
              );
         $active = $this->getActiveCharacters();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active characters found');
             return;

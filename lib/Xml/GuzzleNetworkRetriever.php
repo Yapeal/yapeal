@@ -69,6 +69,7 @@ class GuzzleNetworkRetriever implements
      * @param EveApiReadWriteInterface $data
      *
      * @return self
+     * @throws \LogicException
      */
     public function retrieveEveApi(EveApiReadWriteInterface &$data)
     {
@@ -124,7 +125,7 @@ class GuzzleNetworkRetriever implements
         if ($xml === false) {
             return $xml;
         }
-        if (isset($arguments['vCode'])) {
+        if (array_key_exists('vCode', $arguments)) {
             $arguments['vCode'] = substr($arguments['vCode'], 0, 8) . '...';
         }
         $json = json_encode($arguments);
@@ -156,8 +157,9 @@ class GuzzleNetworkRetriever implements
      * @param EveApiReadInterface $data
      *
      * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface
+     * @throws \LogicException
      */
-    protected function prepareConnection(EveApiReadInterface $data)
+    protected function prepareConnection(EveApiReadInterface &$data)
     {
         $uri = [
             '/{EveApiSectionName}/{EveApiName}.xml.aspx',

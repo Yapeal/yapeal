@@ -71,9 +71,7 @@ class CharacterInfoPrivate extends CharacterInfo
          * information from private in cases were keys have overlap.
          */
         $class = new CharacterInfoPublic(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
+            $this->getPdo(), $this->getLogger(), $this->getCsq()
         );
         $class->autoMagic(
             $data,
@@ -82,7 +80,7 @@ class CharacterInfoPrivate extends CharacterInfo
             $interval
         );
         $active = $this->getActiveCharacters();
-        if (empty($active)) {
+        if (0 === count($active)) {
             $this->getLogger()
                  ->info('No active characters found');
             return;
@@ -101,7 +99,12 @@ class CharacterInfoPrivate extends CharacterInfo
             $data->setEveApiArguments($char)
                  ->setEveApiXml();
             $untilInterval = $interval;
-            if (!$this->oneShot($data, $retrievers, $preservers, $untilInterval)
+            if (!$this->oneShot(
+                $data,
+                $retrievers,
+                $preservers,
+                $untilInterval
+            )
             ) {
                 continue;
             }

@@ -239,45 +239,50 @@ class Wiring
      */
     public function wireErrorLogger()
     {
-        if (array_key_exists('Yapeal.Error.Logger', $this->dic)) {
+        $dic = $this->dic;
+        if (array_key_exists('Yapeal.Error.Logger', $dic)) {
             return $this;
         }
-        if (empty($this->dic['Yapeal.Error.loggerName'])) {
+        if (empty($dic['Yapeal.Error.loggerName'])) {
             $loggerName = 'Monolog\\Logger';
-            if (array_key_exists('Yapeal.Log.class', $this->dic)) {
-                $loggerName = $this->dic['Yapeal.Log.class'];
+            if (array_key_exists('Yapeal.Log.class', $dic)) {
+                $loggerName = $dic['Yapeal.Log.class'];
             }
-            $this->dic['Yapeal.Error.loggerName'] = $loggerName;
+            $dic['Yapeal.Error.loggerName'] = $loggerName;
         }
+        $dic['Yapeal.Error.GroupHandler'] = function ($dic) {
+            $group = [];
+            if ('cli' === PHP_SAPI) {
+                $group[] = new StreamHandler('php://stderr', 100);
+            }
+            $group[] = new StreamHandler(
+                $dic['Yapeal.Error.logDir'] . $dic['Yapeal.Error.fileName'],
+                100
+            );
+            return new GroupHandler($group);
+        };
+        $dic['Yapeal.Error.FCHandler'] = function ($dic) {
+            return new FingersCrossedHandler(
+                $dic['Yapeal.Error.GroupHandler'],
+                $dic['Yapeal.Error.threshold'],
+                $dic['Yapeal.Error.bufferSize']
+            );
+        };
         /**
          * @param ContainerInterface|\ArrayObject $dic
          *
          * @throws \RuntimeException
          * @return ErrorHandler
          */
-        $this->dic['Yapeal.Error.Logger'] = function ($dic) {
+        $dic['Yapeal.Error.Logger'] = function ($dic) {
             /**
-             * @type \Psr\Log\LoggerInterface $logger
+             * @type \Monolog\Logger $logger
              */
             $logger = new $dic['Yapeal.Error.loggerName'](
                 $dic['Yapeal.Error.channel']
             );
-            $group = [];
-            /**
-             * @type \Monolog\Logger $logger
-             */
-            if ('cli' === PHP_SAPI) {
-                $group[] = new StreamHandler('php://stderr', 100);
-            }
-            $group[] = new StreamHandler(
-                $dic['Yapeal.Error.logDir'] . $dic['Yapeal.Error.fileName'], 100
-            );
             $logger->pushHandler(
-                new FingersCrossedHandler(
-                    new GroupHandler($group),
-                    $dic['Yapeal.Error.threshold'],
-                    $dic['Yapeal.Error.bufferSize']
-                )
+                $dic['Yapeal.Error.FCHandler']
             );
             /**
              * @type ErrorHandler $error
@@ -336,6 +341,7 @@ class Wiring
             return $this;
         }
         $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
+            $preservers = [];
             if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
                 $preservers[] = new FileCachePreserver(
                     $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']

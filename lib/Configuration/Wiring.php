@@ -344,7 +344,8 @@ class Wiring
             $preservers = [];
             if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
                 $preservers[] = new FileCachePreserver(
-                    $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']
+                    $dic['Yapeal.Log.Logger'],
+                    $dic['Yapeal.Cache.cacheDir']
                 );
             } else {
                 $preservers[] = new NullPreserver();

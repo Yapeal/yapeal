@@ -43,7 +43,7 @@ use Yapeal\Container\PimpleContainer;
 
 $container = new PimpleContainer();
 $cwd = str_replace('\\', '/', getcwd());
-$application = new Application('Yapeal Console', '0.0.1');
+$application = new Application('Yapeal Console', '2.0.1');
 $application->add(new EveApiRetriever('Network:Cache', $cwd, $container));
 $application->add(new DatabaseInitializer('Database:Init', $cwd, $container));
 $application->add(new DatabaseUpdater('Database:Update', $cwd, $container));

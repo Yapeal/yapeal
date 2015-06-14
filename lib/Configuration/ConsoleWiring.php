@@ -52,7 +52,8 @@ class ConsoleWiring extends Wiring
         }
         $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
             return new FileCachePreserver(
-                $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']
+                $dic['Yapeal.Log.Logger'],
+                $dic['Yapeal.Cache.cacheDir']
             );
         };
         return $this;

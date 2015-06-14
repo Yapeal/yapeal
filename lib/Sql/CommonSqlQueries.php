@@ -83,7 +83,7 @@ SQL;
     public function getActiveApis()
     {
         return sprintf(
-            'SELECT * FROM "%1$s"."%2$sutilEveApi" WHERE "isActive"=1 ORDER BY RAND()',
+            'SELECT * FROM "%1$s"."%2$sutilEveApi" WHERE "active"=1 ORDER BY RAND()',
             $this->databaseName,
             $this->tablePrefix
         );
@@ -121,7 +121,7 @@ SELECT urk."keyID",urk."vCode"
  ON (urk."keyID" = aaki."keyID")
  WHERE
  aaki."type" IN ('Account','Character')
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & 33554432) <> 0
 SQL;
         return sprintf($sql, $this->databaseName, $this->tablePrefix);
@@ -145,7 +145,7 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  ON (akb."characterID" = ac."characterID")
  WHERE
  aaki."type" IN ('Account','Character')
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
  AND aaki."expires" > now()
 SQL;
@@ -175,7 +175,7 @@ SELECT ac."corporationID",urk."keyID",urk."vCode"
  ON (akb."characterID" = ac."characterID")
  WHERE
  aaki."type" = 'Corporation'
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
  AND aaki."expires" > now()
 SQL;
@@ -192,7 +192,7 @@ SQL;
     public function getActiveRegisteredKeys()
     {
         return sprintf(
-            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "isActive"=1',
+            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "active"=1',
             $this->databaseName,
             $this->tablePrefix
         );
@@ -219,7 +219,7 @@ SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  ON (ac."corporationID" = sl."ownerID")
  WHERE
  aaki."type" = 'Corporation'
- AND urk."isActive"=1
+ AND urk."active"=1
  AND sl."ownerID"=%4$s
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;

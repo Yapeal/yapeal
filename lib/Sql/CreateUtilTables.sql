@@ -5,29 +5,29 @@ CREATE TABLE "{database}"."{table_prefix}utilCachedUntil" (
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName","ownerID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     "version" CHAR(12) NOT NULL,
     PRIMARY KEY ("version")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201505150647');
+    ('201506131923');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
+    "active"      TINYINT(1)          NOT NULL,
     "apiName"     CHAR(32)            NOT NULL,
     "interval"    INT(10) UNSIGNED    NOT NULL,
-    "isActive"    TINYINT(1)          NOT NULL,
     "mask"        BIGINT(20) UNSIGNED NOT NULL,
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName","sectionName")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 START TRANSACTION;
-INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName","apiName","mask","interval","isActive")
+INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName","apiName","mask","interval","active")
 VALUES
     ('account','AccountStatus',33554432,3600,1),
     ('account','YapealCorporationSheet',0,21600,1),
@@ -109,44 +109,44 @@ VALUES
     ('server','ServerStatus',1,300,1);
 COMMIT;
 CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
+    "active"        TINYINT(1)          DEFAULT NULL,
     "activeAPIMask" BIGINT(20) UNSIGNED DEFAULT NULL,
-    "isActive"      TINYINT(1)          DEFAULT NULL,
     "keyID"         BIGINT(20) UNSIGNED NOT NULL,
     "vCode"         VARCHAR(64)         NOT NULL,
     PRIMARY KEY ("keyID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask","isActive","keyID","vCode")
+INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask","active","keyID","vCode")
 VALUES
     (8388608,1,1156,'abc123');
 CREATE TABLE "{database}"."{table_prefix}utilRegisteredUploader" (
-    "isActive"            TINYINT(1)   DEFAULT NULL,
+    "active"              TINYINT(1)   DEFAULT NULL,
     "key"                 VARCHAR(255) DEFAULT NULL,
     "ownerID"             BIGINT(20) UNSIGNED NOT NULL,
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","uploadDestinationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
-    "isActive"            TINYINT(1)   DEFAULT NULL,
+    "active"              TINYINT(1)   DEFAULT NULL,
     "name"                VARCHAR(25)  DEFAULT NULL,
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
     "url"                 VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("uploadDestinationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
-    "hash"        CHAR(40)  NOT NULL,
     "apiName"     CHAR(32)  NOT NULL,
+    "hash"        CHAR(40)  NOT NULL,
     "modified"    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "sectionName" CHAR(8)   NOT NULL,
     "xml"         LONGTEXT,
     PRIMARY KEY ("hash")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache1" ("sectionName");
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache2" ("apiName");

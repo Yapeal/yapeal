@@ -241,7 +241,7 @@ class AllianceList extends AbstractCommonEveApi
         return $this;
     }
     /**
-     * @type string[] $columnDefaults
+     * @type array $columnDefaults
      */
     protected $columnDefaults;
     /**

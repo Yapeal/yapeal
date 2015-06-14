@@ -54,7 +54,7 @@ class AssetList extends AbstractCorpSection
     protected function addNesting(SimpleXMLElement $row, $idx = 0)
     {
         /**
-         * @type  SimpleXMLElement|\Traversable $row
+         * @type SimpleXMLElement $row
          */
         $row['lft'] = $idx;
         if ($row->count()) {

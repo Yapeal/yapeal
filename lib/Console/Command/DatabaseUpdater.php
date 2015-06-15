@@ -68,7 +68,9 @@ class DatabaseUpdater extends AbstractDatabaseCommon
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function addDatabaseProcedure(OutputInterface $output)
     {
@@ -115,7 +117,9 @@ HELP;
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function dropDatabaseProcedure(OutputInterface $output)
     {
@@ -134,6 +138,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
      * @throws \Yapeal\Exception\YapealDatabaseException
      */
@@ -158,6 +163,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return \string[]
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
      */
     protected function getUpdateFileList(OutputInterface $output)
@@ -188,7 +194,10 @@ HELP;
     /**
      * @param OutputInterface $output
      *
-     * @return int|DatabaseUpdater
+     * @return int
+     * @throws \InvalidArgumentException
+     * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {
@@ -243,6 +252,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
      * @throws \Yapeal\Exception\YapealDatabaseException
      */

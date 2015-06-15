@@ -151,6 +151,8 @@ EOF;
      * @inheritdoc
      *
      * @throws \LogicException
+     * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -167,16 +169,23 @@ EOF;
             }
             $posts = $arguments;
         }
-        $this->wire($this->getDic());
+        $dic = $this->getDic();
+        $this->wire($dic);
         $data = $this->getXmlData(
             $input->getArgument('api_name'),
             $input->getArgument('section_name'),
             $posts
         );
-        $retriever = $this->getDic()['Yapeal.Xml.Retriever'];
+        /**
+         * @type \Yapeal\Xml\EveApiRetrieverInterface $retriever
+         */
+        $retriever = $dic['Yapeal.Xml.Retriever'];
         $retriever->retrieveEveApi($data);
         if (false !== $data->getEveApiXml()) {
-            $preserver = $this->getDic()['Yapeal.Xml.Preserver'];
+            /**
+             * @type \Yapeal\Xml\EveApiPreserverInterface $preserver
+             */
+            $preserver = $dic['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }
     }

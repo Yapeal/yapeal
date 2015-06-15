@@ -109,8 +109,8 @@ trait CommandToolsTrait
         return $this->cwd;
     }
     /**
-     * @return \ArrayObject|ContainerInterface
-     * @throws YapealConsoleException
+     * @return ContainerInterface
+     * @throws \Yapeal\Exception\YapealConsoleException
      */
     protected function getDic()
     {

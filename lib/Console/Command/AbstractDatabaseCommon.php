@@ -85,6 +85,8 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     }
     /**
      * @param OutputInterface $output
+     *
+     * @return int
      */
     abstract protected function processSql(OutputInterface $output);
     /**
@@ -144,7 +146,9 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     /**
      * @inheritdoc
      *
+     * @return int
      * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -158,8 +162,9 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
      * @param OutputInterface $output
      *
      * @return int
-     * @throws YapealDatabaseException
+     * @throws \InvalidArgumentException
      * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws \Yapeal\Exception\YapealDatabaseException
      */
     protected function executeSqlStatements(
         $sqlStatements,

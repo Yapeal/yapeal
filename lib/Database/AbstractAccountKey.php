@@ -146,9 +146,6 @@ abstract class AbstractAccountKey extends AbstractCommonEveApi
             $ownerID = $data->getEveApiArgument('corporationID');
         }
         $accountKey = $data->getEveApiArgument('accountKey');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             if ('10000' === $accountKey) {

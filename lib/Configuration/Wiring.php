@@ -269,7 +269,7 @@ class Wiring
             );
         };
         /**
-         * @param ContainerInterface|\ArrayObject $dic
+         * @param ContainerInterface $dic
          *
          * @throws \RuntimeException
          * @return ErrorHandler
@@ -303,31 +303,34 @@ class Wiring
      */
     public function wireLogLogger()
     {
-        if (array_key_exists('Yapeal.Log.Logger', $this->dic)) {
+        $dic = $this->dic;
+        if (array_key_exists('Yapeal.Log.Logger', $dic)) {
             return $this;
         }
-        $this->dic['Yapeal.Log.Logger'] = function ($dic) {
-            /**
-             * @type \Psr\Log\LoggerInterface $logger
-             */
-            $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
+        $dic['Yapeal.Log.GroupHandler'] = function ($dic) {
             $group = [];
-            /**
-             * @type \Monolog\Logger $logger
-             */
             if ('cli' === PHP_SAPI) {
                 $group[] = new StreamHandler('php://stderr', 100);
             }
             $group[] = new StreamHandler(
-                $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'], 100
+                $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
+                100
             );
-            $logger->pushHandler(
-                new FingersCrossedHandler(
-                    new GroupHandler($group),
-                    $dic['Yapeal.Log.threshold'],
-                    $dic['Yapeal.Log.bufferSize']
-                )
+            return new GroupHandler($group);
+        };
+        $dic['Yapeal.Log.FCHandler'] = function ($dic) {
+            return new FingersCrossedHandler(
+                $dic['Yapeal.Log.GroupHandler'],
+                $dic['Yapeal.Log.threshold'],
+                $dic['Yapeal.Log.bufferSize']
             );
+        };
+        $this->dic['Yapeal.Log.Logger'] = function ($dic) {
+            /**
+             * @type \Monolog\Logger $logger
+             */
+            $logger = new $dic['Yapeal.Log.class']($dic['Yapeal.Log.channel']);
+            $logger->pushHandler($dic['Yapeal.Log.FCHandler']);
             return $logger;
         };
         return $this;

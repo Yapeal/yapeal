@@ -81,7 +81,7 @@ interface EveApiDatabaseInterface
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval

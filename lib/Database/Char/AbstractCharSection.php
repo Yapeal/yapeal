@@ -119,7 +119,7 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
@@ -128,9 +128,6 @@ abstract class AbstractCharSection extends AbstractCommonEveApi
             return false;
         }
         $charID = $data->getEveApiArgument('characterID');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(

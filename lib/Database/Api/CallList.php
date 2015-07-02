@@ -59,7 +59,7 @@ class CallList extends AbstractCommonEveApi
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval

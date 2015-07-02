@@ -149,7 +149,7 @@ class StarbaseDetail extends AbstractCorpSection
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
@@ -159,9 +159,6 @@ class StarbaseDetail extends AbstractCorpSection
         }
         $corpID = $data->getEveApiArgument('corporationID');
         $itemID = $data->getEveApiArgument('itemID');
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(

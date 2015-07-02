@@ -58,7 +58,7 @@ class CorporationSheet extends AbstractCorpSection
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
@@ -73,9 +73,6 @@ class CorporationSheet extends AbstractCorpSection
             unset($corp['corporationID']);
             $data->setEveApiArguments($corp);
         }
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(

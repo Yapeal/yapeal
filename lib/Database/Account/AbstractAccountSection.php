@@ -116,7 +116,7 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
      * @return bool
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval
@@ -126,9 +126,6 @@ abstract class AbstractAccountSection extends AbstractCommonEveApi
         }
         $keyID = $data->getEveApiArguments();
         $keyID = $keyID['keyID'];
-        /**
-         * @type EveApiReadWriteInterface $data
-         */
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(

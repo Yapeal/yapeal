@@ -53,9 +53,10 @@ class MemberTrackingExtended extends AbstractCorpSection
      * @param int                      $interval
      *
      * @return bool
+     * @throws \LogicException
      */
     public function oneShot(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         EveApiRetrieverInterface $retrievers,
         EveApiPreserverInterface $preservers,
         &$interval

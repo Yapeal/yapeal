@@ -78,10 +78,10 @@
     },
     "require-dev": {
         "dragonrun1/phpspec": "2.1.*@dev",
-        "erusev/parsedown": "*",
+        "erusev/parsedown": "<1.6",
         "mikey179/vfsStream": "~1.4",
         "fabpot/php-cs-fixer": "1.4.2",
-        "phploc/phploc": "*",
+        "phploc/phploc": "<2.2",
         "phpmd/phpmd": "~2.1",
         "phpspec/nyan-formatters": "1.0.1",
         "satooshi/php-coveralls": "dev-master"

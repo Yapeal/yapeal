@@ -15,7 +15,7 @@ ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201506131923');
+    ('201507022249');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "active"      TINYINT(1)          NOT NULL,
     "apiName"     CHAR(32)            NOT NULL,
@@ -90,6 +90,7 @@ VALUES
     ('corp','WalletTransactions',2097152,3600,1),
     ('eve','AllianceList',1,3600,1),
     ('eve','CertificateTree',2,86400,1),
+    ('eve','CharacterAffiliation',0,900,0),
     ('eve','CharacterID',4,3600,1),
     ('eve','CharacterInfo',0,3600,0),
     ('eve','CharacterInfoPrivate',16777216,3600,1),

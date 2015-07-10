@@ -126,12 +126,6 @@ class EveApiRetriever extends Command implements WiringInterface
             'Optional list of additional POST parameter(s) to send to server.',
             []
         );
-        $this->addOption(
-            'directory',
-            'd',
-            InputOption::VALUE_REQUIRED,
-            'Directory that XML will be sent to.'
-        );
         $help
             = <<<EOF
 The <info>%command.full_name%</info> command retrieves the XML data from the Eve Api

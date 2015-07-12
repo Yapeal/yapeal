@@ -155,7 +155,7 @@ EOF;
          * @type array $posts
          */
         $posts = (array)$input->getArgument('post');
-        if (0 === count($posts)) {
+        if (0 !== count($posts)) {
             $arguments = [];
             foreach ($posts as $post) {
                 list($key, $value) = explode('=', $post);

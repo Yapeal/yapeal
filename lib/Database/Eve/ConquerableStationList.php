@@ -57,12 +57,15 @@ class ConquerableStationList extends AbstractCommonEveApi
         $xml
     ) {
         $columnDefaults = [
+            'corporationID' => null,
+            'corporationName' => null,
+            'solarSystemID' => null,
             'stationID' => null,
             'stationName' => null,
-            'solarSystemID' => null,
             'stationTypeID' => null,
-            'corporationID' => null,
-            'corporationName' => null
+            'x' => null,
+            'y' => null,
+            'z' => null
         ];
         $tableName = 'eveConquerableStationList';
         $sql = $this->getCsq()

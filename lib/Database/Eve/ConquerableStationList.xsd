@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:include schemaLocation="../common.xsd"/>
-    <xs:complexType name="rowType">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute type="eveIDType" name="stationID"/>
-                <xs:attribute type="xs:string" name="stationName"/>
-                <xs:attribute type="eveIDType" name="stationTypeID"/>
-                <xs:attribute type="eveIDType" name="solarSystemID"/>
-                <xs:attribute type="eveIDType" name="corporationID"/>
-                <xs:attribute type="xs:string" name="corporationName"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
             <xs:element name="outposts">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="rowType"
-                                    name="row"
-                                    minOccurs="0"
+                        <xs:element type="rowType" name="row" minOccurs="0"
                                     maxOccurs="unbounded"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="rowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="corporationID"/>
+                <xs:attribute type="eveNameType" name="corporationName"/>
+                <xs:attribute type="eveIDType" name="solarSystemID"/>
+                <xs:attribute type="eveIDType" name="stationID"/>
+                <xs:attribute type="eveNameType" name="stationName"/>
+                <xs:attribute type="eveIDType" name="stationTypeID"/>
+                <xs:attribute type="xs:integer" name="x"/>
+                <xs:attribute type="xs:integer" name="y"/>
+                <xs:attribute type="xs:integer" name="z"/>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 </xs:schema>

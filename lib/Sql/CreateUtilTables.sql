@@ -15,7 +15,7 @@ ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
-    ('201507131620');
+    ('201507132213');
 CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "active"      TINYINT(1)          NOT NULL,
     "apiName"     CHAR(32)            NOT NULL,

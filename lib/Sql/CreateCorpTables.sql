@@ -387,17 +387,21 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}corpMemberTracking" ADD INDEX "corpMemberTracking1"  ("ownerID");
+-- sql/updates/201507132213.sql
 CREATE TABLE "{database}"."{table_prefix}corpOutpostList" (
-    "ownerID"                  BIGINT(20) UNSIGNED NOT NULL,
-    "dockingCostPerShipVolume" DECIMAL(17,2)       NOT NULL,
-    "officeRentalCost"         DECIMAL(17,2)       NOT NULL,
-    "reprocessingEfficiency"   DECIMAL(5,4)        NOT NULL,
-    "reprocessingStationTake"  DECIMAL(5,4)        NOT NULL,
-    "solarSystemID"            BIGINT(20) UNSIGNED NOT NULL,
-    "standingOwnerID"          BIGINT(20) UNSIGNED NOT NULL,
-    "stationID"                BIGINT(20) UNSIGNED NOT NULL,
-    "stationName"              CHAR(50)            NOT NULL,
-    "stationTypeID"            BIGINT(20) UNSIGNED NOT NULL,
+    "dockingCostPerShipVolume" DECIMAL(17,2) UNSIGNED  NOT NULL,
+    "officeRentalCost"         DECIMAL(17,2) UNSIGNED  NOT NULL,
+    "ownerID"                  BIGINT(20) UNSIGNED     NOT NULL,
+    "reprocessingEfficiency"   DECIMAL(17,16) UNSIGNED NOT NULL,
+    "reprocessingStationTake"  DECIMAL(17,16) UNSIGNED NOT NULL,
+    "solarSystemID"            BIGINT(20) UNSIGNED     NOT NULL,
+    "standingOwnerID"          BIGINT(20) UNSIGNED     NOT NULL,
+    "stationID"                BIGINT(20) UNSIGNED     NOT NULL,
+    "stationName"              CHAR(255)               NOT NULL,
+    "stationTypeID"            BIGINT(20) UNSIGNED     NOT NULL,
+    "x"                        BIGINT(20)              NOT NULL,
+    "y"                        BIGINT(20)              NOT NULL,
+    "z"                        BIGINT(20)              NOT NULL,
     PRIMARY KEY ("ownerID","stationID")
 )
 ENGINE = { engine}

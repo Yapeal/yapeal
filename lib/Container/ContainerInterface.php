@@ -33,8 +33,6 @@
  */
 namespace Yapeal\Container;
 
-use ArrayAccess;
-
 /**
  * Interface ContainerInterface
  *
@@ -46,7 +44,7 @@ use ArrayAccess;
  *
  * @since 2.0.0-alpha5
  */
-interface ContainerInterface extends ArrayAccess
+interface ContainerInterface
 {
     /**
      * Extends an object definition.

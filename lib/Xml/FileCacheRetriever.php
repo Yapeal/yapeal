@@ -77,7 +77,7 @@ class FileCacheRetriever implements
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiReadWriteInterface &$data)
+    public function retrieveEveApi(EveApiReadWriteInterface $data)
     {
         $mess = sprintf(
             'Started filesystem retrieve for %1$s/%2$s',

@@ -76,7 +76,7 @@ class FileCachePreserver implements EveApiPreserverInterface
      * @throws YapealPreserverFileException
      * @return self
      */
-    public function preserveEveApi(EveApiReadInterface &$data)
+    public function preserveEveApi(EveApiReadInterface $data)
     {
         try {
             $cachePath

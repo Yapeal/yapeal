@@ -71,7 +71,7 @@ class GuzzleNetworkRetriever implements
      * @return self
      * @throws \LogicException
      */
-    public function retrieveEveApi(EveApiReadWriteInterface &$data)
+    public function retrieveEveApi(EveApiReadWriteInterface $data)
     {
         $mess = sprintf(
             'Started network retrieve for %1$s/%2$s',
@@ -159,7 +159,7 @@ class GuzzleNetworkRetriever implements
      * @return \Guzzle\Http\Message\EntityEnclosingRequestInterface
      * @throws \LogicException
      */
-    protected function prepareConnection(EveApiReadInterface &$data)
+    protected function prepareConnection(EveApiReadInterface $data)
     {
         $uri = [
             '/{EveApiSectionName}/{EveApiName}.xml.aspx',

@@ -37,6 +37,8 @@ use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Exception\YapealConsoleException;
+use Yapeal\Exception\YapealDatabaseException;
 
 /**
  * Class DatabaseInitializer
@@ -91,7 +93,8 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string[]
-     * @throws \Yapeal\Exception\YapealConsoleException
+     * @throws InvalidArgumentException
+     * @throws YapealConsoleException
      */
     protected function getCreateFileList(OutputInterface $output)
     {
@@ -137,6 +140,9 @@ HELP;
         if (is_file($file)) {
             $fileList[] = $file;
         }
+        /**
+         * @type \ArrayObject $dic
+         */
         if (array_key_exists('Yapeal.vendorParentDir', $dic)) {
             $file =
                 $dic['Yapeal.vendorParentDir']
@@ -151,6 +157,9 @@ HELP;
      * @param OutputInterface $output
      *
      * @return int
+     * @throws InvalidArgumentException
+     * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {

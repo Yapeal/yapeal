@@ -119,8 +119,10 @@ class ConsoleWiring extends Wiring
                                      . 'config/eveonline.crt'
             ];
             return new GuzzleNetworkRetriever(
-                $dic['Yapeal.Log.Logger'], new Client(
-                    $dic['Yapeal.Network.baseUrl'], ['defaults' => $defaults]
+                $dic['Yapeal.Log.Logger'],
+                new Client(
+                    $dic['Yapeal.Network.baseUrl'],
+                    ['defaults' => $defaults]
                 )
             );
         };

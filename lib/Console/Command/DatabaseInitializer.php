@@ -45,8 +45,8 @@ use Yapeal\Exception\YapealConsoleException;
 class DatabaseInitializer extends AbstractDatabaseCommon
 {
     /**
-     * @param string|null $name
-     * @param string      $cwd
+     * @param string|null        $name
+     * @param string             $cwd
      * @param ContainerInterface $dic
      *
      * @throws InvalidArgumentException
@@ -68,8 +68,7 @@ class DatabaseInitializer extends AbstractDatabaseCommon
     protected function configure()
     {
         $this->addOptions();
-        $help
-            = <<<'HELP'
+        $help = <<<'HELP'
 The <info>%command.full_name%</info> command is used to initialize (create) a new
  database and tables to be used by Yapeal. If you already have a
  config/yapeal.yaml file setup you can use the following:
@@ -93,6 +92,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string[]
+     * @throws InvalidArgumentException
      * @throws YapealConsoleException
      */
     protected function getCreateFileList(OutputInterface $output)
@@ -112,7 +112,7 @@ HELP;
         $path = $this->getDic()['Yapeal.Database.sqlDir'];
         if (!is_readable($path)) {
             $mess = sprintf(
-                '<info>Could NOT access sql directory %1$s</info>',
+                '<info>Could NOT access Sql directory %1$s</info>',
                 $path
             );
             $output->writeln($mess);
@@ -150,7 +150,9 @@ HELP;
     /**
      * @param OutputInterface $output
      *
-     * @throws \Yapeal\Exception\YapealDatabaseException
+     * @throws InvalidArgumentException
+     * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {

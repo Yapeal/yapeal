@@ -14,7 +14,6 @@
 .gitattributes text eol=lf
 .gitignore text eol=lf
 *.crt text eol=lf
-*.ini text eol=lf
 *.dist text eol=lf
 *.json text eol=lf
 *.md text eol=lf

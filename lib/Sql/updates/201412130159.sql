@@ -1,54 +1,48 @@
--- Sql/updates/201412101858.sql
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}charAllianceContactList',
-    'contactName',
-    'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}charContactList',
-    'contactName',
-    'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}charCorporateContactList',
-    'contactName',
-    'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}corpAllianceContactList',
-    'contactName',
-    'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}corpCorporateContactList',
-    'contactName',
-    'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
--- Sql/updates/201412102009.sql
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}corpCorporationSheet',
-    'memberCount',
-    'BIGINT(20) UNSIGNED NOT NULL AFTER "factionName"');
-CALL "{database}"."AddOrModifyColumn"(
-    '{database}',
-    '{table_prefix}corpCorporationSheet',
-    'memberLimit',
-    'BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 AFTER "memberCount"');
--- Sql/updates/201412112108.sql
+-- sql/updates/201412101858.sql
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charAllianceContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}charCorporateContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpAllianceContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporateContactList',
+                                      'contactName',
+                                      'CHAR(50) COLLATE utf8_unicode_ci NOT NULL AFTER "contactID"');
+-- sql/updates/201412102009.sql
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporationSheet',
+                                      'memberCount',
+                                      'BIGINT(20) UNSIGNED NOT NULL AFTER "factionName"');
+CALL "{database}"."AddOrModifyColumn"('{database}',
+                                      '{table_prefix}corpCorporationSheet',
+                                      'memberLimit',
+                                      'BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 AFTER "memberCount"');
+-- sql/updates/201412112108.sql
 DROP PROCEDURE IF EXISTS "{database}"."DropColumn";
 CREATE PROCEDURE "{database}"."DropColumn"(
-    IN param_database_name VARCHAR(100),
-    IN param_table_name    VARCHAR(100),
-    IN param_column_name   VARCHAR(100))
+    IN param_database_name VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_table_name    VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_name   VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci)
     BEGIN
-        IF EXISTS(SELECT NULL
+        IF EXISTS(SELECT
+                      NULL
                   FROM
                       "information_schema"."COLUMNS"
                   WHERE
-                      "COLUMN_NAME"=param_column_name AND
-                      "TABLE_NAME"=param_table_name AND
-                      "table_schema"=param_database_name)
+                      "COLUMN_NAME" COLLATE utf8_unicode_ci = param_column_name AND
+                      "TABLE_NAME" COLLATE utf8_unicode_ci = param_table_name AND
+                      "table_schema" COLLATE utf8_unicode_ci = param_database_name)
         THEN
 /* Create the full statement to execute */
             SET @StatementToExecute = concat('ALTER TABLE "',
@@ -73,7 +67,7 @@ CALL "{database}"."DropColumn"('{database}',
                                '{table_prefix}charCharacterSheet',
                                'cloneTypeID');
 DROP PROCEDURE IF EXISTS "{database}"."DropColumn";
--- Sql/updates/201412130159.sql
+-- sql/updates/201412130159.sql
 ALTER DATABASE "{database}"
 DEFAULT CHARACTER SET utf8
 DEFAULT COLLATE utf8_unicode_ci;

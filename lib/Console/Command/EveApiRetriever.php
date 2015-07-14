@@ -164,7 +164,7 @@ EOF;
         /**
          * @type array $posts
          */
-        $posts = $input->getArgument('post');
+        $posts = (array)$input->getArgument('post');
         if (0 !== count($posts)) {
             $arguments = [];
             foreach ($posts as $post) {

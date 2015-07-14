@@ -44,5 +44,5 @@ interface EveApiRetrieverInterface
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiReadWriteInterface &$data);
+    public function retrieveEveApi(EveApiReadWriteInterface $data);
 }

@@ -9,6 +9,20 @@ CREATE TABLE "{database}"."{table_prefix}eveAllianceList" (
 )
 ENGINE ={ engine}
 COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}eveCharacterAffiliation" (
+    "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
+    "allianceName"    CHAR(50)            NOT NULL,
+    "characterID"     BIGINT(20) UNSIGNED NOT NULL,
+    "characterName"   CHAR(50)            NOT NULL,
+    "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
+    "corporationName" CHAR(50)            NOT NULL,
+    "factionID"       BIGINT(20) UNSIGNED NOT NULL,
+    "factionName"     CHAR(50)            NOT NULL,
+    PRIMARY KEY ("characterID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
+ALTER TABLE "{database}"."{table_prefix}eveCharacterAffiliation" ADD INDEX "eveCharacterAffiliation1"  ("corporationID");
 CREATE TABLE "{database}"."{table_prefix}eveCharacterInfo" (
     "characterID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterName"     CHAR(50)            NOT NULL,
@@ -81,12 +95,15 @@ CREATE TABLE "{database}"."{table_prefix}eveCharactersVictoryPointsYesterday" (
 ENGINE ={ engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}eveConquerableStationList" (
-    "corporationID"   BIGINT(20) UNSIGNED DEFAULT NULL,
-    "corporationName" CHAR(50)            DEFAULT NULL,
-    "solarSystemID"   BIGINT(20) UNSIGNED DEFAULT NULL,
+    "corporationID"   BIGINT(20) UNSIGNED NOT NULL,
+    "corporationName" CHAR(50)            NOT NULL,
+    "solarSystemID"   BIGINT(20) UNSIGNED NOT NULL,
     "stationID"       BIGINT(20) UNSIGNED NOT NULL,
-    "stationName"     CHAR(255)           DEFAULT NULL,
-    "stationTypeID"   BIGINT(20) UNSIGNED DEFAULT NULL,
+    "stationName"     CHAR(255)           NOT NULL,
+    "stationTypeID"   BIGINT(20) UNSIGNED NOT NULL,
+    "x"               BIGINT(20) NOT NULL,
+    "y"               BIGINT(20) NOT NULL,
+    "z"               BIGINT(20) NOT NULL,
     PRIMARY KEY ("stationID")
 )
 ENGINE ={ engine}

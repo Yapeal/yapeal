@@ -82,14 +82,11 @@ SQL;
      */
     public function getActiveApis()
     {
-        $sql
-            = <<<'SQL'
-SELECT "apiName","interval","sectionName"
- FROM "%1$s"."%2$sutilEveApi"
- WHERE "isActive"=1
- ORDER BY RAND()
-SQL;
-        return sprintf($sql, $this->databaseName, $this->tablePrefix);
+        return sprintf(
+            'SELECT "apiName","interval","sectionName" FROM "%1$s"."%2$sutilEveApi" WHERE "active"=1 ORDER BY RAND()',
+            $this->databaseName,
+            $this->tablePrefix
+        );
     }
     /**
      * @param string $ownerID
@@ -124,7 +121,7 @@ SELECT urk."keyID",urk."vCode"
  ON (urk."keyID" = aaki."keyID")
  WHERE
  aaki."type" IN ('Account','Character')
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & 33554432) <> 0
 SQL;
         return sprintf($sql, $this->databaseName, $this->tablePrefix);
@@ -148,8 +145,9 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  ON (akb."characterID" = ac."characterID")
  WHERE
  aaki."type" IN ('Account','Character')
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ AND aaki."expires" > now()
 SQL;
         return sprintf(
             str_replace(["\n", "\r\n"], '', $sql),
@@ -177,8 +175,9 @@ SELECT ac."corporationID",urk."keyID",urk."vCode"
  ON (akb."characterID" = ac."characterID")
  WHERE
  aaki."type" = 'Corporation'
- AND urk."isActive"=1
+ AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
+ AND aaki."expires" > now()
 SQL;
         return sprintf(
             str_replace(["\n", "\r\n"], '', $sql),
@@ -193,7 +192,7 @@ SQL;
     public function getActiveRegisteredKeys()
     {
         return sprintf(
-            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "isActive"=1',
+            'SELECT "keyID","vCode" FROM "%1$s"."%2$sutilRegisteredKey" WHERE "active"=1',
             $this->databaseName,
             $this->tablePrefix
         );
@@ -220,7 +219,7 @@ SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  ON (ac."corporationID" = sl."ownerID")
  WHERE
  aaki."type" = 'Corporation'
- AND urk."isActive"=1
+ AND urk."active"=1
  AND sl."ownerID"=%4$s
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
 SQL;
@@ -251,18 +250,18 @@ SQL;
         $sql
             = <<<'SQL'
 CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
-    IN param_database_name  VARCHAR(100),
-    IN param_table_name     VARCHAR(100),
-    IN param_column_name    VARCHAR(100),
-    IN param_column_details VARCHAR(255))
+    IN param_database_name  VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_table_name     VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_name    VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    IN param_column_details VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci)
     BEGIN
         IF NOT EXISTS(SELECT NULL
                       FROM
                           "information_schema"."COLUMNS"
                       WHERE
-                          "COLUMN_NAME" = param_column_name AND
-                          "TABLE_NAME" = param_table_name AND
-                          "table_schema" = param_database_name)
+                          "COLUMN_NAME" COLLATE utf8_unicode_ci = param_column_name AND
+                          "TABLE_NAME" COLLATE utf8_unicode_ci = param_table_name AND
+                          "table_schema" COLLATE utf8_unicode_ci = param_database_name)
         THEN
 /* Create the full statement to execute */
             SET @StatementToExecute = concat('ALTER TABLE "',
@@ -322,6 +321,22 @@ SQL;
             $this->tablePrefix,
             $tableName,
             $ownerID
+        );
+    }
+    /**
+     * @param string $tableName
+     * @param string $keyID
+     *
+     * @return string
+     */
+    public function getDeleteFromTableWithKeyID($tableName, $keyID)
+    {
+        return sprintf(
+            'DELETE FROM "%1$s"."%2$s%3$s" WHERE "keyID"= \'%4$s\'',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName,
+            $keyID
         );
     }
     /**

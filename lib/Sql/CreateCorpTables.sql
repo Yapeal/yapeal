@@ -111,29 +111,29 @@ CREATE TABLE "{database}"."{table_prefix}corpContainerLog" (
 ENGINE ={ engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpContracts" (
-    "ownerID"        BIGINT(20) UNSIGNED    NOT NULL,
-    "contractID"     BIGINT(20) UNSIGNED    NOT NULL,
-    "issuerID"       BIGINT(20) UNSIGNED    NOT NULL,
-    "issuerCorpID"   BIGINT(20) UNSIGNED    NOT NULL,
-    "assigneeID"     BIGINT(20) UNSIGNED    NOT NULL,
     "acceptorID"     BIGINT(20) UNSIGNED    NOT NULL,
-    "startStationID" BIGINT(20) UNSIGNED    NOT NULL,
-    "endStationID"   BIGINT(20) UNSIGNED    NOT NULL,
-    "type"           CHAR(15)               NOT NULL,
-    "status"         CHAR(24)               NOT NULL,
-    "title"          CHAR(50) DEFAULT NULL,
-    "forCorp"        TINYINT(1)             NOT NULL,
+    "assigneeID"     BIGINT(20) UNSIGNED    NOT NULL,
     "availability"   CHAR(8)                NOT NULL,
-    "dateIssued"     DATETIME               NOT NULL,
+    "buyout"         DECIMAL(17,2)          NOT NULL,
+    "collateral"     DECIMAL(17,2)          NOT NULL,
+    "contractID"     BIGINT(20) UNSIGNED    NOT NULL,
+    "dateAccepted"   DATETIME  DEFAULT NULL,
+    "dateCompleted"  DATETIME  DEFAULT NULL,
     "dateExpired"    DATETIME               NOT NULL,
-    "dateAccepted"   DATETIME DEFAULT NULL,
+    "dateIssued"     DATETIME               NOT NULL,
+    "endStationID"   BIGINT(20) UNSIGNED    NOT NULL,
+    "forCorp"        TINYINT(1)             NOT NULL,
+    "issuerCorpID"   BIGINT(20) UNSIGNED    NOT NULL,
+    "issuerID"       BIGINT(20) UNSIGNED    NOT NULL,
     "numDays"        SMALLINT(3) UNSIGNED   NOT NULL,
-    "dateCompleted"  DATETIME DEFAULT NULL,
+    "ownerID"        BIGINT(20) UNSIGNED    NOT NULL,
     "price"          DECIMAL(17,2)          NOT NULL,
     "reward"         DECIMAL(17,2)          NOT NULL,
-    "collateral"     DECIMAL(17,2)          NOT NULL,
-    "buyout"         DECIMAL(17,2)          NOT NULL,
-    "volume"         DECIMAL(18,4) UNSIGNED NOT NULL,
+    "startStationID" BIGINT(20) UNSIGNED    NOT NULL,
+    "status"         CHAR(24)               NOT NULL,
+    "title"          CHAR(255) DEFAULT NULL,
+    "type"           CHAR(15)               NOT NULL,
+    "volume"         DECIMAL(20,4) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","contractID")
 )
 ENGINE ={ engine}
@@ -169,6 +169,27 @@ CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
     PRIMARY KEY ("corporationID")
 )
 ENGINE ={ engine}
+COLLATE utf8_unicode_ci;
+-- sql/updates/201507131620.sql
+CREATE TABLE "{database}"."{table_prefix}corpCustomsOffices" (
+    "allowAlliance"           TINYINT(1) UNSIGNED     NOT NULL,
+    "allowStandings"          TINYINT(1) UNSIGNED     NOT NULL,
+    "itemID"                  BIGINT(20) UNSIGNED     NOT NULL,
+    "ownerID"                 BIGINT(20) UNSIGNED     NOT NULL,
+    "reinforceHour"           TINYINT(2) UNSIGNED     NOT NULL,
+    "solarSystemID"           BIGINT(20) UNSIGNED     NOT NULL,
+    "solarSystemName"         CHAR(255)               NOT NULL,
+    "standingLevel"           DECIMAL(5,2)            NOT NULL,
+    "taxRateAlliance"         DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateCorp"             DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateStandingBad"      DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateStandingGood"     DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateStandingHigh"     DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateStandingHorrible" DECIMAL(17,16) UNSIGNED NOT NULL,
+    "taxRateStandingNeutral"  DECIMAL(17,16) UNSIGNED NOT NULL,
+    PRIMARY KEY ("ownerID","itemID")
+)
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpDivisions" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
@@ -346,7 +367,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberMedals" (
 ENGINE ={ engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
-    "base"           CHAR(50)            DEFAULT NULL,
+    "base"           CHAR(255)           DEFAULT NULL,
     "baseID"         BIGINT(20) UNSIGNED DEFAULT NULL,
     "characterID"    BIGINT(20) UNSIGNED NOT NULL,
     "grantableRoles" CHAR(64)            DEFAULT NULL,
@@ -366,17 +387,21 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
 ENGINE ={ engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}corpMemberTracking" ADD INDEX "corpMemberTracking1"  ("ownerID");
+-- sql/updates/201507132213.sql
 CREATE TABLE "{database}"."{table_prefix}corpOutpostList" (
-    "ownerID"                  BIGINT(20) UNSIGNED NOT NULL,
-    "dockingCostPerShipVolume" DECIMAL(17,2)       NOT NULL,
-    "officeRentalCost"         DECIMAL(17,2)       NOT NULL,
-    "reprocessingEfficiency"   DECIMAL(5,4)        NOT NULL,
-    "reprocessingStationTake"  DECIMAL(5,4)        NOT NULL,
-    "solarSystemID"            BIGINT(20) UNSIGNED NOT NULL,
-    "standingOwnerID"          BIGINT(20) UNSIGNED NOT NULL,
-    "stationID"                BIGINT(20) UNSIGNED NOT NULL,
-    "stationName"              CHAR(50)            NOT NULL,
-    "stationTypeID"            BIGINT(20) UNSIGNED NOT NULL,
+    "dockingCostPerShipVolume" DECIMAL(17,2) UNSIGNED  NOT NULL,
+    "officeRentalCost"         DECIMAL(17,2) UNSIGNED  NOT NULL,
+    "ownerID"                  BIGINT(20) UNSIGNED     NOT NULL,
+    "reprocessingEfficiency"   DECIMAL(17,16) UNSIGNED NOT NULL,
+    "reprocessingStationTake"  DECIMAL(17,16) UNSIGNED NOT NULL,
+    "solarSystemID"            BIGINT(20) UNSIGNED     NOT NULL,
+    "standingOwnerID"          BIGINT(20) UNSIGNED     NOT NULL,
+    "stationID"                BIGINT(20) UNSIGNED     NOT NULL,
+    "stationName"              CHAR(255)               NOT NULL,
+    "stationTypeID"            BIGINT(20) UNSIGNED     NOT NULL,
+    "x"                        BIGINT(20)              NOT NULL,
+    "y"                        BIGINT(20)              NOT NULL,
+    "z"                        BIGINT(20)              NOT NULL,
     PRIMARY KEY ("ownerID","stationID")
 )
 ENGINE ={ engine}

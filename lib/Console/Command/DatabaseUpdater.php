@@ -69,6 +69,7 @@ class DatabaseUpdater extends AbstractDatabaseCommon
     /**
      * @param OutputInterface $output
      *
+     * @throws \InvalidArgumentException
      * @throws YapealDatabaseException
      * @throws YapealConsoleException
      */
@@ -116,6 +117,7 @@ HELP;
     /**
      * @param OutputInterface $output
      *
+     * @throws \InvalidArgumentException
      * @throws YapealConsoleException
      * @throws YapealDatabaseException
      */
@@ -135,7 +137,9 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string
+     * @throws \InvalidArgumentException
      * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
     protected function getLatestDatabaseVersion(OutputInterface $output)
     {

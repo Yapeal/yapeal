@@ -43,7 +43,7 @@ class NullRetriever implements EveApiRetrieverInterface
      *
      * @return self
      */
-    public function retrieveEveApi(EveApiReadWriteInterface &$data)
+    public function retrieveEveApi(EveApiReadWriteInterface $data)
     {
         $data->getEveApiXml();
         return $this;

@@ -64,14 +64,20 @@ class EveApiXmlData implements EveApiReadWriteInterface
         $this->setCacheInterval($cacheInterval);
     }
     /**
-     * @inheritdoc
+     * @return string
      */
     public function __toString()
     {
         return $this->eveApiXml;
     }
     /**
-     * @inheritdoc
+     * Used to add item to arguments list.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @throws InvalidArgumentException
+     * @return self
      */
     public function addEveApiArgument($name, $value)
     {
@@ -83,7 +89,9 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @throws LogicException
+     * @throws InvalidArgumentException
+     * @return string|null
      */
     public function getCacheInterval()
     {
@@ -94,7 +102,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->cacheInterval;
     }
     /**
-     * @inheritdoc
+     * @param string $name
+     *
+     * @throws InvalidArgumentException
+     * @return string|null
      */
     public function getEveApiArgument($name)
     {
@@ -105,7 +116,8 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiArguments[$name];
     }
     /**
-     * @inheritdoc
+     * @return string[]
+     * @throws LogicException
      */
     public function getEveApiArguments()
     {
@@ -116,7 +128,8 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiArguments;
     }
     /**
-     * @inheritdoc
+     * @throws LogicException
+     * @return string
      */
     public function getEveApiName()
     {
@@ -127,7 +140,8 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiName;
     }
     /**
-     * @inheritdoc
+     * @throws LogicException
+     * @return string
      */
     public function getEveApiSectionName()
     {
@@ -138,7 +152,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiSectionName;
     }
     /**
-     * @inheritdoc
+     * @return string|false
      */
     public function getEveApiXml()
     {
@@ -148,7 +162,8 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->eveApiXml;
     }
     /**
-     * @inheritdoc
+     * @throws LogicException
+     * @return string
      */
     public function getHash()
     {
@@ -159,7 +174,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return hash('md5', $hash);
     }
     /**
-     * @inheritdoc
+     * @param int $value
      */
     public function setCacheInterval($value)
     {
@@ -167,7 +182,24 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * Used to set a list of arguments used when forming request to Eve Api
+     * server.
+     *
+     * Things like KeyID, vCode etc that are either required or optional for the
+     * Eve API. See setter for example.
+     *
+     * Example:
+     * <code>
+     * <?php
+     * $args = array( 'KeyID' => '1156', 'vCode' => 'abc123');
+     * $api->setEveApiArguments($args);
+     * ...
+     * </code>
+     *
+     * @param string[] $values
+     *
+     * @throws InvalidArgumentException
+     * @return self
      */
     public function setEveApiArguments(array $values)
     {
@@ -181,7 +213,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string $value
+     *
+     * @throws InvalidArgumentException
+     * @return self
      */
     public function setEveApiName($value)
     {
@@ -193,7 +228,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string $value
+     *
+     * @throws InvalidArgumentException
+     * @return self
      */
     public function setEveApiSectionName($value)
     {
@@ -205,7 +243,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @inheritdoc
+     * @param string|bool $xml Only allows string or false NOT true.
+     *
+     * @throws InvalidArgumentException
+     * @return self
      */
     public function setEveApiXml($xml = false)
     {

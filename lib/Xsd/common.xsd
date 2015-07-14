@@ -27,17 +27,6 @@
             <xs:enumeration value="0"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="eveListType">
-        <xs:restriction base="xs:normalizedString">
-            <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="eveIDListType">
-        <xs:restriction base="xs:normalizedString">
-            <xs:pattern value=""/>
-            <xs:pattern value="[0-9]+(,\s?[0-9]+)*"/>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:simpleType name="eveDTType">
         <xs:annotation>
             <xs:documentation>Date/time that can be empty.</xs:documentation>
@@ -52,9 +41,18 @@
                     value="(\d{4})-02-((0[1-9])|([1-2]\d))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="eveIDType">
-        <xs:restriction base="xs:long">
-            <xs:minInclusive value="0" fixed="true"/>
+    <xs:complexType name="eveErrorType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="code" use="required"
+                              type="xs:unsignedShort"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="eveIDListType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value=""/>
+            <xs:pattern value="\s*[0-9]+(,\s?[0-9]+)*"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eveIDNegativeType">
@@ -62,10 +60,20 @@
             <xs:minInclusive value="-1" fixed="true"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="eveIDType">
+        <xs:restriction base="xs:long">
+            <xs:minInclusive value="0" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="eveISKType">
         <xs:restriction base="xs:decimal">
             <xs:totalDigits value="17" fixed="true"/>
             <xs:fractionDigits value="2" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eveListType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[a-zA-Z]\w*(,\s?[a-zA-Z]\w*)*"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eveNameType">
@@ -88,19 +96,13 @@
                     value="(\d{4})-02-((0[1-9])|([1-2]\d))(T|\s)(([01]\d)|(2[0-3])):([0-5]\d):([0-5]\d)"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:complexType name="eveErrorType">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="code" use="required"
-                              type="xs:unsignedShort"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
+    <xs:simpleType name="evePercentageType">
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="17" fixed="true"/>
+            <xs:fractionDigits value="16" fixed="true"/>
+        </xs:restriction>
+    </xs:simpleType>
     <!-- Eve Attributes -->
-    <xs:attributeGroup name="charAttrs">
-        <xs:attribute type="eveIDType" name="characterID" use="required"/>
-        <xs:attribute type="eveNameType" name="characterName" use="required"/>
-    </xs:attributeGroup>
     <xs:attributeGroup name="acfAttrs">
         <xs:attribute type="eveIDType" name="allianceID" use="required"/>
         <xs:attribute type="eveNameType" name="allianceName" use="required"/>
@@ -108,6 +110,10 @@
         <xs:attribute type="eveNameType" name="corporationName" use="required"/>
         <xs:attribute type="eveIDType" name="factionID" use="required"/>
         <xs:attribute type="eveNameType" name="factionName" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="charAttrs">
+        <xs:attribute type="eveIDType" name="characterID" use="required"/>
+        <xs:attribute type="eveNameType" name="characterName" use="required"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="rowsetAttrs">
         <xs:attribute name="columns" use="required" type="eveListType"/>

@@ -37,8 +37,9 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Sql\CommonSqlQueries;
+use Yapeal\Exception\YapealConsoleException;
+use Yapeal\Exception\YapealDatabaseException;
 
 /**
  * Trait CommandToolsTrait
@@ -127,6 +128,7 @@ trait CommandToolsTrait
     /**
      * @return PDO
      * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      */
     protected function getPdo()
     {
@@ -139,7 +141,7 @@ trait CommandToolsTrait
                     $exc->getCode(),
                     $exc->getMessage()
                 );
-                throw new YapealConsoleException($mess, 1);
+                throw new YapealDatabaseException($mess, 1, $exc);
             }
         }
         return $this->pdo;

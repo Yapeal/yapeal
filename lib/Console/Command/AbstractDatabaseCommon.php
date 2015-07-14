@@ -192,15 +192,21 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
             ';'
         ];
         $pdo = $this->getPdo();
-        // Split up SQL into statements.
-        $statements = explode(';', $sqlStatements);
-        // Replace {database}, {table_prefix}, ';', and '$$' in statements.
-        $statements = str_replace($templates, $replacements, $statements);
+        // Split up SQL into statements on ';'.
+        // Replace {database}, {table_prefix}, {engine}, ';', and '$$' in statements.
+        /**
+         * @type string[] $statements
+         */
+        $statements = str_replace(
+            $templates,
+            $replacements,
+            explode(';', $sqlStatements)
+        );
         foreach ($statements as $statement => $sql) {
             $sql = trim($sql);
             // 5 is a 'magic' number that I think is shorter than any legal SQL
             // statement.
-            if (strlen($sql) < 5) {
+            if (5 > strlen($sql)) {
                 continue;
             }
             try {
@@ -244,12 +250,10 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
             }
         }
         if (!empty($options['configFile'])) {
-            $this->getDic()['Yapeal.Config.configDir'] = dirname(
-                $options['configFile']
-            );
-            $this->getDic()['Yapeal.Config.fileName'] = basename(
-                $options['configFile']
-            );
+            $this->getDic()['Yapeal.Config.configDir']
+                = dirname($options['configFile']);
+            $this->getDic()['Yapeal.Config.fileName']
+                = basename($options['configFile']);
         }
         return $this;
     }

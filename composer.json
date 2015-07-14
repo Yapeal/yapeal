@@ -21,7 +21,9 @@
         }
     },
     "autoload-dev": {
-        "psr-0": {"Spec\\": ["specs/"]},
+        "psr-0": {
+            "Spec\\": ["specs/"]
+        },
         "psr-4": {
             "Yapeal\\Test\\": ["tests/"]
         }
@@ -41,15 +43,15 @@
     "config": {
         "optimize-autoloader": true
     },
-    "homepage": "https://github.com/Dragonrun1/yapeal",
+    "homepage": "https://github.com/Yapeal/yapeal",
     "support": {
         "forum": "https://forums.eveonline.com/default.aspx?g=posts&t=360758",
-        "issues": "https://github.com/Dragonrun1/yapeal/issues?state=open",
-        "source": "https://github.com/Dragonrun1/yapeal",
-        "wiki": "https://github.com/Dragonrun1/yapeal/wiki"
+        "issues": "https://github.com/Yapeal/yapeal/issues?state=open",
+        "source": "https://github.com/Yapeal/yapeal",
+        "wiki": "https://github.com/Yapeal/yapeal/wiki"
     },
     "require": {
-        "dragonrun1/file_path_normalizer": "~1.0",
+        "dragonrun1/file_path_normalizer": "1.1.*",
         "dragonrun1/event-mediator": "dev-master",
         "ext-curl": "*",
         "ext-date": "*",
@@ -74,8 +76,8 @@
     },
     "require-dev": {
         "dragonrun1/semantic-version": "master@dev",
-        "dragonrun1/phpspec": "dev-master",
-        "erusev/parsedown": "*",
+        "dragonrun1/phpspec": "2.1.*@dev",
+        "erusev/parsedown": "<1.6",
         "mikey179/vfsStream": "~1.4",
         "phpspec/nyan-formatters": "1.0.1",
         "satooshi/php-coveralls": "dev-master"

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified" elementFormDefault="qualified">
+    <xs:include schemaLocation="../common.xsd"/>
+    <xs:complexType name="resultType">
+        <xs:sequence>
+            <xs:element name="pocos">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="rowType" name="row" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attributeGroup ref="rowsetAttrs"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="rowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveBooleanType" name="allowAlliance"/>
+                <xs:attribute type="eveBooleanType" name="allowStandings"/>
+                <xs:attribute type="eveIDType" name="itemID"/>
+                <xs:attribute type="xs:unsignedShort" name="reinforceHour"/>
+                <xs:attribute type="eveIDType" name="solarSystemID"/>
+                <xs:attribute type="eveNameType" name="solarSystemName"/>
+                <xs:attribute type="eveISKType" name="standingLevel"/>
+                <xs:attribute type="evePercentageType" name="taxRateAlliance"/>
+                <xs:attribute type="evePercentageType" name="taxRateCorp"/>
+                <xs:attribute type="evePercentageType" name="taxRateStandingBad"/>
+                <xs:attribute type="evePercentageType" name="taxRateStandingGood"/>
+                <xs:attribute type="evePercentageType" name="taxRateStandingHigh"/>
+                <xs:attribute type="evePercentageType" name="taxRateStandingHorrible"/>
+                <xs:attribute type="evePercentageType" name="taxRateStandingNeutral"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

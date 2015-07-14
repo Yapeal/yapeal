@@ -1,0 +1,7 @@
+-- sql/updates/{updateName}.sql
+CREATE TABLE "{database}"."{table_prefix}{tableName}" (
+    {columnList},
+    PRIMARY KEY ({keys})
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;

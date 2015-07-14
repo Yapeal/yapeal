@@ -1,7 +1,6 @@
-#!/usr/bin/env php
 <?php
 /**
- * Contains Yapeal Console.
+ * Contains {className} class.
  *
  * PHP version 5.4
  *
@@ -9,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) 2014 Michael Cummings
+ * Copyright (C) {copyright} Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -28,25 +27,48 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright 2014 Michael Cummings
+ * @copyright {copyright} Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace Yapeal;
+namespace {namespace};
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
-use Symfony\Component\Console\Application;
-use Yapeal\Console\Command\DatabaseInitializer;
-use Yapeal\Console\Command\DatabaseUpdater;
-use Yapeal\Console\Command\RowsetEveApiCreator;
-use Yapeal\Console\Command\EveApiRetriever;
-use Yapeal\Container\PimpleContainer;
+use LogicException;
+use Yapeal\Database\AttributesDatabasePreserverTrait;
+use Yapeal\Database\EveApiNameTrait;
 
-$container = new PimpleContainer();
-$cwd = str_replace('\\', '/', getcwd());
-$application = new Application('Yapeal Console', '2.0.1');
-$application->add(new EveApiRetriever('Network:Cache', $cwd, $container));
-$application->add(new DatabaseInitializer('Database:Init', $cwd, $container));
-$application->add(new DatabaseUpdater('Database:Update', $cwd, $container));
-$application->add(new RowsetEveApiCreator('Rowset:Creator', $cwd, $container));
-return $application->run();
+/**
+ * Class {className}
+ */
+class {className} extends Abstract{sectionName}Section
+{
+    use EveApiNameTrait, AttributesDatabasePreserverTrait;
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
+     * @return self
+     */
+    protected function preserverTo{className}($xml, $ownerID)
+    {
+        $columnDefaults = [{columnDefaults}];
+        $tableName = '{tableName}';
+        $sql = $this->getCsq()
+                    ->{getDelete};
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName
+        );
+        return $this;
+    }
+    /**
+     * @type int $mask
+     */
+    protected $mask = {mask};
+}

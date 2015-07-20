@@ -7,13 +7,11 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
-                <xs:attribute type="xs:string" name="contactName"
-                              use="required"/>
-                <xs:attribute type="eveBooleanType" name="inWatchlist"
-                              use="optional" default="0"/>
+                <xs:attribute type="xs:string" name="contactName" use="required"/>
+                <xs:attribute type="eveIDType" name="contactTypeID" use="required"/>
+                <xs:attribute type="eveBooleanType" name="inWatchlist" use="optional" default="0"/>
+                <xs:attribute type="eveIDType" name="labelMask" use="required"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
-                <xs:attribute type="eveIDType" name="contactTypeID"
-                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -21,11 +19,10 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
-                <xs:attribute type="xs:string" name="contactName"
-                              use="required"/>
+                <xs:attribute type="xs:string" name="contactName" use="required"/>
+                <xs:attribute type="eveIDType" name="contactTypeID" use="required"/>
+                <xs:attribute type="eveIDType" name="labelMask" use="required"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
-                <xs:attribute type="eveIDType" name="contactTypeID"
-                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -33,42 +30,53 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute type="eveIDType" name="contactID" use="required"/>
-                <xs:attribute type="xs:string" name="contactName"
-                              use="required"/>
+                <xs:attribute type="xs:string" name="contactName" use="required"/>
+                <xs:attribute type="eveIDType" name="contactTypeID" use="required"/>
+                <xs:attribute type="eveIDType" name="labelMask" use="required"/>
                 <xs:attribute type="xs:float" name="standing" use="required"/>
-                <xs:attribute type="eveIDType" name="contactTypeID"
-                              use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="contactListType">
         <xs:sequence>
-            <xs:element type="rowType" name="row" maxOccurs="unbounded"
-                        minOccurs="0"/>
+            <xs:element type="rowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="allianceContactListType">
         <xs:sequence>
-            <xs:element type="allianceRowType" name="row" maxOccurs="unbounded"
-                        minOccurs="0"/>
+            <xs:element type="allianceRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
     <xs:complexType name="corporateContactListType">
         <xs:sequence>
-            <xs:element type="corporateRowType" name="row" maxOccurs="unbounded"
-                        minOccurs="0"/>
+            <xs:element type="corporateRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="rowsetAttrs"/>
     </xs:complexType>
+    <xs:complexType name="contactLabelsType">
+        <xs:sequence>
+            <xs:element type="labelsRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="rowsetAttrs"/>
+    </xs:complexType>
+    <xs:complexType name="labelsRowType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="eveIDType" name="labelID" use="required"/>
+                <xs:attribute type="xs:string" name="name" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="allianceContactListType"
-                        name="allianceContactList"/>
-            <xs:element type="contactListType" name="contactList"/>
-            <xs:element type="corporateContactListType"
-                        name="corporateContactList"/>
+            <xs:element type="contactLabelsType" name="allianceContactLabels" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="allianceContactListType" name="allianceContactList" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="contactLabelsType" name="contactLabels" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="contactListType" name="contactList" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="contactLabelsType" name="corporateContactLabels" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="corporateContactListType" name="corporateContactList" maxOccurs="1" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

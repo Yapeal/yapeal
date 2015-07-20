@@ -70,9 +70,7 @@ class CharacterInfoPrivate extends CharacterInfo
          * Update CharacterInfo public first so it does NOT overwrite additional
          * information from private in cases were keys have overlap.
          */
-        $class = new CharacterInfoPublic(
-            $this->getPdo(), $this->getLogger(), $this->getCsq()
-        );
+        $class = new CharacterInfoPublic($this->getPdo(), $this->getLogger(), $this->getCsq());
         $class->autoMagic(
             $data,
             $retrievers,

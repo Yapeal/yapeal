@@ -98,11 +98,17 @@ class CharacterInfo extends AbstractCharSection
     protected function preserverToCharacterInfo($xml)
     {
         $columnDefaults = [
+            'accountBalance' => '0',
+            'alliance' => '',
+            'allianceDate' => '1970-01-01 00:00:01',
+            'allianceID' => '0',
+            'ancestry' => null,
+            'ancestryID' => null,
+            'bloodline' => null,
+            'bloodlineID' => null,
             'characterID' => null,
             'characterName' => null,
             'race' => null,
-            'bloodline' => null,
-            'accountBalance' => '0',
             'skillPoints' => '0',
             'nextTrainingEnds' => '1970-01-01 00:00:01',
             'shipName' => '',
@@ -111,9 +117,6 @@ class CharacterInfo extends AbstractCharSection
             'corporationID' => null,
             'corporation' => null,
             'corporationDate' => null,
-            'allianceID' => '0',
-            'alliance' => '',
-            'allianceDate' => '1970-01-01 00:00:01',
             'lastKnownLocation' => '',
             'securityStatus' => '0'
         ];
@@ -129,11 +132,11 @@ class CharacterInfo extends AbstractCharSection
     protected function preserverToEmploymentHistory($xml, $ownerID)
     {
         $columnDefaults = [
-            'recordID' => null,
             'corporationID' => null,
             'corporationName' => null,
-            'startDate' => null,
-            'ownerID' => $ownerID
+            'ownerID' => $ownerID,
+            'recordID' => null,
+            'startDate' => null
         ];
         $tableName = 'eveEmploymentHistory';
         $this->attributePreserveData(

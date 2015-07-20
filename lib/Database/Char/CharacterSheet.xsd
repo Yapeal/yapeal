@@ -92,22 +92,20 @@
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
-            <xs:element type="eveIDType" name="allianceID" minOccurs="0"
-                        maxOccurs="1"/>
-            <xs:element type="eveNameType" name="allianceName" minOccurs="0"
-                        maxOccurs="1"/>
+            <xs:element type="eveIDType" name="allianceID" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="eveNameType" name="allianceName" minOccurs="0" maxOccurs="1"/>
             <xs:element type="eveNameType" name="ancestry"/>
+            <xs:element type="eveIDType" name="ancestryID"/>
             <xs:element type="eveISKType" name="balance"/>
             <xs:element type="eveNameType" name="bloodLine"/>
+            <xs:element type="eveIDType" name="bloodLineID"/>
             <xs:element type="eveIDType" name="characterID"/>
             <xs:element type="eveDTType" name="cloneJumpDate"/>
             <xs:element type="eveIDType" name="corporationID"/>
             <xs:element type="eveNameType" name="corporationName"/>
             <xs:element type="eveNEDTType" name="DoB"/>
-            <xs:element type="eveIDType" name="factionID" minOccurs="0"
-                        maxOccurs="1"/>
-            <xs:element type="eveNameType" name="factionName" minOccurs="0"
-                        maxOccurs="1"/>
+            <xs:element type="eveIDType" name="factionID" minOccurs="0" maxOccurs="1"/>
+            <xs:element type="eveNameType" name="factionName" minOccurs="0" maxOccurs="1"/>
             <xs:element type="xs:unsignedInt" name="freeRespecs"/>
             <xs:element type="xs:unsignedLong" name="freeSkillPoints"/>
             <xs:element name="gender">
@@ -131,25 +129,19 @@
             <xs:element name="certificates" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="certificatesRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="certificatesRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
             </xs:element>
-            <xs:element type="rolesType" name="corporationRoles" maxOccurs="1"
-                        minOccurs="0"/>
-            <xs:element type="rolesType" name="corporationRolesAtBase"
-                        maxOccurs="1" minOccurs="0"/>
-            <xs:element type="rolesType" name="corporationRolesAtHQ"
-                        maxOccurs="1" minOccurs="0"/>
-            <xs:element type="rolesType" name="corporationRolesAtOther"
-                        maxOccurs="1" minOccurs="0"/>
+            <xs:element type="rolesType" name="corporationRoles" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="rolesType" name="corporationRolesAtBase" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="rolesType" name="corporationRolesAtHQ" maxOccurs="1" minOccurs="0"/>
+            <xs:element type="rolesType" name="corporationRolesAtOther" maxOccurs="1" minOccurs="0"/>
             <xs:element name="corporationTitles" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="titlesRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="titlesRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -157,8 +149,7 @@
             <xs:element name="implants" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="implantsRowType" name="row"
-                                    maxOccurs="10" minOccurs="0"/>
+                        <xs:element type="implantsRowType" name="row" maxOccurs="10" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -166,8 +157,7 @@
             <xs:element name="jumpCloneImplants" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="jumpCloneImplantsRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="jumpCloneImplantsRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -175,8 +165,7 @@
             <xs:element name="jumpClones" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="jumpClonesRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="jumpClonesRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -184,8 +173,7 @@
             <xs:element name="skills" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="skillsRowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="skillsRowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

@@ -59,8 +59,10 @@ class ContactList extends AbstractCorpSection
         try {
             $this->getPdo()
                  ->beginTransaction();
-            $this->preserverToCorporateContactList($xml, $ownerID);
-            $this->preserverToAllianceContactList($xml, $ownerID);
+            $this->preserverToAllianceContactLabels($xml, $ownerID)
+                 ->preserverToAllianceContactList($xml, $ownerID)
+                 ->preserverToCorporateContactLabels($xml, $ownerID)
+                 ->preserverToCorporateContactList($xml, $ownerID);
             $this->getPdo()
                  ->commit();
         } catch (PDOException $exc) {
@@ -81,6 +83,35 @@ class ContactList extends AbstractCorpSection
      * @param string $ownerID
      *
      * @throws LogicException
+     * @return self
+     */
+    protected function preserverToAllianceContactLabels($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'ownerID' => $ownerID,
+            'labelID' => null,
+            'name'    => null
+        ];
+        $tableName = 'charAllianceContactLabels';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//allianceContactLabels/row'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws LogicException
      * @internal param int $key
      *
      * @return self
@@ -90,10 +121,12 @@ class ContactList extends AbstractCorpSection
         $ownerID
     ) {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'contactID' => null,
+            'ownerID'     => $ownerID,
+            'contactID'   => null,
             'contactName' => null,
-            'standing' => null
+            'contactTypeID' => null,
+            'labelMask'     => null,
+            'standing'    => null
         ];
         $tableName = 'corpAllianceContactList';
         $sql = $this->getCsq()
@@ -111,6 +144,35 @@ class ContactList extends AbstractCorpSection
         return $this;
     }
     /**
+     * @param $xml
+     * @param $ownerID
+     *
+     * @return $this
+     * @throws LogicException
+     */
+    protected function preserverToCorporateContactLabels($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'ownerID' => $ownerID,
+            'labelID' => null,
+            'name'    => null
+        ];
+        $tableName = 'charCorporateContactLabels';
+        $sql = $this->getCsq()
+                    ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
+        $this->getLogger()
+             ->info($sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            $tableName,
+            '//corporateContactLabels/row'
+        );
+        return $this;
+    }
+    /**
      * @param string $xml
      * @param string $ownerID
      *
@@ -124,10 +186,12 @@ class ContactList extends AbstractCorpSection
         $ownerID
     ) {
         $columnDefaults = [
-            'ownerID' => $ownerID,
-            'contactID' => null,
+            'ownerID'     => $ownerID,
+            'contactID'   => null,
             'contactName' => null,
-            'standing' => null
+            'contactTypeID' => null,
+            'labelMask'     => null,
+            'standing'    => null
         ];
         $tableName = 'corpCorporateContactList';
         $sql = $this->getCsq()

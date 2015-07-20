@@ -11,17 +11,12 @@ namespace Yapeal\Log;
 
 use EventMediator\SubscriberInterface;
 use Monolog\Logger as MLogger;
-use Yapeal\Container\ContainerInterface;
-use Yapeal\Container\ServiceCallableInterface;
 use Yapeal\Event\LogEventInterface;
 
 /**
  * Class Logger
  */
-class Logger extends MLogger implements
-    ServiceCallableInterface,
-    SubscriberInterface,
-    EventAwareLoggerInterface
+class Logger extends MLogger implements SubscriberInterface, EventAwareLoggerInterface
 {
     /**
      * @inheritdoc
@@ -32,43 +27,6 @@ class Logger extends MLogger implements
     {
         $events = ['Yapeal.Log.log' => ['logEvent', 'last']];
         return $events;
-    }
-    /**
-     * @inheritdoc
-     *
-     * @api
-     */
-    public static function injectCallable(ContainerInterface &$dic)
-    {
-        $class = __CLASS__;
-        $serviceName = str_replace('\\', '.', $class);
-        if (empty($dic[$serviceName])) {
-            $dic[$serviceName] = function () use ($dic, $class) {
-                $group = [];
-                if (PHP_SAPI === 'cli') {
-                    $group[] = new $dic['Yapeal.Log.Handlers.stream'](
-                        'php://stderr', 100
-                    );
-                }
-                $group[] = new $dic['Yapeal.Log.Handlers.stream'](
-                    $dic['Yapeal.Log.logDir'] . $dic['Yapeal.Log.fileName'],
-                    100
-                );
-                return new $class(
-                    $dic['Yapeal.Log.channel'],
-                    [
-                        new $dic['Yapeal.Log.Handlers.fingersCrossed'](
-                            new $dic['Yapeal.Log.Handlers.group'](
-                                $group
-                            ),
-                            (int)$dic['Yapeal.Log.threshold'],
-                            (int)$dic['Yapeal.Log.bufferSize']
-                        )
-                    ]
-                );
-            };
-        }
-        return $serviceName;
     }
     /**
      * @inheritdoc

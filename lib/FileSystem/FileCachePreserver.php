@@ -78,7 +78,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface &$dic)
+    public static function injectCallable(ContainerInterface $dic)
     {
         if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
             $class = __CLASS__;
@@ -127,8 +127,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
             $data->getEveApiName()
         );
         $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        $cachePath
-            = $this->getSectionCachePath($data->getEveApiSectionName(), $yed);
+        $cachePath = $this->getSectionCachePath($data->getEveApiSectionName(), $yed);
         if (false === $cachePath
             || false === $this->isUsableCachePath($cachePath, $yed)
         ) {
@@ -204,9 +203,9 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
     ) {
         try {
             return $this->getFpn()
-                ->normalizePath(
-                    $this->getCachePath() . $sectionName
-                );
+                        ->normalizePath(
+                            $this->getCachePath() . $sectionName
+                        );
         } catch (Exception $exc) {
             $mess = 'Could NOT get cache path';
             $yed->dispatchLogEvent(
@@ -229,9 +228,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
         ContainerAwareEventDispatcherInterface $yed
     ) {
         if (!is_readable($cachePath)) {
-            $mess =
-                'Cache path is NOT readable or does NOT exist was given '
-                . $cachePath;
+            $mess = 'Cache path is NOT readable or does NOT exist was given ' . $cachePath;
             $yed->dispatchLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
             return false;
         }

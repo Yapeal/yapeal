@@ -54,8 +54,7 @@ class CommonSqlQueries
      */
     public function getAccountCorporationIDsExcludingCorporationKeys()
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT DISTINCT acc."corporationID"
  FROM "%1$s"."%2$saccountCharacters" AS acc
  WHERE
@@ -95,8 +94,7 @@ SQL;
      */
     public function getActiveMailBodiesWithOwnerID($ownerID)
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT "messageID"
  FROM "%1$s"."%2$scharMailMessages" AS cmm
  WHERE "ownerID"=%3$s
@@ -113,8 +111,7 @@ SQL;
      */
     public function getActiveRegisteredAccountStatus()
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT urk."keyID",urk."vCode"
  FROM "%1$s"."%2$sutilRegisteredKey" AS urk
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -133,8 +130,7 @@ SQL;
      */
     public function getActiveRegisteredCharacters($mask)
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT ac."characterID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -163,8 +159,7 @@ SQL;
      */
     public function getActiveRegisteredCorporations($mask)
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT ac."corporationID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -205,8 +200,7 @@ SQL;
      */
     public function getActiveStarbaseTowers($mask, $ownerID)
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT sl."itemID",ac."corporationID",urk."keyID",urk."vCode"
  FROM "%1$s"."%2$saccountKeyBridge" AS akb
  JOIN "%1$s"."%2$saccountAPIKeyInfo" AS aaki
@@ -247,8 +241,7 @@ SQL;
      */
     public function getCreateAddOrModifyColumnProcedure()
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 CREATE PROCEDURE "{database}"."AddOrModifyColumn"(
     IN param_database_name  VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
     IN param_table_name     VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
@@ -309,22 +302,6 @@ SQL;
     }
     /**
      * @param string $tableName
-     * @param string $ownerID
-     *
-     * @return string
-     */
-    public function getDeleteFromTableWithOwnerID($tableName, $ownerID)
-    {
-        return sprintf(
-            'DELETE FROM "%1$s"."%2$s%3$s" WHERE "ownerID"= \'%4$s\'',
-            $this->databaseName,
-            $this->tablePrefix,
-            $tableName,
-            $ownerID
-        );
-    }
-    /**
-     * @param string $tableName
      * @param string $keyID
      *
      * @return string
@@ -337,6 +314,22 @@ SQL;
             $this->tablePrefix,
             $tableName,
             $keyID
+        );
+    }
+    /**
+     * @param string $tableName
+     * @param string $ownerID
+     *
+     * @return string
+     */
+    public function getDeleteFromTableWithOwnerID($tableName, $ownerID)
+    {
+        return sprintf(
+            'DELETE FROM "%1$s"."%2$s%3$s" WHERE "ownerID"= \'%4$s\'',
+            $this->databaseName,
+            $this->tablePrefix,
+            $tableName,
+            $ownerID
         );
     }
     /**
@@ -353,8 +346,7 @@ SQL;
      */
     public function getMemberCorporationIDsExcludingAccountCorporations()
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT DISTINCT emc."corporationID"
  FROM "%1$s"."%2$seveMemberCorporations" AS emc
  WHERE
@@ -381,9 +373,7 @@ SQL;
     public function getUpsert($tableName, array $columnNameList, $rowCount)
     {
         $columns = implode('","', $columnNameList);
-        $rowPrototype
-            = '(' . implode(',', array_fill(0, count($columnNameList), '?'))
-              . ')';
+        $rowPrototype = '(' . implode(',', array_fill(0, count($columnNameList), '?')) . ')';
         $rows = implode(',', array_fill(0, $rowCount, $rowPrototype));
         $updates = [];
         foreach ($columnNameList as $column) {
@@ -410,8 +400,7 @@ SQL;
      */
     public function getUtilCachedUntilExpires($apiName, $sectionName, $ownerID)
     {
-        $sql
-            = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT "expires"
  FROM "%1$s"."%2$sutilCachedUntil"
  WHERE

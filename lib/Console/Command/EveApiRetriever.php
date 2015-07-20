@@ -47,7 +47,9 @@ use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Exception\YapealException;
+use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
+use Yapeal\Xml\EveApiRetrieverInterface;
 
 /**
  * Class EveApiRetriever
@@ -76,6 +78,8 @@ class EveApiRetriever extends Command implements WiringInterface
     /**
      * @param ContainerInterface $dic
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws YapealException
      */
     public function wire(ContainerInterface $dic)
@@ -156,6 +160,9 @@ EOF;
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws YapealException
      * @throws YapealConsoleException
      * @see    setCode()
      */
@@ -182,8 +189,14 @@ EOF;
                      ->setEveApiSectionName($input->getArgument('section_name'))
                      ->setEveApiArguments($posts);
         $retriever = $this->getDic()['Yapeal.Xml.Retriever'];
+        /**
+         * @type EveApiRetrieverInterface $retriever
+         */
         $retriever->retrieveEveApi($data);
         if (false !== $data->getEveApiXml()) {
+            /**
+             * @type EveApiPreserverInterface $preserver
+             */
             $preserver = $this->getDic()['Yapeal.Xml.Preserver'];
             $preserver->preserveEveApi($data);
         }

@@ -33,7 +33,6 @@
  */
 namespace Yapeal\EveApi\Account;
 
-use EventMediator\MediatorInterface;
 use LogicException;
 use PDO;
 use PDOException;
@@ -68,7 +67,7 @@ class AccountSection extends AbstractCommonEveApi
         $mess = sprintf(
             'Received %1$s event for %2$s/%3$s in %4$s',
             $eventName,
-            $data->getEveApiSectionName(),
+            ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName(),
             __CLASS__
         );
@@ -111,11 +110,11 @@ class AccountSection extends AbstractCommonEveApi
      * @return bool
      * @throws LogicException
      */
-    public function oneShot(EveApiReadWriteInterface &$data)
+    public function oneShot(EveApiReadWriteInterface $data)
     {
         $mess = sprintf(
             'Starting %1$s/%2$s::oneShot() for ownerID = %3$s',
-            $data->getEveApiSectionName(),
+            ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName(),
             $data->getEveApiArgument('keyID')
         );
@@ -159,7 +158,7 @@ class AccountSection extends AbstractCommonEveApi
      * @return bool
      * @throws LogicException
      */
-    protected function emitEvents(EveApiReadWriteInterface &$data, $eventSuffix)
+    protected function emitEvents(EveApiReadWriteInterface $data, $eventSuffix)
     {
         // Yapeal.EveApi.Section.Api.Suffix, Yapeal.EveApi.Api.Suffix,
         // Yapeal.EveApi.Section.Suffix, Yapeal.EveApi.Suffix
@@ -167,7 +166,7 @@ class AccountSection extends AbstractCommonEveApi
             ',',
             sprintf(
                 '%3$s.%1$s.%2$s.%4$s,%3$s.%2$s.%4$s,%3$s.%1$s.%4$s,%3$s.%4$s',
-                $data->getEveApiSectionName(),
+                ucfirst($data->getEveApiSectionName()),
                 $data->getEveApiName(),
                 'Yapeal.EveApi',
                 $eventSuffix
@@ -187,7 +186,7 @@ class AccountSection extends AbstractCommonEveApi
                           ->triggerEveApiEvent($eventName, $data);
             $data = $event->getData();
             if ($event->hasBeenHandled()) {
-                $mess = 'Handled in event ' . $eventName;
+                $mess = 'Handled event ' . $eventName;
                 $this->getYem()
                      ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
                 break;
@@ -197,7 +196,7 @@ class AccountSection extends AbstractCommonEveApi
             $mess
                 = sprintf(
                     'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
-                    $data->getEveApiSectionName(),
+                    lcfirst($data->getEveApiSectionName()),
                     $data->getEveApiName(),
                     $data->getEveApiArgument('keyID'),
                     $eventSuffix

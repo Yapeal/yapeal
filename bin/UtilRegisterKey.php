@@ -152,7 +152,6 @@ class UtilRegisterKey
      * @see UtilRegisteredKey
      * @return UtilRegisterKey
      * @throws LogicException
-     * @return self
      */
     public function save()
     {

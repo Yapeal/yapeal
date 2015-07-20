@@ -48,9 +48,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 /**
  * Class FileCacheRetriever
  */
-class FileCacheRetriever implements
-    EveApiRetrieverInterface,
-    LoggerAwareInterface
+class FileCacheRetriever implements EveApiRetrieverInterface, LoggerAwareInterface
 {
     use FilePathNormalizerTrait;
     /**
@@ -89,12 +87,9 @@ class FileCacheRetriever implements
         $this->getLogger()
              ->debug($mess);
         try {
-            $cachePath
-                = $this->getSectionCachePath($data->getEveApiSectionName());
+            $cachePath = $this->getSectionCachePath($data->getEveApiSectionName());
             $this->checkUsableCachePath($cachePath);
-            $cacheFile
-                =
-                $cachePath . $data->getEveApiName() . $data->getHash() . '.xml';
+            $cacheFile = $cachePath . $data->getEveApiName() . $data->getHash() . '.xml';
             $this->checkUsableCacheFile($cacheFile);
             $this->prepareConnection($cacheFile);
             $result = $this->readXmlData($cacheFile);
@@ -154,9 +149,7 @@ class FileCacheRetriever implements
     protected function checkUsableCacheFile($cacheFile)
     {
         if (!is_readable($cacheFile) || !is_file($cacheFile)) {
-            $mess
-                = 'Could NOT find accessible cache file was given '
-                  . $cacheFile;
+            $mess = 'Could NOT find accessible cache file was given ' . $cacheFile;
             throw new YapealRetrieverFileException($mess);
         }
         return $this;
@@ -170,13 +163,11 @@ class FileCacheRetriever implements
     protected function checkUsableCachePath($cachePath)
     {
         if (!is_readable($cachePath)) {
-            $mess = 'Cache path is NOT readable or does NOT exist was given '
-                    . $cachePath;
+            $mess = 'Cache path is NOT readable or does NOT exist was given ' . $cachePath;
             throw new YapealRetrieverPathException($mess);
         }
         if (!is_dir($cachePath)) {
-            $mess = 'Cache path is NOT a directory was given '
-                    . $cachePath;
+            $mess = 'Cache path is NOT a directory was given ' . $cachePath;
             throw new YapealRetrieverPathException($mess);
         }
         return $this;
@@ -221,9 +212,7 @@ class FileCacheRetriever implements
                         ->normalizePath($this->getCachePath() . $sectionName);
         } catch (DomainException $exc) {
             throw new YapealRetrieverPathException(
-                $exc->getMessage(),
-                null,
-                $exc
+                $exc->getMessage(), null, $exc
             );
         }
     }
@@ -234,7 +223,6 @@ class FileCacheRetriever implements
      */
     protected function isExpired($xml)
     {
-
         $simple = new SimpleXMLElement($xml);
         if (null === $simple->currentTime[0]) {
             $mess = 'Xml file missing required currentTime element';

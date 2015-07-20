@@ -79,31 +79,7 @@ interface ContainerInterface
      * @return array An array of value names
      */
     public function keys();
-    /**
-     * Protects a callable from being interpreted as a service.
-     *
-     * This is useful when you want to store a callable as a parameter.
-     *
-     * @param callable|object $callable A callable to protect from being
-     *                                  evaluated
-     *
-     * @return callable The passed callable
-     *
-     * @throws \InvalidArgumentException Service definition has to be a closure
-     *                                   of an invokable object
-     */
-    public function protect($callable);
-    /**
-     * Gets a parameter or the closure defining an object.
-     *
-     * @param string $key The unique identifier for the parameter or object
-     *
-     * @return mixed The value of the parameter or the closure defining an
-     *               object
-     *
-     * @throws \InvalidArgumentException if the identifier is NOT defined
-     */
-    public function raw($key);
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Whether a offset exists
@@ -119,6 +95,7 @@ interface ContainerInterface
      * The return value will be casted to boolean if non-boolean was returned.
      */
     public function offsetExists($offset);
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to retrieve
@@ -131,6 +108,7 @@ interface ContainerInterface
      * @return mixed Can return all value types.
      */
     public function offsetGet($offset);
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to set
@@ -146,6 +124,7 @@ interface ContainerInterface
      * @return void
      */
     public function offsetSet($offset, $value);
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to unset
@@ -158,4 +137,31 @@ interface ContainerInterface
      * @return void
      */
     public function offsetUnset($offset);
+
+    /**
+     * Protects a callable from being interpreted as a service.
+     *
+     * This is useful when you want to store a callable as a parameter.
+     *
+     * @param callable|object $callable A callable to protect from being
+     *                                  evaluated
+     *
+     * @return callable The passed callable
+     *
+     * @throws \InvalidArgumentException Service definition has to be a closure
+     *                                   of an invokable object
+     */
+    public function protect($callable);
+
+    /**
+     * Gets a parameter or the closure defining an object.
+     *
+     * @param string $key The unique identifier for the parameter or object
+     *
+     * @return mixed The value of the parameter or the closure defining an
+     *               object
+     *
+     * @throws \InvalidArgumentException if the identifier is NOT defined
+     */
+    public function raw($key);
 }

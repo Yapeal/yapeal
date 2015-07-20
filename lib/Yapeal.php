@@ -40,8 +40,8 @@ use PDOStatement;
 use Yapeal\Configuration\Wiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Event\ContainerAwareEventDispatcher;
 use Yapeal\Event\EveApiEventInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Log\Logger;
@@ -56,6 +56,11 @@ class Yapeal implements WiringInterface
     use FilePathNormalizerTrait;
     /**
      * @param ContainerInterface $dic
+     *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws YapealException
+     * @throws YapealDatabaseException
      */
     public function __construct(ContainerInterface $dic)
     {
@@ -67,22 +72,25 @@ class Yapeal implements WiringInterface
      *
      * @return int Returns 0 if everything was fine else something >= 1 for any
      * errors.
+     * @throws \LogicException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function autoMagic()
     {
         $dic = $this->getDic();
         /**
-         * @type ContainerAwareEventDispatcher $yed
+         * @type EventMediatorInterface $yem
          */
-        $yed = $dic['Yapeal.Event.EventDispatcher'];
+        $yem = $dic['Yapeal.Event.EventMediator'];
         $mess = 'Let the magic begin!';
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
         /**
          * @type CommonSqlQueries $csq
          */
         $csq = $dic['Yapeal.Database.CommonQueries'];
         $sql = $csq->getActiveApis();
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
         try {
             /**
              * @type PDO $pdo
@@ -95,7 +103,7 @@ class Yapeal implements WiringInterface
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
             $mess = 'Could not access utilEveApi table';
-            $yed->dispatchLogEvent(
+            $yem->triggerLogEvent(
                 'Yapeal.Log.log',
                 Logger::INFO,
                 $mess,
@@ -107,20 +115,22 @@ class Yapeal implements WiringInterface
         array_unshift(
             $result,
             [
-                'apiName' => 'APIKeyInfo',
-                'interval' => '300',
+                'apiName'     => 'APIKeyInfo',
+                'interval'    => '300',
                 'sectionName' => 'Account'
             ]
         );
         foreach ($result as $record) {
             /**
+             * Get new Data instance from factory.
              * @type EveApiReadWriteInterface $data
              */
+            /** @noinspection DisconnectedForeachInstructionInspection */
             $data = $dic['Yapeal.Xml.Data'];
             $data->setEveApiName($record['apiName'])
                  ->setEveApiSectionName($record['sectionName'])
                  ->setCacheInterval($record['interval']);
-            $this->emitEvents($data, $yed);
+            $this->emitEvents($data, $yem);
         }
         return 0;
     }
@@ -137,49 +147,31 @@ class Yapeal implements WiringInterface
     /**
      * @param ContainerInterface $dic
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws YapealException
      * @throws YapealDatabaseException
      */
     public function wire(ContainerInterface $dic)
     {
-        $path = $this->getFpn()
-                     ->normalizePath(dirname(__DIR__));
-        if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $path;
-        }
-        if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $path;
-        }
-        if (empty($dic['Yapeal.vendorParentDir'])) {
-            $vendorPos = strpos($path, 'vendor/');
-            if (false !== $vendorPos) {
-                $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
-            }
-        }
-        (new Wiring($dic))->wireConfig()
-                          ->wireError()
-                          ->wireCache()
-                          ->wireDatabase()
-                          ->wireEvent()
-                          ->wireLog()
-                          ->wireNetwork()
-                          ->wireXml();
+        (new Wiring($dic))->wireAll();
     }
     /**
-     * @param EveApiReadWriteInterface      $data
-     * @param ContainerAwareEventDispatcher $yed
+     * @param EveApiReadWriteInterface $data
+     * @param EventMediatorInterface   $yed
      *
      * @return self
+     * @throws \LogicException
      */
     protected function emitEvents(
         EveApiReadWriteInterface $data,
-        ContainerAwareEventDispatcher $yed
+        EventMediatorInterface $yed
     ) {
-        // Yapeal.EveApi.Section.Api.start, Yapeal.EveApi.Api.start,
-        // Yapeal.EveApi.Section.start, Yapeal.EveApi.start
+        // EveApi.Section.Api.start, EveApi.Api.start,
+        // EveApi.Section.start, EveApi.start
         $eventNames = sprintf(
             '%3$s.%1$s.%2$s.start,%3$s.%2$s.start,%3$s.%1$s.start,%3$s.start',
-            $data->getEveApiSectionName(),
+            ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName(),
             'Yapeal.EveApi'
         );
@@ -187,12 +179,18 @@ class Yapeal implements WiringInterface
             /**
              * @type EveApiEventInterface $event
              */
-            $event = $yed->dispatchEveApiEvent($eventName, $data);
+            $event = $yed->triggerEveApiEvent($eventName, $data);
             $data = $event->getData();
-            if ($event->isHandled()) {
-                break;
+            if ($event->hasBeenHandled()) {
+                return $this;
             }
         }
+        $mess = sprintf(
+            'Nothing handled Eve API start event for %1$s/%2$s',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName()
+        );
+        $yed->triggerLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
         return $this;
     }
     /**

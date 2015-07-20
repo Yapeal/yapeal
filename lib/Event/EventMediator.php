@@ -40,8 +40,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 /**
  * Class EventMediator
  */
-class EventMediator extends PimpleContainerMediator
-    implements EventMediatorInterface
+class EventMediator extends PimpleContainerMediator implements EventMediatorInterface
 {
     /**
      * @param string                   $eventName
@@ -76,7 +75,7 @@ class EventMediator extends PimpleContainerMediator
      */
     public function triggerLogEvent(
         $eventName,
-        $level = LOGGER::DEBUG,
+        $level = Logger::DEBUG,
         $message = '',
         array $context = [],
         LogEventInterface $event = null

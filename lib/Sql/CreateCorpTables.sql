@@ -5,7 +5,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAccountBalance" (
     "balance"    DECIMAL(17,2)        NOT NULL,
     PRIMARY KEY ("ownerID","accountKey")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpAssetList" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAssetList" (
     "typeID"      BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}corpAssetList" ADD INDEX "corpAssetList1"  ("lft");
 ALTER TABLE "{database}"."{table_prefix}corpAssetList" ADD INDEX "corpAssetList2"  ("locationID");
@@ -52,7 +52,7 @@ CREATE TABLE "{database}"."{table_prefix}corpAttackers" (
     "weaponTypeID"    BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID","characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpBlueprints" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE "{database}"."{table_prefix}corpBlueprints" (
     "runs"               BIGINT(20)          NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE "{database}"."{table_prefix}corpCalendarEventAttendees" (
     "response"      CHAR(10)            NOT NULL,
     PRIMARY KEY ("ownerID","characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCombatSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED   NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE "{database}"."{table_prefix}corpCombatSettings" (
     "useStandingsFromOwnerID" BIGINT(20) UNSIGNED   NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpContainerLog" (
     "ownerID"          BIGINT(20) UNSIGNED  NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE "{database}"."{table_prefix}corpContainerLog" (
     "typeID"           BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("ownerID","itemID","logTime")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpContracts" (
     "acceptorID"     BIGINT(20) UNSIGNED    NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE "{database}"."{table_prefix}corpContracts" (
     "volume"         DECIMAL(20,4) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","contractID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE "{database}"."{table_prefix}corpCorporateContactList" (
     "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
     "allianceID"      BIGINT(20) UNSIGNED   NOT NULL DEFAULT 0,
@@ -168,7 +168,7 @@ CREATE TABLE "{database}"."{table_prefix}corpCorporationSheet" (
     "url"             VARCHAR(255)                   DEFAULT NULL,
     PRIMARY KEY ("corporationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 -- sql/updates/201507131620.sql
 CREATE TABLE "{database}"."{table_prefix}corpCustomsOffices" (
@@ -197,7 +197,7 @@ CREATE TABLE "{database}"."{table_prefix}corpDivisions" (
     "description" VARCHAR(255)         NOT NULL,
     PRIMARY KEY ("ownerID","accountKey")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpFacilities" (
     "ownerID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE "{database}"."{table_prefix}corpFacilities" (
     "tax"              DECIMAL(17,2)       NOT NULL,
     PRIMARY KEY ("ownerID","facilityID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE "{database}"."{table_prefix}corpFacWarStats" (
     "victoryPointsTotal"     BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}corpFacWarStats" ADD INDEX "corpFacWarStats1"  ("factionID");
 CREATE TABLE "{database}"."{table_prefix}corpFuel" (
@@ -239,7 +239,7 @@ CREATE TABLE "{database}"."{table_prefix}corpFuel" (
     "quantity" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","itemID","typeID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpGeneralSettings" (
     "ownerID"                 BIGINT(20) UNSIGNED  NOT NULL,
@@ -250,7 +250,7 @@ CREATE TABLE "{database}"."{table_prefix}corpGeneralSettings" (
     "usageFlags"              SMALLINT(5) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
@@ -284,7 +284,7 @@ CREATE TABLE "{database}"."{table_prefix}corpIndustryJobs" (
     "timeInSeconds"        BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","jobID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpItems" (
     "flag"         SMALLINT(5) UNSIGNED NOT NULL,
@@ -298,7 +298,7 @@ CREATE TABLE "{database}"."{table_prefix}corpItems" (
     "typeID"       BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("killID","lft")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpKillMails" (
     "killID"        BIGINT(20) UNSIGNED NOT NULL,
@@ -307,7 +307,7 @@ CREATE TABLE "{database}"."{table_prefix}corpKillMails" (
     "solarSystemID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID","killTime")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpLogo" (
     "ownerID"   BIGINT(20) UNSIGNED  NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE "{database}"."{table_prefix}corpLogo" (
     "shape3"    SMALLINT(5) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","graphicID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMarketOrders" (
     "ownerID"      BIGINT(20) UNSIGNED  NOT NULL,
@@ -341,7 +341,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMarketOrders" (
     "volRemaining" BIGINT(20) UNSIGNED  NOT NULL,
     PRIMARY KEY ("ownerID","orderID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMedals" (
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -352,7 +352,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMedals" (
     "title"       VARCHAR(255)        NOT NULL,
     PRIMARY KEY ("ownerID","medalID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMemberMedals" (
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -364,7 +364,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberMedals" (
     "status"      CHAR(8)             NOT NULL,
     PRIMARY KEY ("ownerID","medalID","characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
     "base"           CHAR(255)           DEFAULT NULL,
@@ -384,7 +384,7 @@ CREATE TABLE "{database}"."{table_prefix}corpMemberTracking" (
     "title"          TEXT,
     PRIMARY KEY ("characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}corpMemberTracking" ADD INDEX "corpMemberTracking1"  ("ownerID");
 -- sql/updates/201507132213.sql
@@ -404,7 +404,7 @@ CREATE TABLE "{database}"."{table_prefix}corpOutpostList" (
     "z"                        BIGINT(20)              NOT NULL,
     PRIMARY KEY ("ownerID","stationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpOutpostServiceDetail" (
     "ownerID"                 BIGINT(20) UNSIGNED   NOT NULL,
@@ -415,7 +415,7 @@ CREATE TABLE "{database}"."{table_prefix}corpOutpostServiceDetail" (
     "surchargePerBadStanding" DECIMAL(5,2)          NOT NULL,
     PRIMARY KEY ("ownerID","stationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -424,7 +424,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromAgents" (
     "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -433,7 +433,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromFactions" (
     "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpStandingsFromNPCCorporations" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStandingsFromNPCCorporations" (
     "standing" DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","fromID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpStarbaseDetail" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -452,7 +452,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStarbaseDetail" (
     "stateTimestamp"  DATETIME            NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpStarbaseList" (
     "ownerID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -466,7 +466,7 @@ CREATE TABLE "{database}"."{table_prefix}corpStarbaseList" (
     "typeID"          BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","itemID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpVictim" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -482,7 +482,7 @@ CREATE TABLE "{database}"."{table_prefix}corpVictim" (
     "shipTypeID"      BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("killID","characterID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpWalletDivisions" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
@@ -490,7 +490,7 @@ CREATE TABLE "{database}"."{table_prefix}corpWalletDivisions" (
     "description" VARCHAR(255)         NOT NULL,
     PRIMARY KEY ("ownerID","accountKey")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpWalletJournal" (
     "ownerID"       BIGINT(20) UNSIGNED  NOT NULL,
@@ -513,7 +513,7 @@ CREATE TABLE "{database}"."{table_prefix}corpWalletJournal" (
     "owner2TypeID"  BIGINT(20) UNSIGNED DEFAULT NULL,
     PRIMARY KEY ("ownerID","accountKey","refID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
@@ -536,5 +536,5 @@ CREATE TABLE "{database}"."{table_prefix}corpWalletTransactions" (
     "typeName"             CHAR(255)            NOT NULL,
     PRIMARY KEY ("ownerID","accountKey","transactionID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;

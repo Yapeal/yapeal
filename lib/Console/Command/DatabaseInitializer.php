@@ -38,6 +38,7 @@ use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Exception\YapealConsoleException;
+use Yapeal\Exception\YapealDatabaseException;
 
 /**
  * Class DatabaseInitializer
@@ -168,6 +169,7 @@ HELP;
             }
             $output->writeln($fileName);
             $this->executeSqlStatements($sqlStatements, $fileName, $output);
+            /** @noinspection DisconnectedForeachInstructionInspection */
             $output->writeln('');
         }
     }

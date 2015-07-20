@@ -44,7 +44,6 @@ interface EveApiReadInterface
      * @return string
      */
     public function __toString();
-
     /**
      * @return int
      * @throws LogicException
@@ -56,7 +55,6 @@ interface EveApiReadInterface
      * @return string|null
      */
     public function getEveApiArgument($name);
-
     /**
      * @return string[]
      */

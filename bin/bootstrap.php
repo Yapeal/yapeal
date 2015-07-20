@@ -34,28 +34,23 @@
 namespace Yapeal;
 
 /*
- * Turn off warning messages for the following includes.
+ * Find Composer auto loader after striping away any vendor path.
+ */
+$path = dirname(__DIR__);
+$vendorPos = strpos($path, 'vendor/');
+if (false !== $vendorPos) {
+    $path = substr($path, 0, $vendorPos);
+}
+/*
+ * Turn off warning messages for the following include.
  */
 $errorReporting = error_reporting(E_ALL & ~E_WARNING);
-/*
- * Find auto loader from one of
- * vendor/bin/
- * OR ./
- * OR bin/
- * OR src/Project/
- * OR vendor/Project/Project/
- */
-(include_once dirname(__DIR__) . '/autoload.php')
-|| (include_once __DIR__ . '/vendor/autoload.php')
-|| (include_once dirname(__DIR__) . '/vendor/autoload.php')
-|| (include_once dirname(dirname(__DIR__)) . '/vendor/autoload.php')
-|| (include_once dirname(dirname(dirname(__DIR__))) . '/autoload.php');
+include_once $path . '/vendor/autoload.php';
 error_reporting($errorReporting);
 unset($errorReporting);
 if (!class_exists('\\Composer\\Autoload\\ClassLoader', false)) {
     if ('cli' === PHP_SAPI) {
-        $mess
-            = 'Could NOT find required Composer class auto loader. Aborting ...';
+        $mess = 'Could NOT find required Composer class auto loader. Aborting ...';
         fwrite(STDERR, $mess);
     }
     return 1;

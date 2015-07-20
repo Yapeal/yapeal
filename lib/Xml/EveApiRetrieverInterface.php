@@ -33,6 +33,9 @@
  */
 namespace Yapeal\Xml;
 
+use Yapeal\Event\EveApiEventInterface;
+use Yapeal\Event\EventMediatorInterface;
+
 /**
  * Common interface for any class that would retrieve (file / network) the Eve
  * Api data in some way.
@@ -40,9 +43,16 @@ namespace Yapeal\Xml;
 interface EveApiRetrieverInterface
 {
     /**
-     * @param EveApiReadWriteInterface $data
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
+     * @param EventMediatorInterface $yem
      *
-     * @return self
+     * @return EveApiEventInterface
+     * @throws \LogicException
      */
-    public function retrieveEveApi(EveApiReadWriteInterface $data);
+    public function retrieveEveApi(
+        EveApiEventInterface $event,
+        $eventName,
+        EventMediatorInterface $yem
+    );
 }

@@ -39,15 +39,14 @@ use tidy;
 use XSLTProcessor;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
-use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Event\EveApiEventInterface;
-use Yapeal\Event\EventSubscriberInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
 
 /**
  * Class Transformer
  */
-class Transformer implements EventSubscriberInterface, ServiceCallableInterface
+class Transformer implements ServiceCallableInterface
 {
     /**
      * @inheritdoc
@@ -68,7 +67,7 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface &$dic)
+    public static function injectCallable(ContainerInterface $dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -82,16 +81,19 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
         return $serviceName;
     }
     /**
-     * @param EveApiEventInterface                   $event
-     * @param string                                 $eventName
-     * @param ContainerAwareEventDispatcherInterface $yed
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function eveApiTransform(
         EveApiEventInterface $event,
         $eventName,
-        ContainerAwareEventDispatcherInterface $yed
+        EventMediatorInterface $yem
     ) {
         $data = $event->getData();
         $mess = sprintf(
@@ -101,33 +103,31 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
             $data->getEveApiName(),
             __CLASS__
         );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        $fileNames
-            = sprintf(
-                '%3$s/%1$s/%2$s.xsl,%3$s/%2$s.xsl,%3$s/%1$s/%1$s.xsl,%3$s/common.xsl',
-                $data->getEveApiSectionName(),
-                $data->getEveApiName(),
-                str_replace('\\', '/', __DIR__)
-            );
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $fileNames = sprintf(
+            '%3$s/%1$s/%2$s.xsl,%3$s/%2$s.xsl,%3$s/%1$s/%1$s.xsl,%3$s/common.xsl',
+            $data->getEveApiSectionName(),
+            $data->getEveApiName(),
+            str_replace('\\', '/', __DIR__)
+        );
         foreach (explode(',', $fileNames) as $fileName) {
             if (!is_readable($fileName) || !is_file($fileName)) {
                 continue;
             }
             $mess = 'Using Xsl file ' . $fileName;
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             $xslt = new XSLTProcessor();
             $oldErrors = libxml_use_internal_errors(true);
             libxml_clear_errors();
             $dom = new DOMDocument();
             $dom->load($fileName);
             $xslt->importStylesheet($dom);
-            $xml
-                = $xslt->transformToXml(
-                    new SimpleXMLElement($data->getEveApiXml())
-                );
+            $xml = $xslt->transformToXml(
+                new SimpleXMLElement($data->getEveApiXml())
+            );
             if (false === $xml) {
                 foreach (libxml_get_errors() as $error) {
-                    $yed->dispatchLogEvent(
+                    $yem->triggerLogEvent(
                         'Yapeal.Log.log',
                         Logger::DEBUG,
                         $error->message
@@ -135,8 +135,7 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
                 }
                 libxml_clear_errors();
                 libxml_use_internal_errors($oldErrors);
-                return $event->setHandled()
-                             ->stopPropagation();
+                return $event->eventHandled();
             }
             libxml_clear_errors();
             libxml_use_internal_errors($oldErrors);
@@ -157,17 +156,17 @@ class Transformer implements EventSubscriberInterface, ServiceCallableInterface
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            return $event->setHandled()
-                         ->stopPropagation();
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+            $event->eventHandled();
         }
-        $mess = sprintf(
-            'Failed to transform data for %1$s/%2$s',
-            $data->getEveApiSectionName(),
-            $data->getEveApiName()
-        );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        return $event->setHandled()
-                     ->stopPropagation();
+        if (!$event->hasBeenHandled()) {
+            $mess = sprintf(
+                'Failed to transform data for %1$s/%2$s',
+                $data->getEveApiSectionName(),
+                $data->getEveApiName()
+            );
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        }
+        return $event;
     }
 }

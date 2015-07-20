@@ -22,10 +22,14 @@
     },
     "autoload-dev": {
         "psr-0": {
-            "Spec\\": ["specs/"]
+            "Spec\\": [
+                "specs/"
+            ]
         },
         "psr-4": {
-            "Yapeal\\Test\\": ["tests/"]
+            "Yapeal\\Test\\": [
+                "tests/"
+            ]
         }
     },
     "authors": [

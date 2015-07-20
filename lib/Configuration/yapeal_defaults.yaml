@@ -53,7 +53,7 @@ Yapeal:
         class: GuzzleHttp\Client
         connect_timeout: 30
         verify: '{Yapeal.baseDir}config/eveonline.crt'
-        userAgent: '{appName}/{appVersion} {appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
+        userAgent: '{appName}/{appVersion} {appComment} Yapeal/3.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
         Headers:
             'Accept': >
                 text/xml,application/xml,application/xhtml+xml;

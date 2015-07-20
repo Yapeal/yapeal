@@ -37,7 +37,6 @@ use FilePathNormalizer\FilePathNormalizerTrait;
 use LogicException;
 use PDO;
 use PDOException;
-use Psr\Log\LoggerAwareTrait;
 use SimpleXMLElement;
 use Yapeal\Log\Logger;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -47,7 +46,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  */
 abstract class AbstractCommonEveApi
 {
-    use LoggerAwareTrait, EveApiToolsTrait, FilePathNormalizerTrait;
+    use EveApiToolsTrait, FilePathNormalizerTrait;
     /**
      * @param string $apiName
      * @param string $sectionName
@@ -65,7 +64,7 @@ abstract class AbstractCommonEveApi
             $ownerID
         );
         $this->getYem()
-            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $sql = $this->getCsq()
                     ->getUtilCachedUntilExpires(
                         $apiName,
@@ -73,32 +72,26 @@ abstract class AbstractCommonEveApi
                         $ownerID
                     );
         $this->getYem()
-            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         $stmt = $this->getPdo()
                      ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (0 === count($expires)) {
             $mess = 'No UtilCachedUntil record found for ownerID = ' . $ownerID;
             $this->getYem()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
         if (1 < count($expires)) {
-            $mess
-                =
-                'Multiple UtilCachedUntil record found for ownerID = '
-                . $ownerID;
+            $mess = 'Multiple UtilCachedUntil record found for ownerID = ' . $ownerID;
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return false;
         }
         if (strtotime($expires[0]['expires'] . '+00:00') < time()) {
-            $mess
-                =
-                'Expired UtilCachedUntil record found for ownerID = '
-                . $ownerID;
+            $mess = 'Expired UtilCachedUntil record found for ownerID = ' . $ownerID;
             $this->getYem()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return false;
         }
         return true;
@@ -109,12 +102,12 @@ abstract class AbstractCommonEveApi
      * @throws LogicException
      * @return bool
      */
-    protected function gotApiLock(EveApiReadWriteInterface &$data)
+    protected function gotApiLock(EveApiReadWriteInterface $data)
     {
         $sql = $this->getCsq()
                     ->getApiLock($data->getHash());
         $this->getYem()
-             ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         try {
             $stmt = $this->getPdo()
                          ->query($sql);
@@ -126,7 +119,7 @@ abstract class AbstractCommonEveApi
                     $data->getEveApiName()
                 );
                 $this->getYem()
-                     ->dispatchLogEvent(
+                     ->triggerLogEvent(
                          'Yapeal.Log.log',
                          Logger::DEBUG,
                          $mess
@@ -140,7 +133,7 @@ abstract class AbstractCommonEveApi
                 $data->getEveApiName()
             );
             $this->getYem()
-                 ->dispatchLogEvent(
+                 ->triggerLogEvent(
                      'Yapeal.Log.log',
                      Logger::WARNING,
                      $mess,
@@ -156,7 +149,7 @@ abstract class AbstractCommonEveApi
      * @throws LogicException
      */
     protected function updateCachedUntil(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         $ownerID
     ) {
         if (false === $data->getEveApiXml()) {
@@ -168,8 +161,7 @@ abstract class AbstractCommonEveApi
         }
         $dateTime = gmdate(
             'Y-m-d H:i:s',
-            strtotime($simple->currentTime[0] . '+00:00')
-            + $data->getCacheInterval()
+            strtotime($simple->currentTime[0] . '+00:00') + $data->getCacheInterval()
         );
         $row = [
             $data->getEveApiName(),
@@ -194,10 +186,10 @@ abstract class AbstractCommonEveApi
                 $ownerID
             );
             $this->getYem()
-                ->dispatchLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
             $mess = 'Database error message was ' . $exc->getMessage();
             $this->getYem()
-                 ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             return;
         }
         $mess = sprintf(
@@ -207,6 +199,6 @@ abstract class AbstractCommonEveApi
             $ownerID
         );
         $this->getYem()
-            ->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
     }
 }

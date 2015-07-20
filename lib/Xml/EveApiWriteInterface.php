@@ -49,9 +49,9 @@ interface EveApiWriteInterface
      * @return self
      */
     public function addEveApiArgument($name, $value);
-
     /**
      * @param int $value Caching interval.
+     *
      * @return self
      */
     public function setCacheInterval($value);

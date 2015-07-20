@@ -5,13 +5,13 @@ CREATE TABLE "{database}"."{table_prefix}utilCachedUntil" (
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName","ownerID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilDatabaseVersion" (
     "version" CHAR(12) NOT NULL,
     PRIMARY KEY ("version")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 INSERT INTO "{database}"."{table_prefix}utilDatabaseVersion" ("version")
 VALUES
@@ -24,7 +24,7 @@ CREATE TABLE "{database}"."{table_prefix}utilEveApi" (
     "sectionName" CHAR(8)             NOT NULL,
     PRIMARY KEY ("apiName","sectionName")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 START TRANSACTION;
 INSERT INTO "{database}"."{table_prefix}utilEveApi" ("sectionName","apiName","mask","interval","active")
@@ -117,7 +117,7 @@ CREATE TABLE "{database}"."{table_prefix}utilRegisteredKey" (
     "vCode"         VARCHAR(64)         NOT NULL,
     PRIMARY KEY ("keyID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 INSERT INTO "{database}"."{table_prefix}utilRegisteredKey" ("activeAPIMask","active","keyID","vCode")
 VALUES
@@ -129,7 +129,7 @@ CREATE TABLE "{database}"."{table_prefix}utilRegisteredUploader" (
     "uploadDestinationID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","uploadDestinationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
     "active"              TINYINT(1)   DEFAULT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE "{database}"."{table_prefix}utilUploadDestination" (
     "url"                 VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY ("uploadDestinationID")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
     "apiName"     CHAR(32)  NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE "{database}"."{table_prefix}utilXmlCache" (
     "xml"         LONGTEXT,
     PRIMARY KEY ("hash")
 )
-ENGINE ={ engine}
+ENGINE = { engine}
 COLLATE utf8_unicode_ci;
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache1" ("sectionName");
 ALTER TABLE "{database}"."{table_prefix}utilXmlCache" ADD INDEX "utilXmlCache2" ("apiName");

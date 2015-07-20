@@ -37,16 +37,15 @@ use DOMDocument;
 use SimpleXMLElement;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Container\ServiceCallableInterface;
-use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Event\EveApiEventInterface;
-use Yapeal\Event\EventSubscriberInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
  * Class Validator
  */
-class Validator implements EventSubscriberInterface, ServiceCallableInterface
+class Validator implements ServiceCallableInterface
 {
     /**
      * @inheritdoc
@@ -67,7 +66,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface &$dic)
+    public static function injectCallable(ContainerInterface $dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -81,16 +80,19 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
         return $serviceName;
     }
     /**
-     * @param EveApiEventInterface                   $event
-     * @param string                                 $eventName
-     * @param ContainerAwareEventDispatcherInterface $yed
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function eveApiValidate(
         EveApiEventInterface $event,
         $eventName,
-        ContainerAwareEventDispatcherInterface $yed
+        EventMediatorInterface $yem
     ) {
         $data = $event->getData();
         $mess = sprintf(
@@ -100,7 +102,7 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
             $data->getEveApiName(),
             __CLASS__
         );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $fileNames = sprintf(
             '%3$s/%1$s/%2$s.xsd,%3$s/%2$s.xsd,%3$s/%1$s/%1$s.xsd,%3$s/common.xsd',
             $data->getEveApiSectionName(),
@@ -112,14 +114,14 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
                 continue;
             }
             $mess = 'Using Xsd file ' . $fileName;
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             $oldErrors = libxml_use_internal_errors(true);
             libxml_clear_errors();
             $dom = new DOMDocument();
             $dom->loadXML($data->getEveApiXml());
             if (!$dom->schemaValidate($fileName)) {
                 foreach (libxml_get_errors() as $error) {
-                    $yed->dispatchLogEvent(
+                    $yem->triggerLogEvent(
                         'Yapeal.Log.log',
                         Logger::INFO,
                         $error->message
@@ -127,13 +129,12 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
                 }
                 libxml_clear_errors();
                 libxml_use_internal_errors($oldErrors);
-                return $event->setHandled()
-                             ->stopPropagation();
+                return $event->eventHandled();
             }
             libxml_clear_errors();
             libxml_use_internal_errors($oldErrors);
             if (false !== strpos($data->getEveApiXml(), '<error')) {
-                $event = $this->emitXmlErrorEvents($event, $yed);
+                $event = $this->emitXmlErrorEvents($event, $yem);
             }
             $mess = sprintf(
                 'Finished %1$s event for %2$s/%3$s',
@@ -141,26 +142,30 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            return $event->setHandled()
-                         ->stopPropagation();
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+            $event->eventHandled();
         }
-        $mess = sprintf(
-            'Failed to validate data for %1$s/%2$s',
-            $data->getEveApiSectionName(),
-            $data->getEveApiName()
-        );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        return $event->setHandled()
-                     ->stopPropagation();
+        if (!$event->hasBeenHandled()) {
+            $mess = sprintf(
+                'Failed to validate data for %1$s/%2$s',
+                $data->getEveApiSectionName(),
+                $data->getEveApiName()
+            );
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        }
+        return $event;
     }
     /**
-     * @param EveApiReadWriteInterface               $data
-     * @param ContainerAwareEventDispatcherInterface $yed
+     * @param EveApiReadWriteInterface $data
+     * @param EventMediatorInterface   $yem
+     *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     protected function checkEveApiXmlError(
-        EveApiReadWriteInterface &$data,
-        ContainerAwareEventDispatcherInterface $yed
+        EveApiReadWriteInterface $data,
+        EventMediatorInterface $yem
     ) {
         if (strpos($data->getEveApiXml(), '<error') === false) {
             return;
@@ -174,21 +179,20 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
             $eventSuffix
         );
         foreach (explode(',', $eventNames) as $eventName) {
-            $event = $yed
-                ->dispatchEveApiEvent($eventName, $data);
+            $event = $yem->triggerEveApiEvent($eventName, $data);
             $data = $event->getData();
         }
         $simple = new SimpleXMLElement($data->getEveApiXml());
-        if (empty($simple->error['code'])) {
+        if (empty($simple->error[0]['code'])) {
             return;
         }
-        $code = (int)$simple->error['code'];
+        $code = (int)$simple->error[0]['code'];
         $mess = sprintf(
             'Eve Error (%3$s): Received from API %1$s/%2$s - %4$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName(),
             $code,
-            (string)$simple->error
+            (string)$simple->error[0]
         );
         if ($code < 200) {
             if (strpos($mess, 'retry after') !== false) {
@@ -196,34 +200,37 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
                     strtotime(substr($mess, -19) . '+00:00') - time()
                 );
             }
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
             return;
         }
         if ($code < 300) {
             // API key errors.
             $mess .= ' for keyID: ' . $data->getEveApiArgument('keyID');
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ERROR, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::ERROR, $mess);
             $data->setCacheInterval(86400);
             return;
         }
         if ($code > 903 && $code < 905) {
             // Major application or Yapeal error.
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::ALERT, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::ALERT, $mess);
             $data->setCacheInterval(86400);
             return;
         }
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
         $data->setCacheInterval(300);
     }
     /**
-     * @param EveApiEventInterface                   $event
-     * @param ContainerAwareEventDispatcherInterface $yed
+     * @param EveApiEventInterface   $event
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     protected function emitXmlErrorEvents(
         EveApiEventInterface $event,
-        ContainerAwareEventDispatcherInterface $yed
+        EventMediatorInterface $yem
     ) {
         $data = $event->getData();
         $eventSuffix = 'xmlError';
@@ -235,9 +242,8 @@ class Validator implements EventSubscriberInterface, ServiceCallableInterface
             $eventSuffix
         );
         foreach (explode(',', $eventNames) as $eventName) {
-            $event = $yed
-                ->dispatchEveApiEvent($eventName, $data);
-            if ($event->isHandled()) {
+            $event = $yem->triggerEveApiEvent($eventName, $data);
+            if ($event->hasBeenHandled()) {
                 break;
             }
             $data = $event->getData();

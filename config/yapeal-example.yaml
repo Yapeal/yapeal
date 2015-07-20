@@ -1,8 +1,9 @@
 ---
 Yapeal:
+    Cache:
     # Settings in the 'Cache' section normally will only be changed during
     # troubleshooting or development work.
-    Cache:
+
         # Base directory where the cached XML will be stored if filesystem
         # caching is active.
         # The default setting of '{Yapeal.baseDir}cache/' uses a cache/
@@ -16,9 +17,9 @@ Yapeal:
         # The default of 'none' turns off using the filesystem cache.
         fileSystemMode: none
 
+    Database:
     # Settings in the 'Database' section will normal be the only ones that need
     # changed by most users.
-    Database:
         class: PDO
 
         # Name of the database (schema) Yapeal will use for tables.
@@ -52,7 +53,7 @@ Yapeal:
         # (Optional) Only needed if using http connection.
         # port: ''
 
-        sharedSql: Yapeal\Database\CommonSqlQueries
+        sharedSql: Yapeal\Sql\CommonSqlQueries
 
         # Prefix to add to all database table names.
         # This default to an empty string and will have no effect on the table
@@ -70,10 +71,11 @@ Yapeal:
         # access to the tables.
         userName: YapealUser
 
+    Error:
     # Changes to all settings in the 'Error' section should only be done if
     # directed to by a developer for debugging. Incorrect changes to these
     # settings could prevent fatal programming errors from being logged.
-    Error:
+
         # See Yapeal.Log.bufferSize for full description as this setting is used
         # in the same way but for error level logging.
         bufferSize: 25
@@ -97,29 +99,23 @@ Yapeal:
         # capped no higher than 500(CRITICAL)
         threshold: 400
 
-    # Events
     Event:
-        class: Yapeal\Event\EveApiEvent
+    # Events
 
-        dispatcher: Yapeal\Event\ContainerAwareEventDispatcher
+        # Mediator for triggered event to handlers.
+        mediator: Yapeal\Event\EventMediator
 
-        # A list of event subscribers names to be added automatically during
-        # wiring.
-        # Each subscriber MUST implement `EventSubscriberInterface`.
-        # NOTE: To keep the list of subscribers from being overwelmed by all the
-        # internal subscribers they are not listed here but are added
-        # automatically during wiring.
-        # Example:
-        # subscribers:
-        #     internal: '...'
-        #     user: MyApp\MySubscriberClass1, MyApp\MySubscriberClass2
-        Subscribers:
-            user: ''
+        Factories:
 
+            eveApi: Yapeal\Event\EveApiEvent
+
+            log: Yapeal\Event\LogEvent
+
+    Log:
     # Care should be taken when making changes to the 'Log' section as mistakes
     # here could cause Yapeal not to run correctly and also have no way to
     # let the user know.
-    Log:
+
         # This setting is used in the FingersCrossedHandlier that is used by the
         # normal Monolog\ErrorHandlier.
         # How many entries should be buffered at most, beyond that the oldest
@@ -131,10 +127,11 @@ Yapeal:
         # about how this setting is used.
         channel: yapeal
 
-        # Yapeal by default uses Monolog but it can be changed to use any logger
-        # that follows PSR-3. You can find more information about PSR-3 at
-        # http://www.php-fig.org/psr/psr-3/
-        class: Monolog\Logger
+        # Yapeal by default uses Monolog with a light event wrapper but it can
+        # be changed to use any logger that follows PSR-3 and implements the
+        # EventAwareLoggerInterface. You can find more information about PSR-3
+        # at http://www.php-fig.org/psr/psr-3/
+        class: Yapeal\Log\Logger
 
         # Name of the log file to be used.
         # The default 'yapeal.log' will be found in the logDir.
@@ -162,9 +159,10 @@ Yapeal:
         # Recommended default for production WARNING or ERROR
         threshold: 300
 
+    Network:
     # Some network related settings mostly having to do with Eve API server
     # connection.
-    Network:
+
         # Used to set a custom application comment which will be added to the
         # User Agent header sent to the Eve API server.
         # Commonly this is used to include short contact information like an
@@ -211,6 +209,17 @@ Yapeal:
         # myApp/0.1 (poc@myApp.com) Yapeal/2.0 (Windows NT 6.1; PHP 5.4.29; Platform i586)
         userAgent: '{appName}/{appVersion} {appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
 
+    Sql:
+
+        sqlDir: '{Yapeal.baseDir}Sql/'
+
     Xml:
+
         class: Yapeal\Xml\EveApiXmlData
+
+        xmlDir: '{Yapeal.baseDir}Xml/'
+
+    Xsd:
+
+        xsdDir: '{Yapeal.baseDir}Xsd/'
 ...

@@ -56,6 +56,8 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     /**
      * @param ContainerInterface $dic
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws YapealDatabaseException
      * @throws YapealException
      */
@@ -152,21 +154,25 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
      *
      * @return int|null null or 0 if everything went fine, or an error code
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws YapealException
      * @throws YapealConsoleException
+     * @throws YapealDatabaseException
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->processCliOptions($input->getOptions());
         $this->wire($this->getDic());
-        $this->processSql($output);
-        return;
+        return $this->processSql($output);
     }
     /**
      * @param string          $sqlStatements
      * @param string          $fileName
      * @param OutputInterface $output
      *
+     * @throws \InvalidArgumentException
      * @throws YapealConsoleException
      * @throws YapealDatabaseException
      */
@@ -222,6 +228,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
                 );
                 throw new YapealDatabaseException($mess, 2);
             }
+            /** @noinspection DisconnectedForeachInstructionInspection */
             $output->write('.');
         }
     }

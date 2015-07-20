@@ -37,9 +37,9 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Sql\CommonSqlQueries;
 use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Sql\CommonSqlQueries;
 
 /**
  * Trait CommandToolsTrait

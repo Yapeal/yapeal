@@ -45,7 +45,7 @@ interface EventMediatorInterface extends ContainerMediatorInterface
      */
     public function triggerLogEvent(
         $eventName,
-        $level = LOGGER::DEBUG,
+        $level = Logger::DEBUG,
         $message = '',
         array $context = [],
         LogEventInterface $event = null

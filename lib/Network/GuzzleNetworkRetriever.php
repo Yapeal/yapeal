@@ -36,10 +36,8 @@ namespace Yapeal\Network;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Container\ServiceCallableInterface;
-use Yapeal\Event\ContainerAwareEventDispatcherInterface;
 use Yapeal\Event\EveApiEventInterface;
-use Yapeal\Event\EventSubscriberInterface;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
 
 /**
@@ -47,9 +45,7 @@ use Yapeal\Log\Logger;
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever implements
-    EventSubscriberInterface,
-    ServiceCallableInterface
+class GuzzleNetworkRetriever
 {
     /**
      * @param ClientInterface|null $client
@@ -76,7 +72,7 @@ class GuzzleNetworkRetriever implements
     /**
      * @inheritdoc
      */
-    public static function injectCallable(ContainerInterface &$dic)
+    public static function injectCallable(ContainerInterface $dic)
     {
         $class = __CLASS__;
         $serviceName = str_replace('\\', '.', $class);
@@ -96,16 +92,17 @@ class GuzzleNetworkRetriever implements
     {
     }
     /**
-     * @param EveApiEventInterface                   $event
-     * @param                                        $eventName
-     * @param ContainerAwareEventDispatcherInterface $yed
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
+     * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
+     * @throws \LogicException
      */
     public function eveApiRetrieve(
         EveApiEventInterface $event,
         $eventName,
-        ContainerAwareEventDispatcherInterface $yed
+        EventMediatorInterface $yem
     ) {
         $data = $event->getData();
         $mess = sprintf(
@@ -115,41 +112,31 @@ class GuzzleNetworkRetriever implements
             $data->getEveApiName(),
             __CLASS__
         );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $mess = sprintf(
             'Started network retrieve for %1$s/%2$s',
             $data->getEveApiSectionName(),
             $data->getEveApiName()
         );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         $uri = [
             '/{EveApiSectionName}/{EveApiName}.xml.aspx',
             [
-                'EveApiSectionName' => strtolower(
-                    $data->getEveApiSectionName()
-                ),
-                'EveApiName' => $data->getEveApiName()
+                'EveApiSectionName' => strtolower($data->getEveApiSectionName()),
+                'EveApiName'        => $data->getEveApiName()
             ]
         ];
         try {
             $response = $this->getClient()
-                             ->post(
-                                 $uri,
-                                 ['body' => $data->getEveApiArguments()]
-                             );
+                             ->post($uri, ['body' => $data->getEveApiArguments()]);
         } catch (RequestException $exc) {
             $mess = sprintf(
                 'Could NOT get XML data for %1$s/%2$s',
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $yed->dispatchLogEvent(
-                'Yapeal.Log.log',
-                Logger::DEBUG,
-                $mess,
-                ['exception' => $exc]
-            );
-            return $event->stopPropagation();
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess, ['exception' => $exc]);
+            return $event;
         }
         $body = (string)$response->getBody();
         if ('' === $body) {
@@ -158,7 +145,7 @@ class GuzzleNetworkRetriever implements
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         }
         $data->setEveApiXml(
             $this->addYapealProcessingInstructionToXml(
@@ -173,10 +160,9 @@ class GuzzleNetworkRetriever implements
             $data->getEveApiSectionName(),
             $data->getEveApiName()
         );
-        $yed->dispatchLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
         return $event->setData($data)
-                     ->setHandled()
-                     ->stopPropagation();
+                     ->eventHandled();
     }
     /**
      * @param ClientInterface|null $value
@@ -208,8 +194,7 @@ class GuzzleNetworkRetriever implements
         return str_replace(
             ["encoding='UTF-8'?>\r\n", "encoding='UTF-8'?>\n"],
             [
-                "encoding='UTF-8'?>\r\n<?yapeal.parameters.json " . $json
-                . "?>\r\n",
+                "encoding='UTF-8'?>\r\n<?yapeal.parameters.json " . $json . "?>\r\n",
                 "encoding='UTF-8'?>\n<?yapeal.parameters.json " . $json . "?>\n"
             ],
             $xml

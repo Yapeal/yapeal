@@ -167,6 +167,7 @@ HELP;
      * @param OutputInterface $output
      *
      * @return string[]
+     * @throws InvalidArgumentException
      * @throws YapealConsoleException
      */
     protected function getUpdateFileList(OutputInterface $output)
@@ -197,12 +198,15 @@ HELP;
     /**
      * @param OutputInterface $output
      *
+     * @throws InvalidArgumentException
+     * @throws YapealConsoleException
      * @throws YapealDatabaseException
      */
     protected function processSql(OutputInterface $output)
     {
         $this->addDatabaseProcedure($output);
         foreach ($this->getUpdateFileList($output) as $fileName) {
+            /** @noinspection DisconnectedForeachInstructionInspection */
             $latestVersion = $this->getLatestDatabaseVersion($output);
             if (!is_file($fileName)) {
                 $mess = sprintf(
@@ -234,6 +238,7 @@ HELP;
             $output->writeln($fileName);
             $this->executeSqlStatements($sqlStatements, $fileName, $output);
             $this->updateDatabaseVersion($updateVersion);
+            /** @noinspection DisconnectedForeachInstructionInspection */
             $output->writeln('');
         }
         $this->dropDatabaseProcedure($output);

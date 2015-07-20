@@ -46,7 +46,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      * @param string      $eveApiSectionName
      * @param string[]    $eveApiArguments
      * @param bool|string $eveApiXml Only allows string or false NOT true.
-     * @param int $cacheInterval
+     * @param int         $cacheInterval
      *
      * @throws InvalidArgumentException
      */

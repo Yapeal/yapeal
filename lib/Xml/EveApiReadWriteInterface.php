@@ -36,8 +36,6 @@ namespace Yapeal\Xml;
 /**
  * Interface EveApiReadWriteInterface
  */
-interface EveApiReadWriteInterface extends
-    EveApiReadInterface,
-    EveApiWriteInterface
+interface EveApiReadWriteInterface extends EveApiReadInterface, EveApiWriteInterface
 {
 }

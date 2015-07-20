@@ -28,8 +28,8 @@
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2015 Michael Cummings
- * @license http://www.gnu.org/copyleft/lesser.html GNU LGPL
- * @author Michael Cummings <mgcummings@yahoo.com>
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
+ * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Exception;
 

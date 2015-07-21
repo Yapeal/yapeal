@@ -10,8 +10,9 @@ COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
-    "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "contactName"   CHAR(50)            NOT NULL,
+    "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
+    "labelMask"     BIGINT(20) UNSIGNED NOT NULL,
     "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
@@ -100,8 +101,10 @@ CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
     "allianceID"        BIGINT(20) UNSIGNED          DEFAULT 0,
     "allianceName"      CHAR(50)                     DEFAULT '',
     "ancestry"          CHAR(24)            NOT NULL,
+    "ancestryID"        BIGINT(20) UNSIGNED NOT NULL,
     "balance"           DECIMAL(17,2)       NOT NULL,
     "bloodLine"         CHAR(24)            NOT NULL,
+    "bloodLineID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID"       BIGINT(20) UNSIGNED NOT NULL,
     "cloneJumpDate"     DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "corporationID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -131,6 +134,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactList" (
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
     "inWatchlist"   CHAR(5)             NOT NULL,
+    "labelMask"     BIGINT(20) UNSIGNED NOT NULL,
     "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )
@@ -202,6 +206,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporateContactList" (
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
     "contactTypeID" BIGINT(20) UNSIGNED DEFAULT NULL,
+    "labelMask"     BIGINT(20) UNSIGNED NOT NULL,
     "standing"      DECIMAL(5,2)        NOT NULL,
     PRIMARY KEY ("ownerID","contactID")
 )

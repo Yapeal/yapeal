@@ -28,7 +28,7 @@ Yapeal:
             stream: Monolog\Handler\StreamHandler
     Event:
         mediator: Yapeal\Event\EventMediator
-        Events:
+        Factories:
             eveApi: Yapeal\Event\EveApiEvent
             log: Yapeal\Event\LogEvent
     Log:
@@ -52,7 +52,7 @@ Yapeal:
         timeout: 10
         class: GuzzleHttp\Client
         connect_timeout: 30
-        verify: '{Yapeal.baseDir}config/eveonline.crt'
+        verify: '{Yapeal.baseDir}config/eveonline.pem'
         userAgent: '{appName}/{appVersion} {appComment} Yapeal/3.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
         Headers:
             'Accept': >
@@ -64,15 +64,11 @@ Yapeal:
             'Accept-Language': 'en-us;q=0.9,en;q=0.8,*;q=0.7'
             'Connection': 'Keep-Alive'
             'Keep-Alive': '300'
+    Sql:
+        sqlDir: '{Yapeal.baseDir}Sql/'
     Xml:
         class: Yapeal\Xml\EveApiXmlData
-        Preservers:
-            file: Yapeal\Xml\FileCachePreserver
-            group: Yapeal\Xml\GroupPreserver
-            'null': Yapeal\Xml\NullPreserver
-        Retrievers:
-            file: Yapeal\Xml\FileCacheRetriever
-            group: Yapeal\Xml\GroupRetriever
-            network: Yapeal\Network\GuzzleNetworkRetriever
-            'null': Yapeal\Xml\NullRetriever
+        xmlDir: '{Yapeal.baseDir}Xml/'
+    Xsd:
+        xsdDir: '{Yapeal.baseDir}Xsd/'
 ...

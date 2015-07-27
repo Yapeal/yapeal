@@ -39,10 +39,6 @@ namespace Yapeal\Xml;
 interface EveApiReadWriteInterface
 {
     /**
-     * @return string
-     */
-    public function __toString();
-    /**
      * Used to add item to arguments list.
      *
      * @param string $name
@@ -52,35 +48,50 @@ interface EveApiReadWriteInterface
      */
     public function addEveApiArgument($name, $value);
     /**
+     * Getter for cache interval.
+     *
      * @return int
-     * @throws LogicException
+     * @throws \LogicException
      */
     public function getCacheInterval();
     /**
+     * Getter for an existing Eve API argument.
+     *
      * @param string $name
      *
-     * @return string|null
+     * @return string
+     * @throws \DomainException Throws exception for unknown arguments.
      */
     public function getEveApiArgument($name);
     /**
+     * Getter for Eve API argument list.
+     *
      * @return string[]
      */
     public function getEveApiArguments();
     /**
+     * Getter for name of Eve API.
+     *
      * @return string
-     * @throws LogicException
+     * @throws \LogicException Throws exception if accessed before being set.
      */
     public function getEveApiName();
     /**
+     * Getter for name of Eve API section.
+     *
      * @return string
-     * @throws LogicException
+     * @throws \LogicException Throws exception if accessed before being set.
      */
     public function getEveApiSectionName();
     /**
-     * @return string|false
+     * Getter for the actual Eve API XML received.
+     *
+     * @return string|false Returns false if XML is a empty string.
      */
     public function getEveApiXml();
     /**
+     * Used to get a repeatable unique hash for any combination API name, section, and arguments.
+     *
      * @return string
      */
     public function getHash();
@@ -93,9 +104,11 @@ interface EveApiReadWriteInterface
      */
     public function hasEveApiArgument($name);
     /**
+     * Cache interval setter.
+     *
      * @param int $value Caching interval.
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setCacheInterval($value);
     /**
@@ -103,7 +116,7 @@ interface EveApiReadWriteInterface
      * server.
      *
      * Things like KeyID, vCode etc that are either required or optional for the
-     * Eve API.
+     * Eve API. See adder for example.
      *
      * Example:
      * <code>
@@ -113,28 +126,38 @@ interface EveApiReadWriteInterface
      * ...
      * </code>
      *
-     * @param array|string[] $values
+     * @param string[] $values
      *
-     * @return self
+     * @return self Fluent interface.
+     * @throws \InvalidArgumentException
+     * @uses EveApiXmlData::addEveApiArgument()
      */
     public function setEveApiArguments(array $values);
     /**
+     * Eve API name setter.
+     *
      * @param string $value
      *
-     * @return self
+     * @return self Fluent interface.
+     * @throws \InvalidArgumentException
      */
     public function setEveApiName($value);
     /**
+     * Eve API section name setter.
+     *
      * @param string $value
      *
-     * @return self
+     * @return self Fluent interface.
+     * @throws \InvalidArgumentException
      */
     public function setEveApiSectionName($value);
     /**
+     * Sets the actual Eve API XML data received.
+     *
      * @param string|bool $xml Only allows string or false NOT true.
      *
-     * @throws InvalidArgumentException
-     * @return self
+     * @return self Fluent interface.
+     * @throws \InvalidArgumentException
      */
     public function setEveApiXml($xml = false);
 }

@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Xml;
 
+use DomainException;
 use InvalidArgumentException;
 use LogicException;
 
@@ -42,42 +43,13 @@ use LogicException;
 class EveApiXmlData implements EveApiReadWriteInterface
 {
     /**
-     * @param string      $eveApiName
-     * @param string      $eveApiSectionName
-     * @param string[]    $eveApiArguments
-     * @param bool|string $eveApiXml Only allows string or false NOT true.
-     * @param int         $cacheInterval
-     *
-     * @throws InvalidArgumentException
-     */
-    public function __construct(
-        $eveApiName = '',
-        $eveApiSectionName = '',
-        array $eveApiArguments = [],
-        $eveApiXml = false,
-        $cacheInterval = 300
-    ) {
-        $this->setEveApiName($eveApiName);
-        $this->setEveApiSectionName($eveApiSectionName);
-        $this->setEveApiArguments($eveApiArguments);
-        $this->setEveApiXml($eveApiXml);
-        $this->setCacheInterval($cacheInterval);
-    }
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->eveApiXml;
-    }
-    /**
      * Used to add item to arguments list.
      *
      * @param string $name
      * @param mixed  $value
      *
      * @throws InvalidArgumentException
-     * @return self
+     * @return self Fluent interface.
      */
     public function addEveApiArgument($name, $value)
     {
@@ -89,9 +61,10 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
-     * @throws LogicException
-     * @throws InvalidArgumentException
-     * @return string|null
+     * Getter for cache interval.
+     *
+     * @return int
+     * @throws \LogicException
      */
     public function getCacheInterval()
     {
@@ -102,68 +75,76 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this->cacheInterval;
     }
     /**
+     * Getter for an existing Eve API argument.
+     *
      * @param string $name
      *
-     * @throws InvalidArgumentException
-     * @return string|null
+     * @return null|string
+     * @throws DomainException
      */
     public function getEveApiArgument($name)
     {
-        if (!is_string($name)) {
-            $mess = 'Name MUST be string but given ' . gettype($name);
-            throw new InvalidArgumentException($mess);
+        $name = (string)$name;
+        if (!array_key_exists($name, $this->eveApiArguments)) {
+            $mess = 'Unknown argument ' . $name;
+            throw new DomainException($mess);
         }
         return $this->eveApiArguments[$name];
     }
     /**
+     * Getter for Eve API argument list.
+     *
      * @return string[]
-     * @throws LogicException
      */
     public function getEveApiArguments()
     {
-        if (null === $this->eveApiArguments) {
-            $mess = 'Tried to access Eve Api arguments before it was set';
-            throw new LogicException($mess);
-        }
         return $this->eveApiArguments;
     }
     /**
-     * @throws LogicException
+     * Getter for name of Eve API.
+     *
      * @return string
+     * @throws LogicException Throws exception if accessed before being set.
      */
     public function getEveApiName()
     {
-        if (0 === strlen($this->eveApiName)) {
+        if ('' === $this->eveApiName) {
             $mess = 'Tried to access Eve Api name before it was set';
             throw new LogicException($mess);
         }
         return $this->eveApiName;
     }
     /**
-     * @throws LogicException
+     * Getter for name of Eve API section.
+     *
      * @return string
+     * @throws LogicException Throws exception if accessed before being set.
      */
     public function getEveApiSectionName()
     {
-        if (0 === strlen($this->eveApiSectionName)) {
+        if ('' === $this->eveApiSectionName) {
             $mess = 'Tried to access Eve Api section name before it was set';
             throw new LogicException($mess);
         }
         return $this->eveApiSectionName;
     }
     /**
-     * @return string|false
+     * Getter for the actual Eve API XML received.
+     *
+     * @return string|false Returns false if XML is a empty string.
      */
     public function getEveApiXml()
     {
-        if (0 === strlen($this->eveApiXml)) {
+        if ('' === $this->eveApiXml) {
             return false;
         }
         return $this->eveApiXml;
     }
     /**
-     * @throws LogicException
+     * Used to get a repeatable unique hash for any combination API name, section, and arguments.
+     *
      * @return string
+     * @throws LogicException
      */
     public function getHash()
     {
@@ -174,7 +155,22 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return hash('md5', $hash);
     }
     /**
+     * Used to check if an argument exists.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasEveApiArgument($name)
+    {
+        return array_key_exists($name, $this->eveApiArguments);
+    }
+    /**
+     * Cache interval setter.
+     *
      * @param int $value
+     *
+     * @return self Fluent interface.
      */
     public function setCacheInterval($value)
     {
@@ -186,7 +182,7 @@ class EveApiXmlData implements EveApiReadWriteInterface
      * server.
      *
      * Things like KeyID, vCode etc that are either required or optional for the
-     * Eve API. See setter for example.
+     * Eve API. See adder for example.
      *
      * Example:
      * <code>
@@ -198,8 +194,9 @@ class EveApiXmlData implements EveApiReadWriteInterface
      *
      * @param string[] $values
      *
+     * @return self Fluent interface.
      * @throws InvalidArgumentException
-     * @return self
+     * @uses EveApiXmlData::addEveApiArgument()
      */
     public function setEveApiArguments(array $values)
     {
@@ -213,71 +210,87 @@ class EveApiXmlData implements EveApiReadWriteInterface
         return $this;
     }
     /**
+     * Eve API name setter.
+     *
      * @param string $value
      *
+     * @return self Fluent interface.
      * @throws InvalidArgumentException
-     * @return self
      */
     public function setEveApiName($value)
     {
         if (!is_string($value)) {
-            $mess = 'Name MUST be string but given ' . gettype($value);
+            $mess = 'Name MUST be string but was given ' . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         $this->eveApiName = $value;
         return $this;
     }
     /**
+     * Eve API section name setter.
+     *
      * @param string $value
      *
+     * @return self Fluent interface.
      * @throws InvalidArgumentException
-     * @return self
      */
     public function setEveApiSectionName($value)
     {
         if (!is_string($value)) {
-            $mess = 'Section name MUST be string but given ' . gettype($value);
+            $mess = 'Section name MUST be string but was given ' . gettype($value);
             throw new InvalidArgumentException($mess);
         }
         $this->eveApiSectionName = $value;
         return $this;
     }
     /**
+     * Sets the actual Eve API XML data received.
+     *
      * @param string|bool $xml Only allows string or false NOT true.
      *
+     * @return self Fluent interface.
      * @throws InvalidArgumentException
-     * @return self
      */
     public function setEveApiXml($xml = false)
     {
-        if ($xml === false) {
+        if (false === $xml) {
             $xml = '';
         }
         if (!is_string($xml)) {
-            $mess = 'Xml MUST be string but given ' . gettype($xml);
+            $mess = 'Xml MUST be string but was given ' . gettype($xml);
             throw new InvalidArgumentException($mess);
         }
         $this->eveApiXml = $xml;
         return $this;
     }
     /**
+     * Holds expected/calculated cache interval for the current API.
+     *
      * @type int $cacheInterval
      */
-    protected $cacheInterval;
+    protected $cacheInterval = 300;
     /**
+     * List of API arguments.
+     *
      * @type string[] $eveApiArguments
      */
-    protected $eveApiArguments;
+    protected $eveApiArguments = [];
     /**
+     * Holds Eve API name.
+     *
      * @type string $eveApiName
      */
     protected $eveApiName;
     /**
+     * Holds Eve API section name.
+     *
      * @type string $eveApiSectionName
      */
     protected $eveApiSectionName;
     /**
+     * Holds the actual Eve API XML data.
+     *
      * @type string $eveApiXml
      */
-    protected $eveApiXml;
+    protected $eveApiXml = '';
 }

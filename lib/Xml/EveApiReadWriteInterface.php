@@ -36,6 +36,105 @@ namespace Yapeal\Xml;
 /**
  * Interface EveApiReadWriteInterface
  */
-interface EveApiReadWriteInterface extends EveApiReadInterface, EveApiWriteInterface
+interface EveApiReadWriteInterface
 {
+    /**
+     * @return string
+     */
+    public function __toString();
+    /**
+     * Used to add item to arguments list.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self Fluent interface.
+     */
+    public function addEveApiArgument($name, $value);
+    /**
+     * @return int
+     * @throws LogicException
+     */
+    public function getCacheInterval();
+    /**
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public function getEveApiArgument($name);
+    /**
+     * @return string[]
+     */
+    public function getEveApiArguments();
+    /**
+     * @return string
+     * @throws LogicException
+     */
+    public function getEveApiName();
+    /**
+     * @return string
+     * @throws LogicException
+     */
+    public function getEveApiSectionName();
+    /**
+     * @return string|false
+     */
+    public function getEveApiXml();
+    /**
+     * @return string
+     */
+    public function getHash();
+    /**
+     * Used to check if an argument exists.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasEveApiArgument($name);
+    /**
+     * @param int $value Caching interval.
+     *
+     * @return self
+     */
+    public function setCacheInterval($value);
+    /**
+     * Used to set a list of arguments used when forming request to Eve Api
+     * server.
+     *
+     * Things like KeyID, vCode etc that are either required or optional for the
+     * Eve API.
+     *
+     * Example:
+     * <code>
+     * <?php
+     * $args = array( 'KeyID' => '1156', 'vCode' => 'abc123');
+     * $api->setEveApiArguments($args);
+     * ...
+     * </code>
+     *
+     * @param array|string[] $values
+     *
+     * @return self
+     */
+    public function setEveApiArguments(array $values);
+    /**
+     * @param string $value
+     *
+     * @return self
+     */
+    public function setEveApiName($value);
+    /**
+     * @param string $value
+     *
+     * @return self
+     */
+    public function setEveApiSectionName($value);
+    /**
+     * @param string|bool $xml Only allows string or false NOT true.
+     *
+     * @throws InvalidArgumentException
+     * @return self
+     */
+    public function setEveApiXml($xml = false);
 }

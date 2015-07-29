@@ -47,7 +47,7 @@ trait EveApiToolsTrait
     /**
      * @param CommonSqlQueries $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setCsq(CommonSqlQueries $value)
     {
@@ -62,16 +62,6 @@ trait EveApiToolsTrait
     public function setPdo(PDO $value)
     {
         $this->pdo = $value;
-        return $this;
-    }
-    /**
-     * @param EventMediatorInterface $value
-     *
-     * @return EveApiToolsTrait
-     */
-    public function setYem(EventMediatorInterface $value)
-    {
-        $this->yem = $value;
         return $this;
     }
     /**
@@ -99,18 +89,6 @@ trait EveApiToolsTrait
         return $this->pdo;
     }
     /**
-     * @return EventMediatorInterface
-     * @throws LogicException
-     */
-    protected function getYem()
-    {
-        if (!$this->yem instanceof ContainerMediatorInterface) {
-            $mess = 'Tried to use yem before it was set';
-            throw new LogicException($mess);
-        }
-        return $this->yem;
-    }
-    /**
      * @type CommonSqlQueries $csq
      */
     protected $csq;
@@ -118,8 +96,4 @@ trait EveApiToolsTrait
      * @type PDO $pdo
      */
     protected $pdo;
-    /**
-     * @type EventMediatorInterface $yem
-     */
-    protected $yem;
 }

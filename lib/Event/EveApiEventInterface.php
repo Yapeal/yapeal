@@ -34,7 +34,6 @@
 namespace Yapeal\Event;
 
 use EventMediator\EventInterface;
-use LogicException;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
@@ -43,15 +42,18 @@ use Yapeal\Xml\EveApiReadWriteInterface;
 interface EveApiEventInterface extends EventInterface
 {
     /**
+     * Get data object.
+     *
      * @return EveApiReadWriteInterface
-     * @throws LogicException Throws exception if code tries to access data
-     *                        before it is set.
+     * @throws \LogicException Throws exception if code tries to access data before it is set.
      */
     public function getData();
     /**
-     * @param EveApiReadWriteInterface|null $value
+     * Set data object.
      *
-     * @return self
+     * @param EveApiReadWriteInterface $value
+     *
+     * @return self Fluent interface.
      */
-    public function setData(EveApiReadWriteInterface &$value);
+    public function setData(EveApiReadWriteInterface $value);
 }

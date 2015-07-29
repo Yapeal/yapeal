@@ -6,8 +6,7 @@
     <xs:complexType name="rowType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute type="eveDTType" name="trainingEnd"
-                              use="required"/>
+                <xs:attribute type="eveDTType" name="trainingEnd" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -17,12 +16,10 @@
             <xs:element type="xs:unsignedLong" name="logonCount"/>
             <xs:element type="xs:unsignedLong" name="logonMinutes"/>
             <xs:element type="eveNEDTType" name="paidUntil"/>
-            <xs:element name="multiCharacterTraining" maxOccurs="1"
-                        minOccurs="0">
+            <xs:element name="multiCharacterTraining" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="rowType" name="row"
-                                    maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element type="rowType" name="row" maxOccurs="unbounded" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

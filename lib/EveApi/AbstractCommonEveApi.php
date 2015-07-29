@@ -38,6 +38,7 @@ use LogicException;
 use PDO;
 use PDOException;
 use SimpleXMLElement;
+use Yapeal\Event\EveApiEventEmitterTrait;
 use Yapeal\Log\Logger;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
@@ -46,7 +47,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  */
 abstract class AbstractCommonEveApi
 {
-    use EveApiToolsTrait, FilePathNormalizerTrait;
+    use EveApiToolsTrait, EveApiEventEmitterTrait, FilePathNormalizerTrait;
     /**
      * @param string $apiName
      * @param string $sectionName
@@ -58,7 +59,7 @@ abstract class AbstractCommonEveApi
     protected function cacheNotExpired($apiName, $sectionName, $ownerID = '0')
     {
         $mess = sprintf(
-            'Checking if cache expired on table %1$s%2$s for ownerID = %3$s',
+            'Checking if cache expired on %1$s/%2$s for ownerID = %3$s',
             $sectionName,
             $apiName,
             $ownerID
@@ -113,32 +114,15 @@ abstract class AbstractCommonEveApi
                          ->query($sql);
             $lock = (bool)$stmt->fetchColumn();
             if (false !== $lock) {
-                $mess = sprintf(
-                    'Got lock for %1$s/%2$s',
-                    $data->getEveApiSectionName(),
-                    $data->getEveApiName()
-                );
+                $mess = sprintf('Got lock for %1$s/%2$s', $data->getEveApiSectionName(), $data->getEveApiName());
                 $this->getYem()
-                     ->triggerLogEvent(
-                         'Yapeal.Log.log',
-                         Logger::DEBUG,
-                         $mess
-                     );
+                     ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
             }
             return $lock;
         } catch (PDOException $exc) {
-            $mess = sprintf(
-                'Could NOT get lock for %1$s/%2$s',
-                $data->getEveApiSectionName(),
-                $data->getEveApiName()
-            );
+            $mess = sprintf('Could NOT get lock for %1$s/%2$s', $data->getEveApiSectionName(), $data->getEveApiName());
             $this->getYem()
-                 ->triggerLogEvent(
-                     'Yapeal.Log.log',
-                     Logger::WARNING,
-                     $mess,
-                     ['exception' => $exc]
-                 );
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess, ['exception' => $exc]);
             return false;
         }
     }
@@ -148,10 +132,8 @@ abstract class AbstractCommonEveApi
      *
      * @throws LogicException
      */
-    protected function updateCachedUntil(
-        EveApiReadWriteInterface $data,
-        $ownerID
-    ) {
+    protected function updateCachedUntil(EveApiReadWriteInterface $data, $ownerID)
+    {
         if (false === $data->getEveApiXml()) {
             return;
         }

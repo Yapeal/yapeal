@@ -39,21 +39,22 @@ namespace Yapeal\Configuration;
 class ConsoleWiring extends Wiring
 {
     /**
-     * @return self
+     * @return self Fluent interface.
+     * @throws \InvalidArgumentException
      */
     public function wireXml()
     {
+        if (empty($this->dic['Yapeal.Xml.Data'])) {
+            $this->dic['Yapeal.Xml.Data'] = $this->dic->factory(
+                function ($dic) {
+                    return new $dic['Yapeal.Xml.class']();
+                }
+            );
+        }
         if (empty($this->dic['Yapeal.Xml.Preserver'])) {
             $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
                 return new $dic['Yapeal.Xml.Preservers.file'](
                     $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']
-                );
-            };
-        }
-        if (empty($this->dic['Yapeal.Xml.Retriever'])) {
-            $this->dic['Yapeal.Xml.Retriever'] = function ($dic) {
-                return new $dic['Yapeal.Xml.Retrievers.network'](
-                    $dic['Yapeal.Network.Client']
                 );
             };
         }

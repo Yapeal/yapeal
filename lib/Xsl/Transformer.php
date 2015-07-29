@@ -37,48 +37,47 @@ use DOMDocument;
 use SimpleXMLElement;
 use tidy;
 use XSLTProcessor;
-use Yapeal\Container\ContainerInterface;
-use Yapeal\Container\ServiceCallableInterface;
+use Yapeal\Event\EveApiEventEmitterTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventMediatorInterface;
+use Yapeal\FileSystem\RelativeFileSearchTrait;
 use Yapeal\Log\Logger;
 
 /**
  * Class Transformer
  */
-class Transformer implements ServiceCallableInterface
+class Transformer implements TransformerInterface
 {
+    use EveApiEventEmitterTrait, RelativeFileSearchTrait;
     /**
-     * @inheritdoc
+     * Transformer Constructor.
      *
-     * @api
+     * @param string|null $xslDir
      */
-    public static function getSubscribedEvents()
+    public function __construct($xslDir = null)
     {
-        $priorityBase = -PHP_INT_MAX;
-        $events = [
-            'Yapeal.EveApi.transform' => [
-                'eveApiTransform',
-                $priorityBase
-            ]
-        ];
-        return $events;
+        $this->setXslDir($xslDir);
     }
     /**
-     * @inheritdoc
+     * Getter for $xslDir.
+     *
+     * @return string
      */
-    public static function injectCallable(ContainerInterface $dic)
+    public function getXslDir()
     {
-        $class = __CLASS__;
-        $serviceName = str_replace('\\', '.', $class);
-        $dic[$serviceName] = function () use ($class) {
-            /**
-             * @type Transformer $callable
-             */
-            $callable = new $class();
-            return $callable;
-        };
-        return $serviceName;
+        return $this->xslDir;
+    }
+    /**
+     * Fluent interface setter for $xslDir.
+     *
+     * @param string $xslDir
+     *
+     * @return self Fluent interface.
+     */
+    public function setXslDir($xslDir)
+    {
+        $this->xslDir = $xslDir;
+        return $this;
     }
     /**
      * @param EveApiEventInterface   $event
@@ -90,83 +89,90 @@ class Transformer implements ServiceCallableInterface
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function eveApiTransform(
+    public function transformEveApi(
         EveApiEventInterface $event,
         $eventName,
         EventMediatorInterface $yem
     ) {
+        $this->setYem($yem);
         $data = $event->getData();
         $mess = sprintf(
-            'Received %1$s event for %2$s/%3$s in %4$s',
+            'Received %1$s event of %2$s/%3$s in %4$s',
             $eventName,
-            $data->getEveApiSectionName(),
+            ucfirst($data->getEveApiSectionName()),
             $data->getEveApiName(),
             __CLASS__
         );
-        $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        $fileNames = sprintf(
-            '%3$s/%1$s/%2$s.xsl,%3$s/%2$s.xsl,%3$s/%1$s/%1$s.xsl,%3$s/common.xsl',
-            $data->getEveApiSectionName(),
-            $data->getEveApiName(),
-            str_replace('\\', '/', __DIR__)
-        );
-        foreach (explode(',', $fileNames) as $fileName) {
-            if (!is_readable($fileName) || !is_file($fileName)) {
-                continue;
-            }
-            $mess = 'Using Xsl file ' . $fileName;
-            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            $xslt = new XSLTProcessor();
-            $oldErrors = libxml_use_internal_errors(true);
-            libxml_clear_errors();
-            $dom = new DOMDocument();
-            $dom->load($fileName);
-            $xslt->importStylesheet($dom);
-            $xml = $xslt->transformToXml(
-                new SimpleXMLElement($data->getEveApiXml())
-            );
-            if (false === $xml) {
-                foreach (libxml_get_errors() as $error) {
-                    $yem->triggerLogEvent(
-                        'Yapeal.Log.log',
-                        Logger::DEBUG,
-                        $error->message
-                    );
-                }
-                libxml_clear_errors();
-                libxml_use_internal_errors($oldErrors);
-                return $event->eventHandled();
-            }
-            libxml_clear_errors();
-            libxml_use_internal_errors($oldErrors);
-            $config = [
-                'indent'        => true,
-                'indent-spaces' => 4,
-                'output-xml'    => true,
-                'input-xml'     => true,
-                'wrap'          => '1000'
-            ];
-            // Tidy
-            $tidy = new tidy();
-            $data->setEveApiXml($tidy->repairString($xml, $config, 'utf8'));
-            $event->setData($data);
+        if ($data->hasEveApiArgument('keyID')) {
+            $mess .= ' for keyID = ' . $data->getEveApiArgument('keyID');
+        }
+        $this->getYem()
+             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+        $fileName = $this->setRelativeBaseDir(__DIR__)
+                         ->findEveApiFile($data->getEveApiSectionName(), $data->getEveApiName(), 'xsl');
+        if ('' === $fileName) {
+            return $event;
+        }
+        $xml = $this->performTransform($fileName, $data->getEveApiXml());
+        if (false === $xml) {
             $mess = sprintf(
-                'Finished %1$s event for %2$s/%3$s',
-                $eventName,
+                'Failed to transform xml of %1$s/%2$s',
                 $data->getEveApiSectionName(),
                 $data->getEveApiName()
             );
-            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            $event->eventHandled();
+            if ($data->hasEveApiArgument('keyID')) {
+                $mess .= ' for keyID = ' . $data->getEveApiArgument('keyID');
+            }
+            $yem->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+            return $event;
         }
-        if (!$event->hasBeenHandled()) {
-            $mess = sprintf(
-                'Failed to transform data for %1$s/%2$s',
-                $data->getEveApiSectionName(),
-                $data->getEveApiName()
-            );
-            $yem->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        }
-        return $event;
+        $xml = (new tidy())->repairString($xml, $this->tidyConfig, 'utf8');
+        file_put_contents(dirname(dirname(str_replace('\\', '/', __DIR__))) . '/cache/test.xml', $xml);
+        return $event->setData($data->setEveApiXml($xml))
+                     ->eventHandled();
     }
+    /**
+     * @param string $fileName
+     * @param string $xml
+     *
+     * @return string|false
+     * @throws \LogicException
+     */
+    protected function performTransform($fileName, $xml)
+    {
+        $xslt = new XSLTProcessor();
+        $oldErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $dom = new DOMDocument();
+        $dom->load($fileName);
+        $xslt->importStylesheet($dom);
+        $xml = $xslt->transformToXml(new SimpleXMLElement($xml));
+        if (false === $xml) {
+            foreach (libxml_get_errors() as $error) {
+                $this->getYem()
+                     ->triggerLogEvent('Yapeal.Log.log', Logger::NOTICE, $error->message);
+            }
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($oldErrors);
+        return $xml;
+    }
+    /**
+     * Holds tidy config settings.
+     *
+     * @type array $tidyConfig
+     */
+    protected $tidyConfig = [
+        'indent'        => true,
+        'indent-spaces' => 4,
+        'output-xml'    => true,
+        'input-xml'     => true,
+        'wrap'          => '1000'
+    ];
+    /**
+     * Holds base directory where Eve API XSL files can be found.
+     *
+     * @type string $xslDir
+     */
+    protected $xslDir;
 }

@@ -31,7 +31,7 @@ interface LogEventInterface extends EventInterface
     /**
      * @param array $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setContext(array $value);
     /**
@@ -43,7 +43,7 @@ interface LogEventInterface extends EventInterface
     /**
      * @param string $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setMessage($value);
 }

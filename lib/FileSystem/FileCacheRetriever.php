@@ -75,7 +75,7 @@ class FileCacheRetriever implements EveApiRetrieverInterface, LoggerAwareInterfa
     /**
      * @param EveApiReadWriteInterface $data
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function retrieveEveApi(EveApiReadWriteInterface &$data)
     {

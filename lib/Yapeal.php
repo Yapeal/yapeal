@@ -137,7 +137,7 @@ class Yapeal implements WiringInterface
     /**
      * @param ContainerInterface $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setDic(ContainerInterface $value)
     {
@@ -160,7 +160,7 @@ class Yapeal implements WiringInterface
      * @param EveApiReadWriteInterface $data
      * @param EventMediatorInterface   $yed
      *
-     * @return self
+     * @return self Fluent interface.
      * @throws \LogicException
      */
     protected function emitEvents(

@@ -49,7 +49,7 @@ trait CommandToolsTrait
     /**
      * @param CommonSqlQueries $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setCsq(CommonSqlQueries $value)
     {
@@ -60,7 +60,7 @@ trait CommandToolsTrait
      * @param string $value
      *
      * @throws InvalidArgumentException
-     * @return self
+     * @return self Fluent interface.
      */
     public function setCwd($value)
     {
@@ -74,7 +74,7 @@ trait CommandToolsTrait
     /**
      * @param ContainerInterface $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setDic(ContainerInterface $value)
     {
@@ -84,7 +84,7 @@ trait CommandToolsTrait
     /**
      * @param PDO $value
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function setPdo(PDO $value)
     {

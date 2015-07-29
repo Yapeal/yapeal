@@ -46,6 +46,7 @@ use Yapeal\Configuration\WiringInterface;
 use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
 use Yapeal\Exception\YapealConsoleException;
+use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiPreserverInterface;
 use Yapeal\Xml\EveApiReadWriteInterface;
@@ -81,29 +82,11 @@ class EveApiRetriever extends Command implements WiringInterface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws YapealException
+     * @throws YapealDatabaseException
      */
     public function wire(ContainerInterface $dic)
     {
-        if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $this->getFpn()
-                                      ->normalizePath($this->getCwd());
-        }
-        $path = $this->getFpn()
-                     ->normalizePath(dirname(dirname(dirname(__DIR__))));
-        if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $path;
-        }
-        if (empty($dic['Yapeal.vendorParentDir'])) {
-            $vendorPos = strpos($path, 'vendor/');
-            if (false !== $vendorPos) {
-                $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
-            }
-        }
-        (new ConsoleWiring($dic))->wireConfig()
-                                 ->wireError()
-                                 ->wireLog()
-                                 ->wireNetwork()
-                                 ->wireXml();
+        (new ConsoleWiring($dic))->wireAll();
     }
     /**
      * Configures the current command.
@@ -188,7 +171,7 @@ EOF;
         $data = $data->setEveApiName($input->getArgument('api_name'))
                      ->setEveApiSectionName($input->getArgument('section_name'))
                      ->setEveApiArguments($posts);
-        $retriever = $this->getDic()['Yapeal.Xml.Retriever'];
+        $retriever = $this->getDic()['Yapeal.Network.Retriever'];
         /**
          * @type EveApiRetrieverInterface $retriever
          */

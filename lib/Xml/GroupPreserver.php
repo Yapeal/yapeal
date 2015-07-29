@@ -53,7 +53,7 @@ class GroupPreserver implements EveApiPreserverInterface, LoggerAwareInterface
     /**
      * @param EveApiReadInterface $data
      *
-     * @return self
+     * @return self Fluent interface.
      */
     public function preserveEveApi(EveApiReadInterface $data)
     {

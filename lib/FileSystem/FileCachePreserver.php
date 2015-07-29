@@ -158,7 +158,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
      * @param string|null $value
      *
      * @throws \InvalidArgumentException
-     * @return self
+     * @return self Fluent interface.
      */
     public function setCachePath($value = null)
     {
@@ -247,7 +247,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
     /**
      * @param $cacheFile
      *
-     * @return self
+     * @return self Fluent interface.
      * @throws YapealException
      */
     protected function prepareConnection($cacheFile)
@@ -272,7 +272,7 @@ class FileCachePreserver implements EventSubscriberInterface, ServiceCallableInt
      * @param string $xml
      * @param string $cacheFile
      *
-     * @return self
+     * @return self Fluent interface.
      * @throws YapealException
      */
     protected function writeXmlData($xml, $cacheFile)

@@ -7,6 +7,14 @@ CREATE TABLE "{database}"."{table_prefix}corpAccountBalance" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}corpAllianceContactLabels" (
+    "ownerID" BIGINT(20) UNSIGNED NOT NULL,
+    "labelID" BIGINT(20) UNSIGNED NOT NULL,
+    "name"    CHAR(255)           NOT NULL,
+    PRIMARY KEY ("ownerID","labelID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}corpAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -136,6 +144,14 @@ CREATE TABLE "{database}"."{table_prefix}corpContracts" (
     "type"           CHAR(15)               NOT NULL,
     "volume"         DECIMAL(20,4) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","contractID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}corpCorporateContactLabels" (
+    "ownerID" BIGINT(20) UNSIGNED NOT NULL,
+    "labelID" BIGINT(20) UNSIGNED NOT NULL,
+    "name"    CHAR(255)           NOT NULL,
+    PRIMARY KEY ("ownerID","labelID")
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;

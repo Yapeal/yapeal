@@ -7,6 +7,14 @@ CREATE TABLE "{database}"."{table_prefix}charAccountBalance" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}charAllianceContactLabels" (
+    "ownerID" BIGINT(20) UNSIGNED NOT NULL,
+    "labelID" BIGINT(20) UNSIGNED NOT NULL,
+    "name"    CHAR(255)           NOT NULL,
+    PRIMARY KEY ("ownerID","labelID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -128,6 +136,14 @@ CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}charContactLabels" (
+    "ownerID" BIGINT(20) UNSIGNED NOT NULL,
+    "labelID" BIGINT(20) UNSIGNED NOT NULL,
+    "name"    CHAR(255)           NOT NULL,
+    PRIMARY KEY ("ownerID","labelID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
 CREATE TABLE "{database}"."{table_prefix}charContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -198,6 +214,14 @@ CREATE TABLE "{database}"."{table_prefix}charContractBids" (
     "contractID" BIGINT(20) UNSIGNED NOT NULL,
     "dateBid"    DATETIME            NOT NULL,
     PRIMARY KEY ("contractID","bidID")
+)
+ENGINE = { engine}
+COLLATE utf8_unicode_ci;
+CREATE TABLE "{database}"."{table_prefix}charCorporateContactLabels" (
+    "ownerID" BIGINT(20) UNSIGNED NOT NULL,
+    "labelID" BIGINT(20) UNSIGNED NOT NULL,
+    "name"    CHAR(255)           NOT NULL,
+    PRIMARY KEY ("ownerID","labelID")
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;

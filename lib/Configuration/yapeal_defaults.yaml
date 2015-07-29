@@ -70,5 +70,9 @@ Yapeal:
         class: Yapeal\Xml\EveApiXmlData
         xmlDir: '{Yapeal.baseDir}Xml/'
     Xsd:
+        class: Yapeal\Xsd\Validator
         xsdDir: '{Yapeal.baseDir}Xsd/'
+    Xsl:
+        class: Yapeal\Xsl\Transformer
+        xslDir: '{Yapeal.baseDir}Xsl/'
 ...

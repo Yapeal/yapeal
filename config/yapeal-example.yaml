@@ -53,8 +53,6 @@ Yapeal:
         # (Optional) Only needed if using http connection.
         # port: ''
 
-        sharedSql: Yapeal\Sql\CommonSqlQueries
-
         # Prefix to add to all database table names.
         # This default to an empty string and will have no effect on the table
         # names in Yapeal.
@@ -102,15 +100,6 @@ Yapeal:
     Event:
     # Events
 
-        # Mediator for triggered event to handlers.
-        mediator: Yapeal\Event\EventMediator
-
-        Factories:
-
-            eveApi: Yapeal\Event\EveApiEvent
-
-            log: Yapeal\Event\LogEvent
-
     Log:
     # Care should be taken when making changes to the 'Log' section as mistakes
     # here could cause Yapeal not to run correctly and also have no way to
@@ -137,14 +126,6 @@ Yapeal:
         # The default 'yapeal.log' will be found in the logDir.
         # For example: /where/installed/yapeal/log/yapeal.log
         fileName: yapeal.log
-
-        Handlers:
-
-            stream: Monolog\Handler\StreamHandler
-
-            fingersCrossed: Monolog\Handler\FingersCrossedHandler
-
-            group: Monolog\Handler\GroupHandler
 
         # Directory where log file will be stored.
         # The default setting of '{Yapeal.baseDir}log/' uses a log/ directory
@@ -208,18 +189,4 @@ Yapeal:
         # Example result:
         # myApp/0.1 (poc@myApp.com) Yapeal/2.0 (Windows NT 6.1; PHP 5.4.29; Platform i586)
         userAgent: '{appName}/{appVersion} {appComment} Yapeal/2.0 ({osName} {osRelease}; PHP {phpVersion}; Platform {machineType})'
-
-    Sql:
-
-        sqlDir: '{Yapeal.baseDir}Sql/'
-
-    Xml:
-
-        class: Yapeal\Xml\EveApiXmlData
-
-        xmlDir: '{Yapeal.baseDir}Xml/'
-
-    Xsd:
-
-        xsdDir: '{Yapeal.baseDir}Xsd/'
 ...

@@ -3,7 +3,7 @@
 /**
  * Contains Yapeal Console.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal

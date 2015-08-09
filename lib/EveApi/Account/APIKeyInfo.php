@@ -2,7 +2,7 @@
 /**
  * Contains APIKeyInfo class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
@@ -33,21 +33,23 @@
  */
 namespace Yapeal\EveApi\Account;
 
+use PDOException;
+use SimpleXMLIterator;
 use Yapeal\EveApi\EveApiNameTrait;
-use Yapeal\EveApi\EveSectionNameTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
+use Yapeal\Log\MessageBuilderTrait;
 
 /**
  * Class APIKeyInfo
  */
 class APIKeyInfo extends AccountSection
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use EveApiNameTrait, MessageBuilderTrait;
     /**
-     * @param EveApiEventInterface   $event
-     * @param string                 $eventName
+     * @param EveApiEventInterface $event
+     * @param string $eventName
      * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
@@ -55,35 +57,123 @@ class APIKeyInfo extends AccountSection
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function eveApiPreserve(
+    public function preserveEveApi(
         EveApiEventInterface $event,
         $eventName,
         EventMediatorInterface $yem
     ) {
         $this->setYem($yem);
-        if ($event->hasBeenHandled()) {
-            $mess = 'Received already handled event ' . $eventName;
-            $this->getYem()
-                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
-            return $event;
-        }
         $data = $event->getData();
-        $mess = sprintf(
-            'Received %1$s event for %2$s/%3$s in %4$s',
-            $eventName,
-            $data->getEveApiSectionName(),
-            $data->getEveApiName(),
-            __CLASS__
-        );
+        $xml = $data->getEveApiXml();
+        $ownerID = $data->getEveApiArgument('KeyID');
         $this->getYem()
-             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-        $fileName = sprintf(
-            '%1$s/cache/%2$s/%3$s.xml',
-            dirname(dirname(dirname(__DIR__))),
-            $data->getEveApiSectionName(),
-            $data->getEveApiName()
+             ->triggerLogEvent(
+                 'Yapeal.Log.log',
+                 Logger::DEBUG,
+                 $this->getReceivedEventMessage($data, $eventName, __CLASS__)
+             );
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToAPIKeyInfo($xml, $ownerID)
+                 ->preserveToCharacters($xml)
+                 ->preserveToKeyBridge($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($this->getSectionName()),
+                $this->getApiName(),
+                $ownerID
+            );
+            $this->getYem()->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess, ['exception' => $exc]);
+             $this->getPdo()
+                  ->rollBack();
+            return $event;
+         }
+        return $event->setHandledSufficiently();
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self
+     */
+    protected function preserveToAPIKeyInfo(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = [
+            'keyID' => $ownerID,
+            'accessMask' => null,
+            'expires' => '2038-01-19 03:14:07',
+            'type' => null
+        ];
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'accountAPIKeyInfo',
+            '//key'
         );
-        file_put_contents($fileName, $data->getEveApiXml());
-        return $event;
+        return $this;
+    }
+    /**
+     * @param string $xml
+     *
+     * @return self
+     */
+    protected function preserveToCharacters(
+        $xml
+    ) {
+        $columnDefaults = [
+            'characterID' => null,
+            'characterName' => null,
+            'corporationID' => null,
+            'corporationName' => null,
+            'allianceID' => null,
+            'allianceName' => null,
+            'factionID' => null,
+            'factionName' => null
+        ];
+        $this->attributePreserveData(
+            $xml,
+            $columnDefaults,
+            'accountCharacters'
+        );
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @throws \LogicException
+     * @return self
+     */
+    protected function preserveToKeyBridge(
+        $xml,
+        $ownerID
+    ) {
+        $chars = (new SimpleXMLIterator($xml))->xpath('//row');
+        if (0 === count($chars)) {
+            return $this;
+        }
+        $rows = [];
+        foreach ($chars as $aRow) {
+            $rows[] = $ownerID;
+            $rows[] = $aRow['characterID'];
+        }
+        $sql = $this->getCsq()
+                    ->getUpsert(
+                        'accountKeyBridge',
+                        ['keyID', 'characterID'],
+                        count($chars)
+                    );
+        $this->getLogger()
+             ->info($sql);
+        $stmt = $this->getPdo()
+                     ->prepare($sql);
+        $stmt->execute($rows);
+        return $this;
     }
 }

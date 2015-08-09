@@ -3,6 +3,9 @@ Yapeal:
     Cache:
         cacheDir: '{Yapeal.baseDir}cache/'
         fileSystemMode: none
+        Handlers:
+            preserver: Yapeal\FileSystem\CachePreserver
+            retriever: Yapeal\FileSystem\CacheRetriever
     Database:
         class: PDO
         database: yapeal

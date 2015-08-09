@@ -2,7 +2,7 @@
 /**
  * Contains AbstractDatabaseCommon class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
@@ -50,39 +50,9 @@ use Yapeal\Exception\YapealException;
 /**
  * Class AbstractDatabaseCommon
  */
-abstract class AbstractDatabaseCommon extends Command implements WiringInterface
+abstract class AbstractDatabaseCommon extends Command
 {
     use CommandToolsTrait, FilePathNormalizerTrait;
-    /**
-     * @param ContainerInterface $dic
-     *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws YapealDatabaseException
-     * @throws YapealException
-     */
-    public function wire(ContainerInterface $dic)
-    {
-        if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $this->getFpn()
-                                      ->normalizePath($this->getCwd());
-        }
-        $path = $this->getFpn()
-                     ->normalizePath(dirname(dirname(dirname(__DIR__))));
-        if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $path;
-        }
-        if (empty($dic['Yapeal.vendorParentDir'])) {
-            $vendorPos = strpos($path, 'vendor/');
-            if (false !== $vendorPos) {
-                $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
-            }
-        }
-        (new ConsoleWiring($dic))->wireConfig()
-                                 ->wireError()
-                                 ->wireLog()
-                                 ->wireDatabase();
-    }
     /**
      * @param OutputInterface $output
      */
@@ -164,7 +134,7 @@ abstract class AbstractDatabaseCommon extends Command implements WiringInterface
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->processCliOptions($input->getOptions());
-        $this->wire($this->getDic());
+        (new ConsoleWiring($this->getDic()))->wireAll();
         return $this->processSql($output);
     }
     /**

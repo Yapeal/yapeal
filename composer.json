@@ -83,6 +83,7 @@
         "dragonrun1/phpspec": "2.1.*@dev",
         "erusev/parsedown": "<1.6",
         "mikey179/vfsStream": "~1.4",
+        "phploc/phploc": "<2.3",
         "phpspec/nyan-formatters": "1.0.1",
         "satooshi/php-coveralls": "dev-master"
     }

@@ -2,9 +2,33 @@
 /**
  * Contains EveApiEventEmitterTrait Trait.
  *
- * PHP version 5.4
+ * PHP version 5.5
+ *
+ * LICENSE:
+ * This file is part of Yet Another Php Eve Api Library also know as Yapeal
+ * which can be used to access the Eve Online API data and place it into a
+ * database.
+ * Copyright (C) 2015 Michael Cummings
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * You should be able to find a copy of this license in the LICENSE.md file. A
+ * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
  * @copyright 2015 Michael Cummings
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
 namespace Yapeal\Event;
@@ -12,6 +36,7 @@ namespace Yapeal\Event;
 use EventMediator\ContainerMediatorInterface;
 use LogicException;
 use Yapeal\Log\Logger;
+use Yapeal\Log\MessageBuilderTrait;
 use Yapeal\Xml\EveApiReadWriteInterface;
 
 /**
@@ -19,12 +44,23 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  */
 trait EveApiEventEmitterTrait
 {
+    use MessageBuilderTrait;
+    /**
+     * @param EventMediatorInterface $value
+     *
+     * @return self Fluent interface.
+     */
+    public function setYem(EventMediatorInterface $value)
+    {
+        $this->yem = $value;
+        return $this;
+    }
     /**
      * @param EveApiReadWriteInterface $data
      * @param string                   $eventSuffix
      *
      * @return bool
-     * @throws LogicException
+     * @throws \LogicException
      */
     protected function emitEvents(EveApiReadWriteInterface $data, $eventSuffix)
     {
@@ -42,48 +78,37 @@ trait EveApiEventEmitterTrait
         );
         $event = null;
         foreach ($eventNames as $eventName) {
-            $mess = 'Emitting event ' . $eventName;
+            $this->getYem()
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $this->getEmittingEventMessage($data, $eventName));
             if (!$this->getYem()
                       ->hasListeners($eventName)
             ) {
                 continue;
             }
-            $this->getYem()
-                 ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            $event = $this->getYem()
-                          ->triggerEveApiEvent($eventName, $data);
-            $data = $event->getData();
-            if ($event->hasBeenHandled()) {
-                $mess = 'Handled event ' . $eventName;
+            $event =
                 $this->getYem()
-                     ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
+                     ->triggerEveApiEvent($eventName, $data);
+            $data = $event->getData();
+            if ($event->isSufficientlyHandled()) {
+                $this->getYem()
+                     ->triggerLogEvent(
+                         'Yapeal.Log.log',
+                         Logger::INFO,
+                         $this->getSufficientlyHandledEventMessage($data, $eventName)
+                     );
                 break;
             }
         }
-        if (null === $event || !$event->hasBeenHandled()) {
-            $mess
-                = sprintf(
-                    'Nothing reported handling %4$s event of Eve API %1$s/%2$s for ownerID = %3$s',
-                    lcfirst($data->getEveApiSectionName()),
-                    $data->getEveApiName(),
-                    $data->getEveApiArgument('keyID'),
-                    $eventSuffix
-                );
+        if (null === $event || !$event->isSufficientlyHandled()) {
             $this->getYem()
-                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent(
+                     'Yapeal.Log.log',
+                     Logger::WARNING,
+                     $this->getNonHandledEventMessage($data, $eventSuffix)
+                 );
             return false;
         }
         return true;
-    }
-    /**
-     * @param EventMediatorInterface $value
-     *
-     * @return self Fluent interface.
-     */
-    public function setYem(EventMediatorInterface $value)
-    {
-        $this->yem = $value;
-        return $this;
     }
     /**
      * @return EventMediatorInterface

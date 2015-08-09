@@ -2,7 +2,7 @@
 /**
  * Contains GuzzleNetworkRetriever class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
@@ -54,12 +54,6 @@ class GuzzleNetworkRetriever
     public function __construct(Client $client = null)
     {
         $this->setClient($client);
-    }
-    /**
-     *
-     */
-    public function __destruct()
-    {
     }
     /**
      * @param EveApiEventInterface   $event
@@ -129,7 +123,6 @@ class GuzzleNetworkRetriever
                 $data->getEveApiArguments()
             )
         );
-        $this->__destruct();
         $mess = sprintf(
             'Finished %1$s event of %2$s/%3$s',
             $eventName,

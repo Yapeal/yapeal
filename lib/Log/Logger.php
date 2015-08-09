@@ -2,7 +2,7 @@
 /**
  * Contains Logger class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * @copyright 2015 Michael Cummings
  * @author    Michael Cummings <mgcummings@yahoo.com>

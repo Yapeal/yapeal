@@ -2,7 +2,7 @@
 /**
  * Contains ConsoleWiring class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
@@ -33,6 +33,9 @@
  */
 namespace Yapeal\Configuration;
 
+use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealException;
+
 /**
  * Class ConsoleWiring
  */
@@ -40,9 +43,27 @@ class ConsoleWiring extends Wiring
 {
     /**
      * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws YapealException
+     * @throws YapealDatabaseException
+     */
+    public function wireAll()
+    {
+        $this->wireConfig()
+             ->wireError()
+             ->wireEvent()
+             ->wireLog()
+             ->wireXml()
+             ->wireCache()
+             ->wireNetwork();
+        return $this;
+    }
+    /**
+     * @return self Fluent interface.
      * @throws \InvalidArgumentException
      */
-    public function wireXml()
+    protected function wireXml()
     {
         if (empty($this->dic['Yapeal.Xml.Data'])) {
             $this->dic['Yapeal.Xml.Data'] = $this->dic->factory(

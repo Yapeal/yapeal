@@ -2,7 +2,7 @@
 /**
  * LogEventInterface.php
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * @since  20150104 14:09
  * @author Michael Cummings <mgcummings@yahoo.com>

@@ -2,7 +2,7 @@
 /**
  * EventMediatorInterface.php
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * @since  20150304 14:03
  * @author Michael Cummings <mgcummings@yahoo.com>

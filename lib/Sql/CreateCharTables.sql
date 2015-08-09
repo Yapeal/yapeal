@@ -1,4 +1,4 @@
-CREATE TABLE "{database}"."{table_prefix}charAccountBalance" (
+CREATE TABLE "yapeal"."{table_prefix}charAccountBalance" (
     "ownerID"    BIGINT(20) UNSIGNED  NOT NULL,
     "accountID"  BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey" SMALLINT(4) UNSIGNED NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE "{database}"."{table_prefix}charAccountBalance" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charAllianceContactLabels" (
+CREATE TABLE "yapeal"."{table_prefix}charAllianceContactLabels" (
     "ownerID" BIGINT(20) UNSIGNED NOT NULL,
     "labelID" BIGINT(20) UNSIGNED NOT NULL,
     "name"    CHAR(255)           NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "{database}"."{table_prefix}charAllianceContactLabels" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
+CREATE TABLE "yapeal"."{table_prefix}charAllianceContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE "{database}"."{table_prefix}charAllianceContactList" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charAssetList" (
+CREATE TABLE "yapeal"."{table_prefix}charAssetList" (
     "ownerID"     BIGINT(20) UNSIGNED  NOT NULL,
     "flag"        SMALLINT(5) UNSIGNED NOT NULL,
     "itemID"      BIGINT(20) UNSIGNED  NOT NULL,
@@ -42,9 +42,9 @@ CREATE TABLE "{database}"."{table_prefix}charAssetList" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}charAssetList" ADD INDEX "charAssetList1"  ("lft");
-ALTER TABLE "{database}"."{table_prefix}charAssetList" ADD INDEX "charAssetList2"  ("locationID");
-CREATE TABLE "{database}"."{table_prefix}charAttackers" (
+ALTER TABLE "yapeal"."{table_prefix}charAssetList" ADD INDEX "charAssetList1"  ("lft");
+ALTER TABLE "yapeal"."{table_prefix}charAssetList" ADD INDEX "charAssetList2"  ("locationID");
+CREATE TABLE "yapeal"."{table_prefix}charAttackers" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50)                     DEFAULT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE "{database}"."{table_prefix}charAttackers" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charAttributes" (
+CREATE TABLE "yapeal"."{table_prefix}charAttributes" (
     "charisma"     TINYINT(2) UNSIGNED NOT NULL,
     "intelligence" TINYINT(2) UNSIGNED NOT NULL,
     "memory"       TINYINT(2) UNSIGNED NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE "{database}"."{table_prefix}charAttributes" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charBlueprints" (
+CREATE TABLE "yapeal"."{table_prefix}charBlueprints" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
     "itemID"             BIGINT(20) UNSIGNED NOT NULL,
     "locationID"         BIGINT(20) UNSIGNED NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE "{database}"."{table_prefix}charBlueprints" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCalendarEventAttendees" (
+CREATE TABLE "yapeal"."{table_prefix}charCalendarEventAttendees" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "characterID"   BIGINT(20) UNSIGNED NOT NULL,
     "characterName" CHAR(50)            NOT NULL,
@@ -98,14 +98,14 @@ CREATE TABLE "{database}"."{table_prefix}charCalendarEventAttendees" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCertificates" (
+CREATE TABLE "yapeal"."{table_prefix}charCertificates" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "certificateID" BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY ("ownerID","certificateID")
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
+CREATE TABLE "yapeal"."{table_prefix}charCharacterSheet" (
     "allianceID"        BIGINT(20) UNSIGNED          DEFAULT 0,
     "allianceName"      CHAR(50)                     DEFAULT '',
     "ancestry"          CHAR(24)            NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE "{database}"."{table_prefix}charCharacterSheet" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContactLabels" (
+CREATE TABLE "yapeal"."{table_prefix}charContactLabels" (
     "ownerID" BIGINT(20) UNSIGNED NOT NULL,
     "labelID" BIGINT(20) UNSIGNED NOT NULL,
     "name"    CHAR(255)           NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactLabels" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContactList" (
+CREATE TABLE "yapeal"."{table_prefix}charContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactList" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContactNotifications" (
+CREATE TABLE "yapeal"."{table_prefix}charContactNotifications" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED NOT NULL,
     "senderID"       BIGINT(20) UNSIGNED NOT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE "{database}"."{table_prefix}charContactNotifications" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContracts" (
+CREATE TABLE "yapeal"."{table_prefix}charContracts" (
     "acceptorID"     BIGINT(20) UNSIGNED    NOT NULL,
     "assigneeID"     BIGINT(20) UNSIGNED    NOT NULL,
     "availability"   CHAR(8)                NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE "{database}"."{table_prefix}charContracts" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContractItems" (
+CREATE TABLE "yapeal"."{table_prefix}charContractItems" (
     "contractID"  BIGINT(20) UNSIGNED NOT NULL,
     "included"    TINYINT(1) UNSIGNED NOT NULL,
     "quantity"    BIGINT(20) UNSIGNED NOT NULL,
@@ -207,7 +207,7 @@ CREATE TABLE "{database}"."{table_prefix}charContractItems" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charContractBids" (
+CREATE TABLE "yapeal"."{table_prefix}charContractBids" (
     "amount"     DECIMAL(17,2)       NOT NULL,
     "bidID"      BIGINT(20) UNSIGNED NOT NULL,
     "bidderID"   BIGINT(20) UNSIGNED NOT NULL,
@@ -217,7 +217,7 @@ CREATE TABLE "{database}"."{table_prefix}charContractBids" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporateContactLabels" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporateContactLabels" (
     "ownerID" BIGINT(20) UNSIGNED NOT NULL,
     "labelID" BIGINT(20) UNSIGNED NOT NULL,
     "name"    CHAR(255)           NOT NULL,
@@ -225,7 +225,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporateContactLabels" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporateContactList" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporateContactList" (
     "ownerID"       BIGINT(20) UNSIGNED NOT NULL,
     "contactID"     BIGINT(20) UNSIGNED NOT NULL,
     "contactName"   CHAR(50)            NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporateContactList" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporationRoles" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporationRoles" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "roleID"   BIGINT(20) UNSIGNED NOT NULL,
     "roleName" CHAR(50)            NOT NULL,
@@ -244,7 +244,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRoles" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporationRolesAtBase" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "roleID"   BIGINT(20) UNSIGNED NOT NULL,
     "roleName" CHAR(50)            NOT NULL,
@@ -252,7 +252,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtBase" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporationRolesAtHQ" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "roleID"   BIGINT(20) UNSIGNED NOT NULL,
     "roleName" CHAR(50)            NOT NULL,
@@ -260,7 +260,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtHQ" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtOther" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporationRolesAtOther" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "roleID"   BIGINT(20) UNSIGNED NOT NULL,
     "roleName" CHAR(50)            NOT NULL,
@@ -268,7 +268,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationRolesAtOther" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charCorporationTitles" (
+CREATE TABLE "yapeal"."{table_prefix}charCorporationTitles" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
     "titleID"   BIGINT(20) UNSIGNED NOT NULL,
     "titleName" CHAR(50)            NOT NULL,
@@ -276,7 +276,7 @@ CREATE TABLE "{database}"."{table_prefix}charCorporationTitles" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charFacWarStats" (
+CREATE TABLE "yapeal"."{table_prefix}charFacWarStats" (
     "ownerID"                BIGINT(20) UNSIGNED NOT NULL,
     "factionID"              BIGINT(20) UNSIGNED NOT NULL,
     "factionName"            CHAR(50)            NOT NULL,
@@ -293,8 +293,8 @@ CREATE TABLE "{database}"."{table_prefix}charFacWarStats" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-ALTER TABLE "{database}"."{table_prefix}charFacWarStats" ADD INDEX "charFacWarStats1"  ("factionID");
-CREATE TABLE "{database}"."{table_prefix}charImplants" (
+ALTER TABLE "yapeal"."{table_prefix}charFacWarStats" ADD INDEX "charFacWarStats1"  ("factionID");
+CREATE TABLE "yapeal"."{table_prefix}charImplants" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "typeID"   BIGINT(20) UNSIGNED NOT NULL,
     "typeName" CHAR(100)           NOT NULL,
@@ -302,7 +302,7 @@ CREATE TABLE "{database}"."{table_prefix}charImplants" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
+CREATE TABLE "yapeal"."{table_prefix}charIndustryJobs" (
     "ownerID"              BIGINT(20) UNSIGNED NOT NULL,
     "activityID"           TINYINT(2) UNSIGNED NOT NULL,
     "blueprintID"          BIGINT(20) UNSIGNED NOT NULL,
@@ -336,7 +336,7 @@ CREATE TABLE "{database}"."{table_prefix}charIndustryJobs" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charItems" (
+CREATE TABLE "yapeal"."{table_prefix}charItems" (
     "flag"         SMALLINT(5) UNSIGNED NOT NULL,
     "killID"       BIGINT(20) UNSIGNED  NOT NULL,
     "lft"          BIGINT(20) UNSIGNED  NOT NULL,
@@ -350,7 +350,7 @@ CREATE TABLE "{database}"."{table_prefix}charItems" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charJumpCloneImplants" (
+CREATE TABLE "yapeal"."{table_prefix}charJumpCloneImplants" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "typeID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -359,7 +359,7 @@ CREATE TABLE "{database}"."{table_prefix}charJumpCloneImplants" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charJumpClones" (
+CREATE TABLE "yapeal"."{table_prefix}charJumpClones" (
     "jumpCloneID" BIGINT(20) UNSIGNED NOT NULL,
     "locationID"  BIGINT(20) UNSIGNED NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
@@ -369,7 +369,7 @@ CREATE TABLE "{database}"."{table_prefix}charJumpClones" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charKillMails" (
+CREATE TABLE "yapeal"."{table_prefix}charKillMails" (
     "killID"        BIGINT(20) UNSIGNED NOT NULL,
     "killTime"      DATETIME            NOT NULL,
     "moonID"        BIGINT(20) UNSIGNED NOT NULL,
@@ -378,7 +378,7 @@ CREATE TABLE "{database}"."{table_prefix}charKillMails" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charMailBodies" (
+CREATE TABLE "yapeal"."{table_prefix}charMailBodies" (
     "ownerID"   BIGINT(20) UNSIGNED NOT NULL,
     "body"      TEXT,
     "messageID" BIGINT(20) UNSIGNED NOT NULL,
@@ -386,7 +386,7 @@ CREATE TABLE "{database}"."{table_prefix}charMailBodies" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charMailingLists" (
+CREATE TABLE "yapeal"."{table_prefix}charMailingLists" (
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "displayName" CHAR(50)            NOT NULL,
     "listID"      BIGINT(20) UNSIGNED NOT NULL,
@@ -394,7 +394,7 @@ CREATE TABLE "{database}"."{table_prefix}charMailingLists" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charMailMessages" (
+CREATE TABLE "yapeal"."{table_prefix}charMailMessages" (
     "ownerID"            BIGINT(20) UNSIGNED NOT NULL,
     "messageID"          BIGINT(20) UNSIGNED NOT NULL,
     "senderID"           BIGINT(20) UNSIGNED NOT NULL,
@@ -409,7 +409,7 @@ CREATE TABLE "{database}"."{table_prefix}charMailMessages" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charMarketOrders" (
+CREATE TABLE "yapeal"."{table_prefix}charMarketOrders" (
     "ownerID"      BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"   SMALLINT(4) UNSIGNED NOT NULL,
     "bid"          TINYINT(1)           NOT NULL,
@@ -430,7 +430,7 @@ CREATE TABLE "{database}"."{table_prefix}charMarketOrders" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charNotifications" (
+CREATE TABLE "yapeal"."{table_prefix}charNotifications" (
     "ownerID"        BIGINT(20) UNSIGNED  NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED  NOT NULL,
     "read"           TINYINT(1)           NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE "{database}"."{table_prefix}charNotifications" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charNotificationTexts" (
+CREATE TABLE "yapeal"."{table_prefix}charNotificationTexts" (
     "ownerID"        BIGINT(20) UNSIGNED NOT NULL,
     "notificationID" BIGINT(20) UNSIGNED NOT NULL,
     "text"           TEXT,
@@ -450,7 +450,7 @@ CREATE TABLE "{database}"."{table_prefix}charNotificationTexts" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charResearch" (
+CREATE TABLE "yapeal"."{table_prefix}charResearch" (
     "ownerID"           BIGINT(20) UNSIGNED NOT NULL,
     "agentID"           BIGINT(20) UNSIGNED NOT NULL,
     "pointsPerDay"      DOUBLE              NOT NULL,
@@ -461,7 +461,7 @@ CREATE TABLE "{database}"."{table_prefix}charResearch" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charSkillInTraining" (
+CREATE TABLE "yapeal"."{table_prefix}charSkillInTraining" (
     "currentTQTime"         DATETIME                     DEFAULT NULL,
     "offset"                TINYINT(2)          NOT NULL,
     "ownerID"               BIGINT(20) UNSIGNED NOT NULL,
@@ -476,7 +476,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkillInTraining" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charSkillQueue" (
+CREATE TABLE "yapeal"."{table_prefix}charSkillQueue" (
     "endSP"         BIGINT(20) UNSIGNED NOT NULL,
     "endTime"       DATETIME            NOT NULL DEFAULT '1970-01-01 00:00:01',
     "level"         TINYINT(1) UNSIGNED NOT NULL,
@@ -489,7 +489,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkillQueue" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charSkills" (
+CREATE TABLE "yapeal"."{table_prefix}charSkills" (
     "level"       TINYINT(1) UNSIGNED NOT NULL,
     "ownerID"     BIGINT(20) UNSIGNED NOT NULL,
     "skillpoints" BIGINT(20) UNSIGNED NOT NULL,
@@ -499,7 +499,7 @@ CREATE TABLE "{database}"."{table_prefix}charSkills" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charStandingsFromAgents" (
+CREATE TABLE "yapeal"."{table_prefix}charStandingsFromAgents" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -508,7 +508,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromAgents" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charStandingsFromFactions" (
+CREATE TABLE "yapeal"."{table_prefix}charStandingsFromFactions" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -517,7 +517,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromFactions" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charStandingsFromNPCCorporations" (
+CREATE TABLE "yapeal"."{table_prefix}charStandingsFromNPCCorporations" (
     "ownerID"  BIGINT(20) UNSIGNED NOT NULL,
     "fromID"   BIGINT(20) UNSIGNED NOT NULL,
     "fromName" CHAR(50)            NOT NULL,
@@ -526,7 +526,7 @@ CREATE TABLE "{database}"."{table_prefix}charStandingsFromNPCCorporations" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charVictim" (
+CREATE TABLE "yapeal"."{table_prefix}charVictim" (
     "killID"          BIGINT(20) UNSIGNED NOT NULL,
     "allianceID"      BIGINT(20) UNSIGNED NOT NULL,
     "allianceName"    CHAR(50) DEFAULT NULL,
@@ -542,7 +542,7 @@ CREATE TABLE "{database}"."{table_prefix}charVictim" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charWalletJournal" (
+CREATE TABLE "yapeal"."{table_prefix}charWalletJournal" (
     "ownerID"       BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"    SMALLINT(4) UNSIGNED NOT NULL,
     "amount"        DECIMAL(17,2)        NOT NULL,
@@ -565,7 +565,7 @@ CREATE TABLE "{database}"."{table_prefix}charWalletJournal" (
 )
 ENGINE = { engine}
 COLLATE utf8_unicode_ci;
-CREATE TABLE "{database}"."{table_prefix}charWalletTransactions" (
+CREATE TABLE "yapeal"."{table_prefix}charWalletTransactions" (
     "ownerID"              BIGINT(20) UNSIGNED  NOT NULL,
     "accountKey"           SMALLINT(4) UNSIGNED NOT NULL,
     "clientID"             BIGINT(20) UNSIGNED           DEFAULT NULL,

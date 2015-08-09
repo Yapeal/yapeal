@@ -2,7 +2,7 @@
 /**
  * Contains EveApiEvent class.
  *
- * PHP version 5.4
+ * PHP version 5.5
  *
  * LICENSE:
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
@@ -62,7 +62,38 @@ class EveApiEvent extends Event implements EveApiEventInterface
         return $this;
     }
     /**
+     * Set to indicate event was handled sufficiently while still allows additional listener(s) to have a chance to
+     * handle the event as well.
+     *
+     * @return self Fluent interface.
+     */
+    public function setHandledSufficiently()
+    {
+        $this->handledSufficiently = true;
+        return $this;
+    }
+    /**
+     * Used to check if event was handled sufficiently by any listener(s).
+     *
+     * This should return true when a listener uses setHandledSufficiently() and/or eventHandled() methods for the
+     * event.
+     *
+     * @return bool
+     */
+    public function isSufficientlyHandled()
+    {
+        return ($this->handledSufficiently || $this->handled);
+    }
+    /**
+     * Holds the data instance.
+     *
      * @type EveApiReadWriteInterface $data
      */
     protected $data;
+    /**
+     * Holds the handled sufficiently state.
+     *
+     * @type bool $handledSufficiently
+     */
+    protected $handledSufficiently = false;
 }

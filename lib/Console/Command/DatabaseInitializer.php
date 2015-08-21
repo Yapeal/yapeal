@@ -33,6 +33,7 @@
  */
 namespace Yapeal\Console\Command;
 
+use DirectoryIterator;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -98,18 +99,7 @@ HELP;
      */
     protected function getCreateFileList(OutputInterface $output)
     {
-        $fileNames = [
-            'Database',
-            'AccountTables',
-            'ApiTables',
-            'CharTables',
-            'CorpTables',
-            'EveTables',
-            'MapTables',
-            'ServerTables',
-            'UtilTables'
-        ];
-        $fileList = [];
+        $sections = ['Database', 'Account', 'Api', 'Char', 'Corp', 'Eve', 'Map', 'Server', 'Util'];
         $path = $this->getDic()['Yapeal.Database.sqlDir'];
         if (!is_readable($path)) {
             $mess = sprintf(
@@ -119,26 +109,29 @@ HELP;
             $output->writeln($mess);
             return [];
         }
-        foreach ($fileNames as $fileName) {
-            $file = $path . 'Create' . $fileName . '.sql';
-            if (!is_file($file)) {
-                $mess = sprintf(
-                    '<info>Could NOT find SQL file %1$s</info>',
-                    $file
-                );
-                $output->writeln($mess);
-                continue;
+        $fileList = [];
+        foreach ($sections as $dir) {
+            foreach (new DirectoryIterator($path . $dir . '/') as $fileInfo) {
+                if ($fileInfo->isDot() || $fileInfo->isDir()) {
+                    continue;
+                };
+                if (!$fileInfo->isFile()
+                    || 'sql' !== $fileInfo->getExtension()
+                    || 'Create' !== substr($fileInfo->getBasename(), 0, 6)
+                ) {
+                    continue;
+                }
+                $fileList[] =
+                    $this->getFpn()
+                         ->normalizeFile($fileInfo->getPathname());
             }
-            $fileList[] = $file;
         }
         $fileNames = [
             $path . 'CustomTables.sql',
-            $this->getDic()['Yapeal.baseDir']
-            . 'config/CustomTables.sql'
+            $this->getDic()['Yapeal.baseDir'] . 'config/CustomTables.sql'
         ];
         if (!empty($this->getDic()['Yapeal.vendorParentDir'])) {
-            $fileNames[] = $this->getDic()['Yapeal.vendorParentDir']
-                           . 'config/CustomTables.sql';
+            $fileNames[] = $this->getDic()['Yapeal.vendorParentDir'] . 'config/CustomTables.sql';
         }
         foreach ($fileNames as $fileName) {
             if (!is_readable($fileName) || !is_file($fileName)) {

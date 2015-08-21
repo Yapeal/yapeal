@@ -80,11 +80,6 @@ trait EveApiEventEmitterTrait
         foreach ($eventNames as $eventName) {
             $this->getYem()
                  ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $this->getEmittingEventMessage($data, $eventName));
-            if (!$this->getYem()
-                      ->hasListeners($eventName)
-            ) {
-                continue;
-            }
             $event =
                 $this->getYem()
                      ->triggerEveApiEvent($eventName, $data);
@@ -96,7 +91,7 @@ trait EveApiEventEmitterTrait
                          Logger::INFO,
                          $this->getSufficientlyHandledEventMessage($data, $eventName)
                      );
-                break;
+                continue;
             }
         }
         if (null === $event || !$event->isSufficientlyHandled()) {

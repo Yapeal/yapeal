@@ -40,9 +40,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yapeal\Configuration\ConsoleWiring;
-use Yapeal\Configuration\WiringInterface;
 use Yapeal\Console\CommandToolsTrait;
-use Yapeal\Container\ContainerInterface;
 use Yapeal\Exception\YapealConsoleException;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
@@ -209,28 +207,27 @@ abstract class AbstractDatabaseCommon extends Command
      * @throws YapealConsoleException
      *
      */
-    protected function processCliOptions(
-        array $options
-    ) {
+    protected function processCliOptions(array $options)
+    {
         $base = 'Yapeal.Database.';
-        foreach ([
-                     'class',
-                     'database',
-                     'hostName',
-                     'password',
-                     'platform',
-                     'tablePrefix',
-                     'userName'
-                 ] as $option) {
+        foreach (
+            [
+                'class',
+                'database',
+                'hostName',
+                'password',
+                'platform',
+                'tablePrefix',
+                'userName'
+            ] as $option
+        ) {
             if (!empty($options[$option])) {
                 $this->getDic()[$base . $option] = $options[$option];
             }
         }
         if (!empty($options['configFile'])) {
-            $this->getDic()['Yapeal.Config.configDir']
-                = dirname($options['configFile']);
-            $this->getDic()['Yapeal.Config.fileName']
-                = basename($options['configFile']);
+            $this->getDic()['Yapeal.Config.configDir'] = dirname($options['configFile']);
+            $this->getDic()['Yapeal.Config.fileName'] = basename($options['configFile']);
         }
         return $this;
     }

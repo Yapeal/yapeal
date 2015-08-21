@@ -40,8 +40,7 @@ use PDOStatement;
 use Yapeal\Configuration\Wiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Container\ContainerInterface;
-use Yapeal\Event\EveApiEventInterface;
-use Yapeal\Event\EventMediatorInterface;
+use Yapeal\Event\EveApiEventEmitterTrait;
 use Yapeal\Exception\YapealDatabaseException;
 use Yapeal\Exception\YapealException;
 use Yapeal\Log\Logger;
@@ -53,7 +52,7 @@ use Yapeal\Xml\EveApiReadWriteInterface;
  */
 class Yapeal implements WiringInterface
 {
-    use FilePathNormalizerTrait;
+    use EveApiEventEmitterTrait, FilePathNormalizerTrait;
     /**
      * @param ContainerInterface $dic
      *
@@ -79,18 +78,17 @@ class Yapeal implements WiringInterface
     public function autoMagic()
     {
         $dic = $this->getDic();
-        /**
-         * @type EventMediatorInterface $yem
-         */
-        $yem = $dic['Yapeal.Event.EventMediator'];
+        $this->setYem($dic['Yapeal.Event.EventMediator']);
         $mess = 'Let the magic begin!';
-        $yem->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
+        $this->getYem()
+             ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $mess);
         /**
          * @type CommonSqlQueries $csq
          */
         $csq = $dic['Yapeal.Database.CommonQueries'];
         $sql = $csq->getActiveApis();
-        $yem->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
+        $this->getYem()
+             ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
         try {
             /**
              * @type PDO $pdo
@@ -103,26 +101,23 @@ class Yapeal implements WiringInterface
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
             $mess = 'Could not access utilEveApi table';
-            $yem->triggerLogEvent(
-                'Yapeal.Log.log',
-                Logger::INFO,
-                $mess,
-                ['exception' => $exc]
-            );
+            $this->getYem()
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $mess, ['exception' => $exc]);
             return 1;
         }
         // Always check APIKeyInfo.
         array_unshift(
             $result,
             [
-                'apiName'     => 'APIKeyInfo',
-                'interval'    => '300',
+                'apiName' => 'APIKeyInfo',
+                'interval' => '300',
                 'sectionName' => 'Account'
             ]
         );
         foreach ($result as $record) {
             /**
              * Get new Data instance from factory.
+             *
              * @type EveApiReadWriteInterface $data
              */
             /** @noinspection DisconnectedForeachInstructionInspection */
@@ -130,7 +125,7 @@ class Yapeal implements WiringInterface
             $data->setEveApiName($record['apiName'])
                  ->setEveApiSectionName($record['sectionName'])
                  ->setCacheInterval($record['interval']);
-            $this->emitEvents($data, $yem);
+            $this->emitEvents($data, 'start');
         }
         return 0;
     }
@@ -155,43 +150,6 @@ class Yapeal implements WiringInterface
     public function wire(ContainerInterface $dic)
     {
         (new Wiring($dic))->wireAll();
-    }
-    /**
-     * @param EveApiReadWriteInterface $data
-     * @param EventMediatorInterface   $yed
-     *
-     * @return self Fluent interface.
-     * @throws \LogicException
-     */
-    protected function emitEvents(
-        EveApiReadWriteInterface $data,
-        EventMediatorInterface $yed
-    ) {
-        // EveApi.Section.Api.start, EveApi.Api.start,
-        // EveApi.Section.start, EveApi.start
-        $eventNames = sprintf(
-            '%3$s.%1$s.%2$s.start,%3$s.%2$s.start,%3$s.%1$s.start,%3$s.start',
-            ucfirst($data->getEveApiSectionName()),
-            $data->getEveApiName(),
-            'Yapeal.EveApi'
-        );
-        foreach (explode(',', $eventNames) as $eventName) {
-            /**
-             * @type EveApiEventInterface $event
-             */
-            $event = $yed->triggerEveApiEvent($eventName, $data);
-            $data = $event->getData();
-            if ($event->hasBeenHandled()) {
-                return $this;
-            }
-        }
-        $mess = sprintf(
-            'Nothing handled Eve API start event for %1$s/%2$s',
-            $data->getEveApiSectionName(),
-            $data->getEveApiName()
-        );
-        $yed->triggerLogEvent('Yapeal.Log.log', Logger::NOTICE, $mess);
-        return $this;
     }
     /**
      * @return array

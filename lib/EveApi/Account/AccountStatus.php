@@ -12,8 +12,7 @@ namespace Yapeal\EveApi\Account;
 use LogicException;
 use PDO;
 use PDOException;
-use Yapeal\EveApi\EveApiNameTrait;
-use Yapeal\EveApi\EveSectionNameTrait;
+use Yapeal\Sql\PreserverTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
@@ -23,7 +22,7 @@ use Yapeal\Log\Logger;
  */
 class AccountStatus extends AccountSection
 {
-    use EveApiNameTrait, EveSectionNameTrait;
+    use PreserverTrait;
     /**
      * @param EveApiEventInterface   $event
      * @param string                 $eventName
@@ -40,47 +39,53 @@ class AccountStatus extends AccountSection
         EventMediatorInterface $yem
     ) {
         $this->setYem($yem);
-        if ($event->hasBeenHandled()) {
-            $mess = 'Received already handled event ' . $eventName;
+        $data = $event->getData();
+        $xml = $data->getEveApiXml();
+        $ownerID = $data->getEveApiArgument('keyID');
+        $this->getYem()
+             ->triggerLogEvent(
+                 'Yapeal.Log.log',
+                 Logger::DEBUG,
+                 $this->getReceivedEventMessage($data, $eventName, __CLASS__)
+             );
+        try {
+            $this->getPdo()
+                 ->beginTransaction();
+            $this->preserveToAccountStatus($xml, $ownerID)
+                 ->preserveToMultiCharacterTraining($xml, $ownerID)
+                 ->preserveToOffers($xml, $ownerID);
+            $this->getPdo()
+                 ->commit();
+        } catch (PDOException $exc) {
+            $mess = sprintf(
+                'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
+                strtolower($data->getEveApiSectionName()),
+                $data->getEveApiName(),
+                $ownerID
+            );
             $this->getYem()
-                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess);
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess, ['exception' => $exc]);
+            $this->getPdo()
+                 ->rollBack();
             return $event;
         }
-        $data = $event->getData();
-        $mess = sprintf(
-            'Received %1$s event of %2$s/%3$s in %4$s',
-            $eventName,
-            ucfirst($data->getEveApiSectionName()),
-            $data->getEveApiName(),
-            __CLASS__
-        );
-        if ($data->hasEveApiArgument('keyID')) {
-            $mess .= ' for keyID = ' . $data->getEveApiArgument('keyID');
-        }
-        $this->getYem()
-             ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-//        $fileName = sprintf(
-//            '%1$s/cache/%2$s/%3$s.xml',
-//            dirname(dirname(dirname(__DIR__))),
-//            $data->getEveApiSectionName(),
-//            $data->getEveApiName()
-//        );
-//        file_put_contents($fileName, $data->getEveApiXml());
-        return $event;
+        return $event->setHandledSufficiently();
     }
     /**
-     * @throws LogicException
      * @return array
+     * @throws LogicException
      */
     protected function getActive()
     {
-        $sql = $this->getCsq()
-                    ->getActiveRegisteredAccountStatus();
+        $sql =
+            $this->getCsq()
+                 ->getActiveRegisteredAccountStatus();
         $this->getYem()
              ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $sql);
         try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
+            $stmt =
+                $this->getPdo()
+                     ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
             $mess = 'Could NOT select from utilRegisteredKeys';
@@ -89,7 +94,86 @@ class AccountStatus extends AccountSection
             $mess = 'Database error message was ' . $exc->getMessage();
             $this->getYem()
                  ->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mess);
-            return [];
         }
+        return [];
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    protected function preserveToAccountStatus(
+        $xml,
+        $ownerID
+    ) {
+        $columnDefaults = [
+            'keyID' => $ownerID,
+            'createDate' => null,
+            'logonCount' => null,
+            'logonMinutes' => null,
+            'paidUntil' => null
+        ];
+        $this->valuesPreserveData($xml, $columnDefaults, 'accountAccountStatus');
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    protected function preserveToMultiCharacterTraining($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'keyID' => $ownerID,
+            'trainingEnd' => null
+        ];
+        $tableName = 'accountMultiCharacterTraining';
+        $sql =
+            $this->getCsq()
+                 ->getDeleteFromTableWithKeyID($tableName, $ownerID);
+        $this->getYem()
+             ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData($xml, $columnDefaults, $tableName, '//multiCharacterTraining/row');
+        return $this;
+    }
+    /**
+     * @param string $xml
+     * @param string $ownerID
+     *
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    protected function preserveToOffers($xml, $ownerID)
+    {
+        $columnDefaults = [
+            'keyID' => $ownerID,
+            'offerID' => null,
+            'offeredDate' => null,
+            'from' => null,
+            'to' => null,
+            'ISK' => null
+        ];
+        $tableName = 'accountOffers';
+        $sql =
+            $this->getCsq()
+                 ->getDeleteFromTableWithKeyID($tableName, $ownerID);
+        $this->getYem()
+             ->triggerLogEvent('Yapeal.Log.log', Logger::INFO, $sql);
+        $this->getPdo()
+             ->exec($sql);
+        $this->attributePreserveData($xml, $columnDefaults, $tableName, '//Offers/row');
+        return $this;
     }
 }

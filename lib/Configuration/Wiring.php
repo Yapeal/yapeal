@@ -391,7 +391,7 @@ class Wiring
                 }
                 $events = [
                     $service . '.start' => [
-                        'eveApiStart',
+                        'startEveApi',
                         'last'
                     ]
                 ];
@@ -400,8 +400,6 @@ class Wiring
                 }
                 $mediator->addServiceSubscriberByEventList($service, $events);
             }
-            //$mediator->triggerLogEvent('Yapeal.Log.log', Logger::DEBUG, $mediator->getListeners());
-            print_r($mediator->getServiceListeners());
         }
         return $this;
     }
@@ -552,15 +550,6 @@ class Wiring
                 return new $dic['Yapeal.Xml.class']();
             });
         }
-        if (empty($this->dic['Yapeal.Xml.Preserver'])) {
-            $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
-                if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
-                    return new $dic['Yapeal.Xml.Preservers.file']($dic['Yapeal.Log.Logger'],
-                        $dic['Yapeal.Cache.cacheDir']);
-                }
-                return new $dic['Yapeal.Xml.Preservers.null']();
-            };
-        }
         return $this;
     }
     /**
@@ -585,6 +574,12 @@ class Wiring
             ['Yapeal.EveApi.transform' => ['transformEveApi', 'last']]);
         return $this;
     }
+    /**
+     * Wire Xsd section.
+     *
+     * @return self Fluent interface.
+     * @throws InvalidArgumentException
+     */
     protected function wireXsd()
     {
         $dic = $this->dic;

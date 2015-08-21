@@ -35,6 +35,7 @@ namespace Yapeal\Console\Command;
 
 use FilePathNormalizer\FilePathNormalizerTrait;
 use SimpleXMLElement;
+use SimpleXMLIterator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,7 +44,10 @@ use Yapeal\Configuration\ConsoleWiring;
 use Yapeal\Configuration\WiringInterface;
 use Yapeal\Console\CommandToolsTrait;
 use Yapeal\Container\ContainerInterface;
+use Yapeal\Event\EveApiEventEmitterTrait;
+use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Exception\YapealDatabaseException;
+use Yapeal\Exception\YapealException;
 use Yapeal\Xml\EveApiReadWriteInterface;
 use Yapeal\Xml\EveApiXmlData;
 
@@ -52,7 +56,7 @@ use Yapeal\Xml\EveApiXmlData;
  */
 class RowsetEveApiCreator extends Command implements WiringInterface
 {
-    use CommandToolsTrait, FilePathNormalizerTrait;
+    use CommandToolsTrait, EveApiEventEmitterTrait, FilePathNormalizerTrait;
     /**
      * @param string|null        $name
      * @param string             $cwd
@@ -74,34 +78,19 @@ class RowsetEveApiCreator extends Command implements WiringInterface
     /**
      * @param ContainerInterface $dic
      *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws YapealException
      * @throws YapealDatabaseException
      */
     public function wire(ContainerInterface $dic)
     {
-        if (empty($dic['Yapeal.cwd'])) {
-            $dic['Yapeal.cwd'] = $this->getFpn()
-                                      ->normalizePath($this->getCwd());
-        }
-        $path = $this->getFpn()
-                     ->normalizePath(dirname(dirname(dirname(__DIR__))));
-        if (empty($dic['Yapeal.baseDir'])) {
-            $dic['Yapeal.baseDir'] = $path;
-        }
-        if (empty($dic['Yapeal.vendorParentDir'])) {
-            $vendorPos = strpos($path, 'vendor/');
-            if (false !== $vendorPos) {
-                $dic['Yapeal.vendorParentDir'] = substr($path, 0, $vendorPos);
-            }
-        }
-        $wiring = new ConsoleWiring($dic);
-        $wiring->wireDefaults()
-               ->wireConfiguration();
-        $dic['Yapeal.Config.Parser'];
-        $wiring->wireErrorLogger();
-        $dic['Yapeal.Error.Logger'];
-        $wiring->wireLogLogger()
-               ->wirePreserver()
-               ->wireRetriever();
+        (new ConsoleWiring($dic))->wireAll();
+    }
+    protected function analyzeEveApi(EveApiReadWriteInterface $data)
+    {
+        $sxi = new SimpleXMLIterator($data->getEveApiXml());
+        $hasNonRowsetChildren = $sxi->xpath('//result/*[not(self::rowset)]');
     }
     /**
      * Configures the current command.
@@ -131,13 +120,14 @@ class RowsetEveApiCreator extends Command implements WiringInterface
         );
         $help = <<<EOF
 The <info>%command.full_name%</info> command retrieves the XML data from the Eve Api
-server and creates Yapeal Eve API Database class for simple rowset type APIs.
+server and creates Yapeal Eve API Database class, xsd, and update sql files
+for simple rowset type APIs.
 
-    <info>php %command.full_name% section_name api_name mask</info>
+    <info>php %command.full_name% section_name api_name mask [<post>]...</info>
 
 EXAMPLES:
-Create Char/AccountBalance class in lib/Database/.
-    <info>%command.name% char AccountBalance 1</info>
+Create Char/AccountBalance class, xsd, and update sql files in lib/Database/.
+    <info>%command.name% char AccountBalance 1 "keyID=1156" "vCode=abc123"</info>
 
 EOF;
         $this->setHelp($help);
@@ -150,10 +140,12 @@ EOF;
      *
      * @return null|int null or 0 if everything went fine, or an error code
      *
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Yapeal\Exception\YapealConsoleException
      * @throws \Yapeal\Exception\YapealDatabaseException
+     * @throws \Yapeal\Exception\YapealException
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -163,16 +155,23 @@ EOF;
         $this->wire($dic);
         $apiName = $input->getArgument('api_name');
         $sectionName = $input->getArgument('section_name');
-        $data = $this->getXmlData(
-            $apiName,
-            $sectionName,
-            $posts
-        );
         /**
-         * @type \Yapeal\Xml\EveApiRetrieverInterface $retriever
+         * @type EventMediatorInterface $yem
          */
-        $retriever = $dic['Yapeal.Xml.Retriever'];
-        $retriever->retrieveEveApi($data);
+        $this->yem = $dic['Yapeal.Event.EventMediator'];
+        /**
+         * Get new Data instance from factory.
+         *
+         * @type EveApiReadWriteInterface $data
+         */
+        /** @noinspection DisconnectedForeachInstructionInspection */
+        $data = $dic['Yapeal.Xml.Data'];
+        $data->setEveApiName($apiName)
+             ->setEveApiSectionName($sectionName)
+             ->setEveApiArguments($posts);
+        foreach (['retrieve', 'transform', 'preserve'] as $eventName) {
+            $this->emitEvents($data, $eventName);
+        }
         if (false === $data->getEveApiXml()) {
             $mess = sprintf(
                 '<error>Could NOT retrieve Eve Api data for %1$s/%2$s</error>',
@@ -182,20 +181,17 @@ EOF;
             $output->writeln($mess);
             return 2;
         }
-        /**
-         * @type \Yapeal\Xml\EveApiPreserverInterface $preserver
-         */
-        $preserver = $dic['Yapeal.Xml.Preserver'];
-        $preserver->preserveEveApi($data);
         $subs = $this->getSubs($data, $input);
-        foreach (['php', 'sql', 'xsd'] as $for) {
-            $template = $this->getTemplate($for, $output);
+        foreach (['EveApi' => 'php', 'Sql' => 'sql', 'Xsd' => 'xsd'] as $dirName => $suffix) {
+            $template = $this->getTemplate($suffix, $output);
             $contents = $this->processTemplate($subs, $template);
             $fileName = sprintf(
-                $this->getDic()['Yapeal.baseDir'] . '/lib/Database/%1$s/%2$s.%3$s',
-                $sectionName,
+                '%1$s/lib/%2$s/%3$s/%4$s.%5$s',
+                $this->getDic()['Yapeal.baseDir'],
+                $dirName,
+                ucfirst($sectionName),
                 $apiName,
-                $for
+                $suffix
             );
             $this->saveToFile($fileName, $contents);
         }
@@ -222,7 +218,7 @@ EOF;
             }
             $columns[] = $column;
         }
-        return implode(",\n", $columns);
+        return implode(",\n" . str_repeat(' ', 12), $columns);
     }
     /**
      * @param  array $columnNames
@@ -237,18 +233,33 @@ EOF;
         }
         $columnNames = array_unique($columnNames);
         sort($columnNames);
+        $maxWidth = strlen(
+                        array_reduce(
+                            $columnNames,
+                            function ($k, $v) {
+                                return (strlen($k) > strlen($v)) ? $k : $v;
+                            }
+                        )
+                    ) + 2;
         $columns = [];
         foreach ($columnNames as $name) {
-            $column = '"' . $name . '" VARCHAR(255) DEFAULT \'\'';
-            if (false !== strpos(strtolower($name), 'name')) {
-                $column = '"' . $name . '" CHAR(50) NOT NULL';
+            $lcName = strtolower($name);
+            $column = 'VARCHAR(255) DEFAULT \'\'';
+            if (false !== strpos($lcName, 'name')) {
+                $column = 'CHAR(100)           NOT NULL';
+            }
+            if (false !== strpos($lcName, 'tax')) {
+                $column = 'DECIMAL(17, 2)      NOT NULL';
+            }
+            if (false !== strpos($lcName, 'time') || false !== strpos($lcName, 'date')) {
+                $column = 'DATETIME            NOT NULL';
             }
             if ('ID' === substr($name, -2)) {
-                $column = '"' . $name . '" BIGINT(20) UNSIGNED NOT NULL';
+                $column = 'BIGINT(20) UNSIGNED NOT NULL';
             }
-            $columns[] = $column;
+            $columns[] = sprintf('%1$-' . $maxWidth . 's %2$s', '"' . $name . '"', $column);
         }
-        return implode(",\n", $columns);
+        return implode(",\n" . str_repeat(' ', 4), $columns);
     }
     /**
      * @param string $sectionName
@@ -269,7 +280,7 @@ EOF;
      */
     protected function getNamespace($sectionName)
     {
-        return 'Yapeal\Database\\' . ucfirst($sectionName);
+        return 'Yapeal\EveApi\\' . ucfirst($sectionName);
     }
     /**
      * @param  string[] $columnNames
@@ -281,16 +292,23 @@ EOF;
         sort($columnNames);
         $columns = [];
         foreach ($columnNames as $name) {
-            $column = '<xs:attribute type="xs:string" name="' . $name . '"/>';
-            if (false !== strpos(strtolower($name), 'name')) {
-                $column = '<xs:attribute type="eveNameType" name="' . $name . '"/>';
+            $lcName = strtolower($name);
+            $type = 'xs:token';
+            if (false !== strpos($lcName, 'name')) {
+                $type = 'eveNameType';
+            }
+            if (false !== strpos($lcName, 'tax')) {
+                $type = 'eveISKType';
+            }
+            if (false !== strpos($lcName, 'time') || false !== strpos($lcName, 'date')) {
+                $type = 'eveNEDTType';
             }
             if ('ID' === substr($name, -2)) {
-                $column = '<xs:attribute type="eveIDType" name="' . $name . '"/>';
+                $type = 'eveIDType';
             }
-            $columns[] = $column;
+            $columns[] = sprintf('<xs:attribute type="%1$s" name="%2$s"/>', $type, $name);
         }
-        return implode("\n", $columns);
+        return implode("\n" . str_repeat(' ', 16), $columns);
     }
     /**
      * @param string[] $keyNames
@@ -304,7 +322,7 @@ EOF;
             array_unshift($keyNames, 'ownerID');
         }
         $keyNames = array_unique($keyNames);
-        return '"' . implode('","', $keyNames) . '"';
+        return '"' . implode('", "', $keyNames) . '"';
     }
     /**
      * @param EveApiReadWriteInterface $data
@@ -318,19 +336,19 @@ EOF;
         $apiName = ucfirst($input->getArgument('api_name'));
         $sectionName = $input->getArgument('section_name');
         $subs = [
-            'className'      => $apiName,
+            'className' => $apiName,
             'columnDefaults' => $this->getColumnDefaults($columnNames, $sectionName),
-            'columnList'     => $this->getColumnList($columnNames, $sectionName),
-            'copyright'      => gmdate('Y'),
-            'getDelete'      => $this->getDeleteFromTable($sectionName),
-            'keys'           => $this->getSqlKeys($keyNames, $sectionName),
-            'mask'           => $input->getArgument('mask'),
-            'namespace'      => $this->getNamespace($sectionName),
-            'sectionName'    => ucfirst($sectionName),
-            'tableName'      => lcfirst($sectionName) . $apiName,
-            'rowAttributes'  => $this->getRowAttributes($columnNames),
-            'rowsetName'     => $rowsetName,
-            'updateName'     => gmdate('YmdHi')
+            'columnList' => $this->getColumnList($columnNames, $sectionName),
+            'copyright' => gmdate('Y'),
+            'getDelete' => $this->getDeleteFromTable($sectionName),
+            'keys' => $this->getSqlKeys($keyNames, $sectionName),
+            'mask' => $input->getArgument('mask'),
+            'namespace' => $this->getNamespace($sectionName),
+            'sectionName' => ucfirst($sectionName),
+            'tableName' => lcfirst($sectionName) . $apiName,
+            'rowAttributes' => $this->getRowAttributes($columnNames),
+            'rowsetName' => $rowsetName,
+            'updateName' => gmdate('YmdHi')
         ];
         return $subs;
     }
@@ -354,7 +372,9 @@ EOF;
     protected function getTemplate($for, OutputInterface $output)
     {
         $templateName = sprintf('%1$s/rowset.%2$s.template', __DIR__, $for);
-        $templateName = $this->fpn->normalizeFile($templateName);
+        $templateName =
+            $this->getFpn()
+                 ->normalizeFile($templateName);
         if (!is_file($templateName)) {
             $mess = '<error>Could NOT find template file ' . $templateName . '</error>';
             $output->writeln($mess);
@@ -378,6 +398,30 @@ EOF;
     protected function getXmlData($apiName, $sectionName, $posts)
     {
         return new EveApiXmlData($apiName, $sectionName, $posts);
+    }
+    /**
+     * @param string $name
+     * @param bool   $forValue
+     *
+     * @return string
+     */
+    protected function getXsdType($name, $forValue = false)
+    {
+        $lcName = strtolower($name);
+        $type = $forValue ? 'xs:string' : 'xs:token';
+        if (false !== strpos($lcName, 'name')) {
+            $type = 'eveNameType';
+        }
+        if (false !== strpos($lcName, 'tax')) {
+            $type = 'eveISKType';
+        }
+        if (false !== strpos($lcName, 'time') || false !== strpos($lcName, 'date')) {
+            $type = 'eveNEDTType';
+        }
+        if ('ID' === substr($name, -2)) {
+            $type = 'eveIDType';
+        }
+        return $type;
     }
     /**
      * @param InputInterface $input
@@ -407,10 +451,8 @@ EOF;
      *
      * @return string
      */
-    protected function processTemplate(
-        array $subs,
-        $template
-    ) {
+    protected function processTemplate(array $subs, $template)
+    {
         $keys = [];
         $replacements = [];
         foreach ($subs as $name => $value) {
@@ -442,7 +484,9 @@ EOF;
      */
     protected function saveToFile($fileName, $contents)
     {
-        $fileName = $this->fpn->normalizeFile($fileName);
+        $fileName =
+            $this->getFpn()
+                 ->normalizeFile($fileName);
         return file_put_contents($fileName, $contents);
     }
 }

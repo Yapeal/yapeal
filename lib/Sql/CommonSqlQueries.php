@@ -81,11 +81,13 @@ SQL;
      */
     public function getActiveApis()
     {
-        return sprintf(
-            'SELECT "apiName","interval","sectionName" FROM "%1$s"."%2$sutilEveApi" WHERE "active"=1 ORDER BY RAND()',
-            $this->databaseName,
-            $this->tablePrefix
-        );
+        $sql = <<<'SQL'
+SELECT "apiName","interval","sectionName"
+ FROM "%1$s"."%2$sutilEveApi"
+ WHERE "active"=1
+ ORDER BY RAND()
+SQL;
+        return sprintf(str_replace(["\n", "\r\n"], '', $sql), $this->databaseName, $this->tablePrefix);
     }
     /**
      * @param string $ownerID
@@ -99,12 +101,7 @@ SELECT "messageID"
  FROM "%1$s"."%2$scharMailMessages" AS cmm
  WHERE "ownerID"=%3$s
 SQL;
-        return sprintf(
-            str_replace(["\n", "\r\n"], '', $sql),
-            $this->databaseName,
-            $this->tablePrefix,
-            $ownerID
-        );
+        return sprintf(str_replace(["\n", "\r\n"], '', $sql), $this->databaseName, $this->tablePrefix, $ownerID);
     }
     /**
      * @return string
@@ -121,7 +118,7 @@ SELECT urk."keyID",urk."vCode"
  AND urk."active"=1
  AND (urk."activeAPIMask" & aaki."accessMask" & 33554432) <> 0
 SQL;
-        return sprintf($sql, $this->databaseName, $this->tablePrefix);
+        return sprintf(str_replace(["\n", "\r\n"], '', $sql), $this->databaseName, $this->tablePrefix);
     }
     /**
      * @param int $mask
@@ -145,12 +142,7 @@ SELECT ac."characterID",urk."keyID",urk."vCode"
  AND (urk."activeAPIMask" & aaki."accessMask" & %3$s) <> 0
  AND aaki."expires" > now()
 SQL;
-        return sprintf(
-            str_replace(["\n", "\r\n"], '', $sql),
-            $this->databaseName,
-            $this->tablePrefix,
-            $mask
-        );
+        return sprintf(str_replace(["\n", "\r\n"], '', $sql), $this->databaseName, $this->tablePrefix, $mask);
     }
     /**
      * @param int $mask
@@ -193,7 +185,7 @@ SQL;
         );
     }
     /**
-     * @param int    $mask
+     * @param int $mask
      * @param string $ownerID
      *
      * @return string
@@ -233,6 +225,15 @@ SQL;
     public function getApiLock($hash)
     {
         return sprintf('SELECT GET_LOCK(\'%1$s\',5)', $hash);
+    }
+    /**
+     * @param string $hash
+     *
+     * @return string
+     */
+    public function getApiLockRelease($hash)
+    {
+        return sprintf('SELECT RELEASE_LOCK(\'%1$s\')', $hash);
     }
     /**
      * Used by 'yc D:U'
@@ -293,12 +294,7 @@ SQL;
      */
     public function getDeleteFromTable($tableName)
     {
-        return sprintf(
-            'DELETE FROM "%1$s"."%2$s%3$s"',
-            $this->databaseName,
-            $this->tablePrefix,
-            $tableName
-        );
+        return sprintf('DELETE FROM "%1$s"."%2$s%3$s"', $this->databaseName, $this->tablePrefix, $tableName);
     }
     /**
      * @param string $tableName
@@ -422,11 +418,7 @@ SQL;
      */
     public function getUtilCachedUntilUpsert()
     {
-        return $this->getUpsert(
-            'utilCachedUntil',
-            ['apiName', 'expires', 'ownerID', 'sectionName'],
-            1
-        );
+        return $this->getUpsert('utilCachedUntil', ['apiName', 'expires', 'ownerID', 'sectionName'], 1);
     }
     /**
      * @return string

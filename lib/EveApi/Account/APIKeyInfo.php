@@ -34,8 +34,7 @@
 namespace Yapeal\EveApi\Account;
 
 use PDOException;
-use SimpleXMLIterator;
-use Yapeal\EveApi\EveApiNameTrait;
+use Yapeal\Sql\PreserverTrait;
 use Yapeal\Event\EveApiEventInterface;
 use Yapeal\Event\EventMediatorInterface;
 use Yapeal\Log\Logger;
@@ -46,10 +45,10 @@ use Yapeal\Log\MessageBuilderTrait;
  */
 class APIKeyInfo extends AccountSection
 {
-    use EveApiNameTrait, MessageBuilderTrait;
+    use MessageBuilderTrait, PreserverTrait;
     /**
-     * @param EveApiEventInterface $event
-     * @param string $eventName
+     * @param EveApiEventInterface   $event
+     * @param string                 $eventName
      * @param EventMediatorInterface $yem
      *
      * @return EveApiEventInterface
@@ -57,15 +56,12 @@ class APIKeyInfo extends AccountSection
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function preserveEveApi(
-        EveApiEventInterface $event,
-        $eventName,
-        EventMediatorInterface $yem
-    ) {
+    public function preserveEveApi(EveApiEventInterface $event, $eventName, EventMediatorInterface $yem)
+    {
         $this->setYem($yem);
         $data = $event->getData();
         $xml = $data->getEveApiXml();
-        $ownerID = $data->getEveApiArgument('KeyID');
+        $ownerID = $data->getEveApiArgument('keyID');
         $this->getYem()
              ->triggerLogEvent(
                  'Yapeal.Log.log',
@@ -83,49 +79,48 @@ class APIKeyInfo extends AccountSection
         } catch (PDOException $exc) {
             $mess = sprintf(
                 'Failed to upsert data from Eve API %1$s/%2$s for %3$s',
-                strtolower($this->getSectionName()),
-                $this->getApiName(),
+                strtolower($data->getEveApiSectionName()),
+                $data->getEveApiName(),
                 $ownerID
             );
-            $this->getYem()->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess, ['exception' => $exc]);
-             $this->getPdo()
-                  ->rollBack();
+            $this->getYem()
+                 ->triggerLogEvent('Yapeal.Log.log', Logger::WARNING, $mess, ['exception' => $exc]);
+            $this->getPdo()
+                 ->rollBack();
             return $event;
-         }
+        }
         return $event->setHandledSufficiently();
     }
     /**
      * @param string $xml
      * @param string $ownerID
      *
-     * @return self
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
-    protected function preserveToAPIKeyInfo(
-        $xml,
-        $ownerID
-    ) {
+    protected function preserveToAPIKeyInfo($xml, $ownerID)
+    {
         $columnDefaults = [
             'keyID' => $ownerID,
             'accessMask' => null,
             'expires' => '2038-01-19 03:14:07',
             'type' => null
         ];
-        $this->attributePreserveData(
-            $xml,
-            $columnDefaults,
-            'accountAPIKeyInfo',
-            '//key'
-        );
+        $this->attributePreserveData($xml, $columnDefaults, 'accountAPIKeyInfo', '//key');
         return $this;
     }
     /**
      * @param string $xml
      *
-     * @return self
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
-    protected function preserveToCharacters(
-        $xml
-    ) {
+    protected function preserveToCharacters($xml)
+    {
         $columnDefaults = [
             'characterID' => null,
             'characterName' => null,
@@ -136,44 +131,22 @@ class APIKeyInfo extends AccountSection
             'factionID' => null,
             'factionName' => null
         ];
-        $this->attributePreserveData(
-            $xml,
-            $columnDefaults,
-            'accountCharacters'
-        );
+        $this->attributePreserveData($xml, $columnDefaults, 'accountCharacters');
         return $this;
     }
     /**
      * @param string $xml
      * @param string $ownerID
      *
+     * @return self Fluent interface.
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \LogicException
-     * @return self
      */
-    protected function preserveToKeyBridge(
-        $xml,
-        $ownerID
-    ) {
-        $chars = (new SimpleXMLIterator($xml))->xpath('//row');
-        if (0 === count($chars)) {
-            return $this;
-        }
-        $rows = [];
-        foreach ($chars as $aRow) {
-            $rows[] = $ownerID;
-            $rows[] = $aRow['characterID'];
-        }
-        $sql = $this->getCsq()
-                    ->getUpsert(
-                        'accountKeyBridge',
-                        ['keyID', 'characterID'],
-                        count($chars)
-                    );
-        $this->getLogger()
-             ->info($sql);
-        $stmt = $this->getPdo()
-                     ->prepare($sql);
-        $stmt->execute($rows);
+    protected function preserveToKeyBridge($xml, $ownerID)
+    {
+        $columnDefaults = ['keyID' => $ownerID, 'characterID' => null];
+        $this->attributePreserveData($xml, $columnDefaults, 'accountKeyBridge');
         return $this;
     }
 }

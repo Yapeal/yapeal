@@ -1,5 +1,5 @@
 -- sql/updates/{updateName}.sql
-CREATE TABLE "{database}"."{table_prefix}{tableName}" (
+CREATE TABLE IF NOT EXISTS "{database}"."{table_prefix}{tableName}" (
     {columnList},
     PRIMARY KEY ({keys})
 )

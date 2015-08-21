@@ -58,6 +58,9 @@ trait MessageBuilderTrait
             if ($data->hasEveApiArgument('characterID')) {
                 $mess .= ' and characterID = %5$s';
                 $subs[] = $data->getEveApiArgument('characterID');
+            }elseif ($data->hasEveApiArgument('corporationID')) {
+                $mess .= ' and corporationID = %5$s';
+                $subs[] = $data->getEveApiArgument('corporationID');
             }
         }
         return vsprintf($mess, $subs);
@@ -109,6 +112,11 @@ trait MessageBuilderTrait
     protected function getSufficientlyHandledEventMessage(EveApiReadWriteInterface $data, $eventName)
     {
         $messagePrefix = 'Sufficiently handled:';
+        return $this->createEventMessage($messagePrefix, $data, $eventName);
+    }
+    protected function getEmptyXmlDataMessage(EveApiReadWriteInterface $data, $eventName)
+    {
+        $messagePrefix = 'XML empty after: ';
         return $this->createEventMessage($messagePrefix, $data, $eventName);
     }
 }

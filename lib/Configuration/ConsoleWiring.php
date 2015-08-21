@@ -55,29 +55,33 @@ class ConsoleWiring extends Wiring
              ->wireEvent()
              ->wireLog()
              ->wireXml()
+             ->wireXsl()
+             ->wireXsd()
              ->wireCache()
-             ->wireNetwork();
+             ->wireNetwork()
+             ->wireDatabase();
         return $this;
     }
     /**
      * @return self Fluent interface.
-     * @throws \InvalidArgumentException
      */
-    protected function wireXml()
+    protected function wireCache()
     {
-        if (empty($this->dic['Yapeal.Xml.Data'])) {
-            $this->dic['Yapeal.Xml.Data'] = $this->dic->factory(
-                function ($dic) {
-                    return new $dic['Yapeal.Xml.class']();
-                }
+        $dic = $this->dic;
+        if ('none' !== $dic['Yapeal.Cache.fileSystemMode']) {
+            if (empty($dic['Yapeal.FileSystem.CachePreserver'])) {
+                $dic['Yapeal.FileSystem.CachePreserver'] = function () use ($dic) {
+                    return new $dic['Yapeal.Cache.Handlers.preserver']($dic['Yapeal.Cache.cacheDir']);
+                };
+            }
+            /**
+             * @type \Yapeal\Event\EventMediatorInterface $mediator
+             */
+            $mediator = $dic['Yapeal.Event.EventMediator'];
+            $mediator->addServiceSubscriberByEventList(
+                'Yapeal.FileSystem.CachePreserver',
+                ['Yapeal.EveApi.preserve' => ['preserveEveApi', 'last']]
             );
-        }
-        if (empty($this->dic['Yapeal.Xml.Preserver'])) {
-            $this->dic['Yapeal.Xml.Preserver'] = function ($dic) {
-                return new $dic['Yapeal.Xml.Preservers.file'](
-                    $dic['Yapeal.Log.Logger'], $dic['Yapeal.Cache.cacheDir']
-                );
-            };
         }
         return $this;
     }

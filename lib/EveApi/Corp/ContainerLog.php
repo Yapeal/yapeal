@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains {className} class.
+ * Contains ContainerLog class.
  *
  * PHP version 5.4
  *
@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) {copyright} Michael Cummings
+ * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,20 +27,20 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright {copyright} Michael Cummings
+ * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace {namespace};
+namespace Yapeal\EveApi\Corp;
 
 use LogicException;
 use Yapeal\Log\Logger;
 use Yapeal\Sql\PreserverTrait;
 
 /**
- * Class {className}
+ * Class ContainerLog
  */
-class {className} extends {sectionName}Section
+class ContainerLog extends CorpSection
 {
     use PreserverTrait;
     /**
@@ -48,7 +48,7 @@ class {className} extends {sectionName}Section
      */
     public function __construct()
     {
-        $this->mask = {mask};
+        $this->mask = 32;
     }
     /**
      * @param string $xml
@@ -57,12 +57,25 @@ class {className} extends {sectionName}Section
      * @return self Fluent interface.
      * @throws LogicException
      */
-    protected function preserveTo{className}($xml, $ownerID)
+    protected function preserveToContainerLog($xml, $ownerID)
     {
         $columnDefaults = [
-            {columnDefaults}
+            'action' => null,
+            'actorID' => null,
+            'actorName' => null,
+            'flag' => null,
+            'itemID' => null,
+            'itemTypeID' => null,
+            'locationID' => null,
+            'logTime' => null,
+            'newConfiguration' => null,
+            'oldConfiguration' => null,
+            'ownerID' => $ownerID,
+            'passwordType' => null,
+            'quantity' => null,
+            'typeID' => null
         ];
-        $tableName = '{tableName}';
+        $tableName = 'corpContainerLog';
         $sql =
             $this->getCsq()
                  ->getDeleteFromTableWithOwnerID($tableName, $ownerID);

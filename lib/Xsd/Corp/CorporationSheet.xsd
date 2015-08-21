@@ -5,29 +5,24 @@
     <xs:complexType name="rowType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute type="xs:unsignedShort" name="accountKey"
-                              use="required"/>
-                <xs:attribute type="xs:string" name="description"
-                              use="required"/>
+                <xs:attribute type="xs:unsignedShort" name="accountKey" use="required"/>
+                <xs:attribute type="xs:string" name="description" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="resultType">
         <xs:sequence>
             <xs:element type="eveIDType" name="allianceID"/>
-            <xs:element type="eveNameType" name="allianceName" minOccurs="0"
-                        maxOccurs="1"/>
+            <xs:element type="eveNameType" name="allianceName" minOccurs="0" maxOccurs="1"/>
             <xs:element type="eveIDType" name="ceoID"/>
             <xs:element type="eveNameType" name="ceoName"/>
             <xs:element type="eveIDType" name="corporationID"/>
             <xs:element type="eveNameType" name="corporationName"/>
             <xs:element type="xs:string" name="description"/>
             <xs:element type="eveIDType" name="factionID"/>
-            <xs:element type="eveNameType" name="factionName" minOccurs="0"
-                        maxOccurs="1"/>
+            <xs:element type="eveNameType" name="factionName" minOccurs="0" maxOccurs="1"/>
             <xs:element type="xs:unsignedLong" name="memberCount"/>
-            <xs:element type="xs:unsignedLong" name="memberLimit" minOccurs="0"
-                        maxOccurs="1"/>
+            <xs:element type="xs:unsignedLong" name="memberLimit" minOccurs="0" maxOccurs="1"/>
             <xs:element type="xs:unsignedLong" name="shares"/>
             <xs:element type="eveIDType" name="stationID"/>
             <xs:element type="xs:string" name="stationName"/>
@@ -50,8 +45,7 @@
             <xs:element name="divisions" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="rowType" name="row" minOccurs="7"
-                                    maxOccurs="7"/>
+                        <xs:element type="rowType" name="row" minOccurs="7" maxOccurs="7"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>
@@ -59,8 +53,7 @@
             <xs:element name="walletDivisions" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element type="rowType" name="row" minOccurs="7"
-                                    maxOccurs="8"/>
+                        <xs:element type="rowType" name="row" minOccurs="7" maxOccurs="8"/>
                     </xs:sequence>
                     <xs:attributeGroup ref="rowsetAttrs"/>
                 </xs:complexType>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains {className} class.
+ * Contains Contracts class.
  *
  * PHP version 5.4
  *
@@ -8,7 +8,7 @@
  * This file is part of Yet Another Php Eve Api Library also know as Yapeal
  * which can be used to access the Eve Online API data and place it into a
  * database.
- * Copyright (C) {copyright} Michael Cummings
+ * Copyright (C) 2015 Michael Cummings
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -27,20 +27,20 @@
  * You should be able to find a copy of this license in the LICENSE.md file. A
  * copy of the GNU GPL should also be available in the GNU-GPL.md file.
  *
- * @copyright {copyright} Michael Cummings
+ * @copyright 2015 Michael Cummings
  * @license   http://www.gnu.org/copyleft/lesser.html GNU LGPL
  * @author    Michael Cummings <mgcummings@yahoo.com>
  */
-namespace {namespace};
+namespace Yapeal\EveApi\Corp;
 
 use LogicException;
 use Yapeal\Log\Logger;
 use Yapeal\Sql\PreserverTrait;
 
 /**
- * Class {className}
+ * Class Contracts
  */
-class {className} extends {sectionName}Section
+class Contracts extends CorpSection
 {
     use PreserverTrait;
     /**
@@ -48,7 +48,7 @@ class {className} extends {sectionName}Section
      */
     public function __construct()
     {
-        $this->mask = {mask};
+        $this->mask = 8388608;
     }
     /**
      * @param string $xml
@@ -57,12 +57,34 @@ class {className} extends {sectionName}Section
      * @return self Fluent interface.
      * @throws LogicException
      */
-    protected function preserveTo{className}($xml, $ownerID)
+    protected function preserveToContracts($xml, $ownerID)
     {
         $columnDefaults = [
-            {columnDefaults}
+            'acceptorID' => null,
+            'assigneeID' => null,
+            'availability' => null,
+            'buyout' => null,
+            'collateral' => null,
+            'contractID' => null,
+            'dateAccepted' => null,
+            'dateCompleted' => null,
+            'dateExpired' => null,
+            'dateIssued' => null,
+            'endStationID' => null,
+            'forCorp' => null,
+            'issuerCorpID' => null,
+            'issuerID' => null,
+            'numDays' => null,
+            'ownerID' => $ownerID,
+            'price' => null,
+            'reward' => null,
+            'startStationID' => null,
+            'status' => null,
+            'title' => null,
+            'type' => null,
+            'volume' => null
         ];
-        $tableName = '{tableName}';
+        $tableName = 'corpContracts';
         $sql =
             $this->getCsq()
                  ->getDeleteFromTableWithOwnerID($tableName, $ownerID);

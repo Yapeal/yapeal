@@ -7,27 +7,22 @@
         <xsl:copy>
             <!-- Elements without child nodes or attributes -->
             <xsl:apply-templates select="child::*[not(*|@*)]">
-                <xsl:sort select="translate(name(),$upper,$lower)"
-                          data-type="text" order="ascending"/>
+                <xsl:sort select="translate(name(),$upper,$lower)" data-type="text" order="ascending"/>
             </xsl:apply-templates>
             <!-- Elements with child nodes but no attributes -->
             <xsl:apply-templates select="child::*[* and not(@*)]">
-                <xsl:sort select="translate(name(),$upper,$lower)"
-                          data-type="text" order="ascending"/>
+                <xsl:sort select="translate(name(),$upper,$lower)" data-type="text" order="ascending"/>
             </xsl:apply-templates>
             <!--
             Elements with child nodes and attributes but without 'name' or 'key'
             attributes (ie NOT rowsets)
             -->
-            <xsl:apply-templates
-                    select="child::*[* and @* and not(@name|@key)]">
-                <xsl:sort select="translate(@name,$upper,$lower)"
-                          data-type="text" order="ascending"/>
+            <xsl:apply-templates select="child::*[* and @* and not(@name|@key)]">
+                <xsl:sort select="translate(@name,$upper,$lower)" data-type="text" order="ascending"/>
             </xsl:apply-templates>
             <!-- Elements with 'name' or 'key' attribute (ie rowsets) -->
             <xsl:apply-templates select="child::*[@name|@key]">
-                <xsl:sort select="translate(@name,$upper,$lower)"
-                          data-type="text" order="ascending"/>
+                <xsl:sort select="translate(@name,$upper,$lower)" data-type="text" order="ascending"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>
@@ -41,8 +36,7 @@
                         <xsl:value-of select="@key"/>
                     </xsl:variable>
                     <xsl:apply-templates select="child::*">
-                        <xsl:sort select="@*[name() = $column]"
-                                  data-type="number"/>
+                        <xsl:sort select="@*[name() = $column]" data-type="number"/>
                     </xsl:apply-templates>
                 </xsl:element>
             </xsl:when>

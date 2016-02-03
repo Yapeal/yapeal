@@ -255,7 +255,7 @@ abstract class AbstractCommonEveApi implements
      * @throws LogicException
      * @return bool
      */
-    protected function gotApiLock(EveApiReadInterface &$data)
+    protected function gotApiLock(EveApiReadInterface $data)
     {
         $sql = $this->getCsq()
                     ->getApiLock($data->getHash());
@@ -284,7 +284,7 @@ abstract class AbstractCommonEveApi implements
      * @return bool
      */
     protected function isEveApiXmlError(
-        EveApiReadWriteInterface &$data,
+        EveApiReadWriteInterface $data,
         &$interval
     ) {
         if (strpos($data->getEveApiXml(), '<error') === false) {
@@ -336,7 +336,7 @@ abstract class AbstractCommonEveApi implements
      * @throws LogicException
      * @return bool
      */
-    protected function isInvalid(EveApiReadInterface &$data)
+    protected function isInvalid(EveApiReadInterface $data)
     {
         $this->getLogger()
              ->debug('Started XSD validating');
@@ -402,7 +402,7 @@ abstract class AbstractCommonEveApi implements
      * @throws LogicException
      * @return self
      */
-    protected function xsltTransform(EveApiReadWriteInterface &$data)
+    protected function xsltTransform(EveApiReadWriteInterface $data)
     {
         $xslt = new XSLTProcessor();
         $oldErrors = libxml_use_internal_errors(true);

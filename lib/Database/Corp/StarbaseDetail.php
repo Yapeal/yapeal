@@ -76,9 +76,7 @@ class StarbaseDetail extends AbstractCorpSection
          * Update Starbase List
          */
         $class = new StarbaseList(
-            $this->getPdo(),
-            $this->getLogger(),
-            $this->getCsq()
+            $this->getPdo(), $this->getLogger(), $this->getCsq()
         );
         $class->autoMagic(
             $data,
@@ -158,7 +156,6 @@ class StarbaseDetail extends AbstractCorpSection
             return false;
         }
         $corpID = $data->getEveApiArgument('corporationID');
-        $itemID = $data->getEveApiArgument('itemID');
         $retrievers->retrieveEveApi($data);
         if ($data->getEveApiXml() === false) {
             $mess = sprintf(
@@ -191,6 +188,7 @@ class StarbaseDetail extends AbstractCorpSection
         if ($this->isEveApiXmlError($data, $interval)) {
             return true;
         }
+        $itemID = $data->getEveApiArgument('itemID');
         $this->preserve($data->getEveApiXml(), $corpID, $itemID);
         return true;
     }
@@ -206,8 +204,9 @@ class StarbaseDetail extends AbstractCorpSection
         $this->getLogger()
              ->debug($sql);
         try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
+            $stmt =
+                $this->getPdo()
+                     ->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $exc) {
             $mess = sprintf(
@@ -220,9 +219,9 @@ class StarbaseDetail extends AbstractCorpSection
         }
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param null   $itemID
+     * @param string      $xml
+     * @param string      $ownerID
+     * @param string|null $itemID
      *
      * @throws LogicException
      * @return self
@@ -252,9 +251,9 @@ class StarbaseDetail extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $itemID
+     * @param string      $xml
+     * @param string      $ownerID
+     * @param string|null $itemID
      *
      * @return self
      */
@@ -279,9 +278,9 @@ class StarbaseDetail extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $itemID
+     * @param string      $xml
+     * @param string      $ownerID
+     * @param string|null $itemID
      *
      * @return self
      */
@@ -302,9 +301,9 @@ class StarbaseDetail extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $itemID
+     * @param string      $xml
+     * @param string      $ownerID
+     * @param string|null $itemID
      *
      * @return self
      */
@@ -327,9 +326,9 @@ class StarbaseDetail extends AbstractCorpSection
         return $this;
     }
     /**
-     * @param string $xml
-     * @param string $ownerID
-     * @param        $itemID
+     * @param string      $xml
+     * @param string      $ownerID
+     * @param string|null $itemID
      *
      * @return self
      */

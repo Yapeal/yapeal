@@ -290,10 +290,14 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface, LoggerAw
         EveApiReadWriteInterface $data,
         &$interval
     ) {
-        if (strpos($data->getEveApiXml(), '<error') === false) {
+        $xml = $data->getEveApiXml();
+        if (false === $xml) {
             return false;
         }
-        $simple = new SimpleXMLElement($data->getEveApiXml());
+        if (false === strpos($xml, '<error')) {
+            return false;
+        }
+        $simple = new SimpleXMLElement($xml);
         if (!isset($simple->error[0])) {
             return false;
         }
@@ -365,14 +369,17 @@ abstract class AbstractCommonEveApi implements EveApiDatabaseInterface, LoggerAw
         return true;
     }
     /**
-     * @param string $xml
-     * @param int    $interval
-     * @param string $ownerID
+     * @param string|false $xml
+     * @param int          $interval
+     * @param string       $ownerID
      *
      * @throws LogicException
      */
     protected function updateCachedUntil($xml, $interval, $ownerID)
     {
+        if (false === $xml) {
+            return;
+        }
         $simple = new SimpleXMLElement($xml);
         $sql =
             $this->getCsq()

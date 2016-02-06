@@ -44,9 +44,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Stephen Gulick <stephenmg12@gmail.com>
  */
-class GuzzleNetworkRetriever implements
-    EveApiRetrieverInterface,
-    LoggerAwareInterface
+class GuzzleNetworkRetriever implements EveApiRetrieverInterface, LoggerAwareInterface
 {
     /**
      * @param LoggerInterface      $logger
@@ -113,8 +111,8 @@ class GuzzleNetworkRetriever implements
         return $this;
     }
     /**
-     * @param string   $xml
-     * @param string[] $arguments
+     * @param string|false $xml
+     * @param string[]     $arguments
      *
      * @return string
      */
@@ -122,7 +120,7 @@ class GuzzleNetworkRetriever implements
         $xml,
         array $arguments
     ) {
-        if ($xml === false) {
+        if (false === $xml) {
             return $xml;
         }
         if (array_key_exists('vCode', $arguments)) {
@@ -132,8 +130,7 @@ class GuzzleNetworkRetriever implements
         return str_replace(
             ["encoding='UTF-8'?>\r\n", "encoding='UTF-8'?>\n"],
             [
-                "encoding='UTF-8'?>\r\n<?yapeal.parameters.json " . $json
-                . "?>\r\n",
+                "encoding='UTF-8'?>\r\n<?yapeal.parameters.json " . $json . "?>\r\n",
                 "encoding='UTF-8'?>\n<?yapeal.parameters.json " . $json . "?>\n"
             ],
             $xml

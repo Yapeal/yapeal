@@ -54,9 +54,7 @@ use Yapeal\Xml\EveApiRetrieverInterface;
 /**
  * Class AbstractCommonEveApi
  */
-abstract class AbstractCommonEveApi implements
-    EveApiDatabaseInterface,
-    LoggerAwareInterface
+abstract class AbstractCommonEveApi implements EveApiDatabaseInterface, LoggerAwareInterface
 {
     use EveApiToolsTrait, FilePathNormalizerTrait;
     /**
@@ -73,6 +71,14 @@ abstract class AbstractCommonEveApi implements
         $this->setLogger($logger);
         $this->setCsq($csq);
     }
+    /**
+     * @return string
+     */
+    abstract protected function getApiName();
+    /**
+     * @return string
+     */
+    abstract protected function getSectionName();
     /**
      * @param EveApiReadWriteInterface $data
      * @param EveApiRetrieverInterface $retrievers
@@ -163,14 +169,6 @@ abstract class AbstractCommonEveApi implements
         return $this->$method($data->getEveApiXml());
     }
     /**
-     * @return string
-     */
-    abstract protected function getApiName();
-    /**
-     * @return string
-     */
-    abstract protected function getSectionName();
-    /**
      * @param string $apiName
      * @param string $sectionName
      * @param string $ownerID
@@ -188,16 +186,18 @@ abstract class AbstractCommonEveApi implements
         );
         $this->getLogger()
              ->debug($mess);
-        $sql = $this->getCsq()
-                    ->getUtilCachedUntilExpires(
-                        $apiName,
-                        $sectionName,
-                        $ownerID
-                    );
+        $sql =
+            $this->getCsq()
+                 ->getUtilCachedUntilExpires(
+                     $apiName,
+                     $sectionName,
+                     $ownerID
+                 );
         $this->getLogger()
              ->debug($sql);
-        $stmt = $this->getPdo()
-                     ->query($sql);
+        $stmt =
+            $this->getPdo()
+                 ->query($sql);
         $expires = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (0 === count($expires)) {
             $this->getLogger()
@@ -219,8 +219,9 @@ abstract class AbstractCommonEveApi implements
     protected function getCwd()
     {
         if (null === $this->cwd) {
-            $this->cwd = $this->getFpn()
-                              ->normalizePath(__DIR__);
+            $this->cwd =
+                $this->getFpn()
+                     ->normalizePath(__DIR__);
         }
         return $this->cwd;
     }
@@ -257,13 +258,15 @@ abstract class AbstractCommonEveApi implements
      */
     protected function gotApiLock(EveApiReadInterface $data)
     {
-        $sql = $this->getCsq()
-                    ->getApiLock($data->getHash());
+        $sql =
+            $this->getCsq()
+                 ->getApiLock($data->getHash());
         $this->getLogger()
              ->info($sql);
         try {
-            $stmt = $this->getPdo()
-                         ->query($sql);
+            $stmt =
+                $this->getPdo()
+                     ->query($sql);
             return (bool)$stmt->fetchColumn();
         } catch (PDOException $exc) {
             $mess = sprintf(
@@ -371,8 +374,9 @@ abstract class AbstractCommonEveApi implements
     protected function updateCachedUntil($xml, $interval, $ownerID)
     {
         $simple = new SimpleXMLElement($xml);
-        $sql = $this->getCsq()
-                    ->getUtilCachedUntilUpsert();
+        $sql =
+            $this->getCsq()
+                 ->getUtilCachedUntilUpsert();
         $pdo = $this->getPdo();
         if (!isset($simple->currentTime[0])) {
             return;
@@ -415,13 +419,30 @@ abstract class AbstractCommonEveApi implements
             )
         );
         $xslt->importStylesheet($dom);
-        $xml = $xslt->transformToXml(
-            new SimpleXMLElement($data->getEveApiXml())
-        );
+        $xml = false;
+        try {
+            $xml = $xslt->transformToXml(
+                new SimpleXMLElement($data->getEveApiXml())
+            );
+        } catch (\Exception $exc) {
+            $mess = sprintf(
+                'XML cause SimpleXMLElement exception in Eve API %1$s/%2$s',
+                lcfirst($data->getEveApiSectionName()),
+                $data->getEveApiName()
+            );
+            $logger = $this->getLogger();
+            $logger->warning($mess, ['exception' => $exc]);
+        }
         if (false === $xml) {
             $logger = $this->getLogger();
-            foreach (libxml_get_errors() as $error) {
-                $logger->debug($error->message);
+            /**
+             * @type array $errors
+             */
+            $errors = libxml_get_errors();
+            if (0 !== count($errors)) {
+                foreach ($errors as $error) {
+                    $logger->debug($error->message);
+                }
             }
             libxml_clear_errors();
             libxml_use_internal_errors($oldErrors);
@@ -430,11 +451,12 @@ abstract class AbstractCommonEveApi implements
         libxml_clear_errors();
         libxml_use_internal_errors($oldErrors);
         $config = [
-            'indent'        => true,
+            'indent' => true,
             'indent-spaces' => 2,
-            'output-xml'    => true,
-            'input-xml'     => true,
-            'wrap'          => '1000'
+            'input-xml' => true,
+            'newline' => 'LF',
+            'output-xml' => true,
+            'wrap' => '1000'
         ];
         // Tidy
         $tidy = new tidy();

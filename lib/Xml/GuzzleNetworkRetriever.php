@@ -114,7 +114,7 @@ class GuzzleNetworkRetriever implements EveApiRetrieverInterface, LoggerAwareInt
      * @param string|false $xml
      * @param string[]     $arguments
      *
-     * @return string
+     * @return string|false
      */
     protected function addYapealProcessingInstructionToXml(
         $xml,

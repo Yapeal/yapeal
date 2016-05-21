@@ -92,7 +92,7 @@ class ContactList extends AbstractCorpSection
             'labelID' => null,
             'name'    => null
         ];
-        $tableName = 'charAllianceContactLabels';
+        $tableName = 'corpAllianceContactLabels';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
         $this->getLogger()
@@ -157,7 +157,7 @@ class ContactList extends AbstractCorpSection
             'labelID' => null,
             'name'    => null
         ];
-        $tableName = 'charCorporateContactLabels';
+        $tableName = 'corpCorporateContactLabels';
         $sql = $this->getCsq()
                     ->getDeleteFromTableWithOwnerID($tableName, $ownerID);
         $this->getLogger()

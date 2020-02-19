@@ -79,7 +79,7 @@
     "require-dev": {
         "dragonrun1/phpspec": "2.1.*@dev",
         "erusev/parsedown": "<1.6",
-        "mikey179/vfsStream": "~1.4",
+        "mikey179/vfsstream": "~1.4",
         "fabpot/php-cs-fixer": "1.4.2",
         "phploc/phploc": "<2.2",
         "phpmd/phpmd": "~2.1",

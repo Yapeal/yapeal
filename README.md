@@ -1,6 +1,8 @@
 YAPEAL (Yet Another PHP Eve Api Library)
 ========================================
 
+Going to archive the project as I'm no longer working on it nor will support it in the future.
+
 ~~Master: [![Build Status](https://travis-ci.org/Dragonrun1/yapeal.svg?branch=master)](https://travis-ci.org/Dragonrun1/yapeal)~~
 
 ~~Master: [![Coverage Status](https://img.shields.io/coveralls/Dragonrun1/yapeal.svg?branch=master)](https://coveralls.io/r/Dragonrun1/yapeal?branch=master)~~
